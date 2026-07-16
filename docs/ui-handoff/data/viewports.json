@@ -1,0 +1,83 @@
+[
+  {
+    "id": "VP-360",
+    "name": "Petit mobile",
+    "width": 360,
+    "height": 800,
+    "density": "1x/2x",
+    "target": "Mobile Web + Flutter",
+    "mandatory": true
+  },
+  {
+    "id": "VP-390",
+    "name": "Mobile standard",
+    "width": 390,
+    "height": 844,
+    "density": "1x/3x",
+    "target": "Mobile Web + Flutter",
+    "mandatory": true
+  },
+  {
+    "id": "VP-430",
+    "name": "Grand mobile",
+    "width": 430,
+    "height": 932,
+    "density": "1x/3x",
+    "target": "Mobile Web + Flutter",
+    "mandatory": true
+  },
+  {
+    "id": "VP-768",
+    "name": "Tablette portrait",
+    "width": 768,
+    "height": 1024,
+    "density": "1x/2x",
+    "target": "Web responsive",
+    "mandatory": true
+  },
+  {
+    "id": "VP-1024",
+    "name": "Tablette paysage",
+    "width": 1024,
+    "height": 768,
+    "density": "1x/2x",
+    "target": "Web responsive",
+    "mandatory": true
+  },
+  {
+    "id": "VP-1280",
+    "name": "Petit desktop",
+    "width": 1280,
+    "height": 800,
+    "density": "1x",
+    "target": "Web",
+    "mandatory": true
+  },
+  {
+    "id": "VP-1440",
+    "name": "Desktop standard",
+    "width": 1440,
+    "height": 900,
+    "density": "1x/2x",
+    "target": "Web",
+    "mandatory": true
+  },
+  {
+    "id": "VP-1672",
+    "name": "Reference visuelle",
+    "width": 1672,
+    "height": 941,
+    "density": "1x",
+    "target": "Web baseline",
+    "mandatory": true
+  },
+  {
+    "id": "VP-1920",
+    "name": "Grand desktop",
+    "width": 1920,
+    "height": 1080,
+    "density": "1x/2x",
+    "target": "Web",
+    "mandatory": false
+  }
+]

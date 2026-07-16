@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CNPM screen inventory",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "scope",
+      "name",
+      "route",
+      "template",
+      "priority"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^(PUB|AUTH|BO|MP|MOB)-[0-9]{3}$"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "route": {
+        "type": "string"
+      },
+      "template": {
+        "type": "string"
+      },
+      "priority": {
+        "enum": [
+          "P0",
+          "P1",
+          "P2"
+        ]
+      },
+      "roles": {
+        "type": "string"
+      },
+      "reference": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string"
+      },
+      "notes": {
+        "type": "string"
+      }
+    },
+    "additionalProperties": false
+  }
+}

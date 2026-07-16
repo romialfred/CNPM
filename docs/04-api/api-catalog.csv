@@ -1,0 +1,78 @@
+﻿Méthode;Chemin;Tag;Operation ID;Finalité
+GET;/auth/me;AUTH;getCurrentUser;Lire le profil, les rôles et le périmètre courant.
+POST;/auth/step-up;AUTH;requestStepUp;Déclencher une authentification renforcée.
+GET;/reference-values;ADMIN;listReferenceValues;Lister les valeurs de référentiel.
+POST;/reference-values;ADMIN;createReferenceValue;Créer une valeur de référentiel.
+PATCH;/reference-values/{id};ADMIN;updateReferenceValue;Mettre à jour une valeur de référentiel.
+GET;/organizations;MEMBER;listOrganizations;Rechercher les entreprises.
+POST;/organizations;MEMBER;createOrganization;Créer une entreprise.
+GET;/organizations/{id};MEMBER;getOrganization;Consulter la fiche 360°.
+PATCH;/organizations/{id};MEMBER;updateOrganization;Mettre à jour une entreprise.
+GET;/organizations/{id}/history;MEMBER;getOrganizationHistory;Consulter l’historique.
+GET;/memberships;MEMBER;listMemberships;Lister les adhésions.
+POST;/memberships;MEMBER;createMembership;Créer une adhésion.
+GET;/enrollment-applications;ENROLLMENT;listEnrollmentApplications;Lister les dossiers d’enrôlement.
+POST;/enrollment-applications;ENROLLMENT;createEnrollmentApplication;Créer un dossier.
+GET;/enrollment-applications/{id};ENROLLMENT;getEnrollmentApplication;Consulter un dossier.
+PATCH;/enrollment-applications/{id};ENROLLMENT;updateEnrollmentApplication;Modifier un brouillon.
+POST;/enrollment-applications/{id}/submit;ENROLLMENT;submitEnrollmentApplication;Soumettre le dossier.
+POST;/enrollment-applications/{id}/request-complement;ENROLLMENT;requestEnrollmentComplement;Demander un complément.
+POST;/enrollment-applications/{id}/approve;ENROLLMENT;approveEnrollmentApplication;Approuver et activer.
+POST;/enrollment-applications/{id}/reject;ENROLLMENT;rejectEnrollmentApplication;Rejeter avec motif.
+GET;/contribution-rules;CONTRIBUTION;listContributionRules;Lister les barèmes.
+POST;/contribution-rules;CONTRIBUTION;createContributionRule;Créer une version de barème.
+POST;/contribution-rules/{id}/publish;CONTRIBUTION;publishContributionRule;Publier après validation.
+GET;/contribution-calls;CONTRIBUTION;listContributionCalls;Lister les appels.
+POST;/contribution-campaigns/simulate;CONTRIBUTION;simulateContributionCampaign;Simuler une campagne.
+POST;/contribution-campaigns/{id}/issue;CONTRIBUTION;issueContributionCampaign;Émettre les appels.
+GET;/organizations/{id}/account-statement;CONTRIBUTION;getAccountStatement;Produire une situation de compte.
+POST;/payment-references;PAYMENT;createPaymentReference;Créer une référence validée CNPM.
+GET;/payments;PAYMENT;listPayments;Lister les transactions.
+GET;/payments/{id};PAYMENT;getPayment;Consulter une transaction.
+POST;/payments/{id}/confirm;PAYMENT;confirmPayment;Confirmer un paiement rapproché.
+POST;/payment-provider-events/{partnerCode};PAYMENT;receivePaymentProviderEvent;Recevoir un callback signé.
+POST;/bank-statements/import;PAYMENT;importBankStatement;Importer un relevé bancaire.
+GET;/reconciliations;PAYMENT;listReconciliations;Lister les rapprochements.
+POST;/reconciliations/{id}/decide;PAYMENT;decideReconciliation;Accepter ou rejeter une proposition.
+POST;/payments/{id}/refunds;PAYMENT;requestRefund;Initier un remboursement contrôlé.
+GET;/receipts;RECEIPT;listReceipts;Lister les reçus.
+GET;/receipts/{id};RECEIPT;getReceipt;Télécharger un reçu.
+GET;/receipts/verify/{token};RECEIPT;verifyReceipt;Vérifier publiquement un reçu.
+POST;/receipts/{id}/cancel;RECEIPT;cancelReceipt;Annuler et remplacer un reçu.
+GET;/collection-campaigns;RECOVERY;listCollectionCampaigns;Lister les campagnes.
+POST;/collection-campaigns;RECOVERY;createCollectionCampaign;Créer une campagne.
+POST;/collection-campaigns/{id}/launch;RECOVERY;launchCollectionCampaign;Lancer une séquence.
+GET;/recovery-cases;RECOVERY;listRecoveryCases;Lister les dossiers de recouvrement.
+POST;/recovery-cases/{id}/actions;RECOVERY;recordRecoveryAction;Tracer une action.
+POST;/recovery-cases/{id}/promises;RECOVERY;createPromiseToPay;Enregistrer une promesse.
+GET;/portal/dashboard;PORTAL;getMemberDashboard;Afficher la synthèse membre.
+GET;/portal/contributions;PORTAL;getMemberContributions;Afficher cotisations et soldes.
+GET;/portal/payments;PORTAL;getMemberPayments;Afficher paiements et statuts.
+GET;/portal/documents;PORTAL;getMemberDocuments;Afficher reçus et attestations.
+GET;/service-requests;REQUEST;listServiceRequests;Lister les requêtes.
+POST;/service-requests;REQUEST;createServiceRequest;Soumettre une requête.
+GET;/service-requests/{id};REQUEST;getServiceRequest;Consulter une requête.
+POST;/service-requests/{id}/messages;REQUEST;addServiceRequestMessage;Ajouter un échange.
+POST;/service-requests/{id}/close;REQUEST;closeServiceRequest;Clôturer avec preuve.
+GET;/professional-groups;GROUP;listProfessionalGroups;Lister les groupements.
+GET;/professional-groups/{id}/dashboard;GROUP;getGroupDashboard;Afficher le tableau sectoriel.
+GET;/bonus-calculations;INCENTIVE;listBonusCalculations;Lister les primes.
+POST;/bonus-calculations/run;INCENTIVE;runBonusCalculation;Calculer une période.
+POST;/bonus-calculations/{id}/approve;INCENTIVE;approveBonusCalculation;Valider à quatre yeux.
+GET;/revenue-share-statements;INCENTIVE;listRevenueShareStatements;Lister les états prestataire.
+POST;/documents/upload-sessions;DOCUMENT;createDocumentUploadSession;Créer un téléversement sécurisé.
+POST;/documents/upload-sessions/{id}/complete;DOCUMENT;completeDocumentUpload;Finaliser après antivirus.
+GET;/documents/{id};DOCUMENT;getDocument;Consulter les métadonnées.
+GET;/documents/{id}/download;DOCUMENT;downloadDocument;Télécharger selon droits.
+GET;/events;EVENT;listEvents;Lister événements et formations.
+POST;/events;EVENT;createEvent;Créer un événement.
+POST;/events/{id}/registrations;EVENT;registerForEvent;Inscrire un participant.
+POST;/events/{id}/attendance/import;EVENT;importAttendance;Importer les présences.
+GET;/dashboards/{code};REPORT;getDashboard;Restituer un tableau de bord.
+POST;/reports/{code}/execute;REPORT;executeReport;Exécuter un rapport.
+POST;/exports;REPORT;createExport;Créer un export audité.
+GET;/exports/{id};REPORT;getExportStatus;Suivre un export.
+GET;/audit-events;AUDIT;searchAuditEvents;Rechercher la piste d’audit.
+POST;/audit-exports;AUDIT;createAuditExport;Générer une preuve d’audit.
+GET;/integration-partners;INTEGRATION;listIntegrationPartners;Lister les partenaires.
+POST;/webhook-subscriptions;INTEGRATION;createWebhookSubscription;Créer un abonnement sortant.

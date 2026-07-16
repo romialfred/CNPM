@@ -1,0 +1,114 @@
+{
+  "REF-AUTH-001": {
+    "route": "/auth/login",
+    "reference": "assets/reference-screens/full/ref-auth-001-login.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-PUB-001": {
+    "route": "/",
+    "reference": "assets/reference-screens/full/ref-pub-001-public-home.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-PUB-006": {
+    "route": "/membres/:slug",
+    "reference": "assets/reference-screens/full/ref-pub-006-member-showcase.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-BO-001": {
+    "route": "/admin/dashboard",
+    "reference": "assets/reference-screens/full/ref-bo-001-dashboard.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-BO-002": {
+    "route": "/admin/members",
+    "reference": "assets/reference-screens/full/ref-bo-002-members-list.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-BO-003": {
+    "route": "/admin/members/:id",
+    "reference": "assets/reference-screens/full/ref-bo-003-member-detail.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-BO-009": {
+    "route": "/admin/enrollments/new",
+    "reference": "assets/reference-screens/full/ref-bo-009-enrollment-form.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-BO-011": {
+    "route": "/admin/contributions",
+    "reference": "assets/reference-screens/full/ref-bo-011-contributions.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-BO-014": {
+    "route": "/admin/payments/reconciliation",
+    "reference": "assets/reference-screens/full/ref-bo-014-payments-reconciliation.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-MP-001": {
+    "route": "/member/home",
+    "reference": "assets/reference-screens/full/ref-mp-001-member-home.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P0"
+  },
+  "REF-BO-017": {
+    "route": "/admin/recovery/campaigns",
+    "reference": "assets/reference-screens/full/ref-bo-017-recovery-campaigns.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P1"
+  },
+  "REF-BO-028": {
+    "route": "/admin/reporting",
+    "reference": "assets/reference-screens/full/ref-bo-028-reporting.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P1"
+  },
+  "REF-BO-030": {
+    "route": "/admin/security/users",
+    "reference": "assets/reference-screens/full/ref-bo-030-admin-security.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P1"
+  },
+  "REF-MOB-001": {
+    "route": "mobile://member",
+    "reference": "assets/reference-screens/full/ref-mob-001-mobile-board.png",
+    "viewports": [
+      "1672x941"
+    ],
+    "priority": "P1"
+  }
+}

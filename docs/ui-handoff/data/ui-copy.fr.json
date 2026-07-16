@@ -1,0 +1,47 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "continue": "Continuer",
+    "back": "Retour",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "reset": "Reinitialiser",
+    "export": "Exporter",
+    "download": "Telecharger",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "loading": "Chargement en cours..."
+  },
+  "auth": {
+    "title": "Connectez-vous a votre espace CNPM",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "forgot": "Mot de passe oublie ?",
+    "adminSpace": "Espace administration",
+    "memberSpace": "Espace membre",
+    "otpTitle": "Verification en deux etapes",
+    "otpHelp": "Saisissez le code a six chiffres envoye par SMS ou e-mail."
+  },
+  "validation": {
+    "required": "Ce champ est obligatoire.",
+    "email": "Saisissez une adresse e-mail valide.",
+    "phone": "Saisissez un numero de telephone valide.",
+    "minLength": "La valeur saisie est trop courte.",
+    "fileType": "Ce type de fichier n est pas autorise.",
+    "fileSize": "Le fichier depasse la taille maximale autorisee.",
+    "generic": "Verifiez les informations saisies."
+  },
+  "states": {
+    "emptyTitle": "Aucune donnee a afficher",
+    "emptyHelp": "Modifiez les filtres ou creez un premier element.",
+    "noResults": "Aucun resultat ne correspond a votre recherche.",
+    "errorTitle": "Une erreur est survenue",
+    "errorHelp": "Reessayez. Si le probleme persiste, contactez l assistance.",
+    "offlineTitle": "Connexion indisponible",
+    "offlineHelp": "Certaines donnees peuvent etre consultees hors connexion. Les modifications seront synchronisees plus tard."
+  }
+}

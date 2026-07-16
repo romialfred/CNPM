@@ -1,0 +1,277 @@
+erDiagram
+  ref_reference_value {
+    uuid id PK
+  }
+  ref_number_sequence {
+    uuid id PK
+  }
+  iam_user_account {
+    uuid id PK
+  }
+  iam_role {
+    uuid id PK
+  }
+  iam_permission {
+    uuid id PK
+  }
+  iam_role_permission {
+    uuid id PK
+  }
+  iam_user_role {
+    uuid id PK
+  }
+  iam_mfa_registration {
+    uuid id PK
+  }
+  iam_access_review {
+    uuid id PK
+  }
+  member_person {
+    uuid id PK
+  }
+  member_organization {
+    uuid id PK
+  }
+  member_organization_identifier {
+    uuid id PK
+  }
+  member_address {
+    uuid id PK
+  }
+  member_organization_contact {
+    uuid id PK
+  }
+  member_membership {
+    uuid id PK
+  }
+  member_membership_status_history {
+    uuid id PK
+  }
+  member_professional_group {
+    uuid id PK
+  }
+  member_group_membership {
+    uuid id PK
+  }
+  member_communication_preference {
+    uuid id PK
+  }
+  enrollment_prospect {
+    uuid id PK
+  }
+  enrollment_enrollment_case {
+    uuid id PK
+  }
+  enrollment_enrollment_review {
+    uuid id PK
+  }
+  enrollment_enrollment_decision {
+    uuid id PK
+  }
+  contribution_fiscal_year {
+    uuid id PK
+  }
+  contribution_rate_rule {
+    uuid id PK
+  }
+  contribution_contribution_call {
+    uuid id PK
+  }
+  contribution_installment {
+    uuid id PK
+  }
+  contribution_adjustment {
+    uuid id PK
+  }
+  payment_payment_reference {
+    uuid id PK
+  }
+  payment_payment_transaction {
+    uuid id PK
+  }
+  payment_payment_allocation {
+    uuid id PK
+  }
+  payment_provider_event {
+    uuid id PK
+  }
+  payment_bank_statement {
+    uuid id PK
+  }
+  payment_bank_statement_line {
+    uuid id PK
+  }
+  payment_reconciliation_case {
+    uuid id PK
+  }
+  receipt_receipt {
+    uuid id PK
+  }
+  recovery_campaign {
+    uuid id PK
+  }
+  recovery_sequence_template {
+    uuid id PK
+  }
+  recovery_sequence_step {
+    uuid id PK
+  }
+  recovery_recovery_case {
+    uuid id PK
+  }
+  recovery_recovery_action {
+    uuid id PK
+  }
+  recovery_promise_to_pay {
+    uuid id PK
+  }
+  incentive_bonus_rule {
+    uuid id PK
+  }
+  incentive_bonus_calculation {
+    uuid id PK
+  }
+  incentive_bonus_line {
+    uuid id PK
+  }
+  incentive_revenue_share_statement {
+    uuid id PK
+  }
+  incentive_financial_dispute {
+    uuid id PK
+  }
+  service_sla_policy {
+    uuid id PK
+  }
+  service_request {
+    uuid id PK
+  }
+  service_request_message {
+    uuid id PK
+  }
+  document_document {
+    uuid id PK
+  }
+  document_document_version {
+    uuid id PK
+  }
+  document_document_link {
+    uuid id PK
+  }
+  governance_commission {
+    uuid id PK
+  }
+  governance_meeting {
+    uuid id PK
+  }
+  governance_meeting_attendance {
+    uuid id PK
+  }
+  governance_decision {
+    uuid id PK
+  }
+  governance_decision_action {
+    uuid id PK
+  }
+  event_event {
+    uuid id PK
+  }
+  event_registration {
+    uuid id PK
+  }
+  notification_template {
+    uuid id PK
+  }
+  notification_notification {
+    uuid id PK
+  }
+  notification_delivery_attempt {
+    uuid id PK
+  }
+  integration_partner {
+    uuid id PK
+  }
+  integration_endpoint_configuration {
+    uuid id PK
+  }
+  integration_outbox_event {
+    uuid id PK
+  }
+  integration_webhook_subscription {
+    uuid id PK
+  }
+  integration_webhook_delivery {
+    uuid id PK
+  }
+  audit_audit_event {
+    uuid id PK
+  }
+  audit_security_event {
+    uuid id PK
+  }
+  audit_data_export {
+    uuid id PK
+  }
+  reporting_report_definition {
+    uuid id PK
+  }
+  reporting_report_execution {
+    uuid id PK
+  }
+  iam_role ||--o{ iam_role_permission : "role_id"
+  iam_permission ||--o{ iam_role_permission : "permission_id"
+  iam_user_account ||--o{ iam_user_role : "user_id"
+  iam_role ||--o{ iam_user_role : "role_id"
+  iam_user_account ||--o{ iam_mfa_registration : "user_id"
+  member_organization ||--o{ member_organization_identifier : "organization_id"
+  member_organization ||--o{ member_address : "organization_id"
+  member_person ||--o{ member_address : "person_id"
+  member_organization ||--o{ member_organization_contact : "organization_id"
+  member_person ||--o{ member_organization_contact : "person_id"
+  member_organization ||--o{ member_membership : "organization_id"
+  member_membership ||--o{ member_membership_status_history : "membership_id"
+  member_organization ||--o{ member_group_membership : "organization_id"
+  member_professional_group ||--o{ member_group_membership : "group_id"
+  member_organization ||--o{ enrollment_prospect : "organization_id"
+  member_professional_group ||--o{ enrollment_prospect : "assigned_group_id"
+  member_organization ||--o{ enrollment_enrollment_case : "organization_id"
+  enrollment_enrollment_case ||--o{ enrollment_enrollment_review : "case_id"
+  enrollment_enrollment_case ||--o{ enrollment_enrollment_decision : "case_id"
+  member_membership ||--o{ contribution_contribution_call : "membership_id"
+  contribution_fiscal_year ||--o{ contribution_contribution_call : "fiscal_year_id"
+  contribution_contribution_call ||--o{ contribution_installment : "contribution_call_id"
+  contribution_contribution_call ||--o{ contribution_adjustment : "contribution_call_id"
+  member_membership ||--o{ payment_payment_reference : "membership_id"
+  payment_payment_reference ||--o{ payment_payment_transaction : "payment_reference_id"
+  payment_payment_transaction ||--o{ payment_payment_allocation : "payment_transaction_id"
+  contribution_installment ||--o{ payment_payment_allocation : "installment_id"
+  payment_bank_statement ||--o{ payment_bank_statement_line : "statement_id"
+  payment_payment_transaction ||--o{ payment_reconciliation_case : "payment_transaction_id"
+  payment_bank_statement_line ||--o{ payment_reconciliation_case : "statement_line_id"
+  payment_payment_transaction ||--o{ receipt_receipt : "payment_transaction_id"
+  receipt_receipt ||--o{ receipt_receipt : "supersedes_receipt_id"
+  recovery_sequence_template ||--o{ recovery_sequence_step : "template_id"
+  member_membership ||--o{ recovery_recovery_case : "membership_id"
+  contribution_fiscal_year ||--o{ recovery_recovery_case : "fiscal_year_id"
+  recovery_recovery_case ||--o{ recovery_recovery_action : "recovery_case_id"
+  recovery_recovery_case ||--o{ recovery_promise_to_pay : "recovery_case_id"
+  incentive_bonus_calculation ||--o{ incentive_bonus_line : "calculation_id"
+  payment_payment_transaction ||--o{ incentive_bonus_line : "payment_transaction_id"
+  member_organization ||--o{ service_request : "organization_id"
+  service_request ||--o{ service_request_message : "request_id"
+  document_document ||--o{ document_document_version : "document_id"
+  document_document ||--o{ document_document_link : "document_id"
+  governance_commission ||--o{ governance_meeting : "commission_id"
+  governance_meeting ||--o{ governance_meeting_attendance : "meeting_id"
+  member_person ||--o{ governance_meeting_attendance : "person_id"
+  governance_meeting ||--o{ governance_decision : "meeting_id"
+  governance_decision ||--o{ governance_decision_action : "decision_id"
+  event_event ||--o{ event_registration : "event_id"
+  member_organization ||--o{ event_registration : "organization_id"
+  member_person ||--o{ event_registration : "person_id"
+  notification_notification ||--o{ notification_delivery_attempt : "notification_id"
+  integration_partner ||--o{ integration_endpoint_configuration : "partner_id"
+  integration_partner ||--o{ integration_webhook_subscription : "partner_id"
+  integration_webhook_subscription ||--o{ integration_webhook_delivery : "subscription_id"
+  integration_outbox_event ||--o{ integration_webhook_delivery : "outbox_event_id"
+  reporting_report_definition ||--o{ reporting_report_execution : "report_definition_id"

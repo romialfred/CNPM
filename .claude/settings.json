@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "disableBypassPermissionsMode": "disable",
+    "disableAutoMode": "disable",
+    "allow": [
+      "Bash(bash scripts/validate-pack.sh:*)",
+      "Bash(bash scripts/validate-openapi.sh:*)",
+      "Bash(bash scripts/check-toolchain.sh:*)",
+      "Bash(python3 scripts/generate-manifest.py:*)",
+      "Bash(mvn -f backend/pom.xml test:*)",
+      "Bash(mvn -f backend/pom.xml clean verify:*)",
+      "Bash(npm --prefix web ci:*)",
+      "Bash(npm --prefix web run lint:*)",
+      "Bash(npm --prefix web run test:ci:*)",
+      "Bash(npm --prefix web run build:*)",
+      "Bash(npm --prefix web run test:a11y:*)",
+      "Bash(npm --prefix web run test:visual:*)",
+      "Bash(npm --prefix web run format:check:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter test:*)",
+      "Bash(docker compose --env-file .env -f infrastructure/docker/compose.yaml config:*)",
+      "Bash(git diff:*)",
+      "Bash(git status:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /:*)",
+      "Bash(rm -rf ~:*)",
+      "Bash(sudo:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(kubectl delete:*)",
+      "Bash(kubectl apply -f *production*:*)",
+      "Bash(terraform destroy:*)",
+      "Bash(psql *production*:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/secrets/**)",
+      "Edit(./docs/00-sources/**)",
+      "Write(./docs/00-sources/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-command.py"
+            ],
+            "timeout": 10,
+            "statusMessage": "Contrôle de sécurité CNPM"
+          }
+        ]
+      }
+    ]
+  }
+}

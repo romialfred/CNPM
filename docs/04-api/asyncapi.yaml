@@ -1,0 +1,209 @@
+asyncapi: 3.0.0
+info:
+  title: CNPM Domain Events
+  version: 1.0.0
+defaultContentType: application/json
+channels:
+  MemberActivated:
+    address: member.activated
+    messages:
+      MemberActivated:
+        $ref: '#/components/messages/MemberActivated'
+  ContributionCallIssued:
+    address: contribution.call.issued
+    messages:
+      ContributionCallIssued:
+        $ref: '#/components/messages/ContributionCallIssued'
+  PaymentReceived:
+    address: payment.received
+    messages:
+      PaymentReceived:
+        $ref: '#/components/messages/PaymentReceived'
+  PaymentConfirmed:
+    address: payment.confirmed
+    messages:
+      PaymentConfirmed:
+        $ref: '#/components/messages/PaymentConfirmed'
+  ReceiptIssued:
+    address: receipt.issued
+    messages:
+      ReceiptIssued:
+        $ref: '#/components/messages/ReceiptIssued'
+  RecoveryActionDue:
+    address: recovery.action.due
+    messages:
+      RecoveryActionDue:
+        $ref: '#/components/messages/RecoveryActionDue'
+  RequestSlaBreached:
+    address: service.request.sla-breached
+    messages:
+      RequestSlaBreached:
+        $ref: '#/components/messages/RequestSlaBreached'
+  DocumentScanCompleted:
+    address: document.scan.completed
+    messages:
+      DocumentScanCompleted:
+        $ref: '#/components/messages/DocumentScanCompleted'
+  NotificationRequested:
+    address: notification.requested
+    messages:
+      NotificationRequested:
+        $ref: '#/components/messages/NotificationRequested'
+  AuditAlertRaised:
+    address: audit.alert.raised
+    messages:
+      AuditAlertRaised:
+        $ref: '#/components/messages/AuditAlertRaised'
+operations:
+  sendMemberActivated:
+    action: send
+    channel:
+      $ref: '#/channels/MemberActivated'
+    messages:
+    - $ref: '#/channels/MemberActivated/messages/MemberActivated'
+  sendContributionCallIssued:
+    action: send
+    channel:
+      $ref: '#/channels/ContributionCallIssued'
+    messages:
+    - $ref: '#/channels/ContributionCallIssued/messages/ContributionCallIssued'
+  sendPaymentReceived:
+    action: send
+    channel:
+      $ref: '#/channels/PaymentReceived'
+    messages:
+    - $ref: '#/channels/PaymentReceived/messages/PaymentReceived'
+  sendPaymentConfirmed:
+    action: send
+    channel:
+      $ref: '#/channels/PaymentConfirmed'
+    messages:
+    - $ref: '#/channels/PaymentConfirmed/messages/PaymentConfirmed'
+  sendReceiptIssued:
+    action: send
+    channel:
+      $ref: '#/channels/ReceiptIssued'
+    messages:
+    - $ref: '#/channels/ReceiptIssued/messages/ReceiptIssued'
+  sendRecoveryActionDue:
+    action: send
+    channel:
+      $ref: '#/channels/RecoveryActionDue'
+    messages:
+    - $ref: '#/channels/RecoveryActionDue/messages/RecoveryActionDue'
+  sendRequestSlaBreached:
+    action: send
+    channel:
+      $ref: '#/channels/RequestSlaBreached'
+    messages:
+    - $ref: '#/channels/RequestSlaBreached/messages/RequestSlaBreached'
+  sendDocumentScanCompleted:
+    action: send
+    channel:
+      $ref: '#/channels/DocumentScanCompleted'
+    messages:
+    - $ref: '#/channels/DocumentScanCompleted/messages/DocumentScanCompleted'
+  sendNotificationRequested:
+    action: send
+    channel:
+      $ref: '#/channels/NotificationRequested'
+    messages:
+    - $ref: '#/channels/NotificationRequested/messages/NotificationRequested'
+  sendAuditAlertRaised:
+    action: send
+    channel:
+      $ref: '#/channels/AuditAlertRaised'
+    messages:
+    - $ref: '#/channels/AuditAlertRaised/messages/AuditAlertRaised'
+components:
+  messages:
+    MemberActivated:
+      name: MemberActivated
+      title: MemberActivated
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: MEMBER
+    ContributionCallIssued:
+      name: ContributionCallIssued
+      title: ContributionCallIssued
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: CONTRIBUTION
+    PaymentReceived:
+      name: PaymentReceived
+      title: PaymentReceived
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: PAYMENT
+    PaymentConfirmed:
+      name: PaymentConfirmed
+      title: PaymentConfirmed
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: PAYMENT
+    ReceiptIssued:
+      name: ReceiptIssued
+      title: ReceiptIssued
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: RECEIPT
+    RecoveryActionDue:
+      name: RecoveryActionDue
+      title: RecoveryActionDue
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: RECOVERY
+    RequestSlaBreached:
+      name: RequestSlaBreached
+      title: RequestSlaBreached
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: REQUEST
+    DocumentScanCompleted:
+      name: DocumentScanCompleted
+      title: DocumentScanCompleted
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: DOCUMENT
+    NotificationRequested:
+      name: NotificationRequested
+      title: NotificationRequested
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: PORTAL
+    AuditAlertRaised:
+      name: AuditAlertRaised
+      title: AuditAlertRaised
+      payload:
+        $ref: '#/components/schemas/DomainEvent'
+      x-domain: AUDIT
+  schemas:
+    DomainEvent:
+      type: object
+      required:
+      - eventId
+      - eventType
+      - occurredAt
+      - aggregateId
+      - correlationId
+      - payload
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+        aggregateId:
+          type: string
+          format: uuid
+        correlationId:
+          type: string
+          format: uuid
+        schemaVersion:
+          type: integer
+        payload:
+          type: object
+          additionalProperties: true

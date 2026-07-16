@@ -1,0 +1,77 @@
+{
+  "color": [
+    "#273481",
+    "#5268B3",
+    "#7F91CF",
+    "#AEBBE8",
+    "#E40C20",
+    "#F79009",
+    "#12B76A",
+    "#2E90FA"
+  ],
+  "backgroundColor": "transparent",
+  "textStyle": {
+    "color": "#475467",
+    "fontFamily": "Inter, system-ui, sans-serif"
+  },
+  "title": {
+    "textStyle": {
+      "color": "#101828",
+      "fontWeight": 600,
+      "fontSize": 14
+    }
+  },
+  "legend": {
+    "textStyle": {
+      "color": "#475467"
+    }
+  },
+  "categoryAxis": {
+    "axisLine": {
+      "lineStyle": {
+        "color": "#EAECF0"
+      }
+    },
+    "axisTick": {
+      "show": false
+    },
+    "axisLabel": {
+      "color": "#667085"
+    },
+    "splitLine": {
+      "show": false
+    }
+  },
+  "valueAxis": {
+    "axisLine": {
+      "show": false
+    },
+    "axisTick": {
+      "show": false
+    },
+    "axisLabel": {
+      "color": "#667085"
+    },
+    "splitLine": {
+      "lineStyle": {
+        "color": "#EAECF0",
+        "type": "dashed"
+      }
+    }
+  },
+  "tooltip": {
+    "backgroundColor": "#101828",
+    "borderWidth": 0,
+    "textStyle": {
+      "color": "#FFFFFF"
+    },
+    "padding": [
+      10,
+      12
+    ]
+  },
+  "dataZoom": {
+    "fillerColor": "rgba(82,104,179,.12)",
+    "borderColor": "#EAECF0"
+  }
+}

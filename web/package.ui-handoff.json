@@ -1,0 +1,18 @@
+{
+  "status": "PENDING_COMPATIBILITY_VALIDATION",
+  "scope": "storybook",
+  "reason": "Le socle Angular 22 utilise TypeScript 6.0. Lors de la consolidation, la version Storybook Angular évaluée n'annonçait pas une plage de dépendance compatible sans contournement.",
+  "requiredCapabilities": [
+    "catalogue des composants Angular",
+    "tests d'interaction",
+    "audit axe",
+    "documentation des variantes et états"
+  ],
+  "implementationRule": "Sélectionner pendant R0 une version officiellement compatible avec Angular 22 et TypeScript 6. Ne pas utiliser --force ou --legacy-peer-deps pour masquer un conflit.",
+  "temporaryCoverage": [
+    "Vitest pour les tests unitaires",
+    "Playwright pour les parcours et la régression visuelle",
+    "@axe-core/playwright pour l'accessibilité"
+  ],
+  "reference": "../docs/ui-handoff/templates/storybook/README.md"
+}

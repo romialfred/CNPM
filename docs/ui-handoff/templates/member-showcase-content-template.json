@@ -1,0 +1,30 @@
+{
+  "slug": "nom-entreprise",
+  "name": "Nom officiel",
+  "tagline": "Proposition de valeur courte",
+  "sector": "Secteur",
+  "location": "Ville, Mali",
+  "employeeRange": "",
+  "foundedYear": null,
+  "legalForm": "",
+  "summary": "",
+  "contacts": {
+    "phone": "",
+    "email": "",
+    "address": "",
+    "hours": ""
+  },
+  "activities": [],
+  "projects": [],
+  "certifications": [],
+  "seo": {
+    "title": "",
+    "description": "",
+    "allowIndexing": false
+  },
+  "publication": {
+    "status": "DRAFT",
+    "lastSavedAt": null,
+    "scheduledAt": null
+  }
+}

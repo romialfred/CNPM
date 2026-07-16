@@ -1,0 +1,59 @@
+{
+  "slug": "somacop-sa",
+  "name": "SOMACOP SA",
+  "tagline": "Batir aujourd hui, construire demain",
+  "sector": "BTP et Genie civil",
+  "location": "Bamako, Mali",
+  "employeeRange": "150-500",
+  "foundedYear": 2010,
+  "legalForm": "Societe Anonyme",
+  "verificationStatus": "VERIFIED",
+  "membershipStatus": "ACTIVE",
+  "summary": "Entreprise malienne specialisee dans les travaux publics, le genie civil et l amenagement durable des infrastructures.",
+  "contacts": {
+    "phone": "+223 20 22 33 44",
+    "email": "contact@somacop.example",
+    "address": "ACI 2000, Bamako, Mali",
+    "hours": "Lun-Ven 08:00-17:00"
+  },
+  "activities": [
+    "Travaux publics et infrastructures",
+    "Batiment et genie civil",
+    "Amenagement urbain",
+    "Etudes et ingenierie",
+    "Materiaux et equipements",
+    "Maintenance et rehabilitation"
+  ],
+  "projects": [
+    {
+      "title": "Route Kati-Koulikoro",
+      "summary": "Construction de 42 km de route bitumee",
+      "category": "Routes et infrastructures"
+    },
+    {
+      "title": "Pont de Senou",
+      "summary": "Construction d un pont en beton arme",
+      "category": "Ouvrages d art"
+    },
+    {
+      "title": "Immeuble SOMAPLAZA",
+      "summary": "Construction d un immeuble R+6",
+      "category": "Batiments"
+    }
+  ],
+  "certifications": [
+    "ISO 9001",
+    "ISO 14001",
+    "ISO 45001"
+  ],
+  "seo": {
+    "title": "SOMACOP SA - Membre du CNPM",
+    "description": "Decouvrez les activites, realisations et coordonnees de SOMACOP SA, membre verifie du CNPM.",
+    "allowIndexing": true
+  },
+  "publication": {
+    "status": "DRAFT",
+    "lastSavedAt": "2026-07-16T08:00:00Z",
+    "scheduledAt": null
+  }
+}

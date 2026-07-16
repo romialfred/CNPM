@@ -1,0 +1,294 @@
+openapi: 3.1.0
+info:
+  title: CNPM Member Showcase API Addendum
+  version: 1.0.0-draft
+  description: >-
+    Contrat de référence du module vitrine. À intégrer dans l’OpenAPI canonique
+    au démarrage de R4 après exécution de promotion-checklist.md.
+servers:
+  - url: /api/v1
+paths:
+  /public/members:
+    get:
+      operationId: listPublicMemberShowcases
+      tags: [PublicShowcase]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: q
+          in: query
+          schema: { type: string, maxLength: 120 }
+        - name: sector
+          in: query
+          schema: { type: string, maxLength: 80 }
+      responses:
+        '200':
+          description: Liste paginée des vitrines publiées
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicShowcasePage'
+  /public/members/{slug}:
+    get:
+      operationId: getPublicMemberShowcase
+      tags: [PublicShowcase]
+      parameters:
+        - $ref: '#/components/parameters/Slug'
+      responses:
+        '200':
+          description: Vitrine publiée
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShowcaseView' }
+        '404': { $ref: '#/components/responses/Problem' }
+  /member/showcase:
+    get:
+      operationId: getOwnShowcase
+      tags: [MemberShowcase]
+      security: [{ oidc: [SHOWCASE.OWN.READ] }]
+      responses:
+        '200':
+          description: Vitrine et brouillon de l’organisation courante
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShowcaseView' }
+    put:
+      operationId: saveOwnShowcaseDraft
+      tags: [MemberShowcase]
+      security: [{ oidc: [SHOWCASE.OWN.WRITE] }]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ShowcaseDraft' }
+      responses:
+        '200':
+          description: Brouillon enregistré
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ShowcaseView' }
+        '409': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+  /member/showcase/submit:
+    post:
+      operationId: submitOwnShowcase
+      tags: [MemberShowcase]
+      security: [{ oidc: [SHOWCASE.OWN.SUBMIT] }]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202': { description: Soumission créée }
+        '409': { $ref: '#/components/responses/Problem' }
+        '422': { $ref: '#/components/responses/Problem' }
+  /member/showcase/analytics:
+    get:
+      operationId: getOwnShowcaseAnalytics
+      tags: [MemberShowcase]
+      security: [{ oidc: [SHOWCASE.OWN.ANALYTICS.READ] }]
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Agrégats anonymisés
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DailyAnalytics' }
+  /admin/showcases:
+    get:
+      operationId: listShowcaseModerationQueue
+      tags: [ShowcaseModeration]
+      security: [{ oidc: [SHOWCASE.MODERATION.READ] }]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/PublicationStatus' }
+      responses:
+        '200':
+          description: File de modération paginée
+  /admin/showcases/{showcaseId}/approve:
+    post:
+      operationId: approveShowcase
+      tags: [ShowcaseModeration]
+      security: [{ oidc: [SHOWCASE.MODERATION.DECIDE] }]
+      parameters:
+        - $ref: '#/components/parameters/ShowcaseId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200': { description: Révision approuvée }
+        '409': { $ref: '#/components/responses/Problem' }
+  /admin/showcases/{showcaseId}/reject:
+    post:
+      operationId: rejectShowcase
+      tags: [ShowcaseModeration]
+      security: [{ oidc: [SHOWCASE.MODERATION.DECIDE] }]
+      parameters:
+        - $ref: '#/components/parameters/ShowcaseId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 10, maxLength: 1000 }
+      responses:
+        '200': { description: Révision rejetée }
+        '409': { $ref: '#/components/responses/Problem' }
+  /admin/showcases/{showcaseId}/publish:
+    post:
+      operationId: publishShowcase
+      tags: [ShowcaseModeration]
+      security: [{ oidc: [SHOWCASE.PUBLISH] }]
+      parameters:
+        - $ref: '#/components/parameters/ShowcaseId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduledAt: { type: [string, 'null'], format: date-time }
+      responses:
+        '200': { description: Publication créée ou planifiée }
+        '409': { $ref: '#/components/responses/Problem' }
+  /admin/showcases/{showcaseId}/suspend:
+    post:
+      operationId: suspendShowcase
+      tags: [ShowcaseModeration]
+      security: [{ oidc: [SHOWCASE.SUSPEND] }]
+      parameters:
+        - $ref: '#/components/parameters/ShowcaseId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 10, maxLength: 1000 }
+      responses:
+        '200': { description: Vitrine suspendue }
+components:
+  securitySchemes:
+    oidc:
+      type: openIdConnect
+      openIdConnectUrl: /realms/cnpm/.well-known/openid-configuration
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 0, default: 0 }
+    PageSize:
+      name: pageSize
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    Slug:
+      name: slug
+      in: path
+      required: true
+      schema: { type: string, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+    ShowcaseId:
+      name: showcaseId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 120 }
+  responses:
+    Problem:
+      description: Erreur normalisée
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+  schemas:
+    PublicationStatus:
+      type: string
+      enum: [DRAFT, IN_REVIEW, APPROVED, SCHEDULED, PUBLISHED, REJECTED, UNPUBLISHED, SUSPENDED]
+    ShowcaseDraft:
+      type: object
+      required: [slug, name, sector, location, summary, publicationStatus]
+      properties:
+        version: { type: integer, minimum: 0 }
+        slug: { type: string, pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$' }
+        name: { type: string, minLength: 2, maxLength: 120 }
+        tagline: { type: string, maxLength: 160 }
+        sector: { type: string, maxLength: 120 }
+        location: { type: string, maxLength: 160 }
+        summary: { type: string, maxLength: 600 }
+        employeeRange: { type: string, maxLength: 40 }
+        foundedYear: { type: integer, minimum: 1800, maximum: 2100 }
+        legalForm: { type: string, maxLength: 80 }
+        sections:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/ShowcaseSection' }
+        publicationStatus: { $ref: '#/components/schemas/PublicationStatus' }
+    ShowcaseView:
+      allOf:
+        - $ref: '#/components/schemas/ShowcaseDraft'
+        - type: object
+          required: [id, organizationId, verificationStatus, updatedAt]
+          properties:
+            id: { type: string, format: uuid }
+            organizationId: { type: string, format: uuid }
+            verificationStatus:
+              type: string
+              enum: [VERIFIED, PENDING, EXPIRED, SUSPENDED, UNVERIFIED]
+            updatedAt: { type: string, format: date-time }
+    ShowcaseSection:
+      type: object
+      required: [type, order, visible, content]
+      properties:
+        type:
+          type: string
+          enum: [ABOUT, ACTIVITIES, PRODUCTS, PROJECTS, GALLERY, CERTIFICATIONS, PARTNERS, TESTIMONIALS, NEWS, CONTACT, SEO]
+        order: { type: integer, minimum: 0 }
+        visible: { type: boolean }
+        content: { type: object, additionalProperties: true }
+    PublicShowcasePage:
+      type: object
+      required: [items, page, pageSize, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/ShowcaseView' }
+        page: { type: integer }
+        pageSize: { type: integer }
+        total: { type: integer, format: int64 }
+    DailyAnalytics:
+      type: object
+      required: [date, views, contactActions]
+      properties:
+        date: { type: string, format: date }
+        views: { type: integer, minimum: 0 }
+        contactActions: { type: integer, minimum: 0 }
+    Problem:
+      type: object
+      required: [timestamp, status, code, message, correlationId]
+      properties:
+        timestamp: { type: string, format: date-time }
+        status: { type: integer }
+        code: { type: string }
+        message: { type: string }
+        correlationId: { type: string, format: uuid }

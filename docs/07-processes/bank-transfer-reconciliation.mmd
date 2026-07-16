@@ -1,0 +1,16 @@
+flowchart LR
+  N0["Start"]
+  N1["Import bank statement"]
+  N0 --> N1
+  N2["Deduplicate lines"]
+  N1 --> N2
+  N3["Score matches"]
+  N2 --> N3
+  N4["Manual review if needed"]
+  N3 --> N4
+  N5["Confirm payment"]
+  N4 --> N5
+  N6["Issue receipt"]
+  N5 --> N6
+  N7["End"]
+  N6 --> N7

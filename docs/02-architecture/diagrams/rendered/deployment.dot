@@ -1,0 +1,29 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.55", fontname="Lato", label="Déploiement de référence", labelloc="t", fontsize=20, fontcolor="#1F3A93"];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#AAB3C2", penwidth=1.0, fontname="Lato", fontsize=10, fontcolor="#1A1D24", margin="0.15,0.10"];
+  edge [color="#5D6470", penwidth=1.0, arrowsize=0.65];
+
+  internet [label="Utilisateurs Web et mobile"];
+  waf [label="DNS / WAF / Load Balancer\nTLS et protection DDoS"];
+  subgraph cluster_k8s {
+    label="Cluster Kubernetes / RKE2 - zones redondantes"; color="#D8DDE6"; fontcolor="#1F3A93"; fontname="Lato";
+    ingress [label="Ingress contrôleur"];
+    web [label="Pods Web Angular"];
+    api [label="Pods API Spring Boot"];
+    worker [label="Workers asynchrones"];
+    keycloak [label="Keycloak"];
+    obs [label="Collecteurs observabilité"];
+  }
+  pgb [label="PgBouncer"];
+  pg [label="PostgreSQL primaire + réplica\nWAL, PITR et chiffrement", color="#1F3A93", penwidth=1.8];
+  rabbit [label="RabbitMQ en cluster"];
+  valkey [label="Valkey haute disponibilité"];
+  s3 [label="Stockage objet S3 compatible\nversionné et répliqué"];
+  backup [label="Coffre de sauvegarde distinct\nrestauration testée"];
+  partners [label="Banques, Mobile Money, SMS, e-mail, INPS"];
+
+  internet -> waf -> ingress;
+  ingress -> web; ingress -> api; ingress -> keycloak;
+  api -> pgb -> pg; worker -> pgb; api -> rabbit; worker -> rabbit; api -> valkey; api -> s3; worker -> partners; api -> partners; keycloak -> pg;
+  pg -> backup; s3 -> backup; rabbit -> obs; api -> obs; pg -> obs;
+}

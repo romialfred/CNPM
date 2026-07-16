@@ -1,0 +1,16 @@
+flowchart LR
+  N0["Start"]
+  N1["Open correction request"]
+  N0 --> N1
+  N2["Validate reason and evidence"]
+  N1 --> N2
+  N3["Four-eyes approval"]
+  N2 --> N3
+  N4["Cancel original"]
+  N3 --> N4
+  N5["Issue replacement"]
+  N4 --> N5
+  N6["Notify member"]
+  N5 --> N6
+  N7["End"]
+  N6 --> N7

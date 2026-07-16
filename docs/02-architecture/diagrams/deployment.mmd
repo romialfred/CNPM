@@ -1,0 +1,14 @@
+flowchart TB
+  Internet[Internet / Réseau CNPM] --> WAF[WAF / Reverse proxy]
+  WAF --> WebPods[Web/PWA]
+  WAF --> ApiPods[API replicas]
+  ApiPods --> PgBouncer[PgBouncer]
+  PgBouncer --> PgPrimary[(PostgreSQL primaire)]
+  PgPrimary --> PgReplica[(Réplique PostgreSQL)]
+  ApiPods --> Rabbit[RabbitMQ HA]
+  ApiPods --> Valkey[Valkey]
+  ApiPods --> S3[Stockage objet]
+  ApiPods --> Keycloak[Keycloak HA]
+  ApiPods --> Obs[Observabilité]
+  Backup[Zone de sauvegarde isolée] <-->|WAL + sauvegardes| PgPrimary
+  DR[Site PRA] -. réplication / restauration .-> Backup

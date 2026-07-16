@@ -1,0 +1,16 @@
+flowchart LR
+  N0["Start"]
+  N1["Request export"]
+  N0 --> N1
+  N2["Check purpose and scope"]
+  N1 --> N2
+  N3["Step-up MFA"]
+  N2 --> N3
+  N4["Approve if sensitive"]
+  N3 --> N4
+  N5["Generate encrypted export"]
+  N4 --> N5
+  N6["Expire and audit"]
+  N5 --> N6
+  N7["End"]
+  N6 --> N7

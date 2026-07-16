@@ -1,0 +1,3690 @@
+openapi: 3.1.0
+info:
+  title: CNPM Digital Platform API
+  version: 1.0.0
+  description: Contrat API de référence pour les portails Web, mobile, back-office et intégrations CNPM.
+servers:
+- url: https://api.example.cnpm.ml/v1
+  description: URL de production à confirmer
+- url: https://api.sandbox.example.cnpm.ml/v1
+  description: Sandbox à confirmer
+security:
+- oauth2:
+  - openid
+tags:
+- name: ADMIN
+  description: Administration et paramétrage
+- name: MEMBER
+  description: Membres et entreprises
+- name: ENROLLMENT
+  description: Enrôlement et adhésion
+- name: CONTRIBUTION
+  description: Cotisations et échéanciers
+- name: PAYMENT
+  description: Paiements et rapprochement
+- name: RECEIPT
+  description: Reçus et attestations
+- name: RECOVERY
+  description: Recouvrement et relances
+- name: PORTAL
+  description: Portail et application membre
+- name: REQUEST
+  description: Requêtes et réclamations
+- name: GROUP
+  description: Groupements professionnels
+- name: INCENTIVE
+  description: Primes et partage de revenus
+- name: DOCUMENT
+  description: Gestion électronique des documents
+- name: EVENT
+  description: Événements et formations
+- name: REPORT
+  description: Décisionnel et reporting
+- name: SECURITY
+  description: Sécurité et identité
+- name: AUDIT
+  description: Audit et conformité
+- name: INTEGRATION
+  description: Intégrations et interopérabilité
+- name: AUTH
+  description: Identité et contexte utilisateur
+paths:
+  /auth/me:
+    get:
+      tags:
+      - AUTH
+      summary: Lire le profil, les rôles et le périmètre courant.
+      operationId: getCurrentUser
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /auth/step-up:
+    post:
+      tags:
+      - AUTH
+      summary: Déclencher une authentification renforcée.
+      operationId: requestStepUp
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+  /reference-values:
+    get:
+      tags:
+      - ADMIN
+      summary: Lister les valeurs de référentiel.
+      operationId: listReferenceValues
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - ADM-001
+      - ADM-002
+      - ADM-003
+      - ADM-004
+      - ADM-005
+    post:
+      tags:
+      - ADMIN
+      summary: Créer une valeur de référentiel.
+      operationId: createReferenceValue
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ADM-001
+      - ADM-002
+      - ADM-003
+      - ADM-004
+      - ADM-005
+  /reference-values/{id}:
+    patch:
+      tags:
+      - ADMIN
+      summary: Mettre à jour une valeur de référentiel.
+      operationId: updateReferenceValue
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ADM-001
+      - ADM-002
+      - ADM-003
+      - ADM-004
+      - ADM-005
+  /organizations:
+    get:
+      tags:
+      - MEMBER
+      summary: Rechercher les entreprises.
+      operationId: listOrganizations
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - MEM-001
+      - MEM-002
+      - MEM-003
+      - MEM-004
+      - MEM-005
+      - MEM-006
+      - MEM-007
+      - MEM-008
+    post:
+      tags:
+      - MEMBER
+      summary: Créer une entreprise.
+      operationId: createOrganization
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - MEM-001
+      - MEM-002
+      - MEM-003
+      - MEM-004
+      - MEM-005
+      - MEM-006
+      - MEM-007
+      - MEM-008
+  /organizations/{id}:
+    get:
+      tags:
+      - MEMBER
+      summary: Consulter la fiche 360°.
+      operationId: getOrganization
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - MEM-001
+      - MEM-002
+      - MEM-003
+      - MEM-004
+      - MEM-005
+      - MEM-006
+      - MEM-007
+      - MEM-008
+    patch:
+      tags:
+      - MEMBER
+      summary: Mettre à jour une entreprise.
+      operationId: updateOrganization
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - MEM-001
+      - MEM-002
+      - MEM-003
+      - MEM-004
+      - MEM-005
+      - MEM-006
+      - MEM-007
+      - MEM-008
+  /organizations/{id}/history:
+    get:
+      tags:
+      - MEMBER
+      summary: Consulter l’historique.
+      operationId: getOrganizationHistory
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - MEM-001
+      - MEM-002
+      - MEM-003
+      - MEM-004
+      - MEM-005
+      - MEM-006
+      - MEM-007
+      - MEM-008
+  /memberships:
+    get:
+      tags:
+      - MEMBER
+      summary: Lister les adhésions.
+      operationId: listMemberships
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - MEM-001
+      - MEM-002
+      - MEM-003
+      - MEM-004
+      - MEM-005
+      - MEM-006
+      - MEM-007
+      - MEM-008
+    post:
+      tags:
+      - MEMBER
+      summary: Créer une adhésion.
+      operationId: createMembership
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - MEM-001
+      - MEM-002
+      - MEM-003
+      - MEM-004
+      - MEM-005
+      - MEM-006
+      - MEM-007
+      - MEM-008
+  /enrollment-applications:
+    get:
+      tags:
+      - ENROLLMENT
+      summary: Lister les dossiers d’enrôlement.
+      operationId: listEnrollmentApplications
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+    post:
+      tags:
+      - ENROLLMENT
+      summary: Créer un dossier.
+      operationId: createEnrollmentApplication
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+  /enrollment-applications/{id}:
+    get:
+      tags:
+      - ENROLLMENT
+      summary: Consulter un dossier.
+      operationId: getEnrollmentApplication
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+    patch:
+      tags:
+      - ENROLLMENT
+      summary: Modifier un brouillon.
+      operationId: updateEnrollmentApplication
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+  /enrollment-applications/{id}/submit:
+    post:
+      tags:
+      - ENROLLMENT
+      summary: Soumettre le dossier.
+      operationId: submitEnrollmentApplication
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+  /enrollment-applications/{id}/request-complement:
+    post:
+      tags:
+      - ENROLLMENT
+      summary: Demander un complément.
+      operationId: requestEnrollmentComplement
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+  /enrollment-applications/{id}/approve:
+    post:
+      tags:
+      - ENROLLMENT
+      summary: Approuver et activer.
+      operationId: approveEnrollmentApplication
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+  /enrollment-applications/{id}/reject:
+    post:
+      tags:
+      - ENROLLMENT
+      summary: Rejeter avec motif.
+      operationId: rejectEnrollmentApplication
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - ENR-001
+      - ENR-002
+      - ENR-003
+      - ENR-004
+      - ENR-005
+      - ENR-006
+      - ENR-007
+      - ENR-008
+  /contribution-rules:
+    get:
+      tags:
+      - CONTRIBUTION
+      summary: Lister les barèmes.
+      operationId: listContributionRules
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - COT-001
+      - COT-002
+      - COT-003
+      - COT-004
+      - COT-005
+      - COT-006
+      - COT-007
+      - COT-008
+    post:
+      tags:
+      - CONTRIBUTION
+      summary: Créer une version de barème.
+      operationId: createContributionRule
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - COT-001
+      - COT-002
+      - COT-003
+      - COT-004
+      - COT-005
+      - COT-006
+      - COT-007
+      - COT-008
+  /contribution-rules/{id}/publish:
+    post:
+      tags:
+      - CONTRIBUTION
+      summary: Publier après validation.
+      operationId: publishContributionRule
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - COT-001
+      - COT-002
+      - COT-003
+      - COT-004
+      - COT-005
+      - COT-006
+      - COT-007
+      - COT-008
+  /contribution-calls:
+    get:
+      tags:
+      - CONTRIBUTION
+      summary: Lister les appels.
+      operationId: listContributionCalls
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - COT-001
+      - COT-002
+      - COT-003
+      - COT-004
+      - COT-005
+      - COT-006
+      - COT-007
+      - COT-008
+  /contribution-campaigns/simulate:
+    post:
+      tags:
+      - CONTRIBUTION
+      summary: Simuler une campagne.
+      operationId: simulateContributionCampaign
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - COT-001
+      - COT-002
+      - COT-003
+      - COT-004
+      - COT-005
+      - COT-006
+      - COT-007
+      - COT-008
+  /contribution-campaigns/{id}/issue:
+    post:
+      tags:
+      - CONTRIBUTION
+      summary: Émettre les appels.
+      operationId: issueContributionCampaign
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - COT-001
+      - COT-002
+      - COT-003
+      - COT-004
+      - COT-005
+      - COT-006
+      - COT-007
+      - COT-008
+  /organizations/{id}/account-statement:
+    get:
+      tags:
+      - CONTRIBUTION
+      summary: Produire une situation de compte.
+      operationId: getAccountStatement
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - COT-001
+      - COT-002
+      - COT-003
+      - COT-004
+      - COT-005
+      - COT-006
+      - COT-007
+      - COT-008
+  /payment-references:
+    post:
+      tags:
+      - PAYMENT
+      summary: Créer une référence validée CNPM.
+      operationId: createPaymentReference
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /payments:
+    get:
+      tags:
+      - PAYMENT
+      summary: Lister les transactions.
+      operationId: listPayments
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /payments/{id}:
+    get:
+      tags:
+      - PAYMENT
+      summary: Consulter une transaction.
+      operationId: getPayment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /payments/{id}/confirm:
+    post:
+      tags:
+      - PAYMENT
+      summary: Confirmer un paiement rapproché.
+      operationId: confirmPayment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /payment-provider-events/{partnerCode}:
+    post:
+      tags:
+      - PAYMENT
+      summary: Recevoir un callback signé.
+      operationId: receivePaymentProviderEvent
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: partnerCode
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /bank-statements/import:
+    post:
+      tags:
+      - PAYMENT
+      summary: Importer un relevé bancaire.
+      operationId: importBankStatement
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /reconciliations:
+    get:
+      tags:
+      - PAYMENT
+      summary: Lister les rapprochements.
+      operationId: listReconciliations
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /reconciliations/{id}/decide:
+    post:
+      tags:
+      - PAYMENT
+      summary: Accepter ou rejeter une proposition.
+      operationId: decideReconciliation
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /payments/{id}/refunds:
+    post:
+      tags:
+      - PAYMENT
+      summary: Initier un remboursement contrôlé.
+      operationId: requestRefund
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PAY-001
+      - PAY-002
+      - PAY-003
+      - PAY-004
+      - PAY-005
+      - PAY-006
+      - PAY-007
+      - PAY-008
+  /receipts:
+    get:
+      tags:
+      - RECEIPT
+      summary: Lister les reçus.
+      operationId: listReceipts
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - REC-001
+      - REC-002
+      - REC-003
+      - REC-004
+      - REC-005
+      - REC-006
+  /receipts/{id}:
+    get:
+      tags:
+      - RECEIPT
+      summary: Télécharger un reçu.
+      operationId: getReceipt
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - REC-001
+      - REC-002
+      - REC-003
+      - REC-004
+      - REC-005
+      - REC-006
+  /receipts/verify/{token}:
+    get:
+      tags:
+      - RECEIPT
+      summary: Vérifier publiquement un reçu.
+      operationId: verifyReceipt
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - REC-001
+      - REC-002
+      - REC-003
+      - REC-004
+      - REC-005
+      - REC-006
+  /receipts/{id}/cancel:
+    post:
+      tags:
+      - RECEIPT
+      summary: Annuler et remplacer un reçu.
+      operationId: cancelReceipt
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REC-001
+      - REC-002
+      - REC-003
+      - REC-004
+      - REC-005
+      - REC-006
+  /collection-campaigns:
+    get:
+      tags:
+      - RECOVERY
+      summary: Lister les campagnes.
+      operationId: listCollectionCampaigns
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - REL-001
+      - REL-002
+      - REL-003
+      - REL-004
+      - REL-005
+      - REL-006
+      - REL-007
+      - REL-008
+    post:
+      tags:
+      - RECOVERY
+      summary: Créer une campagne.
+      operationId: createCollectionCampaign
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REL-001
+      - REL-002
+      - REL-003
+      - REL-004
+      - REL-005
+      - REL-006
+      - REL-007
+      - REL-008
+  /collection-campaigns/{id}/launch:
+    post:
+      tags:
+      - RECOVERY
+      summary: Lancer une séquence.
+      operationId: launchCollectionCampaign
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REL-001
+      - REL-002
+      - REL-003
+      - REL-004
+      - REL-005
+      - REL-006
+      - REL-007
+      - REL-008
+  /recovery-cases:
+    get:
+      tags:
+      - RECOVERY
+      summary: Lister les dossiers de recouvrement.
+      operationId: listRecoveryCases
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - REL-001
+      - REL-002
+      - REL-003
+      - REL-004
+      - REL-005
+      - REL-006
+      - REL-007
+      - REL-008
+  /recovery-cases/{id}/actions:
+    post:
+      tags:
+      - RECOVERY
+      summary: Tracer une action.
+      operationId: recordRecoveryAction
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REL-001
+      - REL-002
+      - REL-003
+      - REL-004
+      - REL-005
+      - REL-006
+      - REL-007
+      - REL-008
+  /recovery-cases/{id}/promises:
+    post:
+      tags:
+      - RECOVERY
+      summary: Enregistrer une promesse.
+      operationId: createPromiseToPay
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REL-001
+      - REL-002
+      - REL-003
+      - REL-004
+      - REL-005
+      - REL-006
+      - REL-007
+      - REL-008
+  /portal/dashboard:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher la synthèse membre.
+      operationId: getMemberDashboard
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - PRT-001
+      - PRT-002
+      - PRT-003
+      - PRT-004
+      - PRT-005
+      - PRT-006
+      - PRT-007
+      - PRT-008
+  /portal/contributions:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher cotisations et soldes.
+      operationId: getMemberContributions
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - PRT-001
+      - PRT-002
+      - PRT-003
+      - PRT-004
+      - PRT-005
+      - PRT-006
+      - PRT-007
+      - PRT-008
+  /portal/payments:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher paiements et statuts.
+      operationId: getMemberPayments
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - PRT-001
+      - PRT-002
+      - PRT-003
+      - PRT-004
+      - PRT-005
+      - PRT-006
+      - PRT-007
+      - PRT-008
+  /portal/documents:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher reçus et attestations.
+      operationId: getMemberDocuments
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - PRT-001
+      - PRT-002
+      - PRT-003
+      - PRT-004
+      - PRT-005
+      - PRT-006
+      - PRT-007
+      - PRT-008
+  /service-requests:
+    get:
+      tags:
+      - REQUEST
+      summary: Lister les requêtes.
+      operationId: listServiceRequests
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - REQ-001
+      - REQ-002
+      - REQ-003
+      - REQ-004
+      - REQ-005
+      - REQ-006
+      - REQ-007
+      - REQ-008
+    post:
+      tags:
+      - REQUEST
+      summary: Soumettre une requête.
+      operationId: createServiceRequest
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REQ-001
+      - REQ-002
+      - REQ-003
+      - REQ-004
+      - REQ-005
+      - REQ-006
+      - REQ-007
+      - REQ-008
+  /service-requests/{id}:
+    get:
+      tags:
+      - REQUEST
+      summary: Consulter une requête.
+      operationId: getServiceRequest
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - REQ-001
+      - REQ-002
+      - REQ-003
+      - REQ-004
+      - REQ-005
+      - REQ-006
+      - REQ-007
+      - REQ-008
+  /service-requests/{id}/messages:
+    post:
+      tags:
+      - REQUEST
+      summary: Ajouter un échange.
+      operationId: addServiceRequestMessage
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REQ-001
+      - REQ-002
+      - REQ-003
+      - REQ-004
+      - REQ-005
+      - REQ-006
+      - REQ-007
+      - REQ-008
+  /service-requests/{id}/close:
+    post:
+      tags:
+      - REQUEST
+      summary: Clôturer avec preuve.
+      operationId: closeServiceRequest
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - REQ-001
+      - REQ-002
+      - REQ-003
+      - REQ-004
+      - REQ-005
+      - REQ-006
+      - REQ-007
+      - REQ-008
+  /professional-groups:
+    get:
+      tags:
+      - GROUP
+      summary: Lister les groupements.
+      operationId: listProfessionalGroups
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - GRP-001
+      - GRP-002
+      - GRP-003
+      - GRP-004
+      - GRP-005
+      - GRP-006
+  /professional-groups/{id}/dashboard:
+    get:
+      tags:
+      - GROUP
+      summary: Afficher le tableau sectoriel.
+      operationId: getGroupDashboard
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - GRP-001
+      - GRP-002
+      - GRP-003
+      - GRP-004
+      - GRP-005
+      - GRP-006
+  /bonus-calculations:
+    get:
+      tags:
+      - INCENTIVE
+      summary: Lister les primes.
+      operationId: listBonusCalculations
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - PRI-001
+      - PRI-002
+      - PRI-003
+      - PRI-004
+      - PRI-005
+      - PRI-006
+      - PRI-007
+  /bonus-calculations/run:
+    post:
+      tags:
+      - INCENTIVE
+      summary: Calculer une période.
+      operationId: runBonusCalculation
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PRI-001
+      - PRI-002
+      - PRI-003
+      - PRI-004
+      - PRI-005
+      - PRI-006
+      - PRI-007
+  /bonus-calculations/{id}/approve:
+    post:
+      tags:
+      - INCENTIVE
+      summary: Valider à quatre yeux.
+      operationId: approveBonusCalculation
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - PRI-001
+      - PRI-002
+      - PRI-003
+      - PRI-004
+      - PRI-005
+      - PRI-006
+      - PRI-007
+  /revenue-share-statements:
+    get:
+      tags:
+      - INCENTIVE
+      summary: Lister les états prestataire.
+      operationId: listRevenueShareStatements
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - PRI-001
+      - PRI-002
+      - PRI-003
+      - PRI-004
+      - PRI-005
+      - PRI-006
+      - PRI-007
+  /documents/upload-sessions:
+    post:
+      tags:
+      - DOCUMENT
+      summary: Créer un téléversement sécurisé.
+      operationId: createDocumentUploadSession
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - GED-001
+      - GED-002
+      - GED-003
+      - GED-004
+      - GED-005
+      - GED-006
+  /documents/upload-sessions/{id}/complete:
+    post:
+      tags:
+      - DOCUMENT
+      summary: Finaliser après antivirus.
+      operationId: completeDocumentUpload
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - GED-001
+      - GED-002
+      - GED-003
+      - GED-004
+      - GED-005
+      - GED-006
+  /documents/{id}:
+    get:
+      tags:
+      - DOCUMENT
+      summary: Consulter les métadonnées.
+      operationId: getDocument
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - GED-001
+      - GED-002
+      - GED-003
+      - GED-004
+      - GED-005
+      - GED-006
+  /documents/{id}/download:
+    get:
+      tags:
+      - DOCUMENT
+      summary: Télécharger selon droits.
+      operationId: downloadDocument
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - GED-001
+      - GED-002
+      - GED-003
+      - GED-004
+      - GED-005
+      - GED-006
+  /events:
+    get:
+      tags:
+      - EVENT
+      summary: Lister événements et formations.
+      operationId: listEvents
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - EVT-001
+      - EVT-002
+      - EVT-003
+      - EVT-004
+    post:
+      tags:
+      - EVENT
+      summary: Créer un événement.
+      operationId: createEvent
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - EVT-001
+      - EVT-002
+      - EVT-003
+      - EVT-004
+  /events/{id}/registrations:
+    post:
+      tags:
+      - EVENT
+      summary: Inscrire un participant.
+      operationId: registerForEvent
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - EVT-001
+      - EVT-002
+      - EVT-003
+      - EVT-004
+  /events/{id}/attendance/import:
+    post:
+      tags:
+      - EVENT
+      summary: Importer les présences.
+      operationId: importAttendance
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - EVT-001
+      - EVT-002
+      - EVT-003
+      - EVT-004
+  /dashboards/{code}:
+    get:
+      tags:
+      - REPORT
+      summary: Restituer un tableau de bord.
+      operationId: getDashboard
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - BI-001
+      - BI-002
+      - BI-003
+      - BI-004
+      - BI-005
+      - BI-006
+      - BI-007
+      - BI-008
+  /reports/{code}/execute:
+    post:
+      tags:
+      - REPORT
+      summary: Exécuter un rapport.
+      operationId: executeReport
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - BI-001
+      - BI-002
+      - BI-003
+      - BI-004
+      - BI-005
+      - BI-006
+      - BI-007
+      - BI-008
+  /exports:
+    post:
+      tags:
+      - REPORT
+      summary: Créer un export audité.
+      operationId: createExport
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - BI-001
+      - BI-002
+      - BI-003
+      - BI-004
+      - BI-005
+      - BI-006
+      - BI-007
+      - BI-008
+  /exports/{id}:
+    get:
+      tags:
+      - REPORT
+      summary: Suivre un export.
+      operationId: getExportStatus
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Ressource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - BI-001
+      - BI-002
+      - BI-003
+      - BI-004
+      - BI-005
+      - BI-006
+      - BI-007
+      - BI-008
+  /audit-events:
+    get:
+      tags:
+      - AUDIT
+      summary: Rechercher la piste d’audit.
+      operationId: searchAuditEvents
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - AUD-001
+      - AUD-002
+      - AUD-003
+      - AUD-004
+      - AUD-005
+  /audit-exports:
+    post:
+      tags:
+      - AUDIT
+      summary: Générer une preuve d’audit.
+      operationId: createAuditExport
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - AUD-001
+      - AUD-002
+      - AUD-003
+      - AUD-004
+      - AUD-005
+  /integration-partners:
+    get:
+      tags:
+      - INTEGRATION
+      summary: Lister les partenaires.
+      operationId: listIntegrationPartners
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Collection paginée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+      x-requirements:
+      - INT-001
+      - INT-002
+      - INT-003
+      - INT-004
+      - INT-005
+      - INT-006
+  /webhook-subscriptions:
+    post:
+      tags:
+      - INTEGRATION
+      summary: Créer un abonnement sortant.
+      operationId: createWebhookSubscription
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      x-requirements:
+      - INT-001
+      - INT-002
+      - INT-003
+      - INT-004
+      - INT-005
+      - INT-006
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://iam.example.cnpm.ml/realms/cnpm/protocol/openid-connect/auth
+          tokenUrl: https://iam.example.cnpm.ml/realms/cnpm/protocol/openid-connect/token
+          scopes:
+            openid: Identité
+            profile: Profil
+            offline_access: Renouvellement contrôlé
+  parameters:
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 16
+        maxLength: 100
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  schemas:
+    Uuid:
+      type: string
+      format: uuid
+    Money:
+      type: object
+      required:
+      - amount
+      - currency
+      properties:
+        amount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+          example: '125000.00'
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          example: XOF
+    AuditFields:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          $ref: '#/components/schemas/Uuid'
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int64
+    Resource:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        businessReference:
+          type: string
+        status:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: true
+        audit:
+          $ref: '#/components/schemas/AuditFields'
+    ResourceInput:
+      type: object
+      properties:
+        businessReference:
+          type: string
+        attributes:
+          type: object
+          additionalProperties: true
+      additionalProperties: false
+    DecisionInput:
+      type: object
+      required:
+      - decision
+      - reason
+      properties:
+        decision:
+          type: string
+          enum:
+          - APPROVE
+          - REJECT
+          - CANCEL
+          - CONFIRM
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+    PageResource:
+      type: object
+      required:
+      - items
+      - page
+      - size
+      - totalElements
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resource'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+    Problem:
+      type: object
+      required:
+      - timestamp
+      - status
+      - code
+      - message
+      - correlationId
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        fieldErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              code:
+                type: string
+              message:
+                type: string
+        correlationId:
+          type: string
+          format: uuid
+  responses:
+    BadRequest:
+      description: Requête invalide
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthorized:
+      description: Authentification requise
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Forbidden:
+      description: Permission ou périmètre insuffisant
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: Conflit d’état ou d’idempotence
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unprocessable:
+      description: Règle métier non satisfaite
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'

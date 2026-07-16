@@ -1,0 +1,17 @@
+digraph G { rankdir=TB; graph [bgcolor="white", fontname="DejaVu Sans", pad="0.2", nodesep="0.55", ranksep="0.75", splines=ortho];
+node [shape=box, style="rounded,filled", fillcolor="white", color="#1F3A93", fontcolor="#1A1D24", fontname="DejaVu Sans", fontsize=10, penwidth=1.2, margin="0.16,0.10"];
+edge [color="#1F3A93", fontcolor="#1A1D24", fontname="DejaVu Sans", fontsize=8.5, penwidth=1.0, arrowsize=0.7];
+  identity [label="Identité
+Keycloak, OIDC, 2FA, passkeys"];
+  authz [label="Autorisation
+RBAC + périmètre + refus par défaut"];
+  app [label="Sécurité applicative
+validation, CSP, fichiers, rate limits"];
+  data [label="Protection des données
+TLS, chiffrement, masquage, rétention"];
+  audit [label="Audit et détection
+journal immuable, alertes, corrélation"];
+  ops [label="DevSecOps
+SAST, SCA, secrets, SBOM, DAST"];
+  identity -> authz -> app -> data -> audit -> ops;
+}

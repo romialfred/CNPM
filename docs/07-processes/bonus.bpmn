@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="https://cnpm.ml/processes">
+  <bpmn:process id="Process_Bonus" name="Calcul et validation des primes" isExecutable="true">
+    <bpmn:startEvent id="StartEvent" name="Début"/>
+    <bpmn:task id="Task1" name="Sélectionner les paiements éligibles"/>
+    <bpmn:task id="Task2" name="Appliquer la règle versionnée"/>
+    <bpmn:task id="Task3" name="Calculer les lignes"/>
+    <bpmn:task id="Task4" name="Contrôler les exceptions"/>
+    <bpmn:task id="Task5" name="Faire valider par un acteur distinct"/>
+    <bpmn:task id="Task6" name="Publier l’état mensuel"/>
+    <bpmn:endEvent id="EndEvent" name="Fin"/>
+    <bpmn:sequenceFlow id="Flow1" sourceRef="StartEvent" targetRef="Task1"/>
+    <bpmn:sequenceFlow id="Flow2" sourceRef="Task1" targetRef="Task2"/>
+    <bpmn:sequenceFlow id="Flow3" sourceRef="Task2" targetRef="Task3"/>
+    <bpmn:sequenceFlow id="Flow4" sourceRef="Task3" targetRef="Task4"/>
+    <bpmn:sequenceFlow id="Flow5" sourceRef="Task4" targetRef="Task5"/>
+    <bpmn:sequenceFlow id="Flow6" sourceRef="Task5" targetRef="Task6"/>
+    <bpmn:sequenceFlow id="Flow7" sourceRef="Task6" targetRef="EndEvent"/>
+  </bpmn:process>
+</bpmn:definitions>

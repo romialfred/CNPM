@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "package": {
+    "name": "CNPM UI/UX Handoff — Integrated Repository",
+    "version": "1.0.0",
+    "language": "fr",
+    "status": "FINAL",
+    "generatedAt": "2026-07-16"
+  },
+  "entrypoints": {
+    "human": "START_HERE.md",
+    "claudeCode": "../../CLAUDE.md",
+    "codex": "../../AGENTS.md",
+    "executiveGuideDocx": "guide/CNPM_UI_UX_Handoff_Guide_v1.0.docx",
+    "executiveGuidePdf": "guide/CNPM_UI_UX_Handoff_Guide_v1.0.pdf"
+  },
+  "sourcePriority": [
+    "docs/00-governance/source-of-truth.md",
+    "product specifications, DCTD, API and RBAC source documents",
+    "design-tokens/tokens.source.json",
+    "data/component-catalog.json",
+    "data/screen-inventory.json",
+    "docs/04-screens/reference-specs/<screen>.md",
+    "assets/reference-screens/full/<reference>.png"
+  ],
+  "implementation": {
+    "web": "Angular",
+    "mobile": "Flutter",
+    "charts": "Apache ECharts",
+    "storybook": true,
+    "visualTesting": "Playwright",
+    "accessibilityTesting": "axe-core"
+  },
+  "paths": {
+    "tokens": "design-tokens/tokens.source.json",
+    "screenInventory": "data/screen-inventory.json",
+    "componentCatalog": "data/component-catalog.json",
+    "fixtures": "data/demo-fixtures.json",
+    "viewports": "data/viewports.json",
+    "referenceManifest": "assets/reference-screens/manifest.json",
+    "openDecisions": "data/open-decisions.json",
+    "integratedWeb": "../../web/",
+    "integratedMobile": "../../mobile/"
+  },
+  "quality": {
+    "wcagTarget": "2.2 AA",
+    "maxSeriousAxeViolations": 0,
+    "pageMaxDiffPixelRatio": 0.005,
+    "componentMaxDiffPixelRatio": 0.003,
+    "requiredViewports": [
+      "360x800",
+      "390x844",
+      "430x932",
+      "768x1024",
+      "1024x768",
+      "1280x800",
+      "1440x900",
+      "1672x941"
+    ]
+  },
+  "pilotScreens": [
+    "AUTH-001",
+    "PUB-001",
+    "PUB-006",
+    "BO-002"
+  ],
+  "prohibitions": [
+    "No decorative large colored frames",
+    "No feature-local magic colors or arbitrary spacing",
+    "No color-only status communication",
+    "No absolute positioning of an entire page to imitate a PNG",
+    "No real member data or production secrets",
+    "No unapproved signatures, stamps, QR codes, partner logos or photographs"
+  ]
+}

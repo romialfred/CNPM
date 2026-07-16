@@ -1,0 +1,67 @@
+﻿Code;Domaine;Action;Description;Sensible;Audit requis
+ADMIN.REFERENTIAL.READ;Administration;Consulter;Consulter les référentiels.;Non;Oui
+ADMIN.REFERENTIAL.WRITE;Administration;Modifier;Créer et modifier les référentiels.;Oui;Oui
+ADMIN.REFERENTIAL.APPROVE;Administration;Valider;Valider un référentiel sensible.;Oui;Oui
+ADMIN.PARAMETER.READ;Administration;Consulter;Consulter les paramètres métier.;Non;Oui
+ADMIN.PARAMETER.WRITE;Administration;Modifier;Modifier les paramètres métier.;Oui;Oui
+IAM.USER.READ;Identité;Consulter;Consulter les comptes utilisateurs.;Non;Oui
+IAM.USER.WRITE;Identité;Administrer;Créer, suspendre ou réactiver un compte.;Oui;Oui
+IAM.ROLE.ASSIGN;Identité;Attribuer;Attribuer ou retirer un rôle.;Oui;Oui
+IAM.MFA.RESET;Identité;Réinitialiser;Réinitialiser un facteur 2FA.;Oui;Oui
+IAM.ACCESS.REVIEW;Identité;Auditer;Exécuter et valider une revue d’accès.;Oui;Oui
+MEMBER.READ;Membres;Consulter;Consulter membres et entreprises.;Non;Oui
+MEMBER.WRITE;Membres;Modifier;Créer et mettre à jour les dossiers membres.;Oui;Oui
+MEMBER.SENSITIVE.WRITE;Membres;Modifier;Modifier NIF, RCCM, représentant ou coordonnées sensibles.;Oui;Oui
+MEMBER.EXPORT;Membres;Exporter;Exporter les données membres.;Oui;Oui
+ENROLLMENT.CREATE;Enrôlement;Créer;Créer ou assister un enrôlement.;Non;Oui
+ENROLLMENT.REVIEW;Enrôlement;Contrôler;Contrôler les pièces et demander des compléments.;Oui;Oui
+ENROLLMENT.APPROVE;Enrôlement;Valider;Approuver ou rejeter un enrôlement.;Oui;Oui
+CONTRIBUTION.READ;Cotisations;Consulter;Consulter appels, échéances et soldes.;Non;Oui
+CONTRIBUTION.RULE.WRITE;Cotisations;Paramétrer;Créer ou modifier un barème.;Oui;Oui
+CONTRIBUTION.RULE.APPROVE;Cotisations;Valider;Publier un barème ou une règle financière.;Oui;Oui
+CONTRIBUTION.GENERATE;Cotisations;Générer;Générer les appels de cotisations.;Oui;Oui
+CONTRIBUTION.ADJUST;Cotisations;Ajuster;Créer un ajustement ou une remise contrôlée.;Oui;Oui
+PAYMENT.READ;Paiements;Consulter;Consulter les paiements et allocations.;Non;Oui
+PAYMENT.RECORD;Paiements;Enregistrer;Enregistrer un encaissement.;Oui;Oui
+PAYMENT.CONFIRM;Paiements;Confirmer;Confirmer un paiement après contrôle CNPM.;Oui;Oui
+PAYMENT.CANCEL;Paiements;Annuler;Annuler ou compenser un paiement.;Oui;Oui
+RECONCILIATION.RUN;Rapprochement;Exécuter;Lancer le rapprochement automatique.;Non;Oui
+RECONCILIATION.OVERRIDE;Rapprochement;Dérogation;Forcer une proposition de rapprochement.;Oui;Oui
+RECONCILIATION.APPROVE;Rapprochement;Valider;Valider un rapprochement manuel ou exceptionnel.;Oui;Oui
+RECEIPT.READ;Reçus;Consulter;Consulter les reçus et attestations.;Non;Oui
+RECEIPT.ISSUE;Reçus;Émettre;Émettre un reçu officiel CNPM.;Oui;Oui
+RECEIPT.CANCEL;Reçus;Annuler;Annuler un reçu et produire une correction.;Oui;Oui
+RECOVERY.READ;Recouvrement;Consulter;Consulter dossiers, campagnes et actions.;Non;Oui
+RECOVERY.CAMPAIGN.WRITE;Recouvrement;Administrer;Créer et piloter une campagne.;Non;Oui
+RECOVERY.ACTION.WRITE;Recouvrement;Traiter;Créer des actions, contacts et promesses.;Non;Oui
+RECOVERY.EXPORT;Recouvrement;Exporter;Exporter les états de recouvrement.;Oui;Oui
+NOTIFICATION.TEMPLATE.WRITE;Notifications;Paramétrer;Gérer les modèles de communication.;Oui;Oui
+NOTIFICATION.SEND;Notifications;Envoyer;Déclencher une communication multicanale.;Oui;Oui
+REQUEST.READ;Requêtes;Consulter;Consulter les requêtes et réclamations.;Non;Oui
+REQUEST.WRITE;Requêtes;Traiter;Créer, affecter et traiter une requête.;Non;Oui
+REQUEST.CLOSE;Requêtes;Clôturer;Clôturer une requête ou réclamation.;Oui;Oui
+GROUP.READ;Groupements;Consulter;Consulter les groupements et rattachements.;Non;Oui
+GROUP.WRITE;Groupements;Administrer;Administrer un groupement et ses rattachements.;Oui;Oui
+GOVERNANCE.WRITE;Gouvernance;Administrer;Gérer commissions, réunions et décisions.;Oui;Oui
+EVENT.WRITE;Événements;Administrer;Gérer événements, formations et inscriptions.;Non;Oui
+INCENTIVE.READ;Primes;Consulter;Consulter primes et rémunérations.;Non;Oui
+INCENTIVE.RULE.WRITE;Primes;Paramétrer;Créer ou modifier une règle de prime.;Oui;Oui
+INCENTIVE.CALCULATE;Primes;Calculer;Calculer un état de prime ou partage de revenus.;Oui;Oui
+INCENTIVE.APPROVE;Primes;Valider;Valider un état de prime ou de rémunération.;Oui;Oui
+REPORT.OPERATIONAL.READ;Décisionnel;Consulter;Consulter les tableaux de bord opérationnels.;Non;Oui
+REPORT.EXECUTIVE.READ;Décisionnel;Consulter;Consulter les tableaux de bord de direction.;Non;Oui
+REPORT.EXPORT;Décisionnel;Exporter;Exporter un rapport PDF/Excel.;Oui;Oui
+REPORT.DESIGN;Décisionnel;Concevoir;Créer ou modifier une définition de rapport.;Oui;Oui
+DOCUMENT.READ;GED;Consulter;Consulter les documents autorisés.;Non;Oui
+DOCUMENT.WRITE;GED;Administrer;Déposer, versionner et classer un document.;Non;Oui
+DOCUMENT.SENSITIVE.READ;GED;Consulter;Consulter les documents sensibles.;Oui;Oui
+AUDIT.READ;Audit;Auditer;Consulter les journaux d’audit et preuves.;Oui;Oui
+AUDIT.EXPORT;Audit;Exporter;Exporter un dossier d’audit.;Oui;Oui
+SECURITY.EVENT.READ;Sécurité;Auditer;Consulter les événements de sécurité.;Oui;Oui
+SECURITY.INCIDENT.WRITE;Sécurité;Traiter;Créer et traiter un incident de sécurité.;Oui;Oui
+INTEGRATION.CONFIG.WRITE;Intégrations;Administrer;Configurer une intégration externe.;Oui;Oui
+INTEGRATION.REPLAY;Intégrations;Rejouer;Rejouer un événement ou webhook échoué.;Oui;Oui
+OPS.MONITOR.READ;Exploitation;Consulter;Consulter métriques et journaux techniques.;Oui;Oui
+OPS.DEPLOY;Exploitation;Déployer;Déployer une version applicative.;Oui;Oui
+DATA.RESTORE;Données;Restaurer;Exécuter une restauration contrôlée.;Oui;Oui
+DATA.EXPORT.ALL;Données;Exporter;Produire une restitution complète CNPM.;Oui;Oui

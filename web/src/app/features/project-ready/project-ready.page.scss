@@ -1,0 +1,21 @@
+.project-ready {
+  min-block-size: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--cnpm-space-7, 28px);
+  background: var(--cnpm-color-surface-page, #f8f9fc);
+  color: var(--cnpm-color-text-primary, #111b3f);
+}
+
+section {
+  max-inline-size: 46rem;
+  padding: 2rem;
+  border: 1px solid var(--cnpm-color-border-default, #dfe3ec);
+  border-radius: var(--cnpm-radius-card, 12px);
+  background: var(--cnpm-color-surface-primary, #fff);
+}
+
+.eyebrow {
+  color: var(--cnpm-color-brand-blue, #273481);
+  font-weight: 700;
+}

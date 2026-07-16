@@ -1,0 +1,885 @@
+{
+  "version": "1.0.0",
+  "files": [
+    {
+      "path": "README.md",
+      "size": 1935,
+      "sha256": "52480c90410eed8626dcbd9d1accbc419c245ca331ef07f90048862f8c5f69f6"
+    },
+    {
+      "path": "RELEASE_NOTES.md",
+      "size": 887,
+      "sha256": "13c5b22d005494d49e00d280d39d475acdd1d512d890ac3b363c94ca20c490de"
+    },
+    {
+      "path": "START_HERE.md",
+      "size": 1540,
+      "sha256": "9d2073a42da0c0874c00878e7c072c4ec182f40478ebd8043921ad0aaa8bdbf7"
+    },
+    {
+      "path": "VALIDATION_REPORT.md",
+      "size": 1319,
+      "sha256": "74e00dccd972dbeb7fa747e306331d83a0cf278e4ad813541af98b0cfbf00156"
+    },
+    {
+      "path": "VERSION",
+      "size": 6,
+      "sha256": "59854984853104df5c353e2f681a15fc7924742f9a2e468c29af248dce45ce03"
+    },
+    {
+      "path": "assets/brand/README.md",
+      "size": 529,
+      "sha256": "b61467cbe1253e8ea20ae4a94d3fc9567fc2ce95acde1029868cee101c7d282d"
+    },
+    {
+      "path": "assets/placeholders/avatar-placeholder.svg",
+      "size": 225,
+      "sha256": "1c1927b538616b09026822591a67ca34bc4fab1486cc910a813dbe107396961e"
+    },
+    {
+      "path": "assets/placeholders/company-logo-placeholder.svg",
+      "size": 482,
+      "sha256": "7f108e5237591fae66b61ed1f10a3590da99ac889dfd9edebed8a6a4cad96d71"
+    },
+    {
+      "path": "assets/placeholders/empty-state.svg",
+      "size": 446,
+      "sha256": "01a8e96e6c8936957d353b97614ab7788830d4360bb71fff1cd4a623614466ed"
+    },
+    {
+      "path": "assets/placeholders/image-placeholder.svg",
+      "size": 422,
+      "sha256": "19780189d830537aef1da5c88aba3e3f06ce3e1fea88f56ec1a33ba154ecc95d"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-auth-001-login.png",
+      "size": 1404866,
+      "sha256": "6edfae84ab720cb8032efb0778575661cae177a1d5e98009223e3eef975d93f7"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-001-dashboard.png",
+      "size": 1228359,
+      "sha256": "479ee26fa681b7ec961e953ca9877312168b116926d88b8de1b4695ec8e6a0b0"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-002-members-list.png",
+      "size": 1323259,
+      "sha256": "37137985a94b6227f255ee89c446922550083159dcc8fe26612d7a2515ed511b"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-003-member-detail.png",
+      "size": 1240761,
+      "sha256": "9b349dbc3f0c52eb4cef813d0fe144b9021baa04e6ce2a756dda53d272d9913a"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-009-enrollment-form.png",
+      "size": 1097138,
+      "sha256": "fa86a32ee6fc0cb075cf875de2f7598b19398155a22bd66a98c01c49909044c3"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-011-contributions.png",
+      "size": 1181737,
+      "sha256": "d3c3cd92fef1250527e3c9fca587040190d4e5d28637ea10731c7f10002341f4"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-014-payments-reconciliation.png",
+      "size": 1257096,
+      "sha256": "fd09982a64e02710089814c6671ad0f6ae6064c2addf9ccf7eebcb5c636ca75a"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-017-recovery-campaigns.png",
+      "size": 1261503,
+      "sha256": "746331ebe2ba1c5ef9f1d8d4dc3125016269d2df1d1100bfcfb419c90ad64901"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-028-reporting.png",
+      "size": 1436085,
+      "sha256": "64a294c030c624c6ced0f28325f92c29856105557166a890d7a66eeb2c2b018e"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-bo-030-admin-security.png",
+      "size": 1259422,
+      "sha256": "b7a9714622802cb08bae6fa1a2efb29616460f668dbf5041fca852266eb1e6d1"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-mob-001-mobile-board.png",
+      "size": 1488371,
+      "sha256": "8f754ea57697cd36f545ba985619d1c06f978d2fbc760fd171013b892cbcbd01"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-mp-001-member-home.png",
+      "size": 1250460,
+      "sha256": "2e4475382362d2a0f9764dd2c346e5533af38d638be879b997f215ec77c8a405"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-pub-001-public-home.png",
+      "size": 1335217,
+      "sha256": "7a4da9392a60a2f6ba8c990ff369c2e2f4a9f42e543c8a9758ce41e5fb2f58a4"
+    },
+    {
+      "path": "assets/reference-screens/full/ref-pub-006-member-showcase.png",
+      "size": 1796611,
+      "sha256": "2dc637a9d494e53cdaed3b2c420f826251c3af822cdbde90e592556e8a2a237f"
+    },
+    {
+      "path": "assets/reference-screens/manifest.csv",
+      "size": 3930,
+      "sha256": "697f0675de769740829451a82f141d5bb336b990adae55f5750dc618bc387623"
+    },
+    {
+      "path": "assets/reference-screens/manifest.json",
+      "size": 5966,
+      "sha256": "8f580d0503bf465d17d95b2646e1b9f3f29f29ae8195a4c5a19a21a4ac7c26a8"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-auth-001-login.png",
+      "size": 231456,
+      "sha256": "fadf60ac17a2533330a08ae44be4d6d8c08740dda57a7aa6634fd53f363b9bae"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-001-dashboard.png",
+      "size": 234108,
+      "sha256": "4bbbc92e317ce67f0d854e54459df42650cd527a1147698a496553db17df5b8b"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-002-members-list.png",
+      "size": 238050,
+      "sha256": "97ef9c481feeeef7136c1b34b4e3e28dd2a596441297ba2e4e55c6d0a4c508e6"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-003-member-detail.png",
+      "size": 235011,
+      "sha256": "75a17b3c886de65e44cb74ca72ac060339eedea0bd4420b7e31917a95f0b5614"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-009-enrollment-form.png",
+      "size": 205892,
+      "sha256": "daedbac32ae4aaa35f3e671f5e5e09031c90175b0e0166b7336de80f362b67d1"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-011-contributions.png",
+      "size": 222968,
+      "sha256": "709e728535324d37cfdf5e3609736774ea006eae7dc0586d175ccaa24889164c"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-014-payments-reconciliation.png",
+      "size": 231589,
+      "sha256": "6c0c8b8419ea1b5a86081446813dbb41cc4c4c8317e9a0d11ec2fa9c94ffa6cf"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-017-recovery-campaigns.png",
+      "size": 238212,
+      "sha256": "919517fde53d4be32a70b304d56d84821086ed42afac40b1b1ee6ed0f09c65e9"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-028-reporting.png",
+      "size": 254129,
+      "sha256": "b7839352cf0974201e789f3c83c376a0a82dabbab046ba5360dbf3717c166320"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-bo-030-admin-security.png",
+      "size": 223441,
+      "sha256": "0ced39d833e6abfe2c2058a6904a2eba7dd0bc0e28737dfe9b695751e42d8d69"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-mob-001-mobile-board.png",
+      "size": 253218,
+      "sha256": "6c5ca1b624b9d15f1ec8c4d9f4c81fd529cb9e97d798846a8036593cd70072ea"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-mp-001-member-home.png",
+      "size": 228845,
+      "sha256": "739c829155173c23e204800d1c0d30d02a2cffa718053669e10a0dd083afaf3d"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-pub-001-public-home.png",
+      "size": 244352,
+      "sha256": "2e1b7b0153d3c2b631450d16f73bbd05269af5ecc8fe8fbb12de9da1add5ad71"
+    },
+    {
+      "path": "assets/reference-screens/thumbnails/ref-pub-006-member-showcase.png",
+      "size": 308844,
+      "sha256": "6aad3d947b3d61db776682f4b2237f25a9efa80f542268d07cdfe4279d0fc53d"
+    },
+    {
+      "path": "data/component-catalog.csv",
+      "size": 7524,
+      "sha256": "a0877e2e9267ae75947d32667365abceab7cf90f7ba299d9f7695c723a79c9e0"
+    },
+    {
+      "path": "data/component-catalog.json",
+      "size": 19071,
+      "sha256": "1bb75637e8e5e96338a13dd8a8c8303a6f954eb575353adb62ce1bd46e972b00"
+    },
+    {
+      "path": "data/demo-fixtures.json",
+      "size": 6910,
+      "sha256": "8177180f18fa666f4f8ec194a2e730ddcc4e4a1ace45347f4c62dc38498c6f07"
+    },
+    {
+      "path": "data/member-showcase-sample.json",
+      "size": 1680,
+      "sha256": "2861c77104c571892739d718418787e0bab9e06f2c2dde0024346620c9185900"
+    },
+    {
+      "path": "data/member-showcase.schema.json",
+      "size": 2842,
+      "sha256": "18f5db54c032da647624e348b108521a0a46ca1eacc4b4f2da954ae2c8c4f57a"
+    },
+    {
+      "path": "data/open-decisions.json",
+      "size": 2925,
+      "sha256": "9e073d37c83076fbc1bc4048a3d8ac772ff87023f8c2c040bf0d144fab8483f8"
+    },
+    {
+      "path": "data/screen-inventory.csv",
+      "size": 10787,
+      "sha256": "ba95d734a5136a6f725edc952373136e34adc902338688092bfeada8a9cea351"
+    },
+    {
+      "path": "data/screen-inventory.json",
+      "size": 28253,
+      "sha256": "3465b3b84969ce84e4e6adf44165c134ae74c996991663b9608b8100042e8156"
+    },
+    {
+      "path": "data/screen-inventory.schema.json",
+      "size": 955,
+      "sha256": "4106995579a859f159daf49a0ec241230e564c2d013bd754fe815696c1b23684"
+    },
+    {
+      "path": "data/ui-copy.en.json",
+      "size": 355,
+      "sha256": "36af92bb99aeddd5d2584dfa86faf5898da4f4d184846f06a65a498b46ffdc9c"
+    },
+    {
+      "path": "data/ui-copy.fr.json",
+      "size": 1721,
+      "sha256": "e745252de044ae3d96712b12ed808efed5002d24f34956a5c5d03662bbcac8b2"
+    },
+    {
+      "path": "data/viewports.json",
+      "size": 1564,
+      "sha256": "96aee8e09f457c9083305f575d3551ef121c7cf706ab4f2ac9fa3fb6189d9472"
+    },
+    {
+      "path": "design-tokens/_tokens.scss",
+      "size": 6417,
+      "sha256": "2c0e186b5df0e4d9eb36d9773819ffc3e512525b322838d6ae22ac37e98ae107"
+    },
+    {
+      "path": "design-tokens/cnpm_theme.dart",
+      "size": 1925,
+      "sha256": "311d1ddec3f242526ddd8b836613a59d002b816c02c4ba01b4ba3811ae15c447"
+    },
+    {
+      "path": "design-tokens/echarts-theme.json",
+      "size": 1233,
+      "sha256": "a18186d7cf65015a80dd088931f0f631e70113b5ba1bd8a6804c23fb37ad2024"
+    },
+    {
+      "path": "design-tokens/package.json",
+      "size": 233,
+      "sha256": "23c02454d264544e663bca86a278b0dbcc4b713ccb5deaf55acd768a2fec9937"
+    },
+    {
+      "path": "design-tokens/style-dictionary.config.json",
+      "size": 479,
+      "sha256": "ce708582e53ad650b0fbd80e06dc793ffdd95f7249ec0ce67a401df20eeb2d70"
+    },
+    {
+      "path": "design-tokens/tokens.css",
+      "size": 7124,
+      "sha256": "8a23853d3f9de7d7ac03aae857acf97296073a57b92f2f80d92e5f06cc922ab1"
+    },
+    {
+      "path": "design-tokens/tokens.source.json",
+      "size": 5801,
+      "sha256": "e1f2afd425d7e53ac7d39eb4b9aa8527f2395b1e22ccab9c4ae26c5707f6ba6f"
+    },
+    {
+      "path": "design-tokens/tokens.ts",
+      "size": 5920,
+      "sha256": "f460ddf5a47b637426df85433f075fa8319a8b0252c30c6721d63c18eaf19801"
+    },
+    {
+      "path": "docs/00-governance/change-control.md",
+      "size": 783,
+      "sha256": "dba3302db623aaca833b69a591c602c7f531e500f153f404681ab890a96782d8"
+    },
+    {
+      "path": "docs/00-governance/handoff-scope.md",
+      "size": 1214,
+      "sha256": "8748463a32a280027d4179fa32ac14b66fd7c2b5a144d7a2d04e307492b38d30"
+    },
+    {
+      "path": "docs/00-governance/legal-and-asset-notes.md",
+      "size": 1084,
+      "sha256": "1f99c8150a897bde3ab5a6f1095df7960886f9d87d1fb66d5ef6324b8ccffcdc"
+    },
+    {
+      "path": "docs/00-governance/open-decisions.md",
+      "size": 1327,
+      "sha256": "9599652e8720e330eb52ce8161c70de7f6dfca8de040a68d16d366a28a805b2b"
+    },
+    {
+      "path": "docs/00-governance/source-of-truth.md",
+      "size": 1254,
+      "sha256": "f3dd30111effe407e5ee22ab12bdf28faf91c2ff267dea9a5c9158c8ecba8f2a"
+    },
+    {
+      "path": "docs/00-governance/tooling-references.md",
+      "size": 602,
+      "sha256": "9a305b3f3e9f9c503a34dfad50d88c62df8637561551ae3f5d6aa55cd550d164"
+    },
+    {
+      "path": "docs/01-foundations/brand-guidelines.md",
+      "size": 996,
+      "sha256": "d8cb13b37c7ae995447e7025bc0e6576aedef9564d7c071c6d2eb13e0f152e62"
+    },
+    {
+      "path": "docs/01-foundations/color-and-contrast.md",
+      "size": 940,
+      "sha256": "5bd1aee9fea7f85ac9d8b422dda25da0763e50b7b5c8fe88a4788ea96aabf670"
+    },
+    {
+      "path": "docs/01-foundations/contrast-report.md",
+      "size": 619,
+      "sha256": "15dcc918978afa4d3c39478d73c9b2dfe3c7e7c0dd3657d145a20dc7b8c72350"
+    },
+    {
+      "path": "docs/01-foundations/design-principles.md",
+      "size": 2679,
+      "sha256": "75691cb9ce43f2ec59fae3a20e5aac8d79b265625fdd715fface6b79fc56264d"
+    },
+    {
+      "path": "docs/01-foundations/design-tokens.md",
+      "size": 2372,
+      "sha256": "5c74d9edd615f5ca7cd1a937128f3926e6e818995f6b82420c5c5c4b6a32237b"
+    },
+    {
+      "path": "docs/01-foundations/iconography.md",
+      "size": 1343,
+      "sha256": "1a4eb09cc82afe91d4eefe7438a09d3ed0fe7be3606afe48b1963cf311fb8d4a"
+    },
+    {
+      "path": "docs/01-foundations/imagery.md",
+      "size": 1153,
+      "sha256": "209f5b8caa5333069c4b04568d28ef810acb018599a75b725a1de68e0e9bf917"
+    },
+    {
+      "path": "docs/01-foundations/layout-grid.md",
+      "size": 1306,
+      "sha256": "3f58b9f17501b4b1e8e908eced7b3330df520d0c8463878bc419bf315338f1ec"
+    },
+    {
+      "path": "docs/01-foundations/motion.md",
+      "size": 776,
+      "sha256": "a7ff620317c99cddc778d8bbb900d9712dc82cbc2aae8d6cf691c2e0630bde85"
+    },
+    {
+      "path": "docs/01-foundations/typography.md",
+      "size": 1364,
+      "sha256": "c727d2cad0447c543322fe0fdaafee18d22ec323a1f7931b0259cb7e361cfea7"
+    },
+    {
+      "path": "docs/02-components/buttons-actions.md",
+      "size": 1416,
+      "sha256": "34bbd4f1d540b49073cbed0bdc460c61feaf8f09f4724f0dfebf573c0b453c45"
+    },
+    {
+      "path": "docs/02-components/charts-visualization.md",
+      "size": 883,
+      "sha256": "3ab1f17d4b136218903b2361b75e7449b2e480faf2f3ab143058bca29173bae5"
+    },
+    {
+      "path": "docs/02-components/component-api-contracts.md",
+      "size": 1178,
+      "sha256": "44dcf159166151d01514791c51e0b411b2ee190191e5ee9e881378891db5a7c8"
+    },
+    {
+      "path": "docs/02-components/component-catalog.md",
+      "size": 7090,
+      "sha256": "5f1073fa97fecee78c7bc61f2728acdd99f22189bb30c816e80dc88f82fbc5dd"
+    },
+    {
+      "path": "docs/02-components/data-table.md",
+      "size": 1337,
+      "sha256": "9f8ccfd51854d3565cc4d7acbaa85f92080de304c4b527e66c60867136dd534b"
+    },
+    {
+      "path": "docs/02-components/domain-components.md",
+      "size": 1548,
+      "sha256": "8a1089fdcfa36f330f360eaa85ff42c2ea6b6e01630bf60963d3e1d2c790e9ce"
+    },
+    {
+      "path": "docs/02-components/feedback-states.md",
+      "size": 1110,
+      "sha256": "47b58d3d400f0ae7a4fef1188a95c7c336326233b3bacd72e8af6b17b2d04aed"
+    },
+    {
+      "path": "docs/02-components/form-controls.md",
+      "size": 1352,
+      "sha256": "5849bb55e2df1307f2f535e7371c4b0c825da316ac4b79788e43214727f7ef30"
+    },
+    {
+      "path": "docs/02-components/navigation.md",
+      "size": 989,
+      "sha256": "2c187637fc6284ffc263460fde19576575d01ca1c6a94df78487b050fdf89c16"
+    },
+    {
+      "path": "docs/02-components/overlays.md",
+      "size": 783,
+      "sha256": "591df4f9838bf2df9b0976a1407b5f159345f1afb178181aa68bc97403caa0c0"
+    },
+    {
+      "path": "docs/03-patterns/authentication-2fa.md",
+      "size": 1081,
+      "sha256": "c3dacb3e1b457fa53f474263bcf5a59b5da140d69d8f408baa2ee5f7e617323c"
+    },
+    {
+      "path": "docs/03-patterns/content-density.md",
+      "size": 911,
+      "sha256": "e575bc4309707009eb6d2c3f835d0ddf806e617851bc02b5250b724635505c89"
+    },
+    {
+      "path": "docs/03-patterns/forms-and-validation.md",
+      "size": 1148,
+      "sha256": "cd0c8173e180590d536f6546a6dc167a5b7103065e0f31872c927d64fa44ad20"
+    },
+    {
+      "path": "docs/03-patterns/loading-empty-error.md",
+      "size": 844,
+      "sha256": "428b12a5cc12aa834e9958a65cc6d35aa639f83642893eb642f92d253522cbe7"
+    },
+    {
+      "path": "docs/03-patterns/localization-formatting.md",
+      "size": 793,
+      "sha256": "630df2beadbddecaaec5248c0668efcd602716cf8c7a06cf235147335509e697"
+    },
+    {
+      "path": "docs/03-patterns/master-detail.md",
+      "size": 760,
+      "sha256": "a56b22045978101cbd8f5d1f39a50758f24943747d62a73e910d479764022752"
+    },
+    {
+      "path": "docs/03-patterns/notifications-audit.md",
+      "size": 768,
+      "sha256": "31fa69c646ea473c018a0a051193d5778d92e9d44f0c5b0fd064d63e5c6e30ec"
+    },
+    {
+      "path": "docs/03-patterns/payments-reconciliation.md",
+      "size": 1260,
+      "sha256": "449bfe5cfc8157e342ee6dc6e46ca65b06958e806c3cc8d9c3548862f76ffe5f"
+    },
+    {
+      "path": "docs/03-patterns/public-member-showcase.md",
+      "size": 2044,
+      "sha256": "57e461794bcbc0d0db58abebd3028494c083cb121000a0248bddc9f7cff161a5"
+    },
+    {
+      "path": "docs/03-patterns/responsive-behavior.md",
+      "size": 1784,
+      "sha256": "79d0de7340ae89994d72a2492686c328bc0f624143732cf773567e3c03372c83"
+    },
+    {
+      "path": "docs/03-patterns/search-filter-sort.md",
+      "size": 1089,
+      "sha256": "bba8302973763bec6d2710f63e0f1867f95b8bd88faede2117f24f687d485bac"
+    },
+    {
+      "path": "docs/04-screens/reference-index.md",
+      "size": 1649,
+      "sha256": "f33d7c2a539d9b46bfd5fa71cf216006d9672a705633f7cc797597f7be0e6712"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/BO-037-showcase-moderation.md",
+      "size": 898,
+      "sha256": "3f4df433ee71d9068177aced0d3f12a776a80c0a3bad6459c1e4d6d0897575e9"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/MP-015-showcase-editor.md",
+      "size": 1268,
+      "sha256": "f5becf077d8ea462e49e613bc06cc03c32e79bb2f90629f79564207a17828cf2"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/MP-016-showcase-preview.md",
+      "size": 769,
+      "sha256": "299c00ae92bb0d9359306fbb23edc69bbacb7de69e9937b18688c69402326718"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-auth-001-login.md",
+      "size": 2365,
+      "sha256": "a0b8bc309998e6190b3f8b35dbfc525db592ab22d1d5bd3d1243fcdecc5f6111"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-001-dashboard.md",
+      "size": 2075,
+      "sha256": "cf6018a32d9d78dfac4509d385d6e6f28ed5fc805b1095c44d5576fc17a7df9d"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-002-members-list.md",
+      "size": 2055,
+      "sha256": "1f51f46d9214c3b828a0fe87015159bf360b0b344d039daa5adf82ed64f01fb4"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-003-member-detail.md",
+      "size": 2105,
+      "sha256": "a4668533f8110da0417e546a2d7f2e799aef1984ad4e062063560472b9b4548b"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-009-enrollment-form.md",
+      "size": 2138,
+      "sha256": "33c4ff9fc728617f9d04c5590ede05b83828551c70f14fae34d4b0872a725151"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-011-contributions.md",
+      "size": 2000,
+      "sha256": "d6746844309f9aa5126a6f265e7c44e18b25a86b8f2cbd35e50b8ba2ab72e8fe"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-014-payments-reconciliation.md",
+      "size": 2102,
+      "sha256": "58324df65f78125abc2229218cdea408ff74bbc8a742ee6e65619415aa646471"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-017-recovery-campaigns.md",
+      "size": 2034,
+      "sha256": "edd0ae48f67475d3d33184529efbcc3f415101c4e0a5adc219a07023eff631c1"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-028-reporting.md",
+      "size": 1943,
+      "sha256": "12884630dd40939b54e6eb8113ef6d1a3603f6b22bde8f6abef575782cf61b08"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-bo-030-admin-security.md",
+      "size": 2008,
+      "sha256": "75fb76c0d4c20964e8d01d18dbda659b404ee2491101aaf79ed089574a2db402"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-mob-001-mobile.md",
+      "size": 2102,
+      "sha256": "35ed47a11d8ccbad37d6382eac0c3c932298a904c3d16102a965c404cff859e6"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-mp-001-member-home.md",
+      "size": 2024,
+      "sha256": "3c7ce3c50a734e83977283e1856f24e7eaad9438598136c368dd40899e099957"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-pub-001-public-home.md",
+      "size": 2180,
+      "sha256": "029093cdcb311d9cf56328f3a824ac4cb1b3c56bc1194ba504c9bdaa52e4fe7b"
+    },
+    {
+      "path": "docs/04-screens/reference-specs/ref-pub-006-member-showcase.md",
+      "size": 2338,
+      "sha256": "f5ed8e7b74fcb930f807111fea1fafdc63b1791eae2aae66449a8daaeefbc5ac"
+    },
+    {
+      "path": "docs/04-screens/screen-inventory.md",
+      "size": 11522,
+      "sha256": "83bea67f286c9ecd68984f2798b1a4c17c73588c6df13cb06e6f4f4a01d6da7b"
+    },
+    {
+      "path": "docs/04-screens/screen-status-model.md",
+      "size": 595,
+      "sha256": "8151e0ce99796017c0679878a93123a49ee04a3dab0ca7f96b96498aa71d01ac"
+    },
+    {
+      "path": "docs/05-content/date-number-currency.md",
+      "size": 890,
+      "sha256": "b8c81ad952018ddde0cb058b6b46cf315ae4d3b6216c8c1ff958ee1828090357"
+    },
+    {
+      "path": "docs/05-content/notification-copy.md",
+      "size": 1247,
+      "sha256": "ecb424c481ed595d9cb983bbfd36202463ba47a72949756f0dfe8d9e454ead7f"
+    },
+    {
+      "path": "docs/05-content/public-showcase-content.md",
+      "size": 1267,
+      "sha256": "28ef4767b06a23fb9b0af45c6d870d950c5d015e99ad5b8cb64491c67d1c4453"
+    },
+    {
+      "path": "docs/05-content/terminology.md",
+      "size": 1999,
+      "sha256": "ba407f373546fddd7939434c9793f919d5a98e41d35dac27dd4f945e4ecc1629"
+    },
+    {
+      "path": "docs/05-content/ui-writing.md",
+      "size": 1347,
+      "sha256": "9ea9a97c07b40128fe003373748c070e8e2084067abfcd9af53832caad8c69db"
+    },
+    {
+      "path": "docs/05-content/validation-messages.md",
+      "size": 1720,
+      "sha256": "4284c6eb2b0d6846efacce253dc333dc4f88d4cd89fe4c5460376f08b532319a"
+    },
+    {
+      "path": "docs/06-accessibility/acceptance-matrix.md",
+      "size": 753,
+      "sha256": "2ae00379861622da2a735435ee4f1f2628b6d262feb27faa4722bad1c64ceba9"
+    },
+    {
+      "path": "docs/06-accessibility/accessibility-requirements.md",
+      "size": 1282,
+      "sha256": "53f872d014cfa076a55b1b6d1084b3083d77701febd0134e5ccdac8f1d6958ef"
+    },
+    {
+      "path": "docs/06-accessibility/keyboard-focus.md",
+      "size": 801,
+      "sha256": "4e052b33e5f8f66d4202c5835894858afb799df52551c4932917fd9ce03b4bb3"
+    },
+    {
+      "path": "docs/06-accessibility/manual-checklist.md",
+      "size": 817,
+      "sha256": "ea210a91f1bddd4d81624274a3e4bbb71b7d803d2b423106475994e562616f98"
+    },
+    {
+      "path": "docs/06-accessibility/screen-reader.md",
+      "size": 770,
+      "sha256": "18a329b3756da100cd07e6a35db4cd7309d8accfdf4c1c998ef61dcb20e59fe0"
+    },
+    {
+      "path": "docs/07-implementation/angular-component-guidelines.md",
+      "size": 1155,
+      "sha256": "3be792743f28af6965d9d022053b11ebb6ac658c4161f9a4fde6ba757ca85758"
+    },
+    {
+      "path": "docs/07-implementation/charts-implementation.md",
+      "size": 865,
+      "sha256": "21283b8e3a008192f409b59ee3ecc7c7ad131f5925852444d74651c42f5784fb"
+    },
+    {
+      "path": "docs/07-implementation/css-scss-conventions.md",
+      "size": 857,
+      "sha256": "0cb0d914a5e0f918f6704d4c639739ff1be51976e2f7dd3a493493b4fd3f178a"
+    },
+    {
+      "path": "docs/07-implementation/flutter-architecture.md",
+      "size": 1125,
+      "sha256": "1877798aaf4e5f9c9e910646b4c797c8633902fb32f5b7d2cc16dc2523931e98"
+    },
+    {
+      "path": "docs/07-implementation/frontend-architecture.md",
+      "size": 2179,
+      "sha256": "0430bfde1147bf85d1cc305a915890c690f0e3e1e6b57391c2c58b6b3210d31a"
+    },
+    {
+      "path": "docs/07-implementation/i18n.md",
+      "size": 757,
+      "sha256": "0fa30d71ec7a2e7356aeb7454af7650bbf922fdea80a9eca098b3660b221f653"
+    },
+    {
+      "path": "docs/07-implementation/icons-and-assets.md",
+      "size": 893,
+      "sha256": "cceef9c8d6d625ee60c5aef2781f53fe27a047c8c96141e816d893155bade1de"
+    },
+    {
+      "path": "docs/07-implementation/implementation-sequence.md",
+      "size": 918,
+      "sha256": "53cc143a70c1e7f7475a7f263ff79f0f09c43263958aa0b48334b345d743a112"
+    },
+    {
+      "path": "docs/07-implementation/performance.md",
+      "size": 856,
+      "sha256": "8b04718be00a135a279e4e768b7b4845254da0a53cae35c5ab590ee10bba474a"
+    },
+    {
+      "path": "docs/07-implementation/print-and-pdf.md",
+      "size": 706,
+      "sha256": "ebcf273ad088a621b1daf4d66448d18f2166bf7c6ca6e0851a3e8db48aa28340"
+    },
+    {
+      "path": "docs/08-quality/acceptance-gates.md",
+      "size": 754,
+      "sha256": "7b82d26ed857751cbf68daa96d042a663ec5a305473c2aa11c8832aaf4b5d13b"
+    },
+    {
+      "path": "docs/08-quality/browser-device-matrix.md",
+      "size": 947,
+      "sha256": "4edf3877f348b0d17c60f00c49a02130d5c67ad2cad5a8b10da641eaece34806"
+    },
+    {
+      "path": "docs/08-quality/storybook-coverage.md",
+      "size": 750,
+      "sha256": "c9b1449b977dd41b4f775a9db52b90a8f19a6a06d017072d3bb8e162a0f3a549"
+    },
+    {
+      "path": "docs/08-quality/test-data.md",
+      "size": 763,
+      "sha256": "a2b4f7370d1ef7c228b8273e962dce281550510e01288bc6967a56049d376ab5"
+    },
+    {
+      "path": "docs/08-quality/ui-review-checklist.md",
+      "size": 1115,
+      "sha256": "c644be224424eeb78326521b01cd3a3076bdaee770f4219129610e7be566cb59"
+    },
+    {
+      "path": "docs/08-quality/visual-regression.md",
+      "size": 1475,
+      "sha256": "7ebdb5b4c9601b4afa22aa91bd9e6e8bfbb07ff95cbd6a4fa1edf248f75dcf34"
+    },
+    {
+      "path": "docs/09-handoff/claude-code-workflow.md",
+      "size": 670,
+      "sha256": "6d5b5577650746aefdf39f5ab4330ce870616a56b7910644e6eb98bbe2a8d967"
+    },
+    {
+      "path": "docs/09-handoff/codex-workflow.md",
+      "size": 443,
+      "sha256": "360805283ae011b9d531265dcd8e7891aeab09c679b8125a04a3a5c9edaca36d"
+    },
+    {
+      "path": "docs/09-handoff/delivery-checklist.md",
+      "size": 733,
+      "sha256": "ed36264f5cfdd0ed47295b975da009753323f5d1166d37667083989a283a9e1a"
+    },
+    {
+      "path": "docs/09-handoff/prompt-library.md",
+      "size": 1473,
+      "sha256": "84b74ed7a25c9fe102851493c0c06bd33b992a474cc884a1a4528db3bdfe7ca6"
+    },
+    {
+      "path": "docs/09-handoff/ui-definition-of-done.md",
+      "size": 940,
+      "sha256": "563959dd678a5933dfd9c20edba416d1b48af7de448678655e81c59c99a610a0"
+    },
+    {
+      "path": "guide/CNPM_UI_UX_Handoff_Guide_v1.0.docx",
+      "size": 18449193,
+      "sha256": "51c3c56035b0d722dfc4768c66e868fe188646c8a7484e67ae418f18df4f3214"
+    },
+    {
+      "path": "guide/CNPM_UI_UX_Handoff_Guide_v1.0.pdf",
+      "size": 3772826,
+      "sha256": "795599ed797dca56b7e23ef2ed5a3db8eb849649c817d0685194006a281a4ea5"
+    },
+    {
+      "path": "handoff.config.json",
+      "size": 2286,
+      "sha256": "863f5f822fbc638914216d969423344e54b1ec1deb7fd3eb125ab3572ff3c6d6"
+    },
+    {
+      "path": "prototype/README.md",
+      "size": 196,
+      "sha256": "acb4c2d7477cd6d0560d40dab2e0dbe23a054dc0b7abd49827dbf34ae7bf9649"
+    },
+    {
+      "path": "prototype/index.html",
+      "size": 7600,
+      "sha256": "3ef8eafaaf77bfc38d28aea4e7222addb156f1f2aec6c92b16c51b71abd7b9ca"
+    },
+    {
+      "path": "prototype/styles.css",
+      "size": 6400,
+      "sha256": "bb6c917ce68596220797a85a21b177a5fa1d13caaf098abc7d9747c5dc9e74dd"
+    },
+    {
+      "path": "scripts/build_tokens.py",
+      "size": 549,
+      "sha256": "09859ae113449cc09ee1c5923e4b115de000191a7172c00fc38e465ef3893540"
+    },
+    {
+      "path": "scripts/compare_images.py",
+      "size": 1377,
+      "sha256": "4c394f7a449ccd7f7422f32e7465afae9c1e938d083a03078481f92d7dd68df9"
+    },
+    {
+      "path": "scripts/generate_manifest.py",
+      "size": 1076,
+      "sha256": "974a797442cb5fba8d20fd903353a1bbae8d84940db26c6be453b3ff5098e485"
+    },
+    {
+      "path": "scripts/validate.sh",
+      "size": 164,
+      "sha256": "821286081fe42faa61a01db8f99e48cb0deeee6d58896ff25e3e47d74eb0dfae"
+    },
+    {
+      "path": "scripts/validate_handoff.py",
+      "size": 6917,
+      "sha256": "463ad31d1d1eb40c37c52d3b358b4cffba87488a569667a0de670ab44b758ed6"
+    },
+    {
+      "path": "scripts/verify_assets.py",
+      "size": 624,
+      "sha256": "8978a09f00663ffa44bb11c88eedbfbf0555e4d86fb205f481aabd39c0e5b6b7"
+    },
+    {
+      "path": "templates/component-spec-template.md",
+      "size": 258,
+      "sha256": "bf427fae941813e1bdb54cf343019cc93ebe837d89ff5c79dcbd8d26cc123fab"
+    },
+    {
+      "path": "templates/member-showcase-content-template.json",
+      "size": 567,
+      "sha256": "0252e06c718738397d91b53068828dd8e32cd9c76f9d64fa77f6367ffd40245b"
+    },
+    {
+      "path": "templates/screen-spec-template.md",
+      "size": 508,
+      "sha256": "52aa5fe3d74adba509e1edad4d3f6e49a5fd3412bdf8bd4d3c0e46545feb8326"
+    },
+    {
+      "path": "templates/storybook/README.md",
+      "size": 672,
+      "sha256": "e2f25ae43f346f9acd23d222e18d0981abc8b9e649a4430933d6a51dc9e4649c"
+    },
+    {
+      "path": "templates/ux-review-template.md",
+      "size": 427,
+      "sha256": "77907cc2684860ca54fbdef314c956c4821dae2035f5053c01a9b9b62f6b9a6b"
+    },
+    {
+      "path": "templates/visual-test-report-template.md",
+      "size": 423,
+      "sha256": "f475d0b831541f07923b127bae300954d853d85080345677a9e3528a78acf191"
+    },
+    {
+      "path": "tests/accessibility/README.md",
+      "size": 319,
+      "sha256": "5afbf164dbda4100e1fae39a345cb9f4911d854e4d2a3217fb8ba4284411975e"
+    },
+    {
+      "path": "tests/accessibility/axe-playwright-example.spec.ts",
+      "size": 412,
+      "sha256": "55eb6c495dc7ff3334bfa9ee756db21b1cae7810ba179e2ac518088950801e1e"
+    },
+    {
+      "path": "tests/visual/README.md",
+      "size": 792,
+      "sha256": "909184a0ee20b8c558995127558aff3a9732b9036e3aed7bf0b050488dc27d93"
+    },
+    {
+      "path": "tests/visual/playwright-example.spec.ts",
+      "size": 479,
+      "sha256": "697b8399dcbd8fc3a34e5e48ef92af2e24c2043ea106f9676e8e680ecd3bf88a"
+    },
+    {
+      "path": "tests/visual/reference-map.json",
+      "size": 2807,
+      "sha256": "4da44b204588663319ef19c7e642543dc28bc72bd22446b3b12311a43bc97c77"
+    },
+    {
+      "path": "validation/guide-docx-a11y.json",
+      "size": 139,
+      "sha256": "d8de462f88b8a9a8d204880580cc90f3737e3bac7af37c8fd3a7c0dd998afc7b"
+    },
+    {
+      "path": "validation/guide-pdf-preflight.txt",
+      "size": 138,
+      "sha256": "c6d584453f56f12dfa9c139cb683b4c9d997a8c4b13fa5fddf399322200de82d"
+    },
+    {
+      "path": "workbooks/CNPM_UI_UX_Handoff_Matrix.xlsx",
+      "size": 44206,
+      "sha256": "3c7076647d8269e26e6407705ce9fc939de380f019b1587f53b7a32b40442909"
+    },
+    {
+      "path": "workbooks/CNPM_UI_UX_Handoff_Matrix_preview.png",
+      "size": 131235,
+      "sha256": "61cbd0053a42fa891a11ee7fb15e8b757401a49140b30d27cb8999243a617e73"
+    }
+  ]
+}

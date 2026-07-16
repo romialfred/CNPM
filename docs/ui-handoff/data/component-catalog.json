@@ -1,0 +1,742 @@
+[
+  {
+    "id": "LAY-001",
+    "category": "Structure",
+    "name": "AdminShell",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "expanded,collapsed,mobile-drawer",
+    "accessibility": "landmarks; skip-link; focus containment",
+    "notes": ""
+  },
+  {
+    "id": "LAY-002",
+    "category": "Structure",
+    "name": "MemberPortalShell",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "desktop,tablet,mobile",
+    "accessibility": "landmarks; current page announcement",
+    "notes": ""
+  },
+  {
+    "id": "LAY-003",
+    "category": "Structure",
+    "name": "PublicShell",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "transparent,solid,menu-open",
+    "accessibility": "semantic header/nav/footer",
+    "notes": ""
+  },
+  {
+    "id": "LAY-004",
+    "category": "Structure",
+    "name": "MobileAppShell",
+    "platforms": "Mobile",
+    "priority": "P0",
+    "required_states": "online,offline,badge",
+    "accessibility": "safe areas; tab semantics",
+    "notes": ""
+  },
+  {
+    "id": "LAY-005",
+    "category": "Structure",
+    "name": "PageHeader",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,with-actions,with-breadcrumb",
+    "accessibility": "heading hierarchy",
+    "notes": ""
+  },
+  {
+    "id": "LAY-006",
+    "category": "Structure",
+    "name": "Section",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "standard,dense,full-bleed",
+    "accessibility": "region name where required",
+    "notes": ""
+  },
+  {
+    "id": "LAY-007",
+    "category": "Structure",
+    "name": "Card",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,interactive,selected,disabled",
+    "accessibility": "interactive card keyboard rules",
+    "notes": ""
+  },
+  {
+    "id": "LAY-008",
+    "category": "Structure",
+    "name": "SplitPane",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "50-50,master-detail,resizable",
+    "accessibility": "order preserved at zoom",
+    "notes": ""
+  },
+  {
+    "id": "NAV-001",
+    "category": "Navigation",
+    "name": "SidebarNavigation",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "expanded,collapsed,mobile",
+    "accessibility": "aria-current; keyboard",
+    "notes": ""
+  },
+  {
+    "id": "NAV-002",
+    "category": "Navigation",
+    "name": "TopBar",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "default,search-open,profile-open",
+    "accessibility": "named controls",
+    "notes": ""
+  },
+  {
+    "id": "NAV-003",
+    "category": "Navigation",
+    "name": "PublicHeader",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "desktop,mobile,scrolled",
+    "accessibility": "menu button aria-expanded",
+    "notes": ""
+  },
+  {
+    "id": "NAV-004",
+    "category": "Navigation",
+    "name": "BottomNavigation",
+    "platforms": "Mobile",
+    "priority": "P0",
+    "required_states": "default,active,badged",
+    "accessibility": "tab role or navigation links",
+    "notes": ""
+  },
+  {
+    "id": "NAV-005",
+    "category": "Navigation",
+    "name": "Breadcrumb",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "default,truncated",
+    "accessibility": "nav aria-label breadcrumb",
+    "notes": ""
+  },
+  {
+    "id": "NAV-006",
+    "category": "Navigation",
+    "name": "Tabs",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,scrollable,disabled",
+    "accessibility": "ARIA tabs + roving tabindex",
+    "notes": ""
+  },
+  {
+    "id": "NAV-007",
+    "category": "Navigation",
+    "name": "Stepper",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "current,complete,error,disabled",
+    "accessibility": "ordered list + current step",
+    "notes": ""
+  },
+  {
+    "id": "NAV-008",
+    "category": "Navigation",
+    "name": "Pagination",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "default,compact,server",
+    "accessibility": "aria-label pagination",
+    "notes": ""
+  },
+  {
+    "id": "ACT-001",
+    "category": "Actions",
+    "name": "Button",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,hover,focus,pressed,loading,disabled",
+    "accessibility": "name; min target; busy",
+    "notes": ""
+  },
+  {
+    "id": "ACT-002",
+    "category": "Actions",
+    "name": "IconButton",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,hover,focus,pressed,disabled",
+    "accessibility": "accessible name required",
+    "notes": ""
+  },
+  {
+    "id": "ACT-003",
+    "category": "Actions",
+    "name": "SplitButton",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "closed,open,disabled",
+    "accessibility": "separate menu semantics",
+    "notes": ""
+  },
+  {
+    "id": "ACT-004",
+    "category": "Actions",
+    "name": "ButtonGroup",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "single,multi",
+    "accessibility": "field/toolbar grouping",
+    "notes": ""
+  },
+  {
+    "id": "ACT-005",
+    "category": "Actions",
+    "name": "Link",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,hover,focus,visited",
+    "accessibility": "not styled as button unless action",
+    "notes": ""
+  },
+  {
+    "id": "FRM-001",
+    "category": "Formulaire",
+    "name": "TextInput",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "empty,filled,focus,error,success,disabled,readonly",
+    "accessibility": "persistent label; error association",
+    "notes": ""
+  },
+  {
+    "id": "FRM-002",
+    "category": "Formulaire",
+    "name": "PasswordInput",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "hidden,visible,error",
+    "accessibility": "toggle has state/name",
+    "notes": ""
+  },
+  {
+    "id": "FRM-003",
+    "category": "Formulaire",
+    "name": "TextArea",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "empty,filled,focus,error,disabled",
+    "accessibility": "character count announced",
+    "notes": ""
+  },
+  {
+    "id": "FRM-004",
+    "category": "Formulaire",
+    "name": "Select",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "closed,open,selected,error,disabled",
+    "accessibility": "keyboard combobox/listbox",
+    "notes": ""
+  },
+  {
+    "id": "FRM-005",
+    "category": "Formulaire",
+    "name": "Autocomplete",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "idle,typing,loading,no-result,selected,error",
+    "accessibility": "combobox ARIA pattern",
+    "notes": ""
+  },
+  {
+    "id": "FRM-006",
+    "category": "Formulaire",
+    "name": "DatePicker",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "empty,selected,range,error,disabled",
+    "accessibility": "keyboard calendar; text fallback",
+    "notes": ""
+  },
+  {
+    "id": "FRM-007",
+    "category": "Formulaire",
+    "name": "Checkbox",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "unchecked,checked,indeterminate,disabled",
+    "accessibility": "native semantics",
+    "notes": ""
+  },
+  {
+    "id": "FRM-008",
+    "category": "Formulaire",
+    "name": "RadioGroup",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,selected,disabled,error",
+    "accessibility": "fieldset/legend",
+    "notes": ""
+  },
+  {
+    "id": "FRM-009",
+    "category": "Formulaire",
+    "name": "Switch",
+    "platforms": "Web/Mobile",
+    "priority": "P1",
+    "required_states": "off,on,disabled",
+    "accessibility": "role switch and label",
+    "notes": ""
+  },
+  {
+    "id": "FRM-010",
+    "category": "Formulaire",
+    "name": "FileUploader",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "idle,drag,uploading,success,error,virus-scan",
+    "accessibility": "button alternative; progress",
+    "notes": ""
+  },
+  {
+    "id": "FRM-011",
+    "category": "Formulaire",
+    "name": "OtpInput",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "empty,partial,complete,error,expired",
+    "accessibility": "one-time-code autocomplete; paste",
+    "notes": ""
+  },
+  {
+    "id": "FRM-012",
+    "category": "Formulaire",
+    "name": "SearchField",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "idle,typing,loading,results,no-result",
+    "accessibility": "search landmark; clear name",
+    "notes": ""
+  },
+  {
+    "id": "FRM-013",
+    "category": "Formulaire",
+    "name": "FilterBar",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "collapsed,expanded,active-filters",
+    "accessibility": "count and removal labels",
+    "notes": ""
+  },
+  {
+    "id": "FRM-014",
+    "category": "Formulaire",
+    "name": "FormSection",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,complete,error",
+    "accessibility": "fieldset when related fields",
+    "notes": ""
+  },
+  {
+    "id": "FRM-015",
+    "category": "Formulaire",
+    "name": "StickyFormActions",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,saving,error",
+    "accessibility": "does not obscure focus",
+    "notes": ""
+  },
+  {
+    "id": "DAT-001",
+    "category": "Donnees",
+    "name": "DataTable",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "loading,empty,error,dense,selection,sort",
+    "accessibility": "caption; headers; sort state",
+    "notes": ""
+  },
+  {
+    "id": "DAT-002",
+    "category": "Donnees",
+    "name": "ResponsiveRecordList",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "table,cards,empty",
+    "accessibility": "same reading order",
+    "notes": ""
+  },
+  {
+    "id": "DAT-003",
+    "category": "Donnees",
+    "name": "ColumnSelector",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "closed,open,saved",
+    "accessibility": "menu checkbox semantics",
+    "notes": ""
+  },
+  {
+    "id": "DAT-004",
+    "category": "Donnees",
+    "name": "BulkActionBar",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "hidden,visible,loading",
+    "accessibility": "selection count announced",
+    "notes": ""
+  },
+  {
+    "id": "DAT-005",
+    "category": "Donnees",
+    "name": "DefinitionList",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "horizontal,stacked",
+    "accessibility": "semantic dl/dt/dd",
+    "notes": ""
+  },
+  {
+    "id": "DAT-006",
+    "category": "Donnees",
+    "name": "Timeline",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,compact,loading",
+    "accessibility": "ordered list; dates readable",
+    "notes": ""
+  },
+  {
+    "id": "DAT-007",
+    "category": "Donnees",
+    "name": "Metric",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "default,trend,warning,critical",
+    "accessibility": "trend not color-only",
+    "notes": ""
+  },
+  {
+    "id": "DAT-008",
+    "category": "Donnees",
+    "name": "Progress",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "determinate,indeterminate,complete,error",
+    "accessibility": "progress semantics",
+    "notes": ""
+  },
+  {
+    "id": "FDB-001",
+    "category": "Feedback",
+    "name": "StatusBadge",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "neutral,info,success,warning,error",
+    "accessibility": "text/icon in addition to color",
+    "notes": ""
+  },
+  {
+    "id": "FDB-002",
+    "category": "Feedback",
+    "name": "Alert",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "info,success,warning,error",
+    "accessibility": "role alert only for urgent",
+    "notes": ""
+  },
+  {
+    "id": "FDB-003",
+    "category": "Feedback",
+    "name": "Toast",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "success,error,info,with-action",
+    "accessibility": "live region; timeout policy",
+    "notes": ""
+  },
+  {
+    "id": "FDB-004",
+    "category": "Feedback",
+    "name": "InlineErrorSummary",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "hidden,visible",
+    "accessibility": "links to invalid fields; focus",
+    "notes": ""
+  },
+  {
+    "id": "FDB-005",
+    "category": "Feedback",
+    "name": "Skeleton",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "text,table,card,chart",
+    "accessibility": "aria-hidden + loading status",
+    "notes": ""
+  },
+  {
+    "id": "FDB-006",
+    "category": "Feedback",
+    "name": "EmptyState",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "first-use,no-results,no-data",
+    "accessibility": "clear next action",
+    "notes": ""
+  },
+  {
+    "id": "FDB-007",
+    "category": "Feedback",
+    "name": "ErrorState",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "recoverable,forbidden,not-found,offline",
+    "accessibility": "recovery action; status code optional",
+    "notes": ""
+  },
+  {
+    "id": "OVR-001",
+    "category": "Superposition",
+    "name": "Dialog",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "open,confirm,danger,loading",
+    "accessibility": "focus trap; return focus",
+    "notes": ""
+  },
+  {
+    "id": "OVR-002",
+    "category": "Superposition",
+    "name": "Drawer",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "left,right,bottom",
+    "accessibility": "focus trap; labelled",
+    "notes": ""
+  },
+  {
+    "id": "OVR-003",
+    "category": "Superposition",
+    "name": "Popover",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "closed,open",
+    "accessibility": "dismissible; no essential hover-only",
+    "notes": ""
+  },
+  {
+    "id": "OVR-004",
+    "category": "Superposition",
+    "name": "Tooltip",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "hidden,visible",
+    "accessibility": "escape; hover and focus",
+    "notes": ""
+  },
+  {
+    "id": "VIS-001",
+    "category": "Visualisation",
+    "name": "ChartContainer",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "loading,empty,error,export",
+    "accessibility": "text summary and data table",
+    "notes": ""
+  },
+  {
+    "id": "VIS-002",
+    "category": "Visualisation",
+    "name": "KpiStrip",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "default,compact,scroll",
+    "accessibility": "semantic list",
+    "notes": ""
+  },
+  {
+    "id": "VIS-003",
+    "category": "Visualisation",
+    "name": "MapPanel",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "loading,data,no-data",
+    "accessibility": "table alternative",
+    "notes": ""
+  },
+  {
+    "id": "VIS-004",
+    "category": "Visualisation",
+    "name": "InsightPanel",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "facts,anomalies,recommendations",
+    "accessibility": "headings and lists",
+    "notes": ""
+  },
+  {
+    "id": "DOM-001",
+    "category": "Metier",
+    "name": "MemberIdentityHeader",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "active,dormant,prospect,suspended",
+    "accessibility": "status text and badge",
+    "notes": ""
+  },
+  {
+    "id": "DOM-002",
+    "category": "Metier",
+    "name": "ContributionSummary",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "paid,partial,late,not-due",
+    "accessibility": "currency and due date accessible",
+    "notes": ""
+  },
+  {
+    "id": "DOM-003",
+    "category": "Metier",
+    "name": "PaymentChannelBadge",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "mobile-money,bank,cash,cheque",
+    "accessibility": "channel text visible",
+    "notes": ""
+  },
+  {
+    "id": "DOM-004",
+    "category": "Metier",
+    "name": "ReconciliationPanel",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "unmatched,partial,matched,exception",
+    "accessibility": "errors linked to allocation fields",
+    "notes": ""
+  },
+  {
+    "id": "DOM-005",
+    "category": "Metier",
+    "name": "ReceiptPreview",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "draft,issued,void,unavailable",
+    "accessibility": "download alternative; metadata",
+    "notes": ""
+  },
+  {
+    "id": "DOM-006",
+    "category": "Metier",
+    "name": "CampaignBuilder",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "audience,message,cadence,schedule,review",
+    "accessibility": "step validity and summary",
+    "notes": ""
+  },
+  {
+    "id": "DOM-007",
+    "category": "Metier",
+    "name": "RequestConversation",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "open,pending,resolved,closed",
+    "accessibility": "message chronology; attachments",
+    "notes": ""
+  },
+  {
+    "id": "DOM-008",
+    "category": "Metier",
+    "name": "DocumentCard",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "available,processing,rejected,expired",
+    "accessibility": "file type/size/status",
+    "notes": ""
+  },
+  {
+    "id": "DOM-009",
+    "category": "Metier",
+    "name": "MemberShowcaseHero",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "verified,unverified,expired",
+    "accessibility": "verification explained in text",
+    "notes": ""
+  },
+  {
+    "id": "DOM-010",
+    "category": "Metier",
+    "name": "ShowcaseActivityCard",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "default,featured,no-image",
+    "accessibility": "image alt; semantic heading",
+    "notes": ""
+  },
+  {
+    "id": "DOM-011",
+    "category": "Metier",
+    "name": "ShowcaseProjectCard",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "default,featured,no-image",
+    "accessibility": "image alt; dates and tags",
+    "notes": ""
+  },
+  {
+    "id": "DOM-012",
+    "category": "Metier",
+    "name": "ShowcaseGallery",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "grid,lightbox,empty",
+    "accessibility": "keyboard lightbox; alt text",
+    "notes": ""
+  },
+  {
+    "id": "DOM-013",
+    "category": "Metier",
+    "name": "ShowcaseEditor",
+    "platforms": "Web",
+    "priority": "P0",
+    "required_states": "draft,invalid,preview,publishing,published",
+    "accessibility": "autosave status announced",
+    "notes": ""
+  },
+  {
+    "id": "DOM-014",
+    "category": "Metier",
+    "name": "VerificationBadge",
+    "platforms": "Web/Mobile",
+    "priority": "P0",
+    "required_states": "verified,pending,expired,suspended",
+    "accessibility": "never imply endorsement beyond status",
+    "notes": ""
+  },
+  {
+    "id": "DOM-015",
+    "category": "Metier",
+    "name": "AgentAssignmentCard",
+    "platforms": "Web",
+    "priority": "P1",
+    "required_states": "assigned,unassigned,unavailable",
+    "accessibility": "contact action names",
+    "notes": ""
+  }
+]

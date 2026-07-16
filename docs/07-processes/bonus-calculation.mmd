@@ -1,0 +1,16 @@
+flowchart LR
+  N0["Start"]
+  N1["Select period"]
+  N0 --> N1
+  N2["Compute eligible collections"]
+  N1 --> N2
+  N3["Apply versioned rules"]
+  N2 --> N3
+  N4["Commission review"]
+  N3 --> N4
+  N5["Approve"]
+  N4 --> N5
+  N6["Publish statement"]
+  N5 --> N6
+  N7["End"]
+  N6 --> N7

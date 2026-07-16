@@ -1,0 +1,1088 @@
+Project CNPM {
+  database_type: 'PostgreSQL'
+  Note: 'Baseline de conception - PostgreSQL source de vérité'
+}
+
+Table ref.reference_value {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  domain varchar(80) [not null]
+  code varchar(80) [not null]
+  label varchar(255) [not null]
+  sort_order integer [not null]
+  active boolean [not null]
+  valid_from timestamp with time zone
+  valid_to timestamp with time zone
+}
+
+Table ref.number_sequence {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  sequence_code varchar(80) [not null, unique]
+  prefix_pattern varchar(120) [not null]
+  current_value bigint [not null]
+  reset_period varchar(20) [not null]
+}
+
+Table iam.user_account {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  keycloak_subject uuid [not null, unique]
+  email varchar(320) [not null, unique]
+  display_name varchar(255) [not null]
+  status varchar(30) [not null]
+  last_login_at timestamp with time zone
+}
+
+Table iam.role {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  code varchar(100) [not null, unique]
+  label varchar(255) [not null]
+  privileged boolean [not null]
+}
+
+Table iam.permission {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  code varchar(120) [not null, unique]
+  domain varchar(80) [not null]
+  description text [not null]
+}
+
+Table iam.role_permission {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  role_id uuid [not null]
+  permission_id uuid [not null]
+}
+
+Table iam.user_role {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  user_id uuid [not null]
+  role_id uuid [not null]
+  scope_type varchar(40) [not null]
+  scope_id uuid
+  valid_from timestamp with time zone [not null]
+  valid_to timestamp with time zone
+  approved_by uuid
+}
+
+Table iam.mfa_registration {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  user_id uuid [not null]
+  factor_type varchar(30) [not null]
+  credential_ref varchar(255) [not null]
+  verified_at timestamp with time zone
+  revoked_at timestamp with time zone
+}
+
+Table iam.access_review {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  review_code varchar(60) [not null, unique]
+  period_start date [not null]
+  period_end date [not null]
+  status varchar(30) [not null]
+  approved_at timestamp with time zone
+}
+
+Table member.person {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  last_name varchar(150) [not null]
+  first_names varchar(200) [not null]
+  email varchar(320)
+  phone varchar(30)
+  job_title varchar(150)
+}
+
+Table member.organization {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  legal_name varchar(255) [not null]
+  trade_name varchar(255)
+  organization_type varchar(40) [not null]
+  sector_code varchar(80)
+  status varchar(30) [not null]
+  risk_level varchar(20) [not null]
+}
+
+Table member.organization_identifier {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid [not null]
+  identifier_type varchar(40) [not null]
+  identifier_value varchar(160) [not null]
+  verified boolean [not null]
+  verified_at timestamp with time zone
+}
+
+Table member.address {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid
+  person_id uuid
+  address_type varchar(30) [not null]
+  line1 varchar(255) [not null]
+  city varchar(120) [not null]
+  country_code char(2) [not null]
+  is_primary boolean [not null]
+}
+
+Table member.organization_contact {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid [not null]
+  person_id uuid [not null]
+  contact_role varchar(50) [not null]
+  is_legal_representative boolean [not null]
+  valid_from date [not null]
+  valid_to date
+}
+
+Table member.membership {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid [not null]
+  membership_number varchar(60) [not null, unique]
+  category_code varchar(50) [not null]
+  status varchar(30) [not null]
+  joined_at date
+  activated_at timestamp with time zone
+}
+
+Table member.membership_status_history {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  membership_id uuid [not null]
+  from_status varchar(30)
+  to_status varchar(30) [not null]
+  reason text
+}
+
+Table member.professional_group {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  code varchar(60) [not null, unique]
+  name varchar(255) [not null]
+  sector_code varchar(80)
+  status varchar(30) [not null]
+}
+
+Table member.group_membership {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid [not null]
+  group_id uuid [not null]
+  is_primary boolean [not null]
+  joined_at date [not null]
+  left_at date
+}
+
+Table member.communication_preference {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid
+  person_id uuid
+  channel varchar(20) [not null]
+  purpose varchar(50) [not null]
+  allowed boolean [not null]
+  captured_at timestamp with time zone [not null]
+}
+
+Table enrollment.prospect {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid
+  source_code varchar(60) [not null]
+  assigned_group_id uuid
+  status varchar(30) [not null]
+  score numeric(5,2)
+}
+
+Table enrollment.enrollment_case {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid [not null]
+  case_number varchar(60) [not null, unique]
+  channel varchar(30) [not null]
+  status varchar(30) [not null]
+  submitted_at timestamp with time zone
+  assigned_to uuid
+}
+
+Table enrollment.enrollment_review {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  case_id uuid [not null]
+  review_type varchar(40) [not null]
+  result varchar(30) [not null]
+  comment text
+}
+
+Table enrollment.enrollment_decision {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  case_id uuid [not null]
+  decision varchar(30) [not null]
+  reason_code varchar(60)
+  comment text
+  decided_by uuid [not null]
+}
+
+Table contribution.fiscal_year {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  year integer [not null, unique]
+  start_date date [not null]
+  end_date date [not null]
+  status varchar(30) [not null]
+}
+
+Table contribution.rate_rule {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  rule_code varchar(60) [not null, unique]
+  category_code varchar(50) [not null]
+  calculation_method varchar(40) [not null]
+  parameters jsonb [not null]
+  valid_from date [not null]
+  valid_to date
+  status varchar(30) [not null]
+  approved_by uuid
+}
+
+Table contribution.contribution_call {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  membership_id uuid [not null]
+  fiscal_year_id uuid [not null]
+  call_number varchar(60) [not null, unique]
+  amount_due numeric(19,2) [not null]
+  currency char(3) [not null]
+  due_date date [not null]
+  status varchar(30) [not null]
+  balance_amount numeric(19,2) [not null]
+}
+
+Table contribution.installment {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  contribution_call_id uuid [not null]
+  installment_no integer [not null]
+  due_date date [not null]
+  amount_due numeric(19,2) [not null]
+  amount_paid numeric(19,2) [not null]
+  status varchar(30) [not null]
+}
+
+Table contribution.adjustment {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  contribution_call_id uuid [not null]
+  adjustment_number varchar(60) [not null, unique]
+  adjustment_type varchar(30) [not null]
+  amount numeric(19,2) [not null]
+  reason_code varchar(60) [not null]
+  approved_by uuid
+}
+
+Table payment.payment_reference {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  membership_id uuid [not null]
+  reference_value varchar(100) [not null, unique]
+  channel varchar(30) [not null]
+  status varchar(30) [not null]
+  expires_at timestamp with time zone
+  approved_by uuid
+}
+
+Table payment.payment_transaction {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  payment_reference_id uuid
+  transaction_number varchar(80) [not null, unique]
+  provider_transaction_id varchar(160)
+  channel varchar(30) [not null]
+  amount numeric(19,2) [not null]
+  currency char(3) [not null]
+  paid_at timestamp with time zone [not null]
+  status varchar(30) [not null]
+  idempotency_key varchar(160) [not null, unique]
+  raw_payload_hash char(64)
+}
+
+Table payment.payment_allocation {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  payment_transaction_id uuid [not null]
+  installment_id uuid [not null]
+  allocated_amount numeric(19,2) [not null]
+  allocation_type varchar(30) [not null]
+}
+
+Table payment.provider_event {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  partner_code varchar(60) [not null]
+  external_event_id varchar(160) [not null]
+  event_type varchar(80) [not null]
+  received_at timestamp with time zone [not null]
+  signature_valid boolean [not null]
+  payload jsonb [not null]
+  processing_status varchar(30) [not null]
+}
+
+Table payment.bank_statement {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  bank_code varchar(60) [not null]
+  account_ref_masked varchar(80) [not null]
+  statement_ref varchar(120) [not null, unique]
+  period_start date [not null]
+  period_end date [not null]
+  status varchar(30) [not null]
+}
+
+Table payment.bank_statement_line {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  statement_id uuid [not null]
+  line_number integer [not null]
+  booking_date date [not null]
+  value_date date
+  amount numeric(19,2) [not null]
+  reference_text text
+  fingerprint char(64) [not null, unique]
+}
+
+Table payment.reconciliation_case {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  payment_transaction_id uuid
+  statement_line_id uuid
+  match_score numeric(5,2)
+  status varchar(30) [not null]
+  override_reason text
+  proposed_by uuid
+  approved_by uuid
+}
+
+Table receipt.receipt {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  payment_transaction_id uuid [not null]
+  receipt_number varchar(80) [not null, unique]
+  issued_at timestamp with time zone [not null]
+  status varchar(30) [not null]
+  document_id uuid [not null]
+  verification_token_hash char(64) [not null]
+  supersedes_receipt_id uuid
+  issued_by uuid [not null]
+}
+
+Table recovery.campaign {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  campaign_code varchar(60) [not null, unique]
+  name varchar(255) [not null]
+  target_segment jsonb [not null]
+  start_at timestamp with time zone [not null]
+  end_at timestamp with time zone
+  status varchar(30) [not null]
+}
+
+Table recovery.sequence_template {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  code varchar(60) [not null, unique]
+  name varchar(255) [not null]
+  category_code varchar(50)
+  active boolean [not null]
+}
+
+Table recovery.sequence_step {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  template_id uuid [not null]
+  step_no integer [not null]
+  delay_days integer [not null]
+  channel varchar(20) [not null]
+  template_code varchar(80) [not null]
+}
+
+Table recovery.recovery_case {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  membership_id uuid [not null]
+  fiscal_year_id uuid [not null]
+  outstanding_amount numeric(19,2) [not null]
+  risk_score numeric(5,2)
+  assigned_to uuid
+  status varchar(30) [not null]
+}
+
+Table recovery.recovery_action {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  recovery_case_id uuid [not null]
+  action_type varchar(40) [not null]
+  channel varchar(20)
+  outcome_code varchar(60)
+  notes text
+  action_at timestamp with time zone [not null]
+}
+
+Table recovery.promise_to_pay {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  recovery_case_id uuid [not null]
+  promised_amount numeric(19,2) [not null]
+  promised_date date [not null]
+  status varchar(30) [not null]
+  fulfilled_payment_id uuid
+}
+
+Table incentive.bonus_rule {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  rule_code varchar(60) [not null, unique]
+  member_category varchar(50) [not null]
+  calculation_method varchar(30) [not null]
+  rate numeric(9,6) [not null]
+  valid_from date [not null]
+  valid_to date
+  status varchar(30) [not null]
+  approved_by uuid
+}
+
+Table incentive.bonus_calculation {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  period_start date [not null]
+  period_end date [not null]
+  status varchar(30) [not null]
+  total_amount numeric(19,2) [not null]
+  calculated_by uuid [not null]
+  approved_by uuid
+}
+
+Table incentive.bonus_line {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  calculation_id uuid [not null]
+  payment_transaction_id uuid [not null]
+  beneficiary_user_id uuid [not null]
+  member_category varchar(50) [not null]
+  base_amount numeric(19,2) [not null]
+  rate numeric(9,6) [not null]
+  bonus_amount numeric(19,2) [not null]
+}
+
+Table incentive.revenue_share_statement {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  period_start date [not null]
+  period_end date [not null]
+  provider_code varchar(60) [not null]
+  gross_collected numeric(19,2) [not null]
+  share_amount numeric(19,2) [not null]
+  status varchar(30) [not null]
+  approved_by uuid
+}
+
+Table incentive.financial_dispute {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  object_type varchar(40) [not null]
+  object_id uuid [not null]
+  reason text [not null]
+  status varchar(30) [not null]
+  resolution text
+}
+
+Table service.sla_policy {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  request_type varchar(60) [not null, unique]
+  first_response_hours integer [not null]
+  resolution_hours integer [not null]
+  calendar_code varchar(60) [not null]
+}
+
+Table service.request {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  organization_id uuid [not null]
+  request_number varchar(60) [not null, unique]
+  request_type varchar(60) [not null]
+  subject varchar(255) [not null]
+  description text [not null]
+  status varchar(30) [not null]
+  priority varchar(20) [not null]
+  assigned_to uuid
+  due_at timestamp with time zone
+  closed_at timestamp with time zone
+}
+
+Table service.request_message {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  request_id uuid [not null]
+  sender_type varchar(30) [not null]
+  body text [not null]
+  visibility varchar(20) [not null]
+}
+
+Table document.document {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  document_code varchar(80) [not null, unique]
+  category_code varchar(60) [not null]
+  title varchar(255) [not null]
+  classification varchar(30) [not null]
+  retention_until date
+  status varchar(30) [not null]
+  current_version_id uuid
+}
+
+Table document.document_version {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  document_id uuid [not null]
+  version_number integer [not null]
+  object_key varchar(500) [not null]
+  file_name varchar(255) [not null]
+  media_type varchar(120) [not null]
+  size_bytes bigint [not null]
+  sha256 char(64) [not null]
+  malware_scan_status varchar(30) [not null]
+}
+
+Table document.document_link {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  document_id uuid [not null]
+  entity_type varchar(80) [not null]
+  entity_id uuid [not null]
+  link_type varchar(40) [not null]
+}
+
+Table governance.commission {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  code varchar(60) [not null, unique]
+  name varchar(255) [not null]
+  status varchar(30) [not null]
+}
+
+Table governance.meeting {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  commission_id uuid
+  meeting_number varchar(60) [not null, unique]
+  title varchar(255) [not null]
+  scheduled_at timestamp with time zone [not null]
+  status varchar(30) [not null]
+  minutes_document_id uuid
+}
+
+Table governance.meeting_attendance {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  meeting_id uuid [not null]
+  person_id uuid [not null]
+  attendance_status varchar(30) [not null]
+  proxy_person_id uuid
+}
+
+Table governance.decision {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  meeting_id uuid
+  decision_number varchar(60) [not null, unique]
+  title varchar(255) [not null]
+  decision_text text [not null]
+  status varchar(30) [not null]
+  effective_date date
+}
+
+Table governance.decision_action {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  decision_id uuid [not null]
+  action_text text [not null]
+  owner_user_id uuid
+  due_date date
+  status varchar(30) [not null]
+}
+
+Table event.event {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  event_code varchar(60) [not null, unique]
+  title varchar(255) [not null]
+  event_type varchar(40) [not null]
+  start_at timestamp with time zone [not null]
+  end_at timestamp with time zone
+  capacity integer
+  status varchar(30) [not null]
+}
+
+Table event.registration {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  event_id uuid [not null]
+  organization_id uuid [not null]
+  person_id uuid
+  status varchar(30) [not null]
+  registered_at timestamp with time zone [not null]
+}
+
+Table notification.template {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  template_code varchar(80) [not null, unique]
+  channel varchar(20) [not null]
+  locale varchar(10) [not null]
+  subject_template text
+  body_template text [not null]
+  status varchar(30) [not null]
+  approved_by uuid
+}
+
+Table notification.notification {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  recipient_type varchar(30) [not null]
+  recipient_ref varchar(320) [not null]
+  channel varchar(20) [not null]
+  template_code varchar(80) [not null]
+  status varchar(30) [not null]
+  scheduled_at timestamp with time zone [not null]
+  correlation_id uuid [not null]
+}
+
+Table notification.delivery_attempt {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  notification_id uuid [not null]
+  attempt_no integer [not null]
+  provider_code varchar(60) [not null]
+  status varchar(30) [not null]
+  provider_message_id varchar(160)
+  response_code varchar(60)
+  attempted_at timestamp with time zone [not null]
+}
+
+Table integration.partner {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  partner_code varchar(60) [not null, unique]
+  name varchar(255) [not null]
+  partner_type varchar(40) [not null]
+  status varchar(30) [not null]
+}
+
+Table integration.endpoint_configuration {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  partner_id uuid [not null]
+  environment varchar(20) [not null]
+  base_url varchar(500) [not null]
+  auth_type varchar(40) [not null]
+  secret_reference varchar(255) [not null]
+  timeout_ms integer [not null]
+  retry_policy jsonb [not null]
+}
+
+Table integration.outbox_event {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  aggregate_type varchar(80) [not null]
+  aggregate_id uuid [not null]
+  event_type varchar(120) [not null]
+  payload jsonb [not null]
+  status varchar(30) [not null]
+  available_at timestamp with time zone [not null]
+  published_at timestamp with time zone
+}
+
+Table integration.webhook_subscription {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  partner_id uuid [not null]
+  event_type varchar(120) [not null]
+  callback_url varchar(500) [not null]
+  secret_reference varchar(255) [not null]
+  active boolean [not null]
+}
+
+Table integration.webhook_delivery {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  subscription_id uuid [not null]
+  outbox_event_id uuid [not null]
+  attempt_no integer [not null]
+  status varchar(30) [not null]
+  http_status integer
+  next_attempt_at timestamp with time zone
+}
+
+Table audit.audit_event {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  actor_user_id uuid
+  actor_type varchar(30) [not null]
+  action_code varchar(120) [not null]
+  entity_type varchar(80) [not null]
+  entity_id uuid
+  before_hash char(64)
+  after_hash char(64)
+  correlation_id uuid [not null]
+  ip_address inet
+  metadata jsonb [not null]
+}
+
+Table audit.security_event {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  user_id uuid
+  event_type varchar(120) [not null]
+  severity varchar(20) [not null]
+  source_ip inet
+  details jsonb [not null]
+  status varchar(30) [not null]
+}
+
+Table audit.data_export {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  requested_by uuid [not null]
+  export_type varchar(80) [not null]
+  scope jsonb [not null]
+  record_count bigint
+  document_id uuid
+  expires_at timestamp with time zone
+  approved_by uuid
+}
+
+Table reporting.report_definition {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  report_code varchar(80) [not null, unique]
+  name varchar(255) [not null]
+  report_type varchar(40) [not null]
+  definition jsonb [not null]
+  required_permission varchar(120) [not null]
+  active boolean [not null]
+}
+
+Table reporting.report_execution {
+  id uuid [pk, not null]
+  created_at timestamp with time zone [not null]
+  created_by uuid
+  updated_at timestamp with time zone [not null]
+  updated_by uuid
+  version bigint [not null]
+  report_definition_id uuid [not null]
+  requested_by uuid [not null]
+  parameters jsonb [not null]
+  status varchar(30) [not null]
+  started_at timestamp with time zone
+  completed_at timestamp with time zone
+  document_id uuid
+}
+
+Ref: iam.role_permission.role_id > iam.role.id
+Ref: iam.role_permission.permission_id > iam.permission.id
+Ref: iam.user_role.user_id > iam.user_account.id
+Ref: iam.user_role.role_id > iam.role.id
+Ref: iam.mfa_registration.user_id > iam.user_account.id
+Ref: member.organization_identifier.organization_id > member.organization.id
+Ref: member.address.organization_id > member.organization.id
+Ref: member.address.person_id > member.person.id
+Ref: member.organization_contact.organization_id > member.organization.id
+Ref: member.organization_contact.person_id > member.person.id
+Ref: member.membership.organization_id > member.organization.id
+Ref: member.membership_status_history.membership_id > member.membership.id
+Ref: member.group_membership.organization_id > member.organization.id
+Ref: member.group_membership.group_id > member.professional_group.id
+Ref: enrollment.prospect.organization_id > member.organization.id
+Ref: enrollment.prospect.assigned_group_id > member.professional_group.id
+Ref: enrollment.enrollment_case.organization_id > member.organization.id
+Ref: enrollment.enrollment_review.case_id > enrollment.enrollment_case.id
+Ref: enrollment.enrollment_decision.case_id > enrollment.enrollment_case.id
+Ref: contribution.contribution_call.membership_id > member.membership.id
+Ref: contribution.contribution_call.fiscal_year_id > contribution.fiscal_year.id
+Ref: contribution.installment.contribution_call_id > contribution.contribution_call.id
+Ref: contribution.adjustment.contribution_call_id > contribution.contribution_call.id
+Ref: payment.payment_reference.membership_id > member.membership.id
+Ref: payment.payment_transaction.payment_reference_id > payment.payment_reference.id
+Ref: payment.payment_allocation.payment_transaction_id > payment.payment_transaction.id
+Ref: payment.payment_allocation.installment_id > contribution.installment.id
+Ref: payment.bank_statement_line.statement_id > payment.bank_statement.id
+Ref: payment.reconciliation_case.payment_transaction_id > payment.payment_transaction.id
+Ref: payment.reconciliation_case.statement_line_id > payment.bank_statement_line.id
+Ref: receipt.receipt.payment_transaction_id > payment.payment_transaction.id
+Ref: receipt.receipt.supersedes_receipt_id > receipt.receipt.id
+Ref: recovery.sequence_step.template_id > recovery.sequence_template.id
+Ref: recovery.recovery_case.membership_id > member.membership.id
+Ref: recovery.recovery_case.fiscal_year_id > contribution.fiscal_year.id
+Ref: recovery.recovery_action.recovery_case_id > recovery.recovery_case.id
+Ref: recovery.promise_to_pay.recovery_case_id > recovery.recovery_case.id
+Ref: incentive.bonus_line.calculation_id > incentive.bonus_calculation.id
+Ref: incentive.bonus_line.payment_transaction_id > payment.payment_transaction.id
+Ref: service.request.organization_id > member.organization.id
+Ref: service.request_message.request_id > service.request.id
+Ref: document.document_version.document_id > document.document.id
+Ref: document.document_link.document_id > document.document.id
+Ref: governance.meeting.commission_id > governance.commission.id
+Ref: governance.meeting_attendance.meeting_id > governance.meeting.id
+Ref: governance.meeting_attendance.person_id > member.person.id
+Ref: governance.decision.meeting_id > governance.meeting.id
+Ref: governance.decision_action.decision_id > governance.decision.id
+Ref: event.registration.event_id > event.event.id
+Ref: event.registration.organization_id > member.organization.id
+Ref: event.registration.person_id > member.person.id
+Ref: notification.delivery_attempt.notification_id > notification.notification.id
+Ref: integration.endpoint_configuration.partner_id > integration.partner.id
+Ref: integration.webhook_subscription.partner_id > integration.partner.id
+Ref: integration.webhook_delivery.subscription_id > integration.webhook_subscription.id
+Ref: integration.webhook_delivery.outbox_event_id > integration.outbox_event.id
+Ref: reporting.report_execution.report_definition_id > reporting.report_definition.id

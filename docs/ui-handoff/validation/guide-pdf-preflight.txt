@@ -1,0 +1,6 @@
+PDF: guide/CNPM_UI_UX_Handoff_Guide_v1.0.pdf
+Pages: 28
+Encrypted: False
+Openable (PyMuPDF): True
+Likely scanned: False
+XFA present: False

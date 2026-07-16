@@ -1,0 +1,20 @@
+digraph G { rankdir=LR; graph [bgcolor="white", fontname="DejaVu Sans", pad="0.2", nodesep="0.55", ranksep="0.75", splines=ortho];
+node [shape=box, style="rounded,filled", fillcolor="white", color="#1F3A93", fontcolor="#1A1D24", fontname="DejaVu Sans", fontsize=10, penwidth=1.2, margin="0.16,0.10"];
+edge [color="#1F3A93", fontcolor="#1A1D24", fontname="DejaVu Sans", fontsize=8.5, penwidth=1.0, arrowsize=0.7];
+  source [label="TDR + spécifications
+Sources de vérité"];
+  claude [label="CLAUDE.md
+Règles permanentes",color="#E30613",penwidth=2];
+  rules [label=".claude/rules
+Conventions par domaine"];
+  skills [label=".claude/skills
+Procédures à la demande"];
+  agents [label=".claude/agents
+Revues spécialisées"];
+  hooks [label=".claude/hooks
+Garde-fous exécutables"];
+  story [label="User story + critères"];
+  code [label="Code + migration + tests"];
+  pr [label="Pull request + preuves"];
+  source -> claude; claude -> story; rules -> story; skills -> story; hooks -> code; story -> code; code -> agents; agents -> pr;
+}

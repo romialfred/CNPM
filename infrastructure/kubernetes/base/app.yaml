@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cnpm-api
+  namespace: cnpm-platform
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: cnpm-api}
+  template:
+    metadata:
+      labels: {app: cnpm-api}
+    spec:
+      serviceAccountName: cnpm-api
+      containers:
+        - name: api
+          image: registry.example.cnpm.ml/cnpm/api:1.0.0
+          ports: [{name: http, containerPort: 8080}]
+          envFrom: [{configMapRef: {name: cnpm-api-config}}]
+          resources:
+            requests: {cpu: 250m, memory: 512Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          readinessProbe: {httpGet: {path: /actuator/health/readiness, port: http}, initialDelaySeconds: 20}
+          livenessProbe: {httpGet: {path: /actuator/health/liveness, port: http}, initialDelaySeconds: 60}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cnpm-api
+  namespace: cnpm-platform
+spec:
+  selector: {app: cnpm-api}
+  ports: [{name: http, port: 80, targetPort: http}]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: cnpm-api
+  namespace: cnpm-platform
+spec:
+  minAvailable: 1
+  selector: {matchLabels: {app: cnpm-api}}

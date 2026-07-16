@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="https://cnpm.ml/bpmn">
+  <process id="Process_incident_response" name="CNPM - incident-response" isExecutable="true">
+    <startEvent id="StartEvent_1" name="Detect"/> <userTask id="Task_1" name="Qualify"/> <userTask id="Task_2" name="Contain"/> <userTask id="Task_3" name="Eradicate"/> <userTask id="Task_4" name="Recover"/> <serviceTask id="Task_5" name="Notify stakeholders"/> <userTask id="Task_6" name="Post-incident review"/> <endEvent id="EndEvent_1" name="Close"/>
+    <sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_1"/> <sequenceFlow id="Flow_2" sourceRef="Task_1" targetRef="Task_2"/> <sequenceFlow id="Flow_3" sourceRef="Task_2" targetRef="Task_3"/> <sequenceFlow id="Flow_4" sourceRef="Task_3" targetRef="Task_4"/> <sequenceFlow id="Flow_5" sourceRef="Task_4" targetRef="Task_5"/> <sequenceFlow id="Flow_6" sourceRef="Task_5" targetRef="Task_6"/> <sequenceFlow id="Flow_end" sourceRef="Task_6" targetRef="EndEvent_1"/>
+  </process>
+</definitions>

@@ -1,0 +1,85 @@
+stages:
+  - validate
+  - test
+  - security
+  - package
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+validate-repository:
+  stage: validate
+  image: python:3.13-slim
+  before_script:
+    - pip install --no-cache-dir pyyaml pillow
+  script:
+    - bash scripts/validate-pack.sh
+
+backend-test:
+  stage: test
+  image: maven:3.9-eclipse-temurin-25
+  services:
+    - name: postgres:18.4
+      alias: postgres
+  variables:
+    POSTGRES_DB: cnpm
+    POSTGRES_USER: cnpm_app
+    POSTGRES_PASSWORD: ci-local-only
+    DATABASE_URL: jdbc:postgresql://postgres:5432/cnpm
+    DATABASE_USER: cnpm_app
+    DATABASE_PASSWORD: ci-local-only
+  script:
+    - mvn -f backend/pom.xml -B clean verify
+  rules:
+    - exists:
+        - backend/pom.xml
+
+web-test:
+  stage: test
+  image: node:24
+  script:
+    - cd web
+    - npm ci
+    - npm run lint
+    - npm run test:ci
+    - npm audit --audit-level=high
+    - npm run build
+  rules:
+    - exists:
+        - web/angular.json
+        - web/package-lock.json
+
+mobile-test:
+  stage: test
+  image: ghcr.io/cirruslabs/flutter:3.44.0
+  script:
+    - cd mobile
+    - flutter pub get
+    - flutter analyze
+    - flutter test
+  rules:
+    - exists:
+        - mobile/pubspec.lock
+        - mobile/android/app/build.gradle
+
+security-scan:
+  stage: security
+  image: aquasec/trivy:0.64.1
+  script:
+    - trivy fs --exit-code 1 --severity CRITICAL,HIGH .
+
+package-placeholder:
+  stage: package
+  image: alpine:3.22
+  script:
+    - echo "Packaging OCI images and SBOM is activated after R0 bootstrap."
+
+production:
+  stage: deploy
+  image: alpine:3.22
+  when: manual
+  allow_failure: false
+  script:
+    - echo "Production deployment requires an approved change record and human authorization."

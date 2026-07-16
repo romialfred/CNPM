@@ -1,0 +1,40 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.45", ranksep="0.5", fontname="Lato", label="Architecture logique cible", labelloc="t", fontsize=20, fontcolor="#1F3A93"];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#AAB3C2", penwidth=1.0, fontname="Lato", fontsize=10, fontcolor="#1A1D24", margin="0.16,0.10"];
+  edge [color="#5D6470", penwidth=1.0, arrowsize=0.65];
+
+  channels [shape=plain, label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="8" CELLPADDING="10" COLOR="#AAB3C2">
+      <TR><TD><B>Portail membre Angular / PWA</B></TD><TD><B>Back-office Angular</B></TD><TD><B>Application mobile Flutter</B></TD></TR>
+    </TABLE>
+  >];
+  gateway [label="API Gateway / BFF léger\nTLS, quotas, corrélation et politiques CORS", color="#1F3A93", penwidth=1.8];
+  iam [label="Keycloak\nOIDC, OAuth 2.0, 2FA, WebAuthn"];
+  core [shape=plain, label=<
+    <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0" CELLPADDING="9" COLOR="#AAB3C2">
+      <TR><TD COLSPAN="4"><FONT COLOR="#1F3A93"><B>MONOLITHE MODULAIRE SPRING BOOT - ARCHITECTURE HEXAGONALE</B></FONT></TD></TR>
+      <TR><TD>Membres / groupements</TD><TD>Enrôlement / adhésion</TD><TD>Cotisations / échéanciers</TD><TD>Paiements / rapprochement</TD></TR>
+      <TR><TD>Reçus / attestations</TD><TD>Recouvrement / relances</TD><TD>Requêtes / GED / événements</TD><TD>Primes / partage</TD></TR>
+      <TR><TD>Reporting / décisionnel</TD><TD>Administration / audit</TD><TD>Intégrations</TD><TD>Portail / self-service</TD></TR>
+    </TABLE>
+  >];
+  services [shape=plain, label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="8" CELLPADDING="9" COLOR="#AAB3C2">
+      <TR><TD>Flowable BPMN/DMN</TD><TD>RabbitMQ + outbox</TD><TD>Valkey - cache technique</TD><TD>Stockage objet S3</TD></TR>
+    </TABLE>
+  >];
+  data [shape=plain, label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="8" CELLPADDING="10" COLOR="#AAB3C2">
+      <TR><TD COLOR="#1F3A93"><B>PostgreSQL - source de vérité ACID</B></TD><TD>Réplique / read model BI</TD><TD>OpenTelemetry / Grafana / Loki / Tempo</TD></TR>
+    </TABLE>
+  >];
+  partners [label="Banques, Mobile Money, SMS/e-mail et INPS futur"];
+
+  channels -> gateway;
+  gateway -> iam [dir=both];
+  gateway -> core;
+  core -> services;
+  core -> data;
+  services -> data;
+  core -> partners [dir=both];
+}

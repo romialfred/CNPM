@@ -1,0 +1,10 @@
+flowchart LR
+  Member[Entreprise membre] -->|Portail Web / mobile| Platform[Plateforme digitale CNPM]
+  Staff[Agents et directions CNPM] -->|Back-office| Platform
+  Groups[Groupements professionnels] -->|Enrôlement et suivi| Platform
+  Auditor[Auditeurs mandatés] -->|Accès contrôlé| Platform
+  Platform -->|Paiements / confirmations| MobileMoney[Opérateurs Mobile Money]
+  Platform -->|Virements / relevés| Banks[Banques]
+  Platform -->|SMS / e-mail| Messaging[Prestataires de messagerie]
+  Platform -.->|Interopérabilité future| INPS[INPS]
+  Platform -->|Identité et 2FA| Keycloak[Keycloak]

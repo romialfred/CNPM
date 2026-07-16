@@ -1,0 +1,32 @@
+# Glossaire
+
+- **CNPM** : Conseil National du Patronat du Mali.
+- **Membre** : Entreprise ou organisation disposant d’une adhésion au CNPM.
+- **Cotisant actif** : Membre cotisant régulièrement.
+- **Cotisant dormant** : Ancien cotisant ayant cessé de payer.
+- **Grand cotisant** : Entreprise contribuant significativement aux cotisations.
+- **Prospect** : Entreprise non encore adhérente ciblée pour l’enrôlement.
+- **Enrôlement** : Processus de collecte, contrôle et validation des informations d’adhésion.
+- **Appel de cotisation** : Créance officielle calculée pour une adhésion et un exercice.
+- **Rapprochement** : Association contrôlée d’un paiement à une référence et une créance.
+- **Reçu officiel** : Preuve CNPM émise après confirmation du paiement.
+- **2FA** : Authentification à deux facteurs.
+- **RBAC** : Contrôle d’accès fondé sur les rôles.
+- **SoD** : Séparation des tâches incompatibles.
+- **Idempotence** : Garantie qu’une répétition ne produit pas un second effet métier.
+- **Outbox** : Table transactionnelle de publication fiable des événements.
+- **RPO** : Perte maximale de données acceptable.
+- **RTO** : Temps maximal de reprise acceptable.
+- **PRA** : Plan de reprise d’activité.
+- **PCA** : Plan de continuité d’activité.
+- **PoC** : Proof of Concept permettant de démontrer la chaîne bout en bout.
+- **DCTD** : Dossier de conception technique détaillée.
+- **ADR** : Architecture Decision Record.
+- **PII** : Donnée permettant d’identifier directement ou indirectement une personne.
+- **PITR** : Restauration PostgreSQL à un instant précis.
+- **SLA** : Engagement de niveau de service.
+- **SLO** : Objectif mesurable de niveau de service.
+- **KYC** : Contrôles de connaissance et de vérification du membre.
+- **PWA** : Application Web progressive.
+- **BPMN** : Notation standard de modélisation des processus.
+- **DMN** : Notation standard de décision.

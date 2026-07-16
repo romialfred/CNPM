@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "purpose": "Fixtures deterministes pour maquettes, Storybook et tests visuels",
+    "period": "2024",
+    "currency": "XOF",
+    "locale": "fr-ML",
+    "warning": "Donnees fictives; ne pas importer en production"
+  },
+  "kpis": {
+    "membersTotal": 4968,
+    "activeMembers": 3842,
+    "dormantMembers": 1126,
+    "prospects": 356,
+    "largeContributorsSubset": 148,
+    "expectedContributions": 2734640000,
+    "collectedContributions": 2145780000,
+    "outstandingContributions": 588860000,
+    "recoveryRate": 78.47,
+    "receiptsIssued": 5278,
+    "newMembers": 356,
+    "retentionRate": 91.2
+  },
+  "members": [
+    {
+      "id": "MEM-0001",
+      "code": "CNPM-2024-0527",
+      "organization": "SOMACOP SA",
+      "category": "Grande entreprise",
+      "segment": "Grand cotisant",
+      "group": "BTP et Infrastructures",
+      "contactName": "Adama Diarra",
+      "contactPhone": "+223 66 12 34 56",
+      "contactEmail": "adiarra@somacop.example",
+      "due": 12500000,
+      "paid": 12500000,
+      "status": "ACTIVE",
+      "lastActivity": "2024-05-27"
+    },
+    {
+      "id": "MEM-0002",
+      "code": "CNPM-2024-0528",
+      "organization": "BICIM SA",
+      "category": "Grande entreprise",
+      "segment": "Actif",
+      "group": "Commerce et Distribution",
+      "contactName": "Fatoumata Diallo",
+      "contactPhone": "+223 66 98 76 54",
+      "contactEmail": "fdiallo@bicim.example",
+      "due": 8750000,
+      "paid": 4000000,
+      "status": "DORMANT",
+      "lastActivity": "2024-03-15"
+    },
+    {
+      "id": "MEM-0003",
+      "code": "CNPM-2024-0529",
+      "organization": "Mali BTP",
+      "category": "Moyenne entreprise",
+      "segment": "Actif",
+      "group": "BTP et Infrastructures",
+      "contactName": "Boubacar Kone",
+      "contactPhone": "+223 66 77 88 99",
+      "contactEmail": "bkone@malibtp.example",
+      "due": 7250000,
+      "paid": 7250000,
+      "status": "ACTIVE",
+      "lastActivity": "2024-05-26"
+    },
+    {
+      "id": "MEM-0004",
+      "code": "CNPM-2024-0530",
+      "organization": "ETS Diallo et Freres",
+      "category": "PME",
+      "segment": "Dormant",
+      "group": "Commerce et Distribution",
+      "contactName": "Abdoulaye Diallo",
+      "contactPhone": "+223 66 44 55 66",
+      "contactEmail": "contact@diallo.example",
+      "due": 1250000,
+      "paid": 625000,
+      "status": "DORMANT",
+      "lastActivity": "2024-04-11"
+    },
+    {
+      "id": "MEM-0005",
+      "code": "CNPM-2024-0531",
+      "organization": "Global Services Mali",
+      "category": "Grande entreprise",
+      "segment": "Actif",
+      "group": "Services",
+      "contactName": "Aissata Maiga",
+      "contactPhone": "+223 66 33 22 11",
+      "contactEmail": "amaiga@global.example",
+      "due": 5000000,
+      "paid": 5000000,
+      "status": "ACTIVE",
+      "lastActivity": "2024-05-25"
+    },
+    {
+      "id": "MEM-0006",
+      "code": "CNPM-2024-0532",
+      "organization": "SODIMEX SA",
+      "category": "Grande entreprise",
+      "segment": "Prospect",
+      "group": "Industrie",
+      "contactName": "Souleymane Traore",
+      "contactPhone": "+223 66 20 30 40",
+      "contactEmail": "straore@sodimex.example",
+      "due": 0,
+      "paid": 0,
+      "status": "PROSPECT",
+      "lastActivity": "2024-02-05"
+    }
+  ],
+  "payments": [
+    {
+      "reference": "MM-2024-0527-00448",
+      "payer": "SOMACOP SA",
+      "amount": 12500000,
+      "channel": "MOBILE_MONEY",
+      "status": "UNMATCHED",
+      "paidAt": "2024-05-27T11:23:00Z",
+      "transactionReference": "250527112345"
+    },
+    {
+      "reference": "VIR-2024-0527-00447",
+      "payer": "BICIM SA",
+      "amount": 8750000,
+      "channel": "BANK_TRANSFER",
+      "status": "UNMATCHED",
+      "paidAt": "2024-05-27T10:18:00Z",
+      "transactionReference": "BCI-270524-447"
+    },
+    {
+      "reference": "CAI-2024-0527-00446",
+      "payer": "ETS Diallo et Freres",
+      "amount": 3250000,
+      "channel": "CASH",
+      "status": "PENDING",
+      "paidAt": "2024-05-27T09:52:00Z",
+      "transactionReference": "CAISSE-446"
+    },
+    {
+      "reference": "VIR-2024-0526-00444",
+      "payer": "Global Services Mali",
+      "amount": 5000000,
+      "channel": "BANK_TRANSFER",
+      "status": "MATCHED",
+      "paidAt": "2024-05-26T16:05:00Z",
+      "transactionReference": "BMS-260524-444"
+    }
+  ],
+  "monthlyCollections": [
+    {
+      "month": "2024-01",
+      "expected": 650000000,
+      "collected": 480000000,
+      "rate": 73.8
+    },
+    {
+      "month": "2024-02",
+      "expected": 740000000,
+      "collected": 560000000,
+      "rate": 75.7
+    },
+    {
+      "month": "2024-03",
+      "expected": 860000000,
+      "collected": 690000000,
+      "rate": 80.2
+    },
+    {
+      "month": "2024-04",
+      "expected": 760000000,
+      "collected": 590000000,
+      "rate": 77.6
+    },
+    {
+      "month": "2024-05",
+      "expected": 720000000,
+      "collected": 565780000,
+      "rate": 78.6
+    },
+    {
+      "month": "2024-06",
+      "expected": 820000000,
+      "collected": 640000000,
+      "rate": 78.0
+    }
+  ],
+  "showcaseSample": {
+    "slug": "somacop-sa",
+    "name": "SOMACOP SA",
+    "tagline": "Batir aujourd hui, construire demain",
+    "sector": "BTP et Genie civil",
+    "location": "Bamako, Mali",
+    "employeeRange": "150-500",
+    "foundedYear": 2010,
+    "legalForm": "Societe Anonyme",
+    "verificationStatus": "VERIFIED",
+    "membershipStatus": "ACTIVE",
+    "summary": "Entreprise malienne specialisee dans les travaux publics, le genie civil et l amenagement durable des infrastructures.",
+    "contacts": {
+      "phone": "+223 20 22 33 44",
+      "email": "contact@somacop.example",
+      "address": "ACI 2000, Bamako, Mali",
+      "hours": "Lun-Ven 08:00-17:00"
+    },
+    "activities": [
+      "Travaux publics et infrastructures",
+      "Batiment et genie civil",
+      "Amenagement urbain",
+      "Etudes et ingenierie",
+      "Materiaux et equipements",
+      "Maintenance et rehabilitation"
+    ],
+    "projects": [
+      {
+        "title": "Route Kati-Koulikoro",
+        "summary": "Construction de 42 km de route bitumee",
+        "category": "Routes et infrastructures"
+      },
+      {
+        "title": "Pont de Senou",
+        "summary": "Construction d un pont en beton arme",
+        "category": "Ouvrages d art"
+      },
+      {
+        "title": "Immeuble SOMAPLAZA",
+        "summary": "Construction d un immeuble R+6",
+        "category": "Batiments"
+      }
+    ],
+    "certifications": [
+      "ISO 9001",
+      "ISO 14001",
+      "ISO 45001"
+    ],
+    "seo": {
+      "title": "SOMACOP SA - Membre du CNPM",
+      "description": "Decouvrez les activites, realisations et coordonnees de SOMACOP SA, membre verifie du CNPM.",
+      "allowIndexing": true
+    },
+    "publication": {
+      "status": "DRAFT",
+      "lastSavedAt": "2026-07-16T08:00:00Z",
+      "scheduledAt": null
+    }
+  }
+}

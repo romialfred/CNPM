@@ -1,0 +1,46 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+CLAUDE.local.md
+.claude/settings.local.json
+**/secrets/**
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# Java / Maven
+backend/**/target/
+.m2/
+*.log
+
+# Node / Angular / Storybook / Playwright
+web/node_modules/
+web/dist/
+web/.angular/
+web/coverage/
+web/storybook-static/
+web/playwright-report/
+web/test-results/
+
+# Flutter / Dart
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/ios/Pods/
+mobile/android/.gradle/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local data and generated reports
+infrastructure/docker/data/
+reports/
+visual-diff/

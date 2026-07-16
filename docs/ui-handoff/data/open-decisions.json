@@ -1,0 +1,92 @@
+[
+  {
+    "id": "UX-DEC-001",
+    "topic": "Police institutionnelle de production",
+    "status": "Open",
+    "owner": "CNPM Communication",
+    "decisionNeeded": "Valider Inter ou une police de remplacement licenciee",
+    "impact": "Metriques typographiques et fidelite visuelle",
+    "dueBefore": "Sprint 0"
+  },
+  {
+    "id": "UX-DEC-002",
+    "topic": "Logo vectoriel officiel",
+    "status": "Open",
+    "owner": "CNPM Communication",
+    "decisionNeeded": "Fournir le SVG ou AI officiel et les regles de zone de protection",
+    "impact": "Qualite des en-tetes, PDF et favicons",
+    "dueBefore": "Sprint 0"
+  },
+  {
+    "id": "UX-DEC-003",
+    "topic": "Photographies et droits",
+    "status": "Open",
+    "owner": "CNPM Communication",
+    "decisionNeeded": "Constituer une phototheque autorisee et les consentements",
+    "impact": "Site public et vitrines membres",
+    "dueBefore": "Avant publication publique"
+  },
+  {
+    "id": "UX-DEC-004",
+    "topic": "Verification membre public",
+    "status": "Open",
+    "owner": "CNPM Secretariat/Finance",
+    "decisionNeeded": "Definir les criteres exacts du badge verifie et sa date d expiration",
+    "impact": "Confiance, responsabilite juridique",
+    "dueBefore": "Vitrine publique"
+  },
+  {
+    "id": "UX-DEC-005",
+    "topic": "Moderation des vitrines",
+    "status": "Open",
+    "owner": "CNPM Communication/Juridique",
+    "decisionNeeded": "Definir SLA, contenus interdits, recours et depublication",
+    "impact": "Workflow et ecrans de moderation",
+    "dueBefore": "Vitrine publique"
+  },
+  {
+    "id": "UX-DEC-006",
+    "topic": "Noms de domaine des vitrines",
+    "status": "Open",
+    "owner": "CNPM IT",
+    "decisionNeeded": "Choisir /membres/slug ou sous-domaines membres.cnpm.ml",
+    "impact": "SEO, certificats, routage",
+    "dueBefore": "Architecture publique"
+  },
+  {
+    "id": "UX-DEC-007",
+    "topic": "Langues publiques",
+    "status": "Open",
+    "owner": "CNPM Communication",
+    "decisionNeeded": "Valider francais seul, anglais et/ou langues locales",
+    "impact": "i18n et production de contenu",
+    "dueBefore": "Sprint public"
+  },
+  {
+    "id": "UX-DEC-008",
+    "topic": "Cartographie",
+    "status": "Open",
+    "owner": "CNPM IT/Juridique",
+    "decisionNeeded": "Choisir fournisseur, consentement et politique de cookies",
+    "impact": "Vitrine membre et contact",
+    "dueBefore": "Publication carte"
+  },
+  {
+    "id": "UX-DEC-009",
+    "topic": "Bibliotheque d icones",
+    "status": "Proposed",
+    "owner": "Product/UX",
+    "decisionNeeded": "Valider Lucide comme source unique",
+    "impact": "Coherence et bundle",
+    "dueBefore": "Sprint 0"
+  },
+  {
+    "id": "UX-DEC-010",
+    "topic": "Tolérance de regression visuelle",
+    "status": "Proposed",
+    "owner": "QA/UX",
+    "decisionNeeded": "Valider 0,5% global et masques zones dynamiques",
+    "impact": "Gates CI",
+    "dueBefore": "Mise en place CI"
+  }
+]

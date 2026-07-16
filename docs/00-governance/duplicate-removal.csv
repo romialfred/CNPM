@@ -1,0 +1,30 @@
+category,removed_source,canonical_destination,action
+official_source,BRS/TDR_NTA_Digitalisation_Cotisations_CNPM.pdf,docs/00-sources/TDR_NTA_Digitalisation_Cotisations_CNPM.pdf,removed duplicate
+official_source,CNPM_UI_UX_Handoff_v1.0/docs/00-governance/source-material/TDR_CNPM_Digitalisation_Cotisations.pdf,docs/00-sources/TDR_NTA_Digitalisation_Cotisations_CNPM.pdf,removed duplicate
+product,Dossier Operatiionel/CNPM_Backlog_Traceabilite_Recette.xlsx,docs/01-product/CNPM_Backlog_Traceabilite_Recette.xlsx,removed duplicate
+product,CNPM_UI_UX_Handoff_v1.0/docs/00-governance/source-material/CNPM_Backlog_Traceabilite_Recette.xlsx,docs/01-product/CNPM_Backlog_Traceabilite_Recette.xlsx,removed duplicate
+security,Dossier Operatiionel/CNPM_RBAC_Matrice.xlsx,docs/05-security/CNPM_RBAC_Matrice.xlsx,removed duplicate
+security,CNPM_UI_UX_Handoff_v1.0/docs/00-governance/source-material/CNPM_RBAC_Matrice.xlsx,docs/05-security/CNPM_RBAC_Matrice.xlsx,removed duplicate
+architecture,Dossier de conception technique/CNPM_DCTD_v1.0.docx,docs/02-architecture/CNPM_DCTD_v1.0.docx,removed duplicate
+architecture,CNPM_UI_UX_Handoff_v1.0/docs/00-governance/source-material/CNPM_DCTD_v1.0.pdf,docs/02-architecture/CNPM_DCTD_v1.0.pdf,removed duplicate
+functional_spec,Specifications fonctionnelles/CNPM_Specifications_Fonctionnelles_v1.1_Design_Professionnel_Sans_Cadres.docx,docs/00-sources/Specifications_Fonctionnelles_CNPM_v1.1.docx,removed duplicate
+functional_spec,CNPM_UI_UX_Handoff_v1.0/docs/00-governance/source-material/CNPM_Specifications_Fonctionnelles_v1.1.pdf,docs/00-sources/Specifications_Fonctionnelles_CNPM_v1.1.pdf,removed duplicate
+data,Dossier Operatiionel/CNPM_Dictionnaire_Donnees_PostgreSQL.xlsx,docs/03-data/CNPM_Dictionnaire_Donnees_PostgreSQL.xlsx,removed duplicate
+governance,Dossier Operatiionel/RAPPORT_VALIDATION_PACK.md,docs/00-governance/archive/pack-validation-report-v1.0.md,removed duplicate
+ui_guide,CNPM_UI_UX_Handoff_Guide_v1.0.pdf,docs/ui-handoff/guide/CNPM_UI_UX_Handoff_Guide_v1.0.pdf,removed duplicate
+ui_workbook,CNPM_UI_UX_Handoff_Matrix.xlsx,docs/ui-handoff/workbooks/CNPM_UI_UX_Handoff_Matrix.xlsx,removed duplicate
+brand,images/logo-CNPM-1.png,docs/00-sources/logo-CNPM.png,removed duplicate
+brand,CNPM_UI_UX_Handoff_v1.0/assets/brand/cnpm-logo-official-provided.png,docs/00-sources/logo-CNPM.png,removed duplicate
+brand,CNPM_UI_UX_Handoff_v1.0/assets/brand/cnpm-logo-source.png,docs/00-sources/logo-CNPM.png,removed duplicate
+visual,Maquettes/Acceuil.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-001-dashboard.png,removed duplicate
+visual,Maquettes/Acceuil Membre.png,docs/ui-handoff/assets/reference-screens/full/ref-mp-001-member-home.png,removed duplicate
+visual,Maquettes/Administration.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-030-admin-security.png,removed duplicate
+visual,Maquettes/Connexion.png,docs/ui-handoff/assets/reference-screens/full/ref-auth-001-login.png,removed duplicate
+visual,Maquettes/Dashboard Corisation.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-011-contributions.png,removed duplicate
+visual,Maquettes/Formulaire d'Enrollement.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-009-enrollment-form.png,removed duplicate
+visual,Maquettes/Liste Membres.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-002-members-list.png,removed duplicate
+visual,Maquettes/Page Cotisation Membre.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-003-member-detail.png,removed duplicate
+visual,Maquettes/Paiement Rapprochement .png,docs/ui-handoff/assets/reference-screens/full/ref-bo-014-payments-reconciliation.png,removed duplicate
+visual,Maquettes/Relance & Appel et Recouvrement.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-017-recovery-campaigns.png,removed duplicate
+visual,Maquettes/Reportting Decisionel.png,docs/ui-handoff/assets/reference-screens/full/ref-bo-028-reporting.png,removed duplicate
+visual,Maquettes/Vitrine.png,docs/ui-handoff/assets/reference-screens/full/ref-pub-006-member-showcase.png,removed duplicate

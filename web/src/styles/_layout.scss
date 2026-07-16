@@ -1,0 +1,9 @@
+.cnpm-page { min-width: 0; padding: 28px; }
+.cnpm-container { width: min(100%, var(--cnpm-size-contentMax)); margin-inline: auto; }
+.cnpm-public-container { width: min(calc(100% - 32px), var(--cnpm-size-publicMax)); margin-inline: auto; }
+.cnpm-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; }
+.cnpm-stack { display: flex; flex-direction: column; gap: 24px; }
+.cnpm-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.cnpm-card { border: 1px solid var(--cnpm-color-border-subtle); border-radius: var(--cnpm-radius-lg); background: var(--cnpm-color-surface-primary); padding: 20px; box-shadow: var(--cnpm-shadow-xs); }
+@media (max-width: 1279px) { .cnpm-page { padding: 20px; } }
+@media (max-width: 767px) { .cnpm-page { padding: 16px; } .cnpm-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; } .cnpm-card { padding: 16px; } }

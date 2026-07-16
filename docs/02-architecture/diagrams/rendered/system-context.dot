@@ -1,0 +1,34 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.55", ranksep="0.8", fontname="Lato", label="Contexte du système CNPM", labelloc="t", fontsize=20, fontcolor="#1F3A93"];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#AAB3C2", penwidth=1.2, fontname="Lato", fontsize=11, fontcolor="#1A1D24", margin="0.18,0.12"];
+  edge [color="#5D6470", penwidth=1.1, arrowsize=0.7, fontname="Lato", fontsize=9, fontcolor="#5D6470"];
+
+  member [label="Membres et entreprises\nPortail Web / application mobile"];
+  agents [label="Agents CNPM\nRecouvrement, finance, secrétariat"];
+  groups [label="Groupements professionnels\nRéférents et responsables"];
+  direction [label="Direction et organes de gouvernance\nPilotage et décisionnel"];
+  auditors [label="Auditeurs autorisés\nContrôle et traçabilité"];
+
+  cnpm [label="PLATEFORME DIGITALE CNPM\nGestion membres, cotisations, paiements, services et reporting", color="#1F3A93", penwidth=2.0, fontsize=13];
+
+  mm [label="Opérateurs Mobile Money"];
+  banks [label="Banques / relevés / virements"];
+  msg [label="SMS, e-mail et notifications"];
+  inps [label="INPS\nInteropérabilité future"];
+  idp [label="Keycloak / fournisseurs d’identité"];
+
+  {rank=same; member; agents; groups; direction; auditors}
+  {rank=same; mm; banks; msg; inps; idp}
+
+  member -> cnpm [label="adhésion, cotisations, requêtes"];
+  agents -> cnpm [label="instruction, validation, recouvrement"];
+  groups -> cnpm [label="enrôlement et mobilisation"];
+  direction -> cnpm [label="décisions, tableaux de bord"];
+  auditors -> cnpm [label="lecture contrôlée"];
+
+  cnpm -> mm [label="initiation / confirmation"];
+  cnpm -> banks [label="références / rapprochement"];
+  cnpm -> msg [label="notifications"];
+  cnpm -> inps [label="API future"];
+  cnpm -> idp [label="OIDC / 2FA"];
+}

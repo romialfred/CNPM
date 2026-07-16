@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" targetNamespace="https://cnpm.ml/processes">
+  <bpmn:process id="Process_BankTransfer" name="Virement et rapprochement bancaire" isExecutable="true">
+    <bpmn:startEvent id="StartEvent" name="Début"/>
+    <bpmn:task id="Task1" name="Diffuser la référence validée"/>
+    <bpmn:task id="Task2" name="Recevoir le virement"/>
+    <bpmn:task id="Task3" name="Importer le relevé"/>
+    <bpmn:task id="Task4" name="Calculer les propositions"/>
+    <bpmn:task id="Task5" name="Traiter les exceptions"/>
+    <bpmn:task id="Task6" name="Valider le rapprochement"/>
+    <bpmn:task id="Task7" name="Confirmer le paiement"/>
+    <bpmn:task id="Task8" name="Émettre le reçu"/>
+    <bpmn:endEvent id="EndEvent" name="Fin"/>
+    <bpmn:sequenceFlow id="Flow1" sourceRef="StartEvent" targetRef="Task1"/>
+    <bpmn:sequenceFlow id="Flow2" sourceRef="Task1" targetRef="Task2"/>
+    <bpmn:sequenceFlow id="Flow3" sourceRef="Task2" targetRef="Task3"/>
+    <bpmn:sequenceFlow id="Flow4" sourceRef="Task3" targetRef="Task4"/>
+    <bpmn:sequenceFlow id="Flow5" sourceRef="Task4" targetRef="Task5"/>
+    <bpmn:sequenceFlow id="Flow6" sourceRef="Task5" targetRef="Task6"/>
+    <bpmn:sequenceFlow id="Flow7" sourceRef="Task6" targetRef="Task7"/>
+    <bpmn:sequenceFlow id="Flow8" sourceRef="Task7" targetRef="Task8"/>
+    <bpmn:sequenceFlow id="Flow9" sourceRef="Task8" targetRef="EndEvent"/>
+  </bpmn:process>
+</bpmn:definitions>

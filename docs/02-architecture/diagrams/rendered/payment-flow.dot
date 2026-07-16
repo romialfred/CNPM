@@ -1,0 +1,21 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.38", ranksep="0.55", fontname="Lato", label="Chaîne financière contrôlée", labelloc="t", fontsize=20, fontcolor="#1F3A93"];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#AAB3C2", penwidth=1.0, fontname="Lato", fontsize=10, fontcolor="#1A1D24", margin="0.15,0.10"];
+  edge [color="#5D6470", penwidth=1.1, arrowsize=0.7, fontname="Lato", fontsize=8.5, fontcolor="#5D6470"];
+
+  call [label="Appel de cotisation\nvalidé et publié"];
+  ref [label="Référence de paiement\nunique et approuvée"];
+  init [label="Initiation\nMobile Money / virement"];
+  callback [label="Notification partenaire\nsignée et idempotente"];
+  match [label="Rapprochement\nautomatique ou manuel"];
+  confirm [label="Confirmation CNPM\npermission + 2FA + SoD"];
+  receipt [label="Reçu officiel\nPDF signé + QR"];
+  notify [label="Notification membre\net archivage"];
+  exception [label="Anomalie / litige\nfile de traitement contrôlée", color="#E30613", fontcolor="#B42318"];
+
+  call -> ref -> init -> callback -> match -> confirm -> receipt -> notify;
+  callback -> exception [label="signature invalide / doublon", color="#E30613"];
+  match -> exception [label="écart / absence de référence", color="#E30613"];
+  confirm -> exception [label="conflit SoD / incohérence", color="#E30613"];
+  exception -> match [label="correction documentée"];
+}

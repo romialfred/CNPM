@@ -1,0 +1,16 @@
+flowchart TB
+  Web[Portail Web Angular/PWA] --> API[API Spring Boot]
+  Mobile[Application Flutter] --> API
+  Backoffice[Back-office Angular] --> API
+  API --> IAM[Keycloak]
+  API --> DB[(PostgreSQL)]
+  API --> MQ[RabbitMQ]
+  API --> Cache[Valkey]
+  API --> Object[Stockage objet S3]
+  API --> Workflow[Flowable]
+  API --> External[Adaptateurs partenaires]
+  MQ --> Workers[Workers asynchrones]
+  Workers --> DB
+  Workers --> External
+  Telemetry[OpenTelemetry] -.-> API
+  Telemetry -.-> Workers
