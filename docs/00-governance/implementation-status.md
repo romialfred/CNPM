@@ -229,3 +229,45 @@ Aucun de ces écarts n'est un oubli ; chacun a sa décision ouverte.
   veut dix colonnes *et* un panneau de 288 px, ce qui ne laisse que 820 px à la table
   à 1440 px. La zone défilante est focalisable, porte `role="region"` et un libellé.
   À 1672 px — la largeur de la maquette — la table tient sans défilement.
+
+## 9. Backend — module ADM « reference-values » (l'étalon)
+
+Premier module métier implémenté de bout en bout, choisi comme étalon (plan LOT 3.d) :
+petit, sans dépendance entrante, sur un domaine sans enjeu financier. Il valide la
+chaîne complète **contrat OpenAPI typé → JPA → Flyway → service `@PreAuthorize` +
+test négatif 403 → réponses `Problem` normalisées**.
+
+| Élément | Détail |
+|---|---|
+| Route | `GET /reference-values` (`listReferenceValues`), filtre `domain`, pagination bornée |
+| Contrat | Schémas `ReferenceValueView` / `ReferenceValuePage` typés, `additionalProperties: false` (fin de l'`additionalProperties: true` sur cette route) |
+| Architecture | Hexagonale : `domain` / `application` / `adapter.in.web` / `adapter.out.persistence` ; l'entité JPA ne franchit pas l'API |
+| Autorisation | `@PreAuthorize("hasRole('ADMIN_FONCTIONNEL')")` au service (ADR-008), seul rôle porteur d'`ADMIN.REFERENTIAL.READ` dans V3 |
+| Tests | 41 backend verts, dont 9 pour ce module + la vérification des frontières Spring Modulith ; le 403 est éprouvé par mutation |
+
+### Audit indépendant du module (non-auto-validation)
+
+Quatre réviseurs backend spécialisés (sécurité, architecture, contrat d'API, tests),
+puis deux sceptiques par constat. **18 constats soumis : 9 confirmés, 9 réfutés.** Les
+9 confirmés corrigés dans le même incrément :
+
+- **Les erreurs 400 de validation ne respectaient pas le format `Problem`** et le
+  `Content-Type` des erreurs était `application/json` au lieu de `application/problem+json`.
+  Ajout d'un `ApiExceptionHandler` (400 typé avec `code` + `correlationId`), correction
+  du `Content-Type`, et d'un `CorrelationIdFilter` qui garantit `X-Correlation-Id` sur
+  **toute** réponse — succès comme erreur. C'est l'infrastructure transverse que
+  l'étalon devait fixer une fois pour toutes.
+- **Absence de garde-fou des frontières de modules** → test `ApplicationModules.verify()`
+  ajouté (Spring Modulith).
+- **Tests renforcés** : pagination effective (page 0 vs page 1, ordre stable), contenu
+  réel des valeurs semées, bornes basses (page négative, taille nulle), corps `Problem`
+  des 400/401/403.
+
+Réfutés à bon droit : le `@PreAuthorize` par nom de rôle plutôt que par code de
+permission (choix assumé d'ADR-008) ; le décodeur JWT factice des tests (bypassé par le
+post-processeur `jwt()`, sans incidence sur la configuration réelle).
+
+Ce que ce module NE livre PAS : les écritures `createReferenceValue` / `updateReferenceValue`
+(idempotence + audit + verrou optimiste), prochain incrément backend. Les référentiels
+« secteur d'activité » et « région » restent absents du seed (DATA-DEC-002 tient : les
+filtres BO-002 correspondants ne sont toujours pas alimentés).

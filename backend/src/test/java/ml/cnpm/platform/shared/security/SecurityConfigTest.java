@@ -199,7 +199,7 @@ class SecurityConfigTest {
                 .andExpect(header().doesNotExist(HttpHeaders.SET_COOKIE));
     }
 
-    /** En-tête de corrélation du contrat, identique à ProblemResponseWriter.CORRELATION_HEADER. */
+    /** En-tête de corrélation du contrat, identique à CorrelationId.HEADER. */
     private static final class ProblemResponseWriterHeader {
         private static final String CORRELATION = "X-Correlation-Id";
 

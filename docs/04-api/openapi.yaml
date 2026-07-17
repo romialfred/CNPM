@@ -123,6 +123,13 @@ paths:
       operationId: listReferenceValues
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
+      - name: domain
+        in: query
+        required: false
+        description: Filtre optionnel sur un domaine de référentiel (ex. MEMBER_CATEGORY).
+        schema:
+          type: string
+          maxLength: 80
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Size'
       responses:
@@ -139,11 +146,11 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Collection paginée
+          description: Collection paginée de valeurs de référentiel
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageResource'
+                $ref: '#/components/schemas/ReferenceValuePage'
       x-requirements:
       - ADM-001
       - ADM-002
@@ -3619,6 +3626,64 @@ components:
           format: int64
         totalPages:
           type: integer
+    ReferenceValueView:
+      type: object
+      description: Valeur de référentiel typée (schéma R0, sans additionalProperties).
+      required:
+      - id
+      - domain
+      - code
+      - label
+      - sortOrder
+      - active
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        domain:
+          type: string
+          maxLength: 80
+        code:
+          type: string
+          maxLength: 80
+        label:
+          type: string
+          maxLength: 255
+        sortOrder:
+          type: integer
+        active:
+          type: boolean
+        validFrom:
+          type: string
+          format: date-time
+          nullable: true
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    ReferenceValuePage:
+      type: object
+      description: Page typée de valeurs de référentiel.
+      required:
+      - items
+      - page
+      - size
+      - totalElements
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferenceValueView'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+      additionalProperties: false
     Problem:
       type: object
       required:
