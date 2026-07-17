@@ -53,6 +53,16 @@ class MembershipListEntity {
     @Column(name = "primary_group_name")
     private String primaryGroupName;
 
+    /** Nuls lorsque l'entreprise n'a aucun représentant légal actif. */
+    @Column(name = "primary_contact_name")
+    private String primaryContactName;
+
+    @Column(name = "primary_contact_email")
+    private String primaryContactEmail;
+
+    @Column(name = "primary_contact_phone")
+    private String primaryContactPhone;
+
     protected MembershipListEntity() {
         // Requis par JPA.
     }
@@ -95,5 +105,17 @@ class MembershipListEntity {
 
     String getPrimaryGroupName() {
         return primaryGroupName;
+    }
+
+    String getPrimaryContactName() {
+        return primaryContactName;
+    }
+
+    String getPrimaryContactEmail() {
+        return primaryContactEmail;
+    }
+
+    String getPrimaryContactPhone() {
+        return primaryContactPhone;
     }
 }

@@ -360,6 +360,50 @@ Sur-optimiser (vue matérialisée indexée, ou dénormalisation de `primary_grou
 > ~50 000, décider entre (a) vue matérialisée rafraîchie, (b) dénormalisation de
 `primary_group_id`, ou (c) restriction du tri par groupement à un usage filtré.
 
+## DATA-DEC-007 — règle du « contact principal » de BO-002
+
+**Propriétaire.** Direction produit / Secrétariat.
+**Impact.** BO-002 (colonne contact) et tout écran affichant un contact d'entreprise.
+**Statut.** Livré sous hypothèse — à confirmer.
+
+**Constat.** BO-002 affiche un contact par membre (`contactName`, `contactPhone`,
+`contactEmail` dans les fixtures), mais ni la fiche `ref-bo-002-members-list.md` ni le
+modèle de données ne définissent **quel** contact afficher. `member.organization_contact`
+ne porte aucun flag `is_primary` : les seuls marqueurs sont `contact_role`,
+`is_legal_representative` et la période de validité (`valid_from`/`valid_to`).
+
+**Hypothèse retenue pour livrer.** Le contact principal est le **représentant légal
+actif** (`is_legal_representative = true`, mandat non expiré). En l'absence de
+représentant légal actif, le contact principal est **null** — on ne devine pas un contact
+parmi les autres rôles. En cas de pluralité (non contrainte en base), le plus récent par
+`valid_from` est retenu, départagé par id. Implémenté dans la vue `member.membership_list`
+(V8, sous-requête LATERAL).
+
+**Données personnelles.** Nom, téléphone et courriel proviennent de `member.person`. La
+vue ne sert qu'un écran d'administration protégé par `MEMBER.READ` ; elle n'est pas
+exposée publiquement (la vitrine R4 relève du consentement distinct d'UX-DEC-013).
+
+**Deux questions de sécurité soulevées par l'audit indépendant, à trancher.**
+
+1. **Granularité de permission.** `data-classification.md` classe les contacts membres
+   en *Confidentiel* (« moindre privilège, masquage »). Or `MEMBER.READ` est détenue par
+   ~14 rôles, dont des rôles opérationnels (caissier, support, recouvrement…) dont le
+   besoin du courriel/téléphone personnel du représentant légal n'est pas démontré.
+   Faut-il une permission dédiée (`MEMBER.CONTACT.READ`) gardant spécifiquement les
+   champs `primaryContact*`, plutôt que `MEMBER.READ` global ?
+2. **Minimisation liste vs détail.** BO-002 est une liste paginée, potentiellement
+   exportable : afficher les coordonnées personnelles sur **chaque ligne** permet un
+   export nominatif de masse sans passer par un flux d'export audité/chiffré/expirable
+   (exigé par `.claude/rules/security.md`). Faut-il réserver `primaryContact*` à une
+   future fiche détail (`GET /memberships/{id}`) plutôt qu'à la liste, ou accepter et
+   justifier explicitement l'exposition en liste (ex. besoin de contact rapide en
+   recouvrement) ?
+
+**Arbitrage demandé.** Confirmer que « contact principal » = représentant légal actif,
+ou fournir la règle réelle (rôle prioritaire, flag `is_primary` à ajouter au modèle,
+comportement si plusieurs représentants légaux, repli si aucun) ; **et** trancher les
+deux questions de sécurité ci-dessus (granularité de permission, liste vs détail).
+
 ## ARCH-DEC-001 — propriété des tables de groupements professionnels
 
 **Propriétaire.** Architecture.

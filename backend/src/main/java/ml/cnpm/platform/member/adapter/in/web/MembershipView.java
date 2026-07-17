@@ -15,7 +15,10 @@ public record MembershipView(
         LocalDate joinedAt,
         long version,
         String primaryGroupCode,
-        String primaryGroupName) {
+        String primaryGroupName,
+        String primaryContactName,
+        String primaryContactEmail,
+        String primaryContactPhone) {
 
     static MembershipView from(Membership membership) {
         return new MembershipView(
@@ -28,6 +31,19 @@ public record MembershipView(
                 membership.joinedAt(),
                 membership.version(),
                 membership.primaryGroupCode(),
-                membership.primaryGroupName());
+                membership.primaryGroupName(),
+                membership.primaryContactName(),
+                membership.primaryContactEmail(),
+                membership.primaryContactPhone());
+    }
+
+    /**
+     * Masque les coordonnées personnelles (Confidentiel) en cas de log accidentel. La
+     * sérialisation JSON de la réponse passe par les accesseurs, pas par {@code toString()}.
+     */
+    @Override
+    public String toString() {
+        return "MembershipView[id=%s, membershipNumber=%s, status=%s, primaryContact=***]"
+                .formatted(id, membershipNumber, status);
     }
 }

@@ -439,6 +439,20 @@ colonne dérivée de la LATERAL, sans filtre sélectif, coûte ~1 s à 100 000 a
 (mesuré). Non bloquant à l'échelle réelle du CNPM (non chiffrée), consigné comme décision
 ouverte plutôt que sur-optimisé prématurément.
 
-Non livré : le contact principal de l'entreprise (dernière colonne BO-002), `getOrganization`
-détail, et les écritures `createOrganization`/`createMembership`. Les montants dus/payés
-restent bloqués (ADR-006, modules.md).
+### BO-002 : contact principal dans listMemberships (vue V8)
+
+Huitième incrément : la dernière colonne « données » de BO-002 — le contact principal de
+l'entreprise. La vue `member.membership_list` est redéfinie (V8, `CREATE OR REPLACE`) pour
+résoudre, par une seconde sous-requête LATERAL, le **représentant légal actif**.
+
+| Élément | Détail |
+|---|---|
+| Règle | Contact principal = représentant légal actif (`is_legal_representative`, mandat non expiré) ; null si aucun ; le plus récent par `valid_from` si plusieurs. **Hypothèse consignée (DATA-DEC-007)** — la fiche ne définit pas la règle et le schéma n'a pas de flag `is_primary` |
+| Champs | `primaryContactName` (nom composé `first_names \|\| ' ' \|\| last_name`), `primaryContactEmail`, `primaryContactPhone` (nullables) ajoutés au domaine, à la vue web et au contrat |
+| Données personnelles | Issues de `member.person` ; vue servie uniquement derrière `MEMBER.READ` (écran d'administration), jamais publique ; tests sur personnes synthétiques (`Prenom1 Nom1`…) |
+| Tests | 25→29 pour listMemberships : représentant légal exposé, non-représentant ignoré, mandat expiré ignoré, absence→null, choix déterministe si plusieurs représentants légaux |
+
+BO-002 dispose désormais de **toutes ses colonnes de données** côté backend (numéro,
+raison sociale, catégorie, statut, groupement, contact). Restent : `getOrganization`
+détail, écritures `createOrganization`/`createMembership`, et le câblage du gateway
+Angular sur l'API. Les montants dus/payés restent bloqués (ADR-006, modules.md).

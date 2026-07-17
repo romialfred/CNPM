@@ -111,6 +111,9 @@ class MembershipPersistenceAdapter implements MembershipRepository {
                 entity.getJoinedAt(),
                 entity.getVersion(),
                 entity.getPrimaryGroupCode(),
-                entity.getPrimaryGroupName());
+                entity.getPrimaryGroupName(),
+                entity.getPrimaryContactName(),
+                entity.getPrimaryContactEmail(),
+                entity.getPrimaryContactPhone());
     }
 }

@@ -69,13 +69,16 @@ class MembershipApiTest {
                         .addFilters(correlationIdFilter)
                         .apply(springSecurity())
                         .build();
-        // Le rattachement entreprise-groupement dépend de l'entreprise (FK ON DELETE
-        // CASCADE) ; on le vide explicitement avant les entreprises. Les groupements de
-        // référence (member.professional_group) sont semés par V6 et conservés : les
-        // rattachements pointent vers des groupements RÉELS via leur code.
+        // Ordre de purge dicté par les FK : organization_contact référence person
+        // (ON DELETE RESTRICT), donc on le vide avant person ; group_membership et
+        // organization_contact référencent organization (CASCADE) mais on les vide
+        // explicitement pour rester lisible. Les groupements de référence
+        // (member.professional_group) sont semés par V6 et conservés.
+        jdbcTemplate.update("DELETE FROM member.organization_contact");
         jdbcTemplate.update("DELETE FROM member.group_membership");
         jdbcTemplate.update("DELETE FROM member.membership");
         jdbcTemplate.update("DELETE FROM member.organization");
+        jdbcTemplate.update("DELETE FROM member.person");
         // Identifiants d'adhésion explicites et ordonnés : rendent le départage par id
         // (tie-breaker) déterministe, donc réellement observable.
         insert("0001", "Alpha SA", "CNPM-2024-0001", "GE", "ACTIVE");
@@ -88,6 +91,49 @@ class MembershipApiTest {
         // Gamma n'a aucun groupement → groupement principal null.
         // Delta n'a qu'un rattachement CLÔTURÉ (left_at non nul) → groupement principal null.
         attachPrimaryGroup("0004", "OPI", "2020-01-01", "2022-12-31");
+        // Contacts (personnes SYNTHÉTIQUES, aucune donnée réelle) :
+        // Alpha a un représentant légal actif → contact principal exposé.
+        attachContact("0001", "01", "Nom1", "Prenom1", "contact1@alpha.example",
+                "+223 00 00 00 01", true, "2024-01-01", null);
+        // Beta a un contact actif mais NON représentant légal → ignoré.
+        attachContact("0002", "02", "Nom2", "Prenom2", "contact2@beta.example",
+                "+223 00 00 00 02", false, "2024-01-01", null);
+        // Delta a un représentant légal EXPIRÉ (valid_to passé) → ignoré.
+        attachContact("0004", "04", "Nom4", "Prenom4", "contact4@delta.example",
+                "+223 00 00 00 04", true, "2020-01-01", "2022-12-31");
+        // Gamma n'a aucun contact → contact principal null.
+    }
+
+    /** Rattache une personne synthétique à l'entreprise comme contact (représentant légal ou non). */
+    private void attachContact(
+            String orgSuffix,
+            String personSuffix,
+            String lastName,
+            String firstNames,
+            String email,
+            String phone,
+            boolean legalRepresentative,
+            String validFrom,
+            String validTo) {
+        String orgId = "11111111-0000-0000-0000-00000000" + orgSuffix;
+        String personId = "33333333-0000-0000-0000-0000000000" + personSuffix;
+        jdbcTemplate.update(
+                "INSERT INTO member.person (id, last_name, first_names, email, phone) "
+                        + "VALUES (?::uuid, ?, ?, ?, ?)",
+                personId,
+                lastName,
+                firstNames,
+                email,
+                phone);
+        jdbcTemplate.update(
+                "INSERT INTO member.organization_contact "
+                        + "(organization_id, person_id, contact_role, is_legal_representative, valid_from, valid_to) "
+                        + "VALUES (?::uuid, ?::uuid, 'REPRESENTANT', ?, ?::date, ?::date)",
+                orgId,
+                personId,
+                legalRepresentative,
+                validFrom,
+                validTo);
     }
 
     private void insert(String suffix, String legalName, String number, String category, String status) {
@@ -304,12 +350,13 @@ class MembershipApiTest {
 
     @Test
     void leavesThePrimaryGroupNullWhenTheOrganizationHasNone() throws Exception {
-        // Gamma n'a aucun rattachement.
+        // Gamma n'a ni groupement ni contact.
         mockMvc.perform(get("/memberships").param("search", "gamma").with(asMemberReader()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].membershipNumber").value("CNPM-2024-0003"))
                 .andExpect(jsonPath("$.items[0].primaryGroupCode").value(nullValue()))
-                .andExpect(jsonPath("$.items[0].primaryGroupName").value(nullValue()));
+                .andExpect(jsonPath("$.items[0].primaryGroupName").value(nullValue()))
+                .andExpect(jsonPath("$.items[0].primaryContactName").value(nullValue()));
     }
 
     @Test
@@ -408,6 +455,129 @@ class MembershipApiTest {
                                         org.hamcrest.Matchers.anyOf(
                                                 org.hamcrest.Matchers.is("GPP"),
                                                 org.hamcrest.Matchers.is("CNOM"))));
+    }
+
+    @Test
+    void exposesTheLegalRepresentativeAsPrimaryContact() throws Exception {
+        mockMvc.perform(get("/memberships").param("search", "alpha").with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].membershipNumber").value("CNPM-2024-0001"))
+                .andExpect(jsonPath("$.items[0].primaryContactName").value("Prenom1 Nom1"))
+                .andExpect(jsonPath("$.items[0].primaryContactEmail").value("contact1@alpha.example"))
+                .andExpect(jsonPath("$.items[0].primaryContactPhone").value("+223 00 00 00 01"));
+    }
+
+    @Test
+    void ignoresANonLegalRepresentativeContact() throws Exception {
+        // Beta n'a qu'un contact actif NON représentant légal → aucun contact principal.
+        mockMvc.perform(get("/memberships").param("search", "beta").with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].membershipNumber").value("CNPM-2024-0002"))
+                .andExpect(jsonPath("$.items[0].primaryContactName").value(nullValue()))
+                .andExpect(jsonPath("$.items[0].primaryContactEmail").value(nullValue()));
+    }
+
+    @Test
+    void ignoresAnExpiredLegalRepresentative() throws Exception {
+        // Delta a un représentant légal dont le mandat est clôturé (valid_to passé) → null.
+        mockMvc.perform(get("/memberships").param("search", "delta").with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].membershipNumber").value("CNPM-2024-0004"))
+                .andExpect(jsonPath("$.items[0].primaryContactName").value(nullValue()));
+    }
+
+    @Test
+    void resolvesTheMostRecentLegalRepresentativeDeterministically() throws Exception {
+        // Aucune contrainte n'interdit deux représentants légaux actifs : la vue retient
+        // le plus récent (valid_from décroissant). Theta en porte deux ; celui de 2024
+        // doit l'emporter sur celui de 2023.
+        String orgId = "11111111-0000-0000-0000-000000006666";
+        String membershipId = "22222222-0000-0000-0000-000000006666";
+        jdbcTemplate.update(
+                "INSERT INTO member.organization (id, legal_name, organization_type, status, risk_level) "
+                        + "VALUES (?::uuid, 'Theta SA', 'GRANDE_ENTREPRISE', 'ACTIVE', 'NORMAL')",
+                orgId);
+        jdbcTemplate.update(
+                "INSERT INTO member.membership (id, organization_id, membership_number, category_code, status, joined_at) "
+                        + "VALUES (?::uuid, ?::uuid, 'CNPM-2024-6666', 'GE', 'ACTIVE', DATE '2024-01-15')",
+                membershipId,
+                orgId);
+        attachContact("6666", "61", "Ancien", "Rep", "ancien@theta.example",
+                "+223 00 00 66 61", true, "2023-01-01", null);
+        attachContact("6666", "62", "Actuel", "Rep", "actuel@theta.example",
+                "+223 00 00 66 62", true, "2024-06-01", null);
+
+        mockMvc.perform(get("/memberships").param("search", "theta").with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.items[0].primaryContactName").value("Rep Actuel"));
+    }
+
+    @Test
+    void ignoresALegalRepresentativeWhoseMandateStartsInTheFuture() throws Exception {
+        // Mandat à effet FUTUR (valid_from > aujourd'hui) : pas encore actif → ignoré.
+        // Verrouille la borne basse valid_from <= CURRENT_DATE de la vue.
+        String futureFrom = java.time.LocalDate.now().plusMonths(1).toString();
+        insertBareMember("5501", "Iota SA", "CNPM-2024-5501");
+        attachContact("5501", "51", "Nom51", "Prenom51", "c51@iota.example",
+                "+223 00 00 55 01", true, futureFrom, null);
+
+        mockMvc.perform(get("/memberships").param("search", "iota").with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].primaryContactName").value(nullValue()));
+    }
+
+    @Test
+    void exposesALegalRepresentativeWithAFutureExpiry() throws Exception {
+        // Mandat pris d'effet et à échéance FUTURE (valid_to > aujourd'hui) : actif → exposé.
+        // Exerce positivement la seconde branche du OR (valid_to >= CURRENT_DATE).
+        String futureTo = java.time.LocalDate.now().plusYears(1).toString();
+        insertBareMember("5502", "Kappa SA", "CNPM-2024-5502");
+        attachContact("5502", "52", "Nom52", "Prenom52", "c52@kappa.example",
+                "+223 00 00 55 02", true, "2024-01-01", futureTo);
+
+        mockMvc.perform(get("/memberships").param("search", "kappa").with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].primaryContactName").value("Prenom52 Nom52"));
+    }
+
+    @Test
+    void returnsASingleRowWhenTwoLegalRepresentativesShareTheValidityDate() throws Exception {
+        // Deux représentants légaux actifs de MÊME valid_from (non contraint en base) : la
+        // vue ne doit jamais dupliquer l'adhésion (LIMIT 1). Le nom retenu dépend du
+        // départage par id (aléatoire) et n'est donc pas asserté.
+        insertBareMember("5503", "Lambda SA", "CNPM-2024-5503");
+        attachContact("5503", "53", "NomA", "RepA", "a53@lambda.example",
+                "+223 00 00 55 31", true, "2024-02-01", null);
+        attachContact("5503", "54", "NomB", "RepB", "b54@lambda.example",
+                "+223 00 00 55 32", true, "2024-02-01", null);
+
+        mockMvc.perform(get("/memberships").param("search", "lambda").with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(
+                        jsonPath("$.items[0].primaryContactName")
+                                .value(
+                                        org.hamcrest.Matchers.anyOf(
+                                                org.hamcrest.Matchers.is("RepA NomA"),
+                                                org.hamcrest.Matchers.is("RepB NomB"))));
+    }
+
+    /** Insère une entreprise + son adhésion, sans groupement ni contact (helper de test ciblé). */
+    private void insertBareMember(String suffix, String legalName, String number) {
+        String orgId = "11111111-0000-0000-0000-00000000" + suffix;
+        String membershipId = "22222222-0000-0000-0000-00000000" + suffix;
+        jdbcTemplate.update(
+                "INSERT INTO member.organization (id, legal_name, organization_type, status, risk_level) "
+                        + "VALUES (?::uuid, ?, 'GRANDE_ENTREPRISE', 'ACTIVE', 'NORMAL')",
+                orgId,
+                legalName);
+        jdbcTemplate.update(
+                "INSERT INTO member.membership (id, organization_id, membership_number, category_code, status, joined_at) "
+                        + "VALUES (?::uuid, ?::uuid, ?, 'GE', 'ACTIVE', DATE '2024-01-15')",
+                membershipId,
+                orgId,
+                number);
     }
 
     @Test

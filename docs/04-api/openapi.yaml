@@ -3809,6 +3809,21 @@ components:
           maxLength: 255
           nullable: true
           description: Dénomination du groupement professionnel principal, ou null si aucun.
+        primaryContactName:
+          type: string
+          maxLength: 351
+          nullable: true
+          description: Nom complet du contact principal (représentant légal actif), ou null si aucun.
+        primaryContactEmail:
+          type: string
+          maxLength: 320
+          nullable: true
+          description: Courriel du contact principal, ou null.
+        primaryContactPhone:
+          type: string
+          maxLength: 30
+          nullable: true
+          description: Téléphone du contact principal, ou null.
       additionalProperties: false
     MembershipPage:
       type: object
