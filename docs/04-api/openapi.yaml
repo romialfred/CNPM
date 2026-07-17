@@ -261,6 +261,41 @@ paths:
       operationId: listOrganizations
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
+      - name: status
+        in: query
+        required: false
+        description: Filtre sur le statut de l'entreprise (ACTIVE, DORMANT, PROSPECT…).
+        schema:
+          type: string
+          maxLength: 30
+      - name: organizationType
+        in: query
+        required: false
+        description: Filtre sur le type d'entreprise.
+        schema:
+          type: string
+          maxLength: 40
+      - name: sectorCode
+        in: query
+        required: false
+        description: Filtre sur le secteur d'activité (code de référentiel).
+        schema:
+          type: string
+          maxLength: 80
+      - name: search
+        in: query
+        required: false
+        description: Recherche libre sur la raison sociale ou le nom commercial.
+        schema:
+          type: string
+          maxLength: 120
+      - name: sort
+        in: query
+        required: false
+        description: 'Tri : legalName ou status, suffixé de ,asc ou ,desc.'
+        schema:
+          type: string
+          maxLength: 40
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Size'
       responses:
@@ -277,11 +312,11 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Collection paginée
+          description: Collection paginée d'entreprises
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageResource'
+                $ref: '#/components/schemas/OrganizationPage'
       x-requirements:
       - MEM-001
       - MEM-002
@@ -3693,6 +3728,66 @@ components:
         active:
           type: boolean
           default: true
+      additionalProperties: false
+    OrganizationView:
+      type: object
+      description: Entreprise membre — vue de liste typée (schéma R0).
+      required:
+      - id
+      - legalName
+      - organizationType
+      - status
+      - riskLevel
+      - version
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        legalName:
+          type: string
+          maxLength: 255
+        tradeName:
+          type: string
+          maxLength: 255
+          nullable: true
+        organizationType:
+          type: string
+          maxLength: 40
+        sectorCode:
+          type: string
+          maxLength: 80
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        riskLevel:
+          type: string
+          maxLength: 20
+        version:
+          type: integer
+          format: int64
+      additionalProperties: false
+    OrganizationPage:
+      type: object
+      description: Page typée d'entreprises membres.
+      required:
+      - items
+      - page
+      - size
+      - totalElements
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationView'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
       additionalProperties: false
     ReferenceValueUpdate:
       type: object

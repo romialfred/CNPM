@@ -20,11 +20,19 @@ n'est jamais une frontière de sécurité.
    chaque appel. CSRF désactivé — correct pour une API consommée par jeton porteur
    et non par cookie de session.
 3. **Rôles Keycloak → autorités Spring** : les rôles de realm (`realm_access.roles`)
-   deviennent des autorités préfixées `ROLE_`. Aucune autorité n'est dérivée d'un
-   profil technique ; un jeton sans rôle n'obtient aucune autorité.
+   deviennent des autorités préfixées `ROLE_`. Un jeton sans rôle n'obtient aucune
+   autorité.
+3bis. **Permissions dérivées → autorités `PERM_`** : à partir des rôles du jeton, les
+   permissions accordées par `iam.role_permission` sont dérivées en autorités préfixées
+   `PERM_` (voir `PermissionDirectory` et `KeycloakAuthoritiesConverter`). Une permission
+   comme `MEMBER.READ` étant portée par une dizaine de rôles, l'autorisation fine
+   s'appuie sur la permission (`hasAuthority('PERM_MEMBER.READ')`) plutôt que sur une
+   énumération de rôles fragile et couplée au seed. Aucune permission n'est inventée :
+   elles proviennent exclusivement du mapping en base. Le mapping est quasi statique,
+   chargé une fois en mémoire ; un changement de seed suppose un redéploiement.
 4. **Autorisation fine par cas d'usage** : `@EnableMethodSecurity` active
-   `@PreAuthorize` sur les services applicatifs. Les contrôleurs ne portent aucune
-   règle métier ni décision d'autorisation implicite.
+   `@PreAuthorize` sur les services applicatifs (par permission de préférence). Les
+   contrôleurs ne portent aucune règle métier ni décision d'autorisation implicite.
 5. **Erreurs normalisées** : 401 (`AUTHENTICATION_REQUIRED`) et 403 (`FORBIDDEN`)
    sont rendues au format `Problem` du contrat avec un `correlationId`, sans trace
    ni détail technique.

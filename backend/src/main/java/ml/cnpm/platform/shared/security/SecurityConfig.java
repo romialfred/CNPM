@@ -56,7 +56,8 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             ProblemResponseWriter problems,
-            SecurityEventRecorder securityEvents)
+            SecurityEventRecorder securityEvents,
+            JwtAuthenticationConverter jwtAuthenticationConverter)
             throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(
@@ -73,7 +74,7 @@ public class SecurityConfig {
                                 oauth2.jwt(
                                         jwt ->
                                                 jwt.jwtAuthenticationConverter(
-                                                        jwtAuthenticationConverter())))
+                                                        jwtAuthenticationConverter)))
                 .exceptionHandling(
                         handling ->
                                 handling
@@ -125,11 +126,15 @@ public class SecurityConfig {
         }
     }
 
-    /** Associe la conversion des rôles de realm Keycloak au décodage du jeton. */
+    /**
+     * Associe au décodage du jeton la conversion des rôles de realm et la dérivation des
+     * permissions qu'ils accordent — l'autorisation fine s'appuie ensuite sur les
+     * permissions (voir {@link KeycloakAuthoritiesConverter}).
+     */
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
+    JwtAuthenticationConverter jwtAuthenticationConverter(PermissionDirectory permissions) {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
+        converter.setJwtGrantedAuthoritiesConverter(new KeycloakAuthoritiesConverter(permissions));
         return converter;
     }
 }

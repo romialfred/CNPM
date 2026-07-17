@@ -323,3 +323,31 @@ dans l'événement de sécurité (enrichissement documenté).
 
 Non livré : magasin de clés d'idempotence générique (DATA-DEC-005) et enrichissement
 de l'événement de sécurité (IP source, corrélation) — avant les modules financiers.
+
+
+### Autorisation par permission + module MEMBER (listOrganizations)
+
+Quatrième incrément backend : le modèle d'autorisation par permission (le blocage que
+posait tout endpoint multi-rôle) et le premier écran de données réelles côté MEMBER.
+
+| Élément | Détail |
+|---|---|
+| Permissions dérivées | Les rôles de realm sont dérivés en autorités `PERM_*` depuis `iam.role_permission` (`PermissionDirectory`, cache mémoire) ; `@PreAuthorize("hasAuthority('PERM_MEMBER.READ')")` remplace l'énumération fragile de ~14 rôles. ADR-008 mis à jour (§3bis) |
+| listOrganizations | `GET /organizations` typé (`OrganizationView`/`OrganizationPage`), filtres status/type/secteur, recherche (métacaractères LIKE échappés), tri borné (liste blanche + départage stable), pagination |
+| Frontières | Nouveau module `member` ; `PageResult` générique remonté dans `shared` (ADM migré dessus) ; `ModularityTest` vert |
+| Montants exclus | Les montants de cotisation (dues/payées de BO-002) restent hors MEMBER — `modules.md` l'interdit tant qu'ADR-006 (read-model) n'est pas promue |
+| Tests | 78 backend verts (15 MEMBER + 6 dérivation de permission) ; garde `@PreAuthorize` éprouvée par mutation |
+
+Audit indépendant : 13 constats, **7 confirmés, 6 réfutés**. Corrigés : métacaractères
+LIKE échappés ; dérivation testée à travers le **bean réellement câblé** (pas une
+instance manuelle) ; contrôle négatif (un rôle sans `MEMBER.READ` ne l'obtient jamais) ;
+tests filtre secteur, tri par statut, aucun-résultat, borne exacte, repli de tri.
+Réfutés à bon droit : cache sans invalidation (seed quasi statique), SQL brut dans
+`shared`, ADM resté role-based (1 seul rôle).
+
+**Limite documentée (ADR-008) :** l'ABAC (périmètre organisation/groupement) n'est pas
+appliqué — un rôle scopé voit toutes les entreprises. Il suppose un périmètre porté par
+le jeton (provisionnement Keycloak), à câbler avant exposition en production.
+
+Non livré : la vue membre complète de BO-002 (jointure adhésion + groupement + contact),
+`listMemberships`, et les montants (ADR-006) — prochains incréments MEMBER.

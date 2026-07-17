@@ -1,7 +1,7 @@
 package ml.cnpm.platform.administration.adapter.in.web;
 
 import java.util.List;
-import ml.cnpm.platform.administration.application.PageResult;
+import ml.cnpm.platform.shared.api.PageResult;
 import ml.cnpm.platform.administration.domain.ReferenceValue;
 
 /**

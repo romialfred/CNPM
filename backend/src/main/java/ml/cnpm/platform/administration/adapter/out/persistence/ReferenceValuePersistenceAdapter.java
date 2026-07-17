@@ -3,7 +3,7 @@ package ml.cnpm.platform.administration.adapter.out.persistence;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import ml.cnpm.platform.administration.application.PageResult;
+import ml.cnpm.platform.shared.api.PageResult;
 import ml.cnpm.platform.administration.application.ReferenceValueDraft;
 import ml.cnpm.platform.administration.application.ReferenceValuePatch;
 import ml.cnpm.platform.administration.application.port.out.ReferenceValueRepository;
