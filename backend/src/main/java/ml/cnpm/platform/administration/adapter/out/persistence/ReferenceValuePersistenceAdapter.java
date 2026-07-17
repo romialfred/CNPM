@@ -1,6 +1,9 @@
 package ml.cnpm.platform.administration.adapter.out.persistence;
 
+import java.util.Optional;
+import java.util.UUID;
 import ml.cnpm.platform.administration.application.PageResult;
+import ml.cnpm.platform.administration.application.ReferenceValueDraft;
 import ml.cnpm.platform.administration.application.port.out.ReferenceValueRepository;
 import ml.cnpm.platform.administration.domain.ReferenceValue;
 import org.springframework.data.domain.Page;
@@ -42,6 +45,26 @@ class ReferenceValuePersistenceAdapter implements ReferenceValueRepository {
                 result.getSize(),
                 result.getTotalElements(),
                 result.getTotalPages());
+    }
+
+    @Override
+    public Optional<ReferenceValue> findByDomainAndCode(String domain, String code) {
+        return jpaRepository.findByDomainAndCode(domain, code).map(ReferenceValuePersistenceAdapter::toDomain);
+    }
+
+    @Override
+    public ReferenceValue create(ReferenceValueDraft draft) {
+        // L'identifiant est assigné avant persistance : `save` sur une entité neuve
+        // effectue une insertion, et la valeur renvoyée porte l'identifiant retenu.
+        ReferenceValueEntity entity =
+                new ReferenceValueEntity(
+                        UUID.randomUUID(),
+                        draft.domain(),
+                        draft.code(),
+                        draft.label(),
+                        draft.sortOrder(),
+                        draft.active());
+        return toDomain(jpaRepository.save(entity));
     }
 
     private static ReferenceValue toDomain(ReferenceValueEntity entity) {

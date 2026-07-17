@@ -271,3 +271,29 @@ Ce que ce module NE livre PAS : les écritures `createReferenceValue` / `updateR
 (idempotence + audit + verrou optimiste), prochain incrément backend. Les référentiels
 « secteur d'activité » et « région » restent absents du seed (DATA-DEC-002 tient : les
 filtres BO-002 correspondants ne sont toujours pas alimentés).
+
+
+### Écritures ADM : createReferenceValue (idempotence + audit)
+
+Deuxième incrément backend : le chemin d'écriture de l'étalon, qui pose les patrons
+que tout futur module financier réutilise — autorisation d'écriture, idempotence,
+événement d'audit transactionnel, conflit d'état.
+
+| Élément | Détail |
+|---|---|
+| Route | `POST /reference-values`, contrat typé `ReferenceValueInput` (`additionalProperties: false`) |
+| Idempotence | Par clé naturelle (domaine, code) faute de magasin de clés (DATA-DEC-005) : rejeu identique → 200, contenu divergent → 409, `Idempotency-Key` exigé (400 si absent) |
+| Audit | Module `audit` (Spring Modulith) : chaque création écrit un événement corrélé dans `audit.audit_event` (append-only), avec empreinte SHA-256, **dans la même transaction** |
+| Erreurs | 400/409 au format `Problem` (`STATE_CONFLICT`, `VALIDATION_ERROR`), `application/problem+json`, `X-Correlation-Id` sur toute réponse |
+| Frontières | `shared` déclaré module OPEN (noyau partagé) ; `administration → audit` ; `ModularityTest` vert |
+| Tests | 49 backend verts (17 pour ADM) ; les gardes @PreAuthorize et audit éprouvées par mutation |
+
+Audit indépendant du write-path : 15 constats, **6 confirmés, 9 réfutés**. Corrigés :
+absence de second audit sur rejeu idempotent et sur conflit désormais vérifiée ;
+longueur minimale de `Idempotency-Key` testée ; acteur d'audit = sujet Keycloak
+vérifié. **Signalé, non corrigé (prochain incrément sécurité, ADR-008) :** aucun
+événement d'audit n'est émis sur un refus 401/403 — le chemin de succès est audité,
+le chemin de refus reste à câbler dans `SecurityConfig` (`audit.security_event`).
+
+Non livré : `updateReferenceValue` (verrou optimiste), et le magasin de clés
+d'idempotence générique (DATA-DEC-005) — à trancher avant les modules financiers.

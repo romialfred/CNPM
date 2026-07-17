@@ -179,23 +179,23 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Opération effectuée
+          description: Valeur déjà existante et identique (rejeu idempotent)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/ReferenceValueView'
         '201':
-          description: Ressource créée
+          description: Valeur de référentiel créée
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/ReferenceValueView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/ReferenceValueInput'
       x-requirements:
       - ADM-001
       - ADM-002
@@ -3660,6 +3660,33 @@ components:
           type: string
           format: date-time
           nullable: true
+      additionalProperties: false
+    ReferenceValueInput:
+      type: object
+      description: Charge de création d'une valeur de référentiel (schéma R0 typé).
+      required:
+      - domain
+      - code
+      - label
+      properties:
+        domain:
+          type: string
+          minLength: 1
+          maxLength: 80
+        code:
+          type: string
+          minLength: 1
+          maxLength: 80
+        label:
+          type: string
+          minLength: 1
+          maxLength: 255
+        sortOrder:
+          type: integer
+          default: 0
+        active:
+          type: boolean
+          default: true
       additionalProperties: false
     ReferenceValuePage:
       type: object

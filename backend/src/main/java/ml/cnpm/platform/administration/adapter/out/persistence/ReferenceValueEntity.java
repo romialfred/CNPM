@@ -46,13 +46,29 @@ class ReferenceValueEntity {
     @Column(name = "valid_to")
     private Instant validTo;
 
-    /** Verrou optimiste, exploité par les mises à jour à venir. */
+    /**
+     * Verrou optimiste, exploité par les mises à jour à venir.
+     *
+     * <p>Type nullable volontaire : une version {@code null} signale une entité neuve, ce
+     * qui laisse Spring Data insérer directement sans {@code SELECT} préalable ; Hibernate
+     * l'initialise à 0 à l'insertion.
+     */
     @Version
     @Column(name = "version", nullable = false)
-    private long version;
+    private Long version;
 
     protected ReferenceValueEntity() {
         // Requis par JPA.
+    }
+
+    /** Construit une entité à insérer ; l'identifiant est assigné avant persistance. */
+    ReferenceValueEntity(UUID id, String domain, String code, String label, int sortOrder, boolean active) {
+        this.id = id;
+        this.domain = domain;
+        this.code = code;
+        this.label = label;
+        this.sortOrder = sortOrder;
+        this.active = active;
     }
 
     UUID getId() {

@@ -3,12 +3,15 @@ package ml.cnpm.platform.administration;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.jayway.jsonpath.JsonPath;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,6 +69,9 @@ class ReferenceValueApiTest {
 
     @Autowired private WebApplicationContext context;
     @Autowired private ml.cnpm.platform.shared.api.CorrelationIdFilter correlationIdFilter;
+    @Autowired private JdbcTemplate jdbcTemplate;
+
+    private static final String KEY = "idem-key-0123456789";
 
     private MockMvc mockMvc;
 
@@ -209,6 +215,203 @@ class ReferenceValueApiTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+    }
+
+    private static String body(String domain, String code, String label, int sortOrder) {
+        return "{\"domain\":\"%s\",\"code\":\"%s\",\"label\":\"%s\",\"sortOrder\":%d,\"active\":true}"
+                .formatted(domain, code, label, sortOrder);
+    }
+
+    @Test
+    void createsANewReferenceValueAndAuditsIt() throws Exception {
+        String responseBody =
+                mockMvc.perform(
+                                post("/reference-values")
+                                        .header("Idempotency-Key", KEY)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(body("TEST_CREATE", "ALPHA", "Alpha", 1))
+                                        .with(asFunctionalAdmin()))
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$.domain").value("TEST_CREATE"))
+                        .andExpect(jsonPath("$.code").value("ALPHA"))
+                        .andExpect(jsonPath("$.label").value("Alpha"))
+                        .andExpect(jsonPath("$.id").exists())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        // La création a bien produit un événement d'audit corrélé, avec une empreinte.
+        String createdId = JsonPath.read(responseBody, "$.id");
+        Integer audited =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.audit_event "
+                                + "WHERE entity_id = ?::uuid AND action_code = 'REFERENCE_VALUE.CREATED' "
+                                + "AND after_hash IS NOT NULL",
+                        Integer.class,
+                        createdId);
+        org.junit.jupiter.api.Assertions.assertEquals(1, audited);
+    }
+
+    @Test
+    void replaysAnIdenticalCreateIdempotently() throws Exception {
+        String payload = body("TEST_IDEM", "BETA", "Beta", 1);
+        mockMvc.perform(
+                        post("/reference-values")
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(payload)
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isCreated());
+
+        // Rejeu strictement identique : la valeur existante est renvoyée (200), sans
+        // doublon ni second effet.
+        mockMvc.perform(
+                        post("/reference-values")
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(payload)
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("BETA"));
+
+        Integer rows =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM ref.reference_value WHERE domain = 'TEST_IDEM'",
+                        Integer.class);
+        org.junit.jupiter.api.Assertions.assertEquals(1, rows);
+
+        // Un rejeu idempotent n'est pas une action : il ne produit pas de second audit.
+        // Sans cette assertion, une régression bruitant l'audit à chaque rejeu passerait.
+        Integer audited =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.audit_event a "
+                                + "JOIN ref.reference_value r ON r.id = a.entity_id "
+                                + "WHERE r.domain = 'TEST_IDEM' AND a.action_code = 'REFERENCE_VALUE.CREATED'",
+                        Integer.class);
+        org.junit.jupiter.api.Assertions.assertEquals(1, audited);
+    }
+
+    @Test
+    void rejectsCreateOfDivergentContentForTheSameKey() throws Exception {
+        String created =
+                mockMvc.perform(
+                                post("/reference-values")
+                                        .header("Idempotency-Key", KEY)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(body("TEST_CONFLICT", "GAMMA", "Gamma", 1))
+                                        .with(asFunctionalAdmin()))
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        // Même (domaine, code) mais libellé différent : conflit d'état, pas un doublon.
+        mockMvc.perform(
+                        post("/reference-values")
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body("TEST_CONFLICT", "GAMMA", "Gamma modifié", 2))
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("STATE_CONFLICT"));
+
+        // Une tentative rejetée n'a produit ni ligne ni audit : seul le premier create
+        // compte. Un audit émis sur le chemin de conflit serait un faux positif de trace.
+        String createdId = JsonPath.read(created, "$.id");
+        Integer audited =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.audit_event WHERE entity_id = ?::uuid",
+                        Integer.class,
+                        createdId);
+        org.junit.jupiter.api.Assertions.assertEquals(1, audited);
+    }
+
+    @Test
+    void rejectsAnIdempotencyKeyShorterThanTheContractMinimum() throws Exception {
+        // Le contrat impose une clé d'au moins 16 caractères ; une clé trop courte est
+        // une validation, rendue au format Problem.
+        mockMvc.perform(
+                        post("/reference-values")
+                                .header("Idempotency-Key", "trop-courte")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body("TEST_SHORTKEY", "X", "X", 1))
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void recordsTheKeycloakSubjectAsAuditActor() throws Exception {
+        // Chemin où le sujet du jeton est un vrai UUID (cas Keycloak) : l'acteur de
+        // l'audit doit être ce sujet, pas null.
+        String subject = "22222222-2222-2222-2222-222222222222";
+        String responseBody =
+                mockMvc.perform(
+                                post("/reference-values")
+                                        .header("Idempotency-Key", KEY)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(body("TEST_ACTOR", "DELTA", "Delta", 1))
+                                        .with(
+                                                jwt()
+                                                        .jwt(j -> j.subject(subject))
+                                                        .authorities(
+                                                                new SimpleGrantedAuthority("ROLE_ADMIN_FONCTIONNEL"))))
+                        .andExpect(status().isCreated())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        String createdId = JsonPath.read(responseBody, "$.id");
+        String actor =
+                jdbcTemplate.queryForObject(
+                        "SELECT actor_user_id::text FROM audit.audit_event WHERE entity_id = ?::uuid",
+                        String.class,
+                        createdId);
+        org.junit.jupiter.api.Assertions.assertEquals(subject, actor);
+    }
+
+    @Test
+    void deniesCreateToRoleWithoutWritePermission() throws Exception {
+        mockMvc.perform(
+                        post("/reference-values")
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body("TEST_FORBIDDEN", "X", "X", 1))
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("ROLE_MEMBRE_UTILISATEUR"))))
+                .andExpect(status().isForbidden());
+        // Rien n'a été inséré malgré la charge valide : l'autorisation précède l'effet.
+        Integer rows =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM ref.reference_value WHERE domain = 'TEST_FORBIDDEN'",
+                        Integer.class);
+        org.junit.jupiter.api.Assertions.assertEquals(0, rows);
+    }
+
+    @Test
+    void rejectsCreateWithoutIdempotencyKey() throws Exception {
+        mockMvc.perform(
+                        post("/reference-values")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body("TEST_NOKEY", "X", "X", 1))
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void rejectsCreateWithABlankRequiredField() throws Exception {
+        mockMvc.perform(
+                        post("/reference-values")
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"domain\":\"TEST\",\"code\":\"X\",\"label\":\"\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
     }
 
     /** Décodeur factice : évite toute récupération réseau des métadonnées OIDC au démarrage. */

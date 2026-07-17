@@ -285,5 +285,34 @@ sans arbitrage romprait la référence des maquettes déjà produites.
 des dénominations sans correspondance réelle, et faire régénérer les maquettes qui les
 affichent.
 
+## DATA-DEC-005 — idempotence des créations sans magasin de clés
+
+**Propriétaire.** Architecture / Direction technique.
+**Impact.** Toutes les créations sensibles (référentiels, et à terme paiements, reçus).
+**Statut.** Tranché en décision technique ; signalé pour information.
+
+**Constat.** `.claude/rules/api.md` et `CLAUDE.md` exigent une clé d'idempotence sur les
+créations sensibles, et le contrat déclare l'en-tête `Idempotency-Key` obligatoire. Or
+le modèle de données ne comporte **aucun magasin générique de clés d'idempotence** : la
+seule idempotence provisionnée est la colonne `payment.payment_transaction.idempotency_key`,
+spécifique aux paiements. `ref.reference_value` n'a pas de colonne de clé.
+
+**Décision.** Pour `createReferenceValue`, l'idempotence est portée par la **clé naturelle
+(domaine, code)**, dont l'unicité est déjà garantie par
+`uq_ref_reference_value_domain_code` :
+
+- même (domaine, code) et contenu identique → la valeur existante est renvoyée (rejeu, 200) ;
+- même (domaine, code) et contenu différent → conflit d'état (409) ;
+- création concurrente franchissant la vérification préalable → la violation d'unicité
+  est traduite en 409.
+
+L'en-tête `Idempotency-Key` reste **exigé** (400 s'il est absent), conformément au
+contrat, mais n'est **pas stocké** : la sémantique complète « même clé → même réponse
+rejouée » n'est pas implémentée.
+
+**Arbitrage demandé.** Décider si un magasin de clés d'idempotence générique
+(table partagée `integration.idempotency_key` ou colonne par table) est introduit avant
+les modules financiers, où la sémantique complète de rejeu est réellement critique.
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.

@@ -1,5 +1,6 @@
 package ml.cnpm.platform.administration.adapter.out.persistence;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,4 +16,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 interface ReferenceValueJpaRepository extends JpaRepository<ReferenceValueEntity, UUID> {
 
     Page<ReferenceValueEntity> findByDomain(String domain, Pageable pageable);
+
+    Optional<ReferenceValueEntity> findByDomainAndCode(String domain, String code);
 }

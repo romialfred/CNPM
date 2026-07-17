@@ -1,10 +1,12 @@
 package ml.cnpm.platform.administration.application.port.out;
 
+import java.util.Optional;
 import ml.cnpm.platform.administration.application.PageResult;
+import ml.cnpm.platform.administration.application.ReferenceValueDraft;
 import ml.cnpm.platform.administration.domain.ReferenceValue;
 
 /**
- * Port sortant de lecture des valeurs de référentiel.
+ * Port sortant des valeurs de référentiel.
  *
  * <p>Le service applicatif dépend de cette abstraction, jamais d'une implémentation
  * JPA concrète : l'inversion de dépendance garde le domaine au centre et le framework
@@ -20,4 +22,15 @@ public interface ReferenceValueRepository {
      * @param size taille de page (déjà bornée en amont)
      */
     PageResult<ReferenceValue> list(String domain, int page, int size);
+
+    /** Valeur portant ce couple (domaine, code), qui en forme l'identité métier unique. */
+    Optional<ReferenceValue> findByDomainAndCode(String domain, String code);
+
+    /**
+     * Insère une nouvelle valeur et la retourne avec son identifiant technique.
+     *
+     * <p>Peut lever une violation d'intégrité si le couple (domaine, code) existe déjà —
+     * cas d'une course entre deux créations concurrentes.
+     */
+    ReferenceValue create(ReferenceValueDraft draft);
 }

@@ -54,7 +54,12 @@ ses cas limites (revendication absente ou malformée → aucune autorité).
   le RBAC par rôle l'est.
 - **Aucun événement d'audit** n'est émis sur un 401/403, alors que
   `security-architecture.md` exige une alerte sur tentative d'élévation de privilège.
-  À câbler avec le module Audit (non encore construit).
+  Le chemin de **succès** d'une action sensible est désormais audité
+  transactionnellement (voir `ml.cnpm.platform.audit`, module construit). Le chemin de
+  **refus** ne l'est toujours pas : un `AuthorizationDeniedEvent` écrivant dans
+  `audit.security_event` reste à câbler dans les gestionnaires de refus de
+  `SecurityConfig`. Signalé par l'audit indépendant du write-path ADM ; **prochain
+  incrément sécurité**, à ne pas présenter comme résolu.
 - `/actuator/prometheus` **n'est pas public** : il exige une authentification. La
   collecte de métriques passera par un accès authentifié ou un port de gestion isolé
   par politique réseau.

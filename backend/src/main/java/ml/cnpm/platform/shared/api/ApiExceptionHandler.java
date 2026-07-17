@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -31,6 +32,7 @@ public class ApiExceptionHandler {
 
     private static final String VALIDATION_CODE = "VALIDATION_ERROR";
     private static final String VALIDATION_MESSAGE = "La requête comporte des paramètres invalides.";
+    private static final String CONFLICT_CODE = "STATE_CONFLICT";
 
     /** Validation des paramètres de méthode (Spring 6.1+/7) : {@code @Min/@Max/@Size} sur les query params. */
     @ExceptionHandler(HandlerMethodValidationException.class)
@@ -69,6 +71,49 @@ public class ApiExceptionHandler {
                         .map(ApiExceptionHandler::toFieldError)
                         .toList();
         return badRequest(fieldErrors, request);
+    }
+
+    /** En-tête requis absent (ex. {@code Idempotency-Key} sur une création). */
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ProblemResponse> onMissingHeader(
+            MissingRequestHeaderException exception, HttpServletRequest request) {
+        ProblemResponse.FieldError fieldError =
+                new ProblemResponse.FieldError(
+                        exception.getHeaderName(), VALIDATION_CODE, "En-tête requis absent.");
+        return badRequest(List.of(fieldError), request);
+    }
+
+    /** État incompatible avec l'opération (ex. valeur de référentiel déjà existante). */
+    @ExceptionHandler(StateConflictException.class)
+    public ResponseEntity<ProblemResponse> onStateConflict(
+            StateConflictException exception, HttpServletRequest request) {
+        return conflict(exception.getMessage(), request);
+    }
+
+    /**
+     * Violation d'intégrité (ex. contrainte d'unicité franchie par une création
+     * concurrente qui a passé la vérification préalable en même temps qu'une autre). Rendu
+     * comme un conflit d'état, avec un message générique — jamais le détail de la
+     * contrainte SQL.
+     */
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ProblemResponse> onDataIntegrityViolation(HttpServletRequest request) {
+        return conflict("L'opération entre en conflit avec l'état actuel de la ressource.", request);
+    }
+
+    private static ResponseEntity<ProblemResponse> conflict(
+            String message, HttpServletRequest request) {
+        ProblemResponse body =
+                new ProblemResponse(
+                        Instant.now(),
+                        HttpStatus.CONFLICT.value(),
+                        CONFLICT_CODE,
+                        message,
+                        List.of(),
+                        CorrelationId.current(request));
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(body);
     }
 
     private static ProblemResponse.FieldError toFieldError(ConstraintViolation<?> violation) {
