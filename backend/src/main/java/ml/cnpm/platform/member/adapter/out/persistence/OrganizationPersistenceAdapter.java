@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import ml.cnpm.platform.member.application.OrganizationQuery;
 import ml.cnpm.platform.member.application.port.out.OrganizationRepository;
 import ml.cnpm.platform.member.domain.Organization;
@@ -48,6 +50,11 @@ class OrganizationPersistenceAdapter implements OrganizationRepository {
                 result.getSize(),
                 result.getTotalElements(),
                 result.getTotalPages());
+    }
+
+    @Override
+    public Optional<Organization> findById(UUID id) {
+        return jpaRepository.findById(id).map(OrganizationPersistenceAdapter::toDomain);
     }
 
     private static Specification<OrganizationEntity> toSpecification(OrganizationQuery query) {

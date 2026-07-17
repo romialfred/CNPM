@@ -1,8 +1,10 @@
 package ml.cnpm.platform.member.application;
 
+import java.util.UUID;
 import ml.cnpm.platform.member.application.port.out.OrganizationRepository;
 import ml.cnpm.platform.member.domain.Organization;
 import ml.cnpm.platform.shared.api.PageResult;
+import ml.cnpm.platform.shared.api.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,5 +38,18 @@ public class OrganizationService {
     @Transactional(readOnly = true)
     public PageResult<Organization> search(OrganizationQuery query) {
         return repository.search(query);
+    }
+
+    /**
+     * Retourne la fiche d'une entreprise par son identifiant technique.
+     *
+     * @throws ResourceNotFoundException si aucune entreprise ne porte cet identifiant
+     */
+    @PreAuthorize("hasAuthority('PERM_MEMBER.READ')")
+    @Transactional(readOnly = true)
+    public Organization get(UUID id) {
+        return repository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Entreprise introuvable."));
     }
 }

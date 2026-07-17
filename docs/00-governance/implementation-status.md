@@ -456,3 +456,26 @@ BO-002 dispose désormais de **toutes ses colonnes de données** côté backend 
 raison sociale, catégorie, statut, groupement, contact). Restent : `getOrganization`
 détail, écritures `createOrganization`/`createMembership`, et le câblage du gateway
 Angular sur l'API. Les montants dus/payés restent bloqués (ADR-006, modules.md).
+
+
+### Fiche entreprise : getOrganization (détail, périmètre réduit)
+
+Neuvième incrément : l'action « Voir » de BO-002, `GET /organizations/{id}`, jusqu'ici
+déclarée avec un schéma générique `Resource`. Désormais typée et implémentée.
+
+| Élément | Détail |
+|---|---|
+| Route | `GET /organizations/{id}` typé `OrganizationView` (le même que la liste : cœur entreprise) ; `id` mal formé → 400 `Problem` (VALIDATION_ERROR), entreprise absente → 404 `Problem` (RESOURCE_NOT_FOUND) |
+| Autorisation | `PERM_MEMBER.READ` (garde distincte de `list`, éprouvée par mutation) ; 401/403 testés |
+| Architecture | Port `OrganizationRepository.findById` ajouté ; adaptateur → `jpaRepository.findById().map(toDomain)` ; service `get(id)` lève `ResourceNotFoundException` ; contrôleur sans logique métier |
+| Tests | 15→21 pour OrganizationApiTest (trouvé + tous champs, non trouvé, id mal formé, champs nullables, 403, 401) ; 122 backend au total |
+
+**Périmètre réduit assumé et signalé.** La fiche `ref-bo-003-member-detail.md` décrit une
+« fiche 360° » (KPI, timeline, paiements, documents, groupement, contacts). Cet incrément
+ne livre que le **cœur entreprise** — les montants dépendent d'ADR-006 (non promue) et
+restent hors MEMBER ; adhésion/groupement/contacts/historique relèvent d'incréments
+suivants. Le contrat OpenAPI a été corrigé (résumé « fiche entreprise (cœur) » + une
+`description` explicitant le périmètre R0 réellement couvert, MEM-001 et MEM-003 partiel),
+à la suite de l'audit contrat indépendant qui a relevé que « fiche 360° » surestimait la
+livraison. `getOrganization` réutilise volontairement `OrganizationView` (pas de schéma
+détail distinct tant que la fiche 360° n'est pas composée).

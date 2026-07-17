@@ -378,7 +378,14 @@ paths:
     get:
       tags:
       - MEMBER
-      summary: Consulter la fiche 360°.
+      summary: Consulter la fiche entreprise (cœur).
+      description: >-
+        Retourne le CŒUR de la fiche entreprise (identité, type, secteur, statut, niveau
+        de risque). La « fiche 360° » complète (adhésion, groupement, contacts, historique,
+        montants dus/payés, documents) sera composée par incréments : les montants
+        dépendent d'ADR-006 (read-model) et restent hors du module MEMBER. Périmètre R0
+        réellement couvert par cette opération : MEM-001 (consultation) ; MEM-003 partiel.
+        Les autres exigences MEM-* du bloc x-requirements relèvent des incréments suivants.
       operationId: getOrganization
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
@@ -386,7 +393,7 @@ paths:
         in: path
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/Uuid'
       responses:
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -401,11 +408,11 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Ressource
+          description: Fiche entreprise
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/OrganizationView'
       x-requirements:
       - MEM-001
       - MEM-002

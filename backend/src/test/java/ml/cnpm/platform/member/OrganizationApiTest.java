@@ -1,5 +1,6 @@
 package ml.cnpm.platform.member;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -231,6 +232,86 @@ class OrganizationApiTest {
     @Test
     void rejectsAnonymousAccess() throws Exception {
         mockMvc.perform(get("/organizations")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getsAnOrganizationByItsIdentifier() throws Exception {
+        String id = "44444444-0000-0000-0000-000000000001";
+        jdbcTemplate.update(
+                "INSERT INTO member.organization "
+                        + "(id, legal_name, trade_name, organization_type, sector_code, status, risk_level) "
+                        + "VALUES (?::uuid, 'Zeta Industries SA', 'Zeta', 'GRANDE_ENTREPRISE', 'AGRI', 'ACTIVE', 'ELEVE')",
+                id);
+
+        mockMvc.perform(get("/organizations/{id}", id).with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.legalName").value("Zeta Industries SA"))
+                .andExpect(jsonPath("$.tradeName").value("Zeta"))
+                .andExpect(jsonPath("$.organizationType").value("GRANDE_ENTREPRISE"))
+                .andExpect(jsonPath("$.sectorCode").value("AGRI"))
+                .andExpect(jsonPath("$.status").value("ACTIVE"))
+                .andExpect(jsonPath("$.riskLevel").value("ELEVE"))
+                .andExpect(jsonPath("$.version").exists());
+    }
+
+    @Test
+    void returnsNotFoundForAnUnknownOrganization() throws Exception {
+        mockMvc.perform(
+                        get("/organizations/{id}", "44444444-0000-0000-0000-0000000000ff")
+                                .with(asMemberReader()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
+    }
+
+    @Test
+    void rejectsAMalformedOrganizationIdentifier() throws Exception {
+        mockMvc.perform(get("/organizations/{id}", "not-a-uuid").with(asMemberReader()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void serializesNullOptionalFieldsOnTheDetail() throws Exception {
+        // tradeName et sectorCode sont facultatifs (nullables) : la fiche doit rester
+        // valide sans eux.
+        String id = "44444444-0000-0000-0000-000000000004";
+        jdbcTemplate.update(
+                "INSERT INTO member.organization (id, legal_name, organization_type, status, risk_level) "
+                        + "VALUES (?::uuid, 'Theta SARL', 'PME', 'PROSPECT', 'NORMAL')",
+                id);
+
+        mockMvc.perform(get("/organizations/{id}", id).with(asMemberReader()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.legalName").value("Theta SARL"))
+                .andExpect(jsonPath("$.tradeName").value(nullValue()))
+                .andExpect(jsonPath("$.sectorCode").value(nullValue()));
+    }
+
+    @Test
+    void deniesGetByIdWithoutTheMemberReadPermission() throws Exception {
+        String id = "44444444-0000-0000-0000-000000000002";
+        jdbcTemplate.update(
+                "INSERT INTO member.organization (id, legal_name, organization_type, status, risk_level) "
+                        + "VALUES (?::uuid, 'Eta SA', 'PME', 'ACTIVE', 'NORMAL')",
+                id);
+
+        mockMvc.perform(
+                        get("/organizations/{id}", id)
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("ROLE_MEMBRE_UTILISATEUR"))))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test
+    void rejectsAnonymousGetById() throws Exception {
+        mockMvc.perform(get("/organizations/{id}", "44444444-0000-0000-0000-000000000003"))
+                .andExpect(status().isUnauthorized());
     }
 
     @TestConfiguration
