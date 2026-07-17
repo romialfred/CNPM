@@ -1,0 +1,38 @@
+/* Bordure plutôt qu'ombre : la carte regroupe sémantiquement, elle ne décore pas. */
+.cnpm-project {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  height: 100%;
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
+}
+
+.cnpm-project__category {
+  margin: 0;
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+  text-transform: uppercase;
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+}
+
+.cnpm-project__title {
+  margin: 0;
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: break-word;
+}
+
+.cnpm-project__summary {
+  margin: 0;
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}

@@ -6,9 +6,18 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      # Port hôte configurable : 5432 est fréquemment déjà occupé par une installation
+      # PostgreSQL locale, qui masque alors ce conteneur — le client se connecte au
+      # mauvais serveur et échoue sur une erreur d'authentification trompeuse. Le port
+      # dans le conteneur reste standard.
+      - "${POSTGRES_HOST_PORT:-55432}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # Les images PostgreSQL 18+ rangent les données dans un sous-répertoire nommé
+      # par version majeure et attendent le montage sur /var/lib/postgresql. Monter
+      # sur /var/lib/postgresql/data faisait échouer le démarrage : le conteneur
+      # sortait en erreur, alors que `docker compose config` restait vert — cette
+      # commande ne valide que la syntaxe, jamais le démarrage réel.
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s

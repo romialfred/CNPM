@@ -1,0 +1,77 @@
+<cnpm-public-shell>
+  <div class="cnpm-home">
+    <!-- Hero : texte et CTA à gauche, aperçu à droite (fiche PUB-001). Le titre et
+         les CTA doivent être visibles sans défilement à 1440x900. -->
+    <section class="cnpm-home__hero">
+      <div class="cnpm-home__hero-text">
+        <h1 class="cnpm-home__title">{{ institution.title }}</h1>
+        <p class="cnpm-home__baseline">{{ institution.baseline }}</p>
+        <div class="cnpm-home__actions">
+          <cnpm-button variant="public-cta" size="lg" routerLink="/auth/login">
+            Accéder à mon espace
+          </cnpm-button>
+        </div>
+      </div>
+      <!-- Aperçu institutionnel sans image : la photothèque et les droits d'usage
+           relèvent d'UX-DEC-003, et la règle interdit l'image générée en production. -->
+      <div class="cnpm-home__hero-aside" aria-hidden="true">
+        <span class="cnpm-home__hero-mark">CNPM</span>
+      </div>
+    </section>
+
+    <!-- Bande de chiffres. La fiche impose d'afficher leur date de mise à jour :
+         faute de date dans la source, on annonce leur caractère indicatif plutôt que
+         de laisser croire à une fraîcheur garantie. -->
+    <section class="cnpm-home__metrics" aria-labelledby="chiffres">
+      <h2 class="cnpm-home__section-title" id="chiffres">Le CNPM en chiffres</h2>
+
+      @switch (state()) {
+        @case ('loading') {
+          <p class="cnpm-home__loading" role="status" aria-live="polite">
+            Chargement des chiffres clés…
+          </p>
+        }
+        @case ('ready') {
+          @if (highlights(); as data) {
+            <ul class="cnpm-home__metric-list">
+              @for (metric of data.metrics; track metric.id) {
+                <li class="cnpm-home__metric">
+                  <span class="cnpm-home__metric-value">
+                    {{ metric.value | number: '1.0-2' }}@if (metric.unit === 'percent') {
+                      <span class="cnpm-home__metric-unit"> %</span>
+                    }
+                  </span>
+                  <span class="cnpm-home__metric-label">{{ metric.label }}</span>
+                </li>
+              }
+            </ul>
+            @if (data.dataAsOf) {
+              <p class="cnpm-home__metric-date">Chiffres arrêtés au {{ data.dataAsOf }}.</p>
+            } @else {
+              <p class="cnpm-home__metric-date">
+                Chiffres indicatifs&nbsp;: leur date d’arrêté n’est pas encore publiée.
+              </p>
+            }
+          }
+        }
+      }
+    </section>
+
+    <section class="cnpm-home__structure" aria-labelledby="organisation">
+      <h2 class="cnpm-home__section-title" id="organisation">Une organisation en réseau</h2>
+      <ul class="cnpm-home__cards">
+        @for (item of structure; track item.id) {
+          <li class="cnpm-home__card">
+            <h3 class="cnpm-home__card-title">{{ item.title }}</h3>
+            <p class="cnpm-home__card-text">{{ item.text }}</p>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- Les sections « actualités », « témoignages », « partenaires » et
+         « newsletter » prévues par la fiche ne sont pas rendues : aucune source ne
+         les alimente, et les remplir reviendrait à fabriquer du contenu
+         institutionnel ou à invoquer des tiers sans leur consentement. -->
+  </div>
+</cnpm-public-shell>

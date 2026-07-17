@@ -11,6 +11,10 @@
     "isolatedModules": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    /* Permet aux adaptateurs de démonstration d'importer les fixtures déterministes
+       du handoff à la compilation, plutôt que de les recopier dans du code — la
+       copie divergerait de la source à la première évolution. */
+    "resolveJsonModule": true,
     "target": "ES2022",
     "module": "preserve"
   },

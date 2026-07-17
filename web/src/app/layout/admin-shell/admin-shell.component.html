@@ -1,0 +1,33 @@
+<div
+  class="cnpm-admin"
+  [class.cnpm-admin--collapsed]="collapsed()"
+  [class.cnpm-admin--drawer-open]="drawerOpen()"
+>
+  <a class="cnpm-admin__skip" href="#contenu-principal">Aller au contenu principal</a>
+
+  <!-- Voile du tiroir. Décoratif : la fermeture au clavier passe par Échap et par le
+       bouton de fermeture, jamais par ce bloc. -->
+  @if (drawerOpen()) {
+    <div class="cnpm-admin__scrim" aria-hidden="true" (click)="closeDrawer()"></div>
+  }
+
+  <aside class="cnpm-admin__sidebar" id="navigation-laterale">
+    <cnpm-sidebar-navigation
+      [collapsed]="collapsed()"
+      (collapseToggle)="toggleCollapsed()"
+      (drawerClose)="closeDrawer()"
+    />
+  </aside>
+
+  <div class="cnpm-admin__frame">
+    <cnpm-top-bar
+      [drawerOpen]="drawerOpen()"
+      (drawerToggle)="toggleDrawer()"
+      (searchSubmit)="runSearch($event)"
+    />
+
+    <main class="cnpm-admin__main" id="contenu-principal">
+      <ng-content />
+    </main>
+  </div>
+</div>

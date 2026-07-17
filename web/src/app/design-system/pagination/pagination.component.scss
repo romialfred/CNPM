@@ -1,0 +1,118 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-pagination__size {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-pagination__select {
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-pagination__select:focus-visible,
+.cnpm-pagination__control:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-pagination__range {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* La liste s'enroule. Sous 1024 px, chaque contrôle passe à 44 px pour la cible
+   tactile : huit contrôles réclament alors 380 px, soit plus que les 320 px de largeur
+   minimale exigée par le reflow. Sans `wrap`, c'est la page entière qui déborde. */
+.cnpm-pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cnpm-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-pagination__control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--cnpm-radius-md);
+  background-color: transparent;
+  color: var(--cnpm-color-text-secondary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  cursor: pointer;
+}
+
+.cnpm-pagination__control:hover:not(:disabled) {
+  background-color: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Aux bornes, le contrôle est réellement `disabled` : contrairement à un bouton
+   d'envoi, rien n'a besoin d'être annoncé sur lui après activation, et le retirer du
+   parcours de tabulation évite de piéger le focus sur une action sans effet. */
+.cnpm-pagination__control:disabled {
+  color: var(--cnpm-color-text-muted);
+  cursor: not-allowed;
+  opacity: tokens.$cnpm-opacity-disabled;
+}
+
+.cnpm-pagination__control--current {
+  background-color: var(--cnpm-color-brand-blue-700);
+  border-color: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-neutral-0);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-pagination__gap {
+  display: inline-flex;
+  justify-content: center;
+  min-width: var(--cnpm-space-6);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* Cible tactile de 44 px : la même règle que les autres contrôles du système. */
+@media (max-width: 1023px) {
+  .cnpm-pagination__control,
+  .cnpm-pagination__select {
+    min-width: var(--cnpm-size-control-lg);
+    height: var(--cnpm-size-control-lg);
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-pagination {
+    justify-content: center;
+  }
+  .cnpm-pagination__size-suffix {
+    display: none;
+  }
+}

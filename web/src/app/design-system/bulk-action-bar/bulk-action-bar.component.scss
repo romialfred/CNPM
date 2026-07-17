@@ -1,0 +1,29 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-bulk__count {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* La sélection active se signale aussi par le poids du texte : la seule couleur ne
+   transmet jamais un état. */
+.cnpm-bulk--active .cnpm-bulk__count {
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-bulk__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}

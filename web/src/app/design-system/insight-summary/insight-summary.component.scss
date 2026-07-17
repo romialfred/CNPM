@@ -1,0 +1,69 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-insight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
+}
+
+.cnpm-insight__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-insight__unit {
+  margin-left: var(--cnpm-space-1);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-regular);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-insight__stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+}
+
+.cnpm-insight__stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+/* Une mesure qui ne se cumule pas aux précédentes est séparée par un filet : sans
+   lui, l'œil additionne des lignes qui ne s'additionnent pas. */
+.cnpm-insight__stat--apart {
+  padding-top: var(--cnpm-space-3);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-insight__stat dt {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Chasses tabulaires : les chiffres s'alignent d'une ligne à l'autre, ce qui rend
+   les ordres de grandeur comparables d'un coup d'œil. */
+.cnpm-insight__stat dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+  white-space: nowrap;
+}
+
+.cnpm-insight__note {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}

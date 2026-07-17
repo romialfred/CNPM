@@ -1,0 +1,135 @@
+<cnpm-public-shell>
+  @switch (state()) {
+    @case ('loading') {
+      <div class="cnpm-showcase__status" role="status" aria-live="polite">
+        <p class="cnpm-showcase__status-text">Chargement de la vitrine…</p>
+      </div>
+    }
+
+    @case ('not-found') {
+      <div class="cnpm-showcase__status">
+        <h1 class="cnpm-showcase__status-title">Vitrine introuvable</h1>
+        <cnpm-alert tone="warning" title="Aucune vitrine ne correspond à cette adresse">
+          Vérifiez l'adresse saisie. La vitrine a peut-être été renommée.
+        </cnpm-alert>
+      </div>
+    }
+
+    @case ('not-public') {
+      <!-- Une vitrine non publiée est distinguée d'une vitrine inexistante : le
+           visiteur sait que l'entreprise est membre, sans que le contenu non validé
+           ne soit exposé. -->
+      <div class="cnpm-showcase__status">
+        <h1 class="cnpm-showcase__status-title">Vitrine non publiée</h1>
+        <cnpm-alert tone="info" title="Cette vitrine n'est pas encore publique">
+          Le contenu est en cours de préparation par l'entreprise membre et n'est pas
+          consultable pour le moment.
+        </cnpm-alert>
+      </div>
+    }
+
+    @case ('published') {
+      @if (showcase(); as member) {
+        <article class="cnpm-showcase">
+          <!-- Hero 5/7 : identité à gauche, média à droite. Le média est un
+               placeholder neutre : la photothèque et les droits d'usage relèvent
+               d'UX-DEC-003, et la fiche interdit toute image générée en production. -->
+          <header class="cnpm-showcase__hero">
+            <div class="cnpm-showcase__identity">
+              <!-- Le badge ouvre une explication du statut (fiche PUB-006). -->
+              <cnpm-verification-badge
+                [status]="member.verificationStatus"
+                [explanation]="badgeExplanation()"
+                [verifiedAt]="member.verifiedAt"
+              />
+              <h1 class="cnpm-showcase__name">{{ member.name }}</h1>
+              <p class="cnpm-showcase__tagline">{{ member.tagline }}</p>
+              <p class="cnpm-showcase__summary">{{ member.summary }}</p>
+            </div>
+            <div class="cnpm-showcase__media" role="img" [attr.aria-label]="'Emblème de ' + member.name">
+              <span class="cnpm-showcase__media-initials" aria-hidden="true">
+                {{ member.name.slice(0, 2) }}
+              </span>
+            </div>
+          </header>
+
+          @if (sections().length) {
+            <!-- Navigation locale ancrée : les ancres pointent sur les sections
+                 réellement rendues, et le fragment rend l'URL partageable. -->
+            <nav class="cnpm-showcase__localnav" aria-label="Sections de la vitrine">
+              <ul class="cnpm-showcase__localnav-list">
+                @for (section of sections(); track section.id) {
+                  <li>
+                    <a class="cnpm-showcase__localnav-link" [href]="'#' + section.id">
+                      {{ section.label }}
+                    </a>
+                  </li>
+                }
+              </ul>
+            </nav>
+          }
+
+          @if (keyFacts().length) {
+            <section class="cnpm-showcase__section" aria-labelledby="faits-cles">
+              <h2 class="cnpm-showcase__section-title" id="faits-cles">Faits clés</h2>
+              <cnpm-definition-list [items]="keyFacts()" />
+            </section>
+          }
+
+          @if (member.activities.length) {
+            <section class="cnpm-showcase__section" aria-labelledby="activites">
+              <h2 class="cnpm-showcase__section-title" id="activites">Activités</h2>
+              <ul class="cnpm-showcase__chips">
+                @for (activity of member.activities; track activity) {
+                  <li class="cnpm-showcase__chip">{{ activity }}</li>
+                }
+              </ul>
+            </section>
+          }
+
+          @if (member.projects.length) {
+            <section class="cnpm-showcase__section" aria-labelledby="realisations">
+              <h2 class="cnpm-showcase__section-title" id="realisations">Réalisations</h2>
+              <ul class="cnpm-showcase__cards">
+                @for (project of member.projects; track project.title) {
+                  <li>
+                    <cnpm-showcase-project-card
+                      [title]="project.title"
+                      [summary]="project.summary"
+                      [category]="project.category"
+                    />
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+
+          @if (member.certifications.length) {
+            <section class="cnpm-showcase__section" aria-labelledby="certifications">
+              <h2 class="cnpm-showcase__section-title" id="certifications">Certifications</h2>
+              <ul class="cnpm-showcase__chips">
+                @for (certification of member.certifications; track certification) {
+                  <li class="cnpm-showcase__chip">{{ certification }}</li>
+                }
+              </ul>
+            </section>
+          }
+
+          @if (contactFacts().length) {
+            <section class="cnpm-showcase__section" aria-labelledby="contact">
+              <h2 class="cnpm-showcase__section-title" id="contact">Contact</h2>
+              <cnpm-definition-list [items]="contactFacts()" />
+            </section>
+          }
+
+          <!-- L'attribution porte sur toute la vitrine et non sur une section : la
+               placer dans « Contact » la faisait disparaître avec elle lorsque les
+               coordonnées ne sont pas publiables. -->
+          <p class="cnpm-showcase__attribution">
+            Contenu publié sous la responsabilité de {{ member.name }}.
+          </p>
+        </article>
+      }
+    }
+  }
+</cnpm-public-shell>

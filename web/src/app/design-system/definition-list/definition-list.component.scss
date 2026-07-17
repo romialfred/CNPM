@@ -1,0 +1,27 @@
+.cnpm-definitions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--cnpm-space-5);
+  margin: 0;
+}
+
+.cnpm-definitions__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-definitions__label {
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-definitions__value {
+  margin: 0;
+  font-family: var(--cnpm-font-family-sans);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: break-word;
+}

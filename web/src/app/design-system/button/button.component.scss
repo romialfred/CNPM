@@ -12,9 +12,22 @@
   font-size: var(--cnpm-font-size-sm);
   line-height: var(--cnpm-font-lineHeight-sm);
   cursor: pointer;
+  /* Le composant rend une ancre lorsqu'il porte une destination : sans cela, le
+     soulignement et la couleur de lien de l'agent utilisateur traverseraient. */
+  text-decoration: none;
   transition:
     background-color var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard),
     border-color var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+}
+
+/* Le libellé aligne son propre contenu : les pictogrammes de Lucide sont rendus en
+   `display: block`, si bien qu'un `span` en flux inline les empilerait au-dessus du
+   texte au lieu de les poser à côté. */
+.cnpm-button__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cnpm-space-2);
 }
 
 /* Le halo `shadow-focus` est trop peu contrasté (~1,3:1) pour servir seul

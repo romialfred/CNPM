@@ -1,0 +1,97 @@
+<!-- Le conteneur défile horizontalement plutôt que de laisser la page déborder :
+     exigence de reflow à 320 px. `tabindex` le rend atteignable au clavier — une
+     zone défilante inatteignable au clavier est un échec de WCAG 2.2 (2.1.1). -->
+<div class="cnpm-table__scroll" tabindex="0" role="region" [attr.aria-label]="caption()">
+  <table class="cnpm-table">
+    <caption class="cnpm-table__caption">
+      {{ caption() }}
+    </caption>
+
+    <thead class="cnpm-table__head">
+      <tr>
+        @if (selectable()) {
+          <th scope="col" class="cnpm-table__cell cnpm-table__cell--select">
+            <input
+              type="checkbox"
+              class="cnpm-table__checkbox"
+              [checked]="allSelected()"
+              [indeterminate]="someSelected()"
+              [attr.aria-checked]="someSelected() ? 'mixed' : allSelected()"
+              (change)="toggleAll()"
+              aria-label="Sélectionner toutes les lignes de la page"
+            />
+          </th>
+        }
+
+        @for (column of columns(); track column.key) {
+          <th
+            scope="col"
+            class="cnpm-table__cell cnpm-table__cell--head"
+            [class.cnpm-table__cell--end]="column.align === 'end'"
+            [attr.aria-sort]="ariaSort(column)"
+          >
+            @if (column.sortable) {
+              <button type="button" class="cnpm-table__sort" (click)="requestSort(column)">
+                <span class="cnpm-table__label">
+                  {{ column.label }}
+                  @if (column.note) {
+                    <span class="cnpm-table__note">{{ column.note }}</span>
+                  }
+                </span>
+                <!-- L'état de tri est déjà porté par `aria-sort` sur l'en-tête ;
+                     le pictogramme reste décoratif et ne le répète pas. -->
+                @if (sortDirection(column) === 'asc') {
+                  <svg lucideArrowUp [size]="iconSize.dense"></svg>
+                } @else if (sortDirection(column) === 'desc') {
+                  <svg lucideArrowDown [size]="iconSize.dense"></svg>
+                } @else {
+                  <svg lucideArrowUpDown [size]="iconSize.dense" class="cnpm-table__sort-idle"></svg>
+                }
+              </button>
+            } @else {
+              <span class="cnpm-table__label">
+                {{ column.label }}
+                @if (column.note) {
+                  <span class="cnpm-table__note">{{ column.note }}</span>
+                }
+              </span>
+            }
+          </th>
+        }
+      </tr>
+    </thead>
+
+    <tbody class="cnpm-table__body">
+      @switch (state()) {
+        @case ('ready') {
+          @for (row of rows(); track rowKey()(row); let i = $index) {
+            <tr class="cnpm-table__row" [class.cnpm-table__row--selected]="isRowSelected(row)">
+              @if (selectable()) {
+                <td class="cnpm-table__cell cnpm-table__cell--select">
+                  <input
+                    type="checkbox"
+                    class="cnpm-table__checkbox"
+                    [checked]="isRowSelected(row)"
+                    (change)="toggleRow(row)"
+                    [attr.aria-label]="'Sélectionner ' + rowLabel()(row)"
+                  />
+                </td>
+              }
+              <ng-container
+                [ngTemplateOutlet]="rowTemplate()"
+                [ngTemplateOutletContext]="{ $implicit: row, index: i }"
+              />
+            </tr>
+          }
+        }
+        @default {
+          <tr>
+            <td class="cnpm-table__cell cnpm-table__status" [attr.colspan]="columnCount()">
+              <ng-content select="[data-table-status]" />
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

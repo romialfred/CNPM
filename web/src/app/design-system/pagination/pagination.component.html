@@ -1,0 +1,99 @@
+<div class="cnpm-pagination">
+  <div class="cnpm-pagination__size">
+    <label class="cnpm-pagination__size-label" for="taille-page">Afficher</label>
+    <select
+      id="taille-page"
+      class="cnpm-pagination__select"
+      [value]="pageSize()"
+      (change)="changePageSize($any($event.target).value)"
+    >
+      @for (option of pageSizeOptions(); track option) {
+        <option [value]="option">{{ option }}</option>
+      }
+    </select>
+    <span class="cnpm-pagination__size-suffix">éléments par page</span>
+  </div>
+
+  <!-- Le rang est annoncé en toutes lettres : « page 3 sur 4 » seul ne dit pas
+       combien d'éléments sont sous les yeux. `aria-live` est absent volontairement —
+       la région de résultats du tableau porte déjà l'annonce. -->
+  <p class="cnpm-pagination__range">
+    @if (totalItems() === 0) {
+      Aucun élément
+    } @else {
+      {{ rangeStart() | number }}–{{ rangeEnd() | number }} sur
+      {{ totalItems() | number }}
+    }
+  </p>
+
+  <nav class="cnpm-pagination__nav" aria-label="Pagination">
+    <ul class="cnpm-pagination__list">
+      <li>
+        <button
+          type="button"
+          class="cnpm-pagination__control"
+          [disabled]="isFirst()"
+          (click)="goTo(1)"
+          aria-label="Première page"
+        >
+          <svg lucideChevronsLeft [size]="iconSize.compact"></svg>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="cnpm-pagination__control"
+          [disabled]="isFirst()"
+          (click)="goTo(page() - 1)"
+          aria-label="Page précédente"
+        >
+          <svg lucideChevronLeft [size]="iconSize.compact"></svg>
+        </button>
+      </li>
+
+      @for (slot of slots(); track $index) {
+        <li>
+          @if (slot === gap) {
+            <span class="cnpm-pagination__gap" aria-hidden="true">{{ gap }}</span>
+          } @else {
+            <!-- `aria-current="page"` porte la position courante ; l'appui n'est donc
+                 pas signalé par la seule couleur du fond. -->
+            <button
+              type="button"
+              class="cnpm-pagination__control cnpm-pagination__control--page"
+              [class.cnpm-pagination__control--current]="slot === page()"
+              [attr.aria-current]="slot === page() ? 'page' : null"
+              [attr.aria-label]="'Page ' + slot"
+              (click)="goTo($any(slot))"
+            >
+              {{ slot }}
+            </button>
+          }
+        </li>
+      }
+
+      <li>
+        <button
+          type="button"
+          class="cnpm-pagination__control"
+          [disabled]="isLast()"
+          (click)="goTo(page() + 1)"
+          aria-label="Page suivante"
+        >
+          <svg lucideChevronRight [size]="iconSize.compact"></svg>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="cnpm-pagination__control"
+          [disabled]="isLast()"
+          (click)="goTo(totalPages())"
+          aria-label="Dernière page"
+        >
+          <svg lucideChevronsRight [size]="iconSize.compact"></svg>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

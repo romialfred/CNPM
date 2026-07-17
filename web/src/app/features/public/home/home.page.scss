@@ -1,0 +1,189 @@
+/* Conteneur 1440 px maximum ; sections 80–112 px verticalement (fiche PUB-001). */
+.cnpm-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-20);
+  width: 100%;
+  max-width: var(--cnpm-size-publicMax);
+  margin: 0 auto;
+  padding: var(--cnpm-space-16) var(--cnpm-layout-pagePaddingDesktop);
+  min-width: 0;
+}
+
+/* Hero en grille 6/6. `minmax(0, …)` empêche la piste de se dimensionner sur le
+   min-content de son contenu et de déborder. */
+.cnpm-home__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+  align-items: center;
+  gap: var(--cnpm-space-10);
+}
+
+.cnpm-home__hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+.cnpm-home__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-5xl);
+  line-height: var(--cnpm-font-lineHeight-5xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-home__baseline {
+  margin: 0;
+  max-width: 34rem;
+  font-size: var(--cnpm-font-size-lg);
+  line-height: var(--cnpm-font-lineHeight-lg);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-home__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-3);
+}
+
+/* Surface neutre bordée, sans image : la photothèque relève d'UX-DEC-003. */
+.cnpm-home__hero-aside {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20rem;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-home__hero-mark {
+  font-size: var(--cnpm-font-size-5xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  color: var(--cnpm-color-brand-blue-500);
+}
+
+.cnpm-home__metrics,
+.cnpm-home__structure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-home__section-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-2xl);
+  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-home__loading {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-home__metric-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-home__metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
+}
+
+.cnpm-home__metric-value {
+  font-size: var(--cnpm-font-size-3xl);
+  line-height: var(--cnpm-font-lineHeight-3xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-home__metric-unit {
+  font-size: var(--cnpm-font-size-xl);
+}
+
+.cnpm-home__metric-label {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-home__metric-date {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-home__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-home__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  min-width: 0;
+}
+
+.cnpm-home__card-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-home__card-text {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Sur mobile, l'ordre de la fiche est : titre, proposition, CTA, puis image. */
+@media (max-width: 1023px) {
+  .cnpm-home__hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--cnpm-space-6);
+  }
+  .cnpm-home__hero-aside {
+    min-height: 12rem;
+  }
+  .cnpm-home__title {
+    font-size: var(--cnpm-font-size-4xl);
+    line-height: var(--cnpm-font-lineHeight-4xl);
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-home {
+    padding: var(--cnpm-space-8) var(--cnpm-layout-pagePaddingMobile);
+    gap: var(--cnpm-space-12);
+  }
+  .cnpm-home__title {
+    font-size: var(--cnpm-font-size-3xl);
+    line-height: var(--cnpm-font-lineHeight-3xl);
+  }
+}

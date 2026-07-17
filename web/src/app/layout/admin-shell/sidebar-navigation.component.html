@@ -1,0 +1,67 @@
+<div class="cnpm-sidebar" [class.cnpm-sidebar--collapsed]="collapsed()">
+  <div class="cnpm-sidebar__brand">
+    <a class="cnpm-sidebar__wordmark" routerLink="/admin/members">
+      <abbr title="Conseil National du Patronat du Mali">CNPM</abbr>
+    </a>
+    <button
+      type="button"
+      class="cnpm-sidebar__drawer-close"
+      (click)="drawerClose.emit()"
+      aria-label="Fermer la navigation"
+    >
+      <svg lucideX [size]="iconSize.control"></svg>
+    </button>
+  </div>
+
+  <nav class="cnpm-sidebar__nav" aria-label="Navigation d’administration">
+    <ul class="cnpm-sidebar__list">
+      @for (entry of navigation; track entry.route) {
+        <li>
+          @if (entry.pending) {
+            <!-- Rubrique déclarée, écran non livré. Rendue en `span` : un lien vers une
+                 page inexistante est un défaut, pas un espace réservé. Le motif est
+                 écrit — « à venir » — et non porté par la seule atténuation. -->
+            <span
+              class="cnpm-sidebar__item cnpm-sidebar__item--pending"
+              aria-disabled="true"
+              aria-describedby="nav-pending"
+            >
+              <cnpm-admin-nav-icon [name]="entry.icon" />
+              <span class="cnpm-sidebar__label">{{ entry.label }}</span>
+              <span class="cnpm-sidebar__hint">à venir</span>
+            </span>
+          } @else {
+            <a
+              class="cnpm-sidebar__item"
+              [routerLink]="entry.route"
+              routerLinkActive="cnpm-sidebar__item--active"
+              (click)="drawerClose.emit()"
+            >
+              <cnpm-admin-nav-icon [name]="entry.icon" />
+              <span class="cnpm-sidebar__label">{{ entry.label }}</span>
+            </a>
+          }
+        </li>
+      }
+    </ul>
+    <p class="cnpm-sidebar__legend" id="nav-pending">
+      Les rubriques marquées « à venir » ne sont pas encore disponibles.
+    </p>
+  </nav>
+
+  <button
+    type="button"
+    class="cnpm-sidebar__collapse"
+    (click)="collapseToggle.emit()"
+    [attr.aria-expanded]="!collapsed()"
+    aria-controls="navigation-laterale"
+  >
+    @if (collapsed()) {
+      <svg lucidePanelLeftOpen [size]="iconSize.control"></svg>
+      <span class="cnpm-sidebar__label">Déployer la navigation</span>
+    } @else {
+      <svg lucidePanelLeftClose [size]="iconSize.control"></svg>
+      <span class="cnpm-sidebar__label">Réduire la navigation</span>
+    }
+  </button>
+</div>

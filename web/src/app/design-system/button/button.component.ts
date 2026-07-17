@@ -1,4 +1,6 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import type { CnpmButtonSize, CnpmButtonVariant } from '../../ui-contracts/button.contract';
 
 /**
@@ -7,26 +9,53 @@ import type { CnpmButtonSize, CnpmButtonVariant } from '../../ui-contracts/butto
  * Composant de présentation pur : aucune dépendance métier. L'état `loading`
  * désactive l'interaction et annonce l'occupation aux technologies d'assistance
  * via `aria-busy`, sans transmettre le statut par la seule couleur.
+ *
+ * Renseigner `routerLink` rend une ancre plutôt qu'un bouton. La distinction n'est
+ * pas cosmétique : un `<button routerLink>` navigue au clic mais n'a pas de `href`,
+ * donc ni ouverture dans un nouvel onglet, ni clic milieu, ni copie de l'adresse,
+ * et il s'annonce « bouton » là où l'utilisateur attend un lien.
  */
 @Component({
   selector: 'cnpm-button',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet, RouterLink],
   template: `
-    <button
-      [type]="inert() ? 'button' : type()"
-      [class]="classes()"
-      [class.cnpm-button--inert]="inert()"
-      [attr.aria-disabled]="inert() ? 'true' : null"
-      [attr.aria-busy]="loading() ? 'true' : null"
-      [attr.aria-label]="accessibleLabel() || null"
-      [attr.aria-describedby]="describedBy() || null"
-      (click)="onClick($event)"
-    >
+    <ng-template #content>
       @if (loading()) {
         <span class="cnpm-button__spinner" aria-hidden="true"></span>
       }
       <span class="cnpm-button__label"><ng-content /></span>
-    </button>
+    </ng-template>
+
+    @if (routerLink(); as destination) {
+      <a
+        [routerLink]="inert() ? null : destination"
+        [class]="classes()"
+        [class.cnpm-button--inert]="inert()"
+        [attr.role]="inert() ? 'link' : null"
+        [attr.tabindex]="inert() ? 0 : null"
+        [attr.aria-disabled]="inert() ? 'true' : null"
+        [attr.aria-busy]="loading() ? 'true' : null"
+        [attr.aria-label]="accessibleLabel() || null"
+        [attr.aria-describedby]="describedBy() || null"
+        (click)="onClick($event)"
+      >
+        <ng-container [ngTemplateOutlet]="content" />
+      </a>
+    } @else {
+      <button
+        [type]="inert() ? 'button' : type()"
+        [class]="classes()"
+        [class.cnpm-button--inert]="inert()"
+        [attr.aria-disabled]="inert() ? 'true' : null"
+        [attr.aria-busy]="loading() ? 'true' : null"
+        [attr.aria-label]="accessibleLabel() || null"
+        [attr.aria-describedby]="describedBy() || null"
+        (click)="onClick($event)"
+      >
+        <ng-container [ngTemplateOutlet]="content" />
+      </button>
+    }
   `,
   styleUrl: './button.component.scss',
 })
@@ -34,6 +63,7 @@ export class ButtonComponent {
   readonly variant = input<CnpmButtonVariant>('primary');
   readonly size = input<CnpmButtonSize>('md');
   readonly type = input<'button' | 'submit'>('button');
+  readonly routerLink = input<string | readonly unknown[] | null>(null);
   readonly loading = input(false);
   readonly disabled = input(false);
   readonly block = input(false);

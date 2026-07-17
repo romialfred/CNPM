@@ -1,0 +1,129 @@
+@use '../../../styles/tokens' as tokens;
+
+/* Topbar 72 px : valeur imposée par `.claude/rules/ux-ui.md`, lue dans le token. */
+.cnpm-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-4);
+  height: var(--cnpm-size-topbar);
+  flex: none;
+  padding: 0 var(--cnpm-layout-pagePaddingDesktop);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-topbar__drawer {
+  display: none;
+}
+
+.cnpm-topbar__search {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 34rem;
+}
+
+/* Le champ porte une étiquette réelle : un `placeholder` disparaît dès la saisie et
+   ne constitue pas un nom accessible. */
+.cnpm-topbar__search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-topbar__field {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  padding: 0 var(--cnpm-space-3);
+  height: var(--cnpm-size-control-md);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+/* Le contour porte le focus sur le groupe entier, l'input natif n'en ayant pas. */
+.cnpm-topbar__field:focus-within {
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-topbar__search-icon {
+  flex: none;
+  color: var(--cnpm-color-neutral-500);
+}
+
+.cnpm-topbar__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-topbar__identity {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  text-align: right;
+}
+
+.cnpm-topbar__name {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-topbar__role {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+@media (max-width: 1023px) {
+  .cnpm-topbar {
+    padding: 0 var(--cnpm-layout-pagePaddingTablet);
+  }
+
+  .cnpm-topbar__drawer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    /* Cible tactile de 44 px. */
+    width: var(--cnpm-size-control-lg);
+    height: var(--cnpm-size-control-lg);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-md);
+    background-color: transparent;
+    color: var(--cnpm-color-text-secondary);
+    cursor: pointer;
+  }
+
+  .cnpm-topbar__drawer:focus-visible {
+    outline: 2px solid var(--cnpm-color-brand-blue-700);
+    outline-offset: 2px;
+  }
+
+  .cnpm-topbar__field {
+    height: var(--cnpm-size-control-lg);
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-topbar {
+    padding: 0 var(--cnpm-layout-pagePaddingMobile);
+  }
+
+  .cnpm-topbar__identity {
+    display: none;
+  }
+}

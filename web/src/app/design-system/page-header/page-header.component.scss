@@ -1,0 +1,37 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-page-header__text {
+  min-width: 0;
+}
+
+.cnpm-page-header__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-2xl);
+  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-page-header__description {
+  margin: var(--cnpm-space-1) 0 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* La fiche BO-002 borne l'en-tête à quatre actions ; elles s'enroulent plutôt que
+   de déborder, le reflow à 320 px l'exigeant. */
+.cnpm-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}

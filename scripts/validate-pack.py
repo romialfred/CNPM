@@ -311,6 +311,13 @@ allowed_duplicate_sets = {
         "docs/ui-handoff/design-tokens/cnpm_theme.dart",
         "mobile/lib/design_system/cnpm_theme.dart",
     }),
+    # Fixtures déterministes du handoff, copiées dans le web comme les tokens : les
+    # écrans pilotes doivent afficher ces données et aucune autre. Une copie identique
+    # est préférable à une transcription dans le code, qui divergerait de la source.
+    frozenset({
+        "docs/ui-handoff/data/demo-fixtures.json",
+        "web/src/assets/demo-fixtures.json",
+    }),
     # Runners natifs générés par `flutter create`. Ces fichiers sont identiques
     # par construction dans le gabarit officiel Flutter : deux icônes de même
     # dimension effective, ou une configuration de build partagée entre variantes.

@@ -9,6 +9,14 @@ spring:
     # identifiant faible et versionné (fail-open). Le développement local
     # positionne DATABASE_PASSWORD via .env ; les tests le fixent par Testcontainers.
     password: ${DATABASE_PASSWORD}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    # Reprend les variables qui pilotent déjà le conteneur : sans configuration,
+    # l'application tentait `guest/guest` et la sonde de santé restait DOWN.
+    # Aucun repli sur les identifiants, pour la même raison que la base.
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
   flyway:
     enabled: true
     locations: classpath:db/migration

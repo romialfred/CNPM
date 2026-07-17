@@ -1,0 +1,202 @@
+@use '../../../styles/tokens' as tokens;
+
+/* Motif de retrait visuel réutilisé : le contenu reste dans l'arbre
+   d'accessibilité, seule sa peinture disparaît. `display: none` l'en retirerait. */
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.cnpm-sidebar__brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
+  height: var(--cnpm-size-topbar);
+  flex: none;
+  padding: 0 var(--cnpm-space-5);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-sidebar__wordmark {
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  color: var(--cnpm-color-text-brand);
+  text-decoration: none;
+}
+
+/* `abbr[title]` reçoit un soulignement pointillé par défaut : il parasite le
+   mot-symbole sans rien apporter, l'infobulle restant portée par `title`. */
+.cnpm-sidebar__wordmark abbr {
+  text-decoration: none;
+}
+
+.cnpm-sidebar__wordmark:focus-visible,
+.cnpm-sidebar__item:focus-visible,
+.cnpm-sidebar__collapse:focus-visible,
+.cnpm-sidebar__drawer-close:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-sidebar__nav {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--cnpm-space-3);
+  min-height: 0;
+}
+
+.cnpm-sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-md);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  text-decoration: none;
+  min-height: var(--cnpm-size-control-md);
+}
+
+a.cnpm-sidebar__item:hover {
+  background-color: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-sidebar__item--active {
+  background-color: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-sidebar__item--pending {
+  color: var(--cnpm-color-text-muted);
+  cursor: not-allowed;
+}
+
+.cnpm-sidebar__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cnpm-sidebar__hint {
+  flex: none;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-sidebar__legend {
+  @include visually-hidden;
+}
+
+.cnpm-sidebar__collapse {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  flex: none;
+  margin: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3);
+  min-height: var(--cnpm-size-control-md);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background-color: transparent;
+  color: var(--cnpm-color-text-secondary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  cursor: pointer;
+}
+
+.cnpm-sidebar__collapse:hover {
+  background-color: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-sidebar__drawer-close {
+  display: none;
+}
+
+/* État réduit : seuls les pictogrammes subsistent. Les libellés sortent de la
+   peinture mais restent annoncés — rétrécir la barre ne doit pas amputer la
+   navigation d'un lecteur d'écran. */
+.cnpm-sidebar--collapsed {
+  .cnpm-sidebar__label,
+  .cnpm-sidebar__hint,
+  .cnpm-sidebar__wordmark {
+    @include visually-hidden;
+  }
+
+  .cnpm-sidebar__item,
+  .cnpm-sidebar__collapse,
+  .cnpm-sidebar__brand {
+    justify-content: center;
+  }
+}
+
+/* Dans le tiroir, la barre est toujours large : l'état réduit du desktop ne doit
+   pas amputer les libellés d'un tiroir qui, lui, a la place. */
+@media (max-width: 1023px) {
+  .cnpm-sidebar--collapsed {
+    .cnpm-sidebar__label,
+    .cnpm-sidebar__hint,
+    .cnpm-sidebar__wordmark {
+      position: static;
+      width: auto;
+      height: auto;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+    }
+
+    .cnpm-sidebar__item,
+    .cnpm-sidebar__collapse,
+    .cnpm-sidebar__brand {
+      justify-content: flex-start;
+    }
+  }
+
+  .cnpm-sidebar__collapse {
+    display: none;
+  }
+
+  .cnpm-sidebar__drawer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: var(--cnpm-size-control-lg);
+    height: var(--cnpm-size-control-lg);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-md);
+    background-color: transparent;
+    color: var(--cnpm-color-text-secondary);
+    cursor: pointer;
+  }
+}

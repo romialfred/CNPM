@@ -1,0 +1,41 @@
+<header class="cnpm-topbar">
+  <button
+    type="button"
+    class="cnpm-topbar__drawer"
+    (click)="drawerToggle.emit()"
+    [attr.aria-expanded]="drawerOpen()"
+    aria-controls="navigation-laterale"
+    aria-label="Ouvrir la navigation"
+  >
+    <svg lucideMenu [size]="iconSize.control"></svg>
+  </button>
+
+  <!-- `role="search"` fournit le repère attendu par le catalogue (FRM-012).
+       La portée est restreinte aux membres et le libellé le dit : promettre une
+       recherche transverse qui n'existe pas serait un contrôle mensonger. -->
+  <form class="cnpm-topbar__search" role="search" (ngSubmit)="submit()">
+    <label class="cnpm-topbar__search-label" for="recherche-globale">
+      Rechercher un membre
+    </label>
+    <span class="cnpm-topbar__field">
+      <svg lucideSearch class="cnpm-topbar__search-icon" [size]="iconSize.control"></svg>
+      <input
+        id="recherche-globale"
+        class="cnpm-topbar__input"
+        type="search"
+        name="q"
+        autocomplete="off"
+        placeholder="Code membre, raison sociale, contact…"
+        [ngModel]="query()"
+        (ngModelChange)="query.set($event)"
+      />
+    </span>
+  </form>
+
+  @if (identity | async; as user) {
+    <div class="cnpm-topbar__identity">
+      <span class="cnpm-topbar__name">{{ user.displayName }}</span>
+      <span class="cnpm-topbar__role">{{ user.roleLabel }}</span>
+    </div>
+  }
+</header>

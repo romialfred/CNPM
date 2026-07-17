@@ -1,0 +1,113 @@
+@use '../../../styles/tokens' as tokens;
+
+/* Sidebar 252 px, marge de page 28 px : valeurs imposées par `.claude/rules/ux-ui.md`,
+   lues dans les tokens et jamais réécrites en dur. */
+.cnpm-admin {
+  display: grid;
+  grid-template-columns: var(--cnpm-size-sidebar-expanded) minmax(0, 1fr);
+  min-height: 100vh;
+  background-color: var(--cnpm-color-surface-page);
+}
+
+.cnpm-admin--collapsed {
+  grid-template-columns: var(--cnpm-size-sidebar-collapsed) minmax(0, 1fr);
+}
+
+/* Le lien d'évitement reste dans le flux et se révèle au focus : `display: none`
+   le retirerait du parcours clavier, ce qui annulerait sa raison d'être. */
+.cnpm-admin__skip {
+  position: absolute;
+  left: var(--cnpm-space-2);
+  top: calc(-1 * var(--cnpm-size-topbar));
+  z-index: 20;
+  padding: var(--cnpm-space-2) var(--cnpm-space-4);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+  transition: top var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+}
+
+.cnpm-admin__skip:focus-visible {
+  top: var(--cnpm-space-2);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-admin__sidebar {
+  min-width: 0;
+  border-right: 1px solid var(--cnpm-color-border-subtle);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-admin__frame {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cnpm-admin__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--cnpm-layout-pagePaddingDesktop);
+}
+
+.cnpm-admin__scrim {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .cnpm-admin,
+  .cnpm-admin--collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Hors tiroir ouvert, la barre sort de l'écran. `visibility: hidden` la retire du
+     parcours de tabulation — un simple `transform` la laisserait focalisable hors
+     champ, et le focus disparaîtrait sous l'œil de l'utilisateur. */
+  .cnpm-admin__sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 15;
+    width: var(--cnpm-size-sidebar-expanded);
+    max-width: 85vw;
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform var(--cnpm-motion-duration-normal) var(--cnpm-motion-easing-standard),
+      visibility var(--cnpm-motion-duration-normal) var(--cnpm-motion-easing-standard);
+  }
+
+  .cnpm-admin--drawer-open .cnpm-admin__sidebar {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .cnpm-admin__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 14;
+    /* Les tokens du handoff n'exportent aucun voile. La couleur dérive donc d'un
+       token existant plutôt que d'un hexadécimal arbitraire — et surtout pas d'un
+       `var()` inventé, qui retomberait en silence. */
+    background-color: color-mix(in srgb, var(--cnpm-color-neutral-950) 50%, transparent);
+  }
+
+  .cnpm-admin__main {
+    padding: var(--cnpm-layout-pagePaddingTablet);
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-admin__main {
+    padding: var(--cnpm-layout-pagePaddingMobile);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-admin__sidebar,
+  .cnpm-admin__skip {
+    transition: none;
+  }
+}

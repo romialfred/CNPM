@@ -1,6 +1,6 @@
 # État d'implémentation
 
-Dernière mise à jour : 2026-07-16. Branche `master`.
+Dernière mise à jour : 2026-07-17. Branche `master`.
 
 Ce document est le constat factuel de l'état réel du dépôt, établi par audit initial.
 Il prime sur toute affirmation d'avancement non accompagnée de preuve.
@@ -16,7 +16,7 @@ atteinte.
 | Périmètre | Cible documentée | État réel vérifié |
 |---|---|---|
 | Backend Java | 19 modules, 88 opérations | 2 fichiers Java (`Application`, `ProblemResponse`), 0 contrôleur, 0 test |
-| Web Angular | 101 écrans, 74 composants | 9 fichiers `.ts`, 0 composant de design system, 1 page placeholder |
+| Web Angular | 101 écrans, 74 composants | **4 écrans livrés** (AUTH-001 connexion et vérification, PUB-001, PUB-006, BO-002) ; **20 composants de design system** ; 2 shells sur 4 (`PublicShell`, `AdminShell`) |
 | Mobile Flutter | Architecture 4 couches, écrans P0 | 5 fichiers Dart ; `pubspec.lock` et runners `android/`/`ios/` absents |
 | PostgreSQL | 73 tables, immuabilité financière | **73 tables, correspondance exacte 1:1 ; 19/19 tables append-only protégées** |
 | Contrats API | 88 opérations | 88 opérations déclarées, **0 implémentée** |
@@ -132,3 +132,47 @@ exécution réelle. Corrigés ou consignés :
    documentaire, 0 % appliqué. Premier verrou avant tout endpoint.
 4. Composants de design system P0, puis `AUTH-001`, `PUB-001`, `PUB-006`, `BO-002`.
 5. CI : ajouter SAST, SBOM, scan de secrets dédié, SCA Maven et Dart.
+
+## 8. Écrans livrés
+
+Livrés selon la méthode « livrer d'abord, auditer ensuite » retenue par le
+commanditaire : un audit indépendant par écran en fin de lot, et non cinq passes.
+
+| Écran | Route | Fiche | Contrôles |
+|---|---|---|---|
+| AUTH-001 | `/auth/login`, `/auth/verify` | `ref-auth-001-login.md` | axe, focus, reflow, cibles tactiles |
+| PUB-006 | `/membres/:slug` | vitrine R4 | axe, SEO, consentement contact, badge |
+| PUB-001 | `/` | `ref-pub-001-home.md` | 7 scénarios, garde éprouvée par mutation |
+| BO-002 | `/admin/members` | `ref-bo-002-members-list.md` | 19 scénarios, 2 gardes éprouvées par mutation |
+
+**Total Playwright : 616 verts.** Les 24 échecs restants sont les baselines de
+régression visuelle, délibérément non générées — voir §4.
+
+### Ce que BO-002 ne livre pas, et pourquoi
+
+Aucun de ces écarts n'est un oubli ; chacun a sa décision ouverte.
+
+- Quatre des sept filtres de la maquette (secteur d'activité, région, niveau de
+  cotisation, période d'adhésion) : aucune donnée ne les alimente — DATA-DEC-002.
+- La cloche de notifications et le menu « Nouvelle action » du bandeau : aucune
+  source, et le compteur « 8 » de la maquette est un chiffre d'image — UX-DEC-014.
+- Les flux d'import et d'export : le « flux contrôlé avec rapport » qu'exige la
+  fiche n'est pas spécifié. Les boutons sont rendus inertes et annoncent leur
+  indisponibilité, plutôt que de conduire à un écran absent.
+- Le tiroir du panneau de synthèse sous 1440 px : non spécifié. La synthèse passe
+  sous la liste, ce qui la laisse lisible plutôt que masquée derrière un contrôle
+  inventé.
+
+### Écarts assumés par rapport à la maquette
+
+- **La maquette est incohérente sur ses propres totaux** : elle affiche 1 126
+  membres pour 3 842 actifs, et un total identique au nombre de dormants. La fiche
+  l'anticipe (« aucun total incohérent ») et `ux-ui.md` interdit de recopier les
+  chiffres faux d'une image générée. L'écran calcule ses agrégats depuis le jeu
+  qu'il affiche : 30 = 23 actifs + 7 dormants, prospects comptés à part.
+- **« Grand cotisant » n'est pas rendu comme un statut** mais comme un marqueur à
+  côté du statut — DATA-DEC-001.
+- **La table défile horizontalement sous 1672 px.** Ce n'est pas évitable : la fiche
+  veut dix colonnes *et* un panneau de 288 px, ce qui ne laisse que 820 px à la table
+  à 1440 px. La zone défilante est focalisable, porte `role="region"` et un libellé.
+  À 1672 px — la largeur de la maquette — la table tient sans défilement.

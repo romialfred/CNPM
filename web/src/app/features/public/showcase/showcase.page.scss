@@ -1,0 +1,209 @@
+/* Conteneur 1440 px maximum, comme le shell public. */
+.cnpm-showcase,
+.cnpm-showcase__status {
+  width: 100%;
+  max-width: var(--cnpm-size-publicMax);
+  margin: 0 auto;
+  padding: var(--cnpm-space-10) var(--cnpm-layout-pagePaddingDesktop);
+  min-width: 0;
+}
+
+.cnpm-showcase {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-12);
+}
+
+.cnpm-showcase__status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  max-width: 40rem;
+}
+
+.cnpm-showcase__status-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-2xl);
+  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-showcase__status-text {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Hero 5/7 (fiche PUB-006). `minmax(0, …)` empêche la piste de se dimensionner sur
+   le min-content de son contenu et de déborder. */
+.cnpm-showcase__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: var(--cnpm-space-8);
+}
+
+.cnpm-showcase__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-showcase__name {
+  margin: 0;
+  font-size: var(--cnpm-font-size-4xl);
+  line-height: var(--cnpm-font-lineHeight-4xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-showcase__tagline {
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  line-height: var(--cnpm-font-lineHeight-lg);
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-showcase__summary {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+/* Média : surface neutre bordée, sans image. La photothèque et les droits d'usage
+   relèvent d'UX-DEC-003 ; la fiche exige un hero crédible sans photo et interdit
+   l'image générée en production. */
+.cnpm-showcase__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16rem;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-subtle);
+}
+
+/* `blue-500` et non `blue-300` : sur la surface subtile, la teinte claire tombait à
+   1,72:1, sous le seuil de 3:1 exigé pour un grand texte. */
+.cnpm-showcase__media-initials {
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-5xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-brand-blue-500);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+}
+
+/* Navigation locale : repères de section, alignés sur les ancres rendues. */
+.cnpm-showcase__localnav {
+  border-block: 1px solid var(--cnpm-color-border-subtle);
+  padding-block: var(--cnpm-space-3);
+}
+
+.cnpm-showcase__localnav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-showcase__localnav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--cnpm-size-control-lg);
+  padding: 0 var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-md);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-link);
+  text-decoration: none;
+}
+
+.cnpm-showcase__localnav-link:hover {
+  background-color: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-showcase__localnav-link:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-showcase__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+  /* L'ancre ne colle pas sous l'en-tête collant. */
+  scroll-margin-top: var(--cnpm-space-16);
+}
+
+.cnpm-showcase__section-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xl);
+  line-height: var(--cnpm-font-lineHeight-xl);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-showcase__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-showcase__chip {
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-subtle);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Grille de cartes ; la carte elle-même est un composant du design system. */
+.cnpm-showcase__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* La responsabilité du contenu revient au membre (fiche PUB-006). */
+.cnpm-showcase__attribution {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* Sous 1024 px, le média secondaire disparaît et l'identité occupe la largeur. */
+@media (max-width: 1023px) {
+  .cnpm-showcase__hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--cnpm-space-6);
+  }
+  .cnpm-showcase__media {
+    display: none;
+  }
+  .cnpm-showcase__name {
+    font-size: var(--cnpm-font-size-3xl);
+    line-height: var(--cnpm-font-lineHeight-3xl);
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-showcase,
+  .cnpm-showcase__status {
+    padding: var(--cnpm-space-6) var(--cnpm-layout-pagePaddingMobile);
+    gap: var(--cnpm-space-8);
+  }
+}

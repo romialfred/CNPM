@@ -1,0 +1,62 @@
+<section class="cnpm-filters" aria-labelledby="filtres-titre">
+  <div class="cnpm-filters__head">
+    <h2 class="cnpm-filters__title" id="filtres-titre">
+      <svg lucideSlidersHorizontal [size]="iconSize.control" class="cnpm-filters__icon"></svg>
+      Recherche et filtres avancés
+      <!-- Le nombre de filtres actifs est écrit, pas seulement figuré par des chips :
+           le catalogue exige que le compte soit annoncé. -->
+      @if (chips().length) {
+        <span class="cnpm-filters__count">
+          {{ chips().length }} {{ chips().length === 1 ? 'filtre actif' : 'filtres actifs' }}
+        </span>
+      }
+    </h2>
+    <button
+      type="button"
+      class="cnpm-filters__toggle"
+      (click)="toggle()"
+      [attr.aria-expanded]="expanded()"
+      aria-controls="filtres-corps"
+    >
+      <span>{{ expanded() ? 'Replier' : 'Déplier' }}</span>
+      @if (expanded()) {
+        <svg lucideChevronUp [size]="iconSize.compact"></svg>
+      } @else {
+        <svg lucideChevronDown [size]="iconSize.compact"></svg>
+      }
+    </button>
+  </div>
+
+  <!-- Le corps est retiré du DOM quand il est replié : le laisser en `display: none`
+       conserverait ses champs dans le parcours de tabulation d'un panneau fermé. -->
+  @if (expanded()) {
+    <div class="cnpm-filters__body" id="filtres-corps">
+      <ng-content />
+    </div>
+  }
+
+  @if (chips().length) {
+    <ul class="cnpm-filters__chips" aria-label="Filtres actifs">
+      @for (chip of chips(); track chip.key) {
+        <li>
+          <span class="cnpm-filters__chip">
+            <span class="cnpm-filters__chip-label">{{ chip.label }}</span>
+            <button
+              type="button"
+              class="cnpm-filters__chip-remove"
+              (click)="chipRemove.emit(chip.key)"
+              [attr.aria-label]="'Retirer le filtre ' + chip.label"
+            >
+              <svg lucideX [size]="iconSize.dense"></svg>
+            </button>
+          </span>
+        </li>
+      }
+      <li>
+        <button type="button" class="cnpm-filters__reset" (click)="resetAll.emit()">
+          Réinitialiser tous les filtres
+        </button>
+      </li>
+    </ul>
+  }
+</section>

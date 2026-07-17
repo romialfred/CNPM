@@ -50,6 +50,24 @@ test('axe AUTH-001 — vérification 2FA', async ({ page }) => {
   await expectNoBlockingViolation(page);
 });
 
+test('axe PUB-006 — vitrine publique membre', async ({ page }) => {
+  await page.goto('/membres/somacop-sa');
+  await expect(page.getByRole('heading', { level: 1, name: 'SOMACOP SA' })).toBeVisible();
+  await expectNoBlockingViolation(page);
+});
+
+test('axe PUB-006 — vitrine non publiée', async ({ page }) => {
+  await page.goto('/membres/somacop-sa-brouillon');
+  await expect(page.getByText('Vitrine non publiée')).toBeVisible();
+  await expectNoBlockingViolation(page);
+});
+
+test('axe PUB-006 — vitrine introuvable', async ({ page }) => {
+  await page.goto('/membres/inconnu');
+  await expect(page.getByText('Vitrine introuvable')).toBeVisible();
+  await expectNoBlockingViolation(page);
+});
+
 test('axe AUTH-001 — session de connexion expirée', async ({ page }) => {
   // Sans défi actif, l'écran bascule en repli. L'alerte est ici de ton « warning »,
   // donc role="status" et non role="alert".
