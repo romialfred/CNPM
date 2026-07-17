@@ -3,15 +3,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  LucideDownload,
-  LucideInbox,
-  LucidePlus,
-  LucideSearchX,
-  LucideUpload,
-} from '@lucide/angular';
+import { LucideDownload, LucidePlus, LucideUpload } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { BulkActionBarComponent } from '../../../design-system/bulk-action-bar/bulk-action-bar.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -22,16 +15,20 @@ import type {
   SortState,
 } from '../../../design-system/data-table/data-table.model';
 import { FilterBarComponent, type FilterChip } from '../../../design-system/filter-bar/filter-bar.component';
+import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import {
   InsightSummaryComponent,
   type InsightStat,
 } from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
+import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import {
   MEMBERS_GATEWAY,
+  MembersAccessError,
   type MemberQuery,
   type MemberRow,
   type MemberStatus,
@@ -69,19 +66,19 @@ const DEFAULT_PAGE_SIZE = 10;
     DecimalPipe,
     FormsModule,
     AdminShellComponent,
-    AlertComponent,
     BadgeComponent,
     BulkActionBarComponent,
     ButtonComponent,
     DataTableComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
     FilterBarComponent,
     InsightSummaryComponent,
     PageHeaderComponent,
     PaginationComponent,
+    SkeletonComponent,
     LucideDownload,
-    LucideInbox,
     LucidePlus,
-    LucideSearchX,
     LucideUpload,
   ],
   templateUrl: './members.page.html',
@@ -143,15 +140,36 @@ export class MembersPage {
   }));
 
   /**
+   * Relance manuelle d'une erreur récupérable. Incrémenter ce compteur ré-émet la
+   * même requête sans toucher à l'URL : le « Réessayer » de l'état d'erreur relance le
+   * chargement en place, comme l'exige la matrice `loading-empty-error.md`, plutôt que
+   * de forcer un rechargement de page entière.
+   */
+  private readonly retryTick = signal(0);
+
+  private readonly fetchTrigger = computed(() => ({ query: this.query(), tick: this.retryTick() }));
+
+  /**
    * `switchMap` abandonne la requête précédente dès qu'un filtre change : sans lui,
    * une réponse lente à un filtre déjà abandonné écraserait la réponse courante.
+   *
+   * Un refus d'accès (403) est distingué d'une panne temporaire : le premier n'est pas
+   * « réessayable », le second l'est.
    */
   private readonly result = toSignal(
-    toObservable(this.query).pipe(
-      switchMap((query) =>
+    toObservable(this.fetchTrigger).pipe(
+      switchMap(({ query }) =>
         this.gateway.search(query).pipe(
           map((page) => ({ kind: 'ready' as const, page })),
-          catchError(() => of({ kind: 'error' as const })),
+          // Deux objets distincts, pas un `kind` à type-union : c'est ce qui permet à
+          // `tableState()` de discriminer proprement 'forbidden' de 'error'.
+          catchError((error: unknown) =>
+            of(
+              error instanceof MembersAccessError
+                ? ({ kind: 'forbidden' as const })
+                : ({ kind: 'error' as const }),
+            ),
+          ),
           startWith({ kind: 'loading' as const }),
         ),
       ),
@@ -181,6 +199,9 @@ export class MembersPage {
     }
     if (result.kind === 'error') {
       return 'error';
+    }
+    if (result.kind === 'forbidden') {
+      return 'forbidden';
     }
     if (result.page.rows.length > 0) {
       return 'ready';
@@ -341,6 +362,11 @@ export class MembersPage {
 
   protected clearSelection(): void {
     this.selected.set(new Set());
+  }
+
+  /** Relance le chargement après une erreur récupérable, sans recharger la page. */
+  protected retry(): void {
+    this.retryTick.update((tick) => tick + 1);
   }
 
   private patch(params: Record<string, string | number | null>): void {

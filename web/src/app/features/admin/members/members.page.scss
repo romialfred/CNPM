@@ -156,32 +156,6 @@
   gap: var(--cnpm-space-1);
 }
 
-.cnpm-members__state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--cnpm-space-2);
-  margin: 0;
-  text-align: center;
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-members__state-icon {
-  color: var(--cnpm-color-neutral-400);
-}
-
-.cnpm-members__state-title {
-  margin: 0;
-  font-size: var(--cnpm-font-size-md);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-members__state-text {
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-}
-
 .cnpm-members__aside {
   display: flex;
   flex-direction: column;

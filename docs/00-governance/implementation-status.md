@@ -141,12 +141,65 @@ commanditaire : un audit indépendant par écran en fin de lot, et non cinq pass
 | Écran | Route | Fiche | Contrôles |
 |---|---|---|---|
 | AUTH-001 | `/auth/login`, `/auth/verify` | `ref-auth-001-login.md` | axe, focus, reflow, cibles tactiles |
+| AUTH-008 | `/auth/session-ended` | `loading-empty-error.md` (ligne « Session expirée ») | axe, h1 unique, reflow 320 px |
 | PUB-006 | `/membres/:slug` | vitrine R4 | axe, SEO, consentement contact, badge |
 | PUB-001 | `/` | `ref-pub-001-home.md` | 7 scénarios, garde éprouvée par mutation |
 | BO-002 | `/admin/members` | `ref-bo-002-members-list.md` | 19 scénarios, 2 gardes éprouvées par mutation |
 
-**Total Playwright : 616 verts.** Les 24 échecs restants sont les baselines de
-régression visuelle, délibérément non générées — voir §4.
+**Total Playwright : 672 verts + 60 tests unitaires.** Les 24 échecs restants sont
+les baselines de régression visuelle, délibérément non générées — voir §4.
+
+### Socle d'états (LOT 1, « premier passif »)
+
+Le pattern `loading-empty-error.md` impose à tout écran de couvrir chargement, vide,
+aucun résultat, erreur, accès interdit et session expirée, avec la règle dure « ne
+jamais afficher une page blanche ou un spinner indéfini ». Les cinq composants
+correspondants manquaient ; ils sont désormais livrés et réutilisés.
+
+| Composant | Catalogue | États |
+|---|---|---|
+| `Skeleton` | FDB-005 | text, table, card, chart ; barres `aria-hidden`, occupation annoncée une fois |
+| `EmptyState` | FDB-006 | first-use, no-results, no-data — réellement distincts |
+| `ErrorState` | FDB-007 | recoverable, forbidden, not-found, offline, + session-ended (extension assumée) |
+| `Toast` | FDB-003 | régions vivantes pré-montées ; erreurs et actions persistantes |
+| `InlineErrorSummary` | FDB-004 | reçoit le focus à l'apparition, lie chaque erreur à son champ |
+
+BO-002 a été reposé sur ces composants : ses états inline ont disparu au profit du
+socle partagé. La dette de vocabulaire signalée par le plan (`badge` exposait
+`critical` là où `status.contract.ts` impose `error`) est soldée.
+
+Ce que ce lot NE livre PAS de LOT 1 : Storybook, la refonte de `PublicShell`, les
+primitives `Section`/`Card`/`Link`/`IconButton`/`Breadcrumb`. Le socle d'états — le
+« premier passif » que le plan place avant tout — est fait ; le reste de LOT 1 suit.
+
+### Audit indépendant du socle (règle de non-auto-validation)
+
+Le socle a été audité par des sous-agents indépendants du développeur — quatre
+réviseurs spécialisés (accessibilité, correction, architecture, tests), puis chaque
+constat soumis à deux sceptiques chargés de le réfuter. **13 constats soumis : 8
+confirmés (≥ 2 sceptiques), 5 réfutés.** Les 8 confirmés ont tous été corrigés dans
+le même incrément.
+
+Corrections issues de l'audit :
+
+- **BO-002 ne gérait ni « accès interdit » ni la relance après erreur** (2 des 6 états
+  de la fiche). Ajout de l'état `forbidden` et d'une action « Réessayer » sur l'erreur
+  récupérable, avec un test unitaire de `MembersPage` qui pilote ces états par un port
+  contrôlable (chargement, erreur + relance, 403).
+- **`VerificationBadge` : `id` de panneau statique** → identifiants dupliqués dès deux
+  badges sur une page. Rendu unique par instance (WCAG 4.1.1/4.1.2).
+- **Garde anti-piège-de-focus de `InlineErrorSummary` non testée** → ajout d'un test
+  N→M sans re-focus et d'un test de cycle, éprouvés par mutation.
+- **`ToastOutlet`, badge, variants `card`/`chart` du Skeleton non couverts** → specs
+  ajoutées ; le routage polite/assertif des toasts est éprouvé par mutation.
+
+Réfutés à bon droit (exemples) : l'état « première utilisation » sans bouton propre
+(l'action primaire « Nouveau membre » de l'en-tête domine déjà la zone — dupliquer
+violerait « une seule action primaire par zone ») ; le texte générique de l'état
+`forbidden` (aucun lien ni destination inventée, donc hors du champ d'UX-DEC-011).
+
+Total après corrections : **78 tests unitaires + 672 Playwright**, tous verts hors
+baselines visuelles délibérément non générées.
 
 ### Ce que BO-002 ne livre pas, et pourquoi
 

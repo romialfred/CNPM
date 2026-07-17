@@ -1,0 +1,45 @@
+@use '../../../styles/tokens' as tokens;
+
+/* Bord sémantique léger plutôt qu'un bloc saturé : `feedback-states.md` proscrit les
+   grands aplats de couleur. */
+.cnpm-error-summary {
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-semantic-error-100);
+  border-left: 3px solid var(--cnpm-color-semantic-error-600);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-semantic-error-50);
+}
+
+/* La cible du focus programmatique doit rester visible : le résumé reçoit le focus à
+   l'apparition, il faut donc que ce focus se voie. */
+.cnpm-error-summary:focus-visible,
+.cnpm-error-summary:focus {
+  outline: 2px solid var(--cnpm-color-semantic-error-700);
+  outline-offset: 2px;
+}
+
+.cnpm-error-summary__title {
+  margin: 0 0 var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-semantic-error-700);
+}
+
+.cnpm-error-summary__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  margin: 0;
+  padding-left: var(--cnpm-space-5);
+}
+
+.cnpm-error-summary__link {
+  color: var(--cnpm-color-semantic-error-700);
+  font-size: var(--cnpm-font-size-sm);
+  text-decoration: underline;
+}
+
+.cnpm-error-summary__link:focus-visible {
+  outline: 2px solid var(--cnpm-color-semantic-error-700);
+  outline-offset: 2px;
+}

@@ -24,6 +24,13 @@ export const authRoutes: Routes = [
         loadComponent: () => import('./verify.page').then((m) => m.VerifyPage),
         title: 'Vérification — CNPM',
       },
+      {
+        // AUTH-008 : atteint après expiration de session. Aucun garde de gateway —
+        // c'est un écran d'information, pas une étape d'authentification.
+        path: 'session-ended',
+        loadComponent: () => import('./session-ended.page').then((m) => m.SessionEndedPage),
+        title: 'Session expirée — CNPM',
+      },
       { path: '', pathMatch: 'full', redirectTo: 'login' },
     ],
   },

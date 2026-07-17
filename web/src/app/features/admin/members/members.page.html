@@ -187,41 +187,56 @@
             </td>
           </ng-template>
 
+          <!-- Les états de la table s'appuient sur les composants du socle (FDB-005/006/007) :
+               chargement, base vide, filtre sans résultat et erreur ne sont plus
+               réécrits localement. « base vide » et « aucun résultat » restent bien
+               distincts — le premier invite à créer, le second à élargir la recherche. -->
           <div data-table-status>
             @switch (tableState()) {
               @case ('loading') {
-                <p class="cnpm-members__state" role="status" aria-live="polite">
-                  Chargement des membres…
-                </p>
+                <cnpm-skeleton
+                  variant="table"
+                  [rows]="pageSize()"
+                  [columns]="columns.length"
+                  label="Chargement des membres…"
+                />
               }
               @case ('empty') {
-                <div class="cnpm-members__state">
-                  <svg lucideInbox [size]="iconSize.empty" class="cnpm-members__state-icon"></svg>
-                  <p class="cnpm-members__state-title">Aucun membre enregistré</p>
-                  <p class="cnpm-members__state-text">
-                    La base de membres est vide. Créez un premier membre pour commencer.
-                  </p>
-                </div>
+                <cnpm-empty-state
+                  variant="first-use"
+                  title="Aucun membre enregistré"
+                  description="La base de membres est vide. Créez un premier membre pour commencer."
+                />
               }
               @case ('noResult') {
-                <div class="cnpm-members__state" role="status" aria-live="polite">
-                  <svg lucideSearchX [size]="iconSize.empty" class="cnpm-members__state-icon"></svg>
-                  <p class="cnpm-members__state-title">Aucun membre ne correspond</p>
-                  <p class="cnpm-members__state-text">
-                    Élargissez la recherche ou retirez un filtre.
-                  </p>
+                <cnpm-empty-state
+                  variant="no-results"
+                  title="Aucun membre ne correspond"
+                  description="Élargissez la recherche ou retirez un filtre."
+                >
                   <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
                     Réinitialiser les filtres
                   </cnpm-button>
-                </div>
+                </cnpm-empty-state>
               }
               @case ('error') {
-                <div class="cnpm-members__state">
-                  <cnpm-alert tone="error" title="La liste n’a pas pu être chargée">
-                    Le service des membres est momentanément indisponible. Vos filtres
-                    sont conservés.
-                  </cnpm-alert>
-                </div>
+                <cnpm-error-state
+                  variant="recoverable"
+                  title="La liste n’a pas pu être chargée"
+                  description="Le service des membres est momentanément indisponible. Vos filtres sont conservés."
+                >
+                  <!-- La matrice loading-empty-error impose « réessayer » : le bouton
+                       relance le chargement en place, sans recharger toute la page. -->
+                  <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                    Réessayer
+                  </cnpm-button>
+                </cnpm-error-state>
+              }
+              @case ('forbidden') {
+                <!-- Accès refusé (403) : la fiche exige cet état. Aucune action
+                     « réessayer » — répéter une requête que le droit condamne n'a pas
+                     de sens ; l'état d'erreur en donne la raison générique. -->
+                <cnpm-error-state variant="forbidden" />
               }
             }
           </div>

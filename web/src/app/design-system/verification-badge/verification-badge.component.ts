@@ -54,8 +54,15 @@ export class VerificationBadgeComponent {
   /** Date à laquelle le CNPM a constaté le statut ; omise si la source ne la porte pas. */
   readonly verifiedAt = input<string | null>(null);
 
+  private static nextId = 0;
+
   protected readonly expanded = signal(false);
-  protected readonly panelId = 'cnpm-verification-panel';
+
+  // Identifiant unique par instance : `aria-controls` et `[id]` doivent se
+  // correspondre sans ambiguïté. Un identifiant constant produirait des `id` dupliqués
+  // dès que deux badges coexistent sur une page (annuaire, liste de vitrines), rendant
+  // `aria-controls` ambigu — WCAG 4.1.1/4.1.2.
+  protected readonly panelId = `cnpm-verification-panel-${VerificationBadgeComponent.nextId++}`;
 
   private static readonly PRESENTATION: Record<
     CnpmVerificationStatus,
@@ -64,7 +71,7 @@ export class VerificationBadgeComponent {
     VERIFIED: { tone: 'success', label: 'Membre vérifié par le CNPM' },
     PENDING: { tone: 'info', label: 'Vérification en cours' },
     EXPIRED: { tone: 'warning', label: 'Vérification expirée' },
-    SUSPENDED: { tone: 'critical', label: 'Membre suspendu' },
+    SUSPENDED: { tone: 'error', label: 'Membre suspendu' },
   };
 
   protected readonly tone = computed(

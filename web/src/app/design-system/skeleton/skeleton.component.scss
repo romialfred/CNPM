@@ -1,0 +1,111 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-skeleton {
+  display: block;
+  min-width: 0;
+}
+
+/* Le statut est lu par les technologies d'assistance sans doubler visuellement les
+   barres, qui portent déjà l'attente à l'écran. */
+.cnpm-skeleton__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-skeleton__bones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-skeleton__line,
+.cnpm-skeleton__cell,
+.cnpm-skeleton__bar {
+  display: block;
+  border-radius: var(--cnpm-radius-sm);
+  background-color: var(--cnpm-color-surface-subtle);
+  /* L'animation de pulsation signale que le contenu arrive ; elle est purement
+     esthétique et se coupe en mouvement réduit. */
+  animation: cnpm-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.cnpm-skeleton__line {
+  height: var(--cnpm-space-4);
+}
+
+.cnpm-skeleton__line--title {
+  height: var(--cnpm-space-6);
+  width: 60%;
+}
+
+.cnpm-skeleton__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+}
+
+.cnpm-skeleton__row {
+  display: flex;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-skeleton__cell {
+  flex: 1 1 0;
+  height: var(--cnpm-space-4);
+}
+
+.cnpm-skeleton__row--head .cnpm-skeleton__cell {
+  height: var(--cnpm-space-5);
+}
+
+.cnpm-skeleton__chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--cnpm-space-3);
+  height: 12rem;
+}
+
+.cnpm-skeleton__bar {
+  flex: 1 1 0;
+  /* Hauteurs variées pour évoquer un graphe, sans laisser croire à une donnée réelle. */
+  height: 55%;
+}
+
+.cnpm-skeleton__bar:nth-child(2n) {
+  height: 80%;
+}
+
+.cnpm-skeleton__bar:nth-child(3n) {
+  height: 40%;
+}
+
+@keyframes cnpm-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* En mouvement réduit, la pulsation s'arrête : l'ossature reste visible et statique
+   plutôt que de clignoter. */
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-skeleton__line,
+  .cnpm-skeleton__cell,
+  .cnpm-skeleton__bar {
+    animation: none;
+  }
+}

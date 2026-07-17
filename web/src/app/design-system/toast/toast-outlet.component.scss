@@ -1,0 +1,109 @@
+@use '../../../styles/tokens' as tokens;
+
+/* Les toasts s'empilent en bas à droite, au-dessus du reste. La pile ne capte pas le
+   pointeur ; chaque toast le réactive, pour ne pas masquer la page dessous. */
+.cnpm-toasts {
+  position: fixed;
+  right: var(--cnpm-space-4);
+  bottom: var(--cnpm-space-4);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  width: min(24rem, calc(100vw - var(--cnpm-space-8)));
+  pointer-events: none;
+}
+
+.cnpm-toasts__region {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-left: 3px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  box-shadow: var(--cnpm-shadow-md);
+  pointer-events: auto;
+}
+
+/* Le bord coloré double le pictogramme : la nature du toast ne tient jamais à la seule
+   teinte du fond. */
+.cnpm-toast--success {
+  border-left-color: var(--cnpm-color-semantic-success-600);
+}
+.cnpm-toast--success .cnpm-toast__icon {
+  color: var(--cnpm-color-semantic-success-600);
+}
+
+.cnpm-toast--error {
+  border-left-color: var(--cnpm-color-semantic-error-600);
+}
+.cnpm-toast--error .cnpm-toast__icon {
+  color: var(--cnpm-color-semantic-error-600);
+}
+
+.cnpm-toast--info {
+  border-left-color: var(--cnpm-color-semantic-info-600);
+}
+.cnpm-toast--info .cnpm-toast__icon {
+  color: var(--cnpm-color-semantic-info-600);
+}
+
+.cnpm-toast__icon {
+  display: inline-flex;
+  flex: none;
+  margin-top: 0.125rem;
+}
+
+.cnpm-toast__message {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-toast__action {
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--cnpm-color-text-brand);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cnpm-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--cnpm-space-6);
+  height: var(--cnpm-space-6);
+  border: none;
+  border-radius: var(--cnpm-radius-sm);
+  background: transparent;
+  color: var(--cnpm-color-text-muted);
+  cursor: pointer;
+}
+
+.cnpm-toast__close:hover {
+  background-color: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-toast__action:focus-visible,
+.cnpm-toast__close:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}

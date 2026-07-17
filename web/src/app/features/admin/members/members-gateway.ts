@@ -81,3 +81,17 @@ export interface MembersGateway {
 }
 
 export const MEMBERS_GATEWAY = new InjectionToken<MembersGateway>('MEMBERS_GATEWAY');
+
+/**
+ * Erreur d'autorisation levée par le port lorsque le backend refuse l'accès (403).
+ *
+ * L'écran distingue ce cas d'une panne temporaire : un refus de droit ne se « réessaie »
+ * pas — le proposer inviterait à répéter une action condamnée. L'adaptateur HTTP réel
+ * lèvera cette erreur sur un 403 ; l'écran la traduit en état « accès refusé ».
+ */
+export class MembersAccessError extends Error {
+  constructor(message = 'Accès refusé à la liste des membres') {
+    super(message);
+    this.name = 'MembersAccessError';
+  }
+}

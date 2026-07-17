@@ -1,0 +1,44 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-10) var(--cnpm-space-4);
+  text-align: center;
+  min-width: 0;
+}
+
+.cnpm-empty__icon {
+  display: inline-flex;
+  color: var(--cnpm-color-neutral-400);
+}
+
+.cnpm-empty__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-empty__description {
+  margin: 0;
+  max-width: 32rem;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Réservé mais non peint tant qu'aucune action n'est projetée : `:empty` évite un
+   espacement fantôme sous les états qui n'ont pas de prochaine action. */
+.cnpm-empty__action:empty {
+  display: none;
+}
+
+.cnpm-empty__action {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--cnpm-space-2);
+  margin-top: var(--cnpm-space-2);
+}

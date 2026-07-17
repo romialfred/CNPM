@@ -1,6 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-export type CnpmBadgeTone = 'neutral' | 'success' | 'warning' | 'critical' | 'info';
+// Vocabulaire aligné sur `ui-contracts/status.contract.ts` et sur FDB-001, qui
+// imposent tous deux `error`. Le composant employait `critical`, en contradiction avec
+// sa propre couche de contrats — une même sémantique nommée de deux façons finit par
+// diverger d'un écran à l'autre.
+export type CnpmBadgeTone = 'neutral' | 'success' | 'warning' | 'error' | 'info';
 
 /**
  * Étiquette d'état du design system.

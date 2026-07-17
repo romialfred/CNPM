@@ -1,0 +1,63 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-10) var(--cnpm-space-4);
+  text-align: center;
+  min-width: 0;
+}
+
+.cnpm-error__icon {
+  display: inline-flex;
+}
+
+/* La teinte du pictogramme double le titre, jamais le contraire : le titre porte
+   seul le sens, la couleur ne fait que le renforcer. */
+.cnpm-error--recoverable .cnpm-error__icon {
+  color: var(--cnpm-color-semantic-error-600);
+}
+
+.cnpm-error--forbidden .cnpm-error__icon {
+  color: var(--cnpm-color-semantic-error-600);
+}
+
+.cnpm-error--not-found .cnpm-error__icon {
+  color: var(--cnpm-color-neutral-400);
+}
+
+.cnpm-error--offline .cnpm-error__icon {
+  color: var(--cnpm-color-semantic-warning-600);
+}
+
+.cnpm-error--session-ended .cnpm-error__icon {
+  color: var(--cnpm-color-semantic-info-600);
+}
+
+.cnpm-error__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-error__description {
+  margin: 0;
+  max-width: 34rem;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-error__action:empty {
+  display: none;
+}
+
+.cnpm-error__action {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--cnpm-space-2);
+  margin-top: var(--cnpm-space-2);
+}
