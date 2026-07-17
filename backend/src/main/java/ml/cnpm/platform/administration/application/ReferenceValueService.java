@@ -106,22 +106,23 @@ public class ReferenceValueService {
                     "La valeur a été modifiée entre-temps ; rechargez-la avant de réessayer.");
         }
         if (patch.isEmpty()) {
-            // Rien à modifier : on renvoie l'état courant sans incrémenter la version ni
+            // Aucun champ fourni : on renvoie l'état courant sans incrémenter la version ni
             // produire un audit — un événement « mise à jour » sans changement serait un
             // faux positif de trace (before_hash == after_hash).
             return existing;
         }
 
         ReferenceValue updated = repository.update(id, patch);
+        String before = fingerprint(existing);
+        String after = fingerprint(updated);
+        if (before.equals(after)) {
+            // Champs fournis mais valeurs identiques : Hibernate n'émet aucun UPDATE et
+            // n'incrémente pas la version. Pas d'audit, sinon faux positif (before == after).
+            return updated;
+        }
         auditRecorder.record(
                 new AuditEntry(
-                        "USER",
-                        actorUserId,
-                        ACTION_UPDATED,
-                        ENTITY_TYPE,
-                        updated.id(),
-                        fingerprint(existing),
-                        fingerprint(updated),
+                        "USER", actorUserId, ACTION_UPDATED, ENTITY_TYPE, updated.id(), before, after,
                         correlationId));
         return updated;
     }

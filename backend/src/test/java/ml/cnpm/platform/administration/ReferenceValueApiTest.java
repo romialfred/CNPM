@@ -461,6 +461,32 @@ class ReferenceValueApiTest {
     }
 
     @Test
+    void doesNotAuditWhenTheUpdateChangesNothing() throws Exception {
+        String created = createAndReturnBody("TEST_NOOP", "U9", "Inchangé");
+        String id = JsonPath.read(created, "$.id");
+        Integer version = JsonPath.read(created, "$.version");
+
+        // Resoumission de la même valeur (champ fourni mais identique) : 200, aucun UPDATE
+        // réel (version inchangée) donc aucun faux audit dans le journal append-only.
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", String.valueOf(version))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"Inchangé\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value(version));
+
+        Integer updateAudits =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.audit_event WHERE entity_id = ?::uuid "
+                                + "AND action_code = 'REFERENCE_VALUE.UPDATED'",
+                        Integer.class,
+                        id);
+        org.junit.jupiter.api.Assertions.assertEquals(0, updateAudits);
+    }
+
+    @Test
     void rejectsAnUpdateOnAStaleVersion() throws Exception {
         String created = createAndReturnBody("TEST_STALE", "U2", "Avant");
         String id = JsonPath.read(created, "$.id");

@@ -95,4 +95,20 @@ class OrganizationEntity {
     long getVersion() {
         return version == null ? 0L : version;
     }
+
+    void applyLegalName(String value) {
+        this.legalName = value;
+    }
+
+    void applyTradeName(String value) {
+        this.tradeName = value;
+    }
+
+    void applyOrganizationType(String value) {
+        this.organizationType = value;
+    }
+
+    void applySectorCode(String value) {
+        this.sectorCode = value;
+    }
 }

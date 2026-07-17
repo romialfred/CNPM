@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,6 +81,27 @@ public class OrganizationController {
     @GetMapping("/organizations/{id}")
     public OrganizationView get(@PathVariable("id") UUID id) {
         return OrganizationView.from(service.get(id));
+    }
+
+    /**
+     * {@code PATCH /organizations/{id}} — modification partielle des champs descriptifs, sous
+     * verrou optimiste. L'en-tête {@code If-Match} porte la version connue du client ; un
+     * écart avec la version courante produit un 409. 404 si l'entreprise est absente.
+     */
+    @PatchMapping("/organizations/{id}")
+    public OrganizationView update(
+            @PathVariable("id") UUID id,
+            @RequestHeader(name = "If-Match") long expectedVersion,
+            @Valid @RequestBody OrganizationUpdateInput input,
+            JwtAuthenticationToken authentication,
+            HttpServletRequest request) {
+        return OrganizationView.from(
+                service.update(
+                        id,
+                        expectedVersion,
+                        input.toPatch(),
+                        actorId(authentication),
+                        CorrelationId.current(request)));
     }
 
     /**

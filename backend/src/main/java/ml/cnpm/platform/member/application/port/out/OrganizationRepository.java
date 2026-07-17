@@ -3,6 +3,7 @@ package ml.cnpm.platform.member.application.port.out;
 import java.util.Optional;
 import java.util.UUID;
 import ml.cnpm.platform.member.application.OrganizationDraft;
+import ml.cnpm.platform.member.application.OrganizationPatch;
 import ml.cnpm.platform.member.application.OrganizationQuery;
 import ml.cnpm.platform.member.domain.Organization;
 import ml.cnpm.platform.shared.api.PageResult;
@@ -33,4 +34,11 @@ public interface OrganizationRepository {
      * doublon lève une violation d'intégrité, traduite en conflit d'état en amont.
      */
     Organization create(OrganizationDraft draft);
+
+    /**
+     * Applique une modification partielle à l'entreprise et retourne son état résultant. Le
+     * verrou optimiste ({@code @Version}) au flush lève une exception si une modification
+     * concurrente est survenue entre-temps, traduite en conflit d'état en amont.
+     */
+    Organization update(UUID id, OrganizationPatch patch);
 }

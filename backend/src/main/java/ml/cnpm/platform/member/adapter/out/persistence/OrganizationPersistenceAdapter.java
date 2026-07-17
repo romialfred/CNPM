@@ -7,7 +7,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.NoSuchElementException;
 import ml.cnpm.platform.member.application.OrganizationDraft;
+import ml.cnpm.platform.member.application.OrganizationPatch;
 import ml.cnpm.platform.member.application.OrganizationQuery;
 import ml.cnpm.platform.member.application.port.out.OrganizationRepository;
 import ml.cnpm.platform.member.domain.Organization;
@@ -97,6 +99,29 @@ class OrganizationPersistenceAdapter implements OrganizationRepository {
                         draft.identifierType(),
                         draft.identifierValue()));
         return toDomain(saved);
+    }
+
+    @Override
+    public Organization update(UUID id, OrganizationPatch patch) {
+        // Entité gérée : on applique les champs fournis, le flush déclenche le contrôle
+        // @Version (une modification concurrente lève un verrou optimiste, traduit en 409).
+        OrganizationEntity entity =
+                jpaRepository
+                        .findById(id)
+                        .orElseThrow(() -> new NoSuchElementException("organization " + id));
+        if (patch.legalName() != null) {
+            entity.applyLegalName(patch.legalName());
+        }
+        if (patch.tradeName() != null) {
+            entity.applyTradeName(patch.tradeName());
+        }
+        if (patch.organizationType() != null) {
+            entity.applyOrganizationType(patch.organizationType());
+        }
+        if (patch.sectorCode() != null) {
+            entity.applySectorCode(patch.sectorCode());
+        }
+        return toDomain(jpaRepository.saveAndFlush(entity));
     }
 
     private static Specification<OrganizationEntity> toSpecification(OrganizationQuery query) {

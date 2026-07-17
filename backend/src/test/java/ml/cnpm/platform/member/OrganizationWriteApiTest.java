@@ -2,6 +2,7 @@ package ml.cnpm.platform.member;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -295,6 +296,204 @@ class OrganizationWriteApiTest {
                                 .header("Idempotency-Key", IDEMPOTENCY_KEY)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(body("Anonyme SA", "RCCM", "ML-2024-H-008")))
+                .andExpect(status().isUnauthorized());
+    }
+
+    private void insertOrganizationRow(String id, String legalName) {
+        jdbcTemplate.update(
+                "INSERT INTO member.organization "
+                        + "(id, legal_name, organization_type, status, risk_level, version) "
+                        + "VALUES (?::uuid, ?, 'PME', 'ACTIVE', 'NORMAL', 0)",
+                id,
+                legalName);
+    }
+
+    @Test
+    void updatesAnOrganizationUnderOptimisticLock() throws Exception {
+        String id = "22222222-1111-0000-0000-000000000001";
+        insertOrganizationRow(id, "Original SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"Nouvelle Raison SA\", \"sectorCode\": \"BTP\" }")
+                                .with(asMemberWriter()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.legalName").value("Nouvelle Raison SA"))
+                .andExpect(jsonPath("$.sectorCode").value("BTP"))
+                // Champ non fourni inchangé, version incrémentée par le verrou optimiste.
+                .andExpect(jsonPath("$.organizationType").value("PME"))
+                .andExpect(jsonPath("$.version").value(1));
+
+        // L'audit porte des empreintes avant/après réelles (non nulles).
+        org.junit.jupiter.api.Assertions.assertEquals(
+                1L,
+                count(
+                        "SELECT count(*) FROM audit.audit_event "
+                                + "WHERE entity_id = ?::uuid AND action_code = 'ORGANIZATION.UPDATED' "
+                                + "AND before_hash IS NOT NULL AND after_hash IS NOT NULL "
+                                + "AND before_hash <> after_hash",
+                        id));
+    }
+
+    @Test
+    void recordsTheKeycloakSubjectAsAuditActor() throws Exception {
+        String id = "22222222-1111-0000-0000-000000000021";
+        String actor = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+        insertOrganizationRow(id, "Acteur SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"Acteur Modifié SA\" }")
+                                .with(
+                                        jwt().jwt(j -> j.subject(actor))
+                                                .authorities(new SimpleGrantedAuthority("PERM_MEMBER.WRITE"))))
+                .andExpect(status().isOk());
+
+        // Le sujet Keycloak (UUID) est bien enregistré comme acteur de l'audit.
+        org.junit.jupiter.api.Assertions.assertEquals(
+                actor,
+                jdbcTemplate.queryForObject(
+                        "SELECT actor_user_id::text FROM audit.audit_event "
+                                + "WHERE entity_id = ?::uuid AND action_code = 'ORGANIZATION.UPDATED'",
+                        String.class,
+                        id));
+    }
+
+    @Test
+    void doesNotAuditWhenThePatchChangesNothing() throws Exception {
+        // Resoumission d'un formulaire sans modification réelle (valeurs identiques à
+        // l'existant) : 200, mais aucun UPDATE réel (version inchangée) donc aucun faux
+        // audit dans le journal append-only.
+        String id = "22222222-1111-0000-0000-000000000022";
+        insertOrganizationRow(id, "Identique SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"Identique SA\" }")
+                                .with(asMemberWriter()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.legalName").value("Identique SA"))
+                .andExpect(jsonPath("$.version").value(0));
+
+        org.junit.jupiter.api.Assertions.assertEquals(
+                0L,
+                count(
+                        "SELECT count(*) FROM audit.audit_event "
+                                + "WHERE entity_id = ?::uuid AND action_code = 'ORGANIZATION.UPDATED'",
+                        id));
+    }
+
+    @Test
+    void requiresTheIfMatchHeaderToUpdate() throws Exception {
+        String id = "22222222-1111-0000-0000-000000000023";
+        insertOrganizationRow(id, "SansIfMatch SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"X SA\" }")
+                                .with(asMemberWriter()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void conflictsWhenIfMatchVersionIsStale() throws Exception {
+        String id = "22222222-1111-0000-0000-000000000002";
+        insertOrganizationRow(id, "Concurrente SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .header("If-Match", "5")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"Écrasée SA\" }")
+                                .with(asMemberWriter()))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("STATE_CONFLICT"));
+    }
+
+    @Test
+    void returnsNotFoundWhenUpdatingAnUnknownOrganization() throws Exception {
+        mockMvc.perform(
+                        patch("/organizations/{id}", "22222222-1111-0000-0000-0000000000ff")
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"Fantôme SA\" }")
+                                .with(asMemberWriter()))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
+    }
+
+    @Test
+    void treatsAnEmptyPatchAsANoOpWithoutAudit() throws Exception {
+        String id = "22222222-1111-0000-0000-000000000003";
+        insertOrganizationRow(id, "Inchangée SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{}")
+                                .with(asMemberWriter()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.legalName").value("Inchangée SA"))
+                // Aucun changement : version inchangée, aucun audit de mise à jour.
+                .andExpect(jsonPath("$.version").value(0));
+
+        org.junit.jupiter.api.Assertions.assertEquals(
+                0L,
+                count(
+                        "SELECT count(*) FROM audit.audit_event "
+                                + "WHERE entity_id = ?::uuid AND action_code = 'ORGANIZATION.UPDATED'",
+                        id));
+    }
+
+    @Test
+    void rejectsANonNumericIfMatch() throws Exception {
+        String id = "22222222-1111-0000-0000-000000000004";
+        insertOrganizationRow(id, "MauvaiseVersion SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .header("If-Match", "pas-un-nombre")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"X SA\" }")
+                                .with(asMemberWriter()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void deniesUpdateWithoutTheMemberWritePermission() throws Exception {
+        String id = "22222222-1111-0000-0000-000000000005";
+        insertOrganizationRow(id, "Protégée SA");
+
+        mockMvc.perform(
+                        patch("/organizations/{id}", id)
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"Interdite SA\" }")
+                                .with(jwt().authorities(new SimpleGrantedAuthority("PERM_MEMBER.READ"))))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test
+    void rejectsAnonymousUpdate() throws Exception {
+        mockMvc.perform(
+                        patch("/organizations/{id}", "22222222-1111-0000-0000-000000000006")
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{ \"legalName\": \"Anonyme SA\" }"))
                 .andExpect(status().isUnauthorized());
     }
 

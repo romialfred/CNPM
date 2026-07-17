@@ -37,6 +37,7 @@ public class OrganizationService {
 
     private static final String ENTITY_TYPE = "member.organization";
     private static final String ACTION_CREATED = "ORGANIZATION.CREATED";
+    private static final String ACTION_UPDATED = "ORGANIZATION.UPDATED";
 
     private final OrganizationRepository repository;
     private final MembershipHistoryRepository historyRepository;
@@ -95,11 +96,70 @@ public class OrganizationService {
         return new OrganizationCreation(created, true);
     }
 
+    /**
+     * Applique une modification partielle à une entreprise, sous verrou optimiste.
+     *
+     * @param expectedVersion version connue du client ({@code If-Match}) ; un écart avec la
+     *     version courante interrompt l'opération sans la tenter
+     * @throws ResourceNotFoundException si aucune entreprise ne porte cet identifiant
+     * @throws StateConflictException si la version attendue ne correspond pas à la version
+     *     courante (modification concurrente déjà survenue)
+     */
+    @PreAuthorize("hasAuthority('PERM_MEMBER.WRITE')")
+    @Transactional
+    public Organization update(
+            UUID id,
+            long expectedVersion,
+            OrganizationPatch patch,
+            UUID actorUserId,
+            UUID correlationId) {
+        Organization existing =
+                repository
+                        .findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Entreprise introuvable."));
+        if (existing.version() != expectedVersion) {
+            throw new StateConflictException(
+                    "L'entreprise a été modifiée entre-temps ; rechargez-la avant de réessayer.");
+        }
+        if (patch.isEmpty()) {
+            // Aucun champ fourni : on renvoie l'état courant sans incrémenter la version ni
+            // produire un audit (un événement sans changement serait un faux positif).
+            return existing;
+        }
+
+        Organization updated = repository.update(id, patch);
+        String before = fingerprint(existing);
+        String after = fingerprint(updated);
+        if (before.equals(after)) {
+            // Champs fournis mais valeurs identiques à l'existant : Hibernate n'émet aucun
+            // UPDATE et n'incrémente pas la version. Émettre un audit « mise à jour » ici
+            // serait un faux positif de trace (before == after) dans un journal append-only.
+            return updated;
+        }
+        auditRecorder.record(
+                new AuditEntry(
+                        "USER", actorUserId, ACTION_UPDATED, ENTITY_TYPE, updated.id(), before, after,
+                        correlationId));
+        return updated;
+    }
+
     private static boolean sameContent(Organization existing, OrganizationDraft draft) {
         return java.util.Objects.equals(existing.legalName(), draft.legalName())
                 && java.util.Objects.equals(existing.tradeName(), draft.tradeName())
                 && java.util.Objects.equals(existing.organizationType(), draft.organizationType())
                 && java.util.Objects.equals(existing.sectorCode(), draft.sectorCode());
+    }
+
+    /** Empreinte SHA-256 du cœur d'une entreprise, pour l'audit avant/après d'une mise à jour. */
+    private static String fingerprint(Organization value) {
+        String canonical =
+                "legalName=" + value.legalName()
+                        + ";tradeName=" + value.tradeName()
+                        + ";organizationType=" + value.organizationType()
+                        + ";sectorCode=" + value.sectorCode()
+                        + ";status=" + value.status()
+                        + ";riskLevel=" + value.riskLevel();
+        return Hashing.sha256Hex(canonical);
     }
 
     /** Empreinte SHA-256 de l'état créé, pour l'audit — sans exposer la donnée elle-même. */

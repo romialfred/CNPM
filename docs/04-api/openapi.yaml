@@ -427,13 +427,25 @@ paths:
       - MEMBER
       summary: Mettre à jour une entreprise.
       operationId: updateOrganization
+      description: >-
+        Modifie les champs descriptifs d'une entreprise (raison sociale, nom commercial,
+        type, secteur), sous verrou optimiste (en-tête If-Match). Le statut de cycle de vie
+        et le niveau de risque ne sont PAS modifiables ici (transitions dédiées) ;
+        l'identifiant métier non plus. Périmètre R0 : MEM-001 (édition du dossier membre).
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
       - name: id
         in: path
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/Uuid'
+      - name: If-Match
+        in: header
+        required: true
+        description: Version attendue (verrou optimiste). Un écart avec la version courante produit un 409.
+        schema:
+          type: integer
+          format: int64
       responses:
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -448,32 +460,19 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Opération effectuée
+          description: Entreprise mise à jour
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
-        '201':
-          description: Ressource créée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/OrganizationView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/OrganizationUpdate'
       x-requirements:
       - MEM-001
-      - MEM-002
-      - MEM-003
-      - MEM-004
-      - MEM-005
-      - MEM-006
-      - MEM-007
-      - MEM-008
   /organizations/{id}/history:
     get:
       tags:
@@ -3954,6 +3953,28 @@ components:
           type: string
           minLength: 1
           maxLength: 160
+      additionalProperties: false
+    OrganizationUpdate:
+      type: object
+      description: >-
+        Modification partielle des champs descriptifs d'une entreprise. Tout champ absent
+        reste inchangé. Le statut, le niveau de risque et l'identifiant métier ne sont pas
+        modifiables ici.
+      properties:
+        legalName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        tradeName:
+          type: string
+          maxLength: 255
+        organizationType:
+          type: string
+          minLength: 1
+          maxLength: 40
+        sectorCode:
+          type: string
+          maxLength: 80
       additionalProperties: false
     OrganizationView:
       type: object

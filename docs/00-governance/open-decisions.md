@@ -437,6 +437,27 @@ en une création relèvent d'incréments suivants.
 d'obligation par forme juridique ; confirmer que l'identifiant métier est la clé
 d'idempotence retenue (ou introduire un magasin de clés générique, cf. DATA-DEC-005).
 
+## DATA-DEC-009 — `updated_at`/`updated_by` non rafraîchis à la mise à jour
+
+**Propriétaire.** Architecture / DBA.
+**Impact.** Toutes les tables mutables (ex. `member.organization`, `ref.reference_value`).
+**Statut.** Gap systémique et pré-existant — à traiter globalement.
+
+**Constat.** Les tables portent `updated_at timestamptz DEFAULT now() NOT NULL` et
+`updated_by uuid`, documentés « horodatage/compte de dernière modification ». Or un
+`DEFAULT` n'est évalué qu'à l'INSERT : aucun `TRIGGER BEFORE UPDATE` ne rafraîchit ces
+colonnes, et les entités JPA ne les mappent pas. Après une mise à jour applicative
+(`updateOrganization`, `updateReferenceValue`), `updated_at` reste figé à la création et
+`updated_by` reste `null` — la promesse du schéma n'est jamais tenue. Aucun risque
+d'écrasement (Hibernate ne touche pas ces colonnes) ; la traçabilité fiable est portée par
+`audit.audit_event`. Relevé par l'audit adversarial de `updateOrganization`.
+
+**Décision attendue.** Introduire, dans une nouvelle migration, un `TRIGGER BEFORE UPDATE`
+générique positionnant `updated_at = now()` sur les tables mutables, et un mécanisme pour
+`updated_by` (variable de session `SET LOCAL app.current_user_id` lue par le trigger, ou
+mapping explicite des colonnes d'audit dans les entités). À traiter **une fois pour tout le
+schéma**, pas table par table.
+
 ## ARCH-DEC-001 — propriété des tables de groupements professionnels
 
 **Propriétaire.** Architecture.

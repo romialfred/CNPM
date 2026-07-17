@@ -538,4 +538,46 @@ réelle** anticipé a été **réfuté** par les sceptiques (l'unicité `uq_memb
 Hypothèse consignée (DATA-DEC-008) : la création exige un identifiant métier (clé
 d'idempotence) ; la nomenclature des types (RCCM/NINA/IFU) et la détection de doublons
 (MEM-002) restent à trancher. Non livré : `createMembership` (workflow d'adhésion),
-`updateOrganization`, identifiants multiples.
+identifiants multiples.
+
+
+### Écriture MEMBER : updateOrganization (verrou optimiste)
+
+Douzième incrément : `PATCH /organizations/{id}`, complétant le CRUD entreprise. Miroir de
+`updateReferenceValue` (étalon ADM).
+
+| Élément | Détail |
+|---|---|
+| Route | `PATCH /organizations/{id}` typé (`OrganizationUpdate` → `OrganizationView`), en-tête `If-Match` |
+| Champs modifiables | Descriptifs uniquement : raison sociale, nom commercial, type, secteur. **Statut, niveau de risque et identifiant métier NON modifiables** (transitions de cycle de vie / identité — hors édition générique) |
+| Verrou optimiste | Double protection : contrôle `If-Match` vs version courante (409 avant tentative) **et** `@Version` JPA au flush (409 sur course réelle) ; PATCH réellement partiel (null = inchangé) ; corps vide = no-op sans audit ni incrément de version |
+| Audit | `ORGANIZATION.UPDATED` avec empreintes SHA-256 avant/après, dans la transaction |
+| Autorisation | `PERM_MEMBER.WRITE` ; 403/401 testés |
+| Tests | `OrganizationWriteApiTest` 11→21 cas (+ 1 no-change côté ADM) ; 153 backend au total : mise à jour partielle + version + audit (empreintes avant≠après), acteur Keycloak (UUID) tracé, resoumission sans changement = pas de faux audit, conflit `If-Match` 409, introuvable 404, no-op corps vide, `If-Match` absent/non numérique 400, 403, 401 |
+
+Audit adversarial (**workflow 5 dimensions × 2 sceptiques**) : 14 constats, **8 confirmés**
+(2 en 2/2). Corrigés :
+
+- **(MAJEUR, correction)** faux positif d'audit : un PATCH resoumettant des **valeurs
+  identiques** n'est pas « dirty » pour Hibernate (aucun UPDATE, version inchangée), mais un
+  audit `UPDATED` (empreinte before==after) était quand même écrit dans le journal
+  **append-only** — trace non rectifiable. Détection sémantique du non-changement ajoutée
+  (`fingerprint(existing).equals(fingerprint(updated))` → pas d'audit). **Le même correctif
+  a été appliqué à `updateReferenceValue`** (patron identique), avec test dans chaque module.
+- **(MAJEUR/MINEUR, tests)** ajout des cas manquants vs l'étalon : `If-Match` absent → 400,
+  acteur Keycloak (UUID) réellement vérifié dans `audit_event.actor_user_id`, assertion
+  d'audit renforcée (before/after non nuls et différents).
+
+Constats confirmés **non corrigés par code, consignés** : (MINEUR) `updated_at`/`updated_by`
+de `member.organization` (et des tables mutables) ne sont pas rafraîchis à l'UPDATE — gap
+**systémique et pré-existant** (aucun trigger `BEFORE UPDATE`), à traiter une fois pour tout
+le schéma (nouvelle migration + acteur via variable de session) → **DATA-DEC-009** ; (MINEUR)
+réponse `422` déclarée mais inatteignable sur les opérations sans règle 422 — gabarit
+générique pré-existant, à nettoyer globalement. Le test de **concurrence réelle** du verrou
+`@Version` au flush (vs le pré-contrôle `If-Match`) reste non couvert : signal mitigé (1/2,
+réfuté sur le constat jumeau), la protection étant assurée par le pré-contrôle testé + le
+mécanisme `@Version` (identique à l'étalon accepté) ; non ajouté pour éviter un test à
+threads instable.
+
+Non livré : `createMembership` (workflow d'adhésion), identifiants multiples, effacement
+d'un champ nullable (ambiguïté PATCH — null = inchangé, documenté).
