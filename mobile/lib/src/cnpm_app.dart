@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../design_system/cnpm_theme.dart';
+import 'package:cnpm_mobile/design_system/cnpm_theme.dart';
 
 class CnpmApp extends StatelessWidget {
   const CnpmApp({super.key});

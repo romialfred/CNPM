@@ -1,0 +1,87 @@
+.cnpm-verify {
+  width: 100%;
+  max-width: 40rem;
+  /* Le shell ne peut pas contraindre ce contenu projeté (encapsulation) : sans
+     `min-width: 0`, la carte se dimensionne sur le min-content des six cases OTP et
+     déborde sous 360 px. */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  padding: var(--cnpm-space-8);
+  background-color: var(--cnpm-color-surface-primary);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+}
+
+.cnpm-verify__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-2xl);
+  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-verify__subtitle {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-verify__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+}
+
+.cnpm-verify__resend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-verify__countdown {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* Zone d'annonce polie : visible seulement pour l'aide technique, sans occuper d'espace. */
+.cnpm-verify__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* `.cnpm-verify__alt` et `.cnpm-verify__link` ont été retirés avec les méthodes
+   alternatives (UX-DEC-011). Seul subsiste le retour à la connexion, réellement rendu
+   par le template en état « session expirée ». */
+.cnpm-verify__back {
+  color: var(--cnpm-color-text-link);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  text-decoration: none;
+}
+
+.cnpm-verify__back:hover {
+  text-decoration: underline;
+}
+
+/* Contour opaque : le halo seul n'atteint pas le rapport 3:1 de WCAG 1.4.11. */
+.cnpm-verify__back:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  border-radius: var(--cnpm-radius-xs);
+}
+
+@media (max-width: 767px) {
+  .cnpm-verify {
+    padding: var(--cnpm-space-4);
+    gap: var(--cnpm-space-4);
+  }
+}

@@ -12,6 +12,12 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+# Le dépôt interdit les répertoires de cache : importer pack_paths ne doit pas
+# créer de __pycache__, que ce script signale lui-même comme une erreur.
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import pack_paths  # noqa: E402
+
 try:
     import yaml
 except ImportError as exc:
@@ -120,13 +126,43 @@ for forbidden in [
     if (ROOT / forbidden).exists():
         errors.append(f"Obsolete or duplicated path still present: {forbidden}")
 
+# Ce qui est proscrit, c'est de VERSIONNER un artefact généré — pas d'en avoir
+# localement. `npm ci`, `mvn verify` et `flutter test`, tous prescrits par
+# START_HERE.md, créent node_modules/, target/ et .dart_tool/ ; les signaler
+# rendait le dépôt invalidable dès qu'on suivait ses propres instructions.
+# On contrôle donc l'état versionné, en retombant sur une analyse du disque
+# lorsque le pack est livré hors dépôt Git.
+def versioned_files() -> set[str] | None:
+    try:
+        completed = subprocess.run(
+            ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return {entry for entry in completed.stdout.decode("utf-8").split("\0") if entry}
+
+
+TRACKED = versioned_files()
+
+
+def is_versioned(path: Path) -> bool:
+    rel = path.relative_to(ROOT).as_posix()
+    if TRACKED is None:
+        return pack_paths.included(path, ROOT)
+    return rel in TRACKED
+
+
 generated_directory_names = {"__pycache__", "node_modules", "target", "dist", "build", ".dart_tool"}
 for path in ROOT.rglob("*"):
     if path.is_dir() and path.name in generated_directory_names:
-        errors.append(f"Generated or cache directory present: {path.relative_to(ROOT)}")
-    if path.is_file() and path.suffix.lower() in {".pyc", ".pyo"}:
+        rel_dir = path.relative_to(ROOT).as_posix() + "/"
+        if TRACKED is None or any(tracked.startswith(rel_dir) for tracked in TRACKED):
+            errors.append(f"Generated or cache directory is versioned: {path.relative_to(ROOT)}")
+    if not path.is_file() or not is_versioned(path):
+        continue
+    if path.suffix.lower() in {".pyc", ".pyo"}:
         errors.append(f"Python cache file present: {path.relative_to(ROOT)}")
-    if path.is_file() and path.suffix.lower() in {".zip", ".tar", ".gz", ".tgz", ".7z"}:
+    if path.suffix.lower() in {".zip", ".tar", ".gz", ".tgz", ".7z"}:
         errors.append(f"Nested archive present: {path.relative_to(ROOT)}")
 
 
@@ -144,17 +180,11 @@ if manifest_path.exists():
             continue
         manifest[rel] = digest
 
-    manifest_excluded_names = {"MANIFEST_SHA256.txt", "file-inventory.csv", ".DS_Store", "Thumbs.db"}
-    manifest_excluded_parts = {".git", "__pycache__", "node_modules", "target", "dist", "build", ".dart_tool"}
-    manifest_excluded_suffixes = {".pyc", ".pyo"}
     expected: dict[str, str] = {}
     for path in ROOT.rglob("*"):
-        if not path.is_file() or path.name in manifest_excluded_names or path.suffix.lower() in manifest_excluded_suffixes:
+        if not pack_paths.included(path, ROOT):
             continue
-        rel_path = path.relative_to(ROOT)
-        if any(part in manifest_excluded_parts for part in rel_path.parts):
-            continue
-        expected[rel_path.as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+        expected[path.relative_to(ROOT).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
 
     missing_manifest = sorted(set(expected) - set(manifest))
     stale_manifest = sorted(set(manifest) - set(expected))
@@ -256,6 +286,11 @@ for path in ROOT.rglob("*"):
         continue
     if path.resolve() == Path(__file__).resolve():
         continue
+    # Les dépendances installées ne sont pas notre code : la documentation d'un
+    # paquet npm peut légitimement contenir un exemple de clé, et le signaler
+    # noyait le contrôle sous des faux positifs dès la première installation.
+    if not is_versioned(path):
+        continue
     text = path.read_text(encoding="utf-8", errors="ignore")
     if re.search(r"image:\s*[^\s]+:latest\b", text):
         errors.append(f"Unpinned image in {path.relative_to(ROOT)}")
@@ -276,12 +311,47 @@ allowed_duplicate_sets = {
         "docs/ui-handoff/design-tokens/cnpm_theme.dart",
         "mobile/lib/design_system/cnpm_theme.dart",
     }),
+    # Runners natifs générés par `flutter create`. Ces fichiers sont identiques
+    # par construction dans le gabarit officiel Flutter : deux icônes de même
+    # dimension effective, ou une configuration de build partagée entre variantes.
+    # Les diverger manuellement casserait la régénération des runners.
+    frozenset({
+        "mobile/ios/Flutter/Debug.xcconfig",
+        "mobile/ios/Flutter/Release.xcconfig",
+    }),
+    frozenset({
+        "mobile/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+        "mobile/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist",
+    }),
+    frozenset({
+        "mobile/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+        "mobile/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings",
+    }),
+    frozenset({
+        "mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png",
+        "mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png",
+    }),
+    frozenset({
+        "mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png",
+        "mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png",
+    }),
+    frozenset({
+        "mobile/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+        "mobile/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+        "mobile/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+    }),
+    frozenset({
+        "mobile/android/app/src/debug/AndroidManifest.xml",
+        "mobile/android/app/src/profile/AndroidManifest.xml",
+    }),
 }
 by_hash: dict[str, list[str]] = defaultdict(list)
 for path in ROOT.rglob("*"):
-    if not path.is_file() or any(part in {".git", "node_modules", "target", "build"} for part in path.relative_to(ROOT).parts):
+    # Même règle d'inclusion que le manifeste : un artefact local ignoré par Git
+    # (.env, .dart_tool, rapports) n'est pas un doublon versionné à signaler.
+    if not pack_paths.included(path, ROOT):
         continue
-    if path.name in {"MANIFEST_SHA256.txt", "file-inventory.csv", "MANIFEST.json", "MANIFEST.sha256"}:
+    if path.name in {"MANIFEST.json", "MANIFEST.sha256"}:
         continue
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     by_hash[digest].append(path.relative_to(ROOT).as_posix())

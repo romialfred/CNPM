@@ -1,0 +1,56 @@
+.cnpm-login {
+  width: 100%;
+  max-width: 40rem; /* 600–640 px selon la fiche AUTH-001 */
+  /* Le shell ne peut pas contraindre ce contenu projeté (encapsulation) : sans
+     `min-width: 0`, la carte se dimensionne sur son min-content et déborde à 320 px. */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  padding: var(--cnpm-space-8);
+  background-color: var(--cnpm-color-surface-primary);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+}
+
+.cnpm-login__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-2xl);
+  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-login__subtitle {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-login__tabs {
+  display: block;
+}
+
+.cnpm-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-login__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  flex-wrap: wrap;
+}
+
+/* Les styles de lien et d'aide ont été retirés avec les affordances correspondantes
+   (UX-DEC-011) : conserver des sélecteurs qui ne ciblent plus rien laisserait croire,
+   à la relecture, que ces éléments existent encore. */
+
+@media (max-width: 767px) {
+  .cnpm-login {
+    padding: var(--cnpm-space-4);
+    gap: var(--cnpm-space-4);
+  }
+}

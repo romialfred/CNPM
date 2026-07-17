@@ -1,0 +1,93 @@
+<cnpm-auth-shell
+  trustTitle="Vérification renforcée"
+  trustText="Une seconde étape protège votre compte et les données institutionnelles."
+>
+  <div class="cnpm-verify">
+    <h1 class="cnpm-verify__title">Vérification en deux étapes</h1>
+
+    @if (state() === 'expired') {
+      <cnpm-alert tone="warning" title="Session de connexion expirée">
+        Votre demande de connexion n'est plus active. Reprenez la connexion pour recevoir un
+        nouveau code.
+      </cnpm-alert>
+      <a class="cnpm-verify__back" routerLink="/auth/login">Retour à la connexion</a>
+    } @else {
+      <cnpm-offline-notice />
+
+      <p class="cnpm-verify__subtitle">
+        Saisissez le code à six chiffres envoyé par votre méthode d'authentification.
+      </p>
+
+      @if (state() === 'success') {
+        <cnpm-alert tone="success" title="Connexion réussie">
+          Redirection vers votre espace…
+        </cnpm-alert>
+      }
+
+      @if (state() === 'error') {
+        <cnpm-alert tone="error" title="Code non valide">
+          Le code saisi est incorrect ou expiré. Réessayez ou demandez un nouveau code.
+        </cnpm-alert>
+      }
+
+      <form class="cnpm-verify__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <cnpm-otp-input
+          #otpField
+          formControlName="code"
+          label="Code de vérification à six chiffres"
+          [length]="6"
+          [error]="codeError()"
+        />
+
+        <cnpm-button
+          type="submit"
+          variant="public-cta"
+          size="lg"
+          [block]="true"
+          [loading]="state() === 'submitting'"
+          [disabled]="state() === 'success'"
+        >
+          Vérifier et se connecter
+        </cnpm-button>
+      </form>
+
+      <div class="cnpm-verify__resend">
+        <!-- Le bouton reste monté en permanence : le détruire pendant qu'il a le
+             focus renverrait celui-ci sur le body. Il est neutralisé, pas retiré. -->
+        <cnpm-button
+          variant="tertiary"
+          size="sm"
+          [disabled]="!canResend()"
+          [describedBy]="canResend() ? null : 'cnpm-resend-hint'"
+          (click)="resend()"
+        >
+          Renvoyer le code
+        </cnpm-button>
+        @if (!canResend()) {
+          <!-- Le décompte reste hors de la région live : il ne doit pas être annoncé
+               chaque seconde. Le motif d'indisponibilité, lui, est décrit à la prise
+               de focus via aria-describedby. -->
+          <p class="cnpm-verify__countdown" aria-hidden="true">
+            Nouveau code possible dans {{ resendCountdown() }} s.
+          </p>
+          <p id="cnpm-resend-hint" class="cnpm-verify__status">{{ resendHint() }}</p>
+        }
+        <!-- Région live pré-montée : seul un contenu ajouté est annoncé. Le décompte
+             en est exclu, pour ne pas parler à chaque seconde. -->
+        <p
+          class="cnpm-verify__status cnpm-verify__announcement"
+          role="status"
+          aria-live="polite"
+        >
+          {{ resendAnnouncement() }}
+        </p>
+      </div>
+
+      <!-- BLOCKED (UX-DEC-011) : la fiche prévoit « méthodes alternatives et codes de
+           secours si autorisés ». Les méthodes réellement autorisées (TOTP, WebAuthn,
+           SMS) et la politique de codes de secours relèvent du provisionnement
+           Keycloak et de la politique de sécurité, non arbitrés. Aucun lien inerte
+           n'est affiché tant que la destination n'existe pas. -->
+    }
+  </div>
+</cnpm-auth-shell>

@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
 set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-python3 "$ROOT/scripts/validate-pack.py"
+. "$ROOT/scripts/python-bin.sh"
+"$(cnpm_python_bin)" "$ROOT/scripts/validate-pack.py"

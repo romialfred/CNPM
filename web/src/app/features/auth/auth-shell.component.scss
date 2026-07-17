@@ -1,0 +1,155 @@
+.cnpm-auth {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--cnpm-color-surface-page);
+}
+
+.cnpm-auth__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--cnpm-space-5) var(--cnpm-layout-pagePaddingDesktop);
+}
+
+.cnpm-auth__wordmark {
+  margin: 0;
+  font-family: var(--cnpm-font-family-sans);
+  font-weight: var(--cnpm-font-weight-bold);
+  font-size: var(--cnpm-font-size-xl);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  color: var(--cnpm-color-text-brand);
+}
+
+/* Pas de soulignement pointillé par défaut du navigateur : le mot-symbole n'est pas
+   une définition à consulter, et le titre reste disponible au survol. */
+.cnpm-auth__wordmark abbr {
+  text-decoration: none;
+}
+
+.cnpm-auth__lang {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+}
+
+.cnpm-auth__lang-label {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-auth__lang-value {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Répartition de la fiche AUTH-001 : message de confiance 52–56 %, formulaire 44–48 %
+   de la zone de contenu. Les deux fourchettes somment à ~96–104 % : la gouttière doit
+   donc tenir dans le reste, ce qui la borne à environ 4 % de la largeur de contenu.
+   Une gouttière de 4 rem laissait les deux zones hors fourchette à tous les viewports
+   desktop (mesuré : 51,5 % / 43,9 % à 1440) ; 2 rem les y ramène partout.
+   `minmax(0, …)` est indispensable : une piste `fr` prend pour minimum le min-content
+   de son item, si bien que la grille pouvait dépasser son conteneur. */
+.cnpm-auth__main {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
+  align-items: center;
+  gap: var(--cnpm-space-8);
+  padding: var(--cnpm-space-8) var(--cnpm-layout-pagePaddingDesktop);
+  width: 100%;
+  max-width: var(--cnpm-size-publicMax);
+  margin: 0 auto;
+}
+
+/* `order: -1` place le message à gauche sur desktop alors qu'il suit le formulaire
+   dans le DOM : l'ordre de lecture reste « tâche principale d'abord », et le <h1> de
+   la page précède ce <h2>. */
+.cnpm-auth__trust {
+  order: -1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  max-width: var(--cnpm-size-publicMax);
+}
+
+/* Reste sous le <h1> de la page (2xl) : un texte secondaire rendu plus gros que le
+   titre principal se lit comme le titre de l'écran. */
+.cnpm-auth__trust-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xl);
+  line-height: var(--cnpm-font-lineHeight-xl);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-auth__trust-text {
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  line-height: var(--cnpm-font-lineHeight-lg);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* `min-width: 0` est indispensable : sans lui, cet item de grille hérite de
+   `min-width: auto` et se dimensionne sur le contenu minimal de son enfant (les six
+   cases OTP), ce qui débordait horizontalement à 360 px.
+   Le contenu projeté ne peut pas être contraint depuis ici — il porte l'attribut de
+   scope de la page appelante, pas celui du shell : chaque page pose donc elle-même
+   `min-width: 0` sur sa carte. */
+.cnpm-auth__panel {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.cnpm-auth__footer {
+  padding: var(--cnpm-space-5) var(--cnpm-layout-pagePaddingDesktop);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-auth__legal {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+  text-align: center;
+}
+
+/* Sous 1024 px : l'illustration/message de confiance disparaît, formulaire seul. */
+/* Sous 1024 px, la fiche demande de retirer l'illustration secondaire, pas le message
+   de confiance : celui-ci passe sous le formulaire et se condense. Le retirer
+   entièrement priverait 4 des 8 viewports obligatoires d'un contenu que la fiche
+   prescrit. */
+@media (max-width: 1023px) {
+  /* Pas de `justify-items: center` : il dimensionnerait l'item sur son contenu
+     (`fit-content`) au lieu de la piste, ce qui le faisait déborder. Le panneau
+     centre déjà sa carte via `justify-content` en flex. */
+  .cnpm-auth__main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--cnpm-space-6);
+  }
+  /* L'ordre visuel rejoint l'ordre du DOM : formulaire puis message condensé. */
+  .cnpm-auth__trust {
+    order: 0;
+    max-width: 40rem;
+    margin-inline: auto;
+  }
+}
+
+/* « Sous 768 px, formulaire seul avec bénéfices condensés » (fiche AUTH-001). */
+@media (max-width: 767px) {
+  .cnpm-auth__topbar,
+  .cnpm-auth__main,
+  .cnpm-auth__footer {
+    padding-inline: var(--cnpm-layout-pagePaddingMobile);
+  }
+  .cnpm-auth__trust-title {
+    font-size: var(--cnpm-font-size-md);
+    line-height: var(--cnpm-font-lineHeight-md);
+  }
+  .cnpm-auth__trust-text {
+    font-size: var(--cnpm-font-size-sm);
+    line-height: var(--cnpm-font-lineHeight-sm);
+  }
+}

@@ -4,23 +4,19 @@ from __future__ import annotations
 import csv
 import hashlib
 import mimetypes
+import sys
 from pathlib import Path
 
+# Ne pas créer de __pycache__ : validate-pack.py rejette les caches du dépôt.
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pack_paths import included  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
-EXCLUDED_NAMES = {"MANIFEST_SHA256.txt", "file-inventory.csv", ".DS_Store", "Thumbs.db"}
-EXCLUDED_PARTS = {".git", "__pycache__", "node_modules", "target", "dist", "build", ".dart_tool"}
-EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
-
-
-def included(path: Path) -> bool:
-    if not path.is_file() or path.name in EXCLUDED_NAMES or path.suffix.lower() in EXCLUDED_SUFFIXES:
-        return False
-    rel = path.relative_to(ROOT)
-    return not any(part in EXCLUDED_PARTS for part in rel.parts)
 
 rows = []
 for path in sorted(ROOT.rglob("*")):
-    if included(path):
+    if included(path, ROOT):
         rel = path.relative_to(ROOT).as_posix()
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         media_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"

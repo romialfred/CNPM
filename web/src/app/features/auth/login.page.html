@@ -1,0 +1,86 @@
+<cnpm-auth-shell>
+  <div class="cnpm-login">
+    <h1 class="cnpm-login__title">Connexion</h1>
+    <p class="cnpm-login__subtitle">Choisissez votre espace, puis identifiez-vous.</p>
+
+    <cnpm-tabs
+      class="cnpm-login__tabs"
+      [tabs]="spaces"
+      ariaLabel="Choix de l'espace"
+      [(selected)]="space"
+    />
+
+    <cnpm-offline-notice />
+
+    <!-- tabindex=-1 : le focus est amené ici après l'échec, faute de quoi il
+         retomberait sur le body au moment où le bouton devient neutralisé. -->
+    @if (state() === 'error') {
+      <div #errorAlert class="cnpm-login__alert" [id]="errorAlertId" tabindex="-1">
+        <cnpm-alert tone="error" title="Identifiants non reconnus">
+          Vérifiez votre adresse e-mail et votre mot de passe, puis réessayez.
+        </cnpm-alert>
+      </div>
+    }
+
+    @if (state() === 'forbidden') {
+      <div #errorAlert class="cnpm-login__alert" [id]="errorAlertId" tabindex="-1">
+        <cnpm-alert tone="warning" title="Accès non autorisé">
+          Cet accès est actuellement refusé. Contactez le secrétariat du CNPM pour
+          connaître la situation de votre compte.
+        </cnpm-alert>
+      </div>
+    }
+
+    <form
+      class="cnpm-login__form"
+      [formGroup]="form"
+      [attr.aria-describedby]="hasFailure() ? errorAlertId : null"
+      (ngSubmit)="submit()"
+      novalidate
+    >
+      <cnpm-text-input
+        #emailField
+        formControlName="email"
+        label="Adresse e-mail"
+        type="email"
+        name="username"
+        autocomplete="username"
+        inputMode="email"
+        [required]="true"
+        [error]="emailError()"
+      />
+
+      <cnpm-password-input
+        formControlName="password"
+        label="Mot de passe"
+        name="current-password"
+        autocomplete="current-password"
+        [required]="true"
+        [error]="passwordError()"
+      />
+
+      <div class="cnpm-login__row">
+        <cnpm-checkbox formControlName="remember">Se souvenir de cet appareil</cnpm-checkbox>
+        <!-- BLOCKED (UX-DEC-011) : la récupération de mot de passe est portée par le
+             fournisseur d'identité, dont le provisionnement n'est pas arbitré. Aucun
+             lien n'est affiché tant que la destination n'existe pas : une affordance
+             visible qui ne mène nulle part est un défaut, pas un espace réservé. -->
+      </div>
+
+      <!-- La fiche AUTH-001 nomme le composant « Button public CTA » : la variante
+           dédiée du design system, pas le bouton primaire générique. -->
+      <cnpm-button
+        type="submit"
+        variant="public-cta"
+        size="lg"
+        [block]="true"
+        [loading]="state() === 'submitting'"
+      >
+        Continuer
+      </cnpm-button>
+    </form>
+
+    <!-- BLOCKED (UX-DEC-011) : aucun canal de support n'est arbitré ; inventer une
+         adresse ou un numéro serait une donnée institutionnelle fabriquée. -->
+  </div>
+</cnpm-auth-shell>

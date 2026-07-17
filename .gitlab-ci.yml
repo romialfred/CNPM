@@ -20,16 +20,18 @@ validate-repository:
 backend-test:
   stage: test
   image: maven:3.9-eclipse-temurin-25
+  # Les tests d'intégration créent leurs propres conteneurs PostgreSQL via
+  # Testcontainers ; ils ont besoin d'un démon Docker, pas d'un service PostgreSQL
+  # en sidecar. Un simple service `postgres:18.4` ne fournit pas de démon Docker :
+  # la suite échouerait avec « Could not find a valid Docker environment ».
   services:
-    - name: postgres:18.4
-      alias: postgres
+    - name: docker:27-dind
+      alias: docker
   variables:
-    POSTGRES_DB: cnpm
-    POSTGRES_USER: cnpm_app
-    POSTGRES_PASSWORD: ci-local-only
-    DATABASE_URL: jdbc:postgresql://postgres:5432/cnpm
-    DATABASE_USER: cnpm_app
-    DATABASE_PASSWORD: ci-local-only
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    # Testcontainers dialogue avec l'API Docker exposée par le service dind.
+    TESTCONTAINERS_HOST_OVERRIDE: docker
   script:
     - mvn -f backend/pom.xml -B clean verify
   rules:
@@ -59,10 +61,14 @@ mobile-test:
     - flutter pub get
     - flutter analyze
     - flutter test
+  # Gate sur le manifeste du projet, pas sur des artefacts générés : la règle
+  # précédente exigeait mobile/pubspec.lock et mobile/android/app/build.gradle,
+  # tous deux absents, si bien que le job ne s'est jamais exécuté et que le
+  # pipeline restait vert sans jamais tester le mobile. Flutter 3.44 génère par
+  # ailleurs build.gradle.kts, que l'ancienne règle n'aurait jamais reconnu.
   rules:
     - exists:
-        - mobile/pubspec.lock
-        - mobile/android/app/build.gradle
+        - mobile/pubspec.yaml
 
 security-scan:
   stage: security

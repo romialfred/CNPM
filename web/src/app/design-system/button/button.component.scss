@@ -1,0 +1,147 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cnpm-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--cnpm-radius-md);
+  font-family: var(--cnpm-font-family-sans);
+  font-weight: var(--cnpm-font-weight-semibold);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard),
+    border-color var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+}
+
+/* Le halo `shadow-focus` est trop peu contrasté (~1,3:1) pour servir seul
+   d'indicateur de focus : les champs le combinent à un changement de bordure. Un
+   bouton n'ayant pas de bordure à faire varier, on trace un contour opaque bâti sur
+   les tokens de marque, qui atteint le rapport 3:1 exigé par WCAG 2.2 (1.4.11). */
+.cnpm-button:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  box-shadow: var(--cnpm-shadow-focus);
+}
+
+/* Rendu neutralisé identique, que l'état vienne de `disabled` ou d'`aria-disabled`
+   (ce dernier étant préféré pour ne pas perdre le focus — voir ButtonComponent).
+   L'opacité vient du token Sass : le générateur du handoff n'exporte pas les
+   opacités en custom property, si bien que `var(--cnpm-opacity-disabled)` était
+   invalide et retombait silencieusement à 1 — l'état désactivé n'était pas atténué. */
+.cnpm-button:disabled,
+.cnpm-button--inert {
+  cursor: not-allowed;
+}
+
+/* L'atténuation porte sur le contenu peint, jamais sur l'hôte : appliquée à l'hôte,
+   elle délaverait aussi le contour de focus (le bouton `aria-disabled` reste
+   focalisable), et la neutraliser au focus ferait disparaître le seul signal visuel
+   de l'état neutralisé au moment précis où l'utilisateur clavier l'atteint. */
+.cnpm-button:disabled .cnpm-button__label,
+.cnpm-button--inert .cnpm-button__label,
+.cnpm-button:disabled .cnpm-button__spinner,
+.cnpm-button--inert .cnpm-button__spinner {
+  opacity: tokens.$cnpm-opacity-disabled;
+}
+
+/* Tailles : hauteurs de contrôle du design system, densités `compact` (36 px) et
+   `comfortable` (40 px), réservées au desktop. */
+.cnpm-button--sm {
+  min-height: var(--cnpm-size-control-sm);
+  padding: 0 var(--cnpm-space-3);
+}
+.cnpm-button--md {
+  min-height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-4);
+}
+.cnpm-button--lg {
+  min-height: var(--cnpm-size-control-lg);
+  padding: 0 var(--cnpm-space-5);
+  font-size: var(--cnpm-font-size-md);
+}
+
+/* Densité `touch` du handoff : « contrôles 44 à 48 px, mobile et tablette ».
+   Cette règle doit venir APRÈS toutes les tailles de base : une media query n'ajoute
+   aucune spécificité, si bien qu'une règle nue déclarée plus bas l'emporterait et
+   annulerait silencieusement le relèvement. */
+@media (max-width: 1023px) {
+  .cnpm-button--sm,
+  .cnpm-button--md {
+    min-height: var(--cnpm-size-control-lg);
+  }
+}
+
+/* Variante primaire : bleu de marque. */
+.cnpm-button--primary {
+  background-color: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+}
+.cnpm-button--primary:hover:not(:disabled):not(.cnpm-button--inert) {
+  background-color: var(--cnpm-color-brand-blue-800);
+}
+
+/* Secondaire : surface neutre bordée, pas d'aplat coloré. */
+.cnpm-button--secondary {
+  background-color: var(--cnpm-color-surface-primary);
+  border-color: var(--cnpm-color-border-default);
+  color: var(--cnpm-color-text-primary);
+}
+.cnpm-button--secondary:hover:not(:disabled):not(.cnpm-button--inert) {
+  background-color: var(--cnpm-color-surface-subtle);
+}
+
+/* Tertiaire : lien-bouton discret. */
+.cnpm-button--tertiary {
+  background-color: transparent;
+  color: var(--cnpm-color-text-brand);
+}
+.cnpm-button--tertiary:hover:not(:disabled):not(.cnpm-button--inert) {
+  background-color: var(--cnpm-color-brand-blue-50);
+}
+
+/* Danger et CTA public : rouge de marque réservé aux actions critiques/publiques. */
+.cnpm-button--danger,
+.cnpm-button--public-cta {
+  background-color: var(--cnpm-color-brand-red-600);
+  color: var(--cnpm-color-text-inverse);
+}
+.cnpm-button--danger:hover:not(:disabled):not(.cnpm-button--inert),
+.cnpm-button--public-cta:hover:not(:disabled):not(.cnpm-button--inert) {
+  background-color: var(--cnpm-color-brand-red-700);
+}
+/* Sur fond rouge, le contour bleu de marque manquerait de contraste : on utilise le
+   texte primaire, opaque, qui reste lisible contre le rouge comme contre la page. */
+.cnpm-button--danger:focus-visible,
+.cnpm-button--public-cta:focus-visible {
+  outline-color: var(--cnpm-color-text-primary);
+  box-shadow: var(--cnpm-shadow-criticalFocus);
+}
+
+.cnpm-button--block {
+  width: 100%;
+}
+
+.cnpm-button__spinner {
+  width: var(--cnpm-size-icon-sm);
+  height: var(--cnpm-size-icon-sm);
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--cnpm-radius-pill);
+  animation: cnpm-button-spin var(--cnpm-motion-duration-slow) linear infinite;
+}
+
+@keyframes cnpm-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-button__spinner {
+    animation-duration: 0ms;
+  }
+}

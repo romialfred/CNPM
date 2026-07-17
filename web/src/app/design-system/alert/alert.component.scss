@@ -1,0 +1,84 @@
+.cnpm-alert {
+  display: flex;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--cnpm-radius-md);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+}
+
+.cnpm-alert__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+  border-radius: var(--cnpm-radius-pill);
+  color: var(--cnpm-color-text-inverse);
+  font-weight: var(--cnpm-font-weight-bold);
+  flex-shrink: 0;
+}
+
+.cnpm-alert__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-alert__title {
+  margin: 0;
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Préfixe lu par les lecteurs d'écran, masqué visuellement : le ton reste porté
+   aussi par l'icône et le texte, jamais par la seule couleur. */
+.cnpm-alert__prefix {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-alert__content {
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-alert--info {
+  background-color: var(--cnpm-color-semantic-info-50);
+  border-color: var(--cnpm-color-semantic-info-100);
+}
+.cnpm-alert--info .cnpm-alert__icon {
+  background-color: var(--cnpm-color-semantic-info-600);
+}
+
+.cnpm-alert--success {
+  background-color: var(--cnpm-color-semantic-success-50);
+  border-color: var(--cnpm-color-semantic-success-100);
+}
+.cnpm-alert--success .cnpm-alert__icon {
+  background-color: var(--cnpm-color-semantic-success-600);
+}
+
+.cnpm-alert--warning {
+  background-color: var(--cnpm-color-semantic-warning-50);
+  border-color: var(--cnpm-color-semantic-warning-100);
+}
+.cnpm-alert--warning .cnpm-alert__icon {
+  background-color: var(--cnpm-color-semantic-warning-600);
+}
+
+.cnpm-alert--error {
+  background-color: var(--cnpm-color-semantic-error-50);
+  border-color: var(--cnpm-color-semantic-error-100);
+}
+.cnpm-alert--error .cnpm-alert__icon {
+  background-color: var(--cnpm-color-semantic-error-600);
+}

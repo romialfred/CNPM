@@ -1,0 +1,90 @@
+.cnpm-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-field__label {
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-field__required {
+  color: var(--cnpm-color-text-critical);
+  margin-inline-start: var(--cnpm-space-1);
+}
+
+.cnpm-field__control {
+  min-height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-3);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-md);
+  color: var(--cnpm-color-text-primary);
+  background-color: var(--cnpm-color-surface-primary);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+}
+
+/* Densité `touch` du handoff : « contrôles 44 à 48 px, mobile et tablette ». La
+   hauteur `comfortable` de 40 px ne vaut qu'au-delà de la tablette. */
+@media (max-width: 1023px) {
+  .cnpm-field__control {
+    min-height: var(--cnpm-size-control-lg);
+  }
+}
+
+.cnpm-field__control::placeholder {
+  color: var(--cnpm-color-text-muted);
+}
+
+/* Contour opaque, et pas seulement un changement de bordure : la règle d'erreur
+   ci-dessous fige `border-color` à la teinte critique (même spécificité, source
+   postérieure), si bien qu'un champ invalide focalisé n'aurait plus d'indicateur —
+   seul resterait le halo, à ~1,2:1. Le contour, lui, n'est jamais écrasé par l'état
+   d'erreur, qui ne touche que la bordure. */
+.cnpm-field__control:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  border-color: var(--cnpm-color-border-focus);
+  box-shadow: var(--cnpm-shadow-focus);
+}
+
+.cnpm-field__control:disabled {
+  background-color: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-disabled);
+  cursor: not-allowed;
+}
+
+.cnpm-field__control[aria-invalid='true'] {
+  border-color: var(--cnpm-color-border-critical);
+}
+
+.cnpm-field__control[aria-invalid='true']:focus-visible {
+  box-shadow: var(--cnpm-shadow-criticalFocus);
+}
+
+/* Erreur : icône + texte, jamais la couleur seule. */
+.cnpm-field__error {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-critical);
+}
+
+.cnpm-field__error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-icon-sm);
+  height: var(--cnpm-size-icon-sm);
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-semantic-error-600);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  flex-shrink: 0;
+}

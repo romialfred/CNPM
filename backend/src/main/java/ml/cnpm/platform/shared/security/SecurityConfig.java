@@ -1,0 +1,94 @@
+package ml.cnpm.platform.shared.security;
+
+import ml.cnpm.platform.shared.api.ProblemResponseWriter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
+
+/**
+ * Politique de sécurité HTTP du monolithe.
+ *
+ * <p>Applique le refus par défaut exigé par {@code docs/05-security/security-architecture.md} :
+ * toute requête non explicitement ouverte requiert un jeton valide. L'API est sans
+ * session (jetons portés à chaque appel) ; CSRF est donc désactivé, ce qui est correct
+ * pour une API stateless consommée par jeton, et non par cookie de session.
+ *
+ * <p>Les erreurs 401/403 sont rendues au format {@code Problem} du contrat, avec un
+ * {@code correlationId}, plutôt que via les pages par défaut du conteneur.
+ */
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    /**
+     * Endpoints réellement publics. Toute autre route est refusée par défaut.
+     *
+     * <p>Seules les sondes de liveness/readiness sont ouvertes : elles ne portent
+     * aucune donnée sensible. {@code /actuator/prometheus} en est délibérément exclu
+     * — exposer les métriques internes sans authentification facilite la
+     * reconnaissance ; leur collecte passe par un accès authentifié ou un port de
+     * gestion isolé par politique réseau.
+     */
+    private static final String[] PUBLIC_ENDPOINTS = {
+        "/actuator/health",
+        "/actuator/health/**",
+        "/actuator/info",
+        // Vérification publique d'un reçu par jeton opaque (docs/04-api : verifyReceipt).
+        "/receipts/verify/**"
+    };
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, ProblemResponseWriter problems)
+            throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        registry ->
+                                registry
+                                        .requestMatchers(PUBLIC_ENDPOINTS)
+                                        .permitAll()
+                                        .anyRequest()
+                                        .authenticated())
+                .oauth2ResourceServer(
+                        oauth2 ->
+                                oauth2.jwt(
+                                        jwt ->
+                                                jwt.jwtAuthenticationConverter(
+                                                        jwtAuthenticationConverter())))
+                .exceptionHandling(
+                        handling ->
+                                handling
+                                        .authenticationEntryPoint(
+                                                (request, response, ex) ->
+                                                        problems.write(
+                                                                request,
+                                                                response,
+                                                                HttpStatus.UNAUTHORIZED.value(),
+                                                                "AUTHENTICATION_REQUIRED",
+                                                                "Authentification absente ou expirée."))
+                                        .accessDeniedHandler(
+                                                (request, response, ex) ->
+                                                        problems.write(
+                                                                request,
+                                                                response,
+                                                                HttpStatus.FORBIDDEN.value(),
+                                                                "FORBIDDEN",
+                                                                "Permission ou périmètre insuffisant.")));
+        return http.build();
+    }
+
+    /** Associe la conversion des rôles de realm Keycloak au décodage du jeton. */
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(new KeycloakRealmRoleConverter());
+        return converter;
+    }
+}

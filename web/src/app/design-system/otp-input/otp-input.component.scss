@@ -1,0 +1,76 @@
+.cnpm-otp {
+  display: flex;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+/* Sur petit écran, la gouttière cède avant la case : c'est le seul moyen de tenir à
+   la fois la cible tactile de 44 px et l'absence de défilement horizontal à VP-360. */
+@media (max-width: 479px) {
+  .cnpm-otp {
+    gap: var(--cnpm-space-1);
+  }
+}
+
+/* Cases fluides plutôt que largeur fixe : six cases de 44 px plus leurs gouttières
+   imposaient une largeur incompressible qui débordait sous 360 px.
+   La gouttière est resserrée sous 480 px (voir plus bas) afin que les cases
+   conservent la cible tactile de 44 px sur VP-360, viewport obligatoire. En dessous
+   de 360 px — hors viewports obligatoires, mais requis par le reflow WCAG à 320 px —
+   elles se rétrécissent jusqu'à 2,25 rem, la taille de contrôle la plus petite du
+   design system. */
+.cnpm-otp__cell {
+  flex: 1 1 0;
+  min-width: var(--cnpm-size-control-sm);
+  max-width: var(--cnpm-size-control-lg);
+  height: var(--cnpm-size-control-xl);
+  text-align: center;
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xl);
+  color: var(--cnpm-color-text-primary);
+  background-color: var(--cnpm-color-surface-primary);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+}
+
+/* Contour opaque : la règle d'erreur ci-dessous fige `border-color` à la teinte
+   critique, laissant sinon une case invalide focalisée sans indicateur — l'état
+   central de l'écran 2FA. Le contour n'est pas écrasé par l'état d'erreur. */
+.cnpm-otp__cell:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  border-color: var(--cnpm-color-border-focus);
+  box-shadow: var(--cnpm-shadow-focus);
+}
+
+.cnpm-otp__cell:disabled {
+  background-color: var(--cnpm-color-surface-subtle);
+  cursor: not-allowed;
+}
+
+.cnpm-otp__cell[aria-invalid='true'] {
+  border-color: var(--cnpm-color-border-critical);
+}
+
+.cnpm-otp__error {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  margin: var(--cnpm-space-2) 0 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-critical);
+}
+
+.cnpm-otp__error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-icon-sm);
+  height: var(--cnpm-size-icon-sm);
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-semantic-error-600);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  flex-shrink: 0;
+}

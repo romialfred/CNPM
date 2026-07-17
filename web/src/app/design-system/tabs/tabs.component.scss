@@ -1,0 +1,58 @@
+/* `flex` et non `inline-flex` : la largeur intrinsèque des onglets débordait sous
+   320 px. Les onglets se partagent la largeur disponible et leur libellé se réduit
+   plutôt que de forcer un défilement horizontal de la page (WCAG 1.4.10). */
+.cnpm-tabs {
+  display: flex;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+/* Le libellé peut revenir à la ligne plutôt qu'imposer sa largeur intrinsèque : sous
+   320 px, « Espace administration » forçait sinon un défilement horizontal de toute la
+   page (WCAG 1.4.10). Sur petit écran, la typographie est resserrée (voir plus bas)
+   pour qu'il tienne sur une ligne : un onglet replié sur deux lignes dépassait la
+   borne haute de 48 px de la densité `touch`. */
+.cnpm-tabs__tab {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: var(--cnpm-size-control-lg);
+  padding: var(--cnpm-space-3) var(--cnpm-space-2);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+  cursor: pointer;
+  overflow-wrap: break-word;
+}
+
+.cnpm-tabs__tab:hover {
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Contour opaque : le halo seul n'atteint pas le rapport 3:1 de WCAG 1.4.11. */
+.cnpm-tabs__tab:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: -2px;
+  box-shadow: var(--cnpm-shadow-focus);
+  border-radius: var(--cnpm-radius-sm);
+}
+
+/* Densité `touch` : le libellé doit tenir sur une ligne pour que la hauteur reste dans
+   la fourchette 44–48 px du handoff. */
+@media (max-width: 479px) {
+  .cnpm-tabs__tab {
+    padding-inline: var(--cnpm-space-1);
+    font-size: var(--cnpm-font-size-xs);
+  }
+}
+
+/* Actif : soulignement + graisse, en plus de aria-selected — pas la couleur seule. */
+.cnpm-tabs__tab--active {
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+  border-bottom-color: var(--cnpm-color-brand-blue-700);
+}
