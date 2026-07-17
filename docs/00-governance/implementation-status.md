@@ -375,3 +375,34 @@ correct, cast Fetch→Join sûr, N+1 évité, limite ABAC documentée.
 Ce qu'il reste pour un BO-002 100 % réel : le groupement (jointure `group_membership`)
 et le contact principal, puis le câblage du gateway Angular sur l'API (backend + auth
 Keycloak). Les montants dus/payés restent bloqués (ADR-006, modules.md).
+
+
+### Seed de la nomenclature institutionnelle réelle (V6)
+
+Sixième incrément : la migration `V6__seed_regions_and_professional_groups.sql` sème la
+nomenclature réelle du CNPM, désignée par le commanditaire depuis son site officiel
+`cnpm.ml`. Débloque partiellement DATA-DEC-002 (filtres Région et Groupement de BO-002).
+
+| Élément | Détail |
+|---|---|
+| Régions | 7 Conseils Patronaux de Région dans `ref.reference_value` domaine `REGION` (Kayes → Tombouctou) |
+| Groupements | 39 groupements professionnels dans `member.professional_group` (sigle + dénomination) |
+| Nature | Structure **publique** du CNPM ; aucune donnée confidentielle de membre, aucun contact personnel de président de CPR |
+| Idempotence | `ON CONFLICT (domain, code)` / `ON CONFLICT (code)` `DO NOTHING` : rejouable, ne réécrit jamais l'existant |
+| Tests | 4 cas (`NomenclatureSeedTest`) : présence, libellés non vides, idempotence + non-écrasement, application depuis V5 ; 9 verts avec `FlywayMigrationTest` |
+
+Audit indépendant (database-reviewer) : **verdict APTE À COMMITTER, aucun défaut
+bloquant**. Idempotence, conformité au schéma (longueurs, apostrophes françaises
+échappées), absence de données personnelles, absence de collision avec le seed V3 et
+réversibilité toutes vérifiées. Deux renforcements de test mineurs appliqués
+(non-écrasement de `ref.reference_value`, étape explicite V5→V6) et la traçabilité
+gouvernance complétée (DATA-DEC-002).
+
+Quatre points laissés à l'arbitrage CNPM (migration immuable → correction par V7 le cas
+échéant), tous consignés dans DATA-DEC-002 : libellé **GCM** (extraction dupliquée,
+réduit au sigle), libellé **AEPES** (non publié, réduit au sigle), **taxonomie de
+secteurs** absente (`sector_code` laissé `NULL`, filtre Secteur toujours non rendu),
+statut du **District de Bamako** (8ᵉ entité régionale ?) non tranché.
+
+Restent bloqués côté BO-002 : filtres Secteur d'activité, Niveau de cotisation (DEC-008)
+et Période d'adhésion.

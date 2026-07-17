@@ -181,7 +181,8 @@ soit retirer `segment` des fixtures, soit le restreindre au seul marqueur.
 
 **Propriétaire.** Direction produit.
 **Impact.** BO-002.
-**Statut.** BLOCKED — décision humaine requise. Livré en périmètre réduit.
+**Statut.** PARTIELLEMENT DÉBLOQUÉ — Région et Groupement semés (2026-07-17) ; Secteur,
+Niveau de cotisation et Période d'adhésion restent BLOCKED.
 
 **Constat.** La maquette expose sept filtres. Les fixtures ne portent de donnée que
 pour quatre d'entre eux.
@@ -190,21 +191,43 @@ pour quatre d'entre eux.
 |---|---|---|
 | Statut | `status` | oui |
 | Catégorie | `category` | oui |
-| Groupement | `group` | oui |
+| Groupement | `member.professional_group` (39 groupements réels, V6) | oui |
 | Recherche texte | plusieurs champs | oui |
-| Secteur d'activité | aucun champ | non |
-| Région | aucun champ | non |
-| Niveau de cotisation | aucun champ | non |
+| Secteur d'activité | aucune taxonomie officielle | non |
+| Région | `ref.reference_value` domaine `REGION` (7 CPR, V6) | oui |
+| Niveau de cotisation | aucun champ (dépend de DEC-008) | non |
 | Période d'adhésion | aucune date d'adhésion (`lastActivity` n'en est pas une) | non |
 
 **Lecture retenue.** Un filtre affiché mais non alimenté est un contrôle mensonger :
-il laisse croire à un tri qui n'a pas lieu. Les quatre filtres sans donnée ne sont
-donc pas rendus, plutôt que rendus inertes ou peuplés de valeurs inventées — la
-liste des régions et des secteurs d'activité du CNPM est une donnée institutionnelle
-qui ne se devine pas.
+il laisse croire à un tri qui n'a pas lieu. Les filtres sans donnée ne sont donc pas
+rendus, plutôt que rendus inertes ou peuplés de valeurs inventées.
 
-**Arbitrage demandé.** Fournir la nomenclature des secteurs d'activité, des régions et
-des niveaux de cotisation, et confirmer si la date d'adhésion entre au modèle.
+**Déblocage 2026-07-17 (source : commanditaire).** Le CNPM a désigné son site officiel
+`cnpm.ml` (pages *Groupements professionnels* et *CPR*) comme référentiel de sa
+nomenclature institutionnelle. La migration `V6__seed_regions_and_professional_groups.sql`
+sème donc :
+
+- **7 régions** (Conseils Patronaux de Région) dans `ref.reference_value` domaine `REGION` ;
+- **39 groupements professionnels** dans `member.professional_group`.
+
+Il s'agit de la **structure publique** du CNPM (aucune donnée confidentielle de membre,
+aucun contact personnel de président de CPR). Quatre points restent à confirmer par le
+CNPM avant toute exposition définitive ; la migration étant immuable, leur correction
+passera par une V7 :
+
+1. **GCM** — l'extraction du site a renvoyé un libellé dupliqué de CAGCDM (probable
+   erreur) ; le sigle est conservé, la dénomination officielle reste à confirmer.
+2. **AEPES** — dénomination complète non publiée sur la fiche ; réduite à son sigle.
+3. **Taxonomie de secteurs** — le site ne publie **aucune** liste de secteurs d'activité.
+   `member.professional_group.sector_code` est laissé `NULL` ; le filtre *Secteur* reste
+   non rendu. L'affectation d'un secteur à chaque groupement relève d'un arbitrage CNPM.
+4. **District de Bamako** — n'est pas un CPR (siège) ; son ajout éventuel comme 8ᵉ entité
+   régionale n'est pas tranché.
+
+**Arbitrage demandé.** (a) Confirmer les 39 groupements et 7 régions semés, corriger
+GCM/AEPES ; (b) fournir la taxonomie des secteurs d'activité ; (c) trancher le statut de
+Bamako ; (d) fournir les niveaux de cotisation (lié à DEC-008) et confirmer si la date
+d'adhésion entre au modèle.
 
 ## DATA-DEC-003 — volume du jeu de démonstration des membres
 
