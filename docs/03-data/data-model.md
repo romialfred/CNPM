@@ -110,4 +110,15 @@
 | `reporting.report_definition` | Catalogue des rapports. | 12 |  | Non |  |
 | `reporting.report_execution` | Historique d’exécution. | 13 |  | Non |  |
 
-Le dictionnaire complet est fourni dans `data-dictionary.csv`; le jeu Flyway exécutable de référence se trouve dans `migrations/`, de `V1__create_schemas_and_tables.sql` à `V4__protect_append_only_tables.sql`.
+Le dictionnaire complet est fourni dans `data-dictionary.csv`; le jeu Flyway exécutable de référence se trouve dans `backend/src/main/resources/db/migration/`, de `V1__create_schemas_and_tables.sql` à la dernière version livrée.
+
+## Vues de lecture
+
+Les vues de lecture servent des écrans qui aplatissent plusieurs tables d'un **même
+module** ; elles ne franchissent aucune frontière de module et ne contiennent aucune
+donnée financière (les montants restent dans `contribution`/`payment`, servis à terme
+par le read-model d'ADR-006).
+
+| Vue | Migration | Rôle | Colonnes dérivées |
+|---|---|---|---|
+| `member.membership_list` | V7 | Liste des membres BO-002 : adhésion jointe à son entreprise et à son **groupement principal** résolu de façon déterministe (LATERAL, un seul, rattachement principal actif le plus récent). | `organization_legal_name`, `primary_group_code`, `primary_group_name` (nullables) |

@@ -530,6 +530,13 @@ paths:
         schema:
           type: string
           maxLength: 50
+      - name: groupCode
+        in: query
+        required: false
+        description: Filtre sur le code du groupement professionnel principal de l'entreprise.
+        schema:
+          type: string
+          maxLength: 60
       - name: search
         in: query
         required: false
@@ -540,7 +547,7 @@ paths:
       - name: sort
         in: query
         required: false
-        description: 'Tri : membershipNumber, status ou organizationLegalName, suffixé de ,asc ou ,desc.'
+        description: 'Tri : membershipNumber, status, organizationLegalName ou primaryGroupName, suffixé de ,asc ou ,desc.'
         schema:
           type: string
           maxLength: 40
@@ -3792,6 +3799,16 @@ components:
         version:
           type: integer
           format: int64
+        primaryGroupCode:
+          type: string
+          maxLength: 60
+          nullable: true
+          description: Code du groupement professionnel principal, ou null si aucun.
+        primaryGroupName:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: Dénomination du groupement professionnel principal, ou null si aucun.
       additionalProperties: false
     MembershipPage:
       type: object

@@ -406,3 +406,39 @@ statut du **District de Bamako** (8ᵉ entité régionale ?) non tranché.
 
 Restent bloqués côté BO-002 : filtres Secteur d'activité, Niveau de cotisation (DEC-008)
 et Période d'adhésion.
+
+
+### BO-002 : groupement principal dans listMemberships (vue de lecture V7)
+
+Septième incrément : la colonne « Groupement » de BO-002, alimentée par une vue de
+lecture `member.membership_list` qui résout le groupement professionnel **principal** de
+chaque adhésion. S'appuie sur les 39 groupements réels semés en V6.
+
+| Élément | Détail |
+|---|---|
+| Vue | `member.membership_list` (V7) : aplatit adhésion + entreprise + groupement principal ; `LEFT JOIN LATERAL ... LIMIT 1` retient un seul rattachement principal actif (le plus récent, départagé par `group_id`), même en l'absence de contrainte d'unicité sur `is_primary` |
+| Lecture sans N+1 | Une ligne par adhésion, colonnes scalaires : plus de fetch join ni de cas spécial comptage ; l'adaptateur (réécrit) filtre/trie/pagine sur la vue |
+| Champs | `primaryGroupCode` / `primaryGroupName` (nullables) ajoutés au domaine, à la vue web et au contrat OpenAPI ; nouveau filtre `groupCode` ; tri `primaryGroupName` |
+| Modèle de lecture | Vue **intra-module** (ne joint que le schéma `member`, aucun montant) : ne relève pas d'ADR-006 (read-model transverse de reporting), confirmé par l'audit architecture |
+| Tests | 105→109 backend verts (25 pour listMemberships), dont groupement exposé, absent→null, rattachement clôturé exclu, **non-principal exclu**, filtre `groupCode` (nominal + 0 résultat), tri par groupement, choix déterministe si plusieurs principaux, unicité de ligne si dates égales |
+
+Panel d'experts seniors (DBA, architecture, testeur, contrat d'API) + vérification
+adversariale : **DBA APTE**, **architecture APTE**, **contrat APTE**, **tests NON** au
+premier tour. Corrigés : les 2 lacunes HAUTES de test (rattachement `is_primary=false`
+ignoré — cible la condition `AND gm.is_primary` de la vue ; contrôle négatif du filtre
+`groupCode`), la lacune MOYENNE (unicité de ligne à dates égales), le négatif de longueur
+`groupCode`, les commentaires de colonnes de la vue, et la traçabilité (data-model.md +
+présente section). Réfutés / confirmés sûrs : unicité de ligne garantie par le `LIMIT 1`
+(vérifié empiriquement à 100 000 lignes), déterminisme du départage garanti par l'index
+`uq_member_group_membership_active`, échappement LIKE et Specification paramétrée sûrs,
+`ddl-auto=validate` accepte la vue, aucune frontière de module ni donnée financière
+franchie.
+
+**Réserve de performance consignée (DATA-DEC-006).** Le tri `primaryGroupName` sur une
+colonne dérivée de la LATERAL, sans filtre sélectif, coûte ~1 s à 100 000 adhésions
+(mesuré). Non bloquant à l'échelle réelle du CNPM (non chiffrée), consigné comme décision
+ouverte plutôt que sur-optimisé prématurément.
+
+Non livré : le contact principal de l'entreprise (dernière colonne BO-002), `getOrganization`
+détail, et les écritures `createOrganization`/`createMembership`. Les montants dus/payés
+restent bloqués (ADR-006, modules.md).

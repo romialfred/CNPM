@@ -1,7 +1,5 @@
 package ml.cnpm.platform.member.adapter.out.persistence;
 
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,33 +17,34 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 /**
- * Adaptateur de persistance des adhésions : filtres dynamiques, recherche sur le numéro
- * ou la raison sociale (métacaractères LIKE échappés), tri borné, pagination.
+ * Adaptateur de persistance des adhésions, sur la vue {@code member.membership_list}.
  *
- * <p>L'entreprise est jointe explicitement (fetch) sur les requêtes de contenu pour éviter
- * un N+1, mais pas sur la requête de comptage — un fetch dans un {@code count(...)}
- * échouerait. Le tri par nom d'entreprise passe par la relation.
+ * <p>La vue résout déjà, par ligne, la raison sociale de l'entreprise et le groupement
+ * principal : l'adaptateur n'a donc qu'à filtrer, trier (en liste blanche) et paginer sur
+ * des colonnes scalaires. Une ligne par adhésion : ni jointure fetch, ni N+1. Les
+ * métacaractères LIKE de la recherche sont échappés.
  */
 @Repository
 class MembershipPersistenceAdapter implements MembershipRepository {
 
-    /** Clés de tri exposées → chemin de propriété. */
+    /** Clés de tri exposées → propriété de l'entité de vue. */
     private static final Map<String, String> SORTABLE =
             Map.of(
                     "membershipNumber", "membershipNumber",
                     "status", "status",
-                    "organizationLegalName", "organization.legalName");
+                    "organizationLegalName", "organizationLegalName",
+                    "primaryGroupName", "primaryGroupName");
 
-    private final MembershipJpaRepository jpaRepository;
+    private final MembershipListJpaRepository jpaRepository;
 
-    MembershipPersistenceAdapter(MembershipJpaRepository jpaRepository) {
+    MembershipPersistenceAdapter(MembershipListJpaRepository jpaRepository) {
         this.jpaRepository = jpaRepository;
     }
 
     @Override
     public PageResult<Membership> search(MembershipQuery query) {
         Pageable pageable = PageRequest.of(query.page(), query.size(), sort(query.sort()));
-        Page<MembershipEntity> result = jpaRepository.findAll(toSpecification(query), pageable);
+        Page<MembershipListEntity> result = jpaRepository.findAll(toSpecification(query), pageable);
         return new PageResult<>(
                 result.getContent().stream().map(MembershipPersistenceAdapter::toDomain).toList(),
                 result.getNumber(),
@@ -54,24 +53,8 @@ class MembershipPersistenceAdapter implements MembershipRepository {
                 result.getTotalPages());
     }
 
-    private static Specification<MembershipEntity> toSpecification(MembershipQuery query) {
+    private static Specification<MembershipListEntity> toSpecification(MembershipQuery query) {
         return (root, criteriaQuery, builder) -> {
-            // Jointure explicite vers l'entreprise. Sur la requête de comptage, un fetch
-            // n'a pas de sens (et échoue) : on se contente alors d'une jointure ordinaire.
-            Join<MembershipEntity, OrganizationEntity> organization;
-            boolean counting = Long.class.equals(criteriaQuery.getResultType());
-            if (counting) {
-                organization = root.join("organization", JoinType.INNER);
-            } else {
-                // Le Fetch renvoyé par Hibernate EST un Join, mais les signatures
-                // génériques imposent le passage par Object.
-                @SuppressWarnings("unchecked")
-                Join<MembershipEntity, OrganizationEntity> fetched =
-                        (Join<MembershipEntity, OrganizationEntity>)
-                                (Object) root.fetch("organization", JoinType.INNER);
-                organization = fetched;
-            }
-
             List<Predicate> predicates = new ArrayList<>();
             if (hasText(query.status())) {
                 predicates.add(builder.equal(root.get("status"), query.status()));
@@ -79,12 +62,16 @@ class MembershipPersistenceAdapter implements MembershipRepository {
             if (hasText(query.categoryCode())) {
                 predicates.add(builder.equal(root.get("categoryCode"), query.categoryCode()));
             }
+            if (hasText(query.groupCode())) {
+                predicates.add(builder.equal(root.get("primaryGroupCode"), query.groupCode()));
+            }
             if (hasText(query.search())) {
                 String pattern = "%" + escapeLike(query.search().toLowerCase(Locale.ROOT)) + "%";
                 predicates.add(
                         builder.or(
                                 builder.like(builder.lower(root.get("membershipNumber")), pattern, '\\'),
-                                builder.like(builder.lower(organization.get("legalName")), pattern, '\\')));
+                                builder.like(
+                                        builder.lower(root.get("organizationLegalName")), pattern, '\\')));
             }
             return builder.and(predicates.toArray(Predicate[]::new));
         };
@@ -113,16 +100,17 @@ class MembershipPersistenceAdapter implements MembershipRepository {
         return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 
-    private static Membership toDomain(MembershipEntity entity) {
-        OrganizationEntity organization = entity.getOrganization();
+    private static Membership toDomain(MembershipListEntity entity) {
         return new Membership(
                 entity.getId(),
                 entity.getMembershipNumber(),
-                organization.getId(),
-                organization.getLegalName(),
+                entity.getOrganizationId(),
+                entity.getOrganizationLegalName(),
                 entity.getCategoryCode(),
                 entity.getStatus(),
                 entity.getJoinedAt(),
-                entity.getVersion());
+                entity.getVersion(),
+                entity.getPrimaryGroupCode(),
+                entity.getPrimaryGroupName());
     }
 }

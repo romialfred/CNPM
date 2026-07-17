@@ -337,5 +337,46 @@ rejouée » n'est pas implémentée.
 (table partagée `integration.idempotency_key` ou colonne par table) est introduit avant
 les modules financiers, où la sémantique complète de rejeu est réellement critique.
 
+## DATA-DEC-006 — coût du tri par groupement à fort volume (vue membership_list)
+
+**Propriétaire.** Architecture / Direction technique.
+**Impact.** BO-002 (`listMemberships`).
+**Statut.** Signalé pour information — hypothèse de volume à valider.
+
+**Constat.** La vue `member.membership_list` (V7) résout le groupement principal par une
+sous-requête `LATERAL`. Trier sur les colonnes **dérivées** de cette LATERAL
+(`primaryGroupName`), sans filtre sélectif, n'est pas indexable sur une vue simple :
+un audit DBA indépendant a mesuré ~1 s et ~700 000 buffers pour 20 lignes rendues sur un
+banc de **100 000 adhésions**. Les tris/filtres sur colonnes réelles (`status`,
+`categoryCode`) et le filtre `groupCode` (39 groupements) restent rapides et indexés.
+
+**Pourquoi ce n'est pas corrigé maintenant.** Le volume réel d'entreprises membres du
+CNPM n'est chiffré par aucune source du dépôt. À l'échelle plausible d'un patronat
+national (quelques milliers de membres, 39 groupements), le coût est négligeable.
+Sur-optimiser (vue matérialisée indexée, ou dénormalisation de `primary_group_id` sur
+`member.membership`) avant de connaître le volume serait prématuré et relèverait d'un ADR.
+
+**Arbitrage demandé.** Fournir l'ordre de grandeur du nombre d'entreprises membres. Si
+> ~50 000, décider entre (a) vue matérialisée rafraîchie, (b) dénormalisation de
+`primary_group_id`, ou (c) restriction du tri par groupement à un usage filtré.
+
+## ARCH-DEC-001 — propriété des tables de groupements professionnels
+
+**Propriétaire.** Architecture.
+**Impact.** Module MEMBER et futur module GRP (Groupements).
+**Statut.** Tranché en décision technique ; signalé pour information.
+
+**Constat.** `docs/02-architecture/modules.md` liste `GRP` (Groupements professionnels)
+comme module logique distinct de `MEM`, et `openapi.yaml` tague `/professional-groups`
+sous `GROUP`. Or les tables `member.professional_group` et `member.group_membership` sont
+physiquement dans le schéma `member`, et la vue `membership_list` (V7) les lit depuis le
+package `member`.
+
+**Décision.** Tant que le module GRP n'est pas implémenté, **MEMBER est propriétaire en
+lecture et écriture** de `professional_group` et `group_membership` — cohérent avec
+`data-model.md` qui décrit le schéma `member` comme « … adhésions **et groupements** ».
+Quand GRP existera, il ne lira pas directement ces tables : il passera par un port exposé
+par MEMBER, ou les tables seront déplacées vers un schéma `grp` via un ADR dédié.
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.

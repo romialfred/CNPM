@@ -13,7 +13,9 @@ public record MembershipView(
         String categoryCode,
         String status,
         LocalDate joinedAt,
-        long version) {
+        long version,
+        String primaryGroupCode,
+        String primaryGroupName) {
 
     static MembershipView from(Membership membership) {
         return new MembershipView(
@@ -24,6 +26,8 @@ public record MembershipView(
                 membership.categoryCode(),
                 membership.status(),
                 membership.joinedAt(),
-                membership.version());
+                membership.version(),
+                membership.primaryGroupCode(),
+                membership.primaryGroupName());
     }
 }
