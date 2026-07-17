@@ -351,3 +351,27 @@ le jeton (provisionnement Keycloak), à câbler avant exposition en production.
 
 Non livré : la vue membre complète de BO-002 (jointure adhésion + groupement + contact),
 `listMemberships`, et les montants (ADR-006) — prochains incréments MEMBER.
+
+
+### Vue « membre » de BO-002 : listMemberships (jointure adhésion↔entreprise)
+
+Cinquième incrément backend : l'opération qui donne à BO-002 ses colonnes réelles
+(code d'adhésion, raison sociale, catégorie, statut), en joignant `member.membership`
+à `member.organization`.
+
+| Élément | Détail |
+|---|---|
+| Route | `GET /memberships` typé (`MembershipView`/`MembershipPage`), jointure vers l'entreprise |
+| Requête | Fetch join anti-N+1 (garde contre la requête de comptage) ; filtres statut/catégorie ; recherche sur numéro OU raison sociale (métacaractères LIKE échappés) ; tri borné (numéro, statut, nom d'entreprise) avec départage stable par id ; pagination |
+| Autorisation | `PERM_MEMBER.READ` (permission dérivée) ; 403/401 testés |
+| Tests | 91→95 backend verts (15 pour listMemberships) |
+
+Panel d'experts seniors (DBA, correction, architecture, testeur) + deux sceptiques par
+constat : 11 soumis, **4 confirmés, 7 réfutés**. Corrigés : couverture du tri complétée
+— tri par numéro et par statut, repli sur clé non autorisée, départage stable éprouvé
+par pagination sur clé à valeurs répétées. Réfutés à bon droit : échappement LIKE
+correct, cast Fetch→Join sûr, N+1 évité, limite ABAC documentée.
+
+Ce qu'il reste pour un BO-002 100 % réel : le groupement (jointure `group_membership`)
+et le contact principal, puis le câblage du gateway Angular sur l'API (backend + auth
+Keycloak). Les montants dus/payés restent bloqués (ADR-006, modules.md).
