@@ -478,7 +478,12 @@ paths:
     get:
       tags:
       - MEMBER
-      summary: Consulter l’historique.
+      summary: Consulter l’historique des statuts.
+      description: >-
+        Historique paginé des changements de statut des adhésions de l'entreprise, du plus
+        récent au plus ancien. Périmètre R0 : les transitions de statut d'adhésion
+        (member.membership_status_history). MEM-004 (historique) est la seule exigence de
+        ce bloc réellement couverte ici.
       operationId: getOrganizationHistory
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
@@ -486,7 +491,9 @@ paths:
         in: path
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/Uuid'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
       responses:
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -501,20 +508,13 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Ressource
+          description: Historique paginé des changements de statut
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/OrganizationHistoryPage'
       x-requirements:
-      - MEM-001
-      - MEM-002
-      - MEM-003
       - MEM-004
-      - MEM-005
-      - MEM-006
-      - MEM-007
-      - MEM-008
   /memberships:
     get:
       tags:
@@ -3845,6 +3845,68 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MembershipView'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+      additionalProperties: false
+    MembershipStatusChangeView:
+      type: object
+      description: Changement de statut d'une adhésion (entrée d'historique append-only).
+      required:
+      - id
+      - membershipId
+      - membershipNumber
+      - toStatus
+      - changedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        membershipId:
+          $ref: '#/components/schemas/Uuid'
+        membershipNumber:
+          type: string
+          maxLength: 60
+        fromStatus:
+          type: string
+          maxLength: 30
+          nullable: true
+          description: Statut avant le changement, null pour le statut initial.
+        toStatus:
+          type: string
+          maxLength: 30
+        reason:
+          type: string
+          nullable: true
+          description: Motif du changement, ou null.
+        changedAt:
+          type: string
+          format: date-time
+          description: Horodatage du changement (timestamptz).
+        changedBy:
+          type: string
+          format: uuid
+          nullable: true
+          description: Acteur du changement, ou null si non renseigné.
+      additionalProperties: false
+    OrganizationHistoryPage:
+      type: object
+      description: Page typée d'entrées d'historique de statut.
+      required:
+      - items
+      - page
+      - size
+      - totalElements
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MembershipStatusChangeView'
         page:
           type: integer
         size:

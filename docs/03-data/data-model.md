@@ -122,3 +122,4 @@ par le read-model d'ADR-006).
 | Vue | Migration | Rôle | Colonnes dérivées |
 |---|---|---|---|
 | `member.membership_list` | V7, V8 | Liste des membres BO-002 : adhésion jointe à son entreprise, son **groupement principal** et son **contact principal** (représentant légal actif — DATA-DEC-007), tous résolus de façon déterministe (LATERAL, un seul chacun). | `organization_legal_name`, `primary_group_code`, `primary_group_name`, `primary_contact_name`, `primary_contact_email`, `primary_contact_phone` (nullables) |
+| `member.organization_status_history` | V9 | Historique BO-002 : changements de statut des adhésions d'une entreprise (lecture de la table append-only `membership_status_history`, rattachée à l'entreprise via l'adhésion). | `organization_id`, `membership_number` |

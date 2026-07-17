@@ -52,4 +52,17 @@ public class OrganizationController {
     public OrganizationView get(@PathVariable("id") UUID id) {
         return OrganizationView.from(service.get(id));
     }
+
+    /**
+     * {@code GET /organizations/{id}/history} — historique paginé des changements de statut
+     * des adhésions de l'entreprise, du plus récent au plus ancien. 404 si l'entreprise est
+     * absente ; taille de page bornée côté serveur.
+     */
+    @GetMapping("/organizations/{id}/history")
+    public OrganizationHistoryPageView history(
+            @PathVariable("id") UUID id,
+            @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+            @RequestParam(name = "size", defaultValue = "20") @Min(1) @Max(100) int size) {
+        return OrganizationHistoryPageView.from(service.getHistory(id, page, size));
+    }
 }

@@ -1,7 +1,9 @@
 package ml.cnpm.platform.member.application;
 
 import java.util.UUID;
+import ml.cnpm.platform.member.application.port.out.MembershipHistoryRepository;
 import ml.cnpm.platform.member.application.port.out.OrganizationRepository;
+import ml.cnpm.platform.member.domain.MembershipStatusChange;
 import ml.cnpm.platform.member.domain.Organization;
 import ml.cnpm.platform.shared.api.PageResult;
 import ml.cnpm.platform.shared.api.ResourceNotFoundException;
@@ -29,9 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrganizationService {
 
     private final OrganizationRepository repository;
+    private final MembershipHistoryRepository historyRepository;
 
-    public OrganizationService(OrganizationRepository repository) {
+    public OrganizationService(
+            OrganizationRepository repository, MembershipHistoryRepository historyRepository) {
         this.repository = repository;
+        this.historyRepository = historyRepository;
     }
 
     @PreAuthorize("hasAuthority('PERM_MEMBER.READ')")
@@ -51,5 +56,21 @@ public class OrganizationService {
         return repository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Entreprise introuvable."));
+    }
+
+    /**
+     * Historique paginé des changements de statut des adhésions d'une entreprise, du plus
+     * récent au plus ancien.
+     *
+     * @throws ResourceNotFoundException si aucune entreprise ne porte cet identifiant — un
+     *     historique vide (entreprise existante sans changement) reste un 200 à liste vide
+     */
+    @PreAuthorize("hasAuthority('PERM_MEMBER.READ')")
+    @Transactional(readOnly = true)
+    public PageResult<MembershipStatusChange> getHistory(UUID id, int page, int size) {
+        if (repository.findById(id).isEmpty()) {
+            throw new ResourceNotFoundException("Entreprise introuvable.");
+        }
+        return historyRepository.findByOrganization(id, page, size);
     }
 }

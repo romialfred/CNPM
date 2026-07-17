@@ -479,3 +479,29 @@ suivants. Le contrat OpenAPI a été corrigé (résumé « fiche entreprise (cœ
 à la suite de l'audit contrat indépendant qui a relevé que « fiche 360° » surestimait la
 livraison. `getOrganization` réutilise volontairement `OrganizationView` (pas de schéma
 détail distinct tant que la fiche 360° n'est pas composée).
+
+
+### Historique entreprise : getOrganizationHistory (V9)
+
+Dixième incrément : l'action « Historique » de BO-002, `GET /organizations/{id}/history`,
+jusqu'ici déclarée avec un schéma générique `Resource`. Typée et implémentée.
+
+| Élément | Détail |
+|---|---|
+| Vue | `member.organization_status_history` (V9) : lecture de la table append-only `membership_status_history`, rattachée à l'entreprise via l'adhésion, avec le numéro d'adhésion pour contexte |
+| Route | `GET /organizations/{id}/history` typé `OrganizationHistoryPage` ; ordre du plus récent au plus ancien (created_at desc, départage par id) ; pagination bornée ; 404 si l'entreprise est absente, **200 à liste vide** si elle existe sans changement |
+| Autorisation | `PERM_MEMBER.READ` (garde propre au endpoint) ; 401/403 testés |
+| Append-only | La vue ne fait que lire une table protégée (triggers V4/V5) ; aucune écriture. Les tests n'y suppriment rien (impossible) : chaque test emploie des identifiants d'entreprise distincts et interroge par entreprise |
+| Tests | Nouvelle classe `OrganizationHistoryApiTest` (9 cas) : ordre, statut initial (`fromStatus` null), motif/acteur null, historique vide vs 404, pagination stable, **départage par id à horodatage égal**, 403, 401, id mal formé, borne de taille |
+
+Audit indépendant via **workflow adversarial** (6 dimensions — DBA, architecture, sécurité,
+tests, contrat, correction — chaque constat vérifié par 2 sceptiques). Sur **9 constats
+soumis, 1 seul confirmé** (2/2 votes) : l'absence de test du départage par id quand deux
+changements partagent `created_at` (cas réel car `created_at DEFAULT now()` = début de
+transaction). Corrigé par `keepsPagesDisjointWhenTwoChangesShareTheTimestamp`, calqué sur
+le test frère de `MembershipApiTest`. Les 8 autres constats ont été réfutés (frontières,
+sémantique 404-vs-200-vide, mapping timestamptz→Instant, typage du contrat, exposition de
+`created_by` : tous jugés corrects).
+
+Périmètre : seule l'exigence MEM-004 (historique) est couverte ; `x-requirements` du contrat
+réduit en conséquence. Les montants et le reste de la fiche 360° restent hors périmètre.
