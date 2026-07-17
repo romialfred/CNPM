@@ -3,6 +3,7 @@ package ml.cnpm.platform.administration;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -412,6 +413,220 @@ class ReferenceValueApiTest {
                                 .with(asFunctionalAdmin()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    private String createAndReturnBody(String domain, String code, String label) throws Exception {
+        return mockMvc.perform(
+                        post("/reference-values")
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body(domain, code, label, 1))
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+    }
+
+    @Test
+    void updatesAValueUnderOptimisticLockAndAuditsIt() throws Exception {
+        String created = createAndReturnBody("TEST_UPDATE", "U1", "Avant");
+        String id = JsonPath.read(created, "$.id");
+        Integer version = JsonPath.read(created, "$.version");
+
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", String.valueOf(version))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"Après\",\"active\":false}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.label").value("Après"))
+                .andExpect(jsonPath("$.active").value(false))
+                // Le domaine et le code, identité, restent inchangés.
+                .andExpect(jsonPath("$.domain").value("TEST_UPDATE"))
+                .andExpect(jsonPath("$.code").value("U1"))
+                // La version a été incrémentée par le verrou optimiste.
+                .andExpect(jsonPath("$.version").value(version + 1));
+
+        // La mise à jour est auditée avec une empreinte avant ET après.
+        Integer audited =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.audit_event WHERE entity_id = ?::uuid "
+                                + "AND action_code = 'REFERENCE_VALUE.UPDATED' "
+                                + "AND before_hash IS NOT NULL AND after_hash IS NOT NULL",
+                        Integer.class,
+                        id);
+        org.junit.jupiter.api.Assertions.assertEquals(1, audited);
+    }
+
+    @Test
+    void rejectsAnUpdateOnAStaleVersion() throws Exception {
+        String created = createAndReturnBody("TEST_STALE", "U2", "Avant");
+        String id = JsonPath.read(created, "$.id");
+
+        // Version attendue erronée : la modification est refusée sans être tentée.
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", "999")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"Ne doit pas passer\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isConflict())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("STATE_CONFLICT"));
+
+        // Rien n'a changé, aucun audit de mise à jour.
+        String label =
+                jdbcTemplate.queryForObject(
+                        "SELECT label FROM ref.reference_value WHERE id = ?::uuid", String.class, id);
+        org.junit.jupiter.api.Assertions.assertEquals("Avant", label);
+        Integer updateAudits =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.audit_event WHERE entity_id = ?::uuid "
+                                + "AND action_code = 'REFERENCE_VALUE.UPDATED'",
+                        Integer.class,
+                        id);
+        org.junit.jupiter.api.Assertions.assertEquals(0, updateAudits);
+    }
+
+    @Test
+    void appliesOnlyTheProvidedFieldsOnAPartialUpdate() throws Exception {
+        // Création avec sortOrder=1, active=true ; un PATCH ne portant que le libellé
+        // laisse sortOrder et active inchangés (sémantique PATCH réellement partielle).
+        String created = createAndReturnBody("TEST_PARTIAL", "P1", "Avant");
+        String id = JsonPath.read(created, "$.id");
+        Integer version = JsonPath.read(created, "$.version");
+
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", String.valueOf(version))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"Après\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.label").value("Après"))
+                .andExpect(jsonPath("$.sortOrder").value(1))
+                .andExpect(jsonPath("$.active").value(true));
+    }
+
+    @Test
+    void treatsAnEmptyPatchAsANoOpWithoutAuditOrVersionBump() throws Exception {
+        // Un corps vide ne modifie rien : ni version incrémentée, ni audit « mise à jour »
+        // (un événement sans changement serait un faux positif de trace).
+        String created = createAndReturnBody("TEST_NOOP", "N1", "Inchangé");
+        String id = JsonPath.read(created, "$.id");
+        Integer version = JsonPath.read(created, "$.version");
+
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", String.valueOf(version))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.label").value("Inchangé"))
+                .andExpect(jsonPath("$.version").value(version));
+
+        Integer updateAudits =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.audit_event WHERE entity_id = ?::uuid "
+                                + "AND action_code = 'REFERENCE_VALUE.UPDATED'",
+                        Integer.class,
+                        id);
+        org.junit.jupiter.api.Assertions.assertEquals(0, updateAudits);
+    }
+
+    @Test
+    void rejectsAnUpdateWithABlankLabel() throws Exception {
+        String created = createAndReturnBody("TEST_BLANK", "B1", "Avant");
+        String id = JsonPath.read(created, "$.id");
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void rendersANonNumericIfMatchAsANormalizedProblem() throws Exception {
+        String created = createAndReturnBody("TEST_BADMATCH", "M1", "Avant");
+        String id = JsonPath.read(created, "$.id");
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", "pas-un-nombre")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"X\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.correlationId").exists());
+    }
+
+    @Test
+    void returnsNotFoundWhenUpdatingAnUnknownId() throws Exception {
+        mockMvc.perform(
+                        patch("/reference-values/{id}", "00000000-0000-0000-0000-000000000000")
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"X\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
+    }
+
+    @Test
+    void requiresAnIfMatchHeaderToUpdate() throws Exception {
+        String created = createAndReturnBody("TEST_NOMATCH", "U3", "Avant");
+        String id = JsonPath.read(created, "$.id");
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"X\"}")
+                                .with(asFunctionalAdmin()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void deniesUpdateToRoleWithoutWritePermission() throws Exception {
+        String created = createAndReturnBody("TEST_UPD_FORBIDDEN", "U4", "Avant");
+        String id = JsonPath.read(created, "$.id");
+        mockMvc.perform(
+                        patch("/reference-values/{id}", id)
+                                .header("If-Match", "0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"label\":\"X\"}")
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("ROLE_MEMBRE_UTILISATEUR"))))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void auditsAnAuthorizationDenialAsASecurityEvent() throws Exception {
+        // ADR-008 exigeait une trace des tentatives de dépassement de droits : un refus
+        // (403) produit désormais un événement de sécurité.
+        Integer before =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.security_event WHERE event_type = 'AUTHORIZATION_DENIED'",
+                        Integer.class);
+        mockMvc.perform(
+                        get("/reference-values")
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("ROLE_MEMBRE_UTILISATEUR"))))
+                .andExpect(status().isForbidden());
+        Integer after =
+                jdbcTemplate.queryForObject(
+                        "SELECT count(*) FROM audit.security_event WHERE event_type = 'AUTHORIZATION_DENIED'",
+                        Integer.class);
+        org.junit.jupiter.api.Assertions.assertEquals(before + 1, after);
     }
 
     /** Décodeur factice : évite toute récupération réseau des métadonnées OIDC au démarrage. */

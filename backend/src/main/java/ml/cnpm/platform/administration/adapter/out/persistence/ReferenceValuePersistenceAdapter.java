@@ -1,9 +1,11 @@
 package ml.cnpm.platform.administration.adapter.out.persistence;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import ml.cnpm.platform.administration.application.PageResult;
 import ml.cnpm.platform.administration.application.ReferenceValueDraft;
+import ml.cnpm.platform.administration.application.ReferenceValuePatch;
 import ml.cnpm.platform.administration.application.port.out.ReferenceValueRepository;
 import ml.cnpm.platform.administration.domain.ReferenceValue;
 import org.springframework.data.domain.Page;
@@ -67,6 +69,32 @@ class ReferenceValuePersistenceAdapter implements ReferenceValueRepository {
         return toDomain(jpaRepository.save(entity));
     }
 
+    @Override
+    public Optional<ReferenceValue> findById(UUID id) {
+        return jpaRepository.findById(id).map(ReferenceValuePersistenceAdapter::toDomain);
+    }
+
+    @Override
+    public ReferenceValue update(UUID id, ReferenceValuePatch patch) {
+        // On charge l'entité gérée, on applique la modification, et le flush déclenche le
+        // contrôle de version JPA (@Version) : une modification concurrente survenue
+        // entre-temps lève une exception de verrou optimiste, traduite en 409 plus haut.
+        ReferenceValueEntity entity =
+                jpaRepository
+                        .findById(id)
+                        .orElseThrow(() -> new NoSuchElementException("reference value " + id));
+        if (patch.label() != null) {
+            entity.applyLabel(patch.label());
+        }
+        if (patch.sortOrder() != null) {
+            entity.applySortOrder(patch.sortOrder());
+        }
+        if (patch.active() != null) {
+            entity.applyActive(patch.active());
+        }
+        return toDomain(jpaRepository.saveAndFlush(entity));
+    }
+
     private static ReferenceValue toDomain(ReferenceValueEntity entity) {
         return new ReferenceValue(
                 entity.getId(),
@@ -76,6 +104,7 @@ class ReferenceValuePersistenceAdapter implements ReferenceValueRepository {
                 entity.getSortOrder(),
                 entity.isActive(),
                 entity.getValidFrom(),
-                entity.getValidTo());
+                entity.getValidTo(),
+                entity.getVersion());
     }
 }

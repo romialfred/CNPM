@@ -7,6 +7,7 @@ import ml.cnpm.platform.administration.domain.ReferenceValue;
 import ml.cnpm.platform.audit.AuditEntry;
 import ml.cnpm.platform.audit.AuditRecorder;
 import ml.cnpm.platform.shared.api.Hashing;
+import ml.cnpm.platform.shared.api.ResourceNotFoundException;
 import ml.cnpm.platform.shared.api.StateConflictException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class ReferenceValueService {
 
     private static final String ENTITY_TYPE = "ref.reference_value";
     private static final String ACTION_CREATED = "REFERENCE_VALUE.CREATED";
+    private static final String ACTION_UPDATED = "REFERENCE_VALUE.UPDATED";
 
     private final ReferenceValueRepository repository;
     private final AuditRecorder auditRecorder;
@@ -74,6 +76,53 @@ public class ReferenceValueService {
                         actorUserId, ACTION_CREATED, ENTITY_TYPE, created.id(), fingerprint(created),
                         correlationId));
         return new ReferenceValueCreation(created, true);
+    }
+
+    /**
+     * Applique une modification partielle, sous verrou optimiste.
+     *
+     * @param expectedVersion version connue du client ({@code If-Match}) ; un écart avec
+     *     la version courante interrompt l'opération sans la tenter
+     * @throws ResourceNotFoundException si aucune valeur ne porte cet identifiant
+     * @throws StateConflictException si la version attendue ne correspond pas à la version
+     *     courante (modification concurrente déjà survenue)
+     */
+    @PreAuthorize("hasRole('ADMIN_FONCTIONNEL')")
+    @Transactional
+    public ReferenceValue update(
+            UUID id,
+            long expectedVersion,
+            ReferenceValuePatch patch,
+            UUID actorUserId,
+            UUID correlationId) {
+        ReferenceValue existing =
+                repository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException("Valeur de référentiel introuvable."));
+        if (existing.version() != expectedVersion) {
+            throw new StateConflictException(
+                    "La valeur a été modifiée entre-temps ; rechargez-la avant de réessayer.");
+        }
+        if (patch.isEmpty()) {
+            // Rien à modifier : on renvoie l'état courant sans incrémenter la version ni
+            // produire un audit — un événement « mise à jour » sans changement serait un
+            // faux positif de trace (before_hash == after_hash).
+            return existing;
+        }
+
+        ReferenceValue updated = repository.update(id, patch);
+        auditRecorder.record(
+                new AuditEntry(
+                        "USER",
+                        actorUserId,
+                        ACTION_UPDATED,
+                        ENTITY_TYPE,
+                        updated.id(),
+                        fingerprint(existing),
+                        fingerprint(updated),
+                        correlationId));
+        return updated;
     }
 
     private static boolean sameContent(ReferenceValue existing, ReferenceValueDraft draft) {

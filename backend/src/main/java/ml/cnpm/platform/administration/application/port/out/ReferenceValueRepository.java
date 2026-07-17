@@ -1,8 +1,10 @@
 package ml.cnpm.platform.administration.application.port.out;
 
 import java.util.Optional;
+import java.util.UUID;
 import ml.cnpm.platform.administration.application.PageResult;
 import ml.cnpm.platform.administration.application.ReferenceValueDraft;
+import ml.cnpm.platform.administration.application.ReferenceValuePatch;
 import ml.cnpm.platform.administration.domain.ReferenceValue;
 
 /**
@@ -25,6 +27,17 @@ public interface ReferenceValueRepository {
 
     /** Valeur portant ce couple (domaine, code), qui en forme l'identité métier unique. */
     Optional<ReferenceValue> findByDomainAndCode(String domain, String code);
+
+    /** Valeur par son identifiant technique. */
+    Optional<ReferenceValue> findById(UUID id);
+
+    /**
+     * Applique une modification partielle et retourne l'état résultant, version incrémentée.
+     *
+     * <p>Peut lever une exception de verrou optimiste si la valeur a été modifiée par une
+     * transaction concurrente pendant l'opération.
+     */
+    ReferenceValue update(UUID id, ReferenceValuePatch patch);
 
     /**
      * Insère une nouvelle valeur et la retourne avec son identifiant technique.

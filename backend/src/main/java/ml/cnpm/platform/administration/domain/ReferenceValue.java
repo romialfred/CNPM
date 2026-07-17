@@ -11,6 +11,10 @@ import java.util.UUID;
  * ({@code .claude/rules/backend-java.md}). Les valeurs de référentiel alimentent les
  * listes déroulantes des écrans (catégories, canaux, priorités…) et sont historisées
  * en base.
+ *
+ * <p>{@code version} porte le verrou optimiste : le client le renvoie dans
+ * {@code If-Match} pour une mise à jour, ce qui rejette toute modification fondée sur
+ * une version périmée.
  */
 public record ReferenceValue(
         UUID id,
@@ -20,4 +24,5 @@ public record ReferenceValue(
         int sortOrder,
         boolean active,
         Instant validFrom,
-        Instant validTo) {}
+        Instant validTo,
+        long version) {}

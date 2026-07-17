@@ -214,7 +214,14 @@ paths:
         in: path
         required: true
         schema:
-          type: string
+          $ref: '#/components/schemas/Uuid'
+      - name: If-Match
+        in: header
+        required: true
+        description: Version attendue (verrou optimiste). Un écart avec la version courante produit un 409.
+        schema:
+          type: integer
+          format: int64
       responses:
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -229,23 +236,17 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Opération effectuée
+          description: Valeur de référentiel mise à jour
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
-        '201':
-          description: Ressource créée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/ReferenceValueView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/ReferenceValueUpdate'
       x-requirements:
       - ADM-001
       - ADM-002
@@ -3636,6 +3637,7 @@ components:
       - label
       - sortOrder
       - active
+      - version
       properties:
         id:
           $ref: '#/components/schemas/Uuid'
@@ -3660,6 +3662,10 @@ components:
           type: string
           format: date-time
           nullable: true
+        version:
+          type: integer
+          format: int64
+          description: Version de verrouillage optimiste, à renvoyer dans `If-Match` pour une mise à jour.
       additionalProperties: false
     ReferenceValueInput:
       type: object
@@ -3687,6 +3693,22 @@ components:
         active:
           type: boolean
           default: true
+      additionalProperties: false
+    ReferenceValueUpdate:
+      type: object
+      description: >-
+        Mise à jour partielle d'une valeur de référentiel. Le domaine et le code
+        forment l'identité et ne sont pas modifiables ; seuls les champs fournis sont
+        appliqués.
+      properties:
+        label:
+          type: string
+          minLength: 1
+          maxLength: 255
+        sortOrder:
+          type: integer
+        active:
+          type: boolean
       additionalProperties: false
     ReferenceValuePage:
       type: object

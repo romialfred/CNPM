@@ -1,5 +1,6 @@
 package ml.cnpm.platform.administration.adapter.in.web;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -7,18 +8,19 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import ml.cnpm.platform.administration.application.ReferenceValueCreation;
 import ml.cnpm.platform.administration.application.ReferenceValueService;
+import ml.cnpm.platform.administration.domain.ReferenceValue;
 import ml.cnpm.platform.shared.api.CorrelationId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Adaptateur entrant HTTP du module ADM ({@code listReferenceValues},
@@ -59,6 +61,23 @@ public class ReferenceValueController {
         // 201 pour une création réelle, 200 pour un rejeu idempotent d'une valeur identique.
         return ResponseEntity.status(outcome.created() ? HttpStatus.CREATED : HttpStatus.OK)
                 .body(view);
+    }
+
+    @PatchMapping("/reference-values/{id}")
+    public ReferenceValueView update(
+            @PathVariable("id") UUID id,
+            @RequestHeader(name = "If-Match") long expectedVersion,
+            @Valid @RequestBody ReferenceValueUpdateInput input,
+            JwtAuthenticationToken authentication,
+            HttpServletRequest request) {
+        ReferenceValue updated =
+                service.update(
+                        id,
+                        expectedVersion,
+                        input.toPatch(),
+                        actorId(authentication),
+                        CorrelationId.current(request));
+        return ReferenceValueView.from(updated);
     }
 
     /**

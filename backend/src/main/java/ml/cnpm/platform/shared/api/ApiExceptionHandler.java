@@ -33,6 +33,7 @@ public class ApiExceptionHandler {
     private static final String VALIDATION_CODE = "VALIDATION_ERROR";
     private static final String VALIDATION_MESSAGE = "La requête comporte des paramètres invalides.";
     private static final String CONFLICT_CODE = "STATE_CONFLICT";
+    private static final String NOT_FOUND_CODE = "RESOURCE_NOT_FOUND";
 
     /** Validation des paramètres de méthode (Spring 6.1+/7) : {@code @Min/@Max/@Size} sur les query params. */
     @ExceptionHandler(HandlerMethodValidationException.class)
@@ -83,6 +84,21 @@ public class ApiExceptionHandler {
         return badRequest(List.of(fieldError), request);
     }
 
+    /**
+     * Type d'un paramètre incompatible (ex. {@code If-Match} non numérique, identifiant
+     * de chemin non-UUID) : rendu comme une validation au format {@code Problem}, et non
+     * comme le corps d'erreur par défaut de Spring.
+     */
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ProblemResponse> onTypeMismatch(
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException exception,
+            HttpServletRequest request) {
+        ProblemResponse.FieldError fieldError =
+                new ProblemResponse.FieldError(
+                        exception.getName(), VALIDATION_CODE, "Valeur de paramètre invalide.");
+        return badRequest(List.of(fieldError), request);
+    }
+
     /** État incompatible avec l'opération (ex. valeur de référentiel déjà existante). */
     @ExceptionHandler(StateConflictException.class)
     public ResponseEntity<ProblemResponse> onStateConflict(
@@ -99,6 +115,29 @@ public class ApiExceptionHandler {
     @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
     public ResponseEntity<ProblemResponse> onDataIntegrityViolation(HttpServletRequest request) {
         return conflict("L'opération entre en conflit avec l'état actuel de la ressource.", request);
+    }
+
+    /** Verrou optimiste : la ressource a changé pendant la transaction de mise à jour. */
+    @ExceptionHandler(org.springframework.orm.ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ProblemResponse> onOptimisticLock(HttpServletRequest request) {
+        return conflict("La ressource a été modifiée entre-temps ; rechargez-la avant de réessayer.", request);
+    }
+
+    /** Ressource visée absente (ex. mise à jour d'un identifiant inexistant). */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ProblemResponse> onNotFound(
+            ResourceNotFoundException exception, HttpServletRequest request) {
+        ProblemResponse body =
+                new ProblemResponse(
+                        Instant.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        NOT_FOUND_CODE,
+                        exception.getMessage(),
+                        List.of(),
+                        CorrelationId.current(request));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(body);
     }
 
     private static ResponseEntity<ProblemResponse> conflict(

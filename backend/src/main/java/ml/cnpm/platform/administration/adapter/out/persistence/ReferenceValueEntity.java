@@ -102,4 +102,20 @@ class ReferenceValueEntity {
     Instant getValidTo() {
         return validTo;
     }
+
+    long getVersion() {
+        return version == null ? 0L : version;
+    }
+
+    void applyLabel(String value) {
+        this.label = value;
+    }
+
+    void applySortOrder(int value) {
+        this.sortOrder = value;
+    }
+
+    void applyActive(boolean value) {
+        this.active = value;
+    }
 }

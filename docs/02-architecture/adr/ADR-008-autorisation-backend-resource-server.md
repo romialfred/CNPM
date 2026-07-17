@@ -52,14 +52,14 @@ ses cas limites (revendication absente ou malformée → aucune autorité).
   validation financière, administration IAM) **n'est pas encore implémenté**.
 - Le **périmètre organisation/groupement** (ABAC) n'est pas encore appliqué : seul
   le RBAC par rôle l'est.
-- **Aucun événement d'audit** n'est émis sur un 401/403, alors que
-  `security-architecture.md` exige une alerte sur tentative d'élévation de privilège.
-  Le chemin de **succès** d'une action sensible est désormais audité
-  transactionnellement (voir `ml.cnpm.platform.audit`, module construit). Le chemin de
-  **refus** ne l'est toujours pas : un `AuthorizationDeniedEvent` écrivant dans
-  `audit.security_event` reste à câbler dans les gestionnaires de refus de
-  `SecurityConfig`. Signalé par l'audit indépendant du write-path ADM ; **prochain
-  incrément sécurité**, à ne pas présenter comme résolu.
+- **Audit des refus** : un refus d'autorisation **403** est désormais tracé. Le
+  gestionnaire `accessDeniedHandler` de `SecurityConfig` écrit un événement
+  `AUTHORIZATION_DENIED` (sévérité `WARNING`) dans `audit.security_event` via
+  `SecurityEventRecorder`, en best-effort — une panne d'audit ne masque pas le refus.
+  Le chemin de **succès** d'une action sensible est audité transactionnellement
+  (`audit.audit_event`). Le **401 anonyme n'est volontairement pas audité** (volume
+  élevé, signal faible : une requête sans jeton n'identifie personne). Enrichissements
+  restants : adresse source (`inet`) et corrélation dans l'événement de sécurité.
 - `/actuator/prometheus` **n'est pas public** : il exige une authentification. La
   collecte de métriques passera par un accès authentifié ou un port de gestion isolé
   par politique réseau.

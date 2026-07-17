@@ -116,7 +116,9 @@ inférieure car sept axes sur dix sont dépourvus de toute preuve.
 - **Note auditée (axe 5, périmètre couche runtime)** : **0,6/1** avant remédiations.
   Restent, tous documentés dans ADR-008 : audience non activée (client Keycloak non
   provisionné), aucun test d'intégration Keycloak, step-up/MFA absent, ABAC
-  organisation/groupement absent, pas d'événement d'audit sur 401/403.
+  organisation/groupement absent. Le **refus 403 est désormais audité**
+  (`audit.security_event`, événement `AUTHORIZATION_DENIED`, testé) ; le 401 anonyme
+  reste volontairement non audité (volume/signal).
 
 ---
 

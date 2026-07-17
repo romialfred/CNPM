@@ -297,3 +297,29 @@ le chemin de refus reste à câbler dans `SecurityConfig` (`audit.security_event
 
 Non livré : `updateReferenceValue` (verrou optimiste), et le magasin de clés
 d'idempotence générique (DATA-DEC-005) — à trancher avant les modules financiers.
+
+
+### CRUD ADM complet : updateReferenceValue + audit des refus
+
+Troisième incrément backend : la mise à jour sous verrou optimiste et la trace des
+refus d'autorisation. Le module ADM offre désormais un CRUD complet (list, create,
+update), l'étalon de bout en bout.
+
+| Élément | Détail |
+|---|---|
+| Route | `PATCH /reference-values/{id}`, contrat `ReferenceValueUpdate` typé, `version` exposée dans la vue |
+| Verrou optimiste | Double protection : contrôle `If-Match` vs version courante (409 avant tentative) **et** `@Version` JPA au flush (409 sur course réelle) ; PATCH réellement partiel ; corps vide = no-op sans audit |
+| Not-found | `RESOURCE_NOT_FOUND` (404) au format `Problem` |
+| Audit des refus | Un **403** écrit un événement `AUTHORIZATION_DENIED` dans `audit.security_event` (best-effort) — ferme la limite d'ADR-008 ; le 401 anonyme reste non audité (volume/signal) |
+| Tests | 59 backend verts (27 ADM) ; les gardes version et audit-de-refus éprouvées par mutation |
+
+Audit indépendant : 21 constats, **8 confirmés, 13 réfutés**. Corrigés : la
+contradiction ADR-008 (documentait le refus comme non audité alors qu'il l'est)
+**redressée dans l'ADR et le scorecard** ; `If-Match` non numérique désormais rendu
+au format `Problem` ; PATCH vide traité en no-op sans audit fantôme ; tests ajoutés
+(PATCH partiel, no-op, libellé vide, absence d'audit sur version obsolète). Réfutés à
+bon droit : dépendance `shared → audit`, non-audit du 401, absence de corrélation
+dans l'événement de sécurité (enrichissement documenté).
+
+Non livré : magasin de clés d'idempotence générique (DATA-DEC-005) et enrichissement
+de l'événement de sécurité (IP source, corrélation) — avant les modules financiers.

@@ -1,5 +1,8 @@
 package ml.cnpm.platform.shared.security;
 
+import java.util.UUID;
+import ml.cnpm.platform.audit.SecurityEvent;
+import ml.cnpm.platform.audit.SecurityEventRecorder;
 import ml.cnpm.platform.shared.api.ProblemResponseWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +11,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Politique de sécurité HTTP du monolithe.
@@ -25,6 +32,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     /**
      * Endpoints réellement publics. Toute autre route est refusée par défaut.
@@ -44,7 +53,10 @@ public class SecurityConfig {
     };
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, ProblemResponseWriter problems)
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            ProblemResponseWriter problems,
+            SecurityEventRecorder securityEvents)
             throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(
@@ -74,14 +86,43 @@ public class SecurityConfig {
                                                                 "AUTHENTICATION_REQUIRED",
                                                                 "Authentification absente ou expirée."))
                                         .accessDeniedHandler(
-                                                (request, response, ex) ->
-                                                        problems.write(
-                                                                request,
-                                                                response,
-                                                                HttpStatus.FORBIDDEN.value(),
-                                                                "FORBIDDEN",
-                                                                "Permission ou périmètre insuffisant.")));
+                                                (request, response, ex) -> {
+                                                    // Un refus d'autorisation est une tentative de dépassement
+                                                    // de droits par un utilisateur authentifié : on la trace.
+                                                    // Le 401 anonyme n'est volontairement pas audité (volume et
+                                                    // signal faibles). Best-effort : une panne d'audit ne doit
+                                                    // pas empêcher le refus d'être renvoyé.
+                                                    recordDenial(securityEvents);
+                                                    problems.write(
+                                                            request,
+                                                            response,
+                                                            HttpStatus.FORBIDDEN.value(),
+                                                            "FORBIDDEN",
+                                                            "Permission ou périmètre insuffisant.");
+                                                }));
         return http.build();
+    }
+
+    private static void recordDenial(SecurityEventRecorder securityEvents) {
+        try {
+            securityEvents.record(SecurityEvent.authorizationDenied(currentSubject()));
+        } catch (RuntimeException auditFailure) {
+            // Ne jamais laisser une panne d'audit masquer le refus lui-même.
+            log.warn("Échec de journalisation d'un refus d'autorisation", auditFailure);
+        }
+    }
+
+    /** Sujet du jeton courant en UUID (cas Keycloak), ou {@code null}. */
+    private static UUID currentSubject() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        try {
+            return UUID.fromString(authentication.getName());
+        } catch (IllegalArgumentException notAUuid) {
+            return null;
+        }
     }
 
     /** Associe la conversion des rôles de realm Keycloak au décodage du jeton. */

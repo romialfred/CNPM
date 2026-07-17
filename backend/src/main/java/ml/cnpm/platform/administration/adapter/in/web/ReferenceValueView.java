@@ -19,7 +19,8 @@ public record ReferenceValueView(
         int sortOrder,
         boolean active,
         Instant validFrom,
-        Instant validTo) {
+        Instant validTo,
+        long version) {
 
     static ReferenceValueView from(ReferenceValue value) {
         return new ReferenceValueView(
@@ -30,6 +31,7 @@ public record ReferenceValueView(
                 value.sortOrder(),
                 value.active(),
                 value.validFrom(),
-                value.validTo());
+                value.validTo(),
+                value.version());
     }
 }
