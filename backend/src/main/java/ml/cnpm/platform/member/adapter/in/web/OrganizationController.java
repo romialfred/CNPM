@@ -1,13 +1,23 @@
 package ml.cnpm.platform.member.adapter.in.web;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
+import ml.cnpm.platform.member.application.OrganizationCreation;
 import ml.cnpm.platform.member.application.OrganizationQuery;
 import ml.cnpm.platform.member.application.OrganizationService;
+import ml.cnpm.platform.shared.api.CorrelationId;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,9 +58,44 @@ public class OrganizationController {
      * échoue à la conversion {@code UUID} et produit un 400 normalisé ; une entreprise
      * absente produit un 404 {@code Problem} (levé par le service).
      */
+    /**
+     * {@code POST /organizations} — crée une entreprise. Idempotent sur l'identifiant métier :
+     * 201 pour une création réelle, 200 pour un rejeu d'une entreprise identique, 409 si
+     * l'identifiant est pris par une entreprise différente. L'en-tête {@code Idempotency-Key}
+     * est exigé (400 sinon), conformément au contrat.
+     */
+    @PostMapping("/organizations")
+    public ResponseEntity<OrganizationView> create(
+            @RequestHeader(name = "Idempotency-Key") @Size(min = 16, max = 100) String idempotencyKey,
+            @Valid @RequestBody OrganizationInput input,
+            JwtAuthenticationToken authentication,
+            HttpServletRequest request) {
+        OrganizationCreation outcome =
+                service.create(input.toDraft(), actorId(authentication), CorrelationId.current(request));
+        OrganizationView view = OrganizationView.from(outcome.value());
+        return ResponseEntity.status(outcome.created() ? HttpStatus.CREATED : HttpStatus.OK)
+                .body(view);
+    }
+
     @GetMapping("/organizations/{id}")
     public OrganizationView get(@PathVariable("id") UUID id) {
         return OrganizationView.from(service.get(id));
+    }
+
+    /**
+     * Identifiant de l'acteur pour l'audit : le sujet du jeton s'il est un UUID (cas
+     * Keycloak), {@code null} sinon — l'audit préfère un acteur absent à un acteur fabriqué.
+     */
+    private static UUID actorId(JwtAuthenticationToken authentication) {
+        String subject = authentication.getToken().getSubject();
+        if (subject == null) {
+            return null;
+        }
+        try {
+            return UUID.fromString(subject);
+        } catch (IllegalArgumentException notAUuid) {
+            return null;
+        }
     }
 
     /**

@@ -331,6 +331,13 @@ paths:
       - MEMBER
       summary: Créer une entreprise.
       operationId: createOrganization
+      description: >-
+        Crée une entreprise membre. Idempotent sur l'identifiant métier
+        (identifierType + identifierValue), unique en base : 201 pour une création réelle,
+        200 pour le rejeu d'une entreprise identique, 409 si l'identifiant est déjà pris par
+        une entreprise différente. L'en-tête Idempotency-Key est exigé. Périmètre R0 :
+        MEM-001 (dossier membre) ; la détection de doublons (MEM-002) et les identifiants
+        multiples relèvent d'incréments suivants.
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
       - $ref: '#/components/parameters/IdempotencyKey'
@@ -348,32 +355,25 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Opération effectuée
+          description: Rejeu idempotent — entreprise déjà existante à l'identique
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/OrganizationView'
         '201':
-          description: Ressource créée
+          description: Entreprise créée
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/OrganizationView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/OrganizationInput'
       x-requirements:
       - MEM-001
-      - MEM-002
-      - MEM-003
-      - MEM-004
-      - MEM-005
-      - MEM-006
-      - MEM-007
-      - MEM-008
   /organizations/{id}:
     get:
       tags:
@@ -3916,6 +3916,44 @@ components:
           format: int64
         totalPages:
           type: integer
+      additionalProperties: false
+    OrganizationInput:
+      type: object
+      description: >-
+        Corps de création d'une entreprise. Le statut initial (PROSPECT) et le niveau de
+        risque (NORMAL) ne sont pas fournis par le client. Le couple identifierType +
+        identifierValue est l'identifiant métier unique servant de clé d'idempotence.
+      required:
+      - legalName
+      - organizationType
+      - identifierType
+      - identifierValue
+      properties:
+        legalName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        tradeName:
+          type: string
+          maxLength: 255
+          nullable: true
+        organizationType:
+          type: string
+          minLength: 1
+          maxLength: 40
+        sectorCode:
+          type: string
+          maxLength: 80
+          nullable: true
+        identifierType:
+          type: string
+          minLength: 1
+          maxLength: 40
+          description: Type d'identifiant métier (ex. RCCM, NINA, IFU — nomenclature à confirmer).
+        identifierValue:
+          type: string
+          minLength: 1
+          maxLength: 160
       additionalProperties: false
     OrganizationView:
       type: object

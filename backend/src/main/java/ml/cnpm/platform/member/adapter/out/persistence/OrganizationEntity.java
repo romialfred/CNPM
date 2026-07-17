@@ -47,6 +47,23 @@ class OrganizationEntity {
         // Requis par JPA.
     }
 
+    OrganizationEntity(
+            UUID id,
+            String legalName,
+            String tradeName,
+            String organizationType,
+            String sectorCode,
+            String status,
+            String riskLevel) {
+        this.id = id;
+        this.legalName = legalName;
+        this.tradeName = tradeName;
+        this.organizationType = organizationType;
+        this.sectorCode = sectorCode;
+        this.status = status;
+        this.riskLevel = riskLevel;
+    }
+
     UUID getId() {
         return id;
     }

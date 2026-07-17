@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import ml.cnpm.platform.member.application.OrganizationDraft;
 import ml.cnpm.platform.member.application.OrganizationQuery;
 import ml.cnpm.platform.member.application.port.out.OrganizationRepository;
 import ml.cnpm.platform.member.domain.Organization;
@@ -34,10 +35,18 @@ class OrganizationPersistenceAdapter implements OrganizationRepository {
     private static final Map<String, String> SORTABLE =
             Map.of("legalName", "legalName", "status", "status");
 
-    private final OrganizationJpaRepository jpaRepository;
+    /** Statut et niveau de risque initiaux d'une entreprise créée (valeurs par défaut du schéma). */
+    private static final String INITIAL_STATUS = "PROSPECT";
+    private static final String INITIAL_RISK_LEVEL = "NORMAL";
 
-    OrganizationPersistenceAdapter(OrganizationJpaRepository jpaRepository) {
+    private final OrganizationJpaRepository jpaRepository;
+    private final OrganizationIdentifierJpaRepository identifierJpaRepository;
+
+    OrganizationPersistenceAdapter(
+            OrganizationJpaRepository jpaRepository,
+            OrganizationIdentifierJpaRepository identifierJpaRepository) {
         this.jpaRepository = jpaRepository;
+        this.identifierJpaRepository = identifierJpaRepository;
     }
 
     @Override
@@ -55,6 +64,39 @@ class OrganizationPersistenceAdapter implements OrganizationRepository {
     @Override
     public Optional<Organization> findById(UUID id) {
         return jpaRepository.findById(id).map(OrganizationPersistenceAdapter::toDomain);
+    }
+
+    @Override
+    public Optional<Organization> findByIdentifier(String identifierType, String identifierValue) {
+        return identifierJpaRepository
+                .findByIdentifierTypeAndIdentifierValue(identifierType, identifierValue)
+                .flatMap(identifier -> jpaRepository.findById(identifier.getOrganizationId()))
+                .map(OrganizationPersistenceAdapter::toDomain);
+    }
+
+    @Override
+    public Organization create(OrganizationDraft draft) {
+        // Insertion atomique (sous la transaction du service) de l'entreprise puis de son
+        // identifiant métier. La contrainte uq_member_identifier_type_value garantit qu'une
+        // création concurrente en doublon échoue plutôt que de dupliquer l'entreprise.
+        UUID organizationId = UUID.randomUUID();
+        OrganizationEntity organization =
+                new OrganizationEntity(
+                        organizationId,
+                        draft.legalName(),
+                        draft.tradeName(),
+                        draft.organizationType(),
+                        draft.sectorCode(),
+                        INITIAL_STATUS,
+                        INITIAL_RISK_LEVEL);
+        OrganizationEntity saved = jpaRepository.save(organization);
+        identifierJpaRepository.save(
+                new OrganizationIdentifierEntity(
+                        UUID.randomUUID(),
+                        organizationId,
+                        draft.identifierType(),
+                        draft.identifierValue()));
+        return toDomain(saved);
     }
 
     private static Specification<OrganizationEntity> toSpecification(OrganizationQuery query) {

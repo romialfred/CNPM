@@ -1,12 +1,17 @@
 package ml.cnpm.platform.member.application;
 
+import java.util.Optional;
 import java.util.UUID;
+import ml.cnpm.platform.audit.AuditEntry;
+import ml.cnpm.platform.audit.AuditRecorder;
 import ml.cnpm.platform.member.application.port.out.MembershipHistoryRepository;
 import ml.cnpm.platform.member.application.port.out.OrganizationRepository;
 import ml.cnpm.platform.member.domain.MembershipStatusChange;
 import ml.cnpm.platform.member.domain.Organization;
+import ml.cnpm.platform.shared.api.Hashing;
 import ml.cnpm.platform.shared.api.PageResult;
 import ml.cnpm.platform.shared.api.ResourceNotFoundException;
+import ml.cnpm.platform.shared.api.StateConflictException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,19 +35,83 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OrganizationService {
 
+    private static final String ENTITY_TYPE = "member.organization";
+    private static final String ACTION_CREATED = "ORGANIZATION.CREATED";
+
     private final OrganizationRepository repository;
     private final MembershipHistoryRepository historyRepository;
+    private final AuditRecorder auditRecorder;
 
     public OrganizationService(
-            OrganizationRepository repository, MembershipHistoryRepository historyRepository) {
+            OrganizationRepository repository,
+            MembershipHistoryRepository historyRepository,
+            AuditRecorder auditRecorder) {
         this.repository = repository;
         this.historyRepository = historyRepository;
+        this.auditRecorder = auditRecorder;
     }
 
     @PreAuthorize("hasAuthority('PERM_MEMBER.READ')")
     @Transactional(readOnly = true)
     public PageResult<Organization> search(OrganizationQuery query) {
         return repository.search(query);
+    }
+
+    /**
+     * Crée une entreprise, ou renvoie l'existante si une entreprise strictement identique
+     * porte déjà le même identifiant métier ({@code identifierType}, {@code identifierValue}).
+     *
+     * <p>Idempotence par clé naturelle faute de magasin de clés (DATA-DEC-005) : même
+     * identifiant et même contenu → rejeu sans effet de bord (200) ; même identifiant et
+     * contenu divergent → conflit d'état (409). Un événement d'audit est produit dans la
+     * même transaction que la création.
+     *
+     * @throws StateConflictException si l'identifiant métier est déjà pris par une
+     *     entreprise au contenu différent
+     */
+    @PreAuthorize("hasAuthority('PERM_MEMBER.WRITE')")
+    @Transactional
+    public OrganizationCreation create(
+            OrganizationDraft draft, UUID actorUserId, UUID correlationId) {
+        Optional<Organization> existing =
+                repository.findByIdentifier(draft.identifierType(), draft.identifierValue());
+        if (existing.isPresent()) {
+            if (sameContent(existing.get(), draft)) {
+                return new OrganizationCreation(existing.get(), false);
+            }
+            throw new StateConflictException(
+                    "Une entreprise différente porte déjà cet identifiant métier.");
+        }
+
+        Organization created = repository.create(draft);
+        auditRecorder.record(
+                AuditEntry.created(
+                        actorUserId,
+                        ACTION_CREATED,
+                        ENTITY_TYPE,
+                        created.id(),
+                        fingerprint(created, draft),
+                        correlationId));
+        return new OrganizationCreation(created, true);
+    }
+
+    private static boolean sameContent(Organization existing, OrganizationDraft draft) {
+        return java.util.Objects.equals(existing.legalName(), draft.legalName())
+                && java.util.Objects.equals(existing.tradeName(), draft.tradeName())
+                && java.util.Objects.equals(existing.organizationType(), draft.organizationType())
+                && java.util.Objects.equals(existing.sectorCode(), draft.sectorCode());
+    }
+
+    /** Empreinte SHA-256 de l'état créé, pour l'audit — sans exposer la donnée elle-même. */
+    private static String fingerprint(Organization value, OrganizationDraft draft) {
+        String canonical =
+                "legalName=" + value.legalName()
+                        + ";tradeName=" + value.tradeName()
+                        + ";organizationType=" + value.organizationType()
+                        + ";sectorCode=" + value.sectorCode()
+                        + ";identifierType=" + draft.identifierType()
+                        + ";identifierValue=" + draft.identifierValue();
+        return Hashing.sha256Hex(canonical);
     }
 
     /**

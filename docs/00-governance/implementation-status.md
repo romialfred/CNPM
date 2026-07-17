@@ -505,3 +505,37 @@ sémantique 404-vs-200-vide, mapping timestamptz→Instant, typage du contrat, e
 
 Périmètre : seule l'exigence MEM-004 (historique) est couverte ; `x-requirements` du contrat
 réduit en conséquence. Les montants et le reste de la fiche 360° restent hors périmètre.
+
+
+### Écriture MEMBER : createOrganization (idempotence + audit)
+
+Onzième incrément — **premier chemin d'écriture du module MEMBER** : `POST /organizations`,
+jusqu'ici déclarée avec un schéma générique. Pose les patrons d'écriture du module
+(autorisation, idempotence, audit transactionnel, conflit) en miroir de l'étalon ADM.
+
+| Élément | Détail |
+|---|---|
+| Route | `POST /organizations` typé (`OrganizationInput` → `OrganizationView`) ; 201 création, 200 rejeu idempotent, 409 conflit |
+| Idempotence | Par **clé naturelle** = identifiant métier `(identifierType, identifierValue)`, unique en base (DATA-DEC-005/008) ; `Idempotency-Key` exigé (400 sinon) mais non stocké |
+| Atomicité | Entreprise + identifiant insérés dans la **même transaction** ; une violation d'unicité de l'identifiant annule tout (pas d'entreprise orpheline) |
+| Audit | Événement `ORGANIZATION.CREATED` corrélé dans `audit.audit_event` (append-only), empreinte SHA-256, dans la transaction ; ni rejeu ni conflit n'écrivent de faux événement |
+| Autorisation | `PERM_MEMBER.WRITE` (distincte de READ) ; 403/401 testés |
+| Défauts serveur | Statut initial `PROSPECT`, risque `NORMAL` (valeurs par défaut du schéma, non fournies par le client) |
+| Frontières | Nouvelle dépendance `member → audit` (comme `administration → audit`) ; `ModularityTest` vert |
+| Tests | Nouvelle classe `OrganizationWriteApiTest` (11 cas) : 201 + persistance + audit, rejeu idempotent 200 (un seul audit), conflit 409, clé manquante/courte 400, raison sociale vide 400, identifiant manquant 400, **JSON malformé et corps absent 400 (Problem)**, 403, 401 |
+
+Audit adversarial (**workflow 6 dimensions × 2 sceptiques**) : 12 constats soumis, **3
+confirmés** (aucun 2/2 fort). Corrigés : (MAJEUR transverse) absence de gestionnaire
+`HttpMessageNotReadableException` → un corps JSON malformé ou absent échappait au format
+`Problem` normalisé ; ajout du gestionnaire dans `ApiExceptionHandler` (bénéficie à **tous**
+les endpoints à corps) + 2 tests ; (MINEUR) Javadoc orpheline dans `OrganizationService` ;
+(MINEUR) mention « MEM-003 partiel » erronée retirée du contrat. Le trou de **concurrence
+réelle** anticipé a été **réfuté** par les sceptiques (l'unicité `uq_member_identifier_type_value`
++ la traduction `DataIntegrityViolationException → 409` garantissent déjà l'intégrité). Note :
+`additionalProperties:false` n'est pas enforcé à l'exécution (Boot désactive
+`FAIL_ON_UNKNOWN_PROPERTIES`) — application stricte = décision de config distincte, non prise ici.
+
+Hypothèse consignée (DATA-DEC-008) : la création exige un identifiant métier (clé
+d'idempotence) ; la nomenclature des types (RCCM/NINA/IFU) et la détection de doublons
+(MEM-002) restent à trancher. Non livré : `createMembership` (workflow d'adhésion),
+`updateOrganization`, identifiants multiples.

@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -96,6 +97,22 @@ public class ApiExceptionHandler {
         ProblemResponse.FieldError fieldError =
                 new ProblemResponse.FieldError(
                         exception.getName(), VALIDATION_CODE, "Valeur de paramètre invalide.");
+        return badRequest(List.of(fieldError), request);
+    }
+
+    /**
+     * Corps de requête illisible : JSON syntaxiquement invalide ou corps absent sur une
+     * opération qui en exige un. Rendu comme une validation au format {@code Problem} ; le
+     * détail technique du parseur n'est jamais exposé. (Le rejet des propriétés inconnues,
+     * lui, dépend de {@code FAIL_ON_UNKNOWN_PROPERTIES}, désactivé par défaut par Spring
+     * Boot ; l'application stricte d'{@code additionalProperties:false} relèverait d'une
+     * décision de configuration distincte.)
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ProblemResponse> onUnreadableBody(HttpServletRequest request) {
+        ProblemResponse.FieldError fieldError =
+                new ProblemResponse.FieldError(
+                        null, VALIDATION_CODE, "Corps de requête illisible ou mal formé.");
         return badRequest(List.of(fieldError), request);
     }
 

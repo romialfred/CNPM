@@ -2,6 +2,7 @@ package ml.cnpm.platform.member.application.port.out;
 
 import java.util.Optional;
 import java.util.UUID;
+import ml.cnpm.platform.member.application.OrganizationDraft;
 import ml.cnpm.platform.member.application.OrganizationQuery;
 import ml.cnpm.platform.member.domain.Organization;
 import ml.cnpm.platform.shared.api.PageResult;
@@ -16,6 +17,20 @@ public interface OrganizationRepository {
 
     PageResult<Organization> search(OrganizationQuery query);
 
-    /** Retourne l'entreprise portant cet identifiant, ou vide si aucune. */
+    /** Retourne l'entreprise portant cet identifiant technique, ou vide si aucune. */
     Optional<Organization> findById(UUID id);
+
+    /**
+     * Retourne l'entreprise portant cet identifiant métier ({@code type}, {@code value}),
+     * ou vide si aucune — support de l'idempotence par clé naturelle à la création.
+     */
+    Optional<Organization> findByIdentifier(String identifierType, String identifierValue);
+
+    /**
+     * Crée une entreprise et son identifiant métier de façon atomique, et retourne
+     * l'entreprise créée (identifiant technique et version renseignés). L'unicité de
+     * l'identifiant métier est garantie par contrainte : une insertion concurrente en
+     * doublon lève une violation d'intégrité, traduite en conflit d'état en amont.
+     */
+    Organization create(OrganizationDraft draft);
 }

@@ -404,6 +404,39 @@ ou fournir la règle réelle (rôle prioritaire, flag `is_primary` à ajouter au
 comportement si plusieurs représentants légaux, repli si aucun) ; **et** trancher les
 deux questions de sécurité ci-dessus (granularité de permission, liste vs détail).
 
+## DATA-DEC-008 — identifiant métier obligatoire à la création d'une entreprise
+
+**Propriétaire.** Direction produit / Secrétariat.
+**Impact.** `createOrganization` (POST /organizations).
+**Statut.** Livré sous hypothèse — à confirmer.
+
+**Constat.** `createOrganization` est une création sensible qui exige une idempotence
+(`CLAUDE.md`, `.claude/rules/api.md`), mais le modèle ne comporte aucun magasin de clés
+d'idempotence générique (DATA-DEC-005). La seule clé naturelle disponible pour une
+entreprise est son **identifiant métier** (`member.organization_identifier`), dont
+l'unicité est garantie par `uq_member_identifier_type_value`.
+
+**Hypothèse retenue pour livrer.** La création exige **au moins un identifiant métier**
+(`identifierType` + `identifierValue`), qui sert de clé naturelle d'idempotence :
+
+- même identifiant + même contenu → rejeu sans effet (200) ;
+- même identifiant + contenu divergent → conflit d'état (409) ;
+- création concurrente franchissant le contrôle préalable → violation d'unicité → 409.
+
+Le statut initial (`PROSPECT`) et le niveau de risque (`NORMAL`) ne sont pas fournis par
+le client : ce sont les valeurs par défaut du schéma.
+
+**Ce qui reste à trancher (n'est PAS inventé ici).** La liste des **types d'identifiants
+valides et obligatoires** (RCCM, NINA, IFU, autres) et lesquels sont requis selon la forme
+juridique : l'implémentation accepte tout `identifierType`/`identifierValue` non vide sans
+valider le type contre une nomenclature. La **détection de doublons** (MEM-002, ex. deux
+raisons sociales proches sans identifiant commun) et la **saisie de plusieurs identifiants**
+en une création relèvent d'incréments suivants.
+
+**Arbitrage demandé.** Fournir la nomenclature des types d'identifiants et les règles
+d'obligation par forme juridique ; confirmer que l'identifiant métier est la clé
+d'idempotence retenue (ou introduire un magasin de clés générique, cf. DATA-DEC-005).
+
 ## ARCH-DEC-001 — propriété des tables de groupements professionnels
 
 **Propriétaire.** Architecture.
