@@ -18,6 +18,12 @@ async function expectNoBlockingViolation(page: import('@playwright/test').Page) 
   expect(blocking).toEqual([]);
 }
 
+test('axe PUB-001 — accueil public', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expectNoBlockingViolation(page);
+});
+
 test('axe AUTH-001 — saisie des identifiants', async ({ page }) => {
   await page.goto('/auth/login');
   await expectNoBlockingViolation(page);

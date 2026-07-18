@@ -1,77 +1,295 @@
-<cnpm-public-shell>
+<cnpm-public-shell [sections]="navSections()">
   <div class="cnpm-home">
-    <!-- Hero : texte et CTA à gauche, aperçu à droite (fiche PUB-001). Le titre et
-         les CTA doivent être visibles sans défilement à 1440x900. -->
-    <section class="cnpm-home__hero">
-      <div class="cnpm-home__hero-text">
-        <h1 class="cnpm-home__title">{{ institution.title }}</h1>
+    <section class="cnpm-home__hero" aria-labelledby="accueil-titre">
+      <div class="cnpm-home__hero-copy">
+        <p class="cnpm-home__eyebrow">
+          <span aria-hidden="true"></span>
+          Bienvenue sur la plateforme du CNPM
+        </p>
+        <h1 class="cnpm-home__title" id="accueil-titre">{{ institution.title }}</h1>
         <p class="cnpm-home__baseline">{{ institution.baseline }}</p>
         <div class="cnpm-home__actions">
           <cnpm-button variant="public-cta" size="lg" routerLink="/auth/login">
-            Accéder à mon espace
+            <svg lucideBriefcaseBusiness [size]="iconSize.control" aria-hidden="true"></svg>
+            Accéder à mon espace membre
           </cnpm-button>
         </div>
+        <p class="cnpm-home__action-note">
+          L'adhésion en ligne sera proposée dès publication de sa destination officielle.
+        </p>
       </div>
-      <!-- Aperçu institutionnel sans image : la photothèque et les droits d'usage
-           relèvent d'UX-DEC-003, et la règle interdit l'image générée en production. -->
-      <div class="cnpm-home__hero-aside" aria-hidden="true">
-        <span class="cnpm-home__hero-mark">CNPM</span>
+
+      <ul class="cnpm-home__promises" aria-label="Rôles du CNPM">
+        @for (promise of promises; track promise.id) {
+          <li>
+            <span class="cnpm-home__promise-icon" aria-hidden="true">
+              @switch (promise.id) {
+                @case ('representer') {
+                  <svg lucideUsers [size]="iconSize.control"></svg>
+                }
+                @case ('defendre') {
+                  <svg lucideShieldCheck [size]="iconSize.control"></svg>
+                }
+                @case ('faciliter') {
+                  <svg lucideRoute [size]="iconSize.control"></svg>
+                }
+                @default {
+                  <svg lucideNetwork [size]="iconSize.control"></svg>
+                }
+              }
+            </span>
+            {{ promise.label }}
+          </li>
+        }
+      </ul>
+
+      <div class="cnpm-home__preview" aria-label="Aperçu fonctionnel de démonstration du portail">
+        <div class="cnpm-home__preview-topbar">
+          <div>
+            <span class="cnpm-home__preview-dot" aria-hidden="true"></span>
+            <strong>Aperçu du portail membre</strong>
+          </div>
+          <span class="cnpm-home__demo-badge">Démonstration</span>
+        </div>
+
+        @switch (state()) {
+          @case ('loading') {
+            <div class="cnpm-home__preview-loading">
+              <cnpm-skeleton
+                variant="card"
+                [rows]="4"
+                label="Chargement de l’aperçu de démonstration…"
+              />
+            </div>
+          }
+          @case ('ready') {
+            @if (highlights(); as data) {
+              <div class="cnpm-home__preview-content">
+                <p class="cnpm-home__preview-welcome">Bienvenue dans votre tableau de bord</p>
+                <div class="cnpm-home__preview-metrics" aria-hidden="true">
+                  @for (metric of data.metrics.slice(0, 3); track metric.id) {
+                    <span>
+                      <small>{{ metric.label }}</small>
+                      <strong>{{ metric.value | number: '1.0-0' }}</strong>
+                    </span>
+                  }
+                </div>
+                <div class="cnpm-home__preview-chart" aria-hidden="true">
+                  <div class="cnpm-home__chart-heading">
+                    <span>Évolution illustrative</span>
+                    <span>Exercice démo</span>
+                  </div>
+                  <div class="cnpm-home__chart-bars">
+                    @for (bar of chartBars; track $index) {
+                      <i [style.height.%]="bar"></i>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          }
+          @default {
+            <p class="cnpm-home__preview-unavailable">Aperçu temporairement indisponible.</p>
+          }
+        }
       </div>
     </section>
 
-    <!-- Bande de chiffres. La fiche impose d'afficher leur date de mise à jour :
-         faute de date dans la source, on annonce leur caractère indicatif plutôt que
-         de laisser croire à une fraîcheur garantie. -->
-    <section class="cnpm-home__metrics" aria-labelledby="chiffres">
-      <h2 class="cnpm-home__section-title" id="chiffres">Le CNPM en chiffres</h2>
+    <section class="cnpm-home__metrics" id="chiffres" aria-labelledby="chiffres-titre">
+      <div class="cnpm-home__section-heading cnpm-home__section-heading--center">
+        <p class="cnpm-home__section-kicker">Repères de démonstration</p>
+        <h2 id="chiffres-titre">Le CNPM en chiffres</h2>
+        <p>Cette zone reproduit la densité attendue avec les fixtures synthétiques du handoff.</p>
+      </div>
 
       @switch (state()) {
         @case ('loading') {
-          <p class="cnpm-home__loading" role="status" aria-live="polite">
-            Chargement des chiffres clés…
-          </p>
+          <div class="cnpm-home__metric-skeletons">
+            @for (item of [1, 2, 3, 4, 5]; track item) {
+              <cnpm-skeleton variant="card" [rows]="2" label="Chargement d’un chiffre clé…" />
+            }
+          </div>
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Les chiffres de démonstration sont indisponibles"
+            description="Le reste du site demeure accessible. Vous pouvez relancer ce chargement."
+          >
+            <cnpm-button variant="secondary" (click)="loadHighlights()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucun chiffre publié"
+            description="Aucune valeur n’est affichée tant que la source de démonstration ne fournit pas de données."
+          />
         }
         @case ('ready') {
           @if (highlights(); as data) {
             <ul class="cnpm-home__metric-list">
               @for (metric of data.metrics; track metric.id) {
                 <li class="cnpm-home__metric">
-                  <span class="cnpm-home__metric-value">
-                    {{ metric.value | number: '1.0-2' }}@if (metric.unit === 'percent') {
-                      <span class="cnpm-home__metric-unit"> %</span>
+                  <span class="cnpm-home__metric-icon" aria-hidden="true">
+                    @switch (metric.id) {
+                      @case ('membres') {
+                        <svg lucideUsers [size]="iconSize.navigation"></svg>
+                      }
+                      @case ('actifs') {
+                        <svg lucideBadgeCheck [size]="iconSize.navigation"></svg>
+                      }
+                      @case ('cotisations') {
+                        <svg lucideChartColumnIncreasing [size]="iconSize.navigation"></svg>
+                      }
+                      @case ('recouvrement') {
+                        <svg lucideWorkflow [size]="iconSize.navigation"></svg>
+                      }
+                      @default {
+                        <svg lucideReceiptText [size]="iconSize.navigation"></svg>
+                      }
                     }
                   </span>
-                  <span class="cnpm-home__metric-label">{{ metric.label }}</span>
+                  <span class="cnpm-home__metric-copy">
+                    <strong class="cnpm-home__metric-value">
+                      {{ metric.value | number: '1.0-2' }}
+                      @if (metric.unit === 'percent') {
+                        <small>&nbsp;%</small>
+                      } @else if (metric.unit === 'currency') {
+                        <small>&nbsp;FCFA</small>
+                      }
+                    </strong>
+                    <span>{{ metric.label }}</span>
+                  </span>
                 </li>
               }
             </ul>
-            @if (data.dataAsOf) {
-              <p class="cnpm-home__metric-date">Chiffres arrêtés au {{ data.dataAsOf }}.</p>
-            } @else {
-              <p class="cnpm-home__metric-date">
-                Chiffres indicatifs&nbsp;: leur date d’arrêté n’est pas encore publiée.
+            <div class="cnpm-home__source-note">
+              <svg lucideBadgeCheck [size]="iconSize.compact" aria-hidden="true"></svg>
+              <p>
+                <strong>Données fictives de démonstration.</strong>
+                {{ data.sourceNotice }}
+                @if (data.dataAsOf) {
+                  Arrêté au {{ data.dataAsOf }}.
+                } @else {
+                  Aucune date d'arrêté officielle n'est publiée.
+                }
               </p>
-            }
+            </div>
           }
         }
       }
     </section>
 
-    <section class="cnpm-home__structure" aria-labelledby="organisation">
-      <h2 class="cnpm-home__section-title" id="organisation">Une organisation en réseau</h2>
-      <ul class="cnpm-home__cards">
-        @for (item of structure; track item.id) {
-          <li class="cnpm-home__card">
-            <h3 class="cnpm-home__card-title">{{ item.title }}</h3>
-            <p class="cnpm-home__card-text">{{ item.text }}</p>
+    <section class="cnpm-home__services" id="services" aria-labelledby="services-titre">
+      <div class="cnpm-home__services-intro">
+        <p class="cnpm-home__section-kicker">Notre action</p>
+        <h2 id="services-titre">Un écosystème au service des entreprises maliennes</h2>
+        <p>
+          La plateforme rend plus lisibles l'organisation en réseau, les services aux membres et les
+          démarches numériques.
+        </p>
+      </div>
+      <ul class="cnpm-home__benefit-list">
+        @for (benefit of benefits; track benefit.id) {
+          <li class="cnpm-home__benefit">
+            <span class="cnpm-home__benefit-icon" aria-hidden="true">
+              @switch (benefit.id) {
+                @case ('representation') {
+                  <svg lucideLandmark [size]="iconSize.navigation"></svg>
+                }
+                @case ('accompagnement') {
+                  <svg lucideRoute [size]="iconSize.navigation"></svg>
+                }
+                @case ('reseau') {
+                  <svg lucideNetwork [size]="iconSize.navigation"></svg>
+                }
+                @default {
+                  <svg lucideChartColumnIncreasing [size]="iconSize.navigation"></svg>
+                }
+              }
+            </span>
+            <div>
+              <h3>{{ benefit.title }}</h3>
+              <p>{{ benefit.text }}</p>
+            </div>
           </li>
         }
       </ul>
     </section>
 
-    <!-- Les sections « actualités », « témoignages », « partenaires » et
-         « newsletter » prévues par la fiche ne sont pas rendues : aucune source ne
-         les alimente, et les remplir reviendrait à fabriquer du contenu
-         institutionnel ou à invoquer des tiers sans leur consentement. -->
+    <section class="cnpm-home__modules" id="modules" aria-labelledby="modules-titre">
+      <div class="cnpm-home__section-heading">
+        <p class="cnpm-home__section-kicker">Services numériques</p>
+        <h2 id="modules-titre">Des modules conçus pour le quotidien des membres</h2>
+        <p>
+          Les accès restent centralisés dans le portail sécurisé : aucune carte ne simule une
+          destination publique.
+        </p>
+      </div>
+      <ul class="cnpm-home__module-list">
+        @for (module of modules; track module.id) {
+          <li class="cnpm-home__module">
+            <span aria-hidden="true">
+              @switch (module.id) {
+                @case ('cotisations') {
+                  <svg lucideBriefcaseBusiness [size]="iconSize.navigation"></svg>
+                }
+                @case ('requetes') {
+                  <svg lucideWorkflow [size]="iconSize.navigation"></svg>
+                }
+                @case ('recus') {
+                  <svg lucideReceiptText [size]="iconSize.navigation"></svg>
+                }
+                @case ('reporting') {
+                  <svg lucideChartColumnIncreasing [size]="iconSize.navigation"></svg>
+                }
+                @default {
+                  <svg lucideBuilding2 [size]="iconSize.navigation"></svg>
+                }
+              }
+            </span>
+            <h3>{{ module.title }}</h3>
+            <p>{{ module.text }}</p>
+          </li>
+        }
+      </ul>
+      <a class="cnpm-home__text-link" routerLink="/auth/login">
+        Accéder aux services dans le portail
+        <svg lucideArrowRight [size]="iconSize.compact" aria-hidden="true"></svg>
+      </a>
+    </section>
+
+    @if (state() === 'ready' && highlights(); as data) {
+      @if (data.news.length > 0) {
+        <section class="cnpm-home__news" id="actualites" aria-labelledby="actualites-titre">
+          <div class="cnpm-home__section-heading">
+            <p class="cnpm-home__section-kicker">Contenus fictifs de démonstration</p>
+            <h2 id="actualites-titre">Actualités et repères</h2>
+            <p>
+              Ces cartes servent uniquement à valider la composition PUB-001. Elles n'annoncent
+              aucun événement réel.
+            </p>
+          </div>
+          <ul class="cnpm-home__news-list">
+            @for (item of data.news; track item.id) {
+              @if (item.fictionalDemo) {
+                <li class="cnpm-home__news-card">
+                  <div class="cnpm-home__news-visual" aria-hidden="true">
+                    <svg lucideFileText [size]="iconSize.empty"></svg>
+                  </div>
+                  <div class="cnpm-home__news-copy">
+                    <span>{{ item.category }}</span>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.summary }}</p>
+                    <small>Publication fictive — aucune destination associée</small>
+                  </div>
+                </li>
+              }
+            }
+          </ul>
+        </section>
+      }
+    }
   </div>
 </cnpm-public-shell>

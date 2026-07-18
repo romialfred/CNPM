@@ -1,172 +1,283 @@
 .cnpm-public {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   min-height: 100vh;
-  background-color: var(--cnpm-color-surface-primary);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-public__skip-link {
+  position: fixed;
+  z-index: var(--cnpm-zIndex-modal);
+  inset-block-start: var(--cnpm-space-3);
+  inset-inline-start: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-inverse);
+  color: var(--cnpm-color-text-inverse);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--cnpm-space-4)));
+  transition: transform var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+}
+
+.cnpm-public__skip-link:focus {
+  outline: 2px solid var(--cnpm-color-text-inverse);
+  outline-offset: 2px;
+  transform: translateY(0);
 }
 
 .cnpm-public__header {
   position: sticky;
-  top: 0;
   z-index: var(--cnpm-zIndex-sticky);
-  background-color: var(--cnpm-color-surface-primary);
-  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  inset-block-start: 0;
+  background: var(--cnpm-color-surface-primary);
+  border-block-end: 1px solid var(--cnpm-color-border-subtle);
 }
 
-/* Conteneur 1440 px maximum (fiche PUB-001). */
 .cnpm-public__bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-6);
   width: 100%;
   max-width: var(--cnpm-size-publicMax);
+  min-height: var(--cnpm-space-20);
   margin: 0 auto;
-  padding: var(--cnpm-space-3) var(--cnpm-layout-pagePaddingDesktop);
+  padding: 0 var(--cnpm-layout-pagePaddingDesktop);
 }
 
-.cnpm-public__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--cnpm-space-3);
-  min-width: 0;
-}
-
-.cnpm-public__wordmark {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--cnpm-font-family-sans);
-  font-weight: var(--cnpm-font-weight-bold);
-  font-size: var(--cnpm-font-size-xl);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  color: var(--cnpm-color-text-brand);
-  text-decoration: none;
-
-  abbr {
-    text-decoration: none;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--cnpm-color-brand-blue-700);
-    outline-offset: 2px;
-    border-radius: var(--cnpm-radius-xs);
-  }
-}
-
-// L'actif officiel est un ensemble horizontal de 300x212 px : emblème à gauche, raison
-// sociale et signature en texte matriciel à droite. À hauteur d'en-tête, ce texte intégré
-// est illisible (moins de 3 px par caractère). On isole donc l'emblème — mesuré dans
-// l'image : x 12→80, y 49→168 — et la raison sociale est composée en texte réel, net à
-// toute taille et lisible par les lecteurs d'écran. L'actif source n'est pas modifié.
-.cnpm-public__emblem {
-  --emblem-height: var(--cnpm-space-12);
-  --emblem-scale: calc(var(--emblem-height) / 119);
-
-  display: block;
-  block-size: var(--emblem-height);
-  inline-size: calc(69 * var(--emblem-scale));
-  background-image: url('/assets/brand/logo-CNPM.png');
-  background-repeat: no-repeat;
-  background-size: calc(300 * var(--emblem-scale)) calc(212 * var(--emblem-scale));
-  background-position: calc(-12 * var(--emblem-scale)) calc(-49 * var(--emblem-scale));
-}
-
+.cnpm-public__brand,
 .cnpm-public__brand-link {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+}
+
+.cnpm-public__brand {
   gap: var(--cnpm-space-3);
-  text-decoration: none;
-  min-inline-size: 0;
+  flex: 0 1 auto;
 }
 
-.cnpm-public__lockup {
-  display: flex;
-  flex-flow: column;
-  gap: calc(var(--cnpm-space-1) / 2);
-  min-inline-size: 0;
+.cnpm-public__brand-link {
+  border-radius: var(--cnpm-radius-sm);
 }
 
-.cnpm-public__wordmark-name {
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: 700;
-  line-height: 1.15;
-  color: var(--cnpm-color-primary-700);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+.cnpm-public__brand-link:focus-visible,
+.cnpm-public__nav-link:focus-visible,
+.cnpm-public__portal-link:focus-visible,
+.cnpm-public__drawer-link:focus-visible,
+.cnpm-public__drawer-portal:focus-visible,
+.cnpm-public__portal-band-link:focus-visible,
+.cnpm-public__footer a:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  box-shadow: var(--cnpm-shadow-focus);
 }
 
-.cnpm-public__wordmark-tagline {
-  margin: 0;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
+/* L'actif officiel contient de l'espace blanc autour du lockup. Le cadre recadre
+   uniquement cette marge intrinsèque : l'emblème, le nom et la signature restent
+   ceux du PNG source, sans recomposition ni altération. */
+.cnpm-public__logo-frame,
+.cnpm-public__footer-logo-frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  flex: 0 0 auto;
+  inline-size: 11.5rem;
+  block-size: 5rem;
 }
 
-@media (max-width: 48rem) {
-  .cnpm-public__lockup {
-    display: none;
-  }
+.cnpm-public__logo,
+.cnpm-public__footer-logo {
+  position: absolute;
+  inset-block-start: -1.9rem;
+  inset-inline-start: 0;
+  display: block;
+  inline-size: 11.5rem;
+  block-size: auto;
 }
 
-/* Mention d'adhésion : texte explicite, jamais une pastille de couleur seule. */
 .cnpm-public__member {
   margin: 0;
   padding: var(--cnpm-space-1) var(--cnpm-space-3);
   border: 1px solid var(--cnpm-color-brand-blue-200);
   border-radius: var(--cnpm-radius-pill);
-  background-color: var(--cnpm-color-brand-blue-50);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-medium);
+  background: var(--cnpm-color-brand-blue-50);
   color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  white-space: nowrap;
 }
 
 .cnpm-public__nav {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--cnpm-space-1);
 }
 
-.cnpm-public__nav-link {
+.cnpm-public__nav-link,
+.cnpm-public__portal-link {
   display: inline-flex;
   align-items: center;
   min-height: var(--cnpm-size-control-lg);
-  padding: 0 var(--cnpm-space-3);
   border-radius: var(--cnpm-radius-md);
-  font-family: var(--cnpm-font-family-sans);
   font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-secondary);
   text-decoration: none;
-
-  &:hover {
-    background-color: var(--cnpm-color-surface-subtle);
-    color: var(--cnpm-color-text-primary);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--cnpm-color-brand-blue-700);
-    outline-offset: 2px;
-  }
 }
 
-/* Actif : graisse et soulignement en plus de la couleur et d'aria-current. */
+.cnpm-public__nav-link {
+  position: relative;
+  padding: 0 var(--cnpm-space-3);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-public__nav-link::after {
+  position: absolute;
+  inset-inline: var(--cnpm-space-3);
+  inset-block-end: 0;
+  height: 2px;
+  border-radius: var(--cnpm-radius-pill);
+  background: transparent;
+  content: '';
+}
+
+.cnpm-public__nav-link:hover,
 .cnpm-public__nav-link--active {
   color: var(--cnpm-color-text-brand);
-  font-weight: var(--cnpm-font-weight-semibold);
-  box-shadow: inset 0 -2px 0 0 var(--cnpm-color-brand-blue-700);
 }
 
-.cnpm-public__nav-link--cta {
-  background-color: var(--cnpm-color-brand-blue-700);
-  color: var(--cnpm-color-text-inverse);
+.cnpm-public__nav-link--active::after {
+  background: var(--cnpm-color-brand-red-600);
+}
 
-  &:hover {
-    background-color: var(--cnpm-color-brand-blue-800);
-    color: var(--cnpm-color-text-inverse);
-  }
+.cnpm-public__portal-link {
+  gap: var(--cnpm-space-2);
+  margin-inline-start: var(--cnpm-space-2);
+  padding: 0 var(--cnpm-space-4);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  box-shadow: var(--cnpm-shadow-xs);
+}
+
+.cnpm-public__portal-link:hover {
+  background: var(--cnpm-color-brand-blue-800);
+}
+
+.cnpm-public__menu-button,
+.cnpm-public__drawer-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--cnpm-size-control-lg);
+  min-height: var(--cnpm-size-control-lg);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.cnpm-public__menu-button {
+  gap: var(--cnpm-space-2);
+  padding: 0 var(--cnpm-space-3);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-public__menu-button:focus-visible,
+.cnpm-public__drawer-close:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  box-shadow: var(--cnpm-shadow-focus);
+}
+
+.cnpm-public__drawer-layer {
+  position: fixed;
+  z-index: var(--cnpm-zIndex-drawer);
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  background: var(--cnpm-color-surface-overlay);
+}
+
+.cnpm-public__drawer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-8);
+  width: min(22rem, calc(100% - var(--cnpm-space-6)));
+  height: 100%;
+  padding: var(--cnpm-space-6);
+  overflow-y: auto;
+  background: var(--cnpm-color-surface-primary);
+  box-shadow: var(--cnpm-shadow-md);
+}
+
+.cnpm-public__drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-public__drawer-kicker,
+.cnpm-public__footer-eyebrow {
+  margin: 0 0 var(--cnpm-space-1);
+  color: var(--cnpm-color-brand-red-600);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+}
+
+.cnpm-public__drawer-title {
+  margin: 0;
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xl);
+  line-height: var(--cnpm-font-lineHeight-xl);
+}
+
+.cnpm-public__drawer-close {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.cnpm-public__drawer-nav {
+  display: flex;
+  flex-direction: column;
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-public__drawer-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-4);
+  min-height: var(--cnpm-space-12);
+  padding: var(--cnpm-space-3) 0;
+  border-block-end: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: none;
+}
+
+.cnpm-public__drawer-portal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cnpm-space-2);
+  min-height: var(--cnpm-size-control-xl);
+  margin-block-start: auto;
+  padding: 0 var(--cnpm-space-4);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: none;
 }
 
 .cnpm-public__main {
@@ -174,243 +285,69 @@
   min-width: 0;
 }
 
-/* Pied de page bleu foncé : le texte inverse y conserve un contraste supérieur à 10:1. */
-.cnpm-public__footer {
-  background-color: var(--cnpm-color-surface-inverse);
-  color: var(--cnpm-color-text-inverse);
-}
-
-.cnpm-public__footer-main {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--cnpm-space-8);
-  width: 100%;
-  max-width: var(--cnpm-size-publicMax);
-  margin: 0 auto;
-  padding: var(--cnpm-space-12) var(--cnpm-layout-pagePaddingDesktop);
-  scroll-margin-top: var(--cnpm-space-16);
-}
-
-.cnpm-public__footer-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--cnpm-space-3);
-  min-width: 0;
-}
-
-.cnpm-public__footer-title {
-  margin: 0;
-  font-size: var(--cnpm-font-size-lg);
-  line-height: var(--cnpm-font-lineHeight-lg);
-  font-weight: var(--cnpm-font-weight-semibold);
-}
-
-.cnpm-public__footer-text,
-.cnpm-public__footer-note,
-.cnpm-public__map-caption {
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  line-height: var(--cnpm-font-lineHeight-sm);
-  color: var(--cnpm-color-brand-blue-200);
-}
-
-.cnpm-public__contact,
-.cnpm-public__social,
-.cnpm-public__legal-links {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  min-width: 0;
-}
-
-.cnpm-public__contact-item,
-.cnpm-public__social-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: var(--cnpm-space-1) var(--cnpm-space-3);
-  font-size: var(--cnpm-font-size-sm);
-  min-width: 0;
-}
-
-/* Le libellé accompagne le pictogramme : une icône seule ne nomme pas la donnée. */
-.cnpm-public__contact-label {
-  font-size: var(--cnpm-font-size-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  color: var(--cnpm-color-brand-blue-200);
-}
-
-.cnpm-public__contact-value {
-  grid-column: 2;
-  color: var(--cnpm-color-text-inverse);
-  /* Une adresse électronique longue doit se couper plutôt que déborder à 320 px. */
-  overflow-wrap: anywhere;
-}
-
-a.cnpm-public__contact-value:hover {
-  text-decoration: underline;
-}
-
-.cnpm-public__social-item {
-  grid-template-columns: auto 1fr;
-  color: var(--cnpm-color-brand-blue-200);
-}
-
-.cnpm-public__footer-cta,
-.cnpm-public__newsletter-submit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--cnpm-space-2);
-  min-height: var(--cnpm-size-control-lg);
-  padding: 0 var(--cnpm-space-4);
-  border: 1px solid transparent;
-  border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-brand-red-600);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-inverse);
-  text-decoration: none;
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--cnpm-color-brand-red-700);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--cnpm-color-text-inverse);
-    outline-offset: 2px;
-  }
-}
-
-/* Plan schématique : bordure claire sur fond sombre, sans ombre portée. */
-.cnpm-public__map {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-2);
-  min-width: 0;
-}
-
-.cnpm-public__map-art {
-  display: block;
-  width: 100%;
-  height: var(--cnpm-space-24);
-  border: 1px solid var(--cnpm-color-brand-blue-500);
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-brand-blue-950);
-  color: var(--cnpm-color-brand-blue-200);
-}
-
-.cnpm-public__newsletter {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-2);
-  width: 100%;
-}
-
-.cnpm-public__newsletter-label {
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
-}
-
-.cnpm-public__newsletter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--cnpm-space-2);
-}
-
-.cnpm-public__newsletter-input {
-  flex: 1 1 10rem;
-  min-width: 0;
-  min-height: var(--cnpm-size-control-lg);
-  padding: 0 var(--cnpm-space-3);
-  border: 1px solid var(--cnpm-color-border-default);
-  border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-surface-primary);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-primary);
-
-  &:focus-visible {
-    outline: 2px solid var(--cnpm-color-text-inverse);
-    outline-offset: 2px;
-  }
-}
-
-.cnpm-public__legal-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--cnpm-space-3) var(--cnpm-space-6);
-  width: 100%;
-  max-width: var(--cnpm-size-publicMax);
-  margin: 0 auto;
-  padding: var(--cnpm-space-6) var(--cnpm-layout-pagePaddingDesktop);
-  border-top: 1px solid var(--cnpm-color-brand-blue-800);
-}
-
-.cnpm-public__copyright {
-  display: flex;
-  align-items: center;
-  gap: var(--cnpm-space-3);
-  margin: 0;
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-inverse);
-
-  abbr {
-    padding: var(--cnpm-space-1) var(--cnpm-space-2);
-    border: 1px solid var(--cnpm-color-brand-blue-500);
-    border-radius: var(--cnpm-radius-xs);
-    font-weight: var(--cnpm-font-weight-bold);
-    text-decoration: none;
-  }
-}
-
-.cnpm-public__legal-links {
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: var(--cnpm-space-2) var(--cnpm-space-5);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-brand-blue-200);
-}
-
-.cnpm-public__legal {
-  flex: 1 1 100%;
-  margin: 0;
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-xs);
-  line-height: var(--cnpm-font-lineHeight-sm);
-  color: var(--cnpm-color-brand-blue-200);
-}
-
-@media (max-width: 1023px) {
+@media (max-width: 79.9375rem) {
   .cnpm-public__bar {
-    flex-wrap: wrap;
+    min-height: var(--cnpm-space-16);
   }
-  .cnpm-public__nav {
-    justify-content: flex-start;
+
+  .cnpm-public__logo-frame {
+    inline-size: 8.75rem;
+    block-size: 3.75rem;
+  }
+
+  .cnpm-public__logo {
+    inset-block-start: -1.45rem;
+    inline-size: 8.75rem;
+  }
+
+  .cnpm-public__nav--desktop {
+    display: none;
+  }
+
+  .cnpm-public__menu-button {
+    display: inline-flex;
   }
 }
 
-@media (max-width: 767px) {
-  .cnpm-public__bar,
-  .cnpm-public__legal-bar {
+@media (max-width: 47.9375rem) {
+  .cnpm-public__bar {
+    gap: var(--cnpm-space-3);
     padding-inline: var(--cnpm-layout-pagePaddingMobile);
   }
-  .cnpm-public__footer-main {
-    padding: var(--cnpm-space-8) var(--cnpm-layout-pagePaddingMobile);
-    gap: var(--cnpm-space-6);
+
+  .cnpm-public__brand {
+    gap: var(--cnpm-space-2);
   }
+
+  .cnpm-public__logo-frame {
+    inline-size: 7.75rem;
+    block-size: 3.5rem;
+  }
+
+  .cnpm-public__logo {
+    inset-block-start: -1.25rem;
+    inline-size: 7.75rem;
+  }
+
   .cnpm-public__member {
-    order: 3;
+    max-width: 6.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cnpm-public__menu-button span {
+    display: none;
+  }
+}
+
+@media (max-width: 22.5rem) {
+  .cnpm-public__member {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-public__skip-link {
+    transition: none;
   }
 }

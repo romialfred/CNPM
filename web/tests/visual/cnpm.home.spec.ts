@@ -38,7 +38,7 @@ test.describe('PUB-001 — chiffres clés', () => {
     // La fiche exige d'afficher la date de mise à jour ; la fixture ne la porte pas.
     // On annonce le caractère indicatif plutôt que d'inventer une fraîcheur.
     await page.goto('/');
-    await expect(page.getByText(/date d’arrêté n’est pas encore publiée/)).toBeVisible();
+    await expect(page.getByText(/Aucune date d'arrêté officielle n'est publiée/)).toBeVisible();
   });
 });
 
@@ -60,17 +60,20 @@ test.describe('PUB-001 — composition', () => {
   });
 
   test('aucun contenu institutionnel fabriqué', async ({ page }) => {
-    // Les sections sans source (actualités, témoignages, partenaires, newsletter) ne
-    // sont pas rendues : les remplir reviendrait à inventer du contenu institutionnel.
+    // Les actualités ne sont rendues que comme contenu de démonstration explicitement
+    // fictif. Témoignages et partenaires restent absents faute de consentement.
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Actualités' })).toHaveCount(0);
+    await expect(page.getByText('Contenus fictifs de démonstration')).toBeVisible();
+    await expect(page.getByText(/Publication fictive — aucune destination associée/)).toHaveCount(
+      3,
+    );
     await expect(page.getByRole('heading', { name: 'Témoignages' })).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Partenaires' })).toHaveCount(0);
   });
 });
 
 test.describe('PUB-001 — reflow', () => {
-  for (const width of [320, 360]) {
+  for (const width of [320, 360, 768, 1024, 1440]) {
     test(`aucun débordement horizontal à ${width} px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/');
@@ -81,4 +84,39 @@ test.describe('PUB-001 — reflow', () => {
       expect(overflow).toBeLessThanOrEqual(0);
     });
   }
+});
+
+test.describe('PublicShell — navigation mobile', () => {
+  test('le drawer piège le focus, se ferme avec Échap et restaure le déclencheur', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+
+    const trigger = page.getByRole('button', { name: 'Ouvrir le menu' });
+    await trigger.click();
+    const drawer = page.getByRole('dialog', { name: 'Site du CNPM' });
+    await expect(drawer).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Fermer le menu' })).toBeFocused();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    const portal = drawer.getByRole('link', { name: 'Accéder au portail membre' });
+    await portal.focus();
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Fermer le menu' })).toBeFocused();
+
+    await page.keyboard.press('Escape');
+    await expect(drawer).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('le contenu arrière est inerte lorsque le drawer est ouvert', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Ouvrir le menu' }).click();
+
+    await expect(page.locator('#contenu-principal')).toHaveAttribute('inert', '');
+    await expect(page.locator('.cnpm-public__footer')).toHaveAttribute('inert', '');
+  });
 });

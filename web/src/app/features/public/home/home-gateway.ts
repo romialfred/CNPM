@@ -10,8 +10,21 @@ export interface PublicMetric {
   readonly unit: 'percent' | 'currency' | null;
 }
 
+/** Actualité éditoriale strictement réservée au profil de démonstration. */
+export interface PublicDemoNews {
+  readonly id: string;
+  readonly category: string;
+  readonly title: string;
+  readonly summary: string;
+  /** Garde explicite : un contenu non marqué fictif ne doit pas être rendu. */
+  readonly fictionalDemo: true;
+}
+
 export interface PublicHighlights {
   readonly metrics: readonly PublicMetric[];
+  readonly news: readonly PublicDemoNews[];
+  /** Provenance affichée avec les valeurs pour éviter toute confusion institutionnelle. */
+  readonly sourceNotice: string;
   /**
    * Date à laquelle les chiffres ont été constatés.
    *
