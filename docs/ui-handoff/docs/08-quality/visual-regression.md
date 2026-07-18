@@ -30,6 +30,27 @@ Détecter les changements involontaires tout en acceptant les différences inév
 
 Les seuils doivent être validés par QA/UX et ajustés par type de rendu.
 
+## Note de fidélité de reprise
+
+La reprise premium ajoute une note déterministe sur 10 produite par
+`scripts/compare_images.py`. Elle combine fidélité pixel, pixels significativement
+différents, structure des contours et distribution colorimétrique. Le seuil de
+livraison demandé est **9,8/10 minimum** sur la référence 1672×941, sans écart
+structurel, textuel, responsive ou d'accessibilité bloquant.
+
+```bash
+python docs/ui-handoff/scripts/compare_images.py \
+  docs/ui-handoff/assets/reference-screens/full/ref-bo-002-members-list.png \
+  captures/REF-BO-002/1672x941.png \
+  --out visual-diff/REF-BO-002 \
+  --min-score 9.8
+```
+
+Une note supérieure au seuil ne suffit pas à elle seule : les tests Playwright, axe,
+clavier, responsive et métier restent des gates indépendants. Inversement, le seuil
+ne peut pas être abaissé pour faire passer un écran. Les masques sont réservés aux
+petites zones dynamiques listées ci-dessous et doivent être documentés dans le rapport.
+
 ## Baselines
 
 1. Première implémentation comparée aux PNG conceptuels.

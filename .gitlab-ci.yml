@@ -16,6 +16,7 @@ validate-repository:
     - pip install --no-cache-dir pyyaml pillow
   script:
     - bash scripts/validate-pack.sh
+    - python -m unittest discover -s docs/ui-handoff/scripts -p "test_*.py"
 
 backend-test:
   stage: test
