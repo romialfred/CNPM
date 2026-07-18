@@ -1,0 +1,68 @@
+import { provideZonelessChangeDetection } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DemoSessionGateway } from './demo-session.gateway';
+import { SESSION_GATEWAY } from './session-gateway';
+import { TopBarComponent } from './top-bar.component';
+
+async function setup() {
+  await TestBed.configureTestingModule({
+    imports: [TopBarComponent],
+    providers: [
+      provideZonelessChangeDetection(),
+      provideRouter([]),
+      { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
+    ],
+  }).compileComponents();
+
+  const fixture = TestBed.createComponent(TopBarComponent);
+  fixture.detectChanges();
+  await fixture.whenStable();
+  fixture.detectChanges();
+  return { fixture, host: fixture.nativeElement as HTMLElement };
+}
+
+describe('TopBarComponent', () => {
+  beforeEach(() => TestBed.resetTestingModule());
+
+  it('borne la recherche aux membres avec un nom accessible persistant', async () => {
+    const { fixture, host } = await setup();
+    const emit = vi.fn();
+    fixture.componentInstance.searchSubmit.subscribe(emit);
+    const input = host.querySelector<HTMLInputElement>('#recherche-globale');
+    const form = host.querySelector<HTMLFormElement>('form[role="search"]');
+
+    expect(host.querySelector('label[for="recherche-globale"]')?.textContent).toContain(
+      'Rechercher un membre',
+    );
+    if (!input || !form) throw new Error('Recherche introuvable');
+    input.value = '  SOMACOP  ';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+    expect(emit).toHaveBeenCalledWith('SOMACOP');
+  });
+
+  it('rend le compteur et le contexte de notification explicitement fictifs', async () => {
+    const { host } = await setup();
+    const trigger = host.querySelector<HTMLElement>('.cnpm-topbar__notification-trigger');
+
+    expect(trigger?.getAttribute('aria-label')).toBe('8 notifications de démonstration');
+    expect(host.querySelector('.cnpm-topbar__notification-count')?.textContent?.trim()).toBe('8');
+    expect(host.textContent).toContain('Le centre de notifications n’est pas encore raccordé.');
+    expect(host.querySelector('.cnpm-topbar__demo')?.textContent).toContain('Démo');
+  });
+
+  it('présente une seule action globale et une identité textuelle', async () => {
+    const { host } = await setup();
+    const action = host.querySelector<HTMLAnchorElement>('.cnpm-topbar__primary-action');
+
+    expect(action?.getAttribute('href')).toBe('/admin/enrollments/new');
+    expect(action?.getAttribute('aria-label')).toBe('Créer un nouvel enrôlement');
+    expect(host.querySelector('.cnpm-topbar__avatar')?.textContent?.trim()).toBe('AD');
+    expect(host.querySelector('.cnpm-topbar__identity')?.getAttribute('aria-label')).toBe(
+      'Agent de démonstration, Administrateur',
+    );
+  });
+});

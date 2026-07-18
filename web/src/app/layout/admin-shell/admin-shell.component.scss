@@ -52,6 +52,13 @@
   padding: var(--cnpm-layout-pagePaddingDesktop);
 }
 
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .cnpm-admin,
+  .cnpm-admin--collapsed {
+    grid-template-columns: var(--cnpm-size-sidebar-collapsed) minmax(0, 1fr);
+  }
+}
+
 .cnpm-admin__scrim {
   display: none;
 }

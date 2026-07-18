@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LucidePanelLeftClose, LucidePanelLeftOpen, LucideX } from '@lucide/angular';
 import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
 import { AdminNavIconComponent } from './admin-nav-icon.component';
 import { ADMIN_NAV } from './admin-nav';
+import { SESSION_GATEWAY } from './session-gateway';
 
 /**
  * Navigation latérale d'administration — `SidebarNavigation` (NAV-001).
@@ -16,6 +18,7 @@ import { ADMIN_NAV } from './admin-nav';
   selector: 'cnpm-sidebar-navigation',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    AsyncPipe,
     RouterLink,
     RouterLinkActive,
     AdminNavIconComponent,
@@ -27,6 +30,8 @@ import { ADMIN_NAV } from './admin-nav';
   styleUrl: './sidebar-navigation.component.scss',
 })
 export class SidebarNavigationComponent {
+  private readonly session = inject(SESSION_GATEWAY);
+
   readonly collapsed = input(false);
 
   readonly collapseToggle = output<void>();
@@ -34,4 +39,5 @@ export class SidebarNavigationComponent {
 
   protected readonly navigation = ADMIN_NAV;
   protected readonly iconSize = CNPM_ICON_SIZE;
+  protected readonly identity = this.session.identity;
 }

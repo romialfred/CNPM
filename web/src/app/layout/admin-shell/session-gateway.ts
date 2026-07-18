@@ -12,6 +12,12 @@ export interface SessionIdentity {
   readonly displayName: string;
   /** Rôle lisible, tel qu'il doit apparaître sous le nom. */
   readonly roleLabel: string;
+  /** Exercice affiché dans le shell, fourni par la session et jamais déduit par l'UI. */
+  readonly exerciseLabel: string;
+  /** Compteur du centre de notifications ; `0` masque le badge. */
+  readonly notificationCount: number;
+  /** Rend explicite un contexte fictif dans le chrome commun et les captures. */
+  readonly demoMode: boolean;
 }
 
 export interface SessionGateway {

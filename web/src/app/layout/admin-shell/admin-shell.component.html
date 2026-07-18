@@ -11,7 +11,13 @@
     <div class="cnpm-admin__scrim" aria-hidden="true" (click)="closeDrawer()"></div>
   }
 
-  <aside class="cnpm-admin__sidebar" id="navigation-laterale">
+  <aside
+    class="cnpm-admin__sidebar"
+    id="navigation-laterale"
+    [attr.role]="drawerOpen() ? 'dialog' : null"
+    [attr.aria-modal]="drawerOpen() ? 'true' : null"
+    [attr.aria-label]="drawerOpen() ? 'Navigation dâ€™administration' : null"
+  >
     <cnpm-sidebar-navigation
       [collapsed]="collapsed()"
       (collapseToggle)="toggleCollapsed()"
@@ -19,7 +25,11 @@
     />
   </aside>
 
-  <div class="cnpm-admin__frame">
+  <div
+    class="cnpm-admin__frame"
+    [attr.inert]="drawerOpen() ? '' : null"
+    [attr.aria-hidden]="drawerOpen() ? 'true' : null"
+  >
     <cnpm-top-bar
       [drawerOpen]="drawerOpen()"
       (drawerToggle)="toggleDrawer()"

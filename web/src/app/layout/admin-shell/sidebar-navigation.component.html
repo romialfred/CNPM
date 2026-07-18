@@ -1,11 +1,28 @@
 <div class="cnpm-sidebar" [class.cnpm-sidebar--collapsed]="collapsed()">
   <div class="cnpm-sidebar__brand">
-    <a class="cnpm-sidebar__wordmark" routerLink="/admin/members">
-      <abbr title="Conseil National du Patronat du Mali">CNPM</abbr>
+    <a
+      class="cnpm-sidebar__wordmark"
+      routerLink="/admin/dashboard"
+      aria-label="Retour au tableau de bord"
+      (click)="drawerClose.emit()"
+    >
+      <span class="cnpm-sidebar__logo-viewport" aria-hidden="true">
+        <img
+          class="cnpm-sidebar__logo"
+          src="/assets/brand/logo-CNPM.png"
+          alt=""
+          width="300"
+          height="200"
+        />
+      </span>
+      <abbr class="cnpm-sidebar__compact-mark" title="Conseil National du Patronat du Mali">
+        CNPM
+      </abbr>
     </a>
     <button
       type="button"
       class="cnpm-sidebar__drawer-close"
+      data-drawer-initial-focus
       (click)="drawerClose.emit()"
       aria-label="Fermer la navigation"
     >
@@ -48,6 +65,21 @@
       Les rubriques marquées « à venir » ne sont pas encore disponibles.
     </p>
   </nav>
+
+  @if (identity | async; as user) {
+    <div
+      class="cnpm-sidebar__exercise"
+      [attr.aria-label]="'Exercice en cours ' + user.exerciseLabel"
+    >
+      <span class="cnpm-sidebar__exercise-label">Exercice en cours</span>
+      <span class="cnpm-sidebar__exercise-value">
+        {{ user.exerciseLabel }}
+        @if (user.demoMode) {
+          <span class="cnpm-sidebar__demo">Démo</span>
+        }
+      </span>
+    </div>
+  }
 
   <button
     type="button"

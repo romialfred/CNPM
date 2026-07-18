@@ -5,7 +5,8 @@
     (click)="drawerToggle.emit()"
     [attr.aria-expanded]="drawerOpen()"
     aria-controls="navigation-laterale"
-    aria-label="Ouvrir la navigation"
+    aria-haspopup="dialog"
+    [attr.aria-label]="drawerOpen() ? 'Fermer la navigation' : 'Ouvrir la navigation'"
   >
     <svg lucideMenu [size]="iconSize.control"></svg>
   </button>
@@ -14,9 +15,7 @@
        La portée est restreinte aux membres et le libellé le dit : promettre une
        recherche transverse qui n'existe pas serait un contrôle mensonger. -->
   <form class="cnpm-topbar__search" role="search" (ngSubmit)="submit()">
-    <label class="cnpm-topbar__search-label" for="recherche-globale">
-      Rechercher un membre
-    </label>
+    <label class="cnpm-topbar__search-label" for="recherche-globale"> Rechercher un membre </label>
     <span class="cnpm-topbar__field">
       <svg lucideSearch class="cnpm-topbar__search-icon" [size]="iconSize.control"></svg>
       <input
@@ -33,9 +32,49 @@
   </form>
 
   @if (identity | async; as user) {
-    <div class="cnpm-topbar__identity">
-      <span class="cnpm-topbar__name">{{ user.displayName }}</span>
-      <span class="cnpm-topbar__role">{{ user.roleLabel }}</span>
+    <details class="cnpm-topbar__notifications">
+      <summary
+        class="cnpm-topbar__notification-trigger"
+        [attr.aria-label]="
+          user.notificationCount +
+          (user.notificationCount > 1 ? ' notifications' : ' notification') +
+          (user.demoMode ? ' de démonstration' : '')
+        "
+        [attr.title]="user.demoMode ? 'Notifications de démonstration' : 'Notifications'"
+      >
+        <svg lucideBell [size]="iconSize.control"></svg>
+        @if (user.notificationCount > 0) {
+          <span class="cnpm-topbar__notification-count" aria-hidden="true">
+            {{ user.notificationCount }}
+          </span>
+        }
+      </summary>
+      <div class="cnpm-topbar__notification-panel">
+        <strong>Notifications de démonstration</strong>
+        <span>Le centre de notifications n’est pas encore raccordé.</span>
+      </div>
+    </details>
+
+    <a
+      class="cnpm-topbar__primary-action"
+      routerLink="/admin/enrollments/new"
+      aria-label="Créer un nouvel enrôlement"
+    >
+      <svg lucidePlus [size]="iconSize.control"></svg>
+      <span>Nouvelle action</span>
+    </a>
+
+    <div class="cnpm-topbar__identity" [attr.aria-label]="user.displayName + ', ' + user.roleLabel">
+      <span class="cnpm-topbar__avatar" aria-hidden="true">{{ initials(user.displayName) }}</span>
+      <span class="cnpm-topbar__identity-copy">
+        <span class="cnpm-topbar__name">{{ user.displayName }}</span>
+        <span class="cnpm-topbar__role">
+          {{ user.roleLabel }}
+          @if (user.demoMode) {
+            <span class="cnpm-topbar__demo">Démo</span>
+          }
+        </span>
+      </span>
     </div>
   }
 </header>

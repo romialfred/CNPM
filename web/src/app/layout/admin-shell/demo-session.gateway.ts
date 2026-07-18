@@ -17,5 +17,8 @@ export class DemoSessionGateway implements SessionGateway {
   readonly identity: Observable<SessionIdentity | null> = of({
     displayName: 'Agent de démonstration',
     roleLabel: 'Administrateur',
+    exerciseLabel: '2024',
+    notificationCount: 8,
+    demoMode: true,
   });
 }

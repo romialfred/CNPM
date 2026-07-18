@@ -26,23 +26,40 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--cnpm-space-2);
-  height: var(--cnpm-size-topbar);
+  min-height: calc(var(--cnpm-size-topbar) + var(--cnpm-space-12));
   flex: none;
-  padding: 0 var(--cnpm-space-5);
+  padding: var(--cnpm-space-1) var(--cnpm-space-4);
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
 }
 
 .cnpm-sidebar__wordmark {
-  font-size: var(--cnpm-font-size-lg);
-  font-weight: var(--cnpm-font-weight-bold);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  color: var(--cnpm-color-text-brand);
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
   text-decoration: none;
 }
 
-/* `abbr[title]` reçoit un soulignement pointillé par défaut : il parasite le
-   mot-symbole sans rien apporter, l'infobulle restant portée par `title`. */
-.cnpm-sidebar__wordmark abbr {
+.cnpm-sidebar__logo-viewport {
+  display: block;
+  width: 100%;
+  height: calc(var(--cnpm-size-topbar) + var(--cnpm-space-10));
+  overflow: hidden;
+}
+
+.cnpm-sidebar__logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: translateY(calc(-1 * var(--cnpm-space-5)));
+}
+
+.cnpm-sidebar__compact-mark {
+  display: none;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  color: var(--cnpm-color-text-brand);
   text-decoration: none;
 }
 
@@ -139,6 +156,39 @@ a.cnpm-sidebar__item:hover {
   color: var(--cnpm-color-text-primary);
 }
 
+.cnpm-sidebar__exercise {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  flex: none;
+  margin: 0 var(--cnpm-space-4) var(--cnpm-space-2);
+}
+
+.cnpm-sidebar__exercise-label {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-sidebar__exercise-value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
+  min-height: var(--cnpm-size-control-sm);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-sidebar__demo {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
 .cnpm-sidebar__drawer-close {
   display: none;
 }
@@ -149,8 +199,16 @@ a.cnpm-sidebar__item:hover {
 .cnpm-sidebar--collapsed {
   .cnpm-sidebar__label,
   .cnpm-sidebar__hint,
-  .cnpm-sidebar__wordmark {
+  .cnpm-sidebar__exercise {
     @include visually-hidden;
+  }
+
+  .cnpm-sidebar__logo-viewport {
+    display: none;
+  }
+
+  .cnpm-sidebar__compact-mark {
+    display: inline;
   }
 
   .cnpm-sidebar__item,
@@ -160,13 +218,35 @@ a.cnpm-sidebar__item:hover {
   }
 }
 
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .cnpm-sidebar__label,
+  .cnpm-sidebar__hint,
+  .cnpm-sidebar__exercise,
+  .cnpm-sidebar__logo-viewport {
+    @include visually-hidden;
+  }
+
+  .cnpm-sidebar__compact-mark {
+    display: inline;
+  }
+
+  .cnpm-sidebar__item,
+  .cnpm-sidebar__brand {
+    justify-content: center;
+  }
+
+  .cnpm-sidebar__collapse {
+    display: none;
+  }
+}
+
 /* Dans le tiroir, la barre est toujours large : l'état réduit du desktop ne doit
    pas amputer les libellés d'un tiroir qui, lui, a la place. */
 @media (max-width: 1023px) {
   .cnpm-sidebar--collapsed {
     .cnpm-sidebar__label,
     .cnpm-sidebar__hint,
-    .cnpm-sidebar__wordmark {
+    .cnpm-sidebar__exercise {
       position: static;
       width: auto;
       height: auto;
@@ -179,6 +259,14 @@ a.cnpm-sidebar__item:hover {
     .cnpm-sidebar__collapse,
     .cnpm-sidebar__brand {
       justify-content: flex-start;
+    }
+
+    .cnpm-sidebar__logo-viewport {
+      display: block;
+    }
+
+    .cnpm-sidebar__compact-mark {
+      display: none;
     }
   }
 
