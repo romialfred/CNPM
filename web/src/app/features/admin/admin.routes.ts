@@ -76,7 +76,7 @@ export const adminRoutes: Routes = [
         title: 'Cotisations — Administration CNPM',
       },
       {
-        path: 'payments',
+        path: 'payments/reconciliation',
         loadComponent: () =>
           import('./payments/payments-reconciliation.page').then(
             (m) => m.PaymentsReconciliationPage,
@@ -84,7 +84,7 @@ export const adminRoutes: Routes = [
         title: 'Rapprochement des paiements — Administration CNPM',
       },
       {
-        path: 'recovery',
+        path: 'recovery/campaigns',
         loadComponent: () =>
           import('./recovery/recovery-campaigns.page').then((m) => m.RecoveryCampaignsPage),
         title: 'Campagnes de relance — Administration CNPM',
@@ -95,11 +95,16 @@ export const adminRoutes: Routes = [
         title: 'Reporting — Administration CNPM',
       },
       {
-        path: 'security',
+        path: 'security/users',
         loadComponent: () =>
           import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
         title: 'Sécurité — Administration CNPM',
       },
+      // Compatibilité des favoris et captures antérieurs à l'alignement sur
+      // l'inventaire UI. Les nouveaux liens utilisent exclusivement les routes canoniques.
+      { path: 'payments', pathMatch: 'full', redirectTo: 'payments/reconciliation' },
+      { path: 'recovery', pathMatch: 'full', redirectTo: 'recovery/campaigns' },
+      { path: 'security', pathMatch: 'full', redirectTo: 'security/users' },
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
     ],
   },

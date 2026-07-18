@@ -8,7 +8,7 @@
            dominante. Import et export ouvrent un flux contrôlé avec rapport, non
            spécifié à ce jour : ils annoncent leur indisponibilité plutôt que de
            conduire à un écran absent. -->
-      <cnpm-button variant="primary">
+      <cnpm-button variant="primary" (click)="startEnrollment()">
         <svg lucidePlus [size]="iconSize.compact"></svg>
         Nouveau membre
       </cnpm-button>
@@ -181,8 +181,12 @@
                  lettres : trois pictogrammes muets rendraient la colonne indéchiffrable. -->
             <td class="cnpm-table__cell">
               <span class="cnpm-members__actions">
-                <cnpm-button variant="tertiary" size="sm">Voir</cnpm-button>
-                <cnpm-button variant="tertiary" size="sm">Historique</cnpm-button>
+                <cnpm-button variant="tertiary" size="sm" (click)="viewMember(member.id)">
+                  Voir
+                </cnpm-button>
+                <cnpm-button variant="tertiary" size="sm" (click)="viewHistory(member.id)">
+                  Historique
+                </cnpm-button>
               </span>
             </td>
           </ng-template>

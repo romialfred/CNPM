@@ -10,9 +10,11 @@ import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
  */
 export const memberRoutes: Routes = [
   {
-    path: 'espace-membre',
+    path: 'member/home',
     providers: [{ provide: MEMBER_HOME_GATEWAY, useClass: DemoMemberHomeGateway }],
     loadComponent: () => import('./home/member-home.page').then((m) => m.MemberHomePage),
     title: 'Mon espace membre — CNPM',
   },
+  // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
+  { path: 'espace-membre', pathMatch: 'full', redirectTo: 'member/home' },
 ];

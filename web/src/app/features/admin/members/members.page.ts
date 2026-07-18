@@ -14,7 +14,10 @@ import type {
   DataTableState,
   SortState,
 } from '../../../design-system/data-table/data-table.model';
-import { FilterBarComponent, type FilterChip } from '../../../design-system/filter-bar/filter-bar.component';
+import {
+  FilterBarComponent,
+  type FilterChip,
+} from '../../../design-system/filter-bar/filter-bar.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
@@ -166,8 +169,8 @@ export class MembersPage {
           catchError((error: unknown) =>
             of(
               error instanceof MembersAccessError
-                ? ({ kind: 'forbidden' as const })
-                : ({ kind: 'error' as const }),
+                ? { kind: 'forbidden' as const }
+                : { kind: 'error' as const },
             ),
           ),
           startWith({ kind: 'loading' as const }),
@@ -188,8 +191,8 @@ export class MembersPage {
   protected readonly categories = computed(() => this.data()?.categories ?? []);
   protected readonly groups = computed(() => this.data()?.groups ?? []);
 
-  protected readonly hasFilters = computed(
-    () => Boolean(this.search() || this.status() || this.category() || this.group()),
+  protected readonly hasFilters = computed(() =>
+    Boolean(this.search() || this.status() || this.category() || this.group()),
   );
 
   protected readonly tableState = computed<DataTableState>(() => {
@@ -362,6 +365,29 @@ export class MembersPage {
 
   protected clearSelection(): void {
     this.selected.set(new Set());
+  }
+
+  /** BO-009 est le parcours canonique de création actuellement livré. */
+  protected startEnrollment(): void {
+    void this.router.navigate(['/admin/enrollments/new']);
+  }
+
+  /**
+   * Ouvre BO-003 en conservant les filtres, le tri et la page dans l'URL de la fiche.
+   * Le retour navigateur restaure ainsi exactement le contexte de BO-002.
+   */
+  protected viewMember(memberId: string): void {
+    void this.router.navigate(['/admin/members', memberId], {
+      queryParamsHandling: 'preserve',
+    });
+  }
+
+  /** L'action Historique adresse directement l'onglet partageable exigé par BO-003. */
+  protected viewHistory(memberId: string): void {
+    void this.router.navigate(['/admin/members', memberId], {
+      queryParams: { onglet: 'historique', hpage: null },
+      queryParamsHandling: 'merge',
+    });
   }
 
   /** Relance le chargement après une erreur récupérable, sans recharger la page. */

@@ -37,9 +37,9 @@ class ControllableGateway implements MemberDetailGateway {
 
 const MEMBER_ID = 'MEM-0001';
 
-function routeStub() {
+function routeStub(queryValues: Record<string, string | readonly string[]> = {}) {
   const params = convertToParamMap({ id: MEMBER_ID });
-  const query = convertToParamMap({});
+  const query = convertToParamMap(queryValues);
   return {
     paramMap: new BehaviorSubject(params).asObservable(),
     queryParamMap: new BehaviorSubject(query).asObservable(),
@@ -47,7 +47,7 @@ function routeStub() {
   };
 }
 
-async function setup() {
+async function setup(queryValues: Record<string, string | readonly string[]> = {}) {
   const gateway = new ControllableGateway();
   TestBed.overrideComponent(MemberDetailPage, {
     // Le port est fourni par le composant lui-même ; un fournisseur de module serait
@@ -60,7 +60,7 @@ async function setup() {
     providers: [
       provideZonelessChangeDetection(),
       provideRouter([]),
-      { provide: ActivatedRoute, useValue: routeStub() },
+      { provide: ActivatedRoute, useValue: routeStub(queryValues) },
       { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
     ],
   }).compileComponents();
@@ -139,6 +139,25 @@ describe('MemberDetailPage — états requis', () => {
 
     expect(gateway.calls.length).toBe(callsBefore + 1);
     expect(host.querySelector('.cnpm-skeleton')).not.toBeNull();
+  });
+
+  it('restitue le contexte de BO-002 sans propager les paramètres propres à la fiche', async () => {
+    const { fixture } = await setup({
+      q: 'somacop',
+      statut: 'ACTIVE',
+      page: '3',
+      onglet: 'historique',
+      hpage: '2',
+    });
+    const page = fixture.componentInstance as unknown as {
+      listQueryParams: () => Record<string, string>;
+    };
+
+    expect(page.listQueryParams()).toEqual({
+      q: 'somacop',
+      statut: 'ACTIVE',
+      page: '3',
+    });
   });
 });
 

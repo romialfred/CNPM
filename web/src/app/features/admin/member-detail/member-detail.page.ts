@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, type Params } from '@angular/router';
 import { LucideMail, LucidePencil, LucidePhone, LucidePrinter } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
@@ -243,6 +243,23 @@ export class MemberDetailPage {
   protected readonly activeTab = computed<MemberTab>(() => {
     const value = this.queryParams().get('onglet');
     return value && TAB_IDS.includes(value) ? (value as MemberTab) : DEFAULT_TAB;
+  });
+
+  /**
+   * Contexte de BO-002 à restituer lors d'un retour explicite à la liste.
+   * `onglet` et `hpage` appartiennent uniquement à BO-003 ; les propager vers la liste
+   * laisserait des paramètres sans sens dans une URL partageable.
+   */
+  protected readonly listQueryParams = computed<Params>(() => {
+    const query = this.queryParams();
+    return Object.fromEntries(
+      query.keys
+        .filter((key) => key !== 'onglet' && key !== 'hpage')
+        .map((key) => {
+          const values = query.getAll(key);
+          return [key, values.length > 1 ? values : (values[0] ?? '')];
+        }),
+    );
   });
 
   /**

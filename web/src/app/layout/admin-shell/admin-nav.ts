@@ -33,16 +33,16 @@ export interface AdminNavEntry {
  * UX-DEC-009 écarte Lucide.
  */
 export const ADMIN_NAV: readonly AdminNavEntry[] = [
-  { label: 'Tableau de bord', route: '/admin/tableau-de-bord', icon: 'dashboard', pending: true },
+  { label: 'Tableau de bord', route: '/admin/dashboard', icon: 'dashboard' },
   { label: 'Membres', route: '/admin/members', icon: 'members' },
-  { label: 'Entreprises', route: '/admin/entreprises', icon: 'companies', pending: true },
-  { label: 'Enrôlements', route: '/admin/enrolements', icon: 'enrolments', pending: true },
-  { label: 'Cotisations', route: '/admin/cotisations', icon: 'contributions', pending: true },
-  { label: 'Paiements', route: '/admin/paiements', icon: 'payments', pending: true },
-  { label: 'Reçus', route: '/admin/recus', icon: 'receipts', pending: true },
-  { label: 'Relances', route: '/admin/relances', icon: 'reminders', pending: true },
-  { label: 'Requêtes', route: '/admin/requetes', icon: 'requests', pending: true },
-  { label: 'Groupements', route: '/admin/groupements', icon: 'groups', pending: true },
-  { label: 'Reporting', route: '/admin/reporting', icon: 'reporting', pending: true },
-  { label: 'Administration', route: '/admin/administration', icon: 'administration', pending: true },
+  { label: 'Entreprises', route: '/admin/organizations', icon: 'companies', pending: true },
+  { label: 'Enrôlements', route: '/admin/enrollments/new', icon: 'enrolments' },
+  { label: 'Cotisations', route: '/admin/contributions', icon: 'contributions' },
+  { label: 'Paiements', route: '/admin/payments/reconciliation', icon: 'payments' },
+  { label: 'Reçus', route: '/admin/receipts', icon: 'receipts', pending: true },
+  { label: 'Relances', route: '/admin/recovery/campaigns', icon: 'reminders' },
+  { label: 'Requêtes', route: '/admin/requests', icon: 'requests', pending: true },
+  { label: 'Groupements', route: '/admin/groups', icon: 'groups', pending: true },
+  { label: 'Reporting', route: '/admin/reporting', icon: 'reporting' },
+  { label: 'Administration', route: '/admin/security/users', icon: 'administration' },
 ];

@@ -3,7 +3,13 @@
     <nav class="cnpm-member__crumbs" aria-label="Fil d’Ariane">
       <ol class="cnpm-member__crumb-list">
         <li class="cnpm-member__crumb">
-          <a class="cnpm-member__crumb-link" routerLink="/admin/members">Membres</a>
+          <a
+            class="cnpm-member__crumb-link"
+            routerLink="/admin/members"
+            [queryParams]="listQueryParams()"
+          >
+            Membres
+          </a>
         </li>
         <li class="cnpm-member__crumb" aria-current="page">Fiche membre</li>
       </ol>
@@ -35,7 +41,12 @@
         <!-- Aucun « réessayer » : répéter une requête que le droit condamne n'a pas de
              sens. La seule issue utile est de revenir à une vue autorisée. -->
         <cnpm-error-state variant="forbidden" titleAs="h1">
-          <cnpm-button variant="secondary" size="sm" routerLink="/admin/members">
+          <cnpm-button
+            variant="secondary"
+            size="sm"
+            routerLink="/admin/members"
+            [queryParams]="listQueryParams()"
+          >
             Revenir à la liste des membres
           </cnpm-button>
         </cnpm-error-state>
@@ -48,7 +59,12 @@
           title="Membre introuvable"
           description="Aucun membre ne correspond à cet identifiant. La fiche a pu être supprimée, ou l’adresse est incomplète."
         >
-          <cnpm-button variant="secondary" size="sm" routerLink="/admin/members">
+          <cnpm-button
+            variant="secondary"
+            size="sm"
+            routerLink="/admin/members"
+            [queryParams]="listQueryParams()"
+          >
             Revenir à la liste des membres
           </cnpm-button>
         </cnpm-error-state>
@@ -116,7 +132,11 @@
                     <svg lucidePrinter [size]="iconSize.compact"></svg>
                     Imprimer
                   </cnpm-button>
-                  <cnpm-button variant="tertiary" routerLink="/admin/members">
+                  <cnpm-button
+                    variant="tertiary"
+                    routerLink="/admin/members"
+                    [queryParams]="listQueryParams()"
+                  >
                     Retour à la liste
                   </cnpm-button>
 

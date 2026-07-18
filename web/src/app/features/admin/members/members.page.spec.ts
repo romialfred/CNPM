@@ -1,8 +1,8 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
 import { DemoSessionGateway } from '../../../layout/admin-shell/demo-session.gateway';
 import {
@@ -10,6 +10,7 @@ import {
   MembersAccessError,
   type MembersGateway,
   type MembersPage as MembersPageData,
+  type MemberRow,
 } from './members-gateway';
 import { MembersPage } from './members.page';
 
@@ -35,6 +36,38 @@ const EMPTY_PAGE: MembersPageData = {
   },
   categories: [],
   groups: [],
+};
+
+const MEMBER_ROW: MemberRow = {
+  id: 'membership-demo-001',
+  code: 'CNPM-DEMO-001',
+  organization: 'Entreprise Démo SA',
+  category: 'A',
+  group: 'Groupement démo',
+  contactName: 'Contact Démo',
+  contactPhone: '+223 00 00 00 00',
+  contactEmail: 'contact@example.test',
+  due: 1_000_000,
+  paid: 750_000,
+  status: 'ACTIVE',
+  lastActivity: '2026-07-18',
+  isLargeContributor: false,
+};
+
+const READY_PAGE: MembersPageData = {
+  ...EMPTY_PAGE,
+  rows: [MEMBER_ROW],
+  totalItems: 1,
+  overview: {
+    ...EMPTY_PAGE.overview,
+    membersTotal: 1,
+    active: 1,
+    expected: MEMBER_ROW.due,
+    collected: MEMBER_ROW.paid,
+    recoveryRate: 75,
+  },
+  categories: [MEMBER_ROW.category],
+  groups: [MEMBER_ROW.group],
 };
 
 /** Gateway dont chaque appel expose un flux que le test résout ou fait échouer à la demande. */
@@ -68,7 +101,22 @@ async function setup() {
   fixture.detectChanges();
   await fixture.whenStable();
   fixture.detectChanges();
-  return { fixture, gateway, host: fixture.nativeElement as HTMLElement };
+  return {
+    fixture,
+    gateway,
+    host: fixture.nativeElement as HTMLElement,
+    router: TestBed.inject(Router),
+  };
+}
+
+function button(host: HTMLElement, label: string): HTMLButtonElement {
+  const match = Array.from(host.querySelectorAll('button')).find(
+    (candidate) => candidate.textContent?.trim() === label,
+  );
+  if (!match) {
+    throw new Error(`Bouton introuvable : ${label}`);
+  }
+  return match;
 }
 
 describe('MembersPage — états requis', () => {
@@ -137,5 +185,33 @@ describe('MembersPage — états requis', () => {
       (b.textContent ?? '').includes('Réessayer'),
     );
     expect(retry).toBeUndefined();
+  });
+
+  it('ouvre BO-009 depuis l action primaire Nouveau membre', async () => {
+    const { host, router } = await setup();
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    button(host, 'Nouveau membre').click();
+
+    expect(navigate).toHaveBeenCalledWith(['/admin/enrollments/new']);
+  });
+
+  it('ouvre la fiche et son historique en conservant le contexte de liste', async () => {
+    const { fixture, gateway, host, router } = await setup();
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    gateway.latest.next(READY_PAGE);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    button(host, 'Voir').click();
+    button(host, 'Historique').click();
+
+    expect(navigate).toHaveBeenNthCalledWith(1, ['/admin/members', MEMBER_ROW.id], {
+      queryParamsHandling: 'preserve',
+    });
+    expect(navigate).toHaveBeenNthCalledWith(2, ['/admin/members', MEMBER_ROW.id], {
+      queryParams: { onglet: 'historique', hpage: null },
+      queryParamsHandling: 'merge',
+    });
   });
 });
