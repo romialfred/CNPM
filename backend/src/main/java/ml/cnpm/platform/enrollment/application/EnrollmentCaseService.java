@@ -56,10 +56,16 @@ public class EnrollmentCaseService {
 
     private final EnrollmentCaseRepository repository;
     private final AuditRecorder auditRecorder;
+    /** API publique du module MEMBER : seul canal autorisé pour créer une adhésion. */
+    private final ml.cnpm.platform.member.MemberActivation memberActivation;
 
-    public EnrollmentCaseService(EnrollmentCaseRepository repository, AuditRecorder auditRecorder) {
+    public EnrollmentCaseService(
+            EnrollmentCaseRepository repository,
+            AuditRecorder auditRecorder,
+            ml.cnpm.platform.member.MemberActivation memberActivation) {
         this.repository = repository;
         this.auditRecorder = auditRecorder;
+        this.memberActivation = memberActivation;
     }
 
     /**
@@ -155,11 +161,39 @@ public class EnrollmentCaseService {
         return moved;
     }
 
-    /** Approuve le dossier. La décision est nominative et consignée (append-only). */
+    /**
+     * Approuve le dossier <strong>et active le membre</strong> — le contrat intitule
+     * l'opération « approuver et activer ». La décision est nominative et consignée
+     * (append-only) ; l'activation crée l'adhésion via l'API applicative du module MEMBER,
+     * dans la même transaction : décision et activation sont validées ou annulées ensemble.
+     *
+     * <p>{@code membershipNumber} et {@code categoryCode} sont fournis par le décideur : la
+     * règle de catégorisation dépend du barème (DEC-008) et le format du numéro n'est fixé par
+     * aucune source (ENR-DEC-001). Leur automatisation ultérieure ne rompra pas le contrat.
+     *
+     * <p>L'articulation entre la machine à états du dossier et celle du compte membre n'est pas
+     * spécifiée par les sources : la lecture retenue est que {@code ACTIVE} qualifie l'adhésion
+     * créée, le dossier restant à {@code APPROVED} (consigné dans ENR-DEC-001).
+     */
     @PreAuthorize("hasAuthority('PERM_ENROLLMENT.APPROVE')")
     @Transactional
-    public EnrollmentCase approve(UUID id, String comment, UUID actorUserId, UUID correlationId) {
-        return decide(id, EnrollmentStatus.APPROVED, null, comment, actorUserId, correlationId);
+    public EnrollmentCase approve(
+            UUID id,
+            String membershipNumber,
+            String categoryCode,
+            String comment,
+            UUID actorUserId,
+            UUID correlationId) {
+        EnrollmentCase decided =
+                decide(id, EnrollmentStatus.APPROVED, null, comment, actorUserId, correlationId);
+        memberActivation.activate(
+                decided.organizationId(),
+                membershipNumber,
+                categoryCode,
+                "Activation par approbation du dossier " + decided.caseNumber(),
+                actorUserId,
+                correlationId);
+        return decided;
     }
 
     /**

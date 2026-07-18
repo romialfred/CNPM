@@ -499,10 +499,26 @@ livrer le cycle de vie du dossier, corriger ces paramètres à une itération ul
 après la démonstration. Aucun de ces différés ne crée de rupture : ils ajoutent des gardes
 et des données, ils n'en retirent aucune.
 
-**Point de gouvernance à ouvrir séparément.** `separation-of-duties.md` (SOD-001..008) **ne
-couvre pas** le couple `ENROLLMENT.CREATE` / `ENROLLMENT.APPROVE`, alors que le rôle
-`VALIDATEUR_ENROLEMENT` détient les deux : un même agent peut créer puis approuver un
-dossier. À arbitrer avant mise en production.
+### SOD — auto-approbation d'un dossier d'adhésion : **TRANCHÉ le 2026-07-18**
+
+`separation-of-duties.md` (SOD-001..008) ne couvre pas le couple `ENROLLMENT.CREATE` /
+`ENROLLMENT.APPROVE`, alors que le rôle `VALIDATEUR_ENROLEMENT` détient les deux.
+
+**Décision du commanditaire (2026-07-18) : « oui, un même agent peut créer et approuver ».**
+L'auto-approbation est donc **autorisée** : aucun contrôle technique ne compare le créateur
+au décideur, et le cumul des permissions sur `VALIDATEUR_ENROLEMENT` est conservé.
+
+**Contrôle compensatoire en place.** La dérogation reste **détectable a posteriori** sans
+travail supplémentaire : la création et la décision sont toutes deux consignées
+nominativement — `audit.audit_event` (acteur de `ENROLLMENT_CASE.CREATED`) et
+`enrollment.enrollment_decision.decided_by` (NOT NULL, table append-only). Un contrôle
+périodique peut donc lister les dossiers où créateur et décideur coïncident. Par ailleurs,
+la décision reste impossible sans passage par le contrôle (`UNDER_REVIEW`) et exige un acteur
+identifiable.
+
+**À revoir si.** Le volume d'adhésions augmente fortement, ou si un audit externe exige la
+règle des quatre yeux sur l'admission — auquel cas la comparaison créateur/décideur devient
+un simple ajout de garde, sans refonte.
 
 ## ARCH-DEC-001 — propriété des tables de groupements professionnels
 

@@ -3934,8 +3934,24 @@ components:
       additionalProperties: false
     EnrollmentApprovalInput:
       type: object
-      description: Corps d'une approbation d'enrôlement — le commentaire est facultatif.
+      description: >-
+        Corps d'une approbation d'enrôlement, qui vaut activation du membre. Le numéro
+        d'adhésion et la catégorie de cotisation sont FOURNIS par le décideur : la règle de
+        catégorisation dépend du barème (DEC-008, ouverte) et le format du numéro n'est fixé
+        par aucune source (ENR-DEC-001). Leur automatisation ultérieure ne rompra pas ce
+        contrat. Le commentaire est facultatif.
+      required:
+      - membershipNumber
+      - categoryCode
       properties:
+        membershipNumber:
+          type: string
+          minLength: 1
+          maxLength: 60
+        categoryCode:
+          type: string
+          minLength: 1
+          maxLength: 50
         comment:
           type: string
           maxLength: 2000

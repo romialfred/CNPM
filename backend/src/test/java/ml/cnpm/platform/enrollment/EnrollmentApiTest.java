@@ -113,6 +113,21 @@ class EnrollmentApiTest {
         return as("PERM_ENROLLMENT.APPROVE");
     }
 
+    /** Corps d'approbation : numéro et catégorie sont fournis par le décideur (ENR-DEC-001). */
+    private static String approval(String membershipNumber) {
+        return """
+                { "membershipNumber": "%s", "categoryCode": "PME", "comment": "Dossier complet" }
+                """
+                .formatted(membershipNumber);
+    }
+
+    /** Entreprise dédiée : RG-002 interdit deux comptes membres actifs pour la même entité. */
+    private String ownOrganization(String suffix) {
+        String id = "12345678-0000-0000-0000-0000000001" + suffix;
+        insertOrganization(id, "Entreprise " + suffix);
+        return id;
+    }
+
     private static String body(String caseNumber, String orgId) {
         return """
                 { "caseNumber": "%s", "organizationId": "%s", "channel": "WEB" }
@@ -121,12 +136,16 @@ class EnrollmentApiTest {
     }
 
     private String createCase(String caseNumber) throws Exception {
+        return createCase(caseNumber, ORG_ID);
+    }
+
+    private String createCase(String caseNumber, String orgId) throws Exception {
         String responseBody =
                 mockMvc.perform(
                                 post("/enrollment-applications")
                                         .header("Idempotency-Key", KEY)
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content(body(caseNumber, ORG_ID))
+                                        .content(body(caseNumber, orgId))
                                         .with(asCreator()))
                         .andExpect(status().isCreated())
                         .andReturn()
@@ -136,7 +155,11 @@ class EnrollmentApiTest {
     }
 
     private String submitted(String caseNumber) throws Exception {
-        String id = createCase(caseNumber);
+        return submitted(caseNumber, ORG_ID);
+    }
+
+    private String submitted(String caseNumber, String orgId) throws Exception {
+        String id = createCase(caseNumber, orgId);
         mockMvc.perform(
                         post("/enrollment-applications/{id}/submit", id)
                                 .header("Idempotency-Key", KEY)
@@ -147,7 +170,11 @@ class EnrollmentApiTest {
 
     /** Dossier pris en charge : seul état depuis lequel une décision est possible. */
     private String underReview(String caseNumber) throws Exception {
-        String id = submitted(caseNumber);
+        return underReview(caseNumber, ORG_ID);
+    }
+
+    private String underReview(String caseNumber, String orgId) throws Exception {
+        String id = submitted(caseNumber, orgId);
         mockMvc.perform(post("/enrollment-applications/{id}/start-review", id).with(asReviewer()))
                 .andExpect(status().isOk());
         return id;
@@ -247,7 +274,7 @@ class EnrollmentApiTest {
                         post("/enrollment-applications/{id}/approve", id)
                                 .header("Idempotency-Key", KEY)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{}")
+                                .content(approval("CNPM-2026-9001"))
                                 .with(asApprover()))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("STATE_CONFLICT"));
@@ -316,13 +343,14 @@ class EnrollmentApiTest {
 
     @Test
     void approvesAnApplicationAndRecordsANamedDecision() throws Exception {
-        String id = underReview("ENR-2026-0010");
+        String org = ownOrganization("10");
+        String id = underReview("ENR-2026-0010", org);
 
         mockMvc.perform(
                         post("/enrollment-applications/{id}/approve", id)
                                 .header("Idempotency-Key", KEY)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{ \"comment\": \"Dossier complet\" }")
+                                .content(approval("CNPM-2026-0010"))
                                 .with(asApprover()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("APPROVED"));
@@ -375,12 +403,12 @@ class EnrollmentApiTest {
 
     @Test
     void refusesAnyTransitionOutOfATerminalState() throws Exception {
-        String id = underReview("ENR-2026-0013");
+        String id = underReview("ENR-2026-0013", ownOrganization("13"));
         mockMvc.perform(
                         post("/enrollment-applications/{id}/approve", id)
                                 .header("Idempotency-Key", KEY)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{}")
+                                .content(approval("CNPM-2026-0013"))
                                 .with(asApprover()))
                 .andExpect(status().isOk());
 
@@ -401,7 +429,7 @@ class EnrollmentApiTest {
                         post("/enrollment-applications/{id}/approve", id)
                                 .header("Idempotency-Key", KEY)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{}")
+                                .content(approval("CNPM-2026-9002"))
                                 .with(asReviewer()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("FORBIDDEN"));
@@ -435,7 +463,7 @@ class EnrollmentApiTest {
                         post("/enrollment-applications/{id}/approve", id)
                                 .header("Idempotency-Key", KEY)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{}")
+                                .content(approval("CNPM-2026-9003"))
                                 .with(
                                         jwt().authorities(
                                                 new SimpleGrantedAuthority("PERM_ENROLLMENT.APPROVE"))))
@@ -466,7 +494,7 @@ class EnrollmentApiTest {
         mockMvc.perform(
                         post("/enrollment-applications/{id}/approve", id)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{}")
+                                .content(approval("CNPM-2026-9001"))
                                 .with(asApprover()))
                 .andExpect(status().isBadRequest());
     }
@@ -498,6 +526,82 @@ class EnrollmentApiTest {
                                 .content(body("ENR-2026-0021", ORG_ID))
                                 .with(asCreator()))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void activatesTheMemberWhenTheApplicationIsApproved() throws Exception {
+        String org = ownOrganization("30");
+        String id = underReview("ENR-2026-0030", org);
+
+        mockMvc.perform(
+                        post("/enrollment-applications/{id}/approve", id)
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(approval("CNPM-2026-0030"))
+                                .with(asApprover()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APPROVED"));
+
+        // L'adhésion est créée active, avec la catégorie fournie par le décideur.
+        Assertions.assertEquals(
+                1L,
+                count(
+                        "SELECT count(*) FROM member.membership WHERE organization_id = ?::uuid "
+                                + "AND membership_number = 'CNPM-2026-0030' AND status = 'ACTIVE' "
+                                + "AND category_code = 'PME' AND activated_at IS NOT NULL",
+                        org));
+        // La transition initiale est consignée dans l'historique append-only.
+        Assertions.assertEquals(
+                1L,
+                count(
+                        "SELECT count(*) FROM member.membership_status_history h "
+                                + "JOIN member.membership m ON m.id = h.membership_id "
+                                + "WHERE m.membership_number = 'CNPM-2026-0030' "
+                                + "AND h.from_status IS NULL AND h.to_status = 'ACTIVE' "
+                                + "AND h.created_by = ?::uuid",
+                        ACTOR));
+        // L'activation est auditée, distinctement de la décision.
+        Assertions.assertEquals(
+                1L,
+                count(
+                        "SELECT count(*) FROM audit.audit_event a "
+                                + "JOIN member.membership m ON m.id = a.entity_id "
+                                + "WHERE m.membership_number = 'CNPM-2026-0030' "
+                                + "AND a.action_code = 'MEMBERSHIP.ACTIVATED'"));
+    }
+
+    @Test
+    void refusesASecondActiveMembershipForTheSameOrganization() throws Exception {
+        // RG-002 : « une entreprise ne peut disposer que d'un compte membre actif par
+        // personnalité juridique ».
+        String org = ownOrganization("31");
+        String first = underReview("ENR-2026-0031", org);
+        mockMvc.perform(
+                        post("/enrollment-applications/{id}/approve", first)
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(approval("CNPM-2026-0031"))
+                                .with(asApprover()))
+                .andExpect(status().isOk());
+
+        String second = underReview("ENR-2026-0032", org);
+        mockMvc.perform(
+                        post("/enrollment-applications/{id}/approve", second)
+                                .header("Idempotency-Key", KEY)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(approval("CNPM-2026-0032"))
+                                .with(asApprover()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("STATE_CONFLICT"));
+
+        // La décision du second dossier est annulée avec l'activation : même transaction.
+        Assertions.assertEquals(
+                1L, count("SELECT count(*) FROM member.membership WHERE organization_id = ?::uuid", org));
+        Assertions.assertEquals(
+                0L,
+                count(
+                        "SELECT count(*) FROM enrollment.enrollment_decision WHERE case_id = ?::uuid",
+                        second));
     }
 
     @TestConfiguration

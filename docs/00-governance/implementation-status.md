@@ -640,8 +640,28 @@ motif obligatoire au rejet (le code ne l'imposait pas alors que la Javadoc l'aff
 écriture des tables append-only par `persist` et non `save` (évite un SELECT avant chaque
 INSERT) ; audit vérifié en base pour les six transitions ; lacune ABAC documentée.
 
-Consignés sans correction (gouvernance ou périmètre) : risque d'**auto-approbation**
-(`VALIDATEUR_ENROLEMENT` cumule CREATE et APPROVE — ENR-DEC-001) ; absence de clôture directe
+### Activation du membre (`APPROVED` → adhésion active)
+
+Quatorzième incrément : l'approbation d'un dossier **crée désormais l'adhésion**, conformément
+au libellé du contrat (« approuver et activer »).
+
+| Élément | Détail |
+|---|---|
+| Frontière de module | ENROLLMENT ne touche aucune table de MEMBER : il appelle l'interface **`MemberActivation`**, déclarée au **package racine** du module MEMBER (surface exposée), implémentée en interne — même patron que `AuditRecorder`. `ModularityTest` a d'ailleurs **rejeté** la première version qui dépendait du service interne |
+| Atomicité | Décision et activation partagent la transaction : un refus d'activation annule la décision (vérifié par test) |
+| RG-002 appliquée | « Une entreprise ne peut disposer que d'un compte membre actif par personnalité juridique » : une seconde activation est refusée en 409 |
+| Idempotence | Par numéro d'adhésion (clé naturelle, index unique) |
+| Traçabilité | Adhésion créée `ACTIVE` avec `activated_at`, transition initiale consignée dans l'historique append-only (`from_status` nul), audit `MEMBERSHIP.ACTIVATED` distinct de la décision |
+| Catégorie et numéro | **Fournis par le décideur**, non calculés — la catégorisation dépend du barème (DEC-008) et le format du numéro n'est fixé par aucune source. Arbitrage du commanditaire : ne pas bloquer, automatiser ensuite sans rupture |
+
+**Articulation dossier / compte membre.** Les sources ne la spécifient pas (manque confirmé
+par l'analyse). Lecture retenue et consignée : `ACTIVE` qualifie **l'adhésion créée**, le
+dossier restant à `APPROVED`.
+
+Consignés sans correction (gouvernance ou périmètre) : l'**auto-approbation**, **autorisée par
+le commanditaire le 2026-07-18** (« oui, un même agent peut créer et approuver ») — dérogation
+assumée, rendue détectable a posteriori par la traçabilité nominative du créateur et du
+décideur ; absence de clôture directe
 d'un dossier abandonné en `COMPLEMENT_REQUIRED` (la source ne rattache `REJECTED` qu'au point
 de décision) ; contrainte `CHECK` sur la colonne `status` et vérification d'existence de
 l'organisation (rendue en 409 plutôt qu'en 400) — à traiter en itération suivante.

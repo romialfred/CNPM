@@ -96,7 +96,12 @@ public class EnrollmentController {
             HttpServletRequest request) {
         return EnrollmentApplicationView.from(
                 service.approve(
-                        id, input.comment(), actorId(authentication), CorrelationId.current(request)));
+                        id,
+                        input.membershipNumber(),
+                        input.categoryCode(),
+                        input.comment(),
+                        actorId(authentication),
+                        CorrelationId.current(request)));
     }
 
     /** Rejette le dossier. Le motif ({@code comment}) est obligatoire. */
