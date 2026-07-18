@@ -255,7 +255,7 @@ incohérent » que la fiche interdit.
 
 **Propriétaire.** Direction produit.
 **Impact.** AdminShell (LAY-001), donc tout écran d'administration.
-**Statut.** BLOCKED — décision humaine requise. Livré en périmètre réduit.
+**Statut.** BLOCKED pour la production — décision humaine requise. Démonstration visuelle bornée autorisée par le mandat de reprise du 2026-07-18.
 
 **Constat.** La maquette `ref-bo-002-members-list.png` place quatre éléments dans la
 barre supérieure. Deux ne s'adossent à aucune spécification.
@@ -264,14 +264,19 @@ barre supérieure. Deux ne s'adossent à aucune spécification.
 |---|---|---|
 | Recherche globale | aucun écran de résultats globaux spécifié | oui, restreinte à la liste des membres |
 | Identité de session | `GET /auth/me` existe côté backend ; le port web ne l'expose pas | oui, via un port `SESSION_GATEWAY` |
-| Cloche de notifications, badge « 8 » | aucun module de notification n'existe ; le « 8 » est un chiffre de maquette | non |
-| Menu « Nouvelle action » | aucun contenu de menu n'est spécifié | non |
+| Cloche de notifications, badge « 8 » | fixture `DemoSessionGateway`, explicitement fictive et sans accusé de lecture | oui en mode démo uniquement |
+| Menu « Nouvelle action » | aucun contenu de menu n'est spécifié | non ; remplacé par un CTA unique vers BO-009 |
 
-**Lecture retenue.** La cloche et son compteur ne sont pas rendus. Afficher « 8 »
-serait recopier un chiffre de maquette — ce que `ux-ui.md` interdit explicitement —
-et une cloche sans compteur reste un contrôle inerte qui promet une fonction absente.
-Le menu « Nouvelle action » n'est pas rendu : un menu dont on ignore les entrées ne
-peut pas être deviné, et l'en-tête de page porte déjà l'action primaire de l'écran.
+**Lecture retenue pour le PoC.** Le mandat de reprise du 2026-07-18 autorise les
+données fictives visibles des maquettes afin d'atteindre la fidélité demandée. La
+cloche et le compteur `8` sont donc servis uniquement par `DemoSessionGateway`,
+annoncés comme « notifications de démonstration » et ouvrent un panneau indiquant
+que le centre n'est pas raccordé. Ce rendu ne constitue ni une source de production,
+ni un accusé de lecture, ni une clôture de l'arbitrage.
+
+Le menu « Nouvelle action » n'est pas inventé. Le shell affiche une action unique,
+déjà livrée et nommée sans ambiguïté pour les technologies d'assistance, vers le
+parcours canonique BO-009 (`/admin/enrollments/new`).
 
 La recherche globale est rendue mais honnête sur sa portée : elle cible la liste des
 membres, seule collection existante, et son libellé le dit.
