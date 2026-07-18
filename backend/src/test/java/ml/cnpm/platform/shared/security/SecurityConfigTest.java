@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -107,7 +108,18 @@ class SecurityConfigTest {
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"))
                 .andExpect(jsonPath("$.status").value(401))
                 .andExpect(jsonPath("$.correlationId").isNotEmpty())
-                .andExpect(header().exists(ProblemResponseWriterHeader.CORRELATION));
+                .andExpect(header().exists(ProblemResponseWriterHeader.CORRELATION))
+                // L'encodage doit être UTF-8 : sans lui le conteneur retombe sur ISO-8859-1
+                // et le message français ressort avec des accents cassés (« expir?e »).
+                .andExpect(
+                        content()
+                                .contentTypeCompatibleWith(
+                                        org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(result -> org.junit.jupiter.api.Assertions.assertTrue(
+                        result.getResponse().getContentType().toLowerCase().contains("utf-8"),
+                        "Content-Type doit porter charset=UTF-8, obtenu : "
+                                + result.getResponse().getContentType()))
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("expirée")));
     }
 
     @Test
