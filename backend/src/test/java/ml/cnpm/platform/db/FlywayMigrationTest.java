@@ -1,6 +1,7 @@
 package ml.cnpm.platform.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -8,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.MigrationInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,6 +50,40 @@ class FlywayMigrationTest extends PostgresMigrationSupport {
 
         assertThat(upgrade.success).isTrue();
         assertThat(upgrade.migrationsExecuted).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("V10 refuse un événement historique PUBLISHED sans date")
+    void outboxGuardRejectsHistoricPublishedStatusWithoutTimestamp() throws SQLException {
+        assertV10RejectsHistoricOutboxValues("'PUBLISHED'", "NULL");
+    }
+
+    @Test
+    @DisplayName("V10 refuse un événement historique daté qui n'est pas PUBLISHED")
+    void outboxGuardRejectsHistoricTimestampWithoutPublishedStatus() throws SQLException {
+        assertV10RejectsHistoricOutboxValues("'NEW'", "now()");
+    }
+
+    private void assertV10RejectsHistoricOutboxValues(String status, String publishedAt)
+            throws SQLException {
+        String jdbcUrl = freshDatabaseUrl();
+        flywayFor(jdbcUrl, "9").migrate();
+
+        try (Connection connection = connectTo(jdbcUrl);
+                Statement statement = connection.createStatement()) {
+            statement.execute(
+                    "INSERT INTO integration.outbox_event "
+                            + "(aggregate_type, aggregate_id, event_type, status, published_at) "
+                            + "VALUES ('TEST', gen_random_uuid(), 'TEST.OUTBOX.INCONSISTENT', "
+                            + status
+                            + ", "
+                            + publishedAt
+                            + ")");
+        }
+
+        assertThatThrownBy(() -> flywayFor(jdbcUrl, null).migrate())
+                .isInstanceOf(FlywayException.class)
+                .hasMessageContaining("existing publication metadata is inconsistent");
     }
 
     @Test

@@ -8,7 +8,7 @@
 - Contraintes et clés étrangères en base; aucune intégrité critique uniquement dans l’interface.
 - Migrations Flyway immuables, testées depuis une base vide et depuis la version précédente.
 - Écritures financières validées immuables; correction par transaction compensatrice.
-- Outbox transactionnelle pour les événements; clés d’idempotence pour les flux financiers.
+- Outbox transactionnelle pour les événements : enveloppe append-only, métadonnées de livraison modifiables jusqu'à l'état terminal `PUBLISHED`; clés d’idempotence pour les flux financiers.
 
 ## Schémas
 
@@ -101,7 +101,7 @@
 | `notification.delivery_attempt` | Tentatives de livraison. | 10 | 24 mois à confirmer | Oui |  |
 | `integration.partner` | Partenaires et systèmes externes. | 10 |  | Non |  |
 | `integration.endpoint_configuration` | Configuration non secrète des endpoints. | 13 |  | Non |  |
-| `integration.outbox_event` | Outbox transactionnelle. | 10 | 24 mois | Oui | RANGE(created_at) mensuel |
+| `integration.outbox_event` | Outbox transactionnelle; enveloppe immuable et métadonnées de livraison contrôlées. | 10 | 24 mois | Oui (enveloppe) | RANGE(created_at) mensuel |
 | `integration.webhook_subscription` | Abonnements sortants. | 11 |  | Non |  |
 | `integration.webhook_delivery` | Livraisons de webhooks. | 9 | 24 mois | Oui |  |
 | `audit.audit_event` | Journal d’audit métier inviolable. | 13 | 10 ans minimum | Oui | RANGE(created_at) mensuel |
