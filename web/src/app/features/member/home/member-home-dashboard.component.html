@@ -1,0 +1,205 @@
+<div class="member-home__dashboard-grid">
+  <section class="member-home__panel member-home__receipts" aria-labelledby="receipts-title">
+    <div class="member-home__section-heading">
+      <h2 id="receipts-title">Mes reçus récents</h2>
+      <span>PDF fictifs — téléchargement indisponible</span>
+    </div>
+
+    @if (receipts().length) {
+      <table>
+        <caption class="member-home__sr-only">
+          Cinq reçus fictifs les plus récents
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">N° reçu</th>
+            <th scope="col">Date</th>
+            <th scope="col">Période</th>
+            <th scope="col" class="member-home__numeric">Montant</th>
+            <th scope="col">Fichier</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (receipt of receipts(); track receipt.id) {
+            <tr>
+              <td data-label="N° reçu">
+                <strong>{{ receipt.reference }}</strong>
+              </td>
+              <td data-label="Date">{{ receipt.paidOn | date: 'dd/MM/yyyy' }}</td>
+              <td data-label="Période">{{ receipt.period }}</td>
+              <td data-label="Montant" class="member-home__numeric">
+                {{ receipt.amount | number: '1.0-0' }} FCFA
+              </td>
+              <td data-label="Fichier">
+                <button
+                  class="member-home__icon-button"
+                  type="button"
+                  [attr.aria-label]="
+                    'Téléchargement indisponible pour le reçu ' + receipt.reference
+                  "
+                  (click)="unavailable.emit('Le téléchargement du reçu ' + receipt.reference)"
+                >
+                  <svg lucideFileDown aria-hidden="true"></svg>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="member-home__empty">Aucun reçu de démonstration disponible.</p>
+    }
+  </section>
+
+  <section class="member-home__panel member-home__request" aria-labelledby="request-title">
+    <div class="member-home__section-heading member-home__section-heading--stacked">
+      <h2 id="request-title">Préparer une requête / réclamation</h2>
+      <span>L’envoi au CNPM n’est pas raccordé. Le brouillon reste sur cet appareil.</span>
+    </div>
+    <form [formGroup]="requestForm()" (ngSubmit)="saveDraftRequested.emit()">
+      <div class="member-home__field">
+        <label for="request-type">Type de requête</label>
+        <select id="request-type" formControlName="requestType">
+          <option value="">Sélectionner un type</option>
+          <option value="document">Demande de document</option>
+          <option value="profile">Correction du profil</option>
+          <option value="contribution">Question sur une cotisation</option>
+        </select>
+      </div>
+      <div class="member-home__field">
+        <label for="request-subject">Objet</label
+        ><input id="request-subject" formControlName="subject" maxlength="120" />
+      </div>
+      <div class="member-home__field">
+        <label for="request-message">Message</label
+        ><textarea
+          id="request-message"
+          formControlName="message"
+          rows="4"
+          maxlength="1200"
+        ></textarea>
+      </div>
+      <div class="member-home__upload" aria-disabled="true">
+        <svg lucidePaperclip aria-hidden="true"></svg
+        ><span
+          ><strong>Pièce jointe indisponible</strong
+          ><small>Le service GED n’est pas raccordé.</small></span
+        >
+      </div>
+      <p class="member-home__draft-status" role="status">{{ draftStatus() }}</p>
+      <button class="member-home__button member-home__button--primary" type="submit">
+        <svg lucideSave aria-hidden="true"></svg>Sauvegarder le brouillon
+      </button>
+    </form>
+  </section>
+
+  <section class="member-home__panel member-home__activities" aria-labelledby="activities-title">
+    <div class="member-home__section-heading">
+      <h2 id="activities-title">Activités récentes & rappels</h2>
+    </div>
+    <ol class="member-home__timeline">
+      @for (activity of activities(); track activity.id) {
+        <li class="member-home__activity member-home__activity--{{ activity.tone }}">
+          <span class="member-home__activity-icon" aria-hidden="true">
+            @if (activity.tone === 'critical') {
+              <svg lucideCircleAlert></svg>
+            } @else if (activity.tone === 'success') {
+              <svg lucideCircleCheck></svg>
+            } @else if (activity.tone === 'info') {
+              <svg lucideCreditCard></svg>
+            } @else {
+              <svg lucideReceiptText></svg>
+            }
+          </span>
+          <div>
+            <span class="member-home__sr-only">{{ activityLabel(activity.tone) }} : </span
+            ><strong>{{ activity.title }}</strong>
+            <p>{{ activity.description }}</p>
+          </div>
+          <time [attr.datetime]="activity.occurredOn">{{
+            activity.occurredOn | date: 'dd/MM/yyyy'
+          }}</time>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <div class="member-home__side-stack">
+    <section class="member-home__panel member-home__profile" aria-labelledby="profile-title">
+      <div class="member-home__section-heading">
+        <h2 id="profile-title">Complétion du profil</h2>
+      </div>
+      <div class="member-home__profile-content">
+        <div
+          class="member-home__progress"
+          role="progressbar"
+          aria-label="Complétion du profil"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="profile().percent"
+        >
+          <svg viewBox="0 0 42 42" aria-hidden="true">
+            <circle cx="21" cy="21" r="16" pathLength="100"></circle>
+            <circle
+              class="member-home__progress-value"
+              cx="21"
+              cy="21"
+              r="16"
+              pathLength="100"
+              [attr.stroke-dasharray]="profile().percent + ' 100'"
+            ></circle>
+          </svg>
+          <strong>{{ profile().percent }}%</strong>
+        </div>
+        <div>
+          <strong>Profil presque complet</strong>
+          <p>Champs fictifs manquants :</p>
+          <ul>
+            @for (field of profile().missingFields; track field) {
+              <li>{{ field }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+      <button
+        class="member-home__button member-home__button--secondary"
+        type="button"
+        (click)="unavailable.emit('La mise à jour du profil')"
+      >
+        Profil indisponible
+      </button>
+    </section>
+
+    <section class="member-home__panel member-home__support" aria-labelledby="support-title">
+      <div class="member-home__section-heading">
+        <h2 id="support-title">Contact & assistance</h2>
+        <span>Coordonnées fictives</span>
+      </div>
+      <dl>
+        <div>
+          <dt>Canal</dt>
+          <dd>{{ support().channel }}</dd>
+        </div>
+        <div>
+          <dt>Téléphone fictif</dt>
+          <dd>{{ support().phone }}</dd>
+        </div>
+        <div>
+          <dt>Courriel fictif</dt>
+          <dd>{{ support().email }}</dd>
+        </div>
+        <div>
+          <dt><svg lucideClock3 aria-hidden="true"></svg> Horaires</dt>
+          <dd>{{ support().hours }}</dd>
+        </div>
+      </dl>
+      <button
+        class="member-home__button member-home__button--secondary"
+        type="button"
+        (click)="unavailable.emit('Le canal d’assistance institutionnel')"
+      >
+        <svg lucideMessageSquareText aria-hidden="true"></svg>Assistance indisponible
+      </button>
+    </section>
+  </div>
+</div>

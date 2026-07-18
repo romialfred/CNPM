@@ -3,6 +3,7 @@ import { delay, type Observable, of } from 'rxjs';
 import type {
   ContributionCall,
   MemberDocument,
+  MemberActivity,
   MemberHomeGateway,
   MemberHomeSnapshot,
   MemberReceipt,
@@ -263,6 +264,37 @@ const REQUESTS: readonly MemberRequest[] = [
   },
 ];
 
+const ACTIVITIES: readonly MemberActivity[] = [
+  {
+    id: 'activity-overdue-call',
+    title: 'Cotisation du 2e trimestre échue',
+    description: 'Échéance initiale : 30 juin 2026',
+    occurredOn: '2026-07-16',
+    tone: 'critical',
+  },
+  {
+    id: 'activity-payment',
+    title: 'Paiement de démonstration enregistré',
+    description: 'Reçu REC-2026-0142-0047 disponible dans la fixture',
+    occurredOn: '2026-06-27',
+    tone: 'info',
+  },
+  {
+    id: 'activity-request',
+    title: 'Requête mise à jour',
+    description: 'Des éléments fictifs ont été ajoutés au dossier',
+    occurredOn: '2026-06-18',
+    tone: 'success',
+  },
+  {
+    id: 'activity-receipt',
+    title: 'Nouveau reçu de démonstration',
+    description: 'REC-2026-0142-0031',
+    occurredOn: '2026-03-28',
+    tone: 'neutral',
+  },
+];
+
 const SNAPSHOT: MemberHomeSnapshot = {
   identity: {
     organization: 'Sahel Agro SA',
@@ -289,6 +321,8 @@ const SNAPSHOT: MemberHomeSnapshot = {
   receipts: RECEIPTS,
   documents: DOCUMENTS,
   requests: REQUESTS,
+  paymentCount: 4,
+  activities: ACTIVITIES,
   contact: {
     contactName: 'Awa Diakité',
     role: 'Directrice administrative et financière',

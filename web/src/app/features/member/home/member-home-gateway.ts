@@ -23,6 +23,8 @@ export type ContributionCallStatus = 'SETTLED' | 'PARTIAL' | 'PENDING' | 'OVERDU
 
 export type MemberRequestStatus = 'RECEIVED' | 'IN_PROGRESS' | 'ANSWERED' | 'CLOSED';
 
+export type MemberActivityTone = 'critical' | 'info' | 'success' | 'neutral';
+
 export interface MemberIdentity {
   readonly organization: string;
   /** Référence métier de l'adhérent, distincte de la clé technique. */
@@ -98,6 +100,15 @@ export interface MemberRequest {
   readonly status: MemberRequestStatus;
 }
 
+export interface MemberActivity {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  /** Date ISO `AAAA-MM-JJ` ; le format relatif n'est pas utilisé pour garder les tests déterministes. */
+  readonly occurredOn: string;
+  readonly tone: MemberActivityTone;
+}
+
 export interface MemberContact {
   readonly contactName: string;
   readonly role: string;
@@ -133,6 +144,9 @@ export interface MemberHomeSnapshot {
   readonly receipts: readonly MemberReceipt[];
   readonly documents: readonly MemberDocument[];
   readonly requests: readonly MemberRequest[];
+  /** Nombre de règlements confirmé par la source, distinct du nombre de reçus. */
+  readonly paymentCount: number;
+  readonly activities: readonly MemberActivity[];
   readonly contact: MemberContact;
   readonly profile: MemberProfileCompletion;
   readonly support: MemberSupportDesk;

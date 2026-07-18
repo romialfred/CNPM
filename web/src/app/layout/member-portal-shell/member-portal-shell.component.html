@@ -1,0 +1,106 @@
+<a class="member-shell__skip-link" href="#contenu-principal">Aller au contenu principal</a>
+
+<div class="member-shell">
+  <header class="member-shell__header">
+    <div class="member-shell__header-inner">
+      <a
+        class="member-shell__brand"
+        routerLink="/member/home"
+        aria-label="CNPM — Accueil du portail membre"
+      >
+        <img src="/assets/brand/logo-CNPM.png" alt="CNPM — Conseil National du Patronat du Mali" />
+      </a>
+
+      <nav class="member-shell__desktop-nav" aria-label="Navigation du portail membre">
+        @for (destination of destinations; track destination.label) {
+          @if (destination.route; as route) {
+            <a [routerLink]="route" aria-current="page">{{ destination.label }}</a>
+          } @else {
+            <span
+              class="member-shell__unavailable"
+              aria-disabled="true"
+              [attr.aria-label]="destination.label + ', indisponible dans cette démonstration'"
+              title="Indisponible dans cette démonstration"
+            >
+              {{ destination.label }}
+            </span>
+          }
+        }
+      </nav>
+
+      <div class="member-shell__account" aria-label="Identité du membre connecté">
+        <button
+          class="member-shell__notification"
+          type="button"
+          disabled
+          title="Notifications indisponibles dans cette démonstration"
+          aria-label="Notifications indisponibles dans cette démonstration"
+        >
+          <svg lucideBell aria-hidden="true"></svg>
+        </button>
+        <span class="member-shell__avatar" aria-hidden="true">
+          <svg lucideBuilding2></svg>
+        </span>
+        <span class="member-shell__account-copy">
+          <strong>{{ userName() }}</strong>
+          <small>{{ organization() }}</small>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <ng-content />
+
+  <nav class="member-shell__mobile-nav" aria-label="Navigation mobile du portail membre">
+    @for (destination of destinations; track destination.label) {
+      @if (destination.route; as route) {
+        <a [routerLink]="route" aria-current="page">
+          @switch (destination.icon) {
+            @case ('home') {
+              <svg lucideHouse aria-hidden="true"></svg>
+            }
+            @case ('payments') {
+              <svg lucideCreditCard aria-hidden="true"></svg>
+            }
+            @case ('receipts') {
+              <svg lucideReceiptText aria-hidden="true"></svg>
+            }
+            @case ('requests') {
+              <svg lucideMessageSquareText aria-hidden="true"></svg>
+            }
+            @default {
+              <svg lucideUserRound aria-hidden="true"></svg>
+            }
+          }
+          <span>{{ destination.mobileLabel }}</span>
+        </a>
+      } @else {
+        <span
+          class="member-shell__mobile-unavailable"
+          aria-disabled="true"
+          [attr.aria-label]="destination.label + ', indisponible dans cette démonstration'"
+        >
+          @switch (destination.icon) {
+            @case ('home') {
+              <svg lucideHouse aria-hidden="true"></svg>
+            }
+            @case ('payments') {
+              <svg lucideCreditCard aria-hidden="true"></svg>
+            }
+            @case ('receipts') {
+              <svg lucideReceiptText aria-hidden="true"></svg>
+            }
+            @case ('requests') {
+              <svg lucideMessageSquareText aria-hidden="true"></svg>
+            }
+            @default {
+              <svg lucideUserRound aria-hidden="true"></svg>
+            }
+          }
+          <span>{{ destination.mobileLabel }}</span>
+          <span class="member-shell__sr-only"> — indisponible</span>
+        </span>
+      }
+    }
+  </nav>
+</div>

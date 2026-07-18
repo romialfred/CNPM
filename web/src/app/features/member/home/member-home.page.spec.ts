@@ -1,23 +1,30 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeFrMl from '@angular/common/locales/fr-ML';
+import { LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ToastService } from '../../../design-system/toast/toast.service';
+import { DemoMemberHomeGateway } from './demo-member-home.gateway';
+import { MEMBER_HOME_GATEWAY } from './member-home-gateway';
 import { MemberHomePage } from './member-home.page';
 
-/**
- * Vérifie ce qu'un simple contrôle de type ne peut pas garantir : que chacun des
- * quatre tableaux de l'écran rend bien SON gabarit de ligne. Quatre `#row` coexistent
- * dans le même gabarit ; si les requêtes de contenu se mélangeaient, les reçus
- * s'afficheraient avec les colonnes des appels — un défaut invisible à la compilation.
- */
+registerLocaleData(localeFrMl);
+
 describe('MemberHomePage', () => {
   let fixture: ComponentFixture<MemberHomePage>;
   let host: HTMLElement;
 
   beforeEach(async () => {
+    sessionStorage.clear();
     await TestBed.configureTestingModule({
       imports: [MemberHomePage],
-      providers: [provideZonelessChangeDetection(), provideRouter([])],
+      providers: [
+        provideZonelessChangeDetection(),
+        provideRouter([]),
+        { provide: LOCALE_ID, useValue: 'fr-ML' },
+        { provide: MEMBER_HOME_GATEWAY, useClass: DemoMemberHomeGateway },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MemberHomePage);
@@ -25,13 +32,8 @@ describe('MemberHomePage', () => {
     fixture.detectChanges();
   });
 
-  /**
-   * L'adaptateur de démonstration simule une latence réseau. `whenStable` n'attend pas
-   * un `setTimeout` en mode sans zone : il faut laisser le délai s'écouler, sans quoi
-   * on n'observerait jamais que l'état de chargement.
-   */
   const settle = async (): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 240));
     await fixture.whenStable();
     fixture.detectChanges();
   };
@@ -41,40 +43,90 @@ describe('MemberHomePage', () => {
     expect(host.textContent).toContain('Chargement de votre espace membre');
   });
 
-  it('rend un unique titre de rang 1', async () => {
+  it('rend le shell, un titre h1 unique et la composition MP-001', async () => {
     await settle();
+
     expect(host.querySelectorAll('h1')).toHaveLength(1);
-    expect(host.querySelector('h1')?.textContent).toContain('Espace membre');
+    expect(host.querySelector('h1')?.textContent).toContain('Bienvenue');
+    expect(host.querySelector('.member-shell__brand img')).not.toBeNull();
+    expect(host.querySelectorAll('.member-home__metrics > button')).toHaveLength(4);
+    expect(
+      host.querySelectorAll(
+        '.member-home__dashboard-grid > section, .member-home__side-stack > section',
+      ),
+    ).toHaveLength(5);
   });
 
-  it('affiche la situation du membre et son reste dû', async () => {
+  it('affiche une situation financière de démonstration cohérente et explicitement fictive', async () => {
     await settle();
+
     const text = host.textContent ?? '';
+    const normalizedText = text.replaceAll(/\s/g, ' ');
+    expect(text).toContain('Démonstration — données 100 % fictives');
     expect(text).toContain('Sahel Agro SA');
     expect(text).toContain('CNPM-DEMO-0142');
-    expect(text).toContain('Échéance dépassée');
+    expect(normalizedText).toContain('1 350 000');
+    expect(normalizedText).toContain('dont 450 000 FCFA échus');
+    expect(text).toContain('30/09/2026');
   });
 
-  it('rend chaque tableau avec son propre gabarit de ligne', async () => {
+  it('n’expose aucun KPI global CNPM ni lien vers une route membre absente', async () => {
     await settle();
 
-    const tables = host.querySelectorAll('table');
-    expect(tables).toHaveLength(4);
+    const text = host.textContent ?? '';
+    expect(text).not.toContain('Membres actifs');
+    expect(text).not.toContain('Taux de recouvrement');
+    expect(text).not.toContain('Nouveaux membres');
 
-    const [calls, receipts, documents, requests] = Array.from(tables);
-    expect(calls.textContent).toContain('APP-2026-0142-T2');
-    expect(receipts.textContent).toContain('REC-2026-0142-0047');
-    expect(documents.textContent).toContain('Attestation d’adhésion 2026');
-    expect(requests.textContent).toContain('REQ-2026-0142-021');
-
-    // Un mélange des gabarits ferait fuir les références d'un tableau dans l'autre.
-    expect(receipts.textContent).not.toContain('APP-2026-0142');
-    expect(documents.textContent).not.toContain('REC-2026-0142');
+    const links = Array.from(host.querySelectorAll<HTMLAnchorElement>('a'));
+    expect(links.length).toBeGreaterThan(0);
+    expect(
+      links.every(
+        (link) =>
+          link.getAttribute('href') === '/member/home' ||
+          link.getAttribute('href') === '#contenu-principal',
+      ),
+    ).toBe(true);
   });
 
-  it('nomme les éléments manquants du dossier, et pas seulement leur nombre', async () => {
+  it('rend les indisponibilités explicites au lieu de simuler une opération', async () => {
+    const toast = TestBed.inject(ToastService);
+    const info = vi.spyOn(toast, 'info');
     await settle();
-    const missing = host.querySelector('.cnpm-member-home__missing');
-    expect(missing?.textContent).toContain('Numéro d’identification fiscale');
+
+    const payment = host.querySelector<HTMLButtonElement>('.member-home__payment');
+    payment?.click();
+
+    expect(payment?.textContent).toContain('Paiement indisponible');
+    expect(info).toHaveBeenCalledWith(expect.stringContaining('Aucune opération n’a été initiée'));
+  });
+
+  it('sauvegarde la requête comme brouillon local sans prétendre l’envoyer', async () => {
+    await settle();
+
+    const subject = host.querySelector<HTMLInputElement>('#request-subject');
+    if (!subject) throw new Error('Champ objet absent');
+    subject.value = 'Demande fictive conservée localement';
+    subject.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const stored = sessionStorage.getItem('cnpm-demo-member-request-draft');
+    expect(stored).toContain('Demande fictive conservée localement');
+    expect(host.querySelector('.member-home__draft-status')?.textContent).toContain(
+      'aucun envoi au CNPM',
+    );
+  });
+
+  it('associe les champs de la requête à leurs labels et expose la progression', async () => {
+    await settle();
+
+    for (const id of ['request-type', 'request-subject', 'request-message']) {
+      expect(host.querySelector(`label[for="${id}"]`)).not.toBeNull();
+      expect(host.querySelector(`#${id}`)).not.toBeNull();
+    }
+
+    const progress = host.querySelector('[role="progressbar"]');
+    expect(progress?.getAttribute('aria-valuenow')).toBe('80');
+    expect(host.querySelector('main#contenu-principal')).not.toBeNull();
   });
 });
