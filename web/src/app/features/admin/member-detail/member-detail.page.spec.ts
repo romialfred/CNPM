@@ -49,11 +49,6 @@ function routeStub(queryValues: Record<string, string | readonly string[]> = {})
 
 async function setup(queryValues: Record<string, string | readonly string[]> = {}) {
   const gateway = new ControllableGateway();
-  TestBed.overrideComponent(MemberDetailPage, {
-    // Le port est fourni par le composant lui-même ; un fournisseur de module serait
-    // masqué par celui de l'élément. C'est ici le seul point de bascule.
-    set: { providers: [{ provide: MEMBER_DETAIL_GATEWAY, useValue: gateway }] },
-  });
 
   await TestBed.configureTestingModule({
     imports: [MemberDetailPage],
@@ -62,6 +57,7 @@ async function setup(queryValues: Record<string, string | readonly string[]> = {
       provideRouter([]),
       { provide: ActivatedRoute, useValue: routeStub(queryValues) },
       { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
+      { provide: MEMBER_DETAIL_GATEWAY, useValue: gateway },
     ],
   }).compileComponents();
 

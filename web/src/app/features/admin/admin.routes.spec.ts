@@ -13,6 +13,7 @@ describe('adminRoutes', () => {
     expect(child('members')?.loadComponent).toBeTypeOf('function');
     expect(child('members/:id')?.loadComponent).toBeTypeOf('function');
     expect(child('enrollments/new')?.loadComponent).toBeTypeOf('function');
+    expect(child('enrollments/new')?.canDeactivate).toHaveLength(1);
     expect(child('contributions')?.loadComponent).toBeTypeOf('function');
     expect(child('payments/reconciliation')?.loadComponent).toBeTypeOf('function');
     expect(child('recovery/campaigns')?.loadComponent).toBeTypeOf('function');

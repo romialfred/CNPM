@@ -37,7 +37,6 @@ import { PageHeaderComponent } from '../../../design-system/page-header/page-hea
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
-import { DemoEnrollmentGateway } from './demo-enrollment.gateway';
 import {
   ENROLLMENT_GATEWAY,
   EnrollmentAccessError,
@@ -162,8 +161,8 @@ const AUTOSAVE_DELAY_MS = 1200;
  * officielles valides que l’écran ne connaît pas ; le contrôle appartient au service de
  * vérification et au back-office.
  *
- * Le port est fourni ici, au niveau du composant : câbler la route ne demande donc
- * qu’une entrée `loadComponent`, sans toucher au fichier de routes partagé.
+ * Le port est fourni par la route afin que l'assemblage puisse sélectionner un
+ * adaptateur de démonstration ou HTTP sans être masqué par le composant.
  */
 @Component({
   selector: 'cnpm-enrollment-form-page',
@@ -172,7 +171,6 @@ const AUTOSAVE_DELAY_MS = 1200;
   // (critère d'acceptation de la fiche). Le navigateur porte lui-même la boîte de
   // dialogue : seul le signalement est de notre ressort.
   host: { '(window:beforeunload)': 'onBeforeUnload($event)' },
-  providers: [{ provide: ENROLLMENT_GATEWAY, useClass: DemoEnrollmentGateway }],
   imports: [
     DatePipe,
     ReactiveFormsModule,
@@ -250,6 +248,10 @@ export class EnrollmentFormPage {
   private readonly documents = signal<Readonly<Record<string, DocumentEntry | undefined>>>({});
   private readonly retryTick = signal(0);
   private hydrated = false;
+  private pendingExitDecision: {
+    readonly promise: Promise<boolean>;
+    resolve(value: boolean): void;
+  } | null = null;
 
   /**
    * `switchMap` sur un compteur de relance : « Réessayer » réémet la requête sans
@@ -568,13 +570,21 @@ export class EnrollmentFormPage {
     this.persistDraft();
   }
 
-  private persistDraft(): void {
+  protected saveAndLeave(): void {
+    if (this.screenState() !== 'ready' || this.locked()) {
+      return;
+    }
+    this.persistDraft(() => this.approveExit());
+  }
+
+  private persistDraft(onSuccess?: () => void): void {
     this.saveState.set('saving');
     this.gateway.saveDraft(this.form.getRawValue()).subscribe({
       next: (draft) => {
         this.savedAt.set(draft.savedAt);
         this.saveState.set('saved');
         this.dirty.set(false);
+        onSuccess?.();
       },
       error: () => this.saveState.set('failed'),
     });
@@ -864,6 +874,28 @@ export class EnrollmentFormPage {
 
   // ---------------------------------------------------------------- sortie
 
+  /**
+   * Point d'entrée du garde de route. La décision est rendue par la confirmation
+   * intégrée à l'écran : aucun `window.confirm` non stylable et aucune perte silencieuse.
+   */
+  confirmNavigation(): boolean | Promise<boolean> {
+    if (!this.dirty() || this.locked()) {
+      return true;
+    }
+
+    this.cancelPending.set(true);
+    if (this.pendingExitDecision) {
+      return this.pendingExitDecision.promise;
+    }
+
+    let resolver: (value: boolean) => void = () => undefined;
+    const promise = new Promise<boolean>((resolve) => {
+      resolver = resolve;
+    });
+    this.pendingExitDecision = { promise, resolve: resolver };
+    return promise;
+  }
+
   protected requestCancel(): void {
     if (this.dirty() && !this.locked()) {
       this.cancelPending.set(true);
@@ -874,11 +906,11 @@ export class EnrollmentFormPage {
 
   protected dismissCancel(): void {
     this.cancelPending.set(false);
+    this.resolvePendingExit(false);
   }
 
   protected leave(): void {
-    this.cancelPending.set(false);
-    void this.router.navigate(['/admin/members']);
+    this.approveExit();
   }
 
   protected onBeforeUnload(event: BeforeUnloadEvent): void {
@@ -889,5 +921,21 @@ export class EnrollmentFormPage {
 
   protected retry(): void {
     this.retryTick.update((tick) => tick + 1);
+  }
+
+  private approveExit(): void {
+    this.cancelPending.set(false);
+    this.dirty.set(false);
+    if (this.pendingExitDecision) {
+      this.resolvePendingExit(true);
+      return;
+    }
+    void this.router.navigate(['/admin/members']);
+  }
+
+  private resolvePendingExit(value: boolean): void {
+    const decision = this.pendingExitDecision;
+    this.pendingExitDecision = null;
+    decision?.resolve(value);
   }
 }

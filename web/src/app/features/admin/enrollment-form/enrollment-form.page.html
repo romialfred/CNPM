@@ -9,11 +9,7 @@
       @case ('loading') {
         <!-- Ossature fidèle à la structure du formulaire : ni page blanche, ni
              indicateur indéfini, conformément à `loading-empty-error.md`. -->
-        <cnpm-skeleton
-          variant="card"
-          [rows]="8"
-          label="Chargement du formulaire d’enrôlement…"
-        />
+        <cnpm-skeleton variant="card" [rows]="8" label="Chargement du formulaire d’enrôlement…" />
       }
 
       @case ('error') {
@@ -47,8 +43,8 @@
 
         @if (submission(); as done) {
           <cnpm-alert tone="success" title="Dossier soumis">
-            Référence du dossier : <strong>{{ done.reference }}</strong>, déposé le
-            {{ done.submittedAt | date: 'dd MMMM y à HH:mm' }}. La version examinée est
+            Référence du dossier : <strong>{{ done.reference }}</strong
+            >, déposé le {{ done.submittedAt | date: 'dd MMMM y à HH:mm' }}. La version examinée est
             verrouillée ; toute correction passera désormais par le back-office.
           </cnpm-alert>
         }
@@ -72,8 +68,8 @@
               <cnpm-button variant="secondary" size="sm" (click)="dismissCancel()">
                 Rester sur le dossier
               </cnpm-button>
-              <cnpm-button variant="tertiary" size="sm" (click)="saveDraftNow()">
-                Enregistrer le brouillon
+              <cnpm-button variant="tertiary" size="sm" (click)="saveAndLeave()">
+                Enregistrer et quitter
               </cnpm-button>
               <cnpm-button variant="danger" size="sm" (click)="leave()">
                 Quitter sans enregistrer
@@ -200,7 +196,11 @@
                       }
                     </div>
 
-                    <div class="cnpm-enrollment__field" [id]="fieldId('creationDate')" tabindex="-1">
+                    <div
+                      class="cnpm-enrollment__field"
+                      [id]="fieldId('creationDate')"
+                      tabindex="-1"
+                    >
                       <label class="cnpm-enrollment__label" [for]="'controle-creationDate'">
                         Date de création
                       </label>
@@ -298,7 +298,11 @@
                       />
                     </div>
 
-                    <div class="cnpm-enrollment__field" [id]="fieldId('contactEmail')" tabindex="-1">
+                    <div
+                      class="cnpm-enrollment__field"
+                      [id]="fieldId('contactEmail')"
+                      tabindex="-1"
+                    >
                       <cnpm-text-input
                         formControlName="contactEmail"
                         label="Adresse e-mail"
@@ -312,7 +316,11 @@
                       />
                     </div>
 
-                    <div class="cnpm-enrollment__field" [id]="fieldId('contactPhone')" tabindex="-1">
+                    <div
+                      class="cnpm-enrollment__field"
+                      [id]="fieldId('contactPhone')"
+                      tabindex="-1"
+                    >
                       <cnpm-text-input
                         formControlName="contactPhone"
                         label="Téléphone"
@@ -424,8 +432,8 @@
                        fabriquerait une donnée officielle. Le calcul appartient au
                        back-office, et l'écran le dit. -->
                   <cnpm-alert tone="info" title="Montant calculé par le back-office" [live]="false">
-                    Cet écran ne saisit aucun montant. La cotisation est établie après examen
-                    du dossier, à partir de la catégorie retenue et du barème en vigueur.
+                    Cet écran ne saisit aucun montant. La cotisation est établie après examen du
+                    dossier, à partir de la catégorie retenue et du barème en vigueur.
                   </cnpm-alert>
 
                   <div class="cnpm-enrollment__grid">
@@ -520,7 +528,8 @@
                           </p>
                           <p class="cnpm-enrollment__document-hint">
                             {{ type.hint }} Formats admis :
-                            {{ type.acceptedExtensions.join(', ') }} — {{ maxSizeLabel(type) }} maximum.
+                            {{ type.acceptedExtensions.join(', ') }} —
+                            {{ maxSizeLabel(type) }} maximum.
                           </p>
                         </div>
 
@@ -530,7 +539,9 @@
                               {{ documentStatusLabel(entry.status) }}
                             </cnpm-badge>
                             <span class="cnpm-enrollment__document-file">{{ entry.fileName }}</span>
-                            <span class="cnpm-enrollment__document-message">{{ entry.message }}</span>
+                            <span class="cnpm-enrollment__document-message">{{
+                              entry.message
+                            }}</span>
                           </div>
                         }
 
@@ -565,7 +576,10 @@
 
                 @case ('review') {
                   <div class="cnpm-enrollment__recap">
-                    <section class="cnpm-enrollment__recap-block" aria-labelledby="recap-identification">
+                    <section
+                      class="cnpm-enrollment__recap-block"
+                      aria-labelledby="recap-identification"
+                    >
                       <h3 class="cnpm-enrollment__recap-title" id="recap-identification">
                         Identification
                       </h3>
@@ -717,15 +731,15 @@
             <h3 class="cnpm-enrollment__aside-subtitle">À savoir</h3>
             <ul class="cnpm-enrollment__aside-list">
               <li class="cnpm-enrollment__aside-note">
-                Le brouillon est enregistré automatiquement ; « Enregistrer le brouillon »
-                reste disponible même si le dossier est incomplet.
+                Le brouillon est enregistré automatiquement ; « Enregistrer le brouillon » reste
+                disponible même si le dossier est incomplet.
               </li>
               <li class="cnpm-enrollment__aside-note">
                 Le RCCM et le NIF sont saisis en texte libre, sans format imposé.
               </li>
               <li class="cnpm-enrollment__aside-note">
-                Les listes de référence de cet environnement sont des jeux de
-                démonstration ; la nomenclature officielle est servie par le back-office.
+                Les listes de référence de cet environnement sont des jeux de démonstration ; la
+                nomenclature officielle est servie par le back-office.
               </li>
             </ul>
           </aside>

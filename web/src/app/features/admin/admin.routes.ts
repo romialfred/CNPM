@@ -7,6 +7,7 @@ import { DASHBOARD_GATEWAY } from './dashboard/dashboard-gateway';
 import { DemoDashboardGateway } from './dashboard/demo-dashboard.gateway';
 import { DemoEnrollmentGateway } from './enrollment-form/demo-enrollment.gateway';
 import { ENROLLMENT_GATEWAY } from './enrollment-form/enrollment-gateway';
+import { pendingEnrollmentChangesGuard } from './enrollment-form/pending-enrollment-changes.guard';
 import { DemoMemberDetailGateway } from './member-detail/demo-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from './member-detail/member-detail-gateway';
 import { DemoMembersGateway } from './members/demo-members.gateway';
@@ -59,6 +60,7 @@ export const adminRoutes: Routes = [
       {
         // Chemin fixe déclaré avant la route paramétrée du même segment.
         path: 'enrollments/new',
+        canDeactivate: [pendingEnrollmentChangesGuard],
         loadComponent: () =>
           import('./enrollment-form/enrollment-form.page').then((m) => m.EnrollmentFormPage),
         title: 'Nouvel enrôlement — Administration CNPM',

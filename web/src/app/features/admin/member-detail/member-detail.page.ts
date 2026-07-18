@@ -37,7 +37,6 @@ import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.comp
 import { TabsComponent, type CnpmTab } from '../../../design-system/tabs/tabs.component';
 import { VerificationBadgeComponent } from '../../../design-system/verification-badge/verification-badge.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
-import { DemoMemberDetailGateway } from './demo-member-detail.gateway';
 import {
   MEMBER_DETAIL_GATEWAY,
   MemberDetailAccessError,
@@ -178,9 +177,6 @@ const MISSING = 'Non renseigné';
 @Component({
   selector: 'cnpm-member-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // Le port est fourni ici avec son adaptateur de démonstration : la route n'a rien à
-  // câbler. Le passage à l'adaptateur HTTP ne touchera que cette ligne.
-  providers: [{ provide: MEMBER_DETAIL_GATEWAY, useClass: DemoMemberDetailGateway }],
   imports: [
     DatePipe,
     DecimalPipe,
