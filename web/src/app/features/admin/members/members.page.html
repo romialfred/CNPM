@@ -199,20 +199,24 @@
                  lettres : trois pictogrammes muets rendraient la colonne indéchiffrable. -->
             <td class="cnpm-table__cell">
               <span class="cnpm-members__actions">
-                <cnpm-button
-                  variant="tertiary"
-                  size="sm"
+                <button
+                  type="button"
+                  class="cnpm-members__row-action"
                   (click)="viewMember(member.organizationId)"
+                  title="Voir le membre"
                 >
-                  Voir
-                </cnpm-button>
-                <cnpm-button
-                  variant="tertiary"
-                  size="sm"
+                  <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
+                  <span class="cnpm-members__row-action-label">Voir</span>
+                </button>
+                <button
+                  type="button"
+                  class="cnpm-members__row-action"
                   (click)="viewHistory(member.organizationId)"
+                  title="Voir l'historique du membre"
                 >
-                  Historique
-                </cnpm-button>
+                  <svg lucideHistory [size]="iconSize.compact" aria-hidden="true"></svg>
+                  <span class="cnpm-members__row-action-label">Historique</span>
+                </button>
               </span>
             </td>
           </ng-template>

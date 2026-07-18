@@ -109,6 +109,7 @@ a.cnpm-sidebar__item:hover {
   background-color: var(--cnpm-color-brand-blue-50);
   color: var(--cnpm-color-text-brand);
   font-weight: var(--cnpm-font-weight-semibold);
+  box-shadow: inset var(--cnpm-space-1) 0 0 var(--cnpm-color-brand-blue-700);
 }
 
 .cnpm-sidebar__item--pending {

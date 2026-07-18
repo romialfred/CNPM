@@ -3,7 +3,13 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LucideDownload, LucidePlus, LucideUpload } from '@lucide/angular';
+import {
+  LucideDownload,
+  LucideEye,
+  LucideHistory,
+  LucidePlus,
+  LucideUpload,
+} from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { BulkActionBarComponent } from '../../../design-system/bulk-action-bar/bulk-action-bar.component';
@@ -82,6 +88,8 @@ const DEFAULT_PAGE_SIZE = 10;
     PaginationComponent,
     SkeletonComponent,
     LucideDownload,
+    LucideEye,
+    LucideHistory,
     LucidePlus,
     LucideUpload,
   ],

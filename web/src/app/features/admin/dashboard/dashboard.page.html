@@ -25,7 +25,12 @@
 
     <!-- Région de statut montée en permanence : une région live créée au moment de
          l'annonce n'est pas lue par toutes les technologies d'assistance. -->
-    <p class="cnpm-dashboard__refresh" role="status" aria-live="polite">
+    <p
+      class="cnpm-dashboard__refresh"
+      [class.cnpm-dashboard__refresh--idle]="!refreshing()"
+      role="status"
+      aria-live="polite"
+    >
       @if (refreshing()) {
         <svg lucideRefreshCw [size]="iconSize.compact" aria-hidden="true"></svg>
         Actualisation des indicateurs…
@@ -54,7 +59,11 @@
         @for (slot of kpiSlots; track slot) {
           <li class="cnpm-dashboard__kpi">
             <div class="cnpm-dashboard__kpi-card">
-              <cnpm-skeleton variant="card" [rows]="2" [label]="slot === 1 ? 'Chargement du tableau de bord…' : ''" />
+              <cnpm-skeleton
+                variant="card"
+                [rows]="2"
+                [label]="slot === 1 ? 'Chargement du tableau de bord…' : ''"
+              />
             </div>
           </li>
         }
@@ -203,10 +212,7 @@
                 @for (month of months(); track month.key) {
                   <li class="cnpm-dashboard__bar">
                     <span class="cnpm-dashboard__bar-plot">
-                      <span
-                        class="cnpm-dashboard__bar-track"
-                        [style.height.%]="trackHeight(month)"
-                      >
+                      <span class="cnpm-dashboard__bar-track" [style.height.%]="trackHeight(month)">
                         <span
                           class="cnpm-dashboard__bar-fill"
                           [style.height.%]="fillHeight(month)"
@@ -316,7 +322,10 @@
         </div>
 
         <div class="cnpm-dashboard__column">
-          <section class="cnpm-dashboard__panel" aria-labelledby="titre-segmentation">
+          <section
+            class="cnpm-dashboard__panel cnpm-dashboard__panel--segmentation"
+            aria-labelledby="titre-segmentation"
+          >
             <h2 class="cnpm-dashboard__panel-title" id="titre-segmentation">
               Segmentation des cotisants
             </h2>
@@ -349,7 +358,9 @@
                            n'est pas une chaîne modifiable, et seule l'écriture par
                            attribut est fiable. -->
                       <circle
-                        [attr.class]="'cnpm-dashboard__donut-arc cnpm-dashboard__donut-arc--' + arc.key"
+                        [attr.class]="
+                          'cnpm-dashboard__donut-arc cnpm-dashboard__donut-arc--' + arc.key
+                        "
                         cx="60"
                         cy="60"
                         [attr.r]="donutRadius"
@@ -422,7 +433,10 @@
             note="Le taux de recouvrement rapporte le total encaissé au total attendu. Les prospects n’entrent pas dans ces montants."
           />
 
-          <section class="cnpm-dashboard__panel" aria-labelledby="titre-alertes">
+          <section
+            class="cnpm-dashboard__panel cnpm-dashboard__panel--alerts"
+            aria-labelledby="titre-alertes"
+          >
             <h2 class="cnpm-dashboard__panel-title" id="titre-alertes">Alertes</h2>
 
             @if (alerts().length === 0) {
@@ -461,7 +475,10 @@
             }
           </section>
 
-          <section class="cnpm-dashboard__panel" aria-labelledby="titre-activite">
+          <section
+            class="cnpm-dashboard__panel cnpm-dashboard__panel--activity"
+            aria-labelledby="titre-activite"
+          >
             <h2 class="cnpm-dashboard__panel-title" id="titre-activite">Activité récente</h2>
 
             @if (activities().length === 0) {

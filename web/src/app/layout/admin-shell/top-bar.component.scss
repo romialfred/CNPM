@@ -19,7 +19,7 @@
 .cnpm-topbar__search {
   flex: 1 1 auto;
   min-width: 0;
-  max-width: 34rem;
+  max-width: 31rem;
 }
 
 /* Le champ porte une étiquette réelle : un `placeholder` disparaît dès la saisie et
@@ -124,6 +124,7 @@
 .cnpm-topbar__notifications {
   position: relative;
   flex: none;
+  margin-inline-start: auto;
 }
 
 .cnpm-topbar__notification-trigger {
