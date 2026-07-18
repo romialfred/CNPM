@@ -1,4 +1,124 @@
-<cnpm-public-shell>
+<!-- Visuels de vitrine.
+     Aucune photothèque n'est arbitrée (UX-DEC-003) et la règle interdit l'image
+     générée en production : les visuels sont des schémas SVG aux couleurs de la
+     marque, porteurs d'un texte alternatif qui annonce leur nature. Le gabarit est
+     factorisé pour que le héros, les réalisations et la galerie partagent le même
+     traitement. Le SVG est répété par motif plutôt que découpé en fragments, afin de
+     rester dans l'espace de noms SVG sans ambiguïté. -->
+<ng-template #visualTpl let-v="v" let-thumb="thumb" let-more="more">
+  <figure class="cnpm-visual" [class.cnpm-visual--thumb]="thumb">
+    @switch (v.shape) {
+      @case ('road') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 320 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <circle cx="160" cy="50" r="28" opacity=".16" />
+          <path d="M96 200 146 62 174 62 224 200Z" opacity=".22" />
+          <path d="M158 74h5l-1 16h-5zM154 102h7l-2 20h-7zM149 136h9l-3 28h-9z" opacity=".55" />
+          <path
+            d="M96 200 146 62M174 62 224 200"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            opacity=".4"
+          />
+          <path d="M0 186h320v14H0z" opacity=".12" />
+        </svg>
+      }
+      @case ('bridge') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 320 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <path d="M0 168h320v32H0z" opacity=".12" />
+          <path
+            d="M24 126Q160 26 296 126"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="6"
+            opacity=".5"
+          />
+          <path
+            d="M70 98v26M110 74v50M160 60v64M210 74v50M250 98v26"
+            stroke="currentColor"
+            stroke-width="2"
+            opacity=".4"
+          />
+          <path d="M0 122h320v10H0z" opacity=".38" />
+          <path d="M58 132h12v46H58zM250 132h12v46h-12z" opacity=".26" />
+        </svg>
+      }
+      @case ('tower') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 320 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <path d="M36 96h52v104H36z" opacity=".22" />
+          <path d="M184 118h48v82h-48z" opacity=".2" />
+          <path d="M100 52h72v148h-72z" opacity=".34" />
+          <path
+            d="M100 78h72M100 102h72M100 126h72M100 150h72M100 174h72M124 52v148M148 52v148"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            opacity=".3"
+          />
+          <path
+            d="M262 200V64h48M262 72h34"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+            opacity=".35"
+          />
+        </svg>
+      }
+      @default {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 320 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <path
+            d="M0 52h320M0 104h320M0 156h320M68 0v200M132 0v200M196 0v200M260 0v200"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+            opacity=".28"
+          />
+          <path d="M0 196 216 0h34L14 200z" opacity=".16" />
+          <path
+            d="M80 64h40v28H80zM144 64h40v28h-40zM80 116h40v28H80zM208 116h40v28h-40z"
+            opacity=".26"
+          />
+          <circle cx="164" cy="130" r="16" opacity=".3" />
+        </svg>
+      }
+    }
+    <!-- Le compteur remplace la légende sur la dernière vignette : « +25 » seul ne
+         dit pas de quoi il s'agit, la légende l'écrit donc en toutes lettres. -->
+    <figcaption class="cnpm-visual__label" [class.cnpm-visual__label--more]="more">
+      {{ more ? '+' + more + ' médias' : v.label }}
+    </figcaption>
+  </figure>
+</ng-template>
+
+<cnpm-public-shell
+  [sections]="navSections()"
+  [memberBadge]="memberBadge()"
+  [contact]="footerContact()"
+>
   @switch (state()) {
     @case ('loading') {
       <div class="cnpm-showcase__status" role="status" aria-live="polite">
@@ -22,8 +142,8 @@
       <div class="cnpm-showcase__status">
         <h1 class="cnpm-showcase__status-title">Vitrine non publiée</h1>
         <cnpm-alert tone="info" title="Cette vitrine n'est pas encore publique">
-          Le contenu est en cours de préparation par l'entreprise membre et n'est pas
-          consultable pour le moment.
+          Le contenu est en cours de préparation par l'entreprise membre et n'est pas consultable
+          pour le moment.
         </cnpm-alert>
       </div>
     }
@@ -31,27 +151,66 @@
     @case ('published') {
       @if (showcase(); as member) {
         <article class="cnpm-showcase">
-          <!-- Hero 5/7 : identité à gauche, média à droite. Le média est un
-               placeholder neutre : la photothèque et les droits d'usage relèvent
-               d'UX-DEC-003, et la fiche interdit toute image générée en production. -->
-          <header class="cnpm-showcase__hero">
+          <!-- HÉRO : identité à gauche, visuel à droite. -->
+          <section class="cnpm-showcase__hero" id="a-propos" aria-labelledby="nom-entreprise">
             <div class="cnpm-showcase__identity">
-              <!-- Le badge ouvre une explication du statut (fiche PUB-006). -->
-              <cnpm-verification-badge
-                [status]="member.verificationStatus"
-                [explanation]="badgeExplanation()"
-                [verifiedAt]="member.verifiedAt"
-              />
-              <h1 class="cnpm-showcase__name">{{ member.name }}</h1>
+              <p class="cnpm-showcase__eyebrow">Membre du CNPM</p>
+              <h1 class="cnpm-showcase__name" id="nom-entreprise">{{ member.name }}</h1>
               <p class="cnpm-showcase__tagline">{{ member.tagline }}</p>
               <p class="cnpm-showcase__summary">{{ member.summary }}</p>
+
+              <div class="cnpm-showcase__actions">
+                <!-- Le contact n'est proposé que si les coordonnées sont publiables :
+                     un bouton menant à une adresse absente serait un cul-de-sac. -->
+                @if (footerContact()?.email; as address) {
+                  <a class="cnpm-showcase__cta" [href]="'mailto:' + address">
+                    Contacter l’entreprise
+                  </a>
+                }
+                <a class="cnpm-showcase__cta cnpm-showcase__cta--ghost" href="#activites">
+                  Voir les activités
+                </a>
+              </div>
+
+              @if (heroMeta().length) {
+                <ul class="cnpm-showcase__meta">
+                  @for (entry of heroMeta(); track entry; let last = $last) {
+                    <!-- Séparateur porté par le gabarit et masqué aux lecteurs
+                         d'écran : la liste porte déjà la séparation sémantique. -->
+                    <li class="cnpm-showcase__meta-item">
+                      {{ entry }}
+                      @if (!last) {
+                        <span aria-hidden="true">•</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
             </div>
-            <div class="cnpm-showcase__media" role="img" [attr.aria-label]="'Emblème de ' + member.name">
-              <span class="cnpm-showcase__media-initials" aria-hidden="true">
-                {{ member.name.slice(0, 2) }}
-              </span>
+
+            <div class="cnpm-showcase__hero-media">
+              <ng-container
+                [ngTemplateOutlet]="visualTpl"
+                [ngTemplateOutletContext]="{ v: member.heroVisual }"
+              />
+              <!-- Carte flottante : le badge porte le statut et son explication.
+                   Aucune affirmation sur les cotisations n'est ajoutée — la vitrine
+                   ne dispose d'aucune donnée de règlement, et UX-DEC-004 n'a pas
+                   arrêté ce que le badge atteste. -->
+              <div class="cnpm-showcase__verified">
+                <cnpm-verification-badge
+                  [status]="member.verificationStatus"
+                  [explanation]="badgeExplanation()"
+                  [verifiedAt]="member.verifiedAt"
+                />
+                <p class="cnpm-showcase__verified-text">Statut d’adhésion contrôlé par le CNPM.</p>
+              </div>
             </div>
-          </header>
+          </section>
+
+          @if (member.isDemoContent) {
+            <p class="cnpm-showcase__eyebrow cnpm-showcase__demo">Données de démonstration</p>
+          }
 
           @if (sections().length) {
             <!-- Navigation locale ancrée : les ancres pointent sur les sections
@@ -69,64 +228,255 @@
             </nav>
           }
 
+          <!-- BANDEAU DE FAITS -->
           @if (keyFacts().length) {
             <section class="cnpm-showcase__section" aria-labelledby="faits-cles">
               <h2 class="cnpm-showcase__section-title" id="faits-cles">Faits clés</h2>
-              <cnpm-definition-list [items]="keyFacts()" />
-            </section>
-          }
-
-          @if (member.activities.length) {
-            <section class="cnpm-showcase__section" aria-labelledby="activites">
-              <h2 class="cnpm-showcase__section-title" id="activites">Activités</h2>
-              <ul class="cnpm-showcase__chips">
-                @for (activity of member.activities; track activity) {
-                  <li class="cnpm-showcase__chip">{{ activity }}</li>
-                }
-              </ul>
-            </section>
-          }
-
-          @if (member.projects.length) {
-            <section class="cnpm-showcase__section" aria-labelledby="realisations">
-              <h2 class="cnpm-showcase__section-title" id="realisations">Réalisations</h2>
-              <ul class="cnpm-showcase__cards">
-                @for (project of member.projects; track project.title) {
-                  <li>
-                    <cnpm-showcase-project-card
-                      [title]="project.title"
-                      [summary]="project.summary"
-                      [category]="project.category"
-                    />
+              <ul class="cnpm-showcase__facts">
+                @for (fact of keyFacts(); track fact.id) {
+                  <li class="cnpm-showcase__fact">
+                    <span class="cnpm-showcase__fact-icon" aria-hidden="true">
+                      @switch (fact.icon) {
+                        @case ('sector') {
+                          <svg lucideHardHat [size]="iconSize.control"></svg>
+                        }
+                        @case ('location') {
+                          <svg lucideMapPin [size]="iconSize.control"></svg>
+                        }
+                        @case ('people') {
+                          <svg lucideUsers [size]="iconSize.control"></svg>
+                        }
+                        @case ('calendar') {
+                          <svg lucideCalendarDays [size]="iconSize.control"></svg>
+                        }
+                        @case ('legal') {
+                          <svg lucideScale [size]="iconSize.control"></svg>
+                        }
+                        @default {
+                          <svg lucideShieldCheck [size]="iconSize.control"></svg>
+                        }
+                      }
+                    </span>
+                    <span class="cnpm-showcase__fact-label">{{ fact.label }}</span>
+                    <span class="cnpm-showcase__fact-value">{{ fact.value }}</span>
                   </li>
                 }
               </ul>
             </section>
           }
 
-          @if (member.certifications.length) {
-            <section class="cnpm-showcase__section" aria-labelledby="certifications">
-              <h2 class="cnpm-showcase__section-title" id="certifications">Certifications</h2>
-              <ul class="cnpm-showcase__chips">
-                @for (certification of member.certifications; track certification) {
-                  <li class="cnpm-showcase__chip">{{ certification }}</li>
-                }
-              </ul>
-            </section>
-          }
+          <!-- ZONE TROIS COLONNES -->
+          <div class="cnpm-showcase__columns">
+            @if (member.activities.length) {
+              <section class="cnpm-showcase__section" aria-labelledby="activites">
+                <h2 class="cnpm-showcase__section-title" id="activites">
+                  Nos activités principales
+                </h2>
+                <ul class="cnpm-showcase__tiles">
+                  @for (activity of member.activities; track activity.title) {
+                    <li class="cnpm-showcase__tile">
+                      <span class="cnpm-showcase__tile-icon" aria-hidden="true">
+                        @switch (activity.icon) {
+                          @case ('roads') {
+                            <svg lucideTrafficCone [size]="iconSize.control"></svg>
+                          }
+                          @case ('building') {
+                            <svg lucideHardHat [size]="iconSize.control"></svg>
+                          }
+                          @case ('urban') {
+                            <svg lucideBuilding2 [size]="iconSize.control"></svg>
+                          }
+                          @case ('studies') {
+                            <svg lucideRuler [size]="iconSize.control"></svg>
+                          }
+                          @case ('materials') {
+                            <svg lucideLayers [size]="iconSize.control"></svg>
+                          }
+                          @default {
+                            <svg lucideWrench [size]="iconSize.control"></svg>
+                          }
+                        }
+                      </span>
+                      <h3 class="cnpm-showcase__tile-title">{{ activity.title }}</h3>
+                      <p class="cnpm-showcase__tile-text">{{ activity.description }}</p>
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
 
-          @if (contactFacts().length) {
-            <section class="cnpm-showcase__section" aria-labelledby="contact">
-              <h2 class="cnpm-showcase__section-title" id="contact">Contact</h2>
-              <cnpm-definition-list [items]="contactFacts()" />
+            @if (member.projects.length) {
+              <section class="cnpm-showcase__section" aria-labelledby="realisations">
+                <h2 class="cnpm-showcase__section-title" id="realisations">Réalisations phares</h2>
+                <ul class="cnpm-showcase__projects">
+                  @for (project of member.projects; track project.title) {
+                    <li class="cnpm-showcase__project">
+                      <ng-container
+                        [ngTemplateOutlet]="visualTpl"
+                        [ngTemplateOutletContext]="{ v: project.visual }"
+                      />
+                      <h3 class="cnpm-showcase__project-title">{{ project.title }}</h3>
+                      <p class="cnpm-showcase__project-text">{{ project.summary }}</p>
+                      <p class="cnpm-showcase__chip">{{ project.category }}</p>
+                    </li>
+                  }
+                </ul>
+                <!-- La commande est neutralisée tant que la page complète n'existe
+                     pas, et le motif est visible à côté d'elle : un contrôle grisé
+                     sans explication laisse croire à une panne. -->
+                <cnpm-button
+                  variant="tertiary"
+                  [disabled]="true"
+                  describedBy="realisations-a-venir"
+                >
+                  Voir toutes nos réalisations
+                </cnpm-button>
+                <p class="cnpm-showcase__note" id="realisations-a-venir">
+                  Page disponible à la mise en service de la vitrine.
+                </p>
+              </section>
+            }
+
+            <div class="cnpm-showcase__aside">
+              @if (member.gallery.length) {
+                <section class="cnpm-showcase__section" aria-labelledby="galerie">
+                  <h2 class="cnpm-showcase__section-title" id="galerie">Galerie</h2>
+                  <ul class="cnpm-showcase__gallery">
+                    @for (item of member.gallery; track $index) {
+                      <li>
+                        <ng-container
+                          [ngTemplateOutlet]="visualTpl"
+                          [ngTemplateOutletContext]="{
+                            v: item.visual,
+                            thumb: true,
+                            more: item.moreCount,
+                          }"
+                        />
+                      </li>
+                    }
+                  </ul>
+                  <cnpm-button variant="tertiary" [disabled]="true" describedBy="galerie-a-venir">
+                    Voir toute la galerie
+                  </cnpm-button>
+                  <p class="cnpm-showcase__note" id="galerie-a-venir">
+                    Galerie complète disponible à la mise en service.
+                  </p>
+                </section>
+              }
+
+              @if (member.certifications.length) {
+                <section class="cnpm-showcase__section" aria-labelledby="certifications">
+                  <h2 class="cnpm-showcase__section-title" id="certifications">
+                    Certifications &amp; distinctions
+                  </h2>
+                  <ul class="cnpm-showcase__certifications">
+                    @for (certification of member.certifications; track certification.name) {
+                      <li class="cnpm-showcase__certification">
+                        <svg lucideAward [size]="iconSize.control" aria-hidden="true"></svg>
+                        <span class="cnpm-showcase__certification-name">
+                          {{ certification.name }}
+                        </span>
+                        <span class="cnpm-showcase__certification-scope">
+                          {{ certification.scope }}
+                        </span>
+                      </li>
+                    }
+                  </ul>
+                </section>
+              }
+            </div>
+          </div>
+
+          <!-- RANGÉE : brochure, partenaires, témoignages -->
+          <div class="cnpm-showcase__columns cnpm-showcase__columns--even">
+            <section class="cnpm-showcase__section" aria-labelledby="brochure">
+              <h2 class="cnpm-showcase__section-title" id="brochure">Brochure de l’entreprise</h2>
+              <p class="cnpm-showcase__brochure">
+                <svg lucideFileText [size]="iconSize.empty" aria-hidden="true"></svg>
+                Présentation détaillée des métiers, références et moyens techniques.
+              </p>
+              <cnpm-button
+                variant="secondary"
+                [disabled]="!member.brochureAvailable"
+                describedBy="brochure-a-venir"
+              >
+                <svg lucideDownload [size]="iconSize.compact"></svg>
+                Télécharger la brochure (PDF)
+              </cnpm-button>
+              @if (!member.brochureAvailable) {
+                <p class="cnpm-showcase__note" id="brochure-a-venir">
+                  Aucun document n’est encore déposé par l’entreprise.
+                </p>
+              }
             </section>
-          }
+
+            @if (member.partners.length) {
+              <section class="cnpm-showcase__section" aria-labelledby="partenaires">
+                <h2 class="cnpm-showcase__section-title" id="partenaires">
+                  Ils nous font confiance
+                </h2>
+                <!-- Aucun logo de tiers n'est reproduit : publier une marque suppose
+                     une autorisation d'usage que la vitrine ne porte pas. Le
+                     monogramme tient lieu de repère visuel. -->
+                <ul class="cnpm-showcase__partners">
+                  @for (partner of member.partners; track partner.name) {
+                    <li class="cnpm-showcase__partner">
+                      <span class="cnpm-showcase__partner-mark" aria-hidden="true">
+                        {{ partner.initials }}
+                      </span>
+                      <span class="cnpm-showcase__partner-name">{{ partner.name }}</span>
+                    </li>
+                  }
+                </ul>
+              </section>
+            }
+
+            @if (testimonial(); as quote) {
+              <section class="cnpm-showcase__section" aria-labelledby="temoignages">
+                <h2 class="cnpm-showcase__section-title" id="temoignages">Témoignages clients</h2>
+                <blockquote class="cnpm-showcase__quote">
+                  <svg lucideQuote [size]="iconSize.empty" aria-hidden="true"></svg>
+                  <p class="cnpm-showcase__quote-text">{{ quote.quote }}</p>
+                  <footer class="cnpm-showcase__quote-author">
+                    {{ quote.author }} — {{ quote.role }}
+                  </footer>
+                </blockquote>
+                @if (member.testimonials.length > 1) {
+                  <div class="cnpm-showcase__carousel" role="group" aria-label="Témoignages">
+                    <button
+                      class="cnpm-showcase__carousel-button"
+                      type="button"
+                      aria-label="Témoignage précédent"
+                      (click)="moveTestimonial(-1)"
+                    >
+                      <svg lucideChevronLeft [size]="iconSize.control"></svg>
+                    </button>
+                    <p class="cnpm-showcase__carousel-count" aria-live="polite">
+                      {{ testimonialIndex() + 1 }} sur {{ member.testimonials.length }}
+                    </p>
+                    <button
+                      class="cnpm-showcase__carousel-button"
+                      type="button"
+                      aria-label="Témoignage suivant"
+                      (click)="moveTestimonial(1)"
+                    >
+                      <svg lucideChevronRight [size]="iconSize.control"></svg>
+                    </button>
+                  </div>
+                }
+              </section>
+            }
+          </div>
 
           <!-- L'attribution porte sur toute la vitrine et non sur une section : la
                placer dans « Contact » la faisait disparaître avec elle lorsque les
                coordonnées ne sont pas publiables. -->
           <p class="cnpm-showcase__attribution">
             Contenu publié sous la responsabilité de {{ member.name }}.
+            @if (member.isDemoContent) {
+              Entreprise, réalisations, partenaires et témoignages sont fictifs&nbsp;: ils
+              illustrent le gabarit et ne désignent aucune organisation réelle.
+            }
           </p>
         </article>
       }

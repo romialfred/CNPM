@@ -1,4 +1,9 @@
-/* Conteneur 1440 px maximum, comme le shell public. */
+/* PUB-006 — vitrine publique.
+   Aucune couleur ni espacement littéral : toutes les valeurs viennent des tokens.
+   Surfaces blanches, bordure avant ombre, rayon 8 px pour les contrôles et 12 px pour
+   les cartes. Les sélecteurs sont groupés : la feuille d'un écran est plafonnée par le
+   budget de build, et un écran riche n'autorise pas une règle par nuance. */
+
 .cnpm-showcase,
 .cnpm-showcase__status {
   width: 100%;
@@ -11,7 +16,20 @@
 .cnpm-showcase {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-12);
+  gap: var(--cnpm-space-10);
+
+  /* Remise à zéro unique plutôt qu'une par bloc. */
+  p,
+  h2,
+  h3 {
+    margin: 0;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 }
 
 .cnpm-showcase__status {
@@ -26,16 +44,37 @@
   font-size: var(--cnpm-font-size-2xl);
   line-height: var(--cnpm-font-lineHeight-2xl);
   font-weight: var(--cnpm-font-weight-bold);
-  color: var(--cnpm-color-text-primary);
 }
 
-.cnpm-showcase__status-text {
-  margin: 0;
+/* Textes secondaires. */
+.cnpm-showcase__status-text,
+.cnpm-showcase__brochure,
+.cnpm-showcase__quote-author,
+.cnpm-showcase__verified-text {
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
   color: var(--cnpm-color-text-secondary);
 }
 
-/* Hero 5/7 (fiche PUB-006). `minmax(0, …)` empêche la piste de se dimensionner sur
-   le min-content de son contenu et de déborder. */
+/* Mentions discrètes. */
+.cnpm-showcase__note,
+.cnpm-showcase__attribution,
+.cnpm-showcase__carousel-count {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-showcase__fact-label,
+.cnpm-showcase__certification-scope,
+.cnpm-showcase__tile-text,
+.cnpm-showcase__project-text,
+.cnpm-showcase__partner-name {
+  font-size: var(--cnpm-font-size-xs);
+  line-height: var(--cnpm-font-lineHeight-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* HÉRO */
 .cnpm-showcase__hero {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -51,152 +90,357 @@
   min-width: 0;
 }
 
+.cnpm-showcase__eyebrow {
+  align-self: flex-start;
+  padding: var(--cnpm-space-1) var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-brand-blue-50);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+  color: var(--cnpm-color-text-brand);
+}
+
 .cnpm-showcase__name {
   margin: 0;
-  font-size: var(--cnpm-font-size-4xl);
-  line-height: var(--cnpm-font-lineHeight-4xl);
+  font-size: var(--cnpm-font-size-5xl);
+  line-height: var(--cnpm-font-lineHeight-5xl);
   font-weight: var(--cnpm-font-weight-bold);
-  color: var(--cnpm-color-text-primary);
+  letter-spacing: var(--cnpm-font-letterSpacing-tight);
+  overflow-wrap: anywhere;
 }
 
 .cnpm-showcase__tagline {
-  margin: 0;
-  font-size: var(--cnpm-font-size-lg);
-  line-height: var(--cnpm-font-lineHeight-lg);
-  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xl);
+  line-height: var(--cnpm-font-lineHeight-xl);
   font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-brand);
 }
 
 .cnpm-showcase__summary {
-  margin: 0;
-  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-md);
   line-height: var(--cnpm-font-lineHeight-md);
+  max-width: 34rem;
 }
 
-/* Média : surface neutre bordée, sans image. La photothèque et les droits d'usage
-   relèvent d'UX-DEC-003 ; la fiche exige un hero crédible sans photo et interdit
-   l'image générée en production. */
-.cnpm-showcase__media {
+.cnpm-showcase__actions,
+.cnpm-showcase__meta,
+.cnpm-showcase__partners,
+.cnpm-showcase__localnav-list,
+.cnpm-showcase__carousel {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+/* Contrôles de la vitrine. Le bouton du design system ne rend pas d'ancre `href`
+   (courriel, fragment) : ces appels à l'action sont des liens, stylés sur les mêmes
+   tokens. La cible tactile reste à 44 px et le focus visible vient de la feuille
+   globale, qui pose déjà un contour de 2 px et son halo. */
+.cnpm-showcase__cta,
+.cnpm-showcase__localnav-link,
+.cnpm-showcase__carousel-button {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 16rem;
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-surface-subtle);
+  min-height: var(--cnpm-size-control-lg);
+  border-radius: var(--cnpm-radius-md);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  text-decoration: none;
 }
 
-/* `blue-500` et non `blue-300` : sur la surface subtile, la teinte claire tombait à
-   1,72:1, sous le seuil de 3:1 exigé pour un grand texte. */
-.cnpm-showcase__media-initials {
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-5xl);
-  font-weight: var(--cnpm-font-weight-bold);
-  color: var(--cnpm-color-brand-blue-500);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+.cnpm-showcase__cta {
+  padding: 0 var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-brand-blue-700);
+  background-color: var(--cnpm-color-brand-blue-700);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-inverse);
+}
+
+.cnpm-showcase__cta--ghost {
+  background-color: transparent;
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-showcase__cta:hover {
+  background-color: var(--cnpm-color-brand-blue-800);
+  border-color: var(--cnpm-color-brand-blue-800);
+}
+
+/* Après la règle pleine : à spécificité égale, le dernier l'emporte, et la variante
+   en contour doit garder son fond clair au survol. */
+.cnpm-showcase__cta--ghost:hover,
+.cnpm-showcase__localnav-link:hover,
+.cnpm-showcase__carousel-button:hover {
+  background-color: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-showcase__meta {
+  gap: var(--cnpm-space-2) var(--cnpm-space-4);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-showcase__hero-media {
+  position: relative;
+  min-width: 0;
+}
+
+.cnpm-showcase__verified {
+  position: absolute;
+  right: var(--cnpm-space-5);
+  bottom: var(--cnpm-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  max-width: 22rem;
+}
+
+/* Mention de démonstration : reprend la pastille du héros, en ton d'avertissement.
+   Lisible sans dramatiser, et sans règle de mise en forme supplémentaire. */
+.cnpm-showcase__demo {
+  background-color: var(--cnpm-color-semantic-warning-50);
+  color: var(--cnpm-color-semantic-warning-700);
 }
 
 /* Navigation locale : repères de section, alignés sur les ancres rendues. */
 .cnpm-showcase__localnav {
   border-block: 1px solid var(--cnpm-color-border-subtle);
-  padding-block: var(--cnpm-space-3);
-}
-
-.cnpm-showcase__localnav-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--cnpm-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  padding-block: var(--cnpm-space-2);
 }
 
 .cnpm-showcase__localnav-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--cnpm-size-control-lg);
   padding: 0 var(--cnpm-space-3);
-  border-radius: var(--cnpm-radius-md);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
   color: var(--cnpm-color-text-link);
-  text-decoration: none;
-}
-
-.cnpm-showcase__localnav-link:hover {
-  background-color: var(--cnpm-color-surface-subtle);
-}
-
-.cnpm-showcase__localnav-link:focus-visible {
-  outline: 2px solid var(--cnpm-color-brand-blue-700);
-  outline-offset: 2px;
 }
 
 .cnpm-showcase__section {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-5);
+  align-items: flex-start;
+  gap: var(--cnpm-space-4);
   min-width: 0;
   /* L'ancre ne colle pas sous l'en-tête collant. */
   scroll-margin-top: var(--cnpm-space-16);
 }
 
 .cnpm-showcase__section-title {
-  margin: 0;
   font-size: var(--cnpm-font-size-xl);
   line-height: var(--cnpm-font-lineHeight-xl);
   font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
 }
 
-.cnpm-showcase__chips {
+/* Surfaces de regroupement : bordure avant ombre, rayon de carte. */
+.cnpm-showcase__fact,
+.cnpm-showcase__tile,
+.cnpm-showcase__project,
+.cnpm-showcase__certification,
+.cnpm-showcase__partner,
+.cnpm-showcase__quote,
+.cnpm-showcase__brochure,
+.cnpm-showcase__verified {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--cnpm-space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+  min-width: 0;
+  padding: var(--cnpm-layout-denseCardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
 }
 
-.cnpm-showcase__chip {
-  padding: var(--cnpm-space-2) var(--cnpm-space-3);
-  border: 1px solid var(--cnpm-color-border-subtle);
+/* Grilles. `minmax(0, …)` empêche une piste de se dimensionner sur son contenu. */
+.cnpm-showcase__facts,
+.cnpm-showcase__tiles,
+.cnpm-showcase__projects,
+.cnpm-showcase__gallery,
+.cnpm-showcase__certifications {
+  display: grid;
+  gap: var(--cnpm-space-3);
+  width: 100%;
+}
+
+.cnpm-showcase__facts {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.cnpm-showcase__tiles,
+.cnpm-showcase__certifications,
+.cnpm-showcase__gallery {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cnpm-showcase__fact-icon,
+.cnpm-showcase__tile-icon,
+.cnpm-showcase__partner-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
   border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-surface-subtle);
+  background-color: var(--cnpm-color-brand-blue-50);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-showcase__fact-value,
+.cnpm-showcase__certification-name,
+.cnpm-showcase__tile-title,
+.cnpm-showcase__project-title {
   font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* Zone à trois colonnes ; la dernière regroupe galerie et certifications. */
+.cnpm-showcase__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 0.95fr);
+  align-items: start;
+  gap: var(--cnpm-space-8);
+}
+
+.cnpm-showcase__columns--even {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cnpm-showcase__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-8);
+  min-width: 0;
+}
+
+/* Catégorie : texte sur pastille neutre, jamais une couleur porteuse de sens.
+   `align-self` la borne à son contenu : étirée, elle formait un bandeau. */
+.cnpm-showcase__chip {
+  align-self: flex-start;
+  padding: var(--cnpm-space-1) var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-surface-subtle);
+  font-size: var(--cnpm-font-size-xs);
   color: var(--cnpm-color-text-secondary);
 }
 
-/* Grille de cartes ; la carte elle-même est un composant du design system. */
-.cnpm-showcase__cards {
+.cnpm-showcase__partner {
+  flex: 1 1 8rem;
+  align-items: center;
+}
+
+.cnpm-showcase__brochure {
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+/* `margin: 0` explicite : le style par défaut du navigateur pose 40 px de marge
+   latérale sur `blockquote`, qui s'ajoutaient à `width: 100%` et faisaient déborder la
+   page de 24 px à 320 px de large. */
+.cnpm-showcase__quote {
+  width: 100%;
+  margin: 0;
+}
+
+.cnpm-showcase__quote-text {
+  font-size: var(--cnpm-font-size-md);
+  line-height: var(--cnpm-font-lineHeight-md);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-showcase__carousel-button {
+  width: var(--cnpm-size-control-lg);
+  border: 1px solid var(--cnpm-color-border-default);
+  background-color: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-brand);
+  cursor: pointer;
+}
+
+/* VISUELS SCHÉMATIQUES
+   Dégradé sobre de la marque ; le libellé repose sur un bandeau opaque, seul moyen de
+   garantir son contraste au-dessus d'un motif clair. */
+.cnpm-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--cnpm-radius-lg);
+  background-image: linear-gradient(
+    150deg,
+    var(--cnpm-color-brand-blue-800),
+    var(--cnpm-color-brand-blue-600)
+  );
+  color: var(--cnpm-color-text-inverse);
+  aspect-ratio: 16 / 9;
+}
+
+.cnpm-visual--thumb {
+  aspect-ratio: 1 / 1;
+}
+
+.cnpm-visual__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.cnpm-visual__label {
+  position: relative;
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  background-color: var(--cnpm-color-brand-blue-950);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+/* Dernière vignette : le compteur couvre la vignette au lieu de la légender. Le fond
+   opaque garantit le contraste, qu'aucun voile translucide sur motif ne donnerait. */
+.cnpm-visual__label--more {
+  position: absolute;
+  inset: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: var(--cnpm-space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* La responsabilité du contenu revient au membre (fiche PUB-006). */
-.cnpm-showcase__attribution {
-  margin: 0;
+  place-items: center;
   font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-muted);
 }
 
-/* Sous 1024 px, le média secondaire disparaît et l'identité occupe la largeur. */
+/* Sous 1280 px la zone à trois colonnes passe à deux, puis à une. */
+@media (max-width: 1279px) {
+  .cnpm-showcase__columns,
+  .cnpm-showcase__columns--even {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--cnpm-space-6);
+  }
+  .cnpm-showcase__facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 1023px) {
   .cnpm-showcase__hero {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--cnpm-space-6);
   }
-  .cnpm-showcase__media {
-    display: none;
-  }
   .cnpm-showcase__name {
-    font-size: var(--cnpm-font-size-3xl);
-    line-height: var(--cnpm-font-lineHeight-3xl);
+    font-size: var(--cnpm-font-size-4xl);
+    line-height: var(--cnpm-font-lineHeight-4xl);
+  }
+  /* La carte flottante repasse dans le flux : superposée à un visuel étroit, elle
+     déborderait et masquerait le motif. */
+  .cnpm-showcase__verified {
+    position: static;
+    max-width: none;
+    margin-top: var(--cnpm-space-3);
   }
 }
 
@@ -205,5 +449,19 @@
   .cnpm-showcase__status {
     padding: var(--cnpm-space-6) var(--cnpm-layout-pagePaddingMobile);
     gap: var(--cnpm-space-8);
+  }
+  .cnpm-showcase__columns,
+  .cnpm-showcase__columns--even,
+  .cnpm-showcase__facts,
+  .cnpm-showcase__tiles,
+  .cnpm-showcase__certifications {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cnpm-showcase__name {
+    font-size: var(--cnpm-font-size-3xl);
+    line-height: var(--cnpm-font-lineHeight-3xl);
+  }
+  .cnpm-showcase__cta {
+    width: 100%;
   }
 }

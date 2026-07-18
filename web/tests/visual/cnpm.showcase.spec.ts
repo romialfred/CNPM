@@ -78,13 +78,20 @@ test.describe('PUB-006 — composition', () => {
 test.describe('PUB-006 — consentement des contacts', () => {
   test('aucune coordonnée n’est publiée sans consentement horodaté', async ({ page }) => {
     // `requirements.md` : « Les contacts publics nécessitent un consentement et une
-    // date de vérification ». La fixture n'en porte pas : la section doit disparaître.
-    await page.goto('/membres/somacop-sa');
+    // date de vérification ». Cette vitrine-ci n'en porte pas : la section disparaît.
+    // La vitrine de démonstration `somacop-sa`, elle, porte un consentement explicite
+    // et publie donc ses coordonnées — les deux sens de la règle sont couverts.
+    await page.goto('/membres/somacop-sa-sans-consentement');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
-    await expect(page.getByText('contact@somacop.example')).toHaveCount(0);
-    await expect(page.getByText('+223 20 22 33 44')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: 'Contact' })).toHaveCount(0);
+    await expect(page.getByText('accueil@somacop.example')).toHaveCount(0);
+    await expect(page.getByText('+223 20 00 00 00')).toHaveCount(0);
+  });
+
+  test('les coordonnées sont publiées lorsque le consentement est horodaté', async ({ page }) => {
+    await page.goto('/membres/somacop-sa');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByText('accueil@somacop.example').first()).toBeVisible();
   });
 });
 

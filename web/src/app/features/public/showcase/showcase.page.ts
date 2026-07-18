@@ -1,25 +1,50 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  LucideAward,
+  LucideBuilding2,
+  LucideCalendarDays,
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucideDownload,
+  LucideFileText,
+  LucideHardHat,
+  LucideLayers,
+  LucideMapPin,
+  LucideQuote,
+  LucideRuler,
+  LucideScale,
+  LucideShieldCheck,
+  LucideTrafficCone,
+  LucideUsers,
+  LucideWrench,
+} from '@lucide/angular';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
+import { ButtonComponent } from '../../../design-system/button/button.component';
+import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import { VerificationBadgeComponent } from '../../../design-system/verification-badge/verification-badge.component';
 import {
-  DefinitionListComponent,
-  type CnpmDefinition,
-} from '../../../design-system/definition-list/definition-list.component';
-import { ShowcaseProjectCardComponent } from '../../../design-system/showcase-project-card/showcase-project-card.component';
-import { PublicShellComponent } from '../public-shell.component';
-import { SHOWCASE_GATEWAY, type MemberShowcase, type PublicationStatus } from './showcase-gateway';
+  PublicShellComponent,
+  type PublicFooterContact,
+  type PublicNavSection,
+} from '../public-shell.component';
+import {
+  SHOWCASE_GATEWAY,
+  type MemberShowcase,
+  type PublicationStatus,
+  type ShowcaseKeyFact,
+} from './showcase-gateway';
 
 type PageState = 'loading' | 'published' | 'not-public' | 'not-found';
 
 /**
  * PUB-006 — Vitrine publique d'un membre.
  *
- * Écran pilote R0 : il valide le langage visuel de la vitrine à partir des fixtures
- * du handoff. Le module vitrine de R4 (API, migrations, modération, éditeur) reste
- * hors périmètre tant que la checklist de promotion et les décisions UX-DEC-004 à
- * UX-DEC-008 ne sont pas fermées.
+ * Écran pilote R0 : il valide le langage visuel de la vitrine. Le module vitrine de R4
+ * (API, migrations, modération, éditeur) reste hors périmètre tant que la checklist de
+ * promotion et les décisions UX-DEC-004 à UX-DEC-008 ne sont pas fermées.
  *
  * Les sections dépourvues de contenu ne sont pas rendues, conformément à la fiche :
  * une vitrine peu remplie ne doit pas afficher d'espaces morts.
@@ -28,11 +53,28 @@ type PageState = 'loading' | 'published' | 'not-public' | 'not-found';
   selector: 'cnpm-showcase-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    NgTemplateOutlet,
     PublicShellComponent,
     VerificationBadgeComponent,
     AlertComponent,
-    DefinitionListComponent,
-    ShowcaseProjectCardComponent,
+    ButtonComponent,
+    LucideAward,
+    LucideBuilding2,
+    LucideCalendarDays,
+    LucideChevronLeft,
+    LucideChevronRight,
+    LucideDownload,
+    LucideFileText,
+    LucideHardHat,
+    LucideLayers,
+    LucideMapPin,
+    LucideQuote,
+    LucideRuler,
+    LucideScale,
+    LucideShieldCheck,
+    LucideTrafficCone,
+    LucideUsers,
+    LucideWrench,
   ],
   templateUrl: './showcase.page.html',
   styleUrl: './showcase.page.scss',
@@ -43,16 +85,20 @@ export class ShowcasePage {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
+  protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly state = signal<PageState>('loading');
   protected readonly showcase = signal<MemberShowcase | null>(null);
   protected readonly publicationStatus = signal<PublicationStatus | null>(null);
+  /** Index du témoignage affiché ; le carrousel n'expose qu'une citation à la fois. */
+  protected readonly testimonialIndex = signal(0);
+
   /**
    * Ancres de la navigation locale.
    *
    * Seules les sections réellement rendues sont proposées : une ancre vers une
    * section absente mènerait nulle part.
    */
-  protected readonly sections = computed(() => {
+  protected readonly sections = computed<readonly PublicNavSection[]>(() => {
     const data = this.showcase();
     if (!data) {
       return [];
@@ -61,24 +107,71 @@ export class ShowcasePage {
       { id: 'faits-cles', label: 'Faits clés', shown: this.keyFacts().length > 0 },
       { id: 'activites', label: 'Activités', shown: data.activities.length > 0 },
       { id: 'realisations', label: 'Réalisations', shown: data.projects.length > 0 },
+      { id: 'galerie', label: 'Galerie', shown: data.gallery.length > 0 },
       { id: 'certifications', label: 'Certifications', shown: data.certifications.length > 0 },
-      { id: 'contact', label: 'Contact', shown: this.contactFacts().length > 0 },
-    ].filter((section) => section.shown);
+    ]
+      .filter((section) => section.shown)
+      .map(({ id, label }) => ({ id, label }));
   });
 
-  /** Faits clés : seules les valeurs réellement renseignées sont exposées. */
-  protected readonly keyFacts = computed<CnpmDefinition[]>(() => {
+  /**
+   * Ancres proposées à la navigation principale.
+   *
+   * « À propos » désigne l'en-tête de la vitrine et « Contact » le bloc de coordonnées
+   * du pied de page — qui n'existe que si les coordonnées sont publiables. Aucune
+   * rubrique sans contenu (produits, actualités) n'est annoncée : la maquette les
+   * prévoit, mais aucune source ne les alimente et un onglet vide se remarque plus
+   * qu'une absence.
+   */
+  protected readonly navSections = computed<readonly PublicNavSection[]>(() => {
+    if (!this.showcase()) {
+      return [];
+    }
+    const anchors: PublicNavSection[] = [{ id: 'a-propos', label: 'À propos' }, ...this.sections()];
+    if (this.footerContact()) {
+      anchors.push({ id: 'contact-vitrine', label: 'Contact' });
+    }
+    return anchors;
+  });
+
+  /** Bandeau de faits : seules les valeurs réellement renseignées sont exposées. */
+  protected readonly keyFacts = computed<readonly ShowcaseKeyFact[]>(() => {
     const data = this.showcase();
     if (!data) {
       return [];
     }
     return [
-      { label: 'Secteur', value: data.sector },
-      { label: 'Forme juridique', value: data.legalForm },
-      { label: 'Création', value: String(data.foundedYear) },
-      { label: 'Effectif', value: data.employeeRange },
-      { label: 'Implantation', value: data.location },
+      { id: 'secteur', label: 'Secteur d’activité', value: data.sector, icon: 'sector' as const },
+      { id: 'lieu', label: 'Localisation', value: data.location, icon: 'location' as const },
+      { id: 'effectif', label: 'Effectif', value: data.employeeRange, icon: 'people' as const },
+      {
+        id: 'creation',
+        label: 'Année de création',
+        value: String(data.foundedYear),
+        icon: 'calendar' as const,
+      },
+      { id: 'statut', label: 'Statut', value: data.legalForm, icon: 'legal' as const },
+      {
+        id: 'adhesion',
+        label: 'Membre CNPM',
+        // Le statut est écrit, jamais porté par la seule couleur du bandeau.
+        value: `Membre actif depuis ${data.memberSince}`,
+        icon: 'member' as const,
+      },
     ].filter((fact) => !!fact.value);
+  });
+
+  /** Ligne de méta sous les actions du héros. */
+  protected readonly heroMeta = computed<readonly string[]>(() => {
+    const data = this.showcase();
+    if (!data) {
+      return [];
+    }
+    return [
+      data.location,
+      data.employeeRange ? `${data.employeeRange} collaborateurs` : '',
+      data.foundedYear ? `Depuis ${data.foundedYear}` : '',
+    ].filter((entry) => !!entry);
   });
 
   /**
@@ -86,21 +179,30 @@ export class ShowcasePage {
    *
    * Vide tant qu'aucun consentement horodaté n'accompagne la vitrine : le handoff
    * impose « un consentement et une date de vérification » pour publier un contact.
-   * Sans eux, la section entière disparaît — publier des coordonnées sans base serait
-   * un manquement, pas un détail d'affichage.
+   * Sans eux, tout le bloc disparaît — publier des coordonnées sans base serait un
+   * manquement, pas un détail d'affichage.
    */
-  protected readonly contactFacts = computed<CnpmDefinition[]>(() => {
+  protected readonly footerContact = computed<PublicFooterContact | null>(() => {
     const data = this.showcase();
-    const contacts = data?.contacts;
-    if (!contacts || !data?.contactConsent) {
-      return [];
+    if (!data?.contactConsent) {
+      return null;
     }
-    return [
-      { label: 'Adresse', value: contacts.address ?? '' },
-      { label: 'Téléphone', value: contacts.phone ?? '' },
-      { label: 'Courriel', value: contacts.email ?? '' },
-      { label: 'Horaires', value: contacts.hours ?? '' },
-    ].filter((fact) => !!fact.value);
+    const { phone, email, address, hours } = data.contacts;
+    if (!phone && !email && !address && !hours) {
+      return null;
+    }
+    return { phone, email, address, hours };
+  });
+
+  /** Mention d'adhésion affichée dans l'en-tête public. */
+  protected readonly memberBadge = computed(() => {
+    const data = this.showcase();
+    return data ? `Membre CNPM — Membre actif depuis ${data.memberSince}` : null;
+  });
+
+  protected readonly testimonial = computed(() => {
+    const list = this.showcase()?.testimonials ?? [];
+    return list.length ? list[this.testimonialIndex() % list.length] : null;
   });
 
   /**
@@ -112,7 +214,8 @@ export class ShowcasePage {
    * inventer une garantie institutionnelle.
    */
   protected readonly badgeExplanation = computed(
-    () => 'Ce statut est attribué par le CNPM. L’entreprise membre ne peut pas l’activer elle-même.',
+    () =>
+      'Ce statut est attribué par le CNPM. L’entreprise membre ne peut pas l’activer elle-même.',
   );
 
   constructor() {
@@ -133,6 +236,15 @@ export class ShowcasePage {
       this.state.set('not-found');
       this.blockIndexing();
     });
+  }
+
+  /** Défilement circulaire : le carrousel ne présente jamais de bouton sans effet. */
+  protected moveTestimonial(step: number): void {
+    const total = this.showcase()?.testimonials.length ?? 0;
+    if (total < 2) {
+      return;
+    }
+    this.testimonialIndex.update((index) => (index + step + total) % total);
   }
 
   private applySeo(showcase: MemberShowcase): void {
