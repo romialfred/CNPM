@@ -51,6 +51,24 @@ clavier, responsive et métier restent des gates indépendants. Inversement, le 
 ne peut pas être abaissé pour faire passer un écran. Les masques sont réservés aux
 petites zones dynamiques listées ci-dessous et doivent être documentés dans le rapport.
 
+### Gate du pack Web référencé
+
+Les treize références Web sont capturées à `1672×941` avec une horloge, une locale,
+un fuseau, des animations et des données de démonstration déterministes. Le mobile
+Flutter `REF-MOB-001` reste contrôlé par sa propre suite golden.
+
+```bash
+CNPM_CAPTURE_DIR=captures npm --prefix web run capture:fidelity
+python docs/ui-handoff/scripts/compare_reference_pack.py captures \
+  --out visual-diff \
+  --min-score 9.8
+```
+
+La seconde commande échoue si une capture Web manque, si ses dimensions diffèrent de
+la référence ou si un seul écran reste sous le seuil. Le rapport agrégé est écrit dans
+`visual-diff/summary.json` et chaque écran conserve sa référence, sa capture, son diff
+et son rapport détaillé.
+
 ### Grille de revue UI complémentaire
 
 Chaque écran reçoit aussi une note de conformité globale, indépendante du score pixel :
