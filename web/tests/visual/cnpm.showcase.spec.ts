@@ -125,7 +125,7 @@ test.describe('PUB-006 — navigation locale', () => {
     const orphans = await page.evaluate(() => {
       const missing: string[] = [];
       document
-        .querySelectorAll<HTMLAnchorElement>('.cnpm-showcase__localnav-link')
+        .querySelectorAll<HTMLAnchorElement>('.cnpm-public__nav--desktop a[href^="#"]')
         .forEach((link) => {
           const id = link.getAttribute('href')?.slice(1) ?? '';
           if (!document.getElementById(id)) {
@@ -138,7 +138,7 @@ test.describe('PUB-006 — navigation locale', () => {
   });
 
   test('aucune ancre ne pointe vers Contact tant qu’il n’est pas publié', async ({ page }) => {
-    await page.goto('/membres/somacop-sa');
+    await page.goto('/membres/somacop-sa-sans-consentement');
     const nav = page.getByRole('navigation', { name: 'Sections de la vitrine' });
     await expect(nav.getByRole('link', { name: 'Contact' })).toHaveCount(0);
   });

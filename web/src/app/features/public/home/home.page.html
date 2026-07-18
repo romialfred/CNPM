@@ -65,24 +65,45 @@
           @case ('ready') {
             @if (highlights(); as data) {
               <div class="cnpm-home__preview-content">
-                <p class="cnpm-home__preview-welcome">Bienvenue dans votre tableau de bord</p>
-                <div class="cnpm-home__preview-metrics" aria-hidden="true">
-                  @for (metric of data.metrics.slice(0, 3); track metric.id) {
-                    <span>
-                      <small>{{ metric.label }}</small>
-                      <strong>{{ metric.value | number: '1.0-0' }}</strong>
-                    </span>
-                  }
-                </div>
-                <div class="cnpm-home__preview-chart" aria-hidden="true">
-                  <div class="cnpm-home__chart-heading">
-                    <span>Évolution illustrative</span>
-                    <span>Exercice démo</span>
+                <aside class="cnpm-home__preview-sidebar" aria-hidden="true">
+                  <span class="cnpm-home__preview-brand">CNPM</span>
+                  <span class="cnpm-home__preview-nav cnpm-home__preview-nav--active">Tableau de bord</span>
+                  <span class="cnpm-home__preview-nav">Membres</span>
+                  <span class="cnpm-home__preview-nav">Entreprises</span>
+                  <span class="cnpm-home__preview-nav">Cotisations</span>
+                  <span class="cnpm-home__preview-nav">Paiements</span>
+                  <span class="cnpm-home__preview-nav">Reçus</span>
+                </aside>
+                <div class="cnpm-home__preview-workspace">
+                  <div class="cnpm-home__preview-heading">
+                    <p class="cnpm-home__preview-welcome">Bienvenue, membre CNPM</p>
+                    <span aria-hidden="true">Vue synthétique</span>
                   </div>
-                  <div class="cnpm-home__chart-bars">
-                    @for (bar of chartBars; track $index) {
-                      <i [style.height.%]="bar"></i>
+                  <div class="cnpm-home__preview-metrics" aria-hidden="true">
+                    @for (metric of data.metrics; track metric.id) {
+                      <span>
+                        <small>{{ metric.label }}</small>
+                        <strong>{{ metric.value | number: '1.0-0' }}</strong>
+                        <i></i>
+                      </span>
                     }
+                  </div>
+                  <div class="cnpm-home__preview-analytics" aria-hidden="true">
+                    <div class="cnpm-home__preview-chart">
+                      <div class="cnpm-home__chart-heading">
+                        <span>Évolution des cotisations</span>
+                        <span>Exercice démo</span>
+                      </div>
+                      <div class="cnpm-home__chart-bars">
+                        @for (bar of chartBars; track $index) {
+                          <i [style.height.%]="bar"></i>
+                        }
+                      </div>
+                    </div>
+                    <div class="cnpm-home__preview-donut">
+                      <strong>78,47&nbsp;%</strong>
+                      <span>recouvré</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -96,10 +117,9 @@
     </section>
 
     <section class="cnpm-home__metrics" id="chiffres" aria-labelledby="chiffres-titre">
-      <div class="cnpm-home__section-heading cnpm-home__section-heading--center">
-        <p class="cnpm-home__section-kicker">Repères de démonstration</p>
+      <div class="cnpm-home__section-heading cnpm-home__section-heading--metrics">
+        <p class="cnpm-home__section-kicker">Données fictives de démonstration</p>
         <h2 id="chiffres-titre">Le CNPM en chiffres</h2>
-        <p>Cette zone reproduit la densité attendue avec les fixtures synthétiques du handoff.</p>
       </div>
 
       @switch (state()) {

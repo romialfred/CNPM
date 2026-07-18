@@ -9,14 +9,14 @@
   width: 100%;
   max-width: var(--cnpm-size-publicMax);
   margin: 0 auto;
-  padding: var(--cnpm-space-10) var(--cnpm-layout-pagePaddingDesktop);
+  padding: var(--cnpm-space-3) var(--cnpm-layout-pagePaddingDesktop) var(--cnpm-space-8);
   min-width: 0;
 }
 
 .cnpm-showcase {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-10);
+  gap: var(--cnpm-space-3);
 
   /* Remise à zéro unique plutôt qu'une par bloc. */
   p,
@@ -86,8 +86,14 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-3);
   min-width: 0;
+}
+
+.cnpm-showcase__eyebrow-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
 }
 
 .cnpm-showcase__eyebrow {
@@ -119,8 +125,8 @@
 }
 
 .cnpm-showcase__summary {
-  font-size: var(--cnpm-font-size-md);
-  line-height: var(--cnpm-font-lineHeight-md);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
   max-width: 34rem;
 }
 
@@ -191,6 +197,10 @@
   min-width: 0;
 }
 
+.cnpm-showcase__hero-media .cnpm-visual {
+  aspect-ratio: 2.7 / 1;
+}
+
 .cnpm-showcase__verified {
   position: absolute;
   right: var(--cnpm-space-5);
@@ -223,15 +233,15 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-2);
   min-width: 0;
   /* L'ancre ne colle pas sous l'en-tête collant. */
   scroll-margin-top: var(--cnpm-space-16);
 }
 
 .cnpm-showcase__section-title {
-  font-size: var(--cnpm-font-size-xl);
-  line-height: var(--cnpm-font-lineHeight-xl);
+  font-size: var(--cnpm-font-size-md);
+  line-height: var(--cnpm-font-lineHeight-md);
   font-weight: var(--cnpm-font-weight-semibold);
 }
 
@@ -248,7 +258,7 @@
   flex-direction: column;
   gap: var(--cnpm-space-2);
   min-width: 0;
-  padding: var(--cnpm-layout-denseCardPadding);
+  padding: var(--cnpm-space-2);
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-lg);
   background-color: var(--cnpm-color-surface-primary);
@@ -269,10 +279,51 @@
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
+.cnpm-showcase__section--facts {
+  gap: 0;
+}
+
+.cnpm-showcase__section--facts .cnpm-showcase__section-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cnpm-showcase__fact {
+  display: grid;
+  grid-template-columns: var(--cnpm-size-control-md) minmax(0, 1fr);
+  grid-template-areas:
+    'icon label'
+    'icon value';
+  align-items: center;
+  column-gap: var(--cnpm-space-3);
+  row-gap: 0;
+}
+
+.cnpm-showcase__fact-icon {
+  grid-area: icon;
+}
+
+.cnpm-showcase__fact-label {
+  grid-area: label;
+}
+
+.cnpm-showcase__fact-value {
+  grid-area: value;
+}
+
 .cnpm-showcase__tiles,
+.cnpm-showcase__projects {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .cnpm-showcase__certifications,
 .cnpm-showcase__gallery {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .cnpm-showcase__fact-icon,
@@ -298,12 +349,16 @@
   overflow-wrap: anywhere;
 }
 
+.cnpm-showcase__fact-value {
+  font-size: var(--cnpm-font-size-xs);
+}
+
 /* Zone à trois colonnes ; la dernière regroupe galerie et certifications. */
 .cnpm-showcase__columns {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) minmax(0, 0.95fr);
   align-items: start;
-  gap: var(--cnpm-space-8);
+  gap: var(--cnpm-space-3);
 }
 
 .cnpm-showcase__columns--even {
@@ -313,7 +368,7 @@
 .cnpm-showcase__aside {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-8);
+  gap: var(--cnpm-space-3);
   min-width: 0;
 }
 
@@ -429,6 +484,12 @@
   .cnpm-showcase__facts {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+  .cnpm-showcase__tiles,
+  .cnpm-showcase__projects,
+  .cnpm-showcase__certifications,
+  .cnpm-showcase__gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1023px) {
@@ -439,6 +500,9 @@
   .cnpm-showcase__name {
     font-size: var(--cnpm-font-size-4xl);
     line-height: var(--cnpm-font-lineHeight-4xl);
+  }
+  .cnpm-showcase__hero-media .cnpm-visual {
+    aspect-ratio: 16 / 9;
   }
   /* La carte flottante repasse dans le flux : superposée à un visuel étroit, elle
      déborderait et masquerait le motif. */

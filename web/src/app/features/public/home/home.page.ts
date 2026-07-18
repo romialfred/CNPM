@@ -62,7 +62,7 @@ type PageState = 'loading' | 'ready' | 'empty' | 'error';
     LucideWorkflow,
   ],
   templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss', './home.sections.scss'],
+  styleUrls: ['./home.page.scss', './home.preview.scss', './home.sections.scss'],
 })
 export class HomePage {
   private readonly gateway = inject(HOME_GATEWAY);

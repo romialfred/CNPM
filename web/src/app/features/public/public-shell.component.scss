@@ -43,7 +43,7 @@
   gap: var(--cnpm-space-6);
   width: 100%;
   max-width: var(--cnpm-size-publicMax);
-  min-height: var(--cnpm-space-20);
+  min-height: var(--cnpm-space-16);
   margin: 0 auto;
   padding: 0 var(--cnpm-layout-pagePaddingDesktop);
 }
@@ -85,17 +85,17 @@
   display: block;
   overflow: hidden;
   flex: 0 0 auto;
-  inline-size: 11.5rem;
-  block-size: 5rem;
+  inline-size: 10rem;
+  block-size: var(--cnpm-space-16);
 }
 
 .cnpm-public__logo,
 .cnpm-public__footer-logo {
   position: absolute;
-  inset-block-start: -1.9rem;
+  inset-block-start: -1.65rem;
   inset-inline-start: 0;
   display: block;
-  inline-size: 11.5rem;
+  inline-size: 10rem;
   block-size: auto;
 }
 

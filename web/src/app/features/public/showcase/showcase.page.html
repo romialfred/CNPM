@@ -636,7 +636,12 @@
           <!-- HÉRO : identité à gauche, visuel à droite. -->
           <section class="cnpm-showcase__hero" id="a-propos" aria-labelledby="nom-entreprise">
             <div class="cnpm-showcase__identity">
-              <p class="cnpm-showcase__eyebrow">Membre du CNPM</p>
+              <div class="cnpm-showcase__eyebrow-row">
+                <p class="cnpm-showcase__eyebrow">Membre du CNPM</p>
+                @if (member.isDemoContent) {
+                  <p class="cnpm-showcase__eyebrow cnpm-showcase__demo">Données de démonstration</p>
+                }
+              </div>
               <h1 class="cnpm-showcase__name" id="nom-entreprise">{{ member.name }}</h1>
               <p class="cnpm-showcase__tagline">{{ member.tagline }}</p>
               <p class="cnpm-showcase__summary">{{ member.summary }}</p>
@@ -690,29 +695,12 @@
             </div>
           </section>
 
-          @if (member.isDemoContent) {
-            <p class="cnpm-showcase__eyebrow cnpm-showcase__demo">Données de démonstration</p>
-          }
-
-          @if (sections().length) {
-            <!-- Navigation locale ancrée : les ancres pointent sur les sections
-                 réellement rendues, et le fragment rend l'URL partageable. -->
-            <nav class="cnpm-showcase__localnav" aria-label="Sections de la vitrine">
-              <ul class="cnpm-showcase__localnav-list">
-                @for (section of sections(); track section.id) {
-                  <li>
-                    <a class="cnpm-showcase__localnav-link" [href]="'#' + section.id">
-                      {{ section.label }}
-                    </a>
-                  </li>
-                }
-              </ul>
-            </nav>
-          }
-
           <!-- BANDEAU DE FAITS -->
           @if (keyFacts().length) {
-            <section class="cnpm-showcase__section" aria-labelledby="faits-cles">
+            <section
+              class="cnpm-showcase__section cnpm-showcase__section--facts"
+              aria-labelledby="faits-cles"
+            >
               <h2 class="cnpm-showcase__section-title" id="faits-cles">Faits clés</h2>
               <ul class="cnpm-showcase__facts">
                 @for (fact of keyFacts(); track fact.id) {

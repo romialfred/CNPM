@@ -92,7 +92,7 @@ export interface PublicFooterContact {
 
           <nav
             class="cnpm-public__nav cnpm-public__nav--desktop"
-            aria-label="Navigation principale"
+            [attr.aria-label]="memberBadge() ? 'Sections de la vitrine' : 'Navigation principale'"
           >
             <a
               class="cnpm-public__nav-link"
@@ -154,7 +154,10 @@ export interface PublicFooterContact {
                 </button>
               </div>
 
-              <nav class="cnpm-public__drawer-nav" aria-label="Navigation mobile">
+              <nav
+                class="cnpm-public__drawer-nav"
+                [attr.aria-label]="memberBadge() ? 'Sections de la vitrine' : 'Navigation mobile'"
+              >
                 <a class="cnpm-public__drawer-link" routerLink="/" (click)="closeMenu()">
                   <span>Accueil</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
