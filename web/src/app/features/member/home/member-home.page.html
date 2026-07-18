@@ -1,0 +1,530 @@
+<!-- Aucun shell membre n'existe : la page porte elle-même son repère de contenu
+     principal et l'unique titre de rang 1 de l'écran. -->
+<main class="cnpm-member-home" id="contenu-principal">
+  <cnpm-page-header
+    title="Espace membre"
+    description="Votre situation de cotisation, vos appels, vos reçus, vos documents et vos coordonnées."
+  />
+
+  <!-- Les données de cet écran sont des fixtures manifestement fictives. Le dire
+       explicitement évite qu'une capture de démonstration soit lue comme une
+       situation réelle d'adhérent. -->
+  <cnpm-alert tone="info" title="Environnement de démonstration">
+    Les informations affichées sont fictives et ne représentent aucune entreprise membre réelle.
+  </cnpm-alert>
+
+  @switch (state()) {
+    @case ('loading') {
+      <!-- Squelette fidèle à la structure : une carte de situation, puis un tableau.
+           Jamais de page blanche ni de spinner indéfini. -->
+      <div class="cnpm-member-home__panel">
+        <cnpm-skeleton variant="card" [rows]="4" label="Chargement de votre espace membre…" />
+        <cnpm-skeleton variant="table" [rows]="4" [columns]="7" label="" />
+      </div>
+    }
+
+    @case ('forbidden') {
+      <!-- Refus de droit : aucune relance proposée — répéter une requête que le droit
+           condamne n'aurait pas de sens. -->
+      <cnpm-error-state variant="forbidden" titleAs="h2" />
+    }
+
+    @case ('error') {
+      <cnpm-error-state
+        variant="recoverable"
+        titleAs="h2"
+        title="Votre espace membre n’a pas pu être chargé"
+        description="Le service est momentanément indisponible. Vos informations n’ont pas été modifiées."
+      >
+        <cnpm-button variant="secondary" (click)="retry()">
+          <svg lucideRefreshCw [size]="iconSize.compact"></svg>
+          Réessayer
+        </cnpm-button>
+      </cnpm-error-state>
+    }
+
+    @default {
+      @if (identity(); as member) {
+        <!-- ============ Ma situation de cotisation ============ -->
+        <section class="cnpm-member-home__block" aria-labelledby="titre-situation">
+          <h2 class="cnpm-member-home__heading" id="titre-situation">Ma situation de cotisation</h2>
+
+          <div class="cnpm-member-home__situation">
+            <div class="cnpm-member-home__identity">
+              <p class="cnpm-member-home__organization">{{ member.organization }}</p>
+              <!-- Le statut d'adhésion est porté par un libellé, jamais par la seule
+                   couleur du badge. -->
+              <cnpm-badge [tone]="membershipTone(member.status)">
+                {{ membershipLabel(member.status) }}
+              </cnpm-badge>
+              <dl class="cnpm-member-home__identity-facts">
+                <div class="cnpm-member-home__identity-fact">
+                  <dt>Numéro d’adhérent</dt>
+                  <dd>{{ member.memberCode }}</dd>
+                </div>
+                <div class="cnpm-member-home__identity-fact">
+                  <dt>Membre depuis</dt>
+                  <dd>{{ member.memberSince | date: 'd MMMM y' }}</dd>
+                </div>
+              </dl>
+            </div>
+
+            @if (situation(); as due) {
+              <div class="cnpm-member-home__due">
+                <p class="cnpm-member-home__due-label" id="libelle-reste-du">
+                  Reste dû, tous exercices confondus
+                </p>
+                <p class="cnpm-member-home__due-amount" aria-describedby="libelle-reste-du">
+                  {{ due.outstandingTotal | number: '1.0-0' }}
+                  <span class="cnpm-member-home__due-unit">FCFA</span>
+                </p>
+
+                @if (due.outstandingTotal === 0) {
+                  <p class="cnpm-member-home__due-note">
+                    Vos cotisations sont à jour. Aucun règlement n’est attendu.
+                  </p>
+                } @else {
+                  @if (due.overdueAmount > 0) {
+                    <p class="cnpm-member-home__due-flag">
+                      <cnpm-badge tone="error">Échéance dépassée</cnpm-badge>
+                      <span>
+                        {{ due.overdueAmount | number: '1.0-0' }} FCFA sont exigibles immédiatement.
+                      </span>
+                    </p>
+                  }
+                  @if (due.nextDueDate) {
+                    <p class="cnpm-member-home__due-note">
+                      Prochaine échéance : {{ due.nextDueDate | date: 'd MMMM y' }}.
+                    </p>
+                  }
+                  <div class="cnpm-member-home__action">
+                    <cnpm-button
+                      variant="primary"
+                      (click)="announceUnavailable('le paiement en ligne')"
+                    >
+                      <svg lucideCreditCard [size]="iconSize.compact"></svg>
+                      Payer maintenant
+                    </cnpm-button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <!-- ============ Mes cotisations, par exercice ============ -->
+        <section class="cnpm-member-home__block" aria-labelledby="titre-cotisations">
+          <h2 class="cnpm-member-home__heading" id="titre-cotisations">Mes cotisations</h2>
+
+          @if (exerciseTabs().length > 0) {
+            <cnpm-tabs
+              [tabs]="exerciseTabs()"
+              ariaLabel="Exercice de cotisation"
+              [selected]="selectedExercise()"
+              (selectedChange)="setExercise($event)"
+            />
+          }
+
+          <div
+            class="cnpm-member-home__panel"
+            role="tabpanel"
+            tabindex="0"
+            [attr.aria-labelledby]="'tab-' + selectedExercise()"
+          >
+            @if (exerciseSummary(); as summary) {
+              <cnpm-insight-summary
+                [title]="'Exercice ' + summary.year"
+                headingId="synthese-exercice"
+                unit="(FCFA)"
+                [stats]="exerciseStats()"
+                note="Montants de votre seule entreprise, pour l’exercice sélectionné."
+              />
+            }
+
+            <h3 class="cnpm-member-home__subheading" id="titre-appels">Appels de cotisation</h3>
+            <cnpm-data-table
+              caption="Vos appels de cotisation pour l’exercice sélectionné, avec leur échéance, le montant appelé, la part déjà réglée, le reste dû et leur statut."
+              [columns]="callColumns"
+              [rows]="calls()"
+              [state]="callsState()"
+              [rowKey]="callKey"
+            >
+              <ng-template #row let-call>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-member-home__reference">{{ call.reference }}</span>
+                </td>
+                <td class="cnpm-table__cell">{{ call.period }}</td>
+                <td class="cnpm-table__cell">{{ call.dueOn | date: 'dd/MM/y' }}</td>
+                <!-- Montants alignés à droite et en chasses tabulaires : les ordres de
+                     grandeur se comparent d'une ligne à l'autre sans effort. -->
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  <span class="cnpm-member-home__amount">{{ call.amount | number: '1.0-0' }}</span>
+                </td>
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  <span class="cnpm-member-home__amount">{{ call.settled | number: '1.0-0' }}</span>
+                </td>
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  <span class="cnpm-member-home__amount">
+                    {{ call.outstanding | number: '1.0-0' }}
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="callTone(call.status)">
+                    {{ callLabel(call.status) }}
+                  </cnpm-badge>
+                </td>
+              </ng-template>
+
+              <div data-table-status>
+                @switch (callsState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="3"
+                      [columns]="callColumns.length"
+                      label="Chargement de vos appels de cotisation…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Aucun appel de cotisation"
+                      description="Aucun appel ne vous a été adressé à ce jour."
+                    />
+                  }
+                  @case ('noResult') {
+                    <cnpm-empty-state
+                      variant="no-results"
+                      title="Aucun appel sur cet exercice"
+                      description="Choisissez un autre exercice pour consulter vos appels."
+                    />
+                  }
+                  @case ('error') {
+                    <cnpm-error-state
+                      variant="recoverable"
+                      title="Vos appels n’ont pas pu être chargés"
+                      description="Le service est momentanément indisponible."
+                    >
+                      <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                        Réessayer
+                      </cnpm-button>
+                    </cnpm-error-state>
+                  }
+                  @case ('forbidden') {
+                    <cnpm-error-state variant="forbidden" />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+
+            <h3 class="cnpm-member-home__subheading" id="titre-recus">Reçus de paiement</h3>
+            <cnpm-data-table
+              caption="Vos reçus de paiement pour l’exercice sélectionné, avec la date de règlement, la période couverte, le montant et le fichier disponible."
+              [columns]="receiptColumns"
+              [rows]="receipts()"
+              [state]="receiptsState()"
+              [rowKey]="receiptKey"
+            >
+              <ng-template #row let-receipt>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-member-home__reference">{{ receipt.reference }}</span>
+                </td>
+                <td class="cnpm-table__cell">{{ receipt.paidOn | date: 'dd/MM/y' }}</td>
+                <td class="cnpm-table__cell">{{ receipt.period }}</td>
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  <span class="cnpm-member-home__amount">
+                    {{ receipt.amount | number: '1.0-0' }}
+                  </span>
+                </td>
+                <!-- Format et poids annoncés avant le téléchargement : la fiche exige
+                     que les reçus se téléchargent « avec statut et taille ». -->
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-member-home__file">
+                    {{ receipt.fileFormat }} · {{ receipt.fileSizeKb }} Ko
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-button
+                    variant="tertiary"
+                    size="sm"
+                    [accessibleLabel]="
+                      'Télécharger le reçu ' +
+                      receipt.reference +
+                      ' — ' +
+                      receipt.fileFormat +
+                      ', ' +
+                      receipt.fileSizeKb +
+                      ' kilo-octets'
+                    "
+                    (click)="announceUnavailable('le téléchargement des reçus')"
+                  >
+                    <svg lucideFileDown [size]="iconSize.dense"></svg>
+                    Télécharger
+                  </cnpm-button>
+                </td>
+              </ng-template>
+
+              <div data-table-status>
+                @switch (receiptsState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="3"
+                      [columns]="receiptColumns.length"
+                      label="Chargement de vos reçus…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Aucun reçu disponible"
+                      description="Vos reçus apparaîtront ici dès l’enregistrement d’un premier règlement."
+                    />
+                  }
+                  @case ('noResult') {
+                    <cnpm-empty-state
+                      variant="no-results"
+                      title="Aucun reçu sur cet exercice"
+                      description="Choisissez un autre exercice pour consulter vos reçus."
+                    />
+                  }
+                  @case ('error') {
+                    <cnpm-error-state
+                      variant="recoverable"
+                      title="Vos reçus n’ont pas pu être chargés"
+                      description="Le service est momentanément indisponible."
+                    >
+                      <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                        Réessayer
+                      </cnpm-button>
+                    </cnpm-error-state>
+                  }
+                  @case ('forbidden') {
+                    <cnpm-error-state variant="forbidden" />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+          </div>
+        </section>
+
+        <!-- ============ Mes documents ============ -->
+        <section class="cnpm-member-home__block" aria-labelledby="titre-documents">
+          <h2 class="cnpm-member-home__heading" id="titre-documents">Mes documents</h2>
+
+          <cnpm-data-table
+            caption="Les documents mis à votre disposition par le CNPM, avec leur type, leur date de délivrance, leur validité et leur fichier."
+            [columns]="documentColumns"
+            [rows]="documents()"
+            [state]="documentsState()"
+            [rowKey]="documentKey"
+          >
+            <ng-template #row let-document>
+              <td class="cnpm-table__cell">
+                {{ document.name }}
+              </td>
+              <td class="cnpm-table__cell">{{ document.kind }}</td>
+              <td class="cnpm-table__cell">{{ document.issuedOn | date: 'dd/MM/y' }}</td>
+              <td class="cnpm-table__cell">
+                @if (document.expiresOn) {
+                  Jusqu’au {{ document.expiresOn | date: 'dd/MM/y' }}
+                } @else {
+                  Sans échéance
+                }
+              </td>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-member-home__file">
+                  {{ document.fileFormat }} · {{ document.fileSizeKb }} Ko
+                </span>
+              </td>
+              <td class="cnpm-table__cell">
+                <cnpm-button
+                  variant="tertiary"
+                  size="sm"
+                  [accessibleLabel]="
+                    'Télécharger ' +
+                    document.name +
+                    ' — ' +
+                    document.fileFormat +
+                    ', ' +
+                    document.fileSizeKb +
+                    ' kilo-octets'
+                  "
+                  (click)="announceUnavailable('le téléchargement des documents')"
+                >
+                  <svg lucideFileDown [size]="iconSize.dense"></svg>
+                  Télécharger
+                </cnpm-button>
+              </td>
+            </ng-template>
+
+            <div data-table-status>
+              @switch (documentsState()) {
+                @case ('loading') {
+                  <cnpm-skeleton
+                    variant="table"
+                    [rows]="3"
+                    [columns]="documentColumns.length"
+                    label="Chargement de vos documents…"
+                  />
+                }
+                @case ('empty') {
+                  <cnpm-empty-state
+                    variant="no-data"
+                    title="Aucun document"
+                    description="Aucun document n’est encore rattaché à votre dossier."
+                  />
+                }
+                @case ('error') {
+                  <cnpm-error-state
+                    variant="recoverable"
+                    title="Vos documents n’ont pas pu être chargés"
+                    description="Le service est momentanément indisponible."
+                  >
+                    <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                      Réessayer
+                    </cnpm-button>
+                  </cnpm-error-state>
+                }
+                @case ('forbidden') {
+                  <cnpm-error-state variant="forbidden" />
+                }
+              }
+            </div>
+          </cnpm-data-table>
+        </section>
+
+        <!-- ============ Mes requêtes ============ -->
+        <section class="cnpm-member-home__block" aria-labelledby="titre-requetes">
+          <div class="cnpm-member-home__block-head">
+            <h2 class="cnpm-member-home__heading" id="titre-requetes">Mes requêtes</h2>
+            <cnpm-button
+              variant="secondary"
+              size="sm"
+              (click)="announceUnavailable('le dépôt d’une requête')"
+            >
+              Déposer une requête
+            </cnpm-button>
+          </div>
+
+          <cnpm-data-table
+            caption="Les requêtes que vous avez adressées au CNPM, avec leur objet, leur date de dépôt et leur statut de traitement."
+            [columns]="requestColumns"
+            [rows]="requests()"
+            [state]="requestsState()"
+            [rowKey]="requestKey"
+          >
+            <ng-template #row let-request>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-member-home__reference">{{ request.reference }}</span>
+              </td>
+              <td class="cnpm-table__cell">{{ request.subject }}</td>
+              <td class="cnpm-table__cell">{{ request.submittedOn | date: 'dd/MM/y' }}</td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="requestTone(request.status)">
+                  {{ requestLabel(request.status) }}
+                </cnpm-badge>
+              </td>
+            </ng-template>
+
+            <div data-table-status>
+              @switch (requestsState()) {
+                @case ('loading') {
+                  <cnpm-skeleton
+                    variant="table"
+                    [rows]="2"
+                    [columns]="requestColumns.length"
+                    label="Chargement de vos requêtes…"
+                  />
+                }
+                @case ('empty') {
+                  <cnpm-empty-state
+                    variant="first-use"
+                    title="Aucune requête déposée"
+                    description="Déposez une requête pour signaler une correction ou demander un document."
+                  />
+                }
+                @case ('error') {
+                  <cnpm-error-state
+                    variant="recoverable"
+                    title="Vos requêtes n’ont pas pu être chargées"
+                    description="Le service est momentanément indisponible."
+                  >
+                    <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                      Réessayer
+                    </cnpm-button>
+                  </cnpm-error-state>
+                }
+                @case ('forbidden') {
+                  <cnpm-error-state variant="forbidden" />
+                }
+              }
+            </div>
+          </cnpm-data-table>
+        </section>
+
+        <!-- ============ Coordonnées, dossier et assistance ============ -->
+        <div class="cnpm-member-home__columns">
+          <section class="cnpm-member-home__block" aria-labelledby="titre-coordonnees">
+            <h2 class="cnpm-member-home__heading" id="titre-coordonnees">Mes coordonnées</h2>
+            <cnpm-definition-list [items]="contactFacts()" />
+            @if (contact(); as details) {
+              <p class="cnpm-member-home__note">
+                Dernière mise à jour : {{ details.updatedOn | date: 'd MMMM y' }}.
+              </p>
+            }
+            <div class="cnpm-member-home__action">
+              <cnpm-button
+                variant="secondary"
+                size="sm"
+                (click)="announceUnavailable('la mise à jour des coordonnées')"
+              >
+                Mettre à jour mes coordonnées
+              </cnpm-button>
+            </div>
+          </section>
+
+          @if (profile(); as completion) {
+            <section class="cnpm-member-home__block" aria-labelledby="titre-dossier">
+              <h2 class="cnpm-member-home__heading" id="titre-dossier">Mon dossier</h2>
+              <p class="cnpm-member-home__completion">
+                <strong>{{ completion.percent }} %</strong> de votre dossier est complété.
+              </p>
+              <!-- La barre double une information déjà écrite en toutes lettres :
+                   elle est donc décorative et retirée de l'arbre d'accessibilité. -->
+              <div class="cnpm-member-home__gauge" aria-hidden="true">
+                <span
+                  class="cnpm-member-home__gauge-fill"
+                  [style.inline-size.%]="completion.percent"
+                ></span>
+              </div>
+
+              @if (completion.missingFields.length > 0) {
+                <p class="cnpm-member-home__note" id="libelle-manquants">
+                  Éléments encore attendus :
+                </p>
+                <!-- Les champs manquants sont nommés, pas seulement comptés : sans
+                     eux, le pourcentage n'appelle aucun geste. -->
+                <ul class="cnpm-member-home__missing" aria-labelledby="libelle-manquants">
+                  @for (field of completion.missingFields; track field) {
+                    <li>{{ field }}</li>
+                  }
+                </ul>
+              } @else {
+                <p class="cnpm-member-home__note">Votre dossier est complet.</p>
+              }
+            </section>
+          }
+
+          <section class="cnpm-member-home__block" aria-labelledby="titre-assistance">
+            <h2 class="cnpm-member-home__heading" id="titre-assistance">Assistance</h2>
+            <cnpm-definition-list [items]="supportFacts()" />
+            <p class="cnpm-member-home__note">
+              Munissez-vous de votre numéro d’adhérent lors de tout échange.
+            </p>
+          </section>
+        </div>
+      }
+    }
+  }
+</main>

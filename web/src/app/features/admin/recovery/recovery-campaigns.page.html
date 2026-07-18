@@ -1,0 +1,465 @@
+<!-- Les états de la table s'appuient sur les composants du socle (FDB-005/006/007) :
+     un seul patron sert les trois vues, ce qui évite trois rédactions divergentes du
+     même message. « Base vide » et « aucun résultat » restent bien distincts — le
+     premier invite à créer, le second à élargir la recherche. -->
+<ng-template #tableStatus>
+  @switch (tableState()) {
+    @case ('loading') {
+      <cnpm-skeleton
+        variant="table"
+        [rows]="pageSize()"
+        [columns]="activeColumns().length"
+        [label]="loadingLabel()"
+      />
+    }
+    @case ('empty') {
+      <cnpm-empty-state
+        [variant]="emptyVariant()"
+        [title]="emptyTitle()"
+        [description]="emptyDescription()"
+      />
+    }
+    @case ('noResult') {
+      <cnpm-empty-state
+        variant="no-results"
+        title="Aucun résultat ne correspond"
+        description="Élargissez la recherche ou retirez un filtre."
+      >
+        <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+          Réinitialiser les filtres
+        </cnpm-button>
+      </cnpm-empty-state>
+    }
+    @case ('error') {
+      <cnpm-error-state
+        variant="recoverable"
+        title="Le suivi des relances n’a pas pu être chargé"
+        description="Le service de relance est momentanément indisponible. Vos filtres sont conservés."
+      >
+        <!-- La matrice loading-empty-error impose « réessayer » : le bouton relance le
+             chargement en place, sans recharger toute la page. -->
+        <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+      </cnpm-error-state>
+    }
+    @case ('forbidden') {
+      <!-- Aucune action « réessayer » : répéter une requête que le droit condamne n'a
+           pas de sens. L'état d'erreur en donne la raison générique. -->
+      <cnpm-error-state variant="forbidden" />
+    }
+  }
+</ng-template>
+
+<cnpm-admin-shell>
+  <div class="cnpm-recovery">
+    <cnpm-page-header
+      title="Campagnes de relance"
+      description="Concevez, planifiez et suivez les relances multicanales : segments ciblés, scénarios, canaux, diffusion et promesses de paiement obtenues."
+    >
+      <!-- Le builder en six étapes de la fiche n'est pas spécifié à ce jour : les
+           actions qui y mènent annoncent leur indisponibilité plutôt que de conduire
+           à un écran absent. -->
+      <cnpm-button variant="primary" [disabled]="true" describedBy="actions-a-venir">
+        <svg lucidePlus [size]="iconSize.compact"></svg>
+        Nouvelle campagne
+      </cnpm-button>
+      <cnpm-button variant="secondary" [disabled]="true" describedBy="actions-a-venir">
+        <svg lucideDownload [size]="iconSize.compact"></svg>
+        Exporter le suivi
+      </cnpm-button>
+      <p class="cnpm-recovery__hint" id="actions-a-venir">
+        La création de campagne et l’export du suivi ne sont pas encore disponibles.
+      </p>
+    </cnpm-page-header>
+
+    <!-- Critère d'acceptation de la fiche : « aucun envoi réel en environnement de
+         test ». L'information est portée par un texte, pas par une couleur seule. -->
+    <cnpm-alert tone="info" title="Environnement de démonstration">
+      Aucun message n’est réellement envoyé depuis cet écran. Les membres, montants et horodatages
+      affichés sont fictifs.
+    </cnpm-alert>
+
+    <div class="cnpm-recovery__layout">
+      <div class="cnpm-recovery__main">
+        <cnpm-tabs
+          ariaLabel="Vues du programme de relance"
+          [tabs]="tabs"
+          [selected]="tab()"
+          (selectedChange)="setTab($event)"
+        />
+
+        <cnpm-filter-bar
+          [expanded]="filtersExpanded()"
+          [chips]="chips()"
+          (expandedChange)="filtersExpanded.set($event)"
+          (chipRemove)="removeChip($event)"
+          (resetAll)="resetFilters()"
+        >
+          <div class="cnpm-recovery__filter">
+            <label class="cnpm-recovery__label" for="filtre-canal">Canal</label>
+            <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique
+                 avant que le `@for` n'ait créé les options, et le filtre ne se
+                 restaurerait pas au rechargement. -->
+            <select
+              id="filtre-canal"
+              class="cnpm-recovery__select"
+              name="canal"
+              [ngModel]="channel() ?? ''"
+              (ngModelChange)="setChannel($event)"
+            >
+              <option value="">Tous les canaux</option>
+              @for (value of channels; track value) {
+                <option [value]="value">{{ channelLabels[value] }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="cnpm-recovery__filter">
+            <label class="cnpm-recovery__label" for="filtre-segment">Segment cible</label>
+            <select
+              id="filtre-segment"
+              class="cnpm-recovery__select"
+              name="segment"
+              [ngModel]="segment() ?? ''"
+              (ngModelChange)="setSegment($event)"
+            >
+              <option value="">Tous les segments</option>
+              @for (value of segments(); track value) {
+                <option [value]="value">{{ value }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Le vocabulaire de statut change avec la vue : un même filtre affiché
+               pour les trois onglets proposerait des valeurs sans effet. -->
+          <div class="cnpm-recovery__filter">
+            <label class="cnpm-recovery__label" for="filtre-statut">
+              {{ statusFilterLabel() }}
+            </label>
+            <select
+              id="filtre-statut"
+              class="cnpm-recovery__select"
+              name="statut"
+              [ngModel]="status() ?? ''"
+              (ngModelChange)="setStatus($event)"
+            >
+              <option value="">Tous les statuts</option>
+              @for (option of statusOptions(); track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- `search` plutôt que `text` : le champ reçoit sa croix d'effacement
+               native et son rôle est annoncé. -->
+          <form class="cnpm-recovery__filter" role="search" (ngSubmit)="applySearch()">
+            <label class="cnpm-recovery__label" for="filtre-recherche">Recherche</label>
+            <input
+              id="filtre-recherche"
+              class="cnpm-recovery__input"
+              type="search"
+              name="recherche"
+              autocomplete="off"
+              placeholder="Référence, campagne, membre…"
+              [ngModel]="searchDraft()"
+              (ngModelChange)="searchDraft.set($event)"
+            />
+          </form>
+        </cnpm-filter-bar>
+
+        <div class="cnpm-recovery__toolbar">
+          <!-- Le fuseau est écrit une fois pour toutes : la fiche exige qu'il soit
+               explicite, et les en-têtes de colonnes le rappellent. -->
+          <p class="cnpm-recovery__timezone">
+            Dates et heures exprimées à l’heure de Bamako (Africa/Bamako, UTC+00:00).
+          </p>
+          <p class="cnpm-recovery__total">
+            @if (data()) {
+              Total&nbsp;: {{ totalItems() | number }} {{ totalLabel() }}
+            }
+          </p>
+        </div>
+
+        <div class="cnpm-recovery__panel" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
+          @switch (tab()) {
+            @case ('deliveries') {
+              <cnpm-data-table
+                [caption]="tableCaption()"
+                [columns]="deliveryColumns"
+                [rows]="deliveryRows()"
+                [state]="tableState()"
+                [sort]="sort()"
+                [rowKey]="deliveryKey"
+                [rowLabel]="deliveryLabel"
+                (sortChange)="onSortChange($event)"
+              >
+                <ng-template #row let-delivery>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__stack">
+                      <span class="cnpm-recovery__strong">{{ delivery.campaignLabel }}</span>
+                      <span class="cnpm-recovery__reference">{{ delivery.campaignReference }}</span>
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__stack">
+                      <span class="cnpm-recovery__strong">{{ delivery.organization }}</span>
+                      <span class="cnpm-recovery__meta">{{ delivery.memberCode }}</span>
+                    </span>
+                  </td>
+                  <!-- Destination partiellement masquée : un journal consulté par
+                       plusieurs profils n'a pas à exposer un contact complet. -->
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__meta">{{ delivery.destination }}</span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <cnpm-badge tone="neutral">{{ channelLabel(delivery.channel) }}</cnpm-badge>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__date">
+                      {{ delivery.sentAt | date: 'dd MMM yyyy, HH:mm' : bamakoOffset }}
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <cnpm-badge [tone]="deliveryStatusTone(delivery.status)">
+                      {{ deliveryStatusLabel(delivery.status) }}
+                    </cnpm-badge>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    @if (delivery.failureReason) {
+                      <span class="cnpm-recovery__meta">{{ delivery.failureReason }}</span>
+                    } @else {
+                      <span aria-label="Aucun motif d’échec">—</span>
+                    }
+                  </td>
+                </ng-template>
+
+                <div data-table-status>
+                  <ng-container [ngTemplateOutlet]="tableStatus" />
+                </div>
+              </cnpm-data-table>
+            }
+
+            @case ('pledges') {
+              <cnpm-data-table
+                [caption]="tableCaption()"
+                [columns]="pledgeColumns"
+                [rows]="pledgeRows()"
+                [state]="tableState()"
+                [sort]="sort()"
+                [rowKey]="pledgeKey"
+                [rowLabel]="pledgeLabel"
+                (sortChange)="onSortChange($event)"
+              >
+                <ng-template #row let-pledge>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__reference">{{ pledge.memberCode }}</span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__stack">
+                      <span class="cnpm-recovery__strong">{{ pledge.organization }}</span>
+                      <span class="cnpm-recovery__meta">{{ pledge.segment }}</span>
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__stack">
+                      <span>{{ pledge.campaignLabel }}</span>
+                      <span class="cnpm-recovery__reference">{{ pledge.campaignReference }}</span>
+                    </span>
+                  </td>
+                  <!-- Montants alignés à droite et formatés fr-ML. L'unité est portée
+                       une fois par l'en-tête, pas répétée à chaque ligne. -->
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-recovery__amount">{{ pledge.amount | number: '1.0-0' }}</span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__date">
+                      {{ pledge.dueDate | date: 'dd MMMM yyyy' : bamakoOffset }}
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <cnpm-badge [tone]="pledgeStatusTone(pledge.status)">
+                      {{ pledgeStatusLabel(pledge.status) }}
+                    </cnpm-badge>
+                  </td>
+                </ng-template>
+
+                <div data-table-status>
+                  <ng-container [ngTemplateOutlet]="tableStatus" />
+                </div>
+              </cnpm-data-table>
+            }
+
+            @default {
+              <cnpm-data-table
+                [caption]="tableCaption()"
+                [columns]="campaignColumns"
+                [rows]="campaignRows()"
+                [state]="tableState()"
+                [sort]="sort()"
+                [rowKey]="campaignKey"
+                [rowLabel]="campaignLabel"
+                (sortChange)="onSortChange($event)"
+              >
+                <ng-template #row let-campaign>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__reference">{{ campaign.reference }}</span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__stack">
+                      <span class="cnpm-recovery__strong">{{ campaign.label }}</span>
+                      <!-- « Traitement dédié » est un marqueur, pas un statut : il se
+                           lit à côté du libellé et ne s'y substitue jamais. -->
+                      @if (campaign.dedicatedToLargeContributors) {
+                        <span class="cnpm-recovery__marker">
+                          <cnpm-badge tone="neutral">Traitement grands cotisants</cnpm-badge>
+                        </span>
+                      }
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell">{{ campaign.segment }}</td>
+                  <td class="cnpm-table__cell">{{ campaign.scenario }}</td>
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__channels">
+                      @for (value of campaign.channels; track value) {
+                        <cnpm-badge tone="neutral">{{ channelLabel(value) }}</cnpm-badge>
+                      }
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    @if (campaign.scheduledAt) {
+                      <span class="cnpm-recovery__date">
+                        {{ campaign.scheduledAt | date: 'dd MMM yyyy, HH:mm' : bamakoOffset }}
+                      </span>
+                    } @else {
+                      <span class="cnpm-recovery__meta">Non planifiée</span>
+                    }
+                  </td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-recovery__amount">{{ campaign.audience | number }}</span>
+                    <span class="cnpm-recovery__note">
+                      {{ campaign.exclusions | number }} exclusion{{
+                        campaign.exclusions === 1 ? '' : 's'
+                      }}
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-recovery__amount">{{ campaign.delivered | number }}</span>
+                    <!-- Test explicite sur `null` : le cas 0 % doit rester visible,
+                         c'est justement l'information la plus utile. -->
+                    @let delivery = deliveryRate(campaign);
+                    @if (delivery !== null) {
+                      <span class="cnpm-recovery__note">
+                        {{ delivery | number: '1.0-0' }}&nbsp;% des envois
+                      </span>
+                    } @else {
+                      <span class="cnpm-recovery__note">Aucun envoi</span>
+                    }
+                  </td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    @let opening = openRate(campaign);
+                    @if (opening !== null) {
+                      <span class="cnpm-recovery__amount">{{ campaign.opened | number }}</span>
+                      <span class="cnpm-recovery__note">
+                        {{ opening | number: '1.0-0' }}&nbsp;% des e-mails délivrés
+                      </span>
+                    } @else {
+                      <!-- Une campagne SMS n'a pas un taux d'ouverture de 0 % : elle
+                           n'en a pas. Afficher « 0 % » la ferait passer pour un échec. -->
+                      <span class="cnpm-recovery__amount">—</span>
+                      <span class="cnpm-recovery__note">Non mesurable</span>
+                    }
+                  </td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-recovery__amount">{{ campaign.pledgeCount | number }}</span>
+                    @let conversion = conversionRate(campaign);
+                    @if (conversion !== null) {
+                      <span class="cnpm-recovery__note">
+                        {{ campaign.pledgedAmount | number: '1.0-0' }} FCFA ·
+                        {{ conversion | number: '1.1-1' }}&nbsp;%
+                      </span>
+                    }
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <cnpm-badge [tone]="campaignStatusTone(campaign.status)">
+                      {{ campaignStatusLabel(campaign.status) }}
+                    </cnpm-badge>
+                  </td>
+                  <!-- Actions écrites en toutes lettres : trois pictogrammes muets
+                       rendraient la colonne indéchiffrable. -->
+                  <td class="cnpm-table__cell">
+                    <span class="cnpm-recovery__actions">
+                      <cnpm-button variant="tertiary" size="sm">Voir</cnpm-button>
+                      <cnpm-button variant="tertiary" size="sm">Performance</cnpm-button>
+                    </span>
+                  </td>
+                </ng-template>
+
+                <div data-table-status>
+                  <ng-container [ngTemplateOutlet]="tableStatus" />
+                </div>
+              </cnpm-data-table>
+            }
+          }
+        </div>
+
+        @if (tableState() === 'ready') {
+          <cnpm-pagination
+            [page]="page()"
+            [pageSize]="pageSize()"
+            [totalItems]="totalItems()"
+            [pageSizeOptions]="pageSizes"
+            (pageChange)="onPageChange($event)"
+            (pageSizeChange)="onPageSizeChange($event)"
+          />
+        }
+      </div>
+
+      @if (overview(); as summary) {
+        <aside class="cnpm-recovery__aside">
+          <cnpm-insight-summary
+            title="Programme de relance"
+            headingId="synthese-programme"
+            [stats]="programStats()"
+            note="Toutes campagnes confondues, quel que soit le filtre appliqué à la vue."
+          />
+
+          <cnpm-insight-summary
+            title="Diffusion"
+            headingId="synthese-diffusion"
+            [stats]="deliveryStats()"
+            note="Délivré : message accepté par l’opérateur ou le serveur de messagerie. Ouvert : e-mail dont l’ouverture a été constatée ; l’ouverture d’un SMS n’est pas mesurable et n’entre pas au dénominateur."
+          />
+
+          <cnpm-insight-summary
+            title="Conversion"
+            headingId="synthese-conversion"
+            [stats]="conversionStats()"
+            note="Conversion : promesse de paiement enregistrée après une relance, rapportée aux membres effectivement joints. Montants en FCFA."
+          />
+
+          <!-- Contrôles que la fiche impose d'afficher avant lancement. Le builder
+               n'étant pas implémenté, ils sont rendus en lecture plutôt que passés
+               sous silence. -->
+          <cnpm-insight-summary
+            title="Contrôles avant lancement"
+            headingId="synthese-controles"
+            [stats]="controlStats()"
+            note="Cumul sur l’ensemble des campagnes. Les membres en opposition au démarchage et les doublons sont retirés de l’audience avant envoi."
+          />
+
+          @if (summary.failedDeliveries > 0) {
+            <cnpm-alert tone="warning" title="Échecs de diffusion">
+              {{ summary.failedDeliveries }} envoi{{ summary.failedDeliveries === 1 ? '' : 's' }}
+              en échec dans le journal. Une relance contrôlée doit être décidée campagne par
+              campagne.
+              <span class="cnpm-recovery__alert-action">
+                <cnpm-button variant="secondary" size="sm" (click)="showFailures()">
+                  Ouvrir le journal des échecs
+                </cnpm-button>
+              </span>
+            </cnpm-alert>
+          }
+        </aside>
+      }
+    </div>
+  </div>
+</cnpm-admin-shell>

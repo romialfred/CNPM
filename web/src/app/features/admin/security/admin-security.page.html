@@ -1,0 +1,574 @@
+<cnpm-admin-shell>
+  <div class="cnpm-security">
+    <cnpm-page-header
+      title="Administration et sécurité"
+      description="Comptes, rôles et permissions, sessions ouvertes et journal d’audit de la plateforme."
+    >
+      <!-- Invitation, suspension, réinitialisation du second facteur et révocation de
+           session sont des flux distincts, soumis à réauthentification (fiche BO-030).
+           Aucun n'est spécifié à ce jour : les commandes annoncent leur indisponibilité
+           plutôt que d'ouvrir sur un écran absent. -->
+      <cnpm-button variant="primary" [disabled]="true" [describedBy]="sensitiveHintId">
+        <svg lucideUserPlus [size]="iconSize.compact"></svg>
+        Inviter un utilisateur
+      </cnpm-button>
+      <cnpm-button variant="secondary" [disabled]="true" [describedBy]="sensitiveHintId">
+        <svg lucideKeyRound [size]="iconSize.compact"></svg>
+        Réinitialiser un second facteur
+      </cnpm-button>
+      <p class="cnpm-security__sr" [id]="sensitiveHintId">
+        Les opérations sensibles suivent un flux dédié avec réauthentification, motif obligatoire et
+        trace d’audit. Ce flux n’est pas encore disponible.
+      </p>
+    </cnpm-page-header>
+
+    <cnpm-tabs
+      [tabs]="tabs"
+      ariaLabel="Sections de l’administration et de la sécurité"
+      [selected]="activeTab()"
+      (selectedChange)="onTabChange($event)"
+    />
+
+    <div class="cnpm-security__layout">
+      <!-- Le panneau est le pendant de l'onglet sélectionné : `aria-labelledby` pointe
+           sur l'onglet actif, dont `cnpm-tabs` porte l'identifiant `tab-<id>`.
+           `tabindex` le rend atteignable au clavier après la bande d'onglets. -->
+      <div
+        class="cnpm-security__panel"
+        role="tabpanel"
+        tabindex="0"
+        [id]="'panel-' + activeTab()"
+        [attr.aria-labelledby]="'tab-' + activeTab()"
+      >
+        @if (supportsSearch()) {
+          <cnpm-filter-bar
+            [expanded]="filtersExpanded()"
+            [chips]="chips()"
+            (expandedChange)="filtersExpanded.set($event)"
+            (chipRemove)="removeChip($event)"
+            (resetAll)="resetFilters()"
+          >
+            <!-- `search` plutôt que `text` : le champ reçoit sa croix d'effacement
+                 native et son rôle est annoncé. -->
+            <form class="cnpm-security__filter" role="search" (ngSubmit)="applySearch()">
+              <label class="cnpm-security__label" for="filtre-securite">Recherche</label>
+              <input
+                id="filtre-securite"
+                class="cnpm-security__input"
+                type="search"
+                name="recherche"
+                autocomplete="off"
+                placeholder="Nom, adresse e-mail, rôle, appareil, action…"
+                [ngModel]="searchDraft()"
+                (ngModelChange)="searchDraft.set($event)"
+              />
+            </form>
+          </cnpm-filter-bar>
+        }
+
+        <!-- Le compte affiché et le compte total sont donnés ensemble : sans le second,
+             une recherche qui masque la moitié des lignes passerait pour la liste
+             complète. -->
+        <p class="cnpm-security__total">
+          @if (counts()) {
+            Affichage de {{ visibleRowCount() | number }} sur {{ totalRowCount() | number }}
+            @switch (activeTab()) {
+              @case ('comptes') {
+                {{ totalRowCount() === 1 ? 'compte' : 'comptes' }}
+              }
+              @case ('roles') {
+                {{ totalRowCount() === 1 ? 'permission' : 'permissions' }}
+              }
+              @case ('sessions') {
+                {{ totalRowCount() === 1 ? 'session' : 'sessions' }}
+              }
+              @case ('audit') {
+                {{ totalRowCount() === 1 ? 'événement' : 'événements' }}
+              }
+            }
+          }
+        </p>
+
+        @switch (activeTab()) {
+          <!-- ======================= Comptes ======================= -->
+          @case ('comptes') {
+            <cnpm-data-table
+              caption="Comptes de la plateforme, avec leur rôle, leur statut, l’état de leur second facteur, leur dernière connexion et leurs sessions ouvertes."
+              [columns]="accountColumns"
+              [rows]="accounts()"
+              [state]="tableState()"
+              [rowKey]="accountKey"
+            >
+              <ng-template #row let-account>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-security__identity">
+                    <span class="cnpm-security__identity-name">{{ account.fullName }}</span>
+                    <span class="cnpm-security__identity-detail">{{ account.email }}</span>
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">{{ account.roleLabel }}</td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="accountStatusTone(account.status)">
+                    {{ accountStatusLabel(account.status) }}
+                  </cnpm-badge>
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="twoFactorTone(account.twoFactor)">
+                    {{ twoFactorLabel(account.twoFactor) }}
+                  </cnpm-badge>
+                </td>
+                <!-- L'absence de connexion se dit « jamais connecté », pas une date
+                     nulle : un tiret seul laisserait croire à une donnée manquante. -->
+                <td class="cnpm-table__cell">
+                  @if (account.lastLoginLabel) {
+                    <time class="cnpm-security__moment" [attr.datetime]="account.lastLoginAt">
+                      {{ account.lastLoginLabel }}
+                    </time>
+                  } @else {
+                    <span class="cnpm-security__muted">Jamais connecté</span>
+                  }
+                </td>
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  <span class="cnpm-security__count">{{ account.activeSessions | number }}</span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-security__actions">
+                    <cnpm-button
+                      variant="tertiary"
+                      size="sm"
+                      [disabled]="true"
+                      [describedBy]="sensitiveHintId"
+                    >
+                      Suspendre
+                    </cnpm-button>
+                    <cnpm-button
+                      variant="tertiary"
+                      size="sm"
+                      [disabled]="true"
+                      [describedBy]="sensitiveHintId"
+                    >
+                      Réinitialiser la 2FA
+                    </cnpm-button>
+                  </span>
+                </td>
+              </ng-template>
+
+              <div data-table-status>
+                @switch (tableState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="6"
+                      [columns]="columnCount()"
+                      label="Chargement des comptes…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="first-use"
+                      title="Aucun compte enregistré"
+                      description="Aucun compte d’administration n’existe encore sur cette plateforme."
+                    />
+                  }
+                  @case ('noResult') {
+                    <cnpm-empty-state
+                      variant="no-results"
+                      title="Aucun compte ne correspond"
+                      description="Élargissez la recherche ou retirez le filtre."
+                    >
+                      <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                        Réinitialiser la recherche
+                      </cnpm-button>
+                    </cnpm-empty-state>
+                  }
+                  @case ('error') {
+                    @if (offline()) {
+                      <cnpm-error-state variant="offline">
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    } @else {
+                      <cnpm-error-state
+                        variant="recoverable"
+                        title="Les comptes n’ont pas pu être chargés"
+                        description="Le service d’administration est momentanément indisponible. Votre recherche est conservée."
+                      >
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    }
+                  }
+                  @case ('forbidden') {
+                    <!-- Aucune action « réessayer » : répéter une requête que le droit
+                         condamne n'a pas de sens. -->
+                    <cnpm-error-state variant="forbidden" />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+          }
+
+          <!-- ================ Rôles et permissions ================ -->
+          @case ('roles') {
+            <cnpm-alert tone="info" title="Matrice en lecture seule" [live]="false">
+              Les droits sont chargés depuis le backend et ne se modifient pas ici : un changement
+              de rôle passe par un flux dédié, qui montre les permissions ajoutées et retirées avant
+              confirmation. Le rôle technique ne reçoit aucun droit financier.
+            </cnpm-alert>
+
+            <cnpm-data-table
+              caption="Matrice des permissions par rôle. Chaque ligne est une permission, chaque colonne un rôle, et chaque cellule indique si le rôle est autorisé."
+              [columns]="permissionColumns()"
+              [rows]="permissions()"
+              [state]="tableState()"
+              [rowKey]="permissionKey"
+            >
+              <ng-template #row let-permission>
+                <th scope="row" class="cnpm-table__cell cnpm-security__permission-head">
+                  <span class="cnpm-security__identity">
+                    <span class="cnpm-security__identity-name">{{ permission.label }}</span>
+                    <span class="cnpm-security__identity-detail">{{ permission.domain }}</span>
+                  </span>
+                </th>
+                <!-- Le statut n'est jamais porté par la seule couleur : la forme du
+                     pictogramme distingue déjà les deux cas, et chaque cellule porte un
+                     texte lu par les technologies d'assistance. Une case cochée sans
+                     libellé serait indéchiffrable hors du contexte visuel. -->
+                @for (grant of permission.grants; track grant.roleId) {
+                  <td class="cnpm-table__cell cnpm-security__grant">
+                    @if (grant.granted) {
+                      <svg
+                        lucideCheck
+                        class="cnpm-security__grant-yes"
+                        [size]="iconSize.compact"
+                        aria-hidden="true"
+                      ></svg>
+                    } @else {
+                      <svg
+                        lucideMinus
+                        class="cnpm-security__grant-no"
+                        [size]="iconSize.compact"
+                        aria-hidden="true"
+                      ></svg>
+                    }
+                    <span class="cnpm-security__sr">
+                      {{ grant.roleLabel }} : {{ grant.granted ? 'autorisé' : 'non autorisé' }}
+                    </span>
+                  </td>
+                }
+              </ng-template>
+
+              <div data-table-status>
+                @switch (tableState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="8"
+                      [columns]="columnCount()"
+                      label="Chargement de la matrice des permissions…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Aucune permission publiée"
+                      description="Le référentiel des rôles et permissions n’est pas encore alimenté."
+                    />
+                  }
+                  @case ('noResult') {
+                    <cnpm-empty-state
+                      variant="no-results"
+                      title="Aucune permission ne correspond"
+                      description="Élargissez la recherche ou retirez le filtre."
+                    />
+                  }
+                  @case ('error') {
+                    @if (offline()) {
+                      <cnpm-error-state variant="offline">
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    } @else {
+                      <cnpm-error-state
+                        variant="recoverable"
+                        title="La matrice n’a pas pu être chargée"
+                        description="Le référentiel des permissions est momentanément indisponible."
+                      >
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    }
+                  }
+                  @case ('forbidden') {
+                    <cnpm-error-state variant="forbidden" />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+
+            <!-- La légende explicite les deux pictogrammes de la matrice. Sans elle,
+                 la lecture repose sur une convention implicite. -->
+            @if (tableState() === 'ready') {
+              <p class="cnpm-security__legend">
+                <span class="cnpm-security__legend-item">
+                  <svg
+                    lucideCheck
+                    class="cnpm-security__grant-yes"
+                    [size]="iconSize.compact"
+                    aria-hidden="true"
+                  ></svg>
+                  Autorisé
+                </span>
+                <span class="cnpm-security__legend-item">
+                  <svg
+                    lucideMinus
+                    class="cnpm-security__grant-no"
+                    [size]="iconSize.compact"
+                    aria-hidden="true"
+                  ></svg>
+                  Non autorisé
+                </span>
+              </p>
+
+              <h2 class="cnpm-security__subtitle">Rôles de la plateforme</h2>
+              <ul class="cnpm-security__roles">
+                @for (role of roles(); track role.id) {
+                  <li class="cnpm-security__role">
+                    <p class="cnpm-security__role-name">{{ role.label }}</p>
+                    <p class="cnpm-security__role-description">{{ role.description }}</p>
+                    <p class="cnpm-security__role-count">
+                      {{ role.accounts | number }}
+                      {{ role.accounts === 1 ? 'compte rattaché' : 'comptes rattachés' }}
+                    </p>
+                  </li>
+                }
+              </ul>
+            }
+          }
+
+          <!-- ======================= Sessions ====================== -->
+          @case ('sessions') {
+            <cnpm-data-table
+              caption="Sessions ouvertes sur la plateforme, avec l’utilisateur, l’appareil, la localisation approximative, l’ouverture, la dernière activité et le statut."
+              [columns]="sessionColumns"
+              [rows]="sessions()"
+              [state]="tableState()"
+              [rowKey]="sessionKey"
+            >
+              <ng-template #row let-session>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-security__identity">
+                    <span class="cnpm-security__identity-name">{{ session.accountName }}</span>
+                    <span class="cnpm-security__identity-detail">{{ session.accountEmail }}</span>
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-security__device">{{ session.device }}</span>
+                  <!-- La session courante est signalée : la révoquer déconnecterait
+                       l'opérateur qui consulte cet écran. -->
+                  @if (session.current) {
+                    <cnpm-badge tone="info">Session courante</cnpm-badge>
+                  }
+                </td>
+                <td class="cnpm-table__cell">{{ session.location }}</td>
+                <td class="cnpm-table__cell">{{ session.startedAtLabel }}</td>
+                <td class="cnpm-table__cell">
+                  <time class="cnpm-security__moment" [attr.datetime]="session.lastSeenAt">
+                    {{ session.lastSeenAtLabel }}
+                  </time>
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="sessionStatusTone(session.status)">
+                    {{ sessionStatusLabel(session.status) }}
+                  </cnpm-badge>
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-button
+                    variant="tertiary"
+                    size="sm"
+                    [disabled]="true"
+                    [describedBy]="sensitiveHintId"
+                  >
+                    Révoquer
+                  </cnpm-button>
+                </td>
+              </ng-template>
+
+              <div data-table-status>
+                @switch (tableState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="5"
+                      [columns]="columnCount()"
+                      label="Chargement des sessions…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Aucune session ouverte"
+                      description="Aucun compte n’a de session en cours sur la plateforme."
+                    />
+                  }
+                  @case ('noResult') {
+                    <cnpm-empty-state
+                      variant="no-results"
+                      title="Aucune session ne correspond"
+                      description="Élargissez la recherche ou retirez le filtre."
+                    >
+                      <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                        Réinitialiser la recherche
+                      </cnpm-button>
+                    </cnpm-empty-state>
+                  }
+                  @case ('error') {
+                    @if (offline()) {
+                      <cnpm-error-state variant="offline">
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    } @else {
+                      <cnpm-error-state
+                        variant="recoverable"
+                        title="Les sessions n’ont pas pu être chargées"
+                        description="Le service des sessions est momentanément indisponible."
+                      >
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    }
+                  }
+                  @case ('forbidden') {
+                    <cnpm-error-state variant="forbidden" />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+          }
+
+          <!-- ==================== Journal d’audit =================== -->
+          @case ('audit') {
+            <cnpm-alert tone="info" title="Journal immuable" [live]="false">
+              Les événements sont ajoutés et jamais modifiés ni supprimés. La recherche filtre
+              l’affichage ; elle ne retire aucune trace.
+            </cnpm-alert>
+
+            <cnpm-data-table
+              caption="Journal d’audit de l’administration, du plus récent au plus ancien, avec l’acteur, l’action, l’objet, le résultat et l’identifiant de corrélation."
+              [columns]="auditColumns"
+              [rows]="audit()"
+              [state]="tableState()"
+              [rowKey]="auditKey"
+            >
+              <ng-template #row let-entry>
+                <td class="cnpm-table__cell">
+                  <time class="cnpm-security__moment" [attr.datetime]="entry.occurredAt">
+                    {{ entry.occurredAtLabel }}
+                  </time>
+                </td>
+                <td class="cnpm-table__cell">{{ entry.actor }}</td>
+                <td class="cnpm-table__cell">{{ entry.action }}</td>
+                <td class="cnpm-table__cell">{{ entry.target }}</td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="auditOutcomeTone(entry.outcome)">
+                    {{ auditOutcomeLabel(entry.outcome) }}
+                  </cnpm-badge>
+                </td>
+                <!-- Identifiant de corrélation : il relie les traces entre services.
+                     Ce n'est pas un jeton et il n'authentifie rien. -->
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-security__correlation">{{ entry.correlationId }}</span>
+                </td>
+              </ng-template>
+
+              <div data-table-status>
+                @switch (tableState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="8"
+                      [columns]="columnCount()"
+                      label="Chargement du journal d’audit…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Aucun événement enregistré"
+                      description="Le journal d’audit ne contient encore aucune trace."
+                    />
+                  }
+                  @case ('noResult') {
+                    <cnpm-empty-state
+                      variant="no-results"
+                      title="Aucun événement ne correspond"
+                      description="Élargissez la recherche ou retirez le filtre."
+                    >
+                      <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                        Réinitialiser la recherche
+                      </cnpm-button>
+                    </cnpm-empty-state>
+                  }
+                  @case ('error') {
+                    @if (offline()) {
+                      <cnpm-error-state variant="offline">
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    } @else {
+                      <cnpm-error-state
+                        variant="recoverable"
+                        title="Le journal n’a pas pu être chargé"
+                        description="Le service d’audit est momentanément indisponible. Votre recherche est conservée."
+                      >
+                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                          Réessayer
+                        </cnpm-button>
+                      </cnpm-error-state>
+                    }
+                  }
+                  @case ('forbidden') {
+                    <cnpm-error-state variant="forbidden" />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+          }
+        }
+      </div>
+
+      <!-- Panneau de synthèse. Ses chiffres viennent de la même source que les
+           tableaux ; aucun n'est recalculé ici. -->
+      @if (data()) {
+        <aside class="cnpm-security__aside">
+          <cnpm-insight-summary
+            title="Posture des comptes"
+            headingId="synthese-securite"
+            [stats]="postureStats()"
+            note="Comptes actifs, suspendus et invités composent les comptes ouverts. Les sessions expirées ne sont pas comptées comme ouvertes."
+          />
+
+          <section class="cnpm-security__card" aria-labelledby="politique-securite">
+            <h2 class="cnpm-security__card-title" id="politique-securite">Politique appliquée</h2>
+            <cnpm-definition-list [items]="policy()" />
+            <!-- La politique réelle n'est pas arbitrée : `CLAUDE.md` interdit d'inventer
+                 une règle, et `documentation.md` impose de marquer toute hypothèse. -->
+            <p class="cnpm-security__card-note">
+              Valeurs de démonstration, à confirmer par la politique de sécurité approuvée. Aucun
+              mot de passe, jeton, code à usage unique ni empreinte de session n’est affiché sur cet
+              écran.
+            </p>
+          </section>
+        </aside>
+      }
+    </div>
+  </div>
+</cnpm-admin-shell>

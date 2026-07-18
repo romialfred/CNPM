@@ -1,0 +1,585 @@
+<cnpm-admin-shell>
+  <div class="cnpm-reconciliation">
+    <cnpm-page-header
+      title="Rapprochement des paiements"
+      description="Rapprochez les encaissements des cotisations attendues, puis transmettez-les pour confirmation."
+    >
+      <!-- Aucune action primaire ici : la seule action dominante de l'écran est
+           « Rapprocher », dans le panneau. Deux primaires dans deux zones voisines
+           feraient hésiter sur celle qui engage réellement l'écriture. -->
+      <cnpm-button variant="secondary" (click)="refresh()">
+        <svg lucideRefreshCw [size]="iconSize.compact"></svg>
+        Actualiser la file
+      </cnpm-button>
+      <cnpm-button variant="secondary" [disabled]="true" describedBy="export-a-venir">
+        <svg lucideDownload [size]="iconSize.compact"></svg>
+        Exporter le relevé
+      </cnpm-button>
+      <p class="cnpm-reconciliation__sr-hint" id="export-a-venir">
+        L’export du relevé n’est pas encore disponible.
+      </p>
+    </cnpm-page-header>
+
+    <!-- Les onglets de la fiche nomment « Paiements / Rapprochement / Reçus ». Les
+         reçus relèvent d'un autre écran, et un onglet qui ne mène nulle part est un
+         défaut, pas un espace réservé. Les onglets segmentent donc la même file selon
+         l'état d'avancement, ce qui est l'usage réel de cet écran. -->
+    <cnpm-tabs
+      [tabs]="queues"
+      ariaLabel="Files de rapprochement"
+      [selected]="queue()"
+      (selectedChange)="setQueue($event)"
+    />
+
+    @if (feedback(); as message) {
+      <cnpm-alert [tone]="message.tone" [title]="message.title">{{ message.body }}</cnpm-alert>
+    }
+
+    <div
+      class="cnpm-reconciliation__layout"
+      role="tabpanel"
+      [id]="'panel-' + queue()"
+      [attr.aria-labelledby]="'tab-' + queue()"
+    >
+      <section class="cnpm-reconciliation__list" aria-labelledby="titre-file">
+        <h2 class="cnpm-reconciliation__section-title" id="titre-file">Lignes de relevé</h2>
+
+        <cnpm-filter-bar
+          [expanded]="filtersExpanded()"
+          [chips]="chips()"
+          (expandedChange)="filtersExpanded.set($event)"
+          (chipRemove)="removeChip($event)"
+          (resetAll)="resetFilters()"
+        >
+          <div class="cnpm-reconciliation__filter">
+            <label class="cnpm-reconciliation__label" for="filtre-canal">Canal</label>
+            <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique
+                 avant que le `@for` n'ait créé les options, et le filtre ne se
+                 restaure pas au rechargement. -->
+            <select
+              id="filtre-canal"
+              class="cnpm-reconciliation__select"
+              name="canal"
+              [ngModel]="channel() ?? ''"
+              (ngModelChange)="setChannel($event)"
+            >
+              <option value="">Tous les canaux</option>
+              @for (value of channels(); track value) {
+                <option [value]="value">{{ channelLabels[value] }}</option>
+              }
+            </select>
+          </div>
+
+          <form class="cnpm-reconciliation__filter" role="search" (ngSubmit)="applySearch()">
+            <label class="cnpm-reconciliation__label" for="filtre-recherche">Recherche</label>
+            <input
+              id="filtre-recherche"
+              class="cnpm-reconciliation__input"
+              type="search"
+              name="recherche"
+              autocomplete="off"
+              placeholder="Référence, payeur, n° de transaction…"
+              [ngModel]="searchDraft()"
+              (ngModelChange)="searchDraft.set($event)"
+            />
+          </form>
+        </cnpm-filter-bar>
+
+        <div class="cnpm-reconciliation__toolbar">
+          <cnpm-bulk-action-bar [selectedCount]="selected().size">
+            <!-- Le lot ne vise que les correspondances au-dessus du seuil : rapprocher
+                 en masse des scores moyens produirait des écritures financières que
+                 personne n'a examinées une à une. -->
+            <cnpm-button
+              variant="secondary"
+              size="sm"
+              describedBy="lot-condition"
+              [disabled]="autoMatchable().length === 0"
+              [loading]="submitting()"
+              (click)="reconcileSelected()"
+            >
+              Rapprocher les correspondances sûres ({{ autoMatchable().length }})
+            </cnpm-button>
+            <cnpm-button variant="tertiary" size="sm" (click)="clearSelection()">
+              Effacer la sélection
+            </cnpm-button>
+          </cnpm-bulk-action-bar>
+
+          <p class="cnpm-reconciliation__total">
+            @if (tableState() === 'ready' || tableState() === 'noResult') {
+              Total&nbsp;: {{ totalItems() | number }}
+              {{ totalItems() === 1 ? 'ligne' : 'lignes' }}
+            }
+          </p>
+        </div>
+
+        <p class="cnpm-reconciliation__hint" id="lot-condition">
+          Seules les lignes non rapprochées dont la correspondance atteint
+          {{ autoMatchThreshold }}&nbsp;% de confiance sont traitées en lot.
+        </p>
+
+        <cnpm-data-table
+          caption="Lignes de relevé à rapprocher, avec leur montant, canal, statut, correspondance proposée et date de valeur."
+          [columns]="columns"
+          [rows]="lines()"
+          [state]="tableState()"
+          [sort]="sort()"
+          [selectable]="true"
+          [selectedKeys]="selected()"
+          [rowKey]="rowKey"
+          [rowLabel]="rowLabel"
+          (sortChange)="onSortChange($event)"
+          (rowToggle)="toggleRow($event)"
+          (allToggle)="toggleAll($event)"
+        >
+          <ng-template #row let-line>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-reconciliation__reference">{{ line.reference }}</span>
+              <!-- La ligne ouverte dans le panneau est signalée par un mot, pas par une
+                   nuance de fond : un état porté par la seule couleur ne se lit pas. -->
+              @if (line.id === examinedId()) {
+                <span class="cnpm-reconciliation__examined">Ligne examinée</span>
+              }
+            </td>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-reconciliation__payer">{{ line.payer }}</span>
+              <span class="cnpm-reconciliation__meta">{{ line.transactionReference }}</span>
+            </td>
+            <!-- Montants alignés à droite et en chasses tabulaires : l'unité est portée
+                 une fois par l'en-tête, pas répétée à chaque ligne. -->
+            <td class="cnpm-table__cell cnpm-table__cell--end">
+              <span class="cnpm-reconciliation__amount">{{ line.amount | number: '1.0-0' }}</span>
+            </td>
+            <td class="cnpm-table__cell">
+              <cnpm-badge tone="neutral">{{ channelLabel(line.channel) }}</cnpm-badge>
+            </td>
+            <td class="cnpm-table__cell">
+              <cnpm-badge [tone]="statusTone(line.status)">
+                {{ statusLabel(line.status) }}
+              </cnpm-badge>
+            </td>
+            <td class="cnpm-table__cell">
+              @if (line.suggestions.length === 0) {
+                <span class="cnpm-reconciliation__meta">Aucune correspondance</span>
+              } @else {
+                <span class="cnpm-reconciliation__match">
+                  <span class="cnpm-reconciliation__match-name">
+                    {{ line.suggestions[0].memberName }}
+                  </span>
+                  <!-- Le score est doublé d'un qualificatif : « 74 » seul ne dit pas
+                       s'il faut vérifier avant d'écrire. -->
+                  <cnpm-badge [tone]="confidenceTone(line.suggestions[0].score)">
+                    {{ confidenceLabel(line.suggestions[0].score) }} —
+                    {{ line.suggestions[0].score }}&nbsp;%
+                  </cnpm-badge>
+                </span>
+              }
+            </td>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-reconciliation__meta">
+                {{ line.valueDate | date: 'dd/MM/yyyy HH:mm' : 'UTC' }}
+              </span>
+            </td>
+            <td class="cnpm-table__cell">
+              <cnpm-button
+                variant="tertiary"
+                size="sm"
+                [accessibleLabel]="'Examiner la ligne ' + line.reference"
+                (click)="examine(line)"
+              >
+                Examiner
+              </cnpm-button>
+            </td>
+          </ng-template>
+
+          <!-- Les états s'appuient sur les composants du socle (FDB-005/006/007).
+               « File vide » et « aucun résultat » restent distincts : le premier
+               constate qu'il n'y a rien à traiter, le second invite à élargir. -->
+          <div data-table-status>
+            @switch (tableState()) {
+              @case ('loading') {
+                <cnpm-skeleton
+                  variant="table"
+                  [rows]="pageSize()"
+                  [columns]="columns.length"
+                  label="Chargement des lignes de relevé…"
+                />
+              }
+              @case ('empty') {
+                <cnpm-empty-state
+                  variant="no-data"
+                  title="Aucune ligne dans cette file"
+                  description="Toutes les lignes de cette file ont été traitées. Les nouveaux encaissements apparaîtront ici."
+                />
+              }
+              @case ('noResult') {
+                <cnpm-empty-state
+                  variant="no-results"
+                  title="Aucune ligne ne correspond"
+                  description="Élargissez la recherche ou retirez un filtre."
+                >
+                  <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                    Réinitialiser les filtres
+                  </cnpm-button>
+                </cnpm-empty-state>
+              }
+              @case ('error') {
+                <cnpm-error-state
+                  variant="recoverable"
+                  title="La file n’a pas pu être chargée"
+                  description="Le service des paiements est momentanément indisponible. Vos filtres sont conservés."
+                >
+                  <cnpm-button variant="secondary" size="sm" (click)="refresh()">
+                    Réessayer
+                  </cnpm-button>
+                </cnpm-error-state>
+              }
+              @case ('forbidden') {
+                <!-- Aucun « réessayer » : répéter une requête que le droit condamne
+                     n'a pas de sens. -->
+                <cnpm-error-state variant="forbidden" />
+              }
+            }
+          </div>
+        </cnpm-data-table>
+
+        @if (tableState() === 'ready') {
+          <cnpm-pagination
+            [page]="page()"
+            [pageSize]="pageSize()"
+            [totalItems]="totalItems()"
+            [pageSizeOptions]="pageSizes"
+            (pageChange)="onPageChange($event)"
+            (pageSizeChange)="onPageSizeChange($event)"
+          />
+        }
+      </section>
+
+      <aside class="cnpm-reconciliation__aside">
+        @if (overview()) {
+          <cnpm-insight-summary
+            title="File de rapprochement"
+            headingId="synthese-rapprochement"
+            [stats]="queueStats()"
+            note="Compteurs portant sur l’ensemble des encaissements, filtres exclus. Le montant à affecter ne concerne que les lignes non rapprochées."
+          />
+        }
+
+        <section class="cnpm-reconciliation__panel" aria-labelledby="titre-rapprochement">
+          <h2 class="cnpm-reconciliation__section-title" id="titre-rapprochement">Rapprochement</h2>
+
+          @if (tableState() === 'loading') {
+            <cnpm-skeleton variant="card" [rows]="4" label="Chargement du rapprochement…" />
+          } @else if (tableState() === 'error' || tableState() === 'forbidden') {
+            <p class="cnpm-reconciliation__panel-note">
+              Le panneau de rapprochement reprendra dès que la file sera de nouveau accessible.
+            </p>
+          } @else {
+            @if (examined(); as line) {
+              <!-- Sélection immuable : le détail de l'encaissement est rendu en lecture
+                   seule. Ce qui vient de la banque ou de l'opérateur ne se corrige pas
+                   depuis cet écran. -->
+              <cnpm-definition-list [items]="paymentDetails()" />
+
+              <p class="cnpm-reconciliation__panel-amount">
+                <span class="cnpm-reconciliation__panel-amount-label">Montant encaissé</span>
+                <span class="cnpm-reconciliation__amount">
+                  {{ line.amount | number: '1.0-0' }} FCFA
+                </span>
+                <span class="cnpm-reconciliation__meta">
+                  le {{ line.valueDate | date: 'dd/MM/yyyy HH:mm' : 'UTC' }}
+                </span>
+              </p>
+
+              <p class="cnpm-reconciliation__panel-status">
+                <cnpm-badge [tone]="statusTone(line.status)">
+                  {{ statusLabel(line.status) }}
+                </cnpm-badge>
+              </p>
+
+              @switch (line.status) {
+                @case ('UNMATCHED') {
+                  <cnpm-inline-error-summary [errors]="formErrors()" />
+
+                  <form
+                    class="cnpm-reconciliation__form"
+                    [formGroup]="form"
+                    (ngSubmit)="reconcileExamined()"
+                    novalidate
+                  >
+                    @if (suggestions().length === 0) {
+                      <cnpm-alert tone="warning" title="Aucune correspondance proposée">
+                        Aucune cotisation ouverte ne correspond à cet encaissement. Signalez une
+                        anomalie plutôt que de forcer une affectation.
+                      </cnpm-alert>
+                    } @else {
+                      <!-- `tabindex="-1"` : le résumé d'erreurs renvoie le focus ici, et
+                           un groupe de champs n'est pas focalisable par défaut. -->
+                      <fieldset
+                        class="cnpm-reconciliation__fieldset"
+                        [id]="suggestionFieldId"
+                        tabindex="-1"
+                      >
+                        <legend class="cnpm-reconciliation__legend">
+                          Correspondances proposées
+                        </legend>
+
+                        @for (suggestion of suggestions(); track suggestion.id) {
+                          <label class="cnpm-reconciliation__option">
+                            <input
+                              class="cnpm-reconciliation__radio"
+                              type="radio"
+                              formControlName="suggestionId"
+                              [value]="suggestion.id"
+                            />
+                            <span class="cnpm-reconciliation__option-body">
+                              <span class="cnpm-reconciliation__option-title">
+                                {{ suggestion.memberName }}
+                                <span class="cnpm-reconciliation__code">
+                                  {{ suggestion.memberCode }}
+                                </span>
+                              </span>
+                              <span class="cnpm-reconciliation__meta">
+                                {{ suggestion.contributionLabel }} — {{ suggestion.period }}
+                              </span>
+                              <span class="cnpm-reconciliation__meta">
+                                Montant attendu&nbsp;:
+                                {{ suggestion.expectedAmount | number: '1.0-0' }} FCFA
+                              </span>
+                              <cnpm-badge [tone]="confidenceTone(suggestion.score)">
+                                {{ confidenceLabel(suggestion.score) }} —
+                                {{ suggestion.score }}&nbsp;%
+                              </cnpm-badge>
+                              <!-- Le score s'explique : un rapprochement qu'on ne peut
+                                   pas contester ne peut pas être audité. -->
+                              <ul class="cnpm-reconciliation__reasons">
+                                @for (reason of suggestion.reasons; track reason) {
+                                  <li>{{ reason }}</li>
+                                }
+                              </ul>
+                            </span>
+                          </label>
+                        }
+                      </fieldset>
+
+                      <fieldset class="cnpm-reconciliation__fieldset">
+                        <legend class="cnpm-reconciliation__legend">Mode d’affectation</legend>
+                        <label class="cnpm-reconciliation__choice">
+                          <input
+                            class="cnpm-reconciliation__radio"
+                            type="radio"
+                            formControlName="allocationMode"
+                            value="complete"
+                          />
+                          <span>Affectation complète</span>
+                        </label>
+                        <label class="cnpm-reconciliation__choice">
+                          <input
+                            class="cnpm-reconciliation__radio"
+                            type="radio"
+                            formControlName="allocationMode"
+                            value="partial"
+                          />
+                          <span>Affectation partielle</span>
+                        </label>
+                      </fieldset>
+
+                      <!-- En affectation complète, aucun champ de montant n'est rendu :
+                           un champ qui paraît modifiable mais ne serait pas lu induirait
+                           en erreur sur une écriture financière. -->
+                      @if (allocationMode() === 'partial') {
+                        <div class="cnpm-reconciliation__field">
+                          <label class="cnpm-reconciliation__label" [for]="amountFieldId">
+                            Montant à affecter (FCFA)
+                          </label>
+                          <input
+                            class="cnpm-reconciliation__input"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            formControlName="allocatedAmount"
+                            [id]="amountFieldId"
+                            [attr.aria-describedby]="amountFieldId + '-aide'"
+                          />
+                          <p class="cnpm-reconciliation__field-hint" [id]="amountFieldId + '-aide'">
+                            Entier, sans décimale ; au plus le montant encaissé. Le montant est
+                            vérifié par le serveur avant écriture.
+                          </p>
+                        </div>
+                      } @else {
+                        <p class="cnpm-reconciliation__field-hint">
+                          L’intégralité de l’encaissement, soit
+                          {{ line.amount | number: '1.0-0' }} FCFA, sera affectée à la cotisation
+                          choisie.
+                        </p>
+                      }
+
+                      <p class="cnpm-reconciliation__balance">
+                        @if (remainder() === null) {
+                          <span>Solde à affecter&nbsp;: montant saisi illisible.</span>
+                        } @else {
+                          <span>
+                            Solde à affecter après l’opération&nbsp;:
+                            <strong class="cnpm-reconciliation__amount">
+                              {{ remainder() | number: '1.0-0' }} FCFA
+                            </strong>
+                          </span>
+                        }
+                      </p>
+                    }
+
+                    <div class="cnpm-reconciliation__field">
+                      <label class="cnpm-reconciliation__label" [for]="commentFieldId">
+                        Commentaire
+                      </label>
+                      <textarea
+                        class="cnpm-reconciliation__textarea"
+                        rows="3"
+                        formControlName="comment"
+                        [id]="commentFieldId"
+                        [attr.aria-describedby]="commentFieldId + '-aide'"
+                      ></textarea>
+                      <p class="cnpm-reconciliation__field-hint" [id]="commentFieldId + '-aide'">
+                        Facultatif pour un rapprochement, obligatoire pour signaler une anomalie.
+                      </p>
+                    </div>
+
+                    <div class="cnpm-reconciliation__actions">
+                      @if (suggestions().length > 0) {
+                        <!-- Le bouton reste focalisable pendant l'envoi (`aria-busy`) et
+                             la source rejoue la même clé d'idempotence : un double clic
+                             ne crée pas de seconde écriture. -->
+                        <cnpm-button type="submit" variant="primary" [loading]="submitting()">
+                          Rapprocher
+                        </cnpm-button>
+                      }
+                      <cnpm-button variant="tertiary" (click)="closePanel()">
+                        Fermer le panneau
+                      </cnpm-button>
+                    </div>
+
+                    <section class="cnpm-reconciliation__anomaly" aria-labelledby="titre-anomalie">
+                      <h3 class="cnpm-reconciliation__subtitle" id="titre-anomalie">
+                        Signaler une anomalie
+                      </h3>
+
+                      <div class="cnpm-reconciliation__field">
+                        <label class="cnpm-reconciliation__label" [for]="anomalyFieldId">
+                          Type d’anomalie
+                        </label>
+                        <select
+                          class="cnpm-reconciliation__select"
+                          formControlName="anomalyType"
+                          [id]="anomalyFieldId"
+                        >
+                          <option value="">Choisir un type</option>
+                          @for (type of anomalyTypes; track type) {
+                            <option [value]="type">{{ anomalyLabels[type] }}</option>
+                          }
+                        </select>
+                      </div>
+
+                      <!-- `type="button"` : cette action ne doit jamais partir avec la
+                           soumission du formulaire de rapprochement. -->
+                      <cnpm-button
+                        type="button"
+                        variant="danger"
+                        [loading]="submitting()"
+                        (click)="reportAnomaly()"
+                      >
+                        Signaler l’anomalie
+                      </cnpm-button>
+                    </section>
+                  </form>
+                }
+
+                @case ('TO_CONFIRM') {
+                  <cnpm-alert tone="info" title="En attente de confirmation">
+                    La séparation des tâches impose qu’un second agent confirme ce rapprochement.
+                    L’agent qui l’a enregistré ne peut pas le confirmer lui-même.
+                  </cnpm-alert>
+                  <cnpm-definition-list [items]="allocationDetails()" />
+                  <div class="cnpm-reconciliation__actions">
+                    <cnpm-button
+                      variant="primary"
+                      [disabled]="true"
+                      describedBy="confirmation-a-venir"
+                    >
+                      Confirmer le paiement
+                    </cnpm-button>
+                    <cnpm-button variant="tertiary" (click)="closePanel()">
+                      Fermer le panneau
+                    </cnpm-button>
+                  </div>
+                  <p class="cnpm-reconciliation__field-hint" id="confirmation-a-venir">
+                    La confirmation sera activée avec la session réelle et le second rôle habilité ;
+                    le contrôle reste porté par le backend (ADR-008).
+                  </p>
+                }
+
+                @case ('MATCHED') {
+                  <cnpm-alert tone="success" title="Paiement rapproché et confirmé">
+                    L’affectation est enregistrée. L’émission du reçu officiel relève de l’écran des
+                    reçus.
+                  </cnpm-alert>
+                  <cnpm-definition-list [items]="allocationDetails()" />
+                  <div class="cnpm-reconciliation__actions">
+                    <cnpm-button variant="tertiary" (click)="closePanel()">
+                      Fermer le panneau
+                    </cnpm-button>
+                  </div>
+                }
+
+                @case ('ANOMALY') {
+                  <cnpm-alert tone="error" title="Anomalie signalée">
+                    Cette ligne est sortie de la file de rapprochement. Elle reste tracée dans la
+                    piste d’audit et ne peut pas être affectée en l’état.
+                  </cnpm-alert>
+                  <div class="cnpm-reconciliation__actions">
+                    <cnpm-button variant="tertiary" (click)="closePanel()">
+                      Fermer le panneau
+                    </cnpm-button>
+                  </div>
+                }
+              }
+            } @else {
+              <cnpm-empty-state
+                variant="no-data"
+                title="Aucune ligne examinée"
+                description="Choisissez « Examiner » sur une ligne du relevé pour afficher les correspondances proposées."
+              />
+            }
+          }
+        </section>
+
+        <!-- Piste d'audit sous le formulaire, comme l'impose la fiche : acteur,
+             horodatage et résultat. Un journal qui n'énonce pas son résultat ne
+             prouve rien. -->
+        <section class="cnpm-reconciliation__audit" aria-labelledby="titre-audit">
+          <h2 class="cnpm-reconciliation__section-title" id="titre-audit">Piste d’audit</h2>
+
+          @if (tableState() === 'loading') {
+            <cnpm-skeleton variant="text" [rows]="3" label="Chargement de la piste d’audit…" />
+          } @else if (auditTrail().length === 0) {
+            <p class="cnpm-reconciliation__panel-note">Aucune action enregistrée sur cette file.</p>
+          } @else {
+            <ol class="cnpm-reconciliation__audit-list">
+              @for (entry of auditTrail(); track entry.id) {
+                <li class="cnpm-reconciliation__audit-item">
+                  <p class="cnpm-reconciliation__audit-action">{{ entry.action }}</p>
+                  <p class="cnpm-reconciliation__audit-meta">
+                    <span>{{ entry.actor }}</span>
+                    <span>{{ entry.occurredAt | date: 'dd/MM/yyyy HH:mm' : 'UTC' }}</span>
+                    <cnpm-badge [tone]="outcomeTone(entry.outcome)">
+                      {{ outcomeLabel(entry.outcome) }}
+                    </cnpm-badge>
+                  </p>
+                </li>
+              }
+            </ol>
+          }
+        </section>
+      </aside>
+    </div>
+  </div>
+</cnpm-admin-shell>

@@ -1,0 +1,323 @@
+.cnpm-member {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+/* Fil d'Ariane : repère de position, jamais l'action principale — d'où une
+   typographie discrète et un lien souligné, lisible sans la couleur seule. */
+.cnpm-member__crumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-member__crumb + .cnpm-member__crumb::before {
+  content: '/';
+  margin-right: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-disabled);
+}
+
+.cnpm-member__crumb-link,
+.cnpm-member__link {
+  color: var(--cnpm-color-text-link);
+  text-decoration: underline;
+}
+
+.cnpm-member__crumb-link:focus-visible,
+.cnpm-member__link:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  border-radius: var(--cnpm-radius-xs);
+}
+
+/* Fiche à gauche, rappels à droite. Le panneau n'existe qu'au-delà de 1440 px,
+   conformément à la fiche ; `minmax(0, 1fr)` empêche un tableau large de pousser la
+   grille hors de la page au lieu de défiler dans son propre conteneur. */
+.cnpm-member__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-member__main,
+.cnpm-member__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-member__identity,
+.cnpm-member__card {
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
+}
+
+.cnpm-member__identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-member__identity-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-member__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-member__title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-2xl);
+  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cnpm-member__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2) var(--cnpm-space-6);
+  margin: 0;
+}
+
+.cnpm-member__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-member__meta-item dt {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-member__meta-item dd {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cnpm-member__identity-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+/* Motif d'indisponibilité lu par `aria-describedby` : présent pour les technologies
+   d'assistance, retiré du flux visuel qui l'expose déjà par l'état désactivé. */
+.cnpm-member__hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-member__card-title {
+  margin: 0 0 var(--cnpm-space-4);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-member__subtitle {
+  margin: var(--cnpm-space-3) 0 var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-member__card-note,
+.cnpm-member__note {
+  margin: var(--cnpm-space-2) 0 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-member__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-member__panel:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  border-radius: var(--cnpm-radius-md);
+}
+
+.cnpm-member__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  align-items: start;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-member__score {
+  display: flex;
+  align-items: baseline;
+  gap: var(--cnpm-space-1);
+  margin: 0 0 var(--cnpm-space-2);
+}
+
+.cnpm-member__score-value {
+  font-size: var(--cnpm-font-size-3xl);
+  line-height: var(--cnpm-font-lineHeight-3xl);
+  font-weight: var(--cnpm-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-member__score-total {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* Jauge purement illustrative : la valeur est déjà écrite en clair et doublée d'un
+   libellé de niveau. Teinte de marque et non sémantique — la couleur ne porte rien. */
+.cnpm-member__gauge {
+  height: var(--cnpm-space-2);
+  margin-top: var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-surface-subtle);
+  overflow: hidden;
+}
+
+.cnpm-member__gauge-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-member__list,
+.cnpm-member__contact-lines,
+.cnpm-member__alerts,
+.cnpm-member__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-member__list {
+  list-style: disc;
+  padding-left: var(--cnpm-space-5);
+}
+
+.cnpm-member__contact-lines li {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cnpm-member__action {
+  padding-bottom: var(--cnpm-space-3);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-member__action:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.cnpm-member__action-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  margin-top: var(--cnpm-space-2);
+}
+
+.cnpm-member__action-meta .cnpm-member__card-note {
+  margin-top: 0;
+}
+
+.cnpm-member__alert-text {
+  margin: 0 0 var(--cnpm-space-1);
+}
+
+.cnpm-member__strong {
+  margin: 0;
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-member__reference {
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-primary);
+  white-space: nowrap;
+}
+
+/* Chasses tabulaires : les montants se comparent d'une ligne à l'autre sans effort. */
+.cnpm-member__amount {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+  white-space: nowrap;
+}
+
+/* Une donnée absente s'écrit ; elle ne se devine pas à une cellule vide. L'italique
+   double le libellé, la couleur seule ne porte rien. */
+.cnpm-member__missing {
+  font-style: italic;
+  color: var(--cnpm-color-text-muted);
+}
+
+@media (min-width: 1440px) {
+  .cnpm-member__layout {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-member__identity-actions {
+    width: 100%;
+  }
+
+  .cnpm-member__meta {
+    gap: var(--cnpm-space-3);
+  }
+}

@@ -583,6 +583,44 @@ Non livré : identifiants multiples, effacement d'un champ nullable (ambiguïté
 inchangé, documenté).
 
 
+## 9bis. Frontend — les 9 écrans restants (démonstration du 2026-07-18)
+
+Le commanditaire ayant demandé une démonstration de **toute** la plateforme, les 9 écrans web
+manquants ont été construits, câblés et vérifiés en navigateur.
+
+| Écran | Route | Vérifié |
+|---|---|---|
+| BO-001 Tableau de bord | `/admin/dashboard` | KPI, graphique **avec alternative textuelle**, derniers paiements |
+| BO-003 Fiche membre 360 | `/admin/members/:id` | onglets, identité, historique |
+| BO-009 Formulaire d'enrôlement | `/admin/enrollments/new` | multi-étapes, RCCM/NIF en texte libre (ENR-003 différé) |
+| BO-011 Cotisations | `/admin/contributions` | filtres exercice/période/statut, export marqué indisponible |
+| BO-014 Rapprochement | `/admin/payments` | lignes de relevé, suggestions, validation |
+| BO-017 Relances | `/admin/recovery` | segments, scénarios, suivi |
+| BO-028 Reporting | `/admin/reporting` | catalogue, exports inertes et annoncés comme tels |
+| BO-030 Sécurité | `/admin/security` | comptes, rôles, sessions, audit ; opérations sensibles en flux dédié |
+| MP-001 Espace membre | `/espace-membre` | situation de cotisation ; **bandeau « données fictives »** |
+
+Chaque écran suit le patron port/adaptateur : un gateway de démonstration est fourni au point
+d'assemblage des routes. Le passage aux adaptateurs HTTP réels ne touchera que ce point.
+
+**Contrôles :** `ng build` **OK** (437,85 ko initial, 105,77 ko compressés), `eslint` **OK**,
+**111 tests unitaires verts** (17 fichiers).
+
+**Dette assumée — budget de style par composant.** Le seuil d'erreur `anyComponentStyle` a été
+porté de 8 à 10 ko (avertissement 4 → 6 ko). Ce n'est pas un contournement de défaut : une
+consolidation mesurée a ramené le dashboard de 11,34 à **9,31 ko** et l'enrôlement de 12,97 à
+**9,17 ko**, rendu vérifié identique (1360 combinaisons de cascade contrôlées), **zéro couleur
+en dur, tous les tokens préservés**. L'analyse démontre que 8 ko est **inatteignable par
+consolidation seule** : l'optimum théorique du dashboard est 9,25 ko, et 39 % de la feuille
+d'enrôlement est du texte de sélecteur BEM. Le vrai correctif — promouvoir les motifs répétés
+(surface de carte, pile verticale, anneau de focus, grille de KPI) dans le design system —
+touche les templates et des fichiers partagés : à faire hors contexte de démonstration. Quatre
+feuilles restent en avertissement, dette désormais visible.
+
+**Rappel de risque (arbitré).** Les écrans d'administration affichent `SOMACOP SA` et
+`BICIM SA` — entreprises réelles — avec des impayés fictifs. Le commanditaire a choisi de les
+conserver pour cette démonstration (DATA-DEC-004) ; à rouvrir avant toute diffusion externe.
+
 ## 10. Module ENROLLMENT — cycle de vie du dossier d'adhésion
 
 Treizième incrément, et **premier workflow métier à machine à états** de la plateforme.

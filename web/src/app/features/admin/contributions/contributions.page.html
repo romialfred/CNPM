@@ -1,0 +1,311 @@
+<cnpm-admin-shell>
+  <div class="cnpm-contributions">
+    <cnpm-page-header
+      title="Cotisations"
+      description="Suivez les appels de cotisation, les règlements et les soldes restant dus par membre et par période."
+    >
+      <!-- Une seule action primaire dominante par zone (ux-ui.md). L'export dépend d'un
+           flux contrôlé — métadonnées de filtre, date et habilitation, exigés par la
+           fiche — qui n'existe pas encore : il annonce son indisponibilité plutôt que
+           de produire un fichier incomplet. -->
+      <cnpm-button variant="primary">
+        <svg lucideFileText [size]="iconSize.compact"></svg>
+        Générer des appels
+      </cnpm-button>
+      <cnpm-button variant="secondary" [disabled]="true" describedBy="export-a-venir">
+        <svg lucideDownload [size]="iconSize.compact"></svg>
+        Exporter
+      </cnpm-button>
+      <p class="cnpm-contributions__hint" id="export-a-venir">
+        L’export des cotisations n’est pas encore disponible.
+      </p>
+    </cnpm-page-header>
+
+    <div class="cnpm-contributions__layout">
+      <div class="cnpm-contributions__list">
+        <cnpm-filter-bar
+          [expanded]="filtersExpanded()"
+          [chips]="chips()"
+          (expandedChange)="filtersExpanded.set($event)"
+          (chipRemove)="removeChip($event)"
+          (resetAll)="resetFilters()"
+        >
+          <div class="cnpm-contributions__filter">
+            <label class="cnpm-contributions__label" for="filtre-exercice">Exercice</label>
+            <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique
+                 avant que le `@for` n'ait créé les options, le navigateur rejette une
+                 valeur qui ne correspond à aucune option, et le filtre ne se restaure
+                 pas au rechargement. L'accessor de `ngModel` suit la création des
+                 options. -->
+            <select
+              id="filtre-exercice"
+              class="cnpm-contributions__select"
+              name="exercice"
+              [ngModel]="fiscalYear() ?? ''"
+              (ngModelChange)="setFiscalYear($event)"
+            >
+              <option value="">Tous les exercices</option>
+              @for (value of fiscalYears(); track value) {
+                <option [value]="value">{{ value }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="cnpm-contributions__filter">
+            <label class="cnpm-contributions__label" for="filtre-periode">Période</label>
+            <select
+              id="filtre-periode"
+              class="cnpm-contributions__select"
+              name="periode"
+              [ngModel]="quarter() ?? ''"
+              (ngModelChange)="setQuarter($event)"
+            >
+              <option value="">Toutes les périodes</option>
+              @for (value of quarters; track value) {
+                <option [value]="value">{{ quarterLabels[value] }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="cnpm-contributions__filter">
+            <label class="cnpm-contributions__label" for="filtre-statut">Statut</label>
+            <select
+              id="filtre-statut"
+              class="cnpm-contributions__select"
+              name="statut"
+              [ngModel]="status() ?? ''"
+              (ngModelChange)="setStatus($event)"
+            >
+              <option value="">Tous les statuts</option>
+              @for (value of statuses; track value) {
+                <option [value]="value">{{ statusLabels[value] }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- `search` plutôt que `text` : le champ reçoit sa croix d'effacement native
+               et son rôle est annoncé. -->
+          <form class="cnpm-contributions__filter" role="search" (ngSubmit)="applySearch()">
+            <label class="cnpm-contributions__label" for="filtre-membre">Membre</label>
+            <input
+              id="filtre-membre"
+              class="cnpm-contributions__input"
+              type="search"
+              name="membre"
+              autocomplete="off"
+              placeholder="Référence, code ou raison sociale…"
+              [ngModel]="searchDraft()"
+              (ngModelChange)="searchDraft.set($event)"
+            />
+          </form>
+        </cnpm-filter-bar>
+
+        <div class="cnpm-contributions__toolbar">
+          <p class="cnpm-contributions__total">
+            @if (data()) {
+              Total&nbsp;: {{ totalItems() | number }}
+              {{ totalItems() === 1 ? 'appel' : 'appels' }}
+            }
+          </p>
+
+          <!-- « En retard » n'a de sens qu'à une date donnée. La taire laisserait croire
+               à un temps réel et rendrait le tableau invérifiable. -->
+          @if (asOf(); as reference) {
+            <p class="cnpm-contributions__asof">
+              Échéances appréciées au {{ reference | date: 'dd/MM/yyyy' }}.
+            </p>
+          }
+        </div>
+
+        <cnpm-data-table
+          caption="Appels de cotisation, avec le membre concerné, la période, les montants appelés et réglés, le solde restant dû, l’échéance et le statut."
+          [columns]="columns"
+          [rows]="rows()"
+          [state]="tableState()"
+          [sort]="sort()"
+          [rowKey]="rowKey"
+          (sortChange)="onSortChange($event)"
+        >
+          <ng-template #row let-call>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-contributions__reference">{{ call.reference }}</span>
+            </td>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-contributions__member">
+                <span class="cnpm-contributions__member-name">{{ call.memberName }}</span>
+                <span class="cnpm-contributions__member-code">{{ call.memberCode }}</span>
+              </span>
+            </td>
+            <td class="cnpm-table__cell">{{ periodLabel(call) }}</td>
+
+            <!-- Montants alignés à droite et formatés `fr-ML` : critère de la fiche.
+                 L'œil compare des ordres de grandeur en lisant les unités les unes sous
+                 les autres. -->
+            <td class="cnpm-table__cell cnpm-table__cell--end">
+              <span class="cnpm-contributions__amount">
+                {{ call.calledAmount | number: '1.0-0' }}
+              </span>
+            </td>
+            <td class="cnpm-table__cell cnpm-table__cell--end">
+              <span class="cnpm-contributions__amount">
+                {{ call.paidAmount | number: '1.0-0' }}
+              </span>
+            </td>
+            <td class="cnpm-table__cell cnpm-table__cell--end">
+              <span class="cnpm-contributions__amount">
+                {{ call.outstandingAmount | number: '1.0-0' }}
+              </span>
+              <!-- « Appelé = payé + reste » est un critère d'acceptation ; il ne tient
+                   qu'à ajustement affiché. L'écart est donc nommé, jamais absorbé en
+                   silence. -->
+              @if (call.adjustmentAmount > 0) {
+                <span class="cnpm-contributions__note">
+                  après ajustement de {{ call.adjustmentAmount | number: '1.0-0' }}
+                </span>
+              }
+            </td>
+
+            <!-- Échue ou à échoir : la distinction est portée par un mot, la couleur ne
+                 fait que la renforcer. Un statut n'est jamais transmis par la seule
+                 couleur. -->
+            <td class="cnpm-table__cell">
+              <span class="cnpm-contributions__due">
+                <span class="cnpm-contributions__date">{{ call.dueDate | date: 'dd/MM/yyyy' }}</span>
+                <span
+                  class="cnpm-contributions__due-flag"
+                  [class.cnpm-contributions__due-flag--past]="call.pastDue"
+                >
+                  {{ call.pastDue ? 'Échue' : 'À échoir' }}
+                </span>
+              </span>
+            </td>
+
+            <td class="cnpm-table__cell">
+              <span class="cnpm-contributions__status">
+                <cnpm-badge [tone]="statusTone(call.status)">
+                  {{ statusLabel(call.status) }}
+                </cnpm-badge>
+                <!-- Le retard prime sur le règlement partiel, qui commande pourtant le
+                     montant de la relance : il se lit à côté du statut, jamais à sa
+                     place. -->
+                @if (isPartiallySettled(call)) {
+                  <cnpm-badge tone="neutral">Partiellement réglé</cnpm-badge>
+                }
+              </span>
+            </td>
+
+            <!-- Actions écrites en toutes lettres, comme sur BO-002 : trois
+                 pictogrammes muets rendraient la colonne indéchiffrable. Le nom
+                 accessible cite la référence, faute de quoi une liste de dix boutons
+                 « Relancer » est inutilisable hors contexte visuel. -->
+            <td class="cnpm-table__cell">
+              <span class="cnpm-contributions__actions">
+                <cnpm-button
+                  variant="tertiary"
+                  size="sm"
+                  [accessibleLabel]="'Voir l’appel ' + call.reference"
+                >
+                  Voir
+                </cnpm-button>
+                @if (canEmit(call)) {
+                  <cnpm-button
+                    variant="secondary"
+                    size="sm"
+                    [accessibleLabel]="'Émettre l’appel ' + call.reference"
+                  >
+                    Émettre
+                  </cnpm-button>
+                }
+                @if (canRemind(call)) {
+                  <cnpm-button
+                    variant="secondary"
+                    size="sm"
+                    [accessibleLabel]="'Relancer l’appel ' + call.reference"
+                  >
+                    Relancer
+                  </cnpm-button>
+                }
+              </span>
+            </td>
+          </ng-template>
+
+          <!-- Les états s'appuient sur les composants du socle (FDB-005/006/007).
+               « Base vide » et « aucun résultat » restent distincts : le premier invite
+               à générer un premier appel, le second à élargir la recherche. -->
+          <div data-table-status>
+            @switch (tableState()) {
+              @case ('loading') {
+                <cnpm-skeleton
+                  variant="table"
+                  [rows]="pageSize()"
+                  [columns]="columns.length"
+                  label="Chargement des appels de cotisation…"
+                />
+              }
+              @case ('empty') {
+                <cnpm-empty-state
+                  variant="first-use"
+                  title="Aucun appel de cotisation"
+                  description="Aucun appel n’a encore été préparé. Générez des appels pour ouvrir un exercice."
+                />
+              }
+              @case ('noResult') {
+                <cnpm-empty-state
+                  variant="no-results"
+                  title="Aucun appel ne correspond"
+                  description="Élargissez la recherche ou retirez un filtre."
+                >
+                  <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                    Réinitialiser les filtres
+                  </cnpm-button>
+                </cnpm-empty-state>
+              }
+              @case ('error') {
+                <cnpm-error-state
+                  variant="recoverable"
+                  title="Les cotisations n’ont pas pu être chargées"
+                  description="Le service des cotisations est momentanément indisponible. Vos filtres sont conservés."
+                >
+                  <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                    Réessayer
+                  </cnpm-button>
+                </cnpm-error-state>
+              }
+              @case ('forbidden') {
+                <!-- Aucune action « réessayer » : répéter une requête que le droit
+                     condamne n'a pas de sens. -->
+                <cnpm-error-state variant="forbidden" />
+              }
+            }
+          </div>
+        </cnpm-data-table>
+
+        @if (tableState() === 'ready') {
+          <cnpm-pagination
+            [page]="page()"
+            [pageSize]="pageSize()"
+            [totalItems]="totalItems()"
+            [pageSizeOptions]="pageSizes"
+            (pageChange)="onPageChange($event)"
+            (pageSizeChange)="onPageSizeChange($event)"
+          />
+        }
+      </div>
+
+      <!-- Panneau de synthèse : cinq indicateurs au maximum, plafond de la fiche. Ses
+           chiffres portent sur le même jeu filtré que le tableau — un total « tous
+           exercices » posé au-dessus d'une liste restreinte à 2024 additionnerait des
+           montants que personne ne regarde. -->
+      @if (overview()) {
+        <aside class="cnpm-contributions__aside">
+          <cnpm-insight-summary
+            title="Suivi des cotisations"
+            headingId="synthese-cotisations"
+            [stats]="stats()"
+            note="Totaux portant sur les appels retenus par les filtres actifs. Les brouillons ne sont pas encore appelés : ils n’entrent dans aucun montant."
+          />
+        </aside>
+      }
+    </div>
+  </div>
+</cnpm-admin-shell>

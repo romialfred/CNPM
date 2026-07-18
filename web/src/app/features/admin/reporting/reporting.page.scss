@@ -1,0 +1,344 @@
+@use '../../../../styles/tokens' as tokens;
+
+.cnpm-reporting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+/* Le motif d'indisponibilité des exports occupe sa propre ligne sous les deux boutons
+   qu'il décrit : glissé entre eux, il les séparerait et romprait le groupe d'actions. */
+.cnpm-reporting__hint {
+  flex-basis: 100%;
+  margin: 0;
+  max-width: 22rem;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-reporting__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-reporting__label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reporting__select,
+.cnpm-reporting__input {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reporting__select:focus-visible,
+.cnpm-reporting__input:focus-visible {
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+/* Deux cartes de trois mesures : six indicateurs au maximum, comme l'impose la fiche.
+   `minmax(0, 1fr)` empêche une carte de se dimensionner sur son contenu le plus long
+   et de déséquilibrer la paire. */
+.cnpm-reporting__kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-reporting__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  align-items: start;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-reporting__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-reporting__report {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
+}
+
+/* Le panneau est focalisable pour que la tabulation entre dans le contenu de l'onglet
+   sélectionné ; sans anneau visible, ce focus serait invisible. */
+.cnpm-reporting__report:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-reporting__report-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-reporting__report-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reporting__report-description {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reporting__method {
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-reporting__method-summary {
+  padding: var(--cnpm-space-3);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+  cursor: pointer;
+}
+
+.cnpm-reporting__method-summary:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: -2px;
+  border-radius: var(--cnpm-radius-md);
+}
+
+.cnpm-reporting__method-body {
+  padding: 0 var(--cnpm-space-3) var(--cnpm-space-3);
+}
+
+.cnpm-reporting__chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  margin: 0;
+  min-width: 0;
+}
+
+.cnpm-reporting__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-reporting__legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reporting__swatch {
+  width: var(--cnpm-size-icon-xs);
+  height: var(--cnpm-size-icon-xs);
+  border-radius: var(--cnpm-radius-xs);
+}
+
+/* Palette bornée à deux teintes de la couleur de marque : la fiche exige une palette
+   limitée, et le rouge reste réservé aux actions critiques. */
+.cnpm-reporting__swatch--expected {
+  background-color: var(--cnpm-color-brand-blue-200);
+}
+
+.cnpm-reporting__swatch--collected {
+  background-color: var(--cnpm-color-brand-blue-700);
+}
+
+/* Le tracé se redimensionne avec son conteneur : aucune largeur en pixels ne fuit, et
+   le reflow à 320 px n'introduit pas de défilement horizontal. */
+.cnpm-reporting__chart-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.cnpm-reporting__chart-grid {
+  stroke: var(--cnpm-chart-grid);
+  stroke-width: 1;
+}
+
+.cnpm-reporting__bar--expected {
+  fill: var(--cnpm-color-brand-blue-200);
+}
+
+.cnpm-reporting__bar--collected {
+  fill: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-reporting__chart-label {
+  fill: var(--cnpm-chart-axis);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-reporting__chart-caption {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-reporting__dimension {
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Chasses tabulaires : les chiffres s'alignent d'une ligne à l'autre, ce qui rend les
+   ordres de grandeur comparables d'un coup d'œil. */
+.cnpm-reporting__amount {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+  white-space: nowrap;
+}
+
+/* La couleur ne fait que redoubler le signe « moins », déjà porté par le nombre : un
+   écart négatif reste lisible en niveaux de gris. */
+.cnpm-reporting__amount--negative {
+  color: var(--cnpm-color-text-critical);
+}
+
+.cnpm-reporting__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-reporting__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
+}
+
+.cnpm-reporting__panel-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reporting__panel-note {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-reporting__panel-empty {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reporting__insights {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-reporting__insight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cnpm-space-2);
+  padding-bottom: var(--cnpm-space-4);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  min-width: 0;
+}
+
+.cnpm-reporting__insight:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.cnpm-reporting__insight-message {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reporting__insight-rationale {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reporting__insight-label {
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+/* Sous 1280 px, la fiche fait passer les insights sous les graphiques. Le panneau
+   quitte donc la colonne latérale et s'étale en deux blocs, plutôt que d'être masqué
+   derrière un contrôle non spécifié. */
+@media (max-width: 1279px) {
+  .cnpm-reporting__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-reporting__aside {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .cnpm-reporting__panel {
+    flex: 1 1 20rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-reporting__kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-reporting__aside {
+    flex-direction: column;
+  }
+
+  /* Cible tactile portée à 44–48 px sur mobile, conformément aux règles UX. */
+  .cnpm-reporting__select,
+  .cnpm-reporting__input {
+    height: var(--cnpm-size-control-lg);
+  }
+}

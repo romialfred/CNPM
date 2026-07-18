@@ -1,0 +1,415 @@
+@use '../../../../styles/tokens' as tokens;
+
+.cnpm-reconciliation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+/* Liste et panneau de rapprochement. `minmax(0, 1fr)` empêche la colonne de la table
+   de se dimensionner sur son min-content : sans cela, une table à huit colonnes
+   pousserait la grille au-delà de la page au lieu de défiler dans son conteneur. */
+.cnpm-reconciliation__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24rem;
+  align-items: start;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__list,
+.cnpm-reconciliation__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__section-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reconciliation__subtitle {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Texte réservé aux technologies d'assistance : il décrit un bouton neutralisé, dont
+   le motif doit être annoncé sans encombrer la barre d'actions. */
+.cnpm-reconciliation__sr-hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-reconciliation__hint,
+.cnpm-reconciliation__field-hint,
+.cnpm-reconciliation__panel-note {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-reconciliation__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reconciliation__select,
+.cnpm-reconciliation__input,
+.cnpm-reconciliation__textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reconciliation__select,
+.cnpm-reconciliation__input {
+  height: var(--cnpm-size-control-md);
+}
+
+.cnpm-reconciliation__textarea {
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  resize: vertical;
+}
+
+/* Contour opaque : le halo seul n'atteint pas le rapport 3:1 de WCAG 1.4.11. */
+.cnpm-reconciliation__select:focus-visible,
+.cnpm-reconciliation__input:focus-visible,
+.cnpm-reconciliation__textarea:focus-visible,
+.cnpm-reconciliation__fieldset:focus-visible {
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-reconciliation__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__total {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reconciliation__reference {
+  display: block;
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+  white-space: nowrap;
+}
+
+/* Marqueur textuel de la ligne ouverte dans le panneau : un liseré coloré seul ne
+   transmettrait pas l'état. */
+.cnpm-reconciliation__examined {
+  display: inline-block;
+  margin-top: var(--cnpm-space-1);
+  padding: 0 var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-strong);
+  border-radius: var(--cnpm-radius-pill);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+  white-space: nowrap;
+}
+
+.cnpm-reconciliation__payer {
+  display: block;
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reconciliation__meta {
+  display: block;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Chasses tabulaires : les montants s'alignent d'une ligne à l'autre, ce qui rend les
+   ordres de grandeur comparables d'un coup d'œil. */
+.cnpm-reconciliation__amount {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+  white-space: nowrap;
+}
+
+.cnpm-reconciliation__match {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cnpm-space-1);
+  min-width: 10rem;
+}
+
+.cnpm-reconciliation__match-name {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Surfaces neutres et bordures plutôt qu'ombres : le panneau regroupe, il n'attire pas. */
+.cnpm-reconciliation__panel,
+.cnpm-reconciliation__audit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__panel-amount {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  margin: 0;
+}
+
+.cnpm-reconciliation__panel-amount-label {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reconciliation__panel-status {
+  margin: 0;
+}
+
+.cnpm-reconciliation__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.cnpm-reconciliation__legend {
+  padding: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Chaque correspondance est une cible complète : le libellé entier coche le choix,
+   ce qui évite une cible de 16 px sur un geste engageant une écriture financière. */
+.cnpm-reconciliation__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  cursor: pointer;
+  min-width: 0;
+}
+
+.cnpm-reconciliation__option:has(.cnpm-reconciliation__radio:checked) {
+  border-color: var(--cnpm-color-brand-blue-700);
+  background-color: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-reconciliation__option:has(.cnpm-reconciliation__radio:focus-visible) {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-reconciliation__option-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__option-title {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reconciliation__code {
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-regular);
+  color: var(--cnpm-color-text-secondary);
+  white-space: nowrap;
+}
+
+.cnpm-reconciliation__reasons {
+  margin: 0;
+  padding-left: var(--cnpm-space-5);
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reconciliation__choice {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  min-height: var(--cnpm-size-control-md);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+  cursor: pointer;
+}
+
+/* Le contrôle natif conserve sa taille de cible et son focus système ; seul son
+   alignement est ajusté. */
+.cnpm-reconciliation__radio {
+  flex: none;
+  width: var(--cnpm-size-icon-sm);
+  height: var(--cnpm-size-icon-sm);
+  margin: 0;
+  accent-color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-reconciliation__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__balance {
+  margin: 0;
+  padding: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-subtle);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reconciliation__balance .cnpm-reconciliation__amount {
+  display: inline;
+}
+
+.cnpm-reconciliation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+/* L'anomalie est une sortie de parcours : elle est séparée par un filet et vit sous
+   les actions nominales, jamais à côté d'elles. */
+.cnpm-reconciliation__anomaly {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding-top: var(--cnpm-space-4);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-reconciliation__audit-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  padding-left: var(--cnpm-space-3);
+  border-left: 2px solid var(--cnpm-color-border-subtle);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__audit-action {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-reconciliation__audit-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Sous 1440 px, la fiche fait de la troisième zone un tiroir. Faute de spécification
+   de ce tiroir, le panneau passe sous la liste : il reste lisible et complet plutôt
+   que masqué derrière un contrôle non spécifié. */
+@media (max-width: 1439px) {
+  .cnpm-reconciliation__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-reconciliation__aside {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .cnpm-reconciliation__aside > * {
+    flex: 1 1 20rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-reconciliation__aside {
+    flex-direction: column;
+  }
+
+  /* Densité tactile : la cible passe dans la fourchette 44–48 px du handoff. */
+  .cnpm-reconciliation__select,
+  .cnpm-reconciliation__input {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  .cnpm-reconciliation__choice {
+    min-height: var(--cnpm-size-control-lg);
+  }
+}

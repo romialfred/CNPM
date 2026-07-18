@@ -1,0 +1,242 @@
+// MP-001 — Accueil de l'espace membre.
+//
+// Aucune couleur, dimension ou graisse n'est écrite en dur : tout vient des tokens du
+// handoff. Surfaces blanches et neutres, bordures plutôt qu'ombres, et le rouge laissé
+// au seul signal réellement critique — le badge d'échéance dépassée, porté par le
+// design system.
+//
+// Les hauteurs de ligne et les graisses de titre viennent de `styles/_typography.scss` :
+// les redéclarer ici les ferait diverger du reste de l'application à la première
+// évolution.
+
+.cnpm-member-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+  max-inline-size: var(--cnpm-size-contentMax);
+  margin: 0 auto;
+  padding: var(--cnpm-layout-pagePaddingDesktop);
+  background-color: var(--cnpm-color-surface-page);
+}
+
+// Une carte par regroupement sémantique, jamais pour décorer.
+.cnpm-member-home__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+// L'encapsulation de vue borne cette règle aux éléments de CE gabarit : les titres et
+// paragraphes des composants du design system ne sont pas touchés. Une seule règle
+// remplace ainsi une longue liste de `margin: 0`.
+.cnpm-member-home p,
+.cnpm-member-home h2,
+.cnpm-member-home h3 {
+  margin-block-end: 0;
+}
+
+.cnpm-member-home__panel,
+.cnpm-member-home__identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-member-home__identity {
+  align-items: flex-start;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-member-home__block-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-member-home__action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+}
+
+// ---------- Situation de cotisation ----------
+
+// Identité à gauche, montant dû à droite ; sous 768 px le montant passe en premier.
+.cnpm-member-home__situation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  align-items: start;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-member-home__organization {
+  font-size: var(--cnpm-font-size-2xl);
+  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-member-home__identity-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-6);
+  margin: 0;
+}
+
+.cnpm-member-home__identity-fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-member-home__identity-fact dt {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-member-home__identity-fact dd {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+// Surface neutre bordée, pas un aplat de marque : le montant se distingue par sa taille
+// et sa position.
+.cnpm-member-home__due {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+  padding: var(--cnpm-layout-denseCardPadding);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-member-home__due-amount {
+  font-size: var(--cnpm-font-size-3xl);
+  line-height: var(--cnpm-font-lineHeight-3xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cnpm-member-home__due-unit {
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-secondary);
+}
+
+// Le retard est signalé par un badge libellé ET une phrase : jamais par la couleur seule.
+.cnpm-member-home__due-flag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-member-home__due-label,
+.cnpm-member-home__due-note,
+.cnpm-member-home__note,
+.cnpm-member-home__file {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-member-home__file {
+  font-size: var(--cnpm-font-size-xs);
+  white-space: nowrap;
+}
+
+// Le panneau d'onglet est focalisable ; son anneau de focus vient de la règle globale
+// `:focus-visible` de `styles/_reset.scss`, à ne pas redéclarer ici.
+
+// ---------- Cellules ----------
+
+.cnpm-member-home__reference {
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+  white-space: nowrap;
+}
+
+// Chasses tabulaires : les montants s'alignent d'une ligne à l'autre, ce qui rend la
+// comparaison immédiate.
+.cnpm-member-home__amount {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cnpm-font-weight-medium);
+  white-space: nowrap;
+}
+
+// ---------- Coordonnées, dossier, assistance ----------
+
+.cnpm-member-home__columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-member-home__gauge {
+  block-size: var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-surface-subtle);
+  overflow: hidden;
+}
+
+.cnpm-member-home__gauge-fill {
+  display: block;
+  block-size: 100%;
+  background-color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-member-home__missing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  margin: 0;
+  padding-inline-start: var(--cnpm-space-5);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+// ---------- Adaptation ----------
+
+@media (max-width: 1279px) {
+  .cnpm-member-home {
+    padding: var(--cnpm-layout-pagePaddingTablet);
+  }
+
+  .cnpm-member-home__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-member-home {
+    padding: var(--cnpm-layout-pagePaddingMobile);
+  }
+
+  // Le montant dû et son action remontent en tête : la fiche impose qu'ils restent
+  // atteignables sans défilement sur mobile lorsqu'une dette est due.
+  .cnpm-member-home__situation,
+  .cnpm-member-home__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-member-home__due {
+    order: -1;
+  }
+
+  .cnpm-member-home__identity-facts {
+    gap: var(--cnpm-space-4);
+  }
+}

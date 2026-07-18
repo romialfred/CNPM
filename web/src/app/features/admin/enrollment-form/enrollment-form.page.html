@@ -1,0 +1,736 @@
+<cnpm-admin-shell>
+  <div class="cnpm-enrollment">
+    <cnpm-page-header
+      title="Nouvel enrôlement"
+      description="Constituez un dossier d’adhésion complet et vérifiable. Le dossier reste reprenable tant qu’il n’est pas soumis."
+    />
+
+    @switch (screenState()) {
+      @case ('loading') {
+        <!-- Ossature fidèle à la structure du formulaire : ni page blanche, ni
+             indicateur indéfini, conformément à `loading-empty-error.md`. -->
+        <cnpm-skeleton
+          variant="card"
+          [rows]="8"
+          label="Chargement du formulaire d’enrôlement…"
+        />
+      }
+
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le formulaire n’a pas pu être chargé"
+          description="Les référentiels d’enrôlement sont momentanément indisponibles. Aucune saisie n’a été perdue."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+
+      @case ('forbidden') {
+        <!-- Aucun « réessayer » : répéter une requête que le droit condamne n'a pas de
+             sens, et l'écran ne divulgue pas le motif du refus. -->
+        <cnpm-error-state variant="forbidden" />
+      }
+
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Référentiel d’enrôlement indisponible"
+          description="Aucune catégorie ni pièce justificative n’est publiée par le back-office. Un dossier ouvert sans référentiel serait inexploitable."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Recharger</cnpm-button>
+        </cnpm-empty-state>
+      }
+
+      @default {
+        <cnpm-offline-notice />
+
+        @if (submission(); as done) {
+          <cnpm-alert tone="success" title="Dossier soumis">
+            Référence du dossier : <strong>{{ done.reference }}</strong>, déposé le
+            {{ done.submittedAt | date: 'dd MMMM y à HH:mm' }}. La version examinée est
+            verrouillée ; toute correction passera désormais par le back-office.
+          </cnpm-alert>
+        }
+
+        @if (submitState() === 'failed') {
+          <cnpm-alert tone="error" title="La soumission a échoué">
+            Le service n’a pas accepté le dépôt. Vos saisies et vos pièces sont conservées :
+            réessayez dans un instant.
+          </cnpm-alert>
+        }
+
+        @if (cancelPending()) {
+          <!-- Confirmation avant abandon : critère d'acceptation de la fiche. Une région
+               d'alerte plutôt qu'une boîte modale — pas de piège de focus à maintenir,
+               et le contexte du dossier reste lisible derrière. -->
+          <div class="cnpm-enrollment__confirm" role="alert">
+            <cnpm-alert tone="warning" title="Modifications non enregistrées" [live]="false">
+              Ce dossier contient des saisies qui ne sont pas encore enregistrées.
+            </cnpm-alert>
+            <div class="cnpm-enrollment__confirm-actions">
+              <cnpm-button variant="secondary" size="sm" (click)="dismissCancel()">
+                Rester sur le dossier
+              </cnpm-button>
+              <cnpm-button variant="tertiary" size="sm" (click)="saveDraftNow()">
+                Enregistrer le brouillon
+              </cnpm-button>
+              <cnpm-button variant="danger" size="sm" (click)="leave()">
+                Quitter sans enregistrer
+              </cnpm-button>
+            </div>
+          </div>
+        }
+
+        <div class="cnpm-enrollment__progress-zone">
+          <p class="cnpm-enrollment__step-count">
+            Étape {{ currentIndex() + 1 }} sur {{ steps.length }} — {{ currentStep().label }}
+          </p>
+          <!-- La progression est doublée d'un libellé chiffré : la barre seule ne
+               transmettrait l'avancement que par sa longueur. -->
+          <div
+            class="cnpm-enrollment__progress"
+            role="progressbar"
+            aria-label="Étapes terminées"
+            aria-valuemin="0"
+            [attr.aria-valuemax]="steps.length"
+            [attr.aria-valuenow]="completedSteps()"
+            [attr.aria-valuetext]="completedSteps() + ' étape(s) terminée(s) sur ' + steps.length"
+          >
+            <span class="cnpm-enrollment__progress-fill" [style.width.%]="progressPercent()"></span>
+          </div>
+          <p class="cnpm-enrollment__autosave" role="status" aria-live="polite">
+            {{ saveStateLabel() }}
+            @if (savedAt(); as moment) {
+              <span class="cnpm-enrollment__autosave-time">
+                — {{ moment | date: 'HH:mm:ss' }}
+              </span>
+            }
+          </p>
+        </div>
+
+        <nav class="cnpm-enrollment__stepper" aria-label="Étapes de l’enrôlement">
+          <ol class="cnpm-stepper">
+            @for (step of steps; track step.id; let index = $index) {
+              <li class="cnpm-stepper__item">
+                <button
+                  type="button"
+                  class="cnpm-stepper__button"
+                  [class.cnpm-stepper__button--current]="step.id === current()"
+                  [class.cnpm-stepper__button--complete]="stepStatus(step.id) === 'complete'"
+                  [class.cnpm-stepper__button--error]="stepStatus(step.id) === 'error'"
+                  [attr.aria-current]="step.id === current() ? 'step' : null"
+                  (click)="goTo(step.id)"
+                >
+                  <span class="cnpm-stepper__index" aria-hidden="true">{{ index + 1 }}</span>
+                  <span class="cnpm-stepper__text">
+                    <span class="cnpm-stepper__label">{{ step.label }}</span>
+                    <!-- Le statut est écrit, jamais seulement coloré. -->
+                    <span class="cnpm-stepper__status">{{ stepStatusLabel(step.id) }}</span>
+                  </span>
+                </button>
+              </li>
+            }
+          </ol>
+        </nav>
+
+        <div class="cnpm-enrollment__layout">
+          <form class="cnpm-enrollment__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+            <cnpm-inline-error-summary [errors]="errors()" />
+
+            <section class="cnpm-enrollment__section" aria-labelledby="etape-titre">
+              <div class="cnpm-enrollment__section-head">
+                <h2 class="cnpm-enrollment__section-title" id="etape-titre">
+                  {{ currentStep().heading }}
+                </h2>
+                <p class="cnpm-enrollment__section-hint">{{ currentStep().hint }}</p>
+              </div>
+
+              @switch (current()) {
+                @case ('identification') {
+                  <div class="cnpm-enrollment__grid">
+                    <!-- Le conteneur porte l'ancre du résumé d'erreurs : le champ du
+                         design system génère son `id` interne, hors de portée de
+                         l'écran. Le focus atterrit donc sur le libellé du champ. -->
+                    <div class="cnpm-enrollment__field" [id]="fieldId('legalName')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="legalName"
+                        label="Raison sociale"
+                        name="organization"
+                        autocomplete="organization"
+                        placeholder="Ex. : Sahel Agro SA"
+                        [required]="true"
+                        [error]="errorFor('legalName')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('tradeName')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="tradeName"
+                        label="Nom commercial"
+                        name="trade-name"
+                        placeholder="Facultatif"
+                        [error]="errorFor('tradeName')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field">
+                      <label class="cnpm-enrollment__label" [for]="fieldId('legalForm')">
+                        Forme juridique
+                        <span class="cnpm-enrollment__required" aria-hidden="true">*</span>
+                      </label>
+                      <select
+                        class="cnpm-enrollment__control"
+                        [id]="fieldId('legalForm')"
+                        formControlName="legalForm"
+                        aria-required="true"
+                        [attr.aria-invalid]="invalidAttr('legalForm')"
+                        [attr.aria-describedby]="describedBy('legalForm')"
+                      >
+                        <option value="">Sélectionnez une forme juridique</option>
+                        @for (option of legalForms(); track option.id) {
+                          <option [value]="option.id">{{ option.label }}</option>
+                        }
+                      </select>
+                      @if (errorFor('legalForm'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('legalForm')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('creationDate')" tabindex="-1">
+                      <label class="cnpm-enrollment__label" [for]="'controle-creationDate'">
+                        Date de création
+                      </label>
+                      <input
+                        class="cnpm-enrollment__control"
+                        type="date"
+                        id="controle-creationDate"
+                        formControlName="creationDate"
+                        [attr.aria-invalid]="invalidAttr('creationDate')"
+                        [attr.aria-describedby]="describedBy('creationDate')"
+                      />
+                      @if (errorFor('creationDate'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('creationDate')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+
+                    <!-- RCCM et NIF : texte libre, aucun masque. Un format imposé côté
+                         écran rejetterait des références officielles valides. -->
+                    <div class="cnpm-enrollment__field" [id]="fieldId('rccm')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="rccm"
+                        label="Numéro RCCM"
+                        name="rccm"
+                        autocomplete="off"
+                        placeholder="Tel qu’il figure sur le registre"
+                        [required]="true"
+                        [error]="errorFor('rccm')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('nif')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="nif"
+                        label="Numéro d’identification fiscale (NIF)"
+                        name="nif"
+                        autocomplete="off"
+                        placeholder="Tel qu’il figure sur l’attestation"
+                        [required]="true"
+                        [error]="errorFor('nif')"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="cnpm-enrollment__check">
+                    <cnpm-button
+                      variant="secondary"
+                      size="sm"
+                      [loading]="checkingRegistration()"
+                      [disabled]="locked()"
+                      (click)="checkRegistration()"
+                    >
+                      Vérifier RCCM et NIF
+                    </cnpm-button>
+                    <!-- Région pré-montée : insérer la région live et son contenu d'un
+                         même mouvement rendrait l'annonce peu fiable. -->
+                    <div class="cnpm-enrollment__check-result" role="status" aria-live="polite">
+                      @if (registrationCheck(); as check) {
+                        <cnpm-badge [tone]="checkTone(check.outcome)">
+                          {{ checkLabel(check.outcome) }}
+                        </cnpm-badge>
+                        <p class="cnpm-enrollment__check-detail">
+                          {{ check.detail }}
+                          <span class="cnpm-enrollment__check-time">
+                            Contrôle effectué le {{ check.checkedAt | date: 'dd/MM/y à HH:mm' }}.
+                          </span>
+                        </p>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @case ('contacts') {
+                  <div class="cnpm-enrollment__grid">
+                    <div class="cnpm-enrollment__field" [id]="fieldId('contactName')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="contactName"
+                        label="Nom du contact principal"
+                        name="contact-name"
+                        autocomplete="name"
+                        [required]="true"
+                        [error]="errorFor('contactName')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('contactRole')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="contactRole"
+                        label="Fonction du contact"
+                        name="contact-role"
+                        placeholder="Facultatif"
+                        [error]="errorFor('contactRole')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('contactEmail')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="contactEmail"
+                        label="Adresse e-mail"
+                        type="email"
+                        name="contact-email"
+                        autocomplete="email"
+                        inputMode="email"
+                        placeholder="contact@sahel-agro.example"
+                        [required]="true"
+                        [error]="errorFor('contactEmail')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('contactPhone')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="contactPhone"
+                        label="Téléphone"
+                        type="tel"
+                        name="contact-phone"
+                        autocomplete="tel"
+                        inputMode="tel"
+                        [required]="true"
+                        [error]="errorFor('contactPhone')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('address')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="address"
+                        label="Adresse postale"
+                        name="address"
+                        autocomplete="street-address"
+                        [required]="true"
+                        [error]="errorFor('address')"
+                      />
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('city')" tabindex="-1">
+                      <!-- Champ libre plutôt qu'une liste : aucune nomenclature
+                           administrative officielle n'est arbitrée pour cet écran. -->
+                      <cnpm-text-input
+                        formControlName="city"
+                        label="Ville ou localité"
+                        name="city"
+                        autocomplete="address-level2"
+                        [required]="true"
+                        [error]="errorFor('city')"
+                      />
+                    </div>
+                  </div>
+                }
+
+                @case ('category') {
+                  <div class="cnpm-enrollment__grid">
+                    <div class="cnpm-enrollment__field">
+                      <label class="cnpm-enrollment__label" [for]="fieldId('category')">
+                        Catégorie d’entreprise
+                        <span class="cnpm-enrollment__required" aria-hidden="true">*</span>
+                      </label>
+                      <select
+                        class="cnpm-enrollment__control"
+                        [id]="fieldId('category')"
+                        formControlName="category"
+                        aria-required="true"
+                        [attr.aria-invalid]="invalidAttr('category')"
+                        [attr.aria-describedby]="describedBy('category')"
+                      >
+                        <option value="">Sélectionnez une catégorie</option>
+                        @for (option of categories(); track option.id) {
+                          <option [value]="option.id">{{ option.label }}</option>
+                        }
+                      </select>
+                      @if (errorFor('category'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('category')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+
+                    <div class="cnpm-enrollment__field">
+                      <label class="cnpm-enrollment__label" [for]="fieldId('group')">
+                        Groupement professionnel
+                      </label>
+                      <select
+                        class="cnpm-enrollment__control"
+                        [id]="fieldId('group')"
+                        formControlName="group"
+                        [attr.aria-invalid]="invalidAttr('group')"
+                        [attr.aria-describedby]="describedBy('group')"
+                      >
+                        <!-- Le groupement n'est pas rendu obligatoire : la règle métier
+                             qui le rendrait tel n'est pas arbitrée, et l'exemple visuel
+                             de la maquette ne fait pas règle (critère de la fiche). -->
+                        <option value="">Aucun groupement pour l’instant</option>
+                        @for (option of groups(); track option.id) {
+                          <option [value]="option.id">{{ option.label }}</option>
+                        }
+                      </select>
+                      @if (errorFor('group'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('group')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('workforce')" tabindex="-1">
+                      <cnpm-text-input
+                        formControlName="workforce"
+                        label="Effectif déclaré"
+                        name="workforce"
+                        inputMode="numeric"
+                        placeholder="Nombre de salariés"
+                        [error]="errorFor('workforce')"
+                      />
+                    </div>
+                  </div>
+                }
+
+                @case ('contribution') {
+                  <!-- Aucun barème n'est affiché : inventer un taux de cotisation
+                       fabriquerait une donnée officielle. Le calcul appartient au
+                       back-office, et l'écran le dit. -->
+                  <cnpm-alert tone="info" title="Montant calculé par le back-office" [live]="false">
+                    Cet écran ne saisit aucun montant. La cotisation est établie après examen
+                    du dossier, à partir de la catégorie retenue et du barème en vigueur.
+                  </cnpm-alert>
+
+                  <div class="cnpm-enrollment__grid">
+                    <div class="cnpm-enrollment__field">
+                      <label class="cnpm-enrollment__label" [for]="fieldId('periodicity')">
+                        Périodicité de cotisation
+                        <span class="cnpm-enrollment__required" aria-hidden="true">*</span>
+                      </label>
+                      <select
+                        class="cnpm-enrollment__control"
+                        [id]="fieldId('periodicity')"
+                        formControlName="periodicity"
+                        aria-required="true"
+                        [attr.aria-invalid]="invalidAttr('periodicity')"
+                        [attr.aria-describedby]="describedBy('periodicity')"
+                      >
+                        <option value="">Sélectionnez une périodicité</option>
+                        @for (option of periodicities(); track option.id) {
+                          <option [value]="option.id">{{ option.label }}</option>
+                        }
+                      </select>
+                      @if (errorFor('periodicity'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('periodicity')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+
+                    <div class="cnpm-enrollment__field">
+                      <label class="cnpm-enrollment__label" [for]="fieldId('startDate')">
+                        Date d’effet souhaitée
+                        <span class="cnpm-enrollment__required" aria-hidden="true">*</span>
+                      </label>
+                      <input
+                        class="cnpm-enrollment__control"
+                        type="date"
+                        [id]="fieldId('startDate')"
+                        formControlName="startDate"
+                        aria-required="true"
+                        [attr.aria-invalid]="invalidAttr('startDate')"
+                        [attr.aria-describedby]="describedBy('startDate')"
+                      />
+                      @if (errorFor('startDate'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('startDate')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+
+                    <div class="cnpm-enrollment__field cnpm-enrollment__field--wide">
+                      <label class="cnpm-enrollment__label" [for]="fieldId('notes')">
+                        Observations
+                      </label>
+                      <textarea
+                        class="cnpm-enrollment__textarea"
+                        [id]="fieldId('notes')"
+                        formControlName="notes"
+                        rows="4"
+                        placeholder="Éléments utiles à l’instruction du dossier (facultatif)."
+                        [attr.aria-invalid]="invalidAttr('notes')"
+                        [attr.aria-describedby]="describedBy('notes')"
+                      ></textarea>
+                      @if (errorFor('notes'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('notes')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @case ('documents') {
+                  <ul class="cnpm-enrollment__documents">
+                    @for (type of documentTypes(); track type.id) {
+                      @let entry = documentEntry(type.id);
+                      <li
+                        class="cnpm-enrollment__document"
+                        [id]="documentFieldId(type.id)"
+                        tabindex="-1"
+                      >
+                        <div class="cnpm-enrollment__document-head">
+                          <p class="cnpm-enrollment__document-name">
+                            {{ type.label }}
+                            <!-- L'obligation est écrite, pas seulement marquée d'un
+                                 astérisque coloré. -->
+                            <span class="cnpm-enrollment__document-flag">
+                              {{ type.required ? 'Pièce obligatoire' : 'Pièce facultative' }}
+                            </span>
+                          </p>
+                          <p class="cnpm-enrollment__document-hint">
+                            {{ type.hint }} Formats admis :
+                            {{ type.acceptedExtensions.join(', ') }} — {{ maxSizeLabel(type) }} maximum.
+                          </p>
+                        </div>
+
+                        @if (entry) {
+                          <div class="cnpm-enrollment__document-state">
+                            <cnpm-badge [tone]="documentTone(entry.status)">
+                              {{ documentStatusLabel(entry.status) }}
+                            </cnpm-badge>
+                            <span class="cnpm-enrollment__document-file">{{ entry.fileName }}</span>
+                            <span class="cnpm-enrollment__document-message">{{ entry.message }}</span>
+                          </div>
+                        }
+
+                        <div class="cnpm-enrollment__document-actions">
+                          <input
+                            class="cnpm-enrollment__file"
+                            type="file"
+                            [id]="'fichier-' + type.id"
+                            [attr.accept]="acceptAttribute(type)"
+                            [attr.disabled]="locked() ? '' : null"
+                            (change)="onFileSelected(type, $event)"
+                          />
+                          <label class="cnpm-enrollment__file-label" [for]="'fichier-' + type.id">
+                            <svg lucideUpload [size]="iconSize.compact" aria-hidden="true"></svg>
+                            {{ entry ? 'Remplacer le fichier' : 'Choisir un fichier' }}
+                          </label>
+                          @if (entry) {
+                            <cnpm-button
+                              variant="tertiary"
+                              size="sm"
+                              [disabled]="locked()"
+                              (click)="removeDocument(type.id)"
+                            >
+                              Retirer
+                            </cnpm-button>
+                          }
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+
+                @case ('review') {
+                  <div class="cnpm-enrollment__recap">
+                    <section class="cnpm-enrollment__recap-block" aria-labelledby="recap-identification">
+                      <h3 class="cnpm-enrollment__recap-title" id="recap-identification">
+                        Identification
+                      </h3>
+                      @if (identificationRecap().length > 0) {
+                        <cnpm-definition-list [items]="identificationRecap()" />
+                      } @else {
+                        <p class="cnpm-enrollment__recap-empty">
+                          Aucune information d’identification n’est encore renseignée.
+                        </p>
+                      }
+                    </section>
+
+                    <section class="cnpm-enrollment__recap-block" aria-labelledby="recap-contacts">
+                      <h3 class="cnpm-enrollment__recap-title" id="recap-contacts">
+                        Contact et adresse
+                      </h3>
+                      @if (contactsRecap().length > 0) {
+                        <cnpm-definition-list [items]="contactsRecap()" />
+                      } @else {
+                        <p class="cnpm-enrollment__recap-empty">
+                          Aucun contact n’est encore renseigné.
+                        </p>
+                      }
+                    </section>
+
+                    <section class="cnpm-enrollment__recap-block" aria-labelledby="recap-adhesion">
+                      <h3 class="cnpm-enrollment__recap-title" id="recap-adhesion">
+                        Catégorie et cotisation
+                      </h3>
+                      @if (membershipRecap().length > 0) {
+                        <cnpm-definition-list [items]="membershipRecap()" />
+                      } @else {
+                        <p class="cnpm-enrollment__recap-empty">
+                          Aucune catégorie ni modalité n’est encore renseignée.
+                        </p>
+                      }
+                    </section>
+
+                    <section class="cnpm-enrollment__recap-block" aria-labelledby="recap-pieces">
+                      <h3 class="cnpm-enrollment__recap-title" id="recap-pieces">
+                        Pièces déposées
+                      </h3>
+                      @if (attachedDocuments().length > 0) {
+                        <ul class="cnpm-enrollment__recap-documents">
+                          @for (type of attachedDocuments(); track type.id) {
+                            @let entry = documentEntry(type.id);
+                            @if (entry) {
+                              <li class="cnpm-enrollment__recap-document">
+                                <span class="cnpm-enrollment__recap-document-name">
+                                  {{ type.label }}
+                                </span>
+                                <span class="cnpm-enrollment__recap-document-file">
+                                  {{ entry.fileName }}
+                                </span>
+                                <cnpm-badge [tone]="documentTone(entry.status)">
+                                  {{ documentStatusLabel(entry.status) }}
+                                </cnpm-badge>
+                              </li>
+                            }
+                          }
+                        </ul>
+                      } @else {
+                        <cnpm-empty-state
+                          variant="first-use"
+                          title="Aucune pièce déposée"
+                          description="Les pièces obligatoires doivent être déposées à l’étape « Documents » avant la soumission."
+                        >
+                          <cnpm-button variant="secondary" size="sm" (click)="goTo('documents')">
+                            Aller aux documents
+                          </cnpm-button>
+                        </cnpm-empty-state>
+                      }
+                    </section>
+
+                    <div class="cnpm-enrollment__field" [id]="fieldId('certified')" tabindex="-1">
+                      <cnpm-checkbox formControlName="certified">
+                        Je certifie l’exactitude des informations saisies et des pièces déposées.
+                      </cnpm-checkbox>
+                      @if (errorFor('certified'); as message) {
+                        <p class="cnpm-enrollment__error" [id]="errorId('certified')">
+                          <span class="cnpm-enrollment__error-icon" aria-hidden="true">!</span>
+                          {{ message }}
+                        </p>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </section>
+
+            <!-- Barre d'actions stable : elle ne quitte jamais l'écran, quelle que soit
+                 la longueur de l'étape. -->
+            <div class="cnpm-enrollment__actions">
+              <div class="cnpm-enrollment__actions-left">
+                <cnpm-button variant="tertiary" (click)="requestCancel()">Annuler</cnpm-button>
+                <cnpm-button
+                  variant="secondary"
+                  [loading]="saveState() === 'saving'"
+                  [disabled]="locked()"
+                  (click)="saveDraftNow()"
+                >
+                  Enregistrer le brouillon
+                </cnpm-button>
+              </div>
+
+              <div class="cnpm-enrollment__actions-right">
+                <cnpm-button variant="secondary" [disabled]="isFirstStep()" (click)="previous()">
+                  <svg lucideChevronLeft [size]="iconSize.compact" aria-hidden="true"></svg>
+                  Étape précédente
+                </cnpm-button>
+
+                @if (isLastStep()) {
+                  <cnpm-button
+                    type="submit"
+                    variant="primary"
+                    [loading]="submitState() === 'submitting'"
+                    [disabled]="locked()"
+                  >
+                    Soumettre le dossier
+                  </cnpm-button>
+                } @else {
+                  <cnpm-button type="submit" variant="primary">
+                    Étape suivante
+                    <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                  </cnpm-button>
+                }
+              </div>
+            </div>
+          </form>
+
+          <aside class="cnpm-enrollment__aside" aria-labelledby="aide-titre">
+            <h2 class="cnpm-enrollment__aside-title" id="aide-titre">Aide au remplissage</h2>
+
+            <p class="cnpm-enrollment__aside-text">{{ currentStep().hint }}</p>
+
+            <h3 class="cnpm-enrollment__aside-subtitle">Pièces attendues</h3>
+            <ul class="cnpm-enrollment__aside-list">
+              @for (type of documentTypes(); track type.id) {
+                @let entry = documentEntry(type.id);
+                <li class="cnpm-enrollment__aside-item">
+                  <span class="cnpm-enrollment__aside-item-label">{{ type.label }}</span>
+                  <span class="cnpm-enrollment__aside-item-status">
+                    {{ entry ? documentStatusLabel(entry.status) : 'Non déposée' }}
+                  </span>
+                </li>
+              }
+            </ul>
+
+            <h3 class="cnpm-enrollment__aside-subtitle">À savoir</h3>
+            <ul class="cnpm-enrollment__aside-list">
+              <li class="cnpm-enrollment__aside-note">
+                Le brouillon est enregistré automatiquement ; « Enregistrer le brouillon »
+                reste disponible même si le dossier est incomplet.
+              </li>
+              <li class="cnpm-enrollment__aside-note">
+                Le RCCM et le NIF sont saisis en texte libre, sans format imposé.
+              </li>
+              <li class="cnpm-enrollment__aside-note">
+                Les listes de référence de cet environnement sont des jeux de
+                démonstration ; la nomenclature officielle est servie par le back-office.
+              </li>
+            </ul>
+          </aside>
+        </div>
+      }
+    }
+  </div>
+</cnpm-admin-shell>

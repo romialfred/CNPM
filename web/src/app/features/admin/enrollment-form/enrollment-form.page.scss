@@ -1,0 +1,530 @@
+/* Écran BO-009 — nouvel enrôlement.
+   Deux principes tiennent cette feuille sous le budget de style par composant :
+   1. les bases partagées (surfaces de contrôle, pastilles, échelles de texte,
+      piles et rangées) sont déclarées une seule fois pour tous les blocs
+      concernés ;
+   2. rien n'est redéclaré de ce que `src/styles/_reset.scss` et
+      `_typography.scss` servent déjà globalement — couleur de texte héritée du
+      `body`, `font: inherit` des contrôles natifs, anneau `:focus-visible`
+      global avec `outline-offset: 2px` sur les éléments focalisables,
+      neutralisation des transitions en mouvement réduit, `h2` à 18 px/600 et
+      `h3` à 16 px/600. */
+
+/* ------------------------------------------------------------ bases partagées */
+
+/* Surfaces de contrôle : bordure plutôt qu'ombre, fond neutre (`ux-ui.md`). */
+.cnpm-stepper__button,
+.cnpm-enrollment__control,
+.cnpm-enrollment__textarea,
+.cnpm-enrollment__file-label {
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+}
+
+/* Pastilles rondes centrées : numéro d'étape et glyphe d'erreur. Le carré est
+   tenu par `aspect-ratio` — une seule dimension à déclarer de chaque côté. */
+.cnpm-stepper__index,
+.cnpm-enrollment__error-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  aspect-ratio: 1;
+  border-radius: var(--cnpm-radius-pill);
+}
+
+/* Mentions secondaires : statut d'étape, indications et messages de pièces. */
+.cnpm-stepper__status,
+.cnpm-enrollment__document-flag,
+.cnpm-enrollment__document-hint,
+.cnpm-enrollment__document-message,
+.cnpm-enrollment__recap-document-file,
+.cnpm-enrollment__aside-item-status,
+.cnpm-enrollment__aside-note {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Libellés de champ, intitulés de pièce et déclencheur de dépôt. */
+.cnpm-stepper__label,
+.cnpm-enrollment__label,
+.cnpm-enrollment__recap-document-name,
+.cnpm-enrollment__file-label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+/* Listes de contenu : la sémantique reste, la puce disparaît. */
+.cnpm-stepper,
+.cnpm-enrollment__documents,
+.cnpm-enrollment__recap-documents,
+.cnpm-enrollment__aside-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ------------------------------------------------------------------ enrôlement */
+
+.cnpm-enrollment {
+  /* Piles verticales : base commune, seul l'écart distingue les blocs. */
+  &,
+  &__recap {
+    display: flex;
+    flex-flow: column;
+    gap: var(--cnpm-space-5);
+    min-width: 0;
+  }
+
+  &__form,
+  &__section {
+    display: flex;
+    flex-flow: column;
+    gap: var(--cnpm-space-4);
+    min-width: 0;
+  }
+
+  &__documents,
+  &__document,
+  &__confirm,
+  &__aside {
+    display: flex;
+    flex-flow: column;
+    gap: var(--cnpm-space-3);
+    min-width: 0;
+  }
+
+  &__progress-zone,
+  &__field,
+  &__check-result,
+  &__recap-block,
+  &__recap-documents,
+  &__aside-list {
+    display: flex;
+    flex-flow: column;
+    gap: var(--cnpm-space-2);
+    min-width: 0;
+  }
+
+  &__section-head,
+  &__document-head {
+    display: flex;
+    flex-flow: column;
+    gap: var(--cnpm-space-1);
+  }
+
+  /* Rangées : toutes s'enveloppent, condition du reflow à 320 px. */
+  &__document-state,
+  &__document-actions,
+  &__recap-document,
+  &__actions-left,
+  &__actions-right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cnpm-space-2);
+  }
+
+  &__document-name,
+  &__aside-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--cnpm-space-2);
+  }
+
+  /* Cartes neutres : regroupement sémantique, jamais décoratif. */
+  &__section,
+  &__confirm,
+  &__actions,
+  &__aside {
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-lg);
+    background: var(--cnpm-color-surface-primary);
+  }
+
+  /* Texte d'accompagnement. */
+  &__autosave,
+  &__section-hint,
+  &__check-detail,
+  &__recap-empty,
+  &__aside-text,
+  &__aside-subtitle {
+    margin: 0;
+    font-size: var(--cnpm-font-size-sm);
+    color: var(--cnpm-color-text-secondary);
+  }
+
+  /* `h2` et `h3` portent déjà la taille et la graisse voulues : seule la marge
+     basse doit être annulée pour que l'écart de la pile fasse foi. */
+  &__section-title,
+  &__recap-title,
+  &__document-hint {
+    margin: 0;
+  }
+
+  /* Intitulé en gras d'un bloc de saisie ou d'une pièce. */
+  &__step-count,
+  &__document-name {
+    margin: 0;
+    font-size: var(--cnpm-font-size-sm);
+    font-weight: var(--cnpm-font-weight-semibold);
+  }
+
+  /* Formulaire large et panneau d'aide étroit : proportion 8–9 / 3–4 colonnes de
+     la fiche BO-009. `minmax(0, 1fr)` empêche la colonne du formulaire de se
+     dimensionner sur son min-content, ce qui pousserait la grille hors page. */
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    align-items: start;
+    gap: var(--cnpm-space-6);
+  }
+
+  /* Deux colonnes de champs au plus : au-delà, l'œil perd la relation entre un
+     libellé et son contrôle. */
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--cnpm-space-4);
+  }
+
+  &__section {
+    padding: var(--cnpm-space-5);
+  }
+
+  /* -------------------------------------------------------------- progression */
+
+  &__progress {
+    block-size: var(--cnpm-space-2);
+    inline-size: 100%;
+    overflow: hidden;
+    border-radius: var(--cnpm-radius-pill);
+    background: var(--cnpm-color-surface-subtle);
+  }
+
+  &__progress-fill {
+    display: block;
+    block-size: 100%;
+    background: var(--cnpm-color-brand-blue-700);
+    transition: width var(--cnpm-motion-duration-normal) var(--cnpm-motion-easing-standard);
+  }
+
+  &__autosave-time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ------------------------------------------------------------------ champs */
+
+  /* Le conteneur reçoit le focus depuis le résumé d'erreurs ; l'anneau global
+     doit rester visible, sinon le lien déplace un focus que personne ne voit. */
+  &__field {
+    &:focus-visible {
+      outline-offset: 4px;
+      border-radius: var(--cnpm-radius-sm);
+    }
+  }
+
+  &__field--wide {
+    grid-column: 1 / -1;
+  }
+
+  &__required {
+    color: var(--cnpm-color-text-critical);
+  }
+
+  &__control,
+  &__textarea {
+    inline-size: 100%;
+    font-size: var(--cnpm-font-size-sm);
+    color: var(--cnpm-color-text-primary);
+
+    &:focus-visible {
+      border-color: var(--cnpm-color-brand-blue-700);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      background: var(--cnpm-color-surface-subtle);
+      color: var(--cnpm-color-text-disabled);
+    }
+
+    &[aria-invalid='true'] {
+      border-color: var(--cnpm-color-border-critical);
+    }
+  }
+
+  &__control {
+    block-size: var(--cnpm-size-control-md);
+    padding: 0 var(--cnpm-space-3);
+  }
+
+  &__textarea {
+    padding: var(--cnpm-space-2) var(--cnpm-space-3);
+    resize: vertical;
+  }
+
+  /* Le message d'erreur porte un glyphe et un texte : l'invalidité n'est jamais
+     rendue par la seule couleur de bordure. */
+  &__error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cnpm-space-2);
+    margin: 0;
+    font-size: var(--cnpm-font-size-sm);
+    color: var(--cnpm-color-text-critical);
+  }
+
+  &__error-icon {
+    block-size: var(--cnpm-size-icon-sm);
+    background: var(--cnpm-color-semantic-error-100);
+    font-size: var(--cnpm-font-size-xs);
+    font-weight: var(--cnpm-font-weight-bold);
+  }
+
+  /* --------------------------------------------------------------- RCCM / NIF */
+
+  &__check {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--cnpm-space-3);
+    padding-block-start: var(--cnpm-space-2);
+    border-block-start: 1px solid var(--cnpm-color-border-subtle);
+  }
+
+  &__check-result {
+    flex: 1 1 18rem;
+  }
+
+  &__check-time {
+    display: block;
+    font-size: var(--cnpm-font-size-xs);
+    color: var(--cnpm-color-text-muted);
+  }
+
+  /* ---------------------------------------------------------------- documents */
+
+  &__document {
+    padding: var(--cnpm-space-4);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-md);
+    background: var(--cnpm-color-surface-secondary);
+
+    &:focus-visible {
+      outline-offset: 2px;
+    }
+  }
+
+  /* L'obligation est écrite, pas seulement marquée d'un astérisque coloré. */
+  &__document-flag {
+    font-weight: var(--cnpm-font-weight-regular);
+  }
+
+  &__document-file {
+    font-size: var(--cnpm-font-size-sm);
+    overflow-wrap: anywhere;
+  }
+
+  /* Le champ natif reste dans le flux du clavier — masqué à la vue, jamais
+     retiré de la tabulation : le libellé stylé sert de contrôle visible et
+     l'anneau de focus se reporte sur lui. */
+  &__file {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    opacity: 0;
+
+    &:focus-visible + .cnpm-enrollment__file-label {
+      outline: 2px solid var(--cnpm-color-border-focus);
+      outline-offset: 2px;
+    }
+
+    &:disabled + .cnpm-enrollment__file-label {
+      border-color: var(--cnpm-color-border-subtle);
+      color: var(--cnpm-color-text-disabled);
+      cursor: not-allowed;
+    }
+  }
+
+  &__file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cnpm-space-2);
+    min-block-size: var(--cnpm-size-control-md);
+    padding: 0 var(--cnpm-space-4);
+    border-color: var(--cnpm-color-border-strong);
+    cursor: pointer;
+  }
+
+  /* ------------------------------------------------------------ récapitulatif */
+
+  &__recap-document {
+    padding-block: var(--cnpm-space-2);
+    border-block-end: 1px solid var(--cnpm-color-border-subtle);
+  }
+
+  &__recap-document-file {
+    overflow-wrap: anywhere;
+  }
+
+  /* ------------------------------------------------------------------ abandon */
+
+  &__confirm {
+    padding: var(--cnpm-space-4);
+    border-color: var(--cnpm-color-border-default);
+  }
+
+  &__confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cnpm-space-2);
+  }
+
+  /* --------------------------------------------------------- barre d'actions */
+
+  /* Barre stable en bas de la colonne du formulaire. Sans elle, les actions
+     d'enregistrement quittent l'écran dès qu'une étape dépasse le viewport. */
+  &__actions {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cnpm-space-3);
+    padding: var(--cnpm-space-3) var(--cnpm-space-4)
+      calc(var(--cnpm-space-3) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* ------------------------------------------------------------ panneau d'aide */
+
+  &__aside {
+    padding: var(--cnpm-space-4);
+  }
+
+  &__aside-title {
+    margin: 0;
+    font-size: var(--cnpm-font-size-md);
+  }
+
+  &__aside-item {
+    justify-content: space-between;
+    font-size: var(--cnpm-font-size-sm);
+  }
+}
+
+/* --------------------------------------------------------------------- stepper */
+
+.cnpm-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+
+  &__item {
+    flex: 1 1 10rem;
+    min-width: 0;
+  }
+
+  &__button {
+    display: flex;
+    align-items: center;
+    gap: var(--cnpm-space-2);
+    inline-size: 100%;
+    min-block-size: var(--cnpm-size-control-lg);
+    padding: var(--cnpm-space-2) var(--cnpm-space-3);
+    text-align: start;
+    color: var(--cnpm-color-text-primary);
+    cursor: pointer;
+  }
+
+  &__index {
+    block-size: var(--cnpm-size-icon-lg);
+    background: var(--cnpm-color-surface-subtle);
+    font-size: var(--cnpm-font-size-sm);
+    font-weight: var(--cnpm-font-weight-semibold);
+    color: var(--cnpm-color-text-secondary);
+  }
+
+  &__text {
+    display: flex;
+    flex-flow: column;
+    min-width: 0;
+  }
+
+  /* L'étape courante se distingue par la bordure, la graisse ET le libellé
+     « Étape en cours » : jamais par la seule couleur. */
+  &__button--current {
+    border-color: var(--cnpm-color-brand-blue-700);
+    border-inline-start-width: 3px;
+
+    .cnpm-stepper__index {
+      background: var(--cnpm-color-brand-blue-700);
+      color: var(--cnpm-color-text-inverse);
+    }
+
+    .cnpm-stepper__label {
+      font-weight: var(--cnpm-font-weight-semibold);
+    }
+  }
+
+  &__button--complete .cnpm-stepper__index {
+    background: var(--cnpm-color-semantic-success-100);
+    color: var(--cnpm-color-semantic-success-700);
+  }
+
+  &__button--error {
+    border-color: var(--cnpm-color-border-critical);
+
+    .cnpm-stepper__index {
+      background: var(--cnpm-color-semantic-error-100);
+      color: var(--cnpm-color-semantic-error-700);
+    }
+
+    .cnpm-stepper__status {
+      color: var(--cnpm-color-text-critical);
+      font-weight: var(--cnpm-font-weight-medium);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------- adaptatif */
+
+/* Sous 1280 px, le panneau d'aide passe sous le formulaire. La fiche le veut
+   repliable sur mobile ; faute de spécification de ce repli, il reste déployé et
+   lisible plutôt que masqué derrière un contrôle non spécifié. */
+@media (max-width: 1279px) {
+  .cnpm-enrollment__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-enrollment {
+    &__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__section {
+      padding: var(--cnpm-space-4);
+    }
+
+    /* Cible tactile 44–48 px sur mobile, conformément à `ux-ui.md`. */
+    &__control,
+    &__file-label {
+      block-size: var(--cnpm-size-control-lg);
+    }
+
+    &__actions,
+    &__actions-left,
+    &__actions-right {
+      inline-size: 100%;
+    }
+  }
+
+  .cnpm-stepper__item {
+    flex: 1 1 100%;
+  }
+}

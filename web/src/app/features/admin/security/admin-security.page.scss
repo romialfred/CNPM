@@ -1,0 +1,308 @@
+@use '../../../../styles/tokens' as tokens;
+
+.cnpm-security {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+/* Panneau principal et synthèse latérale, comme la fiche BO-030 (320–360 px).
+   `minmax(0, 1fr)` empêche la colonne du tableau de se dimensionner sur son
+   min-content : sans cela, une matrice à six colonnes pousserait la grille au-delà de
+   la page au lieu de défiler dans son propre conteneur. */
+.cnpm-security__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  align-items: start;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-security__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+/* Le panneau est focalisable pour être atteint au clavier depuis la bande d'onglets ;
+   son contour doit donc rester visible (WCAG 2.4.7). */
+.cnpm-security__panel:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 4px;
+  border-radius: var(--cnpm-radius-md);
+}
+
+/* Texte réservé aux technologies d'assistance : il nomme un statut, une aide ou un
+   en-tête que le visuel porte déjà par la forme. */
+.cnpm-security__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-security__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-security__label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-security__input {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__input:focus-visible {
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-security__total {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Les cellules de ligne sont déclarées dans CE gabarit : l'encapsulation d'Angular les
+   rattache à cet écran, si bien que les styles de cellule du design system, portés par
+   le composant `DataTable`, ne les atteignent pas. Les valeurs sont reprises des
+   tokens, jamais réinventées. */
+.cnpm-table__cell {
+  padding: var(--cnpm-space-3);
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-table__cell--end {
+  text-align: right;
+}
+
+/* Identité sur deux lignes — nom puis adresse — avec un plancher : sans lui, la table
+   comprime l'adresse jusqu'à la hacher, ce qui la rend illisible et fait enfler la
+   ligne. */
+.cnpm-security__identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 12rem;
+}
+
+.cnpm-security__identity-name {
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__identity-detail {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.cnpm-security__moment {
+  white-space: nowrap;
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__muted {
+  color: var(--cnpm-color-text-muted);
+}
+
+/* Chasses tabulaires : sans elles, comparer deux décomptes d'une ligne à l'autre
+   demande un effort inutile. */
+.cnpm-security__count {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-security__device {
+  display: block;
+  min-width: 12rem;
+}
+
+.cnpm-security__correlation {
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Les actions restent sur une ligne : un tableau se lit en balayant les lignes, et des
+   lignes deux fois plus hautes coûtent plus cher que le défilement qu'elles évitent. */
+.cnpm-security__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--cnpm-space-1);
+}
+
+/* ---------------------------- Matrice des droits ---------------------------- */
+
+.cnpm-security__permission-head {
+  font-weight: var(--cnpm-font-weight-regular);
+}
+
+.cnpm-security__grant {
+  text-align: center;
+}
+
+/* La forme distingue déjà les deux cas ; la couleur ne fait que la renforcer, et
+   chaque cellule porte en plus un texte lu par les technologies d'assistance. */
+.cnpm-security__grant-yes {
+  color: var(--cnpm-color-semantic-success-700);
+  vertical-align: middle;
+}
+
+.cnpm-security__grant-no {
+  color: var(--cnpm-color-text-disabled);
+  vertical-align: middle;
+}
+
+.cnpm-security__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-security__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-security__subtitle {
+  margin: var(--cnpm-space-2) 0 0;
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--cnpm-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Bordure plutôt qu'ombre, surface blanche : `ux-ui.md` proscrit les cadres colorés et
+   les ombres lourdes, et la carte ne sert ici qu'au regroupement sémantique. */
+.cnpm-security__role {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-security__role-name {
+  margin: 0;
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-security__role-description {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-security__role-count {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* -------------------------------- Panneau ---------------------------------- */
+
+.cnpm-security__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-security__card {
+  padding: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-security__card-title {
+  margin: 0 0 var(--cnpm-space-3);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__card-note {
+  margin: var(--cnpm-space-3) 0 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* Sous 1440 px, la synthèse passe sous le panneau : elle reste lisible et complète,
+   plutôt que d'être masquée derrière un tiroir non spécifié. */
+@media (max-width: 1439px) {
+  .cnpm-security__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-security__aside {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  cnpm-insight-summary,
+  .cnpm-security__card {
+    flex: 1 1 18rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-security__aside {
+    flex-direction: column;
+  }
+
+  .cnpm-security__input {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  /* Reflow à 320 px : les cartes de rôle passent sur une colonne unique plutôt que
+     d'imposer une largeur minimale que la page ne peut pas offrir. */
+  .cnpm-security__roles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

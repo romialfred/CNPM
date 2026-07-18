@@ -1,0 +1,417 @@
+<cnpm-admin-shell>
+  <div class="cnpm-reporting">
+    <cnpm-page-header
+      title="Reporting décisionnel"
+      description="Analysez le recouvrement des cotisations, sa concentration et son évolution sur la période de votre choix."
+    >
+      <!-- La fiche prévoit un `ExportMenu` avec export asynchrone et notification. Ce
+           flux n'est pas spécifié : les deux actions restent visibles mais inertes, et
+           annoncent leur indisponibilité. Un bouton qui ne produit rien en silence use
+           la confiance bien plus vite qu'une indisponibilité assumée. -->
+      <cnpm-button variant="secondary" [disabled]="true" describedBy="export-indisponible">
+        <svg lucideFileText [size]="iconSize.compact"></svg>
+        Exporter en PDF
+      </cnpm-button>
+      <cnpm-button variant="secondary" [disabled]="true" describedBy="export-indisponible">
+        <svg lucideFileSpreadsheet [size]="iconSize.compact"></svg>
+        Exporter en Excel
+      </cnpm-button>
+      <p class="cnpm-reporting__hint" id="export-indisponible">
+        Exports indisponibles : le flux d’export asynchrone et sa notification ne sont pas encore
+        spécifiés.
+      </p>
+    </cnpm-page-header>
+
+    <!-- `live` désactivé : le bandeau est présent au chargement et ne change pas. Une
+         région live annoncerait un message que personne n'attend. -->
+    <cnpm-alert tone="info" title="Données de démonstration" [live]="false">
+      Les chiffres de cet écran sont fictifs et servent uniquement à la démonstration. Ils ne
+      représentent aucune donnée réelle du CNPM ni d’un de ses membres.
+    </cnpm-alert>
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeChip($event)"
+      (resetAll)="resetFilters()"
+    >
+      <div class="cnpm-reporting__filter">
+        <label class="cnpm-reporting__label" for="filtre-exercice">Exercice</label>
+        <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique avant
+             que le `@for` n'ait créé les options, et la valeur restaurée depuis l'URL
+             serait rejetée par le navigateur. -->
+        <select
+          id="filtre-exercice"
+          class="cnpm-reporting__select"
+          name="exercice"
+          [ngModel]="exercise()"
+          (ngModelChange)="setExercise($event)"
+        >
+          @for (value of exercises; track value) {
+            <option [value]="value">{{ exerciseLabels[value] }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="cnpm-reporting__filter">
+        <label class="cnpm-reporting__label" for="filtre-periode">Période</label>
+        <select
+          id="filtre-periode"
+          class="cnpm-reporting__select"
+          name="periode"
+          [ngModel]="period()"
+          (ngModelChange)="setPeriod($event)"
+        >
+          @for (value of periods; track value) {
+            <option [value]="value">{{ periodLabels[value] }}</option>
+          }
+        </select>
+      </div>
+
+      <form class="cnpm-reporting__filter" role="search" (ngSubmit)="applySearch()">
+        <label class="cnpm-reporting__label" for="filtre-recherche">
+          Rechercher une ligne du rapport
+        </label>
+        <input
+          id="filtre-recherche"
+          class="cnpm-reporting__input"
+          type="search"
+          name="recherche"
+          autocomplete="off"
+          placeholder="Mois, région, groupement, catégorie…"
+          [ngModel]="searchDraft()"
+          (ngModelChange)="searchDraft.set($event)"
+        />
+      </form>
+    </cnpm-filter-bar>
+
+    <!-- Bandeau d'indicateurs : six mesures au maximum, comme l'impose la fiche.
+         Chaque carte porte son unité une seule fois, en titre, plutôt que de la
+         répéter sur chaque ligne. -->
+    @if (loading()) {
+      <div class="cnpm-reporting__kpis">
+        <cnpm-skeleton variant="card" [rows]="3" label="Chargement des indicateurs…" />
+        <cnpm-skeleton variant="card" [rows]="3" label="" />
+      </div>
+    } @else {
+      <div class="cnpm-reporting__kpis">
+        <cnpm-insight-summary
+          title="Cotisations de la période"
+          headingId="kpi-cotisations"
+          unit="(FCFA)"
+          [stats]="contributionStats()"
+          [note]="'Source : ' + descriptor().source + ' ' + updatedAt() + '.'"
+        />
+        <cnpm-insight-summary
+          title="Performance de la période"
+          headingId="kpi-performance"
+          [stats]="performanceStats()"
+          note="Le taux rapporte les encaissements aux cotisations attendues. L’effectif est un stock en fin de période ; les adhésions sont un flux cumulé sur la période."
+        />
+      </div>
+    }
+
+    <div class="cnpm-reporting__layout">
+      <div class="cnpm-reporting__main">
+        <!-- Catalogue de rapports. Le patron `tablist` porte la navigation par flèches
+             et l'état sélectionné ; le rapport choisi reste dans l'URL, ce qui rend
+             l'analyse citable telle quelle. -->
+        <cnpm-tabs
+          ariaLabel="Catalogue de rapports"
+          [tabs]="catalogue"
+          [selected]="reportId()"
+          (selectedChange)="selectReport($event)"
+        />
+
+        <section
+          class="cnpm-reporting__report"
+          role="tabpanel"
+          tabindex="0"
+          [attr.aria-labelledby]="'tab-' + reportId()"
+        >
+          <div class="cnpm-reporting__report-head">
+            <h2 class="cnpm-reporting__report-title">{{ descriptor().title }}</h2>
+            <p class="cnpm-reporting__report-description">{{ descriptor().description }}</p>
+          </div>
+
+          <!-- La fiche demande un `MetricDefinitionTooltip`. Une bulle au survol reste
+               hors de portée au clavier et sur écran tactile : la méthode est donc
+               dépliable, donc atteignable et copiable. -->
+          <details class="cnpm-reporting__method">
+            <summary class="cnpm-reporting__method-summary">
+              Définition, source et période de cet indicateur
+            </summary>
+            <div class="cnpm-reporting__method-body">
+              <cnpm-definition-list [items]="metricDefinitions()" />
+            </div>
+          </details>
+
+          @if (loading()) {
+            <cnpm-skeleton
+              variant="chart"
+              [columns]="skeletonRows"
+              label="Chargement du graphique…"
+            />
+          } @else {
+            @if (chart(); as chartData) {
+              <figure class="cnpm-reporting__chart">
+                <ul class="cnpm-reporting__legend">
+                  <li class="cnpm-reporting__legend-item">
+                    <span
+                      class="cnpm-reporting__swatch cnpm-reporting__swatch--expected"
+                      aria-hidden="true"
+                    ></span>
+                    Cotisations attendues
+                  </li>
+                  <li class="cnpm-reporting__legend-item">
+                    <span
+                      class="cnpm-reporting__swatch cnpm-reporting__swatch--collected"
+                      aria-hidden="true"
+                    ></span>
+                    Encaissements
+                  </li>
+                </ul>
+
+                <!-- Tracé décoratif : les mêmes valeurs sont dans le tableau ci-dessous,
+                     qui est l'alternative accessible exigée par la fiche. Annoncer deux
+                     fois les mêmes chiffres rendrait la page bavarde sans rien ajouter.
+                     Aucun effet de volume ni de perspective : la palette se limite à
+                     deux teintes de la couleur de marque. -->
+                <svg
+                  class="cnpm-reporting__chart-svg"
+                  [attr.viewBox]="chartViewBox"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  @for (y of chartData.gridY; track y) {
+                    <line
+                      class="cnpm-reporting__chart-grid"
+                      [attr.x1]="chartLeft"
+                      [attr.x2]="chartRight"
+                      [attr.y1]="y"
+                      [attr.y2]="y"
+                    />
+                  }
+                  @for (bar of chartData.bars; track bar.key) {
+                    <rect
+                      class="cnpm-reporting__bar cnpm-reporting__bar--expected"
+                      [attr.x]="bar.expectedX"
+                      [attr.y]="bar.expectedY"
+                      [attr.width]="bar.barWidth"
+                      [attr.height]="bar.expectedHeight"
+                    ></rect>
+                    <rect
+                      class="cnpm-reporting__bar cnpm-reporting__bar--collected"
+                      [attr.x]="bar.collectedX"
+                      [attr.y]="bar.collectedY"
+                      [attr.width]="bar.barWidth"
+                      [attr.height]="bar.collectedHeight"
+                    ></rect>
+                    <text
+                      class="cnpm-reporting__chart-label"
+                      text-anchor="middle"
+                      [attr.x]="bar.labelX"
+                      [attr.y]="chartLabelY"
+                    >
+                      {{ bar.label }}
+                    </text>
+                  }
+                </svg>
+
+                <figcaption class="cnpm-reporting__chart-caption">
+                  Cotisations attendues et encaissements, échelle de 0 à
+                  {{ chartData.max | number: '1.0-0' }} FCFA. Les mêmes valeurs, chiffrées, figurent
+                  dans le tableau ci-dessous.
+                </figcaption>
+              </figure>
+            }
+          }
+
+          <cnpm-data-table
+            [caption]="tableCaption()"
+            [columns]="columns()"
+            [rows]="rows()"
+            [state]="tableState()"
+            [sort]="sort()"
+            [rowKey]="rowKey"
+            [rowLabel]="rowLabel"
+            (sortChange)="onSortChange($event)"
+          >
+            <ng-template #row let-line>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-reporting__dimension">{{ line.label }}</span>
+              </td>
+              <!-- Montants alignés à droite et en chasses tabulaires : l'unité est portée
+                   une fois par l'en-tête, jamais répétée sur chaque ligne. -->
+              <td class="cnpm-table__cell cnpm-table__cell--end">
+                <span class="cnpm-reporting__amount">{{ line.expected | number: '1.0-0' }}</span>
+              </td>
+              <td class="cnpm-table__cell cnpm-table__cell--end">
+                <span class="cnpm-reporting__amount">{{ line.collected | number: '1.0-0' }}</span>
+              </td>
+              <!-- Le signe porte l'information ; la couleur ne fait que la redoubler,
+                   jamais la remplacer. -->
+              <td class="cnpm-table__cell cnpm-table__cell--end">
+                <span
+                  class="cnpm-reporting__amount"
+                  [class.cnpm-reporting__amount--negative]="line.gap < 0"
+                >
+                  {{ line.gap | number: '1.0-0' }}
+                </span>
+              </td>
+              <td class="cnpm-table__cell cnpm-table__cell--end">
+                @if (line.recoveryRate === null) {
+                  <span aria-label="Donnée indisponible">—</span>
+                } @else {
+                  <span class="cnpm-reporting__amount">
+                    {{ line.recoveryRate | number: '1.1-1' }}&nbsp;%
+                  </span>
+                }
+              </td>
+              <td class="cnpm-table__cell cnpm-table__cell--end">
+                @if (line.share === null) {
+                  <span aria-label="Donnée indisponible">—</span>
+                } @else {
+                  <span class="cnpm-reporting__amount">
+                    {{ line.share | number: '1.1-1' }}&nbsp;%
+                  </span>
+                }
+              </td>
+              @if (descriptor().hasMembers) {
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  @if (line.members === null) {
+                    <span aria-label="Donnée indisponible">—</span>
+                  } @else {
+                    <span class="cnpm-reporting__amount">{{ line.members | number }}</span>
+                  }
+                </td>
+              }
+            </ng-template>
+
+            <!-- Les états s'appuient sur les composants du socle (FDB-005/006/007).
+                 « Période sans donnée » et « aucun résultat » restent distincts : la
+                 première invite à changer de période, le second à élargir la recherche. -->
+            <div data-table-status>
+              @switch (tableState()) {
+                @case ('loading') {
+                  <cnpm-skeleton
+                    variant="table"
+                    [rows]="skeletonRows"
+                    [columns]="columns().length"
+                    label="Chargement du rapport…"
+                  />
+                }
+                @case ('empty') {
+                  @if (periodWithoutData()) {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Aucune donnée sur cette période"
+                      description="L’exercice sélectionné ne comporte pas encore d’écriture sur cette période. Choisissez une période déjà arrêtée."
+                    >
+                      <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                        Revenir à l’année complète
+                      </cnpm-button>
+                    </cnpm-empty-state>
+                  } @else {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Rapport vide"
+                      description="Ce rapport ne comporte aucune ligne pour la période sélectionnée."
+                    />
+                  }
+                }
+                @case ('noResult') {
+                  <cnpm-empty-state
+                    variant="no-results"
+                    title="Aucune ligne ne correspond"
+                    description="Élargissez la recherche ou retirez le filtre pour retrouver l’ensemble du rapport."
+                  >
+                    <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                      Réinitialiser les filtres
+                    </cnpm-button>
+                  </cnpm-empty-state>
+                }
+                @case ('error') {
+                  <cnpm-error-state
+                    variant="recoverable"
+                    title="Le rapport n’a pas pu être chargé"
+                    description="Le service de reporting est momentanément indisponible. Vos filtres sont conservés."
+                  >
+                    <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                      Réessayer
+                    </cnpm-button>
+                  </cnpm-error-state>
+                }
+                @case ('forbidden') {
+                  <!-- Aucune action « réessayer » : répéter une requête que le droit
+                       condamne n'a pas de sens. -->
+                  <cnpm-error-state variant="forbidden" />
+                }
+              }
+            </div>
+          </cnpm-data-table>
+        </section>
+      </div>
+
+      <aside class="cnpm-reporting__aside">
+        <section class="cnpm-reporting__panel" aria-labelledby="panneau-analyses">
+          <h2 class="cnpm-reporting__panel-title" id="panneau-analyses">
+            Analyses et recommandations
+          </h2>
+          <!-- La fiche exige que les recommandations automatiques soient identifiées
+               comme telles et explicables : chaque énoncé porte donc sa nature et la
+               règle qui l'a produit. Une recommandation sans règle énoncée est un
+               oracle, que personne ne peut vérifier ni contester. -->
+          <p class="cnpm-reporting__panel-note">
+            Énoncés produits automatiquement à partir des seuls chiffres du rapport affiché. Ce sont
+            des constats, pas des décisions.
+          </p>
+
+          @if (loading()) {
+            <cnpm-skeleton [rows]="4" label="Chargement des analyses…" />
+          } @else if (insights().length === 0) {
+            <p class="cnpm-reporting__panel-empty">
+              Aucune analyse : la période sélectionnée ne comporte pas de donnée à interpréter.
+            </p>
+          } @else {
+            <ul class="cnpm-reporting__insights">
+              @for (insight of insights(); track insight.id) {
+                <li class="cnpm-reporting__insight">
+                  <cnpm-badge [tone]="insightTone(insight.kind)">
+                    {{ insightLabel(insight.kind) }}
+                  </cnpm-badge>
+                  <p class="cnpm-reporting__insight-message">{{ insight.message }}</p>
+                  <p class="cnpm-reporting__insight-rationale">
+                    <span class="cnpm-reporting__insight-label">Règle appliquée :</span>
+                    {{ insight.rationale }}
+                  </p>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="cnpm-reporting__panel" aria-labelledby="panneau-regions">
+          <h2 class="cnpm-reporting__panel-title" id="panneau-regions">
+            Taux de recouvrement par région
+          </h2>
+          @if (loading()) {
+            <cnpm-skeleton [rows]="6" label="Chargement des taux régionaux…" />
+          } @else if (regionRates().length === 0) {
+            <p class="cnpm-reporting__panel-empty">
+              Aucun taux régional : la période sélectionnée ne comporte pas de donnée.
+            </p>
+          } @else {
+            <cnpm-definition-list [items]="regionRates()" />
+          }
+          <p class="cnpm-reporting__panel-note">
+            La carte du Mali n’est pas rendue : la fiche impose un fond cartographique officiel
+            validé, absent du dépôt. Une carte approximative induirait en erreur sur un découpage
+            territorial.
+          </p>
+        </section>
+      </aside>
+    </div>
+  </div>
+</cnpm-admin-shell>

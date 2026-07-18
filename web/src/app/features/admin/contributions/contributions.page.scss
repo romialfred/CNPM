@@ -1,0 +1,214 @@
+.cnpm-contributions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+/* Tableau dominant et panneau de synthèse latéral (fiche BO-011).
+   `minmax(0, 1fr)` empêche la colonne du tableau de se dimensionner sur son
+   min-content : sans cela, une table à neuf colonnes pousserait la grille au-delà de
+   la page au lieu de défiler dans son propre conteneur. */
+.cnpm-contributions__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  align-items: start;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-contributions__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+/* Motif de l'indisponibilité de l'export : lu par les technologies d'assistance via
+   `aria-describedby`, masqué visuellement puisque le bouton désactivé le porte déjà. */
+.cnpm-contributions__hint {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-contributions__filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-contributions__label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-contributions__select,
+.cnpm-contributions__input {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-contributions__select:focus-visible,
+.cnpm-contributions__input:focus-visible {
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-contributions__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-contributions__total {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-contributions__asof {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-contributions__reference {
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+  white-space: nowrap;
+}
+
+/* Raison sociale et code sur deux lignes : le code seul est illisible, la raison
+   sociale seule est ambiguë entre deux établissements homonymes. */
+.cnpm-contributions__member {
+  display: flex;
+  flex-direction: column;
+  min-width: 10rem;
+}
+
+.cnpm-contributions__member-name {
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-contributions__member-code {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Les chiffres s'alignent verticalement grâce aux chasses tabulaires : sans elles,
+   comparer deux montants d'une colonne à l'autre demande un effort inutile. */
+.cnpm-contributions__amount {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+  white-space: nowrap;
+}
+
+.cnpm-contributions__note {
+  display: block;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-contributions__due {
+  display: flex;
+  flex-direction: column;
+}
+
+.cnpm-contributions__date {
+  color: var(--cnpm-color-text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* La mention porte l'information ; la couleur ne fait que la renforcer. Retirer la
+   teinte laisserait « Échue » parfaitement lisible — c'est la condition posée par
+   `ux-ui.md` sur tout état. */
+.cnpm-contributions__due-flag {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+  white-space: nowrap;
+}
+
+.cnpm-contributions__due-flag--past {
+  color: var(--cnpm-color-text-critical);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-contributions__status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cnpm-space-1);
+}
+
+/* Les actions restent sur une ligne : un tableau de neuf colonnes se lit en balayant
+   les lignes, et des lignes deux fois plus hautes coûtent plus cher que la barre de
+   défilement qu'elles feraient disparaître. */
+.cnpm-contributions__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-contributions__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+/* Sous 1440 px, la synthèse passe sous la liste plutôt que derrière un tiroir non
+   spécifié : elle reste lisible et complète. */
+@media (max-width: 1439px) {
+  .cnpm-contributions__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-contributions__aside {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  cnpm-insight-summary {
+    flex: 1 1 18rem;
+  }
+}
+
+/* Cibles tactiles de 44 à 48 px sous le breakpoint mobile (ux-ui.md). */
+@media (max-width: 767px) {
+  .cnpm-contributions__aside {
+    flex-direction: column;
+  }
+
+  .cnpm-contributions__select,
+  .cnpm-contributions__input {
+    height: var(--cnpm-size-control-lg);
+  }
+}

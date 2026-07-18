@@ -1,0 +1,583 @@
+/* Aucune transition ni animation dans cette feuille : « Aucune animation au test
+   visuel » est un critère de recette de la fiche BO-001.
+
+   Feuille consolidée pour tenir le budget `anyComponentStyle` d'Angular (8 kB) :
+   les sélecteurs qui partagent un même bloc de déclarations sont regroupés, et le
+   préfixe de bloc est imbriqué. Les commentaires disparaissent à la minification :
+   ils ne pèsent rien dans le budget, la documentation des choix normatifs est donc
+   conservée intégralement. Aucune couleur ni aucun espacement en dur : toutes les
+   valeurs restent des tokens `var(--cnpm-…)`. */
+
+.cnpm-dashboard {
+  gap: var(--cnpm-space-6);
+
+  /* ---------------------------------------------------------- Empilements verticaux */
+
+  &,
+  &__period,
+  &__kpis,
+  &__kpi-card,
+  &__column,
+  &__panel,
+  &__legend-list,
+  &__feed-item,
+  &__shortcut-text {
+    display: flex;
+    flex-flow: column;
+    min-width: 0;
+  }
+
+  /* Listes verticales sans puces : alertes, activité récente et raccourcis. */
+  &__alerts,
+  &__feed,
+  &__shortcuts {
+    display: flex;
+    flex-flow: column;
+    gap: var(--cnpm-space-3);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Bordure plutôt qu'ombre : `ux-ui.md` demande la bordure d'abord, et les cartes
+     uniquement pour un regroupement sémantique — ici, un indicateur et sa définition,
+     ou un panneau et son contenu. */
+  &__kpi-card,
+  &__panel {
+    padding: var(--cnpm-layout-cardPadding);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-lg);
+    background: var(--cnpm-color-surface-primary);
+  }
+
+  &__column,
+  &__panel {
+    gap: var(--cnpm-space-4);
+  }
+
+  &__period {
+    gap: var(--cnpm-space-2);
+  }
+
+  &__kpis {
+    gap: var(--cnpm-space-3);
+  }
+
+  &__kpi-card {
+    flex: 1 1 auto;
+    gap: var(--cnpm-space-1);
+  }
+
+  &__shortcuts {
+    gap: var(--cnpm-space-2);
+  }
+
+  /* ------------------------------------------------------------------ Filtre période */
+
+  &__select {
+    width: 100%;
+    min-width: 8rem;
+    height: var(--cnpm-size-control-md);
+    padding: 0 var(--cnpm-space-3);
+    border: 1px solid var(--cnpm-color-border-default);
+    border-radius: var(--cnpm-radius-md);
+    /* La police est déjà héritée : le socle applique `font: inherit` aux contrôles. */
+    background: var(--cnpm-color-surface-primary);
+    font-size: var(--cnpm-font-size-sm);
+    color: var(--cnpm-color-text-primary);
+  }
+
+  /* Région de statut montée en permanence. Elle n'est pas masquée : une actualisation
+     silencieuse laisserait croire à un écran figé. */
+  &__refresh {
+    display: flex;
+    align-items: center;
+    gap: var(--cnpm-space-2);
+    min-height: var(--cnpm-font-lineHeight-sm);
+    margin: 0;
+    font-size: var(--cnpm-font-size-sm);
+  }
+
+  /* ---------------------------------------------------------------------- Bandeau KPI */
+
+  /* Cinq colonnes au-delà de 1440 px ; quatre à partir de 1280 px, où le cinquième KPI
+     passe à la rangée suivante — « À 1280 px, réduire à quatre KPI et déplacer le
+     cinquième ». Deux rangées au maximum, jamais trois. */
+  &__kpi-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--cnpm-space-4);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__kpi {
+    display: flex;
+    min-width: 0;
+  }
+
+  &__kpi-label {
+    margin: 0;
+  }
+
+  &__kpi-value {
+    margin: 0;
+    font-size: var(--cnpm-font-size-2xl);
+    line-height: var(--cnpm-font-lineHeight-2xl);
+  }
+
+  &__kpi-definition {
+    margin: 0;
+    line-height: var(--cnpm-font-lineHeight-xs);
+  }
+
+  &__kpi-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cnpm-space-1);
+    margin-block-start: auto;
+    padding-block-start: var(--cnpm-space-2);
+  }
+
+  /* ------------------------------------------------------------------------ Disposition */
+
+  /* Graphique et tableau à gauche (8 colonnes de la fiche), synthèses à droite (4).
+     `minmax(0, …)` empêche la colonne de gauche de se dimensionner sur son min-content :
+     sans cela, une table à six colonnes pousserait la grille au-delà de la page au lieu
+     de défiler dans son propre conteneur. */
+  &__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 20rem);
+    align-items: start;
+    gap: var(--cnpm-space-6);
+    min-width: 0;
+  }
+
+  /* En-tête de panneau, ligne de légende et raccourci : même répartition aux extrémités. */
+  &__panel-head,
+  &__legend-row,
+  &__shortcut {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--cnpm-space-3);
+  }
+
+  &__panel-head,
+  &__legend-row {
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  &__panel-head {
+    flex-wrap: wrap;
+  }
+
+  &__trend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cnpm-space-2);
+    margin: 0;
+  }
+
+  /* ------------------------------------------------------------------------- Graphique */
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cnpm-space-4);
+    margin: 0;
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cnpm-space-2);
+  }
+
+  /* La pastille par défaut porte la couleur de la série encaissée : les modificateurs
+     `--collected` et `--active` n'ont donc rien à redéclarer. */
+  &__swatch {
+    display: inline-block;
+    width: var(--cnpm-size-icon-xs);
+    height: var(--cnpm-size-icon-xs);
+    border-radius: var(--cnpm-radius-xs);
+    background: var(--cnpm-color-brand-blue-700);
+  }
+
+  &__swatch--expected {
+    background: var(--cnpm-color-brand-blue-200);
+  }
+
+  &__swatch--dormant {
+    background: var(--cnpm-color-brand-blue-300);
+  }
+
+  /* Hauteur de tracé fixée localement : aucun token de dimension ne couvre la géométrie
+     d'un graphique, et une hauteur en `rem` suit le zoom texte jusqu'à 200 %. */
+  &__bars {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: end;
+    gap: var(--cnpm-space-3);
+    height: 13rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-end: 1px solid var(--cnpm-color-border-subtle);
+  }
+
+  &__bar {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--cnpm-space-2);
+    height: 100%;
+    min-width: 0;
+  }
+
+  &__bar-plot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 100%;
+    min-width: 0;
+  }
+
+  /* Le rail porte le montant attendu, la part pleine le montant encaissé : le taux de
+     recouvrement du mois se lit directement comme le remplissage du rail. */
+  &__bar-track {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    max-width: 2.75rem;
+    border-radius: var(--cnpm-radius-xs);
+    background: var(--cnpm-color-brand-blue-200);
+  }
+
+  &__bar-fill {
+    width: 100%;
+    border-radius: var(--cnpm-radius-xs);
+    background: var(--cnpm-color-brand-blue-700);
+  }
+
+  &__data-summary {
+    cursor: pointer;
+  }
+
+  &__data[open] &__data-summary {
+    margin-block-end: var(--cnpm-space-3);
+  }
+
+  /* ------------------------------------------------------------------------- Tableaux */
+
+  &__amount {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__reference {
+    font-weight: var(--cnpm-font-weight-semibold);
+    color: var(--cnpm-color-text-brand);
+    white-space: nowrap;
+  }
+
+  /* ---------------------------------------------------------------------- Segmentation */
+
+  &__donut-wrap {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+  }
+
+  /* SVG et centre occupent la même cellule de grille : superposer sans positionnement
+     absolu garde le bloc dans le flux et le laisse se réduire à 320 px. */
+  &__donut,
+  &__donut-center {
+    grid-area: 1 / 1;
+  }
+
+  &__donut {
+    width: 9.5rem;
+    height: 9.5rem;
+  }
+
+  &__donut-track {
+    fill: none;
+    stroke: var(--cnpm-color-surface-subtle);
+    stroke-width: 14;
+  }
+
+  &__donut-arc {
+    fill: none;
+    stroke-width: 14;
+  }
+
+  &__donut-arc--active {
+    stroke: var(--cnpm-color-brand-blue-700);
+  }
+
+  &__donut-arc--dormant {
+    stroke: var(--cnpm-color-brand-blue-300);
+  }
+
+  &__donut-center {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    margin: 0;
+    text-align: center;
+  }
+
+  &__donut-total {
+    font-size: var(--cnpm-font-size-xl);
+    line-height: var(--cnpm-font-lineHeight-xl);
+  }
+
+  &__legend-list {
+    gap: var(--cnpm-space-2);
+    margin: 0;
+  }
+
+  /* Les cohortes qui ne composent pas la base sont séparées par un filet : elles ne
+     s'additionnent pas aux précédentes, et rien ne doit suggérer le contraire. */
+  &__legend-list--related {
+    padding-block-start: var(--cnpm-space-3);
+    border-block-start: 1px solid var(--cnpm-color-border-subtle);
+  }
+
+  &__legend-term {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--cnpm-space-2);
+    min-width: 0;
+    font-size: var(--cnpm-font-size-sm);
+  }
+
+  &__legend-value {
+    margin: 0;
+    font-size: var(--cnpm-font-size-sm);
+    white-space: nowrap;
+  }
+
+  /* --------------------------------------------------------------- Alertes et activité */
+
+  &__alert-detail {
+    font-size: var(--cnpm-font-size-sm);
+  }
+
+  &__alert-time {
+    margin: var(--cnpm-space-1) 0 0;
+  }
+
+  &__feed-item {
+    gap: var(--cnpm-space-1);
+    padding-block-end: var(--cnpm-space-3);
+    border-block-end: 1px solid var(--cnpm-color-border-subtle);
+  }
+
+  &__feed-item:last-child {
+    padding-block-end: 0;
+    border-block-end: 0;
+  }
+
+  &__feed-label {
+    margin: 0;
+    font-size: var(--cnpm-font-size-sm);
+    font-weight: var(--cnpm-font-weight-semibold);
+    color: var(--cnpm-color-text-primary);
+  }
+
+  &__feed-time {
+    margin: 0;
+  }
+
+  /* ------------------------------------------------------------------------ Raccourcis */
+
+  /* Cible tactile de 44 px au minimum : la hauteur de contrôle `lg` du socle. */
+  &__shortcut {
+    align-items: center;
+    min-height: var(--cnpm-size-control-lg);
+    padding: var(--cnpm-space-2) var(--cnpm-space-3);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-md);
+    color: var(--cnpm-color-text-primary);
+    text-decoration: none;
+  }
+
+  &__shortcut:hover {
+    border-color: var(--cnpm-color-border-default);
+    background: var(--cnpm-color-surface-subtle);
+  }
+
+  /* ---------------------------------------------------------------------- Typographie */
+
+  &__section-title,
+  &__panel-title {
+    margin: 0;
+    font-size: var(--cnpm-font-size-md);
+    line-height: var(--cnpm-font-lineHeight-md);
+    font-weight: var(--cnpm-font-weight-semibold);
+    color: var(--cnpm-color-text-primary);
+  }
+
+  &__label,
+  &__kpi-label,
+  &__kpi-missing,
+  &__kpi-link,
+  &__data-summary,
+  &__shortcut-label {
+    font-size: var(--cnpm-font-size-sm);
+    font-weight: var(--cnpm-font-weight-medium);
+  }
+
+  &__label,
+  &__kpi-label,
+  &__refresh,
+  &__legend-term {
+    color: var(--cnpm-color-text-secondary);
+  }
+
+  &__kpi-link,
+  &__shortcut-label {
+    color: var(--cnpm-color-text-link);
+    text-decoration: underline;
+  }
+
+  &__data-summary {
+    color: var(--cnpm-color-text-link);
+  }
+
+  /* Une valeur absente reste une phrase lisible, pas un tiret énigmatique ni un zéro
+     trompeur : elle descend donc à la taille du texte courant. */
+  &__kpi-missing {
+    color: var(--cnpm-color-text-muted);
+  }
+
+  &__kpi-unit {
+    margin-inline-start: var(--cnpm-space-1);
+  }
+
+  &__kpi-unit,
+  &__legend-share {
+    font-weight: var(--cnpm-font-weight-regular);
+    color: var(--cnpm-color-text-muted);
+  }
+
+  /* Mentions 12 px atténuées. */
+  &__kpi-definition,
+  &__note,
+  &__alert-time,
+  &__donut-caption,
+  &__feed-time {
+    font-size: var(--cnpm-font-size-xs);
+    color: var(--cnpm-color-text-muted);
+  }
+
+  /* Mentions 12 px courantes. */
+  &__legend,
+  &__trend-detail,
+  &__bar-label,
+  &__feed-detail,
+  &__shortcut-description {
+    font-size: var(--cnpm-font-size-xs);
+    color: var(--cnpm-color-text-secondary);
+  }
+
+  /* Quatre nombres empilés sans dire lequel contient lequel se prêtent à toutes les
+     lectures : la note et les détails partagent l'interligne du texte courant. */
+  &__note,
+  &__alert-detail,
+  &__feed-detail {
+    margin: 0;
+    line-height: var(--cnpm-font-lineHeight-sm);
+  }
+
+  &__bar-label {
+    text-align: center;
+  }
+
+  /* Chasses tabulaires : sans elles, comparer deux montants d'une ligne à l'autre
+     demande un effort inutile. */
+  &__kpi-value,
+  &__donut-total,
+  &__legend-value {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--cnpm-font-weight-semibold);
+    color: var(--cnpm-color-text-primary);
+  }
+
+  &__amount,
+  &__payer {
+    font-weight: var(--cnpm-font-weight-medium);
+    color: var(--cnpm-color-text-primary);
+  }
+
+  /* ------------------------------------------------------------------- Focus visible */
+
+  &__select:focus-visible,
+  &__kpi-link:focus-visible,
+  &__data-summary:focus-visible,
+  &__shortcut:focus-visible {
+    outline: 2px solid var(--cnpm-color-brand-blue-700);
+    outline-offset: 2px;
+  }
+
+  &__kpi-link:focus-visible,
+  &__data-summary:focus-visible {
+    border-radius: var(--cnpm-radius-xs);
+  }
+
+  &__select:focus-visible {
+    border-color: var(--cnpm-color-brand-blue-700);
+    outline-offset: 1px;
+  }
+
+  /* ---------------------------------------------------------------------- Adaptations */
+
+  /* Sous 1440 px, le cinquième KPI passe à la rangée suivante — la fiche demande de
+     « réduire à quatre KPI et déplacer le cinquième » à partir de 1280 px. */
+  @media (max-width: 1439px) {
+    &__kpi-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* Tablette : sections empilées, comme l'impose la composition normative. */
+  @media (max-width: 1279px) {
+    &__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__kpi-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    &__kpi-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__select {
+      height: var(--cnpm-size-control-lg);
+    }
+  }
+
+  /* Reflow à 320 px : une seule colonne, et le graphique se resserre plutôt que de
+     forcer un défilement horizontal de la page. */
+  @media (max-width: 479px) {
+    &__kpi-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__bars {
+      height: 10rem;
+      gap: var(--cnpm-space-1);
+    }
+  }
+}

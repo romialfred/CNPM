@@ -308,6 +308,17 @@ sans arbitrage romprait la référence des maquettes déjà produites.
 des dénominations sans correspondance réelle, et faire régénérer les maquettes qui les
 affichent.
 
+**Arbitrage du commanditaire (2026-07-18) : les garder telles quelles.** Sollicité avant la
+démonstration — les écrans d'administration affichent `SOMACOP SA` et `BICIM SA` avec des
+paiements « non rapprochés » et des statuts inventés — le commanditaire a choisi de conserver
+le jeu d'origine. Décision assumée, l'auditoire de la démonstration sachant qu'il s'agit de
+données de test.
+
+**Risque résiduel maintenu.** Ce choix vaut pour un auditoire averti ; il reste déconseillé
+pour toute capture, support ou vitrine destinés à circuler hors de ce cadre. À rouvrir avant
+publication externe. L'écran `MP-001` (espace membre) affiche pour sa part un bandeau
+« Environnement de démonstration » et n'emploie que des raisons sociales fictives.
+
 ## DATA-DEC-005 — idempotence des créations sans magasin de clés
 
 **Propriétaire.** Architecture / Direction technique.

@@ -1,0 +1,576 @@
+<cnpm-admin-shell>
+  <div class="cnpm-member">
+    <nav class="cnpm-member__crumbs" aria-label="Fil d’Ariane">
+      <ol class="cnpm-member__crumb-list">
+        <li class="cnpm-member__crumb">
+          <a class="cnpm-member__crumb-link" routerLink="/admin/members">Membres</a>
+        </li>
+        <li class="cnpm-member__crumb" aria-current="page">Fiche membre</li>
+      </ol>
+    </nav>
+
+    @switch (state()) {
+      @case ('loading') {
+        <!-- Jamais de page blanche ni de spinner indéfini : le squelette reprend la
+             structure réelle — identité, informations générales, puis tableau. Une
+             seule région de statut annonce l'occupation ; la seconde reste muette pour
+             ne pas faire entendre deux fois la même chose. -->
+        <h1 class="cnpm-member__title">Fiche membre</h1>
+        <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la fiche membre…" />
+        <cnpm-skeleton variant="table" [rows]="5" [columns]="6" label="" />
+      }
+
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h1"
+          title="La fiche membre n’a pas pu être chargée"
+          description="Le service des membres est momentanément indisponible. Aucune donnée n’a été perdue."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+
+      @case ('forbidden') {
+        <!-- Aucun « réessayer » : répéter une requête que le droit condamne n'a pas de
+             sens. La seule issue utile est de revenir à une vue autorisée. -->
+        <cnpm-error-state variant="forbidden" titleAs="h1">
+          <cnpm-button variant="secondary" size="sm" routerLink="/admin/members">
+            Revenir à la liste des membres
+          </cnpm-button>
+        </cnpm-error-state>
+      }
+
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          titleAs="h1"
+          title="Membre introuvable"
+          description="Aucun membre ne correspond à cet identifiant. La fiche a pu être supprimée, ou l’adresse est incomplète."
+        >
+          <cnpm-button variant="secondary" size="sm" routerLink="/admin/members">
+            Revenir à la liste des membres
+          </cnpm-button>
+        </cnpm-error-state>
+      }
+
+      @default {
+        @if (detail(); as member) {
+          <div class="cnpm-member__layout">
+            <div class="cnpm-member__main">
+              <!-- En-tête d'identité pleine largeur : statut, actions et vérification.
+                   Le statut est porté par un libellé, jamais par la seule couleur. -->
+              <header class="cnpm-member__identity">
+                <div class="cnpm-member__identity-text">
+                  <div class="cnpm-member__title-row">
+                    <h1 class="cnpm-member__title">{{ member.identity.organization }}</h1>
+                    <cnpm-badge [tone]="memberStatusTone(member.identity.status)">
+                      {{ memberStatusLabel(member.identity.status) }}
+                    </cnpm-badge>
+                    <!-- « Grand cotisant » est un marqueur, pas un statut : il se lit à
+                         côté et ne s'y substitue jamais. -->
+                    @if (member.identity.isLargeContributor) {
+                      <cnpm-badge tone="neutral">Grand cotisant</cnpm-badge>
+                    }
+                  </div>
+
+                  <dl class="cnpm-member__meta">
+                    <div class="cnpm-member__meta-item">
+                      <dt>Code membre</dt>
+                      <dd>{{ member.identity.code }}</dd>
+                    </div>
+                    <div class="cnpm-member__meta-item">
+                      <dt>Catégorie</dt>
+                      <dd>{{ member.identity.category }}</dd>
+                    </div>
+                    <div class="cnpm-member__meta-item">
+                      <dt>Groupement</dt>
+                      <dd>{{ member.identity.group }}</dd>
+                    </div>
+                  </dl>
+
+                  <cnpm-verification-badge
+                    [status]="member.identity.verification"
+                    [explanation]="verificationExplanation"
+                    [verifiedAt]="
+                      member.identity.verifiedAt ? formatDay(member.identity.verifiedAt) : null
+                    "
+                  />
+                </div>
+
+                <!-- Les commandes non câblées annoncent leur indisponibilité plutôt que
+                     de conduire à un écran absent ; le motif est lu par `aria-describedby`,
+                     donc annoncé au clavier comme à la souris. -->
+                <div class="cnpm-member__identity-actions">
+                  <cnpm-button
+                    variant="primary"
+                    [disabled]="true"
+                    [describedBy]="
+                      member.permissions.canEdit ? 'flux-modification' : 'droit-modifier'
+                    "
+                  >
+                    <svg lucidePencil [size]="iconSize.compact"></svg>
+                    Modifier
+                  </cnpm-button>
+                  <cnpm-button variant="secondary" [disabled]="true" describedBy="vue-impression">
+                    <svg lucidePrinter [size]="iconSize.compact"></svg>
+                    Imprimer
+                  </cnpm-button>
+                  <cnpm-button variant="tertiary" routerLink="/admin/members">
+                    Retour à la liste
+                  </cnpm-button>
+
+                  <p class="cnpm-member__hint" id="flux-modification">
+                    L’écran de modification d’un membre n’est pas encore disponible.
+                  </p>
+                  <p class="cnpm-member__hint" id="droit-modifier">
+                    Votre rôle ne permet pas de modifier cette fiche.
+                  </p>
+                  <p class="cnpm-member__hint" id="vue-impression">
+                    La vue d’impression dédiée de la fiche n’est pas encore disponible ; la capture
+                    de l’écran ne la remplace pas.
+                  </p>
+                </div>
+              </header>
+
+              <section class="cnpm-member__card" aria-labelledby="informations-titre">
+                <h2 class="cnpm-member__card-title" id="informations-titre">
+                  Informations générales
+                </h2>
+                <cnpm-definition-list [items]="generalFacts()" />
+              </section>
+
+              <cnpm-tabs
+                [tabs]="tabs"
+                ariaLabel="Sections de la fiche membre"
+                [selected]="activeTab()"
+                (selectedChange)="onTabChange($event)"
+              />
+
+              <!-- `tabindex="0"` : le panneau n'a pas toujours d'élément focalisable, et
+                   sans lui son contenu serait inatteignable au clavier après l'onglet. -->
+              <section
+                class="cnpm-member__panel"
+                role="tabpanel"
+                tabindex="0"
+                [id]="'panneau-' + activeTab()"
+                [attr.aria-labelledby]="'tab-' + activeTab()"
+              >
+                @switch (activeTab()) {
+                  @case ('synthese') {
+                    @if (member.permissions.canViewFinancials) {
+                      <div class="cnpm-member__stats">
+                        <cnpm-insight-summary
+                          title="Cotisations"
+                          headingId="synthese-cotisations"
+                          unit="(FCFA)"
+                          [stats]="contributionStats()"
+                          note="Montants de l’exercice en cours, repris de la liste des membres. La fiche ne recalcule aucun total."
+                        />
+                        <cnpm-insight-summary
+                          title="Suivi"
+                          headingId="synthese-suivi"
+                          [stats]="followUpStats()"
+                          note="Un reçu n’est émis qu’après rapprochement du paiement."
+                        />
+
+                        @if (member.risk; as risk) {
+                          <!-- Le score n'est jamais affiché seul : la fiche impose ses
+                               facteurs et sa date d'évaluation. Un nombre nu ne se
+                               conteste pas et n'oriente aucune action. -->
+                          <section class="cnpm-member__card" aria-labelledby="risque-titre">
+                            <h2 class="cnpm-member__card-title" id="risque-titre">
+                              Score de risque
+                            </h2>
+                            <p class="cnpm-member__score">
+                              <span class="cnpm-member__score-value">{{ risk.score }}</span>
+                              <span class="cnpm-member__score-total">/ 100</span>
+                            </p>
+                            <cnpm-badge [tone]="riskLevelTone(risk.level)">
+                              {{ riskLevelLabel(risk.level) }}
+                            </cnpm-badge>
+                            <div
+                              class="cnpm-member__gauge"
+                              role="img"
+                              [attr.aria-label]="'Score de ' + risk.score + ' sur 100'"
+                            >
+                              <span class="cnpm-member__gauge-fill" [style.width.%]="risk.score">
+                              </span>
+                            </div>
+                            <p class="cnpm-member__card-note">
+                              Évalué le {{ formatDay(risk.assessedOn) }}
+                            </p>
+                            <h3 class="cnpm-member__subtitle">Facteurs retenus</h3>
+                            <ul class="cnpm-member__list">
+                              @for (factor of risk.factors; track factor) {
+                                <li>{{ factor }}</li>
+                              }
+                            </ul>
+                          </section>
+                        }
+                      </div>
+
+                      @if (member.summary.nextDueOn) {
+                        <p class="cnpm-member__note">
+                          Prochaine échéance : {{ member.summary.nextDueLabel }}, à régler avant le
+                          {{ formatDay(member.summary.nextDueOn) }}.
+                        </p>
+                      }
+                    } @else {
+                      <!-- Masquage selon le rôle : l'absence est expliquée plutôt que
+                           silencieuse, sinon la fiche paraît incomplète ou en panne. -->
+                      <cnpm-alert tone="info" title="Données financières masquées" [live]="false">
+                        <p>
+                          Votre rôle ne donne pas accès aux cotisations et aux paiements de ce
+                          membre.
+                        </p>
+                      </cnpm-alert>
+                    }
+
+                    <section class="cnpm-member__card" aria-labelledby="agent-titre">
+                      <h2 class="cnpm-member__card-title" id="agent-titre">Agent affecté</h2>
+                      @if (member.agent; as agent) {
+                        <p class="cnpm-member__strong">{{ agent.name }}</p>
+                        <p class="cnpm-member__card-note">{{ agent.role }}</p>
+                        <ul class="cnpm-member__contact-lines">
+                          @if (agent.phone) {
+                            <li>
+                              <svg lucidePhone [size]="iconSize.compact" aria-hidden="true"></svg>
+                              <a class="cnpm-member__link" [href]="'tel:' + agent.phone">
+                                {{ agent.phone }}
+                              </a>
+                            </li>
+                          }
+                          @if (agent.email) {
+                            <li>
+                              <svg lucideMail [size]="iconSize.compact" aria-hidden="true"></svg>
+                              <a class="cnpm-member__link" [href]="'mailto:' + agent.email">
+                                {{ agent.email }}
+                              </a>
+                            </li>
+                          }
+                        </ul>
+                        <dl class="cnpm-member__meta">
+                          <div class="cnpm-member__meta-item">
+                            <dt>Portefeuille</dt>
+                            <dd>{{ agent.portfolio | number }} membres</dd>
+                          </div>
+                          <div class="cnpm-member__meta-item">
+                            <dt>Taux de recouvrement</dt>
+                            <dd>{{ agent.recoveryRate | number: '1.0-0' }} %</dd>
+                          </div>
+                          <div class="cnpm-member__meta-item">
+                            <dt>Dernier contact</dt>
+                            <dd>
+                              @if (agent.lastContactOn) {
+                                {{ agent.lastContactOn | date: 'dd/MM/yyyy' }}
+                              } @else {
+                                <span class="cnpm-member__missing">{{ missingLabel }}</span>
+                              }
+                            </dd>
+                          </div>
+                        </dl>
+                      } @else {
+                        <cnpm-empty-state
+                          variant="no-data"
+                          title="Aucun agent affecté"
+                          description="Ce membre n’est rattaché à aucun agent de recouvrement à ce jour."
+                        />
+                      }
+                    </section>
+                  }
+
+                  @case ('adhesion') {
+                    <section class="cnpm-member__card" aria-labelledby="adhesion-titre">
+                      <h2 class="cnpm-member__card-title" id="adhesion-titre">
+                        Dossier d’adhésion
+                      </h2>
+                      <cnpm-definition-list [items]="membershipFacts()" />
+                      <p class="cnpm-member__card-note">
+                        Les données d’adhésion sont issues du dossier validé par le CNPM. Toute
+                        correction passe par l’écran d’enrôlement.
+                      </p>
+                    </section>
+                  }
+
+                  @case ('cotisations') {
+                    <cnpm-data-table
+                      caption="Périodes de cotisation appelées pour ce membre, avec montant appelé, montant réglé, reste dû et statut."
+                      [columns]="contributionColumns"
+                      [rows]="member.contributions"
+                      [state]="tableState(member.contributions.length)"
+                      [rowKey]="contributionKey"
+                    >
+                      <ng-template #row let-line>
+                        <td class="cnpm-table__cell">{{ line.label }}</td>
+                        <td class="cnpm-table__cell">{{ line.dueOn | date: 'dd/MM/yyyy' }}</td>
+                        <td class="cnpm-table__cell cnpm-table__cell--end">
+                          <span class="cnpm-member__amount">
+                            {{ line.expected | number: '1.0-0' }}
+                          </span>
+                        </td>
+                        <td class="cnpm-table__cell cnpm-table__cell--end">
+                          <span class="cnpm-member__amount">{{ line.paid | number: '1.0-0' }}</span>
+                        </td>
+                        <td class="cnpm-table__cell cnpm-table__cell--end">
+                          <span class="cnpm-member__amount">
+                            {{ line.expected - line.paid | number: '1.0-0' }}
+                          </span>
+                        </td>
+                        <td class="cnpm-table__cell">
+                          <cnpm-badge [tone]="contributionStatusTone(line.status)">
+                            {{ contributionStatusLabel(line.status) }}
+                          </cnpm-badge>
+                        </td>
+                      </ng-template>
+
+                      <div data-table-status>
+                        <cnpm-empty-state
+                          variant="no-data"
+                          title="Aucune période appelée"
+                          description="Aucune cotisation n’a encore été appelée pour ce membre."
+                        />
+                      </div>
+                    </cnpm-data-table>
+
+                    <p class="cnpm-member__note">
+                      Une écriture validée ne se modifie pas depuis la fiche : les corrections
+                      passent par l’écran des cotisations, qui produit une écriture compensatrice.
+                    </p>
+                  }
+
+                  @case ('paiements') {
+                    <cnpm-data-table
+                      caption="Paiements enregistrés pour ce membre, avec date, période couverte, montant, canal, reçu et état de rapprochement."
+                      [columns]="paymentColumns"
+                      [rows]="member.payments"
+                      [state]="tableState(member.payments.length)"
+                      [rowKey]="paymentKey"
+                    >
+                      <ng-template #row let-payment>
+                        <td class="cnpm-table__cell">
+                          <span class="cnpm-member__reference">{{ payment.reference }}</span>
+                        </td>
+                        <td class="cnpm-table__cell">
+                          {{ payment.paidAt | date: 'dd/MM/yyyy HH:mm' }}
+                        </td>
+                        <td class="cnpm-table__cell">{{ payment.period }}</td>
+                        <td class="cnpm-table__cell cnpm-table__cell--end">
+                          <span class="cnpm-member__amount">
+                            {{ payment.amount | number: '1.0-0' }}
+                          </span>
+                        </td>
+                        <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
+                        <td class="cnpm-table__cell">
+                          @if (payment.receipt) {
+                            <span class="cnpm-member__reference">{{ payment.receipt }}</span>
+                          } @else {
+                            <span class="cnpm-member__missing">Non émis</span>
+                          }
+                        </td>
+                        <td class="cnpm-table__cell">
+                          <cnpm-badge [tone]="paymentStatusTone(payment.status)">
+                            {{ paymentStatusLabel(payment.status) }}
+                          </cnpm-badge>
+                        </td>
+                      </ng-template>
+
+                      <div data-table-status>
+                        <cnpm-empty-state
+                          variant="no-data"
+                          title="Aucun paiement enregistré"
+                          description="Aucun règlement n’a encore été rattaché à ce membre."
+                        />
+                      </div>
+                    </cnpm-data-table>
+                  }
+
+                  @case ('documents') {
+                    <cnpm-data-table
+                      caption="Pièces justificatives du dossier du membre, avec date de dépôt, validité, poids et statut."
+                      [columns]="documentColumns"
+                      [rows]="member.documents"
+                      [state]="tableState(member.documents.length)"
+                      [rowKey]="documentKey"
+                    >
+                      <ng-template #row let-document>
+                        <td class="cnpm-table__cell">
+                          <span class="cnpm-member__strong">{{ document.title }}</span>
+                        </td>
+                        <td class="cnpm-table__cell">{{ document.kind }}</td>
+                        <!-- Une pièce jamais déposée n'a pas de date : le dire évite de
+                             confondre « donnée absente » et « valeur vide ». -->
+                        <td class="cnpm-table__cell">
+                          @if (document.issuedOn) {
+                            {{ document.issuedOn | date: 'dd/MM/yyyy' }}
+                          } @else {
+                            <span class="cnpm-member__missing">{{ missingLabel }}</span>
+                          }
+                        </td>
+                        <td class="cnpm-table__cell">
+                          @if (document.expiresOn) {
+                            {{ document.expiresOn | date: 'dd/MM/yyyy' }}
+                          } @else {
+                            <span class="cnpm-member__missing">{{ missingLabel }}</span>
+                          }
+                        </td>
+                        <td class="cnpm-table__cell">
+                          @if (document.sizeLabel) {
+                            {{ document.sizeLabel }}
+                          } @else {
+                            <span class="cnpm-member__missing">{{ missingLabel }}</span>
+                          }
+                        </td>
+                        <td class="cnpm-table__cell">
+                          <cnpm-badge [tone]="documentStatusTone(document.status)">
+                            {{ documentStatusLabel(document.status) }}
+                          </cnpm-badge>
+                        </td>
+                      </ng-template>
+
+                      <div data-table-status>
+                        <cnpm-empty-state
+                          variant="first-use"
+                          title="Aucune pièce déposée"
+                          description="Le dossier documentaire de ce membre est vide. Sollicitez les pièces auprès du contact principal."
+                        />
+                      </div>
+                    </cnpm-data-table>
+                  }
+
+                  @case ('historique') {
+                    <cnpm-data-table
+                      caption="Historique des événements enregistrés sur la fiche du membre, du plus récent au plus ancien."
+                      [columns]="historyColumns"
+                      [rows]="historyRows()"
+                      [state]="tableState(historyTotal())"
+                      [rowKey]="historyKey"
+                    >
+                      <ng-template #row let-entry>
+                        <td class="cnpm-table__cell">{{ entry.at | date: 'dd/MM/yyyy HH:mm' }}</td>
+                        <td class="cnpm-table__cell">
+                          <span class="cnpm-member__strong">{{ entry.action }}</span>
+                        </td>
+                        <td class="cnpm-table__cell">{{ entry.actor }}</td>
+                        <td class="cnpm-table__cell">{{ entry.detail }}</td>
+                      </ng-template>
+
+                      <div data-table-status>
+                        <cnpm-empty-state
+                          variant="no-data"
+                          title="Aucun événement"
+                          description="Aucune action n’a encore été enregistrée sur cette fiche."
+                        />
+                      </div>
+                    </cnpm-data-table>
+
+                    @if (historyTotal() > historyPageSize) {
+                      <cnpm-pagination
+                        [page]="historyPage()"
+                        [pageSize]="historyPageSize"
+                        [totalItems]="historyTotal()"
+                        [pageSizeOptions]="historyPageSizes"
+                        (pageChange)="onHistoryPageChange($event)"
+                      />
+                    }
+
+                    <p class="cnpm-member__note">
+                      L’historique est en lecture seule : aucune entrée ne peut être modifiée ni
+                      supprimée depuis la fiche.
+                    </p>
+                  }
+                }
+              </section>
+            </div>
+
+            <!-- Panneau d'alertes et d'actions. Au-dessous de 1440 px, il repasse dans le
+                 flux sous la fiche plutôt que d'être masqué derrière un tiroir non
+                 spécifié : son contenu reste lisible et complet. -->
+            <aside class="cnpm-member__aside" aria-label="Rappels et prochaines actions">
+              <section class="cnpm-member__card" aria-labelledby="alertes-titre">
+                <h2 class="cnpm-member__card-title" id="alertes-titre">Rappels et alertes</h2>
+                <ul class="cnpm-member__alerts">
+                  @for (alert of member.alerts; track alert.id) {
+                    <li>
+                      <!-- `live` désactivé : ces alertes sont présentes au chargement et
+                           ne réagissent à aucune action ; trois régions live annonceraient
+                           trois messages d'un coup. -->
+                      <cnpm-alert [tone]="alert.tone" [title]="alert.title" [live]="false">
+                        <p class="cnpm-member__alert-text">{{ alert.message }}</p>
+                        <p class="cnpm-member__alert-text">
+                          <span class="cnpm-member__strong">Prochaine action :</span>
+                          {{ alert.nextAction }}
+                        </p>
+                      </cnpm-alert>
+                    </li>
+                  }
+                </ul>
+              </section>
+
+              <section class="cnpm-member__card" aria-labelledby="actions-titre">
+                <h2 class="cnpm-member__card-title" id="actions-titre">Prochaines actions</h2>
+                @if (member.nextActions.length > 0) {
+                  <ul class="cnpm-member__actions">
+                    @for (action of member.nextActions; track action.id) {
+                      <li class="cnpm-member__action">
+                        <p class="cnpm-member__strong">{{ action.label }}</p>
+                        <div class="cnpm-member__action-meta">
+                          <cnpm-badge [tone]="priorityTone(action.priority)">
+                            {{ priorityLabel(action.priority) }}
+                          </cnpm-badge>
+                          @if (action.dueOn) {
+                            <span class="cnpm-member__card-note">
+                              Échéance&nbsp;: {{ action.dueOn | date: 'dd/MM/yyyy' }}
+                            </span>
+                          }
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <cnpm-empty-state
+                    variant="no-data"
+                    title="Aucune action programmée"
+                    description="Rien n’est attendu de votre part sur cette fiche."
+                  />
+                }
+              </section>
+
+              <section class="cnpm-member__card" aria-labelledby="contact-titre">
+                <h2 class="cnpm-member__card-title" id="contact-titre">Contact principal</h2>
+                @if (member.permissions.canViewContacts && member.mainContact) {
+                  @if (member.mainContact; as contact) {
+                    <p class="cnpm-member__strong">{{ contact.name }}</p>
+                    <p class="cnpm-member__card-note">{{ contact.role }}</p>
+                    <ul class="cnpm-member__contact-lines">
+                      @if (contact.phone) {
+                        <li>
+                          <svg lucidePhone [size]="iconSize.compact" aria-hidden="true"></svg>
+                          <a class="cnpm-member__link" [href]="'tel:' + contact.phone">
+                            {{ contact.phone }}
+                          </a>
+                        </li>
+                      }
+                      @if (contact.email) {
+                        <li>
+                          <svg lucideMail [size]="iconSize.compact" aria-hidden="true"></svg>
+                          <a class="cnpm-member__link" [href]="'mailto:' + contact.email">
+                            {{ contact.email }}
+                          </a>
+                        </li>
+                      }
+                    </ul>
+                  }
+                } @else {
+                  <p class="cnpm-member__card-note">
+                    Les coordonnées du contact ne sont pas accessibles avec votre rôle.
+                  </p>
+                }
+              </section>
+            </aside>
+          </div>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>
