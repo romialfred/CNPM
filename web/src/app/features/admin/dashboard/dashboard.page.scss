@@ -59,26 +59,6 @@
     gap: var(--cnpm-space-4);
   }
 
-  &__column > &__panel--segmentation {
-    order: 1;
-  }
-
-  &__column > &__panel--alerts {
-    order: 2;
-  }
-
-  &__column > &__panel--activity {
-    order: 3;
-  }
-
-  &__column > cnpm-insight-summary {
-    order: 4;
-  }
-
-  &__column > nav#{&}__panel {
-    order: 5;
-  }
-
   &__period {
     gap: var(--cnpm-space-2);
   }
@@ -124,7 +104,9 @@
     font-size: var(--cnpm-font-size-sm);
   }
 
-  &__refresh--idle {
+  &__refresh--idle,
+  &__kpi-definition,
+  &__section-title {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -133,6 +115,7 @@
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+    border: 0;
   }
 
   /* ---------------------------------------------------------------------- Bandeau KPI */
@@ -163,18 +146,6 @@
     margin: 0;
     font-size: var(--cnpm-font-size-2xl);
     line-height: var(--cnpm-font-lineHeight-2xl);
-  }
-
-  &__kpi-definition {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
   }
 
   &__kpi-link {
@@ -484,20 +455,6 @@
     line-height: var(--cnpm-font-lineHeight-md);
     font-weight: var(--cnpm-font-weight-semibold);
     color: var(--cnpm-color-text-primary);
-  }
-
-  /* La bande de cartes est deja introduite par le titre de page. Ce titre reste
-     disponible aux lecteurs d'ecran sans consommer une ligne absente du visuel de
-     reference. */
-  &__section-title {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 
   &__label,

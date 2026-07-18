@@ -425,14 +425,6 @@
             }
           </section>
 
-          <cnpm-insight-summary
-            title="Cotisations de l’exercice"
-            headingId="synthese-cotisations"
-            unit="(FCFA)"
-            [stats]="contributionStats()"
-            note="Le taux de recouvrement rapporte le total encaissé au total attendu. Les prospects n’entrent pas dans ces montants."
-          />
-
           <section
             class="cnpm-dashboard__panel cnpm-dashboard__panel--alerts"
             aria-labelledby="titre-alertes"
@@ -503,6 +495,14 @@
               </ol>
             }
           </section>
+
+          <cnpm-insight-summary
+            title="Cotisations de l’exercice"
+            headingId="synthese-cotisations"
+            unit="(FCFA)"
+            [stats]="contributionStats()"
+            note="Le taux de recouvrement rapporte le total encaissé au total attendu. Les prospects n’entrent pas dans ces montants."
+          />
 
           <nav class="cnpm-dashboard__panel" aria-labelledby="titre-raccourcis">
             <h2 class="cnpm-dashboard__panel-title" id="titre-raccourcis">Raccourcis</h2>
