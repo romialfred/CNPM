@@ -1,5 +1,8 @@
+import { inject } from '@angular/core';
 import type { Routes } from '@angular/router';
+import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoSessionGateway } from '../../layout/admin-shell/demo-session.gateway';
+import { HttpSessionGateway } from '../../layout/admin-shell/http-session.gateway';
 import { SESSION_GATEWAY } from '../../layout/admin-shell/session-gateway';
 import { CONTRIBUTIONS_GATEWAY } from './contributions/contributions-gateway';
 import { DemoContributionsGateway } from './contributions/demo-contributions.gateway';
@@ -11,6 +14,7 @@ import { pendingEnrollmentChangesGuard } from './enrollment-form/pending-enrollm
 import { DemoMemberDetailGateway } from './member-detail/demo-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from './member-detail/member-detail-gateway';
 import { DemoMembersGateway } from './members/demo-members.gateway';
+import { HttpMembersGateway } from './members/http-members.gateway';
 import { MEMBERS_GATEWAY } from './members/members-gateway';
 import { DemoPaymentsGateway } from './payments/demo-payments.gateway';
 import { PAYMENTS_GATEWAY } from './payments/payments-gateway';
@@ -20,32 +24,115 @@ import { DemoReportingGateway } from './reporting/demo-reporting.gateway';
 import { REPORTING_GATEWAY } from './reporting/reporting-gateway';
 import { ADMIN_SECURITY_GATEWAY } from './security/admin-security-gateway';
 import { DemoAdminSecurityGateway } from './security/demo-admin-security.gateway';
+import { adminSessionGuard } from './admin-session.guard';
+import {
+  UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
+  UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
+  UNAVAILABLE_DASHBOARD_GATEWAY,
+  UNAVAILABLE_ENROLLMENT_GATEWAY,
+  UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
+  UNAVAILABLE_PAYMENTS_GATEWAY,
+  UNAVAILABLE_RECOVERY_GATEWAY,
+  UNAVAILABLE_REPORTING_GATEWAY,
+} from './unavailable-admin-gateways';
 
 /**
  * Routes d'administration, chargées à la demande.
  *
- * Les ports sont fournis ici avec leurs adaptateurs de démonstration. Les remplacer
- * par les adaptateurs HTTP réels ne touchera que ce point d'assemblage — aucune page.
+ * Les ports sont composés ici selon `CNPM_DATA_MODE`. En HTTP, une feature non
+ * raccordée devient explicitement indisponible et ne retombe jamais sur ses fixtures.
  *
- * Aucun garde de route n'est posé : la permission se vérifie côté backend, et un
- * garde côté navigateur ne protégerait rien. Il améliorera l'expérience une fois la
- * session réelle câblée (ADR-008), sans jamais s'y substituer.
+ * Le garde de session améliore uniquement l'expérience en cas de 401. Il ne remplace
+ * jamais la vérification des permissions et du périmètre côté backend (ADR-008).
  */
 export const adminRoutes: Routes = [
   {
     path: 'admin',
     providers: [
-      { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
-      { provide: MEMBERS_GATEWAY, useClass: DemoMembersGateway },
-      { provide: DASHBOARD_GATEWAY, useClass: DemoDashboardGateway },
-      { provide: MEMBER_DETAIL_GATEWAY, useClass: DemoMemberDetailGateway },
-      { provide: ENROLLMENT_GATEWAY, useClass: DemoEnrollmentGateway },
-      { provide: CONTRIBUTIONS_GATEWAY, useClass: DemoContributionsGateway },
-      { provide: PAYMENTS_GATEWAY, useClass: DemoPaymentsGateway },
-      { provide: RECOVERY_GATEWAY, useClass: DemoRecoveryGateway },
-      { provide: REPORTING_GATEWAY, useClass: DemoReportingGateway },
-      { provide: ADMIN_SECURITY_GATEWAY, useClass: DemoAdminSecurityGateway },
+      DemoSessionGateway,
+      HttpSessionGateway,
+      {
+        provide: SESSION_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoSessionGateway)
+            : inject(HttpSessionGateway),
+      },
+      DemoMembersGateway,
+      HttpMembersGateway,
+      {
+        provide: MEMBERS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMembersGateway)
+            : inject(HttpMembersGateway),
+      },
+      {
+        provide: DASHBOARD_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoDashboardGateway)
+            : UNAVAILABLE_DASHBOARD_GATEWAY,
+      },
+      {
+        provide: MEMBER_DETAIL_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberDetailGateway)
+            : UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
+      },
+      {
+        provide: ENROLLMENT_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoEnrollmentGateway)
+            : UNAVAILABLE_ENROLLMENT_GATEWAY,
+      },
+      {
+        provide: CONTRIBUTIONS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoContributionsGateway)
+            : UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
+      },
+      {
+        provide: PAYMENTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoPaymentsGateway)
+            : UNAVAILABLE_PAYMENTS_GATEWAY,
+      },
+      {
+        provide: RECOVERY_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoRecoveryGateway)
+            : UNAVAILABLE_RECOVERY_GATEWAY,
+      },
+      {
+        provide: REPORTING_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoReportingGateway)
+            : UNAVAILABLE_REPORTING_GATEWAY,
+      },
+      {
+        provide: ADMIN_SECURITY_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoAdminSecurityGateway)
+            : UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
+      },
+      DemoDashboardGateway,
+      DemoMemberDetailGateway,
+      DemoEnrollmentGateway,
+      DemoContributionsGateway,
+      DemoPaymentsGateway,
+      DemoRecoveryGateway,
+      DemoReportingGateway,
+      DemoAdminSecurityGateway,
     ],
+    canActivate: [adminSessionGuard],
     children: [
       {
         path: 'dashboard',

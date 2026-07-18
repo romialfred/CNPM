@@ -69,11 +69,13 @@
   @if (identity | async; as user) {
     <div
       class="cnpm-sidebar__exercise"
-      [attr.aria-label]="'Exercice en cours ' + user.exerciseLabel"
+      [attr.aria-label]="
+        user.exerciseLabel ? 'Exercice en cours ' + user.exerciseLabel : 'Exercice indisponible'
+      "
     >
       <span class="cnpm-sidebar__exercise-label">Exercice en cours</span>
       <span class="cnpm-sidebar__exercise-value">
-        {{ user.exerciseLabel }}
+        {{ user.exerciseLabel ?? 'Indisponible' }}
         @if (user.demoMode) {
           <span class="cnpm-sidebar__demo">Démo</span>
         }

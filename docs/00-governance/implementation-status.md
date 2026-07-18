@@ -709,3 +709,23 @@ décideur ; absence de clôture directe
 d'un dossier abandonné en `COMPLEMENT_REQUIRED` (la source ne rattache `REJECTED` qu'au point
 de décision) ; contrainte `CHECK` sur la colonne `status` et vérification d'existence de
 l'organisation (rendue en 409 plutôt qu'en 400) — à traiter en itération suivante.
+
+## 11. Reprise premium - premier raccordement Web vers l'API
+
+BO-002 possède désormais le premier adaptateur HTTP de feature, sans sacrifier le rendu
+de démonstration validé.
+
+| Élément | Détail |
+|---|---|
+| Composition | `CNPM_DATA_MODE` global, `http` par défaut ; `demo` activé explicitement par `/runtime-config.js`, remplaçable au déploiement. Aucun fallback sur erreur ou feature non raccordée (ADR-009) |
+| Session | `GET /v1/auth/me` alimente le shell en mode HTTP ; une absence de session retourne à la connexion en conservant l'URL, tandis qu'une panne serveur reste visible. Exercice et notifications restent indisponibles tant que le contrat ne les fournit pas |
+| Authentification | Le profil démo conserve AUTH-001 fictif. Le profil HTTP reste explicitement indisponible jusqu'au client OIDC/PKCE Keycloak ; aucun mot de passe n'est relayé par un endpoint natif inventé |
+| Route | `GET /v1/memberships`, pagination Web 1-based traduite en API 0-based, filtres et tris contractuels |
+| Identifiants | La ligne conserve l'UUID d'adhésion pour la sélection ; les actions BO-003 utilisent désormais `organizationId` |
+| Données absentes | Montants, activité, grand cotisant, facettes et synthèse sont signalés indisponibles ; les filtres sans facettes sont masqués ; aucun zéro ou agrégat de page n'est inventé |
+| Contrat | Statuts inconnus et tris non livrés sont refusés explicitement ; le 403 devient l'état d'accès refusé de BO-002 |
+| Tests | **187 tests Web complets verts** (33 fichiers) ; revue architecture indépendante acceptée après 45 tests ciblés : configuration runtime, composition de tous les ports, AUTH fermée, garde de session, session nullable, permissions UI, mapping HTTP, pagination et erreurs |
+
+Le mode démo reste la source visuelle complète tant qu'ADR-006 et les contrats de
+reporting ne sont pas promus. L'adaptateur HTTP est néanmoins compilé, testé et sélectionné
+au même point d'assemblage en mode intégré.

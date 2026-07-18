@@ -36,33 +36,37 @@
       <summary
         class="cnpm-topbar__notification-trigger"
         [attr.aria-label]="
-          user.notificationCount +
-          (user.notificationCount > 1 ? ' notifications' : ' notification') +
-          (user.demoMode ? ' de démonstration' : '')
+          user.notificationCount === null
+            ? 'Notifications indisponibles'
+            : user.notificationCount +
+              (user.notificationCount > 1 ? ' notifications' : ' notification') +
+              (user.demoMode ? ' de démonstration' : '')
         "
         [attr.title]="user.demoMode ? 'Notifications de démonstration' : 'Notifications'"
       >
         <svg lucideBell [size]="iconSize.control"></svg>
-        @if (user.notificationCount > 0) {
+        @if (user.notificationCount !== null && user.notificationCount > 0) {
           <span class="cnpm-topbar__notification-count" aria-hidden="true">
             {{ user.notificationCount }}
           </span>
         }
       </summary>
       <div class="cnpm-topbar__notification-panel">
-        <strong>Notifications de démonstration</strong>
+        <strong>{{ user.demoMode ? 'Notifications de démonstration' : 'Notifications' }}</strong>
         <span>Le centre de notifications n’est pas encore raccordé.</span>
       </div>
     </details>
 
-    <a
-      class="cnpm-topbar__primary-action"
-      routerLink="/admin/enrollments/new"
-      aria-label="Créer un nouvel enrôlement"
-    >
-      <svg lucidePlus [size]="iconSize.control"></svg>
-      <span>Nouvelle action</span>
-    </a>
+    @if (user.permissions.includes('ENROLLMENT.CREATE')) {
+      <a
+        class="cnpm-topbar__primary-action"
+        routerLink="/admin/enrollments/new"
+        aria-label="Créer un nouvel enrôlement"
+      >
+        <svg lucidePlus [size]="iconSize.control"></svg>
+        <span>Nouvelle action</span>
+      </a>
+    }
 
     <div class="cnpm-topbar__identity" [attr.aria-label]="user.displayName + ', ' + user.roleLabel">
       <span class="cnpm-topbar__avatar" aria-hidden="true">{{ initials(user.displayName) }}</span>

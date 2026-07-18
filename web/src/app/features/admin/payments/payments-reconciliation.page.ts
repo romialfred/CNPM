@@ -46,7 +46,6 @@ import { PaginationComponent } from '../../../design-system/pagination/paginatio
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TabsComponent, type CnpmTab } from '../../../design-system/tabs/tabs.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
-import { DemoPaymentsGateway } from './demo-payments.gateway';
 import {
   PAYMENTS_GATEWAY,
   PaymentsAccessError,
@@ -139,7 +138,6 @@ interface PanelFeedback {
   // Le port est fourni ici pour que l'écran fonctionne sans toucher aux routes. Au
   // câblage définitif, déplacer cette fourniture dans `admin.routes.ts`, à côté de
   // `MEMBERS_GATEWAY` : un seul point d'assemblage pour tous les adaptateurs.
-  providers: [{ provide: PAYMENTS_GATEWAY, useClass: DemoPaymentsGateway }],
   imports: [
     DatePipe,
     DecimalPipe,

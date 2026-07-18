@@ -21,7 +21,7 @@ import { AuthShellComponent } from './auth-shell.component';
 import { AUTH_GATEWAY, type AuthSpace } from './auth-gateway';
 import { AuthFlowStore } from './auth-flow.store';
 
-type FormState = 'idle' | 'submitting' | 'error' | 'forbidden';
+type FormState = 'idle' | 'submitting' | 'error' | 'forbidden' | 'unavailable';
 
 /**
  * AUTH-001 — étape identifiants.
@@ -63,7 +63,9 @@ export class LoginPage {
 
   /** Un échec est affiché : identifiants refusés ou accès non autorisé. */
   protected hasFailure(): boolean {
-    return this.state() === 'error' || this.state() === 'forbidden';
+    return (
+      this.state() === 'error' || this.state() === 'forbidden' || this.state() === 'unavailable'
+    );
   }
 
   protected readonly spaces: readonly CnpmTab[] = [
@@ -123,9 +125,8 @@ export class LoginPage {
     this.state.set('submitting');
     const { email, password, remember } = this.form.getRawValue();
     const space = this.space() as AuthSpace;
-    this.gateway
-      .submitCredentials({ space, email, password, rememberDevice: remember })
-      .subscribe((result) => {
+    this.gateway.submitCredentials({ space, email, password, rememberDevice: remember }).subscribe({
+      next: (result) => {
         if (result.outcome === 'mfa-required') {
           this.flow.startChallenge(result.challengeId, space);
           void this.router.navigate(['/auth/verify']);
@@ -134,12 +135,19 @@ export class LoginPage {
         // Erreur neutre : la saisie de l'email est préservée, le mot de passe effacé.
         this.form.controls.password.reset('');
         this.state.set(result.outcome === 'forbidden' ? 'forbidden' : 'error');
-        // Le bouton vient d'être neutralisé puis réactivé ; sans reprise explicite,
-        // le focus serait retombé sur le body et l'utilisateur clavier devrait
-        // retabuler depuis le haut du document pour découvrir l'erreur.
-        afterNextRender(() => this.errorAlert()?.nativeElement.focus(), {
-          injector: this.injector,
-        });
-      });
+        this.focusFailure();
+      },
+      error: () => {
+        this.form.controls.password.reset('');
+        this.state.set('unavailable');
+        this.focusFailure();
+      },
+    });
+  }
+
+  private focusFailure(): void {
+    afterNextRender(() => this.errorAlert()?.nativeElement.focus(), {
+      injector: this.injector,
+    });
   }
 }

@@ -5,7 +5,7 @@ import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { provideCnpmApi } from './core/api/api.config';
+import { provideCnpmApi, readCnpmRuntimeConfig } from './core/api/api.config';
 import { apiProblemInterceptor } from './core/api/api-problem.interceptor';
 import { correlationIdInterceptor } from './core/api/correlation-id.interceptor';
 import { provideCnpmIcons } from './design-system/icon/icon';
@@ -19,7 +19,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideCnpmApi(),
+    // `runtime-config.js` est remplaçable au déploiement sans recompiler le bundle.
+    // S'il manque, `provideCnpmApi` ferme en mode HTTP ; aucun échec réseau ne
+    // déclenche un repli vers les fixtures.
+    provideCnpmApi(readCnpmRuntimeConfig()),
     provideHttpClient(withInterceptors([correlationIdInterceptor, apiProblemInterceptor])),
     provideCnpmIcons(),
     { provide: LOCALE_ID, useValue: 'fr-ML' },

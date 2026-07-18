@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AUTH_GATEWAY, type AuthGateway, type CredentialsRequest } from './auth-gateway';
 import { AuthFlowStore } from './auth-flow.store';
 import { LoginPage } from './login.page';
@@ -9,9 +9,13 @@ import { LoginPage } from './login.page';
 class StubGateway implements AuthGateway {
   lastRequest?: CredentialsRequest;
   outcome: 'mfa-required' | 'invalid' | 'forbidden' = 'mfa-required';
+  unavailable = false;
 
   submitCredentials(request: CredentialsRequest) {
     this.lastRequest = request;
+    if (this.unavailable) {
+      return throwError(() => new Error('indisponible'));
+    }
     if (this.outcome === 'mfa-required') {
       return of({ outcome: 'mfa-required', challengeId: 'challenge-1' } as const);
     }
@@ -185,6 +189,18 @@ describe('LoginPage (AUTH-001)', () => {
     const text = element.textContent ?? '';
     expect(text).toContain('Accès non autorisé');
     expect(text).not.toContain('Identifiants non reconnus');
+  });
+
+  it('annonce un profil HTTP indisponible sans transmettre davantage le mot de passe', async () => {
+    const { fixture, element } = await setup();
+    gateway.unavailable = true;
+    fill(fixture, element, 'agent@cnpm.example', 'secret');
+    submit(element);
+    fixture.detectChanges();
+
+    expect(element.textContent).toContain('Connexion indisponible');
+    expect(element.textContent).toContain("Aucun identifiant n'a été transmis");
+    expect(element.querySelector<HTMLInputElement>('input[type="password"]')?.value).toBe('');
   });
 
   it('relie l’alerte au formulaire après un échec', async () => {

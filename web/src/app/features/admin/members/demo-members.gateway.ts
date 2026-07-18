@@ -62,6 +62,9 @@ export class DemoMembersGateway implements MembersGateway {
     .filter((member) => isMemberStatus(member.status))
     .map((member) => ({
       id: member.id,
+      // Les fixtures de démonstration modélisent une entreprise par ligne ; le même
+      // UUID fictif sert donc explicitement aux deux agrégats.
+      organizationId: member.id,
       code: member.code,
       organization: member.organization,
       category: member.category,
@@ -95,6 +98,7 @@ export class DemoMembersGateway implements MembersGateway {
       overview: this.overview(),
       categories: this.distinct((member) => member.category),
       groups: this.distinct((member) => member.group),
+      supportedSortKeys: ['code', 'organization', 'due', 'paid', 'status', 'lastActivity'],
     };
 
     // Latence simulée : sans elle, l'état de chargement ne serait jamais peint et ne
@@ -122,7 +126,7 @@ export class DemoMembersGateway implements MembersGateway {
       member.contactName,
       member.contactEmail,
       member.contactPhone,
-    ].some((field) => fold(field).includes(term));
+    ].some((field) => field !== null && fold(field).includes(term));
   }
 
   private sortRows(rows: readonly MemberRow[], query: MemberQuery): readonly MemberRow[] {
@@ -139,12 +143,12 @@ export class DemoMembersGateway implements MembersGateway {
   private compare(left: MemberRow, right: MemberRow, key: string): number {
     switch (key) {
       case 'due':
-        return left.due - right.due;
+        return (left.due ?? 0) - (right.due ?? 0);
       case 'paid':
-        return left.paid - right.paid;
+        return (left.paid ?? 0) - (right.paid ?? 0);
       case 'lastActivity':
         // Format ISO `AAAA-MM-JJ` : l'ordre lexicographique est l'ordre chronologique.
-        return left.lastActivity.localeCompare(right.lastActivity);
+        return (left.lastActivity ?? '').localeCompare(right.lastActivity ?? '');
       case 'organization':
         return left.organization.localeCompare(right.organization, 'fr');
       case 'status':
@@ -155,8 +159,10 @@ export class DemoMembersGateway implements MembersGateway {
     }
   }
 
-  private distinct(pick: (member: MemberRow) => string): readonly string[] {
-    return [...new Set(this.all.map(pick))].sort((a, b) => a.localeCompare(b, 'fr'));
+  private distinct(pick: (member: MemberRow) => string | null): readonly string[] {
+    return [...new Set(this.all.map(pick).filter((value): value is string => value !== null))].sort(
+      (a, b) => a.localeCompare(b, 'fr'),
+    );
   }
 
   private overview(): MembersOverview {
@@ -168,8 +174,8 @@ export class DemoMembersGateway implements MembersGateway {
     // contredirait le critère d'acceptation.
     const base = [...active, ...dormant];
 
-    const expected = base.reduce((sum, member) => sum + member.due, 0);
-    const collected = base.reduce((sum, member) => sum + member.paid, 0);
+    const expected = base.reduce((sum, member) => sum + (member.due ?? 0), 0);
+    const collected = base.reduce((sum, member) => sum + (member.paid ?? 0), 0);
 
     return {
       membersTotal: base.length,

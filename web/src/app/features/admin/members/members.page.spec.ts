@@ -1,7 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
 import { DemoSessionGateway } from '../../../layout/admin-shell/demo-session.gateway';
@@ -10,6 +10,7 @@ import {
   MembersAccessError,
   type MembersGateway,
   type MembersPage as MembersPageData,
+  type MembersOverview,
   type MemberRow,
 } from './members-gateway';
 import { MembersPage } from './members.page';
@@ -21,25 +22,29 @@ import { MembersPage } from './members.page';
  * récupérable avec relance, et accès refusé.
  */
 
+const EMPTY_OVERVIEW: MembersOverview = {
+  membersTotal: 0,
+  active: 0,
+  dormant: 0,
+  prospects: 0,
+  largeContributors: 0,
+  expected: 0,
+  collected: 0,
+  recoveryRate: null,
+};
+
 const EMPTY_PAGE: MembersPageData = {
   rows: [],
   totalItems: 0,
-  overview: {
-    membersTotal: 0,
-    active: 0,
-    dormant: 0,
-    prospects: 0,
-    largeContributors: 0,
-    expected: 0,
-    collected: 0,
-    recoveryRate: null,
-  },
+  overview: EMPTY_OVERVIEW,
   categories: [],
   groups: [],
+  supportedSortKeys: ['code', 'organization', 'due', 'paid', 'status', 'lastActivity'],
 };
 
 const MEMBER_ROW: MemberRow = {
   id: 'membership-demo-001',
+  organizationId: 'organization-demo-001',
   code: 'CNPM-DEMO-001',
   organization: 'Entreprise Démo SA',
   category: 'A',
@@ -59,15 +64,15 @@ const READY_PAGE: MembersPageData = {
   rows: [MEMBER_ROW],
   totalItems: 1,
   overview: {
-    ...EMPTY_PAGE.overview,
+    ...EMPTY_OVERVIEW,
     membersTotal: 1,
     active: 1,
-    expected: MEMBER_ROW.due,
-    collected: MEMBER_ROW.paid,
+    expected: MEMBER_ROW.due ?? 0,
+    collected: MEMBER_ROW.paid ?? 0,
     recoveryRate: 75,
   },
   categories: [MEMBER_ROW.category],
-  groups: [MEMBER_ROW.group],
+  groups: MEMBER_ROW.group ? [MEMBER_ROW.group] : [],
 };
 
 /** Gateway dont chaque appel expose un flux que le test résout ou fait échouer à la demande. */
@@ -85,7 +90,7 @@ class ControllableGateway implements MembersGateway {
   }
 }
 
-async function setup() {
+async function setup(withEnrollmentPermission = true) {
   const gateway = new ControllableGateway();
   await TestBed.configureTestingModule({
     imports: [MembersPage],
@@ -93,7 +98,21 @@ async function setup() {
       provideZonelessChangeDetection(),
       provideRouter([]),
       { provide: MEMBERS_GATEWAY, useValue: gateway },
-      { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
+      withEnrollmentPermission
+        ? { provide: SESSION_GATEWAY, useClass: DemoSessionGateway }
+        : {
+            provide: SESSION_GATEWAY,
+            useValue: {
+              identity: of({
+                displayName: 'Lecteur',
+                roleLabel: 'LECTEUR',
+                exerciseLabel: null,
+                notificationCount: null,
+                demoMode: false,
+                permissions: ['MEMBER.READ'],
+              }),
+            },
+          },
     ],
   }).compileComponents();
 
@@ -196,6 +215,15 @@ describe('MembersPage — états requis', () => {
     expect(navigate).toHaveBeenCalledWith(['/admin/enrollments/new']);
   });
 
+  it('masque le CTA BO-009 sans ENROLLMENT.CREATE', async () => {
+    const { host } = await setup(false);
+    expect(
+      Array.from(host.querySelectorAll('button')).some((item) =>
+        item.textContent?.includes('Nouveau membre'),
+      ),
+    ).toBe(false);
+  });
+
   it('ouvre la fiche et son historique en conservant le contexte de liste', async () => {
     const { fixture, gateway, host, router } = await setup();
     const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
@@ -206,10 +234,10 @@ describe('MembersPage — états requis', () => {
     button(host, 'Voir').click();
     button(host, 'Historique').click();
 
-    expect(navigate).toHaveBeenNthCalledWith(1, ['/admin/members', MEMBER_ROW.id], {
+    expect(navigate).toHaveBeenNthCalledWith(1, ['/admin/members', MEMBER_ROW.organizationId], {
       queryParamsHandling: 'preserve',
     });
-    expect(navigate).toHaveBeenNthCalledWith(2, ['/admin/members', MEMBER_ROW.id], {
+    expect(navigate).toHaveBeenNthCalledWith(2, ['/admin/members', MEMBER_ROW.organizationId], {
       queryParams: { onglet: 'historique', hpage: null },
       queryParamsHandling: 'merge',
     });

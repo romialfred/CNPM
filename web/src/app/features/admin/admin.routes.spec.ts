@@ -9,6 +9,7 @@ function child(path: string): Route | undefined {
 describe('adminRoutes', () => {
   it('déclare les routes canoniques des écrans livrés', () => {
     expect(adminRoutes[0]?.path).toBe('admin');
+    expect(adminRoutes[0]?.canActivate).toHaveLength(1);
     expect(child('dashboard')?.loadComponent).toBeTypeOf('function');
     expect(child('members')?.loadComponent).toBeTypeOf('function');
     expect(child('members/:id')?.loadComponent).toBeTypeOf('function');

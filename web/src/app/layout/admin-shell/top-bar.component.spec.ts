@@ -2,17 +2,20 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { of } from 'rxjs';
 import { DemoSessionGateway } from './demo-session.gateway';
-import { SESSION_GATEWAY } from './session-gateway';
+import { SESSION_GATEWAY, type SessionGateway } from './session-gateway';
 import { TopBarComponent } from './top-bar.component';
 
-async function setup() {
+async function setup(sessionGateway?: SessionGateway) {
   await TestBed.configureTestingModule({
     imports: [TopBarComponent],
     providers: [
       provideZonelessChangeDetection(),
       provideRouter([]),
-      { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
+      sessionGateway
+        ? { provide: SESSION_GATEWAY, useValue: sessionGateway }
+        : { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
     ],
   }).compileComponents();
 
@@ -64,5 +67,19 @@ describe('TopBarComponent', () => {
     expect(host.querySelector('.cnpm-topbar__identity')?.getAttribute('aria-label')).toBe(
       'Agent de démonstration, Administrateur',
     );
+  });
+
+  it('masque l action d enrôlement sans la permission backend', async () => {
+    const { host } = await setup({
+      identity: of({
+        displayName: 'Lecteur',
+        roleLabel: 'LECTEUR',
+        exerciseLabel: null,
+        notificationCount: null,
+        demoMode: false,
+        permissions: ['MEMBER.READ'],
+      }),
+    });
+    expect(host.querySelector('.cnpm-topbar__primary-action')).toBeNull();
   });
 });

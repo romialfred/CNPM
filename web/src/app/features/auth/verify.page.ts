@@ -18,7 +18,7 @@ import { AuthShellComponent } from './auth-shell.component';
 import { AUTH_GATEWAY } from './auth-gateway';
 import { AuthFlowStore } from './auth-flow.store';
 
-type VerifyState = 'idle' | 'submitting' | 'error' | 'success' | 'expired';
+type VerifyState = 'idle' | 'submitting' | 'error' | 'success' | 'expired' | 'unavailable';
 
 const RESEND_DELAY_SECONDS = 30;
 
@@ -54,9 +54,7 @@ export class VerifyPage {
 
   private readonly otpField = viewChild<OtpInputComponent>('otpField');
 
-  protected readonly state = signal<VerifyState>(
-    this.flow.activeChallenge() ? 'idle' : 'expired',
-  );
+  protected readonly state = signal<VerifyState>(this.flow.activeChallenge() ? 'idle' : 'expired');
   protected readonly resendCountdown = signal(RESEND_DELAY_SECONDS);
   protected readonly canResend = computed(() => this.resendCountdown() === 0);
   /** Nombre de renvois effectués ; rend chaque annonce distincte de la précédente. */
@@ -122,19 +120,20 @@ export class VerifyPage {
       return;
     }
     this.state.set('submitting');
-    this.gateway.verifyCode(challenge.id, this.form.getRawValue().code).subscribe((result) => {
-      if (result.outcome === 'authenticated') {
-        this.state.set('success');
-        this.flow.clear();
-        // Laisse le temps aux lecteurs d'écran d'annoncer le succès avant de rediriger.
-        setTimeout(() => void this.router.navigateByUrl(result.redirectTo), 900);
-        return;
-      }
-      this.form.reset({ code: '' });
-      this.state.set('error');
-      // Le focus repart sur la première case : sans cela il resterait sur un bouton
-      // neutralisé et l'utilisateur devrait retabuler pour ressaisir le code.
-      this.otpField()?.focusFirstCell();
+    this.gateway.verifyCode(challenge.id, this.form.getRawValue().code).subscribe({
+      next: (result) => {
+        if (result.outcome === 'authenticated') {
+          this.state.set('success');
+          this.flow.clear();
+          // Laisse le temps aux lecteurs d'écran d'annoncer le succès avant de rediriger.
+          setTimeout(() => void this.router.navigateByUrl(result.redirectTo), 900);
+          return;
+        }
+        this.form.reset({ code: '' });
+        this.state.set('error');
+        this.otpField()?.focusFirstCell();
+      },
+      error: () => this.state.set('unavailable'),
     });
   }
 
@@ -143,14 +142,13 @@ export class VerifyPage {
     if (!challenge || !this.canResend()) {
       return;
     }
-    this.gateway.resendCode(challenge.id).subscribe(() => {
-      // Annonce explicite : vider la région live n'annoncerait rien, l'utilisateur
-      // n'aurait aucune confirmation que le code est reparti. Le compteur rend chaque
-      // message distinct : réécrire la même chaîne ne déclencherait aucune émission
-      // (égalité Object.is du signal), donc aucune annonce dès le second renvoi.
-      this.resendCount.update((count) => count + 1);
-      this.startCountdown();
-      this.otpField()?.focusFirstCell();
+    this.gateway.resendCode(challenge.id).subscribe({
+      next: () => {
+        this.resendCount.update((count) => count + 1);
+        this.startCountdown();
+        this.otpField()?.focusFirstCell();
+      },
+      error: () => this.state.set('unavailable'),
     });
   }
 

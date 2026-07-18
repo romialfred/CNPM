@@ -33,7 +33,6 @@ import { PaginationComponent } from '../../../design-system/pagination/paginatio
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TabsComponent, type CnpmTab } from '../../../design-system/tabs/tabs.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
-import { DemoRecoveryGateway } from './demo-recovery.gateway';
 import {
   RECOVERY_GATEWAY,
   RecoveryAccessError,
@@ -147,7 +146,6 @@ interface StatusOption {
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Le port est fourni au composant : l'écran s'assemble sans dépendre d'un point de
   // câblage extérieur. Basculer sur l'adaptateur HTTP ne touchera que cette ligne.
-  providers: [{ provide: RECOVERY_GATEWAY, useClass: DemoRecoveryGateway }],
   imports: [
     DatePipe,
     DecimalPipe,

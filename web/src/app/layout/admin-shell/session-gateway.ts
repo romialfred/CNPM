@@ -4,20 +4,22 @@ import type { Observable } from 'rxjs';
 /**
  * Identité de la session affichée par le bandeau d'administration.
  *
- * Volontairement pauvre : le bandeau n'a besoin que d'un nom à afficher et d'un rôle
- * à annoncer. Il ne porte ni permission ni jeton — les permissions se vérifient côté
- * backend, et l'UI ne fait que les refléter (`frontend-angular.md`).
+ * Le bandeau reçoit l'identité et les permissions dérivées par le backend. Il ne
+ * porte jamais de jeton ; les permissions UI ne font que refléter les autorisations,
+ * dont la vérification reste obligatoire côté backend (`frontend-angular.md`).
  */
 export interface SessionIdentity {
   readonly displayName: string;
   /** Rôle lisible, tel qu'il doit apparaître sous le nom. */
   readonly roleLabel: string;
-  /** Exercice affiché dans le shell, fourni par la session et jamais déduit par l'UI. */
-  readonly exerciseLabel: string;
-  /** Compteur du centre de notifications ; `0` masque le badge. */
-  readonly notificationCount: number;
+  /** Exercice affiché dans le shell ; `null` lorsque le contrat ne le fournit pas. */
+  readonly exerciseLabel: string | null;
+  /** Compteur du centre de notifications ; `null` signifie que le service est indisponible. */
+  readonly notificationCount: number | null;
   /** Rend explicite un contexte fictif dans le chrome commun et les captures. */
   readonly demoMode: boolean;
+  /** Permissions dérivées par le backend, sans préfixe `PERM_`. */
+  readonly permissions: readonly string[];
 }
 
 export interface SessionGateway {

@@ -1,17 +1,29 @@
+import { inject } from '@angular/core';
 import type { Routes } from '@angular/router';
+import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
+import { UNAVAILABLE_MEMBER_HOME_GATEWAY } from './unavailable-member-gateways';
 
 /**
  * Routes de l'espace membre (côté adhérent), chargées à la demande.
  *
- * Le port est fourni ici avec son adaptateur de démonstration : le remplacer par
- * l'adaptateur HTTP réel ne touchera que ce point d'assemblage, jamais les pages.
+ * Le port est composé ici selon `CNPM_DATA_MODE`. Tant que le dashboard auto-scopé
+ * n'existe pas, le profil HTTP est indisponible et n'expose aucune fixture membre.
  */
 export const memberRoutes: Routes = [
   {
     path: 'member/home',
-    providers: [{ provide: MEMBER_HOME_GATEWAY, useClass: DemoMemberHomeGateway }],
+    providers: [
+      DemoMemberHomeGateway,
+      {
+        provide: MEMBER_HOME_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberHomeGateway)
+            : UNAVAILABLE_MEMBER_HOME_GATEWAY,
+      },
+    ],
     loadComponent: () => import('./home/member-home.page').then((m) => m.MemberHomePage),
     title: 'Mon espace membre — CNPM',
   },

@@ -25,8 +25,17 @@
     @if (state() === 'forbidden') {
       <div #errorAlert class="cnpm-login__alert" [id]="errorAlertId" tabindex="-1">
         <cnpm-alert tone="warning" title="Accès non autorisé">
-          Cet accès est actuellement refusé. Contactez le secrétariat du CNPM pour
-          connaître la situation de votre compte.
+          Cet accès est actuellement refusé. Contactez le secrétariat du CNPM pour connaître la
+          situation de votre compte.
+        </cnpm-alert>
+      </div>
+    }
+
+    @if (state() === 'unavailable') {
+      <div #errorAlert class="cnpm-login__alert" [id]="errorAlertId" tabindex="-1">
+        <cnpm-alert tone="warning" title="Connexion indisponible">
+          La connexion intégrée n'est pas encore disponible dans cet environnement. Aucun
+          identifiant n'a été transmis.
         </cnpm-alert>
       </div>
     }

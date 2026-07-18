@@ -1,18 +1,31 @@
+import { inject } from '@angular/core';
 import type { Routes } from '@angular/router';
+import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { AUTH_GATEWAY } from './auth-gateway';
 import { DemoAuthGateway } from './demo-auth.gateway';
+import { UnavailableAuthGateway } from './unavailable-auth.gateway';
 
 /**
  * Routes AUTH-001, chargées à la demande.
  *
- * Le port `AUTH_GATEWAY` est fourni ici avec l'adaptateur de démonstration
- * déterministe. Le remplacer par l'adaptateur Keycloak réel ne touchera que ce
- * point d'assemblage, jamais les pages.
+ * Le profil démo utilise l'adaptateur déterministe. Le profil HTTP reste fermé tant
+ * que le client OIDC/PKCE Keycloak n'est pas livré ; aucun mot de passe n'est relayé
+ * vers une API native improvisée.
  */
 export const authRoutes: Routes = [
   {
     path: 'auth',
-    providers: [{ provide: AUTH_GATEWAY, useClass: DemoAuthGateway }],
+    providers: [
+      DemoAuthGateway,
+      UnavailableAuthGateway,
+      {
+        provide: AUTH_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoAuthGateway)
+            : inject(UnavailableAuthGateway),
+      },
+    ],
     children: [
       {
         path: 'login',

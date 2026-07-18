@@ -13,21 +13,25 @@ import type { SortState } from '../../../design-system/data-table/data-table.mod
 export type MemberStatus = 'ACTIVE' | 'DORMANT' | 'PROSPECT';
 
 export interface MemberRow {
+  /** Identifiant technique de l'adhésion, utilisé pour la sélection de ligne. */
   readonly id: string;
+  /** Identifiant de l'entreprise, seul identifiant valide pour ouvrir BO-003. */
+  readonly organizationId: string;
   readonly code: string;
   readonly organization: string;
   readonly category: string;
-  readonly group: string;
-  readonly contactName: string;
-  readonly contactPhone: string;
-  readonly contactEmail: string;
-  /** Montants en XOF, entiers. Jamais un flottant : `CLAUDE.md` l'interdit. */
-  readonly due: number;
-  readonly paid: number;
+  readonly group: string | null;
+  readonly contactName: string | null;
+  readonly contactPhone: string | null;
+  readonly contactEmail: string | null;
+  /** Montants en XOF, entiers. `null` tant que le read-model ADR-006 ne les expose pas. */
+  readonly due: number | null;
+  readonly paid: number | null;
   readonly status: MemberStatus;
   /** Date ISO `AAAA-MM-JJ`, formatée à l'affichage seulement. */
-  readonly lastActivity: string;
-  readonly isLargeContributor: boolean;
+  readonly lastActivity: string | null;
+  /** `null` tant que DATA-DEC-001 n'est pas portée par un contrat backend. */
+  readonly isLargeContributor: boolean | null;
 }
 
 export interface MemberQuery {
@@ -64,10 +68,13 @@ export interface MembersPage {
   readonly rows: readonly MemberRow[];
   /** Nombre de membres correspondant au filtre, toutes pages confondues. */
   readonly totalItems: number;
-  readonly overview: MembersOverview;
+  /** Absent du contrat R0 ; livré par la démo et, plus tard, par le read-model ADR-006. */
+  readonly overview: MembersOverview | null;
   /** Valeurs réellement présentes dans la source ; jamais une nomenclature inventée. */
-  readonly categories: readonly string[];
-  readonly groups: readonly string[];
+  readonly categories: readonly string[] | null;
+  readonly groups: readonly string[] | null;
+  /** Clés que la source sait trier globalement, jamais seulement sur la page courante. */
+  readonly supportedSortKeys: readonly string[];
 }
 
 /**

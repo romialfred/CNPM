@@ -7,8 +7,8 @@
 
     @if (state() === 'expired') {
       <cnpm-alert tone="warning" title="Session de connexion expirée">
-        Votre demande de connexion n'est plus active. Reprenez la connexion pour recevoir un
-        nouveau code.
+        Votre demande de connexion n'est plus active. Reprenez la connexion pour recevoir un nouveau
+        code.
       </cnpm-alert>
       <a class="cnpm-verify__back" routerLink="/auth/login">Retour à la connexion</a>
     } @else {
@@ -27,6 +27,12 @@
       @if (state() === 'error') {
         <cnpm-alert tone="error" title="Code non valide">
           Le code saisi est incorrect ou expiré. Réessayez ou demandez un nouveau code.
+        </cnpm-alert>
+      }
+
+      @if (state() === 'unavailable') {
+        <cnpm-alert tone="warning" title="Vérification indisponible">
+          La connexion intégrée n'est pas encore disponible dans cet environnement.
         </cnpm-alert>
       }
 
@@ -74,11 +80,7 @@
         }
         <!-- Région live pré-montée : seul un contenu ajouté est annoncé. Le décompte
              en est exclu, pour ne pas parler à chaque seconde. -->
-        <p
-          class="cnpm-verify__status cnpm-verify__announcement"
-          role="status"
-          aria-live="polite"
-        >
+        <p class="cnpm-verify__status cnpm-verify__announcement" role="status" aria-live="polite">
           {{ resendAnnouncement() }}
         </p>
       </div>

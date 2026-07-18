@@ -127,9 +127,9 @@ describe('VerifyPage (AUTH-001 — 2FA)', () => {
     fixture.detectChanges();
 
     expect(element.querySelector('[role="alert"]')?.textContent).toContain('Code non valide');
-    const values = Array.from(
-      element.querySelectorAll<HTMLInputElement>('.cnpm-otp__cell'),
-    ).map((cell) => cell.value);
+    const values = Array.from(element.querySelectorAll<HTMLInputElement>('.cnpm-otp__cell')).map(
+      (cell) => cell.value,
+    );
     expect(values).toEqual(['', '', '', '', '', '']);
   });
 

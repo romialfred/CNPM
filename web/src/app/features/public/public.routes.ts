@@ -1,27 +1,48 @@
+import { inject } from '@angular/core';
 import type { Routes } from '@angular/router';
+import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoHomeGateway } from './home/demo-home.gateway';
 import { HOME_GATEWAY } from './home/home-gateway';
 import { DemoShowcaseGateway } from './showcase/demo-showcase.gateway';
 import { SHOWCASE_GATEWAY } from './showcase/showcase-gateway';
+import {
+  UNAVAILABLE_HOME_GATEWAY,
+  UNAVAILABLE_SHOWCASE_GATEWAY,
+} from './unavailable-public-gateways';
 
 /**
  * Routes publiques, chargées à la demande.
  *
- * Le port `SHOWCASE_GATEWAY` est fourni ici avec l'adaptateur de démonstration :
- * l'API R4 n'étant pas promue dans le contrat canonique, seul ce point d'assemblage
- * changera lorsqu'elle le sera.
+ * Les ports sont composés ici selon `CNPM_DATA_MODE`. L'API R4 de vitrine n'étant pas
+ * promue, le profil HTTP expose son indisponibilité sans repli vers les fixtures.
  */
 export const publicRoutes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    providers: [{ provide: HOME_GATEWAY, useClass: DemoHomeGateway }],
+    providers: [
+      DemoHomeGateway,
+      {
+        provide: HOME_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo' ? inject(DemoHomeGateway) : UNAVAILABLE_HOME_GATEWAY,
+      },
+    ],
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
     title: 'Conseil National du Patronat du Mali',
   },
   {
     path: 'membres/:slug',
-    providers: [{ provide: SHOWCASE_GATEWAY, useClass: DemoShowcaseGateway }],
+    providers: [
+      DemoShowcaseGateway,
+      {
+        provide: SHOWCASE_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoShowcaseGateway)
+            : UNAVAILABLE_SHOWCASE_GATEWAY,
+      },
+    ],
     loadComponent: () => import('./showcase/showcase.page').then((m) => m.ShowcasePage),
     // Le titre définitif est posé par la page à partir des données SEO de la vitrine.
     title: 'Vitrine membre — CNPM',

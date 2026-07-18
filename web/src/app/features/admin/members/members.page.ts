@@ -29,6 +29,7 @@ import { PageHeaderComponent } from '../../../design-system/page-header/page-hea
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
+import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
 import {
   MEMBERS_GATEWAY,
   MembersAccessError,
@@ -91,6 +92,7 @@ export class MembersPage {
   private readonly gateway = inject(MEMBERS_GATEWAY);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly session = inject(SESSION_GATEWAY);
 
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly pageSizes = PAGE_SIZES;
@@ -98,6 +100,13 @@ export class MembersPage {
   protected readonly statuses = Object.keys(STATUS_LABELS) as readonly MemberStatus[];
 
   protected readonly filtersExpanded = signal(true);
+  private readonly sessionIdentity = toSignal(
+    this.session.identity.pipe(catchError(() => of(null))),
+    { initialValue: null },
+  );
+  protected readonly canStartEnrollment = computed(
+    () => this.sessionIdentity()?.permissions.includes('ENROLLMENT.CREATE') ?? false,
+  );
   /** Sélection bornée à la page affichée — la fiche impose une portée explicite. */
   protected readonly selected = signal<ReadonlySet<string>>(new Set<string>());
 
@@ -188,8 +197,8 @@ export class MembersPage {
   protected readonly overview = computed(() => this.data()?.overview ?? null);
   protected readonly rows = computed<readonly MemberRow[]>(() => this.data()?.rows ?? []);
   protected readonly totalItems = computed(() => this.data()?.totalItems ?? 0);
-  protected readonly categories = computed(() => this.data()?.categories ?? []);
-  protected readonly groups = computed(() => this.data()?.groups ?? []);
+  protected readonly categories = computed(() => this.data()?.categories ?? null);
+  protected readonly groups = computed(() => this.data()?.groups ?? null);
 
   protected readonly hasFilters = computed(() =>
     Boolean(this.search() || this.status() || this.category() || this.group()),
@@ -215,18 +224,50 @@ export class MembersPage {
     return this.hasFilters() ? 'noResult' : 'empty';
   });
 
-  protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'code', label: 'Code membre', sortable: true },
-    { key: 'organization', label: 'Raison sociale', sortable: true },
-    { key: 'category', label: 'Catégorie' },
-    { key: 'group', label: 'Groupement' },
-    { key: 'contact', label: 'Contact principal' },
-    { key: 'due', label: 'Cotisation due', note: '(FCFA)', align: 'end', sortable: true },
-    { key: 'paid', label: 'Cotisation payée', note: '(FCFA)', align: 'end', sortable: true },
-    { key: 'status', label: 'Statut', sortable: true },
-    { key: 'lastActivity', label: 'Dernière activité', sortable: true },
-    { key: 'actions', label: 'Actions' },
-  ];
+  protected readonly columns = computed<readonly DataTableColumn[]>(() => {
+    const supported = new Set(
+      this.data()?.supportedSortKeys ?? [
+        'code',
+        'organization',
+        'due',
+        'paid',
+        'status',
+        'lastActivity',
+      ],
+    );
+    return [
+      { key: 'code', label: 'Code membre', sortable: supported.has('code') },
+      {
+        key: 'organization',
+        label: 'Raison sociale',
+        sortable: supported.has('organization'),
+      },
+      { key: 'category', label: 'Catégorie' },
+      { key: 'group', label: 'Groupement', sortable: supported.has('group') },
+      { key: 'contact', label: 'Contact principal' },
+      {
+        key: 'due',
+        label: 'Cotisation due',
+        note: '(FCFA)',
+        align: 'end',
+        sortable: supported.has('due'),
+      },
+      {
+        key: 'paid',
+        label: 'Cotisation payée',
+        note: '(FCFA)',
+        align: 'end',
+        sortable: supported.has('paid'),
+      },
+      { key: 'status', label: 'Statut', sortable: supported.has('status') },
+      {
+        key: 'lastActivity',
+        label: 'Dernière activité',
+        sortable: supported.has('lastActivity'),
+      },
+      { key: 'actions', label: 'Actions' },
+    ];
+  });
 
   protected readonly chips = computed<readonly FilterChip[]>(() => {
     const chips: FilterChip[] = [];
@@ -302,7 +343,9 @@ export class MembersPage {
    * un membre qui ne doit rien le présenterait comme mauvais payeur.
    */
   protected paidShare(row: MemberRow): number | null {
-    return row.due === 0 ? null : (row.paid / row.due) * 100;
+    return row.due === null || row.paid === null || row.due === 0
+      ? null
+      : (row.paid / row.due) * 100;
   }
 
   protected applySearch(): void {
@@ -369,6 +412,9 @@ export class MembersPage {
 
   /** BO-009 est le parcours canonique de création actuellement livré. */
   protected startEnrollment(): void {
+    if (!this.canStartEnrollment()) {
+      return;
+    }
     void this.router.navigate(['/admin/enrollments/new']);
   }
 
