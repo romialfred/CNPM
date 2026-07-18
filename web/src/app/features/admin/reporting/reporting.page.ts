@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideFileSpreadsheet, LucideFileText } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -20,15 +19,9 @@ import {
 } from '../../../design-system/definition-list/definition-list.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
-import {
-  FilterBarComponent,
-  type FilterChip,
-} from '../../../design-system/filter-bar/filter-bar.component';
+import type { FilterChip } from '../../../design-system/filter-bar/filter-bar.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
-import {
-  InsightSummaryComponent,
-  type InsightStat,
-} from '../../../design-system/insight-summary/insight-summary.component';
+import type { InsightStat } from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TabsComponent, type CnpmTab } from '../../../design-system/tabs/tabs.component';
@@ -142,15 +135,12 @@ function round(value: number): number {
     DecimalPipe,
     FormsModule,
     AdminShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
     DefinitionListComponent,
     EmptyStateComponent,
     ErrorStateComponent,
-    FilterBarComponent,
-    InsightSummaryComponent,
     PageHeaderComponent,
     SkeletonComponent,
     TabsComponent,

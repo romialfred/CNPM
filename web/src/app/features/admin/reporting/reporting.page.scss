@@ -3,24 +3,39 @@
 .cnpm-reporting {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-6);
+  gap: var(--cnpm-space-3);
   min-width: 0;
 }
 
 /* Le motif d'indisponibilité des exports occupe sa propre ligne sous les deux boutons
    qu'il décrit : glissé entre eux, il les séparerait et romprait le groupe d'actions. */
 .cnpm-reporting__hint {
-  flex-basis: 100%;
-  margin: 0;
-  max-width: 22rem;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-reporting__filter-strip {
+  display: grid;
+  grid-template-columns: 10rem 13rem minmax(16rem, 1fr) auto;
+  align-items: end;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-2) var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
 }
 
 .cnpm-reporting__filter {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-2);
+  gap: var(--cnpm-space-1);
   min-width: 0;
 }
 
@@ -56,31 +71,82 @@
    et de déséquilibrer la paire. */
 .cnpm-reporting__kpis {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--cnpm-space-4);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--cnpm-space-3);
   min-width: 0;
+}
+
+.cnpm-reporting__kpi {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-height: 4rem;
+  padding: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-reporting__kpi-icon {
+  display: grid;
+  width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
+  place-items: center;
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-brand-blue-50);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-reporting__kpi-label,
+.cnpm-reporting__kpi-value,
+.cnpm-reporting__kpi-trend {
+  margin: 0;
+}
+
+.cnpm-reporting__kpi-label {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-reporting__kpi-value {
+  margin-top: var(--cnpm-space-1);
+  overflow: hidden;
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--cnpm-color-text-brand);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnpm-reporting__kpi-trend {
+  margin-top: var(--cnpm-space-1);
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-semantic-success-700);
 }
 
 .cnpm-reporting__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 20rem;
   align-items: start;
-  gap: var(--cnpm-space-6);
+  gap: var(--cnpm-space-4);
   min-width: 0;
 }
 
 .cnpm-reporting__main {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-2);
   min-width: 0;
 }
 
 .cnpm-reporting__report {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-4);
-  padding: var(--cnpm-layout-cardPadding);
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-lg);
   background-color: var(--cnpm-color-surface-primary);
@@ -313,6 +379,14 @@
    quitte donc la colonne latérale et s'étale en deux blocs, plutôt que d'être masqué
    derrière un contrôle non spécifié. */
 @media (max-width: 1279px) {
+  .cnpm-reporting__filter-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cnpm-reporting__kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .cnpm-reporting__layout {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -328,6 +402,7 @@
 }
 
 @media (max-width: 767px) {
+  .cnpm-reporting__filter-strip,
   .cnpm-reporting__kpis {
     grid-template-columns: minmax(0, 1fr);
   }

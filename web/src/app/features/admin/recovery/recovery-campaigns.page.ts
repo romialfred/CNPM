@@ -168,7 +168,7 @@ interface StatusOption {
     LucidePlus,
   ],
   templateUrl: './recovery-campaigns.page.html',
-  styleUrl: './recovery-campaigns.page.scss',
+  styleUrls: ['./recovery-campaigns.page.scss', './recovery-campaigns.metrics.scss'],
 })
 export class RecoveryCampaignsPage {
   private readonly gateway = inject(RECOVERY_GATEWAY);

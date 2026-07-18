@@ -3,7 +3,7 @@
 .cnpm-security {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-5);
+  gap: var(--cnpm-space-3);
   min-width: 0;
 }
 
@@ -15,14 +15,14 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 20rem;
   align-items: start;
-  gap: var(--cnpm-space-6);
+  gap: var(--cnpm-space-4);
   min-width: 0;
 }
 
 .cnpm-security__panel {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-3);
   min-width: 0;
 }
 
@@ -49,16 +49,7 @@
 }
 
 .cnpm-security__filter {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-2);
-  min-width: 0;
-}
-
-.cnpm-security__label {
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-secondary);
+  width: min(24rem, 100%);
 }
 
 .cnpm-security__input {
@@ -83,8 +74,24 @@
 .cnpm-security__total {
   margin: 0;
   font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
+  font-size: var(--cnpm-font-size-xs);
   color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-security__panel-tools,
+.cnpm-security__matrix-head,
+.cnpm-security__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-security__panel-title {
+  margin: 0 0 var(--cnpm-space-1);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
 }
 
 /* Les cellules de ligne sont déclarées dans CE gabarit : l'encapsulation d'Angular les
@@ -92,7 +99,7 @@
    le composant `DataTable`, ne les atteignent pas. Les valeurs sont reprises des
    tokens, jamais réinventées. */
 .cnpm-table__cell {
-  padding: var(--cnpm-space-3);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
   text-align: left;
   vertical-align: middle;
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
@@ -110,6 +117,25 @@
   display: flex;
   flex-direction: column;
   min-width: 12rem;
+}
+
+.cnpm-security__account {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-security__avatar {
+  display: grid;
+  flex: 0 0 var(--cnpm-size-control-sm);
+  width: var(--cnpm-size-control-sm);
+  height: var(--cnpm-size-control-sm);
+  place-items: center;
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-brand-blue-50);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-brand);
 }
 
 .cnpm-security__identity-name {
@@ -153,13 +179,6 @@
 
 /* Les actions restent sur une ligne : un tableau se lit en balayant les lignes, et des
    lignes deux fois plus hautes coûtent plus cher que le défilement qu'elles évitent. */
-.cnpm-security__actions {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--cnpm-space-1);
-}
-
 /* ---------------------------- Matrice des droits ---------------------------- */
 
 .cnpm-security__permission-head {
@@ -199,10 +218,46 @@
 }
 
 .cnpm-security__subtitle {
-  margin: var(--cnpm-space-2) 0 0;
-  font-size: var(--cnpm-font-size-lg);
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
   font-weight: var(--cnpm-font-weight-semibold);
   color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__matrix-preview {
+  padding: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-security__matrix-head p {
+  margin: var(--cnpm-space-1) 0 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-security__matrix-scroll {
+  margin-top: var(--cnpm-space-2);
+  overflow-x: auto;
+}
+
+.cnpm-security__matrix {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-security__matrix th,
+.cnpm-security__matrix td {
+  padding: var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  text-align: center;
+}
+
+.cnpm-security__matrix th:first-child {
+  min-width: 13rem;
+  text-align: left;
 }
 
 .cnpm-security__roles {
@@ -249,12 +304,12 @@
 .cnpm-security__aside {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-3);
   min-width: 0;
 }
 
 .cnpm-security__card {
-  padding: var(--cnpm-space-5);
+  padding: var(--cnpm-space-4);
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-lg);
   background-color: var(--cnpm-color-surface-primary);
@@ -267,9 +322,39 @@
   color: var(--cnpm-color-text-primary);
 }
 
+.cnpm-security__card-head .cnpm-security__card-title {
+  margin: 0;
+}
+
 .cnpm-security__card-note {
   margin: var(--cnpm-space-3) 0 0;
   font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-security__audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  margin: var(--cnpm-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-security__audit-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-security__audit-list span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-security__audit-list small {
   color: var(--cnpm-color-text-secondary);
 }
 
@@ -298,6 +383,16 @@
 
   .cnpm-security__input {
     height: var(--cnpm-size-control-lg);
+  }
+
+  .cnpm-security__panel-tools,
+  .cnpm-security__matrix-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cnpm-security__filter {
+    width: 100%;
   }
 
   /* Reflow à 320 px : les cartes de rôle passent sur une colonne unique plutôt que

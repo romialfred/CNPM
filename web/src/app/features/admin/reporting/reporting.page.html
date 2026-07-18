@@ -2,7 +2,7 @@
   <div class="cnpm-reporting">
     <cnpm-page-header
       title="Reporting décisionnel"
-      description="Analysez le recouvrement des cotisations, sa concentration et son évolution sur la période de votre choix."
+      description="Analysez le recouvrement des cotisations, sa concentration et son évolution. Données fictives de démonstration."
     >
       <!-- La fiche prévoit un `ExportMenu` avec export asynchrone et notification. Ce
            flux n'est pas spécifié : les deux actions restent visibles mais inertes, et
@@ -22,22 +22,9 @@
       </p>
     </cnpm-page-header>
 
-    <!-- `live` désactivé : le bandeau est présent au chargement et ne change pas. Une
-         région live annoncerait un message que personne n'attend. -->
-    <cnpm-alert tone="info" title="Données de démonstration" [live]="false">
-      Les chiffres de cet écran sont fictifs et servent uniquement à la démonstration. Ils ne
-      représentent aucune donnée réelle du CNPM ni d’un de ses membres.
-    </cnpm-alert>
-
-    <cnpm-filter-bar
-      [expanded]="filtersExpanded()"
-      [chips]="chips()"
-      (expandedChange)="filtersExpanded.set($event)"
-      (chipRemove)="removeChip($event)"
-      (resetAll)="resetFilters()"
-    >
+    <section class="cnpm-reporting__filter-strip" aria-label="Filtres globaux du reporting">
       <div class="cnpm-reporting__filter">
-        <label class="cnpm-reporting__label" for="filtre-exercice">Exercice</label>
+        <label class="cnpm-reporting__hint" for="filtre-exercice">Exercice</label>
         <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique avant
              que le `@for` n'ait créé les options, et la valeur restaurée depuis l'URL
              serait rejetée par le navigateur. -->
@@ -55,7 +42,7 @@
       </div>
 
       <div class="cnpm-reporting__filter">
-        <label class="cnpm-reporting__label" for="filtre-periode">Période</label>
+        <label class="cnpm-reporting__hint" for="filtre-periode">Période</label>
         <select
           id="filtre-periode"
           class="cnpm-reporting__select"
@@ -70,7 +57,7 @@
       </div>
 
       <form class="cnpm-reporting__filter" role="search" (ngSubmit)="applySearch()">
-        <label class="cnpm-reporting__label" for="filtre-recherche">
+        <label class="cnpm-reporting__hint" for="filtre-recherche">
           Rechercher une ligne du rapport
         </label>
         <input
@@ -84,32 +71,80 @@
           (ngModelChange)="searchDraft.set($event)"
         />
       </form>
-    </cnpm-filter-bar>
+      @if (chips().length > 0) {
+        <cnpm-button variant="tertiary" size="sm" (click)="resetFilters()">
+          Réinitialiser
+        </cnpm-button>
+      }
+    </section>
 
-    <!-- Bandeau d'indicateurs : six mesures au maximum, comme l'impose la fiche.
-         Chaque carte porte son unité une seule fois, en titre, plutôt que de la
-         répéter sur chaque ligne. -->
+    <!-- Six cartes indépendantes : la lecture horizontale retrouve la composition
+         décisionnelle de la maquette tout en respectant la borne normative. -->
     @if (loading()) {
       <div class="cnpm-reporting__kpis">
-        <cnpm-skeleton variant="card" [rows]="3" label="Chargement des indicateurs…" />
-        <cnpm-skeleton variant="card" [rows]="3" label="" />
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <cnpm-skeleton
+            variant="card"
+            [rows]="2"
+            [label]="item === 1 ? 'Chargement des indicateurs…' : ''"
+          />
+        }
       </div>
     } @else {
-      <div class="cnpm-reporting__kpis">
-        <cnpm-insight-summary
-          title="Cotisations de la période"
-          headingId="kpi-cotisations"
-          unit="(FCFA)"
-          [stats]="contributionStats()"
-          [note]="'Source : ' + descriptor().source + ' ' + updatedAt() + '.'"
-        />
-        <cnpm-insight-summary
-          title="Performance de la période"
-          headingId="kpi-performance"
-          [stats]="performanceStats()"
-          note="Le taux rapporte les encaissements aux cotisations attendues. L’effectif est un stock en fin de période ; les adhésions sont un flux cumulé sur la période."
-        />
-      </div>
+      @if (totals(); as summary) {
+        <section class="cnpm-reporting__kpis" aria-label="Indicateurs de la période">
+          <article class="cnpm-reporting__kpi">
+            <span class="cnpm-reporting__kpi-icon" aria-hidden="true">E</span>
+            <div>
+              <p class="cnpm-reporting__kpi-label">Encaissements totaux</p>
+              <p class="cnpm-reporting__kpi-value">{{ summary.collected | number: '1.0-0' }}</p>
+              <p class="cnpm-reporting__kpi-trend">FCFA · période sélectionnée</p>
+            </div>
+          </article>
+          <article class="cnpm-reporting__kpi">
+            <span class="cnpm-reporting__kpi-icon" aria-hidden="true">%</span>
+            <div>
+              <p class="cnpm-reporting__kpi-label">Taux de recouvrement</p>
+              <p class="cnpm-reporting__kpi-value">
+                {{ summary.recoveryRate | number: '1.1-1' }}&nbsp;%
+              </p>
+              <p class="cnpm-reporting__kpi-trend">Encaissements / cotisations attendues</p>
+            </div>
+          </article>
+          <article class="cnpm-reporting__kpi">
+            <span class="cnpm-reporting__kpi-icon" aria-hidden="true">C</span>
+            <div>
+              <p class="cnpm-reporting__kpi-label">Cotisations attendues</p>
+              <p class="cnpm-reporting__kpi-value">{{ summary.expected | number: '1.0-0' }}</p>
+              <p class="cnpm-reporting__kpi-trend">FCFA · source contractuelle</p>
+            </div>
+          </article>
+          <article class="cnpm-reporting__kpi">
+            <span class="cnpm-reporting__kpi-icon" aria-hidden="true">M</span>
+            <div>
+              <p class="cnpm-reporting__kpi-label">Membres actifs</p>
+              <p class="cnpm-reporting__kpi-value">{{ summary.activeMembers | number }}</p>
+              <p class="cnpm-reporting__kpi-trend">Stock en fin de période</p>
+            </div>
+          </article>
+          <article class="cnpm-reporting__kpi">
+            <span class="cnpm-reporting__kpi-icon" aria-hidden="true">+</span>
+            <div>
+              <p class="cnpm-reporting__kpi-label">Nouvelles adhésions</p>
+              <p class="cnpm-reporting__kpi-value">{{ summary.newMembers | number }}</p>
+              <p class="cnpm-reporting__kpi-trend">Flux cumulé sur la période</p>
+            </div>
+          </article>
+          <article class="cnpm-reporting__kpi">
+            <span class="cnpm-reporting__kpi-icon" aria-hidden="true">R</span>
+            <div>
+              <p class="cnpm-reporting__kpi-label">Reste à recouvrer</p>
+              <p class="cnpm-reporting__kpi-value">{{ summary.outstanding | number: '1.0-0' }}</p>
+              <p class="cnpm-reporting__kpi-trend">FCFA · écart courant</p>
+            </div>
+          </article>
+        </section>
+      }
     }
 
     <div class="cnpm-reporting__layout">

@@ -40,54 +40,47 @@
         [id]="'panel-' + activeTab()"
         [attr.aria-labelledby]="'tab-' + activeTab()"
       >
-        @if (supportsSearch()) {
-          <cnpm-filter-bar
-            [expanded]="filtersExpanded()"
-            [chips]="chips()"
-            (expandedChange)="filtersExpanded.set($event)"
-            (chipRemove)="removeChip($event)"
-            (resetAll)="resetFilters()"
-          >
-            <!-- `search` plutôt que `text` : le champ reçoit sa croix d'effacement
-                 native et son rôle est annoncé. -->
+        <div class="cnpm-security__panel-tools">
+          <div>
+            <h2 class="cnpm-security__panel-title">
+              @switch (activeTab()) {
+                @case ('comptes') {
+                  Gestion des utilisateurs
+                }
+                @case ('roles') {
+                  Matrice des rôles et permissions
+                }
+                @case ('sessions') {
+                  Sessions ouvertes
+                }
+                @case ('audit') {
+                  Journal d’audit
+                }
+              }
+            </h2>
+            <p class="cnpm-security__total">
+              @if (counts()) {
+                {{ visibleRowCount() | number }} sur {{ totalRowCount() | number }} éléments
+                affichés
+              }
+            </p>
+          </div>
+          @if (supportsSearch()) {
             <form class="cnpm-security__filter" role="search" (ngSubmit)="applySearch()">
-              <label class="cnpm-security__label" for="filtre-securite">Recherche</label>
+              <label class="cnpm-security__sr" for="filtre-securite">Rechercher</label>
               <input
                 id="filtre-securite"
                 class="cnpm-security__input"
                 type="search"
                 name="recherche"
                 autocomplete="off"
-                placeholder="Nom, adresse e-mail, rôle, appareil, action…"
+                placeholder="Rechercher un utilisateur…"
                 [ngModel]="searchDraft()"
                 (ngModelChange)="searchDraft.set($event)"
               />
             </form>
-          </cnpm-filter-bar>
-        }
-
-        <!-- Le compte affiché et le compte total sont donnés ensemble : sans le second,
-             une recherche qui masque la moitié des lignes passerait pour la liste
-             complète. -->
-        <p class="cnpm-security__total">
-          @if (counts()) {
-            Affichage de {{ visibleRowCount() | number }} sur {{ totalRowCount() | number }}
-            @switch (activeTab()) {
-              @case ('comptes') {
-                {{ totalRowCount() === 1 ? 'compte' : 'comptes' }}
-              }
-              @case ('roles') {
-                {{ totalRowCount() === 1 ? 'permission' : 'permissions' }}
-              }
-              @case ('sessions') {
-                {{ totalRowCount() === 1 ? 'session' : 'sessions' }}
-              }
-              @case ('audit') {
-                {{ totalRowCount() === 1 ? 'événement' : 'événements' }}
-              }
-            }
           }
-        </p>
+        </div>
 
         @switch (activeTab()) {
           <!-- ======================= Comptes ======================= -->
@@ -95,15 +88,20 @@
             <cnpm-data-table
               caption="Comptes de la plateforme, avec leur rôle, leur statut, l’état de leur second facteur, leur dernière connexion et leurs sessions ouvertes."
               [columns]="accountColumns"
-              [rows]="accounts()"
+              [rows]="accountPreview()"
               [state]="tableState()"
               [rowKey]="accountKey"
             >
               <ng-template #row let-account>
                 <td class="cnpm-table__cell">
-                  <span class="cnpm-security__identity">
-                    <span class="cnpm-security__identity-name">{{ account.fullName }}</span>
-                    <span class="cnpm-security__identity-detail">{{ account.email }}</span>
+                  <span class="cnpm-security__account">
+                    <span class="cnpm-security__avatar" aria-hidden="true">
+                      {{ account.fullName.slice(0, 1) }}
+                    </span>
+                    <span class="cnpm-security__identity">
+                      <span class="cnpm-security__identity-name">{{ account.fullName }}</span>
+                      <span class="cnpm-security__identity-detail">{{ account.email }}</span>
+                    </span>
                   </span>
                 </td>
                 <td class="cnpm-table__cell">{{ account.roleLabel }}</td>
@@ -132,24 +130,15 @@
                   <span class="cnpm-security__count">{{ account.activeSessions | number }}</span>
                 </td>
                 <td class="cnpm-table__cell">
-                  <span class="cnpm-security__actions">
-                    <cnpm-button
-                      variant="tertiary"
-                      size="sm"
-                      [disabled]="true"
-                      [describedBy]="sensitiveHintId"
-                    >
-                      Suspendre
-                    </cnpm-button>
-                    <cnpm-button
-                      variant="tertiary"
-                      size="sm"
-                      [disabled]="true"
-                      [describedBy]="sensitiveHintId"
-                    >
-                      Réinitialiser la 2FA
-                    </cnpm-button>
-                  </span>
+                  <cnpm-button
+                    variant="tertiary"
+                    size="sm"
+                    [disabled]="true"
+                    [describedBy]="sensitiveHintId"
+                    [accessibleLabel]="'Actions de sécurité pour ' + account.fullName"
+                  >
+                    ⋮
+                  </cnpm-button>
                 </td>
               </ng-template>
 
@@ -208,6 +197,67 @@
                 }
               </div>
             </cnpm-data-table>
+
+            @if (tableState() === 'ready') {
+              <section class="cnpm-security__matrix-preview" aria-labelledby="apercu-matrice">
+                <div class="cnpm-security__matrix-head">
+                  <div>
+                    <h2 class="cnpm-security__subtitle" id="apercu-matrice">
+                      Matrice des rôles et permissions
+                    </h2>
+                    <p>Aperçu en lecture seule · droits fournis par le backend</p>
+                  </div>
+                  <cnpm-button variant="tertiary" size="sm" (click)="onTabChange('roles')">
+                    Voir la matrice complète
+                  </cnpm-button>
+                </div>
+                <div class="cnpm-security__matrix-scroll" tabindex="0">
+                  <table class="cnpm-security__matrix">
+                    <caption class="cnpm-security__sr">
+                      Aperçu des permissions accordées à chaque rôle
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Permissions</th>
+                        @for (role of roles(); track role.id) {
+                          <th scope="col">{{ role.label }}</th>
+                        }
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (permission of permissionPreview(); track permission.id) {
+                        <tr>
+                          <th scope="row">{{ permission.label }}</th>
+                          @for (grant of permission.grants; track grant.roleId) {
+                            <td>
+                              @if (grant.granted) {
+                                <svg
+                                  lucideCheck
+                                  class="cnpm-security__grant-yes"
+                                  [size]="iconSize.compact"
+                                  aria-hidden="true"
+                                ></svg>
+                              } @else {
+                                <svg
+                                  lucideMinus
+                                  class="cnpm-security__grant-no"
+                                  [size]="iconSize.compact"
+                                  aria-hidden="true"
+                                ></svg>
+                              }
+                              <span class="cnpm-security__sr">
+                                {{ grant.roleLabel }} :
+                                {{ grant.granted ? 'autorisé' : 'non autorisé' }}
+                              </span>
+                            </td>
+                          }
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            }
           }
 
           <!-- ================ Rôles et permissions ================ -->
@@ -566,6 +616,28 @@
               mot de passe, jeton, code à usage unique ni empreinte de session n’est affiché sur cet
               écran.
             </p>
+          </section>
+
+          <section class="cnpm-security__card" aria-labelledby="alertes-audit">
+            <div class="cnpm-security__card-head">
+              <h2 class="cnpm-security__card-title" id="alertes-audit">Alertes d’audit récentes</h2>
+              <cnpm-button variant="tertiary" size="sm" (click)="onTabChange('audit')">
+                Voir tout
+              </cnpm-button>
+            </div>
+            <ul class="cnpm-security__audit-list">
+              @for (entry of audit().slice(0, 4); track entry.id) {
+                <li>
+                  <cnpm-badge [tone]="auditOutcomeTone(entry.outcome)">
+                    {{ auditOutcomeLabel(entry.outcome) }}
+                  </cnpm-badge>
+                  <span>
+                    <strong>{{ entry.action }}</strong>
+                    <small>{{ entry.target }} · {{ entry.occurredAtLabel }}</small>
+                  </span>
+                </li>
+              }
+            </ul>
           </section>
         </aside>
       }

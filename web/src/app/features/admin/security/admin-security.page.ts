@@ -23,10 +23,6 @@ import type {
 import { DefinitionListComponent } from '../../../design-system/definition-list/definition-list.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
-import {
-  FilterBarComponent,
-  type FilterChip,
-} from '../../../design-system/filter-bar/filter-bar.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import {
   InsightSummaryComponent,
@@ -52,7 +48,7 @@ import {
 } from './admin-security-gateway';
 
 const TABS: readonly CnpmTab[] = [
-  { id: 'comptes', label: 'Comptes' },
+  { id: 'comptes', label: 'Utilisateurs' },
   { id: 'roles', label: 'Rôles et permissions' },
   { id: 'sessions', label: 'Sessions' },
   { id: 'audit', label: 'Journal d’audit' },
@@ -180,7 +176,6 @@ const AUDIT_COLUMNS: readonly DataTableColumn[] = [
     DefinitionListComponent,
     EmptyStateComponent,
     ErrorStateComponent,
-    FilterBarComponent,
     InsightSummaryComponent,
     PageHeaderComponent,
     SkeletonComponent,
@@ -222,8 +217,6 @@ export class AdminSecurityPage {
 
   /** Saisie en cours ; ne devient un filtre qu'à la validation du formulaire. */
   protected readonly searchDraft = signal(this.route.snapshot.queryParamMap.get('q') ?? '');
-
-  protected readonly filtersExpanded = signal(true);
 
   protected readonly supportsSearch = computed(() =>
     (SEARCHABLE_TABS as readonly string[]).includes(this.activeTab()),
@@ -281,8 +274,15 @@ export class AdminSecurityPage {
   protected readonly accounts = computed<readonly SecurityAccount[]>(
     () => this.data()?.accounts ?? [],
   );
+  /** Six lignes au premier écran, puis la vue complète reste accessible par recherche. */
+  protected readonly accountPreview = computed<readonly SecurityAccount[]>(() =>
+    this.accounts().slice(0, 6),
+  );
   protected readonly permissions = computed<readonly PermissionRow[]>(
     () => this.data()?.permissions ?? [],
+  );
+  protected readonly permissionPreview = computed<readonly PermissionRow[]>(() =>
+    this.permissions().slice(0, 6),
   );
   protected readonly roles = computed(() => this.data()?.roles ?? []);
   protected readonly sessions = computed<readonly SecuritySession[]>(
@@ -311,7 +311,7 @@ export class AdminSecurityPage {
   protected readonly visibleRowCount = computed(() => {
     switch (this.activeTab()) {
       case 'comptes':
-        return this.accounts().length;
+        return this.accountPreview().length;
       case 'roles':
         return this.permissions().length;
       case 'sessions':
@@ -368,11 +368,6 @@ export class AdminSecurityPage {
     // Une collection vide et un filtre trop étroit appellent des gestes opposés :
     // les confondre mène l'un des deux dans une impasse.
     return this.search() ? 'noResult' : 'empty';
-  });
-
-  protected readonly chips = computed<readonly FilterChip[]>(() => {
-    const search = this.search();
-    return search ? [{ key: 'q', label: `Recherche : ${search}` }] : [];
   });
 
   /**
@@ -456,13 +451,6 @@ export class AdminSecurityPage {
 
   protected applySearch(): void {
     this.patch({ q: this.searchDraft().trim() || null });
-  }
-
-  protected removeChip(key: string): void {
-    if (key === 'q') {
-      this.searchDraft.set('');
-    }
-    this.patch({ [key]: null });
   }
 
   protected resetFilters(): void {
