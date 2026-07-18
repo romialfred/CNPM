@@ -1,5 +1,11 @@
 # État d'implémentation
 
+> **Reprise du 18 juillet 2026.** Ce journal contient l'historique incrémental et ses
+> tableaux initiaux ne décrivent plus à eux seuls l'état courant. La baseline vérifiée,
+> les gates de qualité et l'ordre de reprise sont consignés dans
+> `reprise-baseline-2026-07-18.md`. Toute nouvelle livraison doit mettre à jour les deux
+> documents sans réécrire les preuves historiques ci-dessous.
+
 Dernière mise à jour : 2026-07-17. Branche `master`.
 
 Ce document est le constat factuel de l'état réel du dépôt, établi par audit initial.

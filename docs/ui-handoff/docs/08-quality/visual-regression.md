@@ -51,6 +51,29 @@ clavier, responsive et métier restent des gates indépendants. Inversement, le 
 ne peut pas être abaissé pour faire passer un écran. Les masques sont réservés aux
 petites zones dynamiques listées ci-dessous et doivent être documentés dans le rapport.
 
+### Grille de revue UI complémentaire
+
+Chaque écran reçoit aussi une note de conformité globale, indépendante du score pixel :
+
+| Critère | Poids sur 10 |
+|---|---:|
+| Structure et composition normative | 2,0 |
+| Tokens, espacements et typographie | 1,4 |
+| Responsive et reflow | 1,4 |
+| États et interactions | 1,4 |
+| Accessibilité WCAG 2.2 AA | 1,5 |
+| Cohérence du contenu et des données | 0,8 |
+| Fidélité et preuves visuelles | 1,5 |
+
+Chaque sous-critère reçoit `0`, `0,5` ou `1`. La livraison exige **9,8/10** sur
+cette grille **et** au moins 9,8/10 au comparateur automatique. Les plafonds suivants
+évitent qu'une moyenne masque un défaut important :
+
+- aucune baseline approuvée : note globale plafonnée à 8,5 ;
+- écart structurel, responsive ou fonctionnel majeur : note plafonnée à 8,9 ;
+- blocage clavier ou accessibilité critique : note plafonnée à 6,9 ;
+- un défaut critique ou majeur non résolu interdit toute promotion de baseline.
+
 ## Baselines
 
 1. Première implémentation comparée aux PNG conceptuels.
