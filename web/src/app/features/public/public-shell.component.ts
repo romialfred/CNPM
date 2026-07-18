@@ -5,6 +5,7 @@ import {
   DestroyRef,
   ElementRef,
   Renderer2,
+  afterRenderEffect,
   inject,
   input,
   signal,
@@ -331,6 +332,11 @@ export class PublicShellComponent {
   private previousBodyOverflow = '';
 
   constructor() {
+    afterRenderEffect(() => {
+      if (this.menuOpen()) {
+        this.drawer()?.nativeElement.querySelector<HTMLElement>('button, a[href]')?.focus();
+      }
+    });
     inject(DestroyRef).onDestroy(() => this.restoreBodyScroll());
   }
 
@@ -341,9 +347,6 @@ export class PublicShellComponent {
     this.previousBodyOverflow = this.document.body.style.overflow;
     this.renderer.setStyle(this.document.body, 'overflow', 'hidden');
     this.menuOpen.set(true);
-    Promise.resolve().then(() => {
-      this.drawer()?.nativeElement.querySelector<HTMLElement>('button, a[href]')?.focus();
-    });
   }
 
   protected closeMenu(restoreFocus = true): void {
