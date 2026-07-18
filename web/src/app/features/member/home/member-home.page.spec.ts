@@ -97,8 +97,18 @@ describe('MemberHomePage', () => {
     const payment = host.querySelector<HTMLButtonElement>('.member-home__payment');
     payment?.click();
 
-    expect(payment?.textContent).toContain('Paiement indisponible');
+    expect(payment?.textContent).toContain('Payer maintenant');
     expect(info).toHaveBeenCalledWith(expect.stringContaining('Aucune opération n’a été initiée'));
+  });
+
+  it('personnalise l’accueil et garde la démonstration explicitement signalée sans bandeau structurel', async () => {
+    await settle();
+
+    expect(host.querySelector('h1')?.textContent).toContain('Bienvenue, Awa');
+    expect(host.querySelector('.member-home__demo-note')?.textContent).toContain(
+      'données 100 % fictives',
+    );
+    expect(host.querySelector('main > cnpm-alert')).toBeNull();
   });
 
   it('sauvegarde la requête comme brouillon local sans prétendre l’envoyer', async () => {

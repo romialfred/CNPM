@@ -3,7 +3,9 @@
 }
 .member-home__dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns:
+    minmax(0, 3.85fr) minmax(0, 2.85fr) minmax(0, 2.85fr)
+    minmax(0, 2.4fr);
   gap: var(--cnpm-space-4);
   align-items: start;
 }
@@ -14,16 +16,16 @@
   padding: var(--cnpm-space-4);
 }
 .member-home__receipts {
-  grid-column: span 4;
+  grid-column: auto;
 }
 .member-home__request,
 .member-home__activities {
-  grid-column: span 3;
+  grid-column: auto;
 }
 .member-home__side-stack {
   display: grid;
-  grid-column: span 2;
-  gap: var(--cnpm-space-4);
+  grid-column: auto;
+  gap: var(--cnpm-space-3);
 }
 .member-home__section-heading {
   display: flex;
@@ -48,6 +50,17 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
+.member-home__section-heading button {
+  min-height: var(--cnpm-size-control-sm);
+  border: 0;
+  background: transparent;
+  color: var(--cnpm-color-text-link);
+  font: inherit;
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  cursor: pointer;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -55,7 +68,7 @@ table {
 }
 :is(th, td) {
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
-  padding: var(--cnpm-space-3) var(--cnpm-space-2);
+  padding: var(--cnpm-space-1) var(--cnpm-space-2);
   text-align: start;
   vertical-align: middle;
 }
@@ -89,13 +102,23 @@ td strong {
   width: var(--cnpm-size-icon-sm);
 }
 
+.member-home__list-action {
+  margin-top: var(--cnpm-space-4);
+}
+
 .member-home__request form,
 .member-home__field {
   display: grid;
   gap: var(--cnpm-space-2);
 }
 .member-home__request form {
-  gap: var(--cnpm-space-3);
+  gap: var(--cnpm-space-2);
+}
+.member-home__request .member-home__section-heading {
+  margin-bottom: 0;
+}
+.member-home__request .member-home__field {
+  gap: var(--cnpm-space-1);
 }
 .member-home__field label {
   color: var(--cnpm-color-text-secondary);
@@ -113,8 +136,14 @@ td strong {
   font: inherit;
   font-size: var(--cnpm-font-size-sm);
 }
+.member-home__field :is(input, select) {
+  height: var(--cnpm-size-control-md);
+  padding-block: var(--cnpm-space-1);
+}
 .member-home__field textarea {
-  min-height: 6.25rem;
+  height: 4rem;
+  min-height: var(--cnpm-size-control-xl);
+  max-height: 4rem;
   resize: vertical;
 }
 .member-home__upload {
@@ -123,7 +152,7 @@ td strong {
   gap: var(--cnpm-space-3);
   border: 1px dashed var(--cnpm-color-border-default);
   border-radius: var(--cnpm-radius-md);
-  padding: var(--cnpm-space-3);
+  padding: var(--cnpm-space-2);
   color: var(--cnpm-color-text-muted);
 }
 .member-home__upload svg {
@@ -137,6 +166,14 @@ td strong {
 .member-home__upload small,
 .member-home__draft-status {
   color: var(--cnpm-color-text-muted);
+}
+.member-home__draft-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 .member-home__draft-status {
   margin: 0;
@@ -158,6 +195,11 @@ td strong {
   font-weight: 600;
   cursor: pointer;
 }
+.member-home__request .member-home__button,
+.member-home__side-stack .member-home__button {
+  height: var(--cnpm-size-control-md);
+  min-height: var(--cnpm-size-control-md);
+}
 .member-home__button svg {
   width: var(--cnpm-size-icon-sm);
   height: var(--cnpm-size-icon-sm);
@@ -174,7 +216,7 @@ td strong {
 
 .member-home__timeline {
   display: grid;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -224,7 +266,7 @@ td strong {
   display: flex;
   align-items: center;
   gap: var(--cnpm-space-3);
-  margin-bottom: var(--cnpm-space-3);
+  margin-bottom: 0;
 }
 .member-home__progress {
   position: relative;
@@ -261,10 +303,26 @@ td strong {
   gap: var(--cnpm-space-3);
   margin: 0 0 var(--cnpm-space-4);
 }
+.member-home__side-stack .member-home__panel {
+  padding: var(--cnpm-space-3);
+}
+.member-home__profile {
+  padding-bottom: var(--cnpm-space-1) !important;
+}
+.member-home__side-stack .member-home__section-heading {
+  margin-bottom: var(--cnpm-space-2);
+}
+.member-home__activities {
+  align-self: stretch;
+}
 .member-home__support dl div,
 .member-home__support dt {
   display: grid;
   gap: var(--cnpm-space-1);
+}
+.member-home__support dl div {
+  grid-template-columns: var(--cnpm-size-icon-md) minmax(0, 1fr);
+  align-items: start;
 }
 .member-home__support :is(dt, dd) {
   margin: 0;
@@ -292,6 +350,9 @@ td strong {
 }
 
 @media (max-width: 79.9375rem) {
+  .member-home__dashboard-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
   .member-home__receipts,
   .member-home__request {
     grid-column: span 6;

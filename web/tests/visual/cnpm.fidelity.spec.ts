@@ -29,7 +29,7 @@ const screens: readonly FidelityScreen[] = [
   {
     id: 'REF-MP-001',
     route: '/member/home',
-    heading: /Bienvenue dans votre espace membre/,
+    heading: /Bienvenue,/,
   },
   { id: 'REF-BO-017', route: '/admin/recovery/campaigns', heading: 'Campagnes de relance' },
   { id: 'REF-BO-028', route: '/admin/reporting', heading: 'Reporting décisionnel' },

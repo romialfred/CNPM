@@ -8,7 +8,9 @@ import {
   LucideCreditCard,
   LucideFileDown,
   LucideMessageSquareText,
+  LucideMail,
   LucidePaperclip,
+  LucidePhone,
   LucideReceiptText,
   LucideSave,
 } from '@lucide/angular';
@@ -46,7 +48,9 @@ const ACTIVITY_LABELS: Readonly<Record<MemberActivityTone, string>> = {
     LucideCreditCard,
     LucideFileDown,
     LucideMessageSquareText,
+    LucideMail,
     LucidePaperclip,
+    LucidePhone,
     LucideReceiptText,
     LucideSave,
   ],
@@ -66,5 +70,13 @@ export class MemberHomeDashboardComponent {
 
   protected activityLabel(tone: MemberActivityTone): string {
     return ACTIVITY_LABELS[tone];
+  }
+
+  protected receiptPeriodLabel(period: string): string {
+    const match = /^(1er|[2-4]e) trimestre (\d{4})/.exec(period);
+    if (!match) {
+      return period;
+    }
+    return `T${Number.parseInt(match[1], 10)} ${match[2]}`;
   }
 }

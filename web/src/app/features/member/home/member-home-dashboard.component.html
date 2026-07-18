@@ -2,7 +2,7 @@
   <section class="member-home__panel member-home__receipts" aria-labelledby="receipts-title">
     <div class="member-home__section-heading">
       <h2 id="receipts-title">Mes reçus récents</h2>
-      <span>PDF fictifs — téléchargement indisponible</span>
+      <button type="button" (click)="unavailable.emit('La liste des reçus')">Voir tous</button>
     </div>
 
     @if (receipts().length) {
@@ -26,7 +26,9 @@
                 <strong>{{ receipt.reference }}</strong>
               </td>
               <td data-label="Date">{{ receipt.paidOn | date: 'dd/MM/yyyy' }}</td>
-              <td data-label="Période">{{ receipt.period }}</td>
+              <td data-label="Période" [attr.aria-label]="receipt.period" [title]="receipt.period">
+                {{ receiptPeriodLabel(receipt.period) }}
+              </td>
               <td data-label="Montant" class="member-home__numeric">
                 {{ receipt.amount | number: '1.0-0' }} FCFA
               </td>
@@ -35,7 +37,13 @@
                   class="member-home__icon-button"
                   type="button"
                   [attr.aria-label]="
-                    'Téléchargement indisponible pour le reçu ' + receipt.reference
+                    'Téléchargement indisponible pour le reçu ' +
+                    receipt.reference +
+                    ', ' +
+                    receipt.fileFormat +
+                    ' fictif de ' +
+                    receipt.fileSizeKb +
+                    ' Ko'
                   "
                   (click)="unavailable.emit('Le téléchargement du reçu ' + receipt.reference)"
                 >
@@ -46,6 +54,13 @@
           }
         </tbody>
       </table>
+      <button
+        class="member-home__list-action member-home__button member-home__button--secondary"
+        type="button"
+        (click)="unavailable.emit('La liste des reçus')"
+      >
+        <svg lucideReceiptText aria-hidden="true"></svg>Voir tous les reçus
+      </button>
     } @else {
       <p class="member-home__empty">Aucun reçu de démonstration disponible.</p>
     }
@@ -53,8 +68,8 @@
 
   <section class="member-home__panel member-home__request" aria-labelledby="request-title">
     <div class="member-home__section-heading member-home__section-heading--stacked">
-      <h2 id="request-title">Préparer une requête / réclamation</h2>
-      <span>L’envoi au CNPM n’est pas raccordé. Le brouillon reste sur cet appareil.</span>
+      <h2 id="request-title">Soumettre une requête / réclamation</h2>
+      <span>Le brouillon de démonstration reste sur cet appareil.</span>
     </div>
     <form [formGroup]="requestForm()" (ngSubmit)="saveDraftRequested.emit()">
       <div class="member-home__field">
@@ -68,7 +83,12 @@
       </div>
       <div class="member-home__field">
         <label for="request-subject">Objet</label
-        ><input id="request-subject" formControlName="subject" maxlength="120" />
+        ><input
+          id="request-subject"
+          formControlName="subject"
+          maxlength="120"
+          placeholder="Objet de votre requête"
+        />
       </div>
       <div class="member-home__field">
         <label for="request-message">Message</label
@@ -77,6 +97,7 @@
           formControlName="message"
           rows="4"
           maxlength="1200"
+          placeholder="Décrivez votre demande en détail…"
         ></textarea>
       </div>
       <div class="member-home__upload" aria-disabled="true">
@@ -173,23 +194,35 @@
     <section class="member-home__panel member-home__support" aria-labelledby="support-title">
       <div class="member-home__section-heading">
         <h2 id="support-title">Contact & assistance</h2>
-        <span>Coordonnées fictives</span>
+        <span>Démonstration</span>
       </div>
       <dl>
         <div>
-          <dt>Canal</dt>
+          <dt>
+            <svg lucideMessageSquareText aria-hidden="true"></svg
+            ><span class="member-home__sr-only">Canal</span>
+          </dt>
           <dd>{{ support().channel }}</dd>
         </div>
         <div>
-          <dt>Téléphone fictif</dt>
+          <dt>
+            <svg lucidePhone aria-hidden="true"></svg
+            ><span class="member-home__sr-only">Téléphone fictif</span>
+          </dt>
           <dd>{{ support().phone }}</dd>
         </div>
         <div>
-          <dt>Courriel fictif</dt>
+          <dt>
+            <svg lucideMail aria-hidden="true"></svg
+            ><span class="member-home__sr-only">Courriel fictif</span>
+          </dt>
           <dd>{{ support().email }}</dd>
         </div>
         <div>
-          <dt><svg lucideClock3 aria-hidden="true"></svg> Horaires</dt>
+          <dt>
+            <svg lucideClock3 aria-hidden="true"></svg
+            ><span class="member-home__sr-only">Horaires</span>
+          </dt>
           <dd>{{ support().hours }}</dd>
         </div>
       </dl>

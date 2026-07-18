@@ -4,11 +4,6 @@
   [memberCode]="identity()?.memberCode ?? ''"
 >
   <main class="member-home" id="contenu-principal">
-    <cnpm-alert tone="info" title="Démonstration — données 100 % fictives">
-      Aucun membre réel, aucun montant officiel et aucune opération financière réelle ne sont
-      utilisés.
-    </cnpm-alert>
-
     @switch (state()) {
       @case ('loading') {
         <section class="member-home__loading" aria-label="Chargement de votre portail membre">
@@ -42,12 +37,15 @@
       @case ('ready') {
         @if (identity(); as member) {
           <section class="member-home__hero" aria-labelledby="member-home-title">
+            <p class="member-home__demo-note">
+              Démonstration — données 100 % fictives, aucune opération financière réelle
+            </p>
             <div class="member-home__welcome">
               <div>
                 <h1 id="member-home-title">
-                  Bienvenue dans votre espace membre <span aria-hidden="true">👋</span>
+                  Bienvenue, {{ welcomeName() }} <span aria-hidden="true">👋</span>
                 </h1>
-                <p>Retrouvez l’essentiel de votre dossier CNPM de démonstration.</p>
+                <p>Ravi de vous revoir sur votre portail membre du CNPM.</p>
               </div>
               <div class="member-home__identity">
                 <span class="member-home__identity-icon" aria-hidden="true"
@@ -95,7 +93,7 @@
                   aria-describedby="payment-demo-note"
                   (click)="announceUnavailable('Le paiement en ligne')"
                 >
-                  <svg lucideCreditCard aria-hidden="true"></svg>Paiement indisponible
+                  <svg lucideCreditCard aria-hidden="true"></svg>Payer maintenant
                 </button>
                 <span class="member-home__sr-only" id="payment-demo-note"
                   >Démonstration uniquement, aucune transaction ne sera initiée.</span
@@ -114,7 +112,7 @@
               <span
                 ><small>Mes cotisations</small
                 ><strong>{{ situation()?.outstandingTotal ?? 0 | number: '1.0-0' }} FCFA</strong
-                ><em>Parcours indisponible</em></span
+                ><em>Voir le détail</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
             </button>
             <button type="button" (click)="announceUnavailable('L’historique des paiements')">
@@ -125,7 +123,7 @@
               ></span>
               <span
                 ><small>Mes paiements</small><strong>{{ paymentCount() }}</strong
-                ><em>Historique indisponible</em></span
+                ><em>Voir l'historique</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
             </button>
             <button type="button" (click)="announceUnavailable('La liste des reçus')">
@@ -136,7 +134,7 @@
               ></span>
               <span
                 ><small>Mes reçus</small><strong>{{ receiptCount() }}</strong
-                ><em>Liste indisponible</em></span
+                ><em>Voir tous les reçus</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
             </button>
             <button type="button" (click)="announceUnavailable('Le suivi des requêtes')">
@@ -147,7 +145,7 @@
               ></span>
               <span
                 ><small>Mes requêtes</small><strong>{{ requestCount() }}</strong
-                ><em>Suivi indisponible</em></span
+                ><em>Voir mes requêtes</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
             </button>
           </section>
@@ -176,7 +174,9 @@
               <li>Formations & renforcement</li>
               <li>Opportunités d’affaires</li>
             </ul>
-            <span>Parcours indisponible</span>
+            <button type="button" (click)="announceUnavailable('Les avantages membres')">
+              Voir tous les avantages <svg lucideArrowRight aria-hidden="true"></svg>
+            </button>
           </section>
         }
       }

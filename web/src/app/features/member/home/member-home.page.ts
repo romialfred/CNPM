@@ -21,7 +21,6 @@ import {
   LucideRefreshCw,
   LucideWalletCards,
 } from '@lucide/angular';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
@@ -64,7 +63,6 @@ const MEMBERSHIP_LABELS: Readonly<Record<MembershipStatus, string>> = {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
-    AlertComponent,
     ErrorStateComponent,
     SkeletonComponent,
     MemberPortalShellComponent,
@@ -102,6 +100,9 @@ export class MemberHomePage {
   protected readonly identity = computed(() => this.snapshot()?.identity ?? null);
   protected readonly situation = computed(() => this.snapshot()?.situation ?? null);
   protected readonly contact = computed(() => this.snapshot()?.contact ?? null);
+  protected readonly welcomeName = computed(
+    () => this.contact()?.contactName.trim().split(/\s+/)[0] || 'membre CNPM',
+  );
   protected readonly profile = computed(() => this.snapshot()?.profile ?? null);
   protected readonly support = computed(() => this.snapshot()?.support ?? null);
   protected readonly paymentCount = computed(() => this.snapshot()?.paymentCount ?? 0);

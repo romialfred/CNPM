@@ -1,155 +1,294 @@
+:host {
+  display: block;
+}
+
 .cnpm-auth {
+  position: relative;
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
-  background-color: var(--cnpm-color-surface-page);
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-auth::before,
+.cnpm-auth::after {
+  position: absolute;
+  z-index: 0;
+  border: 1px solid var(--cnpm-color-brand-blue-100);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.cnpm-auth::before {
+  width: 60rem;
+  height: 32rem;
+  inset: -18rem auto auto -9rem;
+  rotate: 18deg;
+  opacity: 0.55;
+}
+
+.cnpm-auth::after {
+  width: 48rem;
+  height: 18rem;
+  inset: auto auto 3rem -11rem;
+  rotate: -13deg;
+  opacity: 0.45;
+}
+
+.cnpm-auth__topbar,
+.cnpm-auth__main,
+.cnpm-auth__footer {
+  position: relative;
+  z-index: 1;
 }
 
 .cnpm-auth__topbar {
   display: flex;
+  min-height: 6.25rem;
   align-items: center;
   justify-content: space-between;
-  padding: var(--cnpm-space-5) var(--cnpm-layout-pagePaddingDesktop);
+  padding: var(--cnpm-space-4) calc(var(--cnpm-space-10) * 2);
 }
 
-.cnpm-auth__wordmark {
-  margin: 0;
-  font-family: var(--cnpm-font-family-sans);
-  font-weight: var(--cnpm-font-weight-bold);
-  font-size: var(--cnpm-font-size-xl);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  color: var(--cnpm-color-text-brand);
-}
-
-/* Pas de soulignement pointillé par défaut du navigateur : le mot-symbole n'est pas
-   une définition à consulter, et le titre reste disponible au survol. */
-.cnpm-auth__wordmark abbr {
-  text-decoration: none;
+.cnpm-auth__logo {
+  width: 15rem;
+  height: 5.5rem;
+  object-fit: fill;
 }
 
 .cnpm-auth__lang {
   display: inline-flex;
   align-items: center;
   gap: var(--cnpm-space-2);
-  margin: 0;
 }
 
-.cnpm-auth__lang-label {
+.cnpm-auth__lang span {
+  display: inline-grid;
+  min-width: var(--cnpm-size-control-md);
+  min-height: var(--cnpm-size-control-md);
+  place-items: center;
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
   font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-secondary);
+  font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .cnpm-auth__lang-value {
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-primary);
+  border-color: var(--cnpm-color-brand-blue-700) !important;
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
 }
 
-/* Répartition de la fiche AUTH-001 : message de confiance 52–56 %, formulaire 44–48 %
-   de la zone de contenu. Les deux fourchettes somment à ~96–104 % : la gouttière doit
-   donc tenir dans le reste, ce qui la borne à environ 4 % de la largeur de contenu.
-   Une gouttière de 4 rem laissait les deux zones hors fourchette à tous les viewports
-   desktop (mesuré : 51,5 % / 43,9 % à 1440) ; 2 rem les y ramène partout.
-   `minmax(0, …)` est indispensable : une piste `fr` prend pour minimum le min-content
-   de son item, si bien que la grille pouvait dépasser son conteneur. */
+.cnpm-auth__lang-unavailable {
+  color: var(--cnpm-color-text-muted);
+}
+
 .cnpm-auth__main {
-  flex: 1 1 auto;
   display: grid;
-  grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
-  align-items: center;
-  gap: var(--cnpm-space-8);
-  padding: var(--cnpm-space-8) var(--cnpm-layout-pagePaddingDesktop);
   width: 100%;
-  max-width: var(--cnpm-size-publicMax);
+  max-width: var(--cnpm-size-contentMax);
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
+  align-items: start;
+  gap: var(--cnpm-space-8);
   margin: 0 auto;
+  padding: 0 calc(var(--cnpm-space-10) * 2) var(--cnpm-space-10);
 }
 
-/* `order: -1` place le message à gauche sur desktop alors qu'il suit le formulaire
-   dans le DOM : l'ordre de lecture reste « tâche principale d'abord », et le <h1> de
-   la page précède ce <h2>. */
+.cnpm-auth__panel {
+  display: flex;
+  min-width: 0;
+  justify-content: center;
+}
+
 .cnpm-auth__trust {
   order: -1;
   display: flex;
+  max-width: 37rem;
   flex-direction: column;
   gap: var(--cnpm-space-4);
-  max-width: var(--cnpm-size-publicMax);
+  margin-top: calc(var(--cnpm-space-10) * 2);
 }
 
-/* Reste sous le <h1> de la page (2xl) : un texte secondaire rendu plus gros que le
-   titre principal se lit comme le titre de l'écran. */
 .cnpm-auth__trust-title {
+  max-width: 32rem;
   margin: 0;
-  font-size: var(--cnpm-font-size-xl);
-  line-height: var(--cnpm-font-lineHeight-xl);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
+  color: var(--cnpm-color-brand-blue-900);
+  font-size: var(--cnpm-font-size-4xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  line-height: 1.2;
+}
+
+.cnpm-auth__accent {
+  width: 3.75rem;
+  height: 0.1875rem;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-red-600);
 }
 
 .cnpm-auth__trust-text {
+  max-width: 34rem;
   margin: 0;
-  font-size: var(--cnpm-font-size-lg);
-  line-height: var(--cnpm-font-lineHeight-lg);
   color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-md);
+  line-height: var(--cnpm-font-lineHeight-lg);
 }
 
-/* `min-width: 0` est indispensable : sans lui, cet item de grille hérite de
-   `min-width: auto` et se dimensionne sur le contenu minimal de son enfant (les six
-   cases OTP), ce qui débordait horizontalement à 360 px.
-   Le contenu projeté ne peut pas être contraint depuis ici — il porte l'attribut de
-   scope de la page appelante, pas celui du shell : chaque page pose donc elle-même
-   `min-width: 0` sur sa carte. */
-.cnpm-auth__panel {
-  display: flex;
-  justify-content: center;
-  min-width: 0;
+.cnpm-auth__benefits {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  margin: var(--cnpm-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-auth__benefits li {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-auth__benefits li > span {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-auth__benefits svg {
+  width: var(--cnpm-size-icon-lg);
+  height: var(--cnpm-size-icon-lg);
+}
+
+.cnpm-auth__benefits div {
+  display: grid;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-auth__benefits strong {
+  color: var(--cnpm-color-brand-blue-900);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-auth__benefits small {
+  max-width: 27rem;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  line-height: var(--cnpm-font-lineHeight-sm);
 }
 
 .cnpm-auth__footer {
-  padding: var(--cnpm-space-5) var(--cnpm-layout-pagePaddingDesktop);
+  display: flex;
+  min-height: 4.25rem;
+  align-items: center;
+  justify-content: space-between;
   border-top: 1px solid var(--cnpm-color-border-subtle);
+  padding: var(--cnpm-space-4) calc(var(--cnpm-space-10) * 2);
+  background: var(--cnpm-color-surface-primary);
 }
 
-.cnpm-auth__legal {
+.cnpm-auth__legal,
+.cnpm-auth__secure {
   margin: 0;
-  font-size: var(--cnpm-font-size-sm);
   color: var(--cnpm-color-text-muted);
-  text-align: center;
+  font-size: var(--cnpm-font-size-sm);
 }
 
-/* Sous 1024 px : l'illustration/message de confiance disparaît, formulaire seul. */
-/* Sous 1024 px, la fiche demande de retirer l'illustration secondaire, pas le message
-   de confiance : celui-ci passe sous le formulaire et se condense. Le retirer
-   entièrement priverait 4 des 8 viewports obligatoires d'un contenu que la fiche
-   prescrit. */
-@media (max-width: 1023px) {
-  /* Pas de `justify-items: center` : il dimensionnerait l'item sur son contenu
-     (`fit-content`) au lieu de la piste, ce qui le faisait déborder. Le panneau
-     centre déjà sa carte via `justify-content` en flex. */
+.cnpm-auth__secure {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-auth__secure svg {
+  width: var(--cnpm-size-icon-md);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+@media (max-width: 63.9375rem) {
+  .cnpm-auth__topbar,
+  .cnpm-auth__main,
+  .cnpm-auth__footer {
+    padding-inline: var(--cnpm-layout-pagePaddingTablet);
+  }
+
   .cnpm-auth__main {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--cnpm-space-6);
   }
-  /* L'ordre visuel rejoint l'ordre du DOM : formulaire puis message condensé. */
+
   .cnpm-auth__trust {
     order: 0;
     max-width: 40rem;
-    margin-inline: auto;
+    margin: 0 auto;
+  }
+
+  .cnpm-auth__benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* « Sous 768 px, formulaire seul avec bénéfices condensés » (fiche AUTH-001). */
-@media (max-width: 767px) {
+@media (max-width: 47.9375rem) {
+  .cnpm-auth__topbar {
+    min-height: 4.5rem;
+  }
+
   .cnpm-auth__topbar,
   .cnpm-auth__main,
   .cnpm-auth__footer {
     padding-inline: var(--cnpm-layout-pagePaddingMobile);
   }
+
+  .cnpm-auth__logo {
+    width: 9rem;
+    height: 4rem;
+  }
+
+  .cnpm-auth__lang-unavailable,
+  .cnpm-auth__benefits li:nth-child(n + 3) {
+    display: none;
+  }
+
+  .cnpm-auth__main {
+    padding-block: var(--cnpm-space-4);
+  }
+
   .cnpm-auth__trust-title {
     font-size: var(--cnpm-font-size-md);
     line-height: var(--cnpm-font-lineHeight-md);
   }
-  .cnpm-auth__trust-text {
-    font-size: var(--cnpm-font-size-sm);
-    line-height: var(--cnpm-font-lineHeight-sm);
+
+  .cnpm-auth__trust-text,
+  .cnpm-auth__benefits small {
+    font-size: var(--cnpm-font-size-xs);
+  }
+
+  .cnpm-auth__benefits {
+    grid-template-columns: 1fr;
+    gap: var(--cnpm-space-2);
+  }
+
+  .cnpm-auth__benefits li {
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+  }
+
+  .cnpm-auth__benefits li > span {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .cnpm-auth__footer {
+    min-height: auto;
+    justify-content: center;
+  }
+
+  .cnpm-auth__secure {
+    display: none;
   }
 }

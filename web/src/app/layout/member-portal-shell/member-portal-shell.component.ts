@@ -37,17 +37,18 @@ export class MemberPortalShellComponent {
   readonly organization = input('Espace membre');
   readonly userName = input('Membre CNPM');
   readonly memberCode = input('');
+  readonly notificationCount = input(3);
 
   protected readonly destinations: readonly MemberPortalDestination[] = [
     { label: 'Accueil', mobileLabel: 'Accueil', route: '/member/home', icon: 'home' },
-    {
-      label: 'Cotisations / Paiements',
-      mobileLabel: 'Cotisations',
-      route: null,
-      icon: 'payments',
-    },
+    { label: 'Cotisations', mobileLabel: 'Cotisations', route: null, icon: 'payments' },
+    { label: 'Paiements', mobileLabel: 'Paiements', route: null, icon: 'payments' },
     { label: 'Reçus', mobileLabel: 'Reçus', route: null, icon: 'receipts' },
     { label: 'Requêtes', mobileLabel: 'Requêtes', route: null, icon: 'requests' },
-    { label: 'Profil', mobileLabel: 'Profil', route: null, icon: 'profile' },
+    { label: 'Documents', mobileLabel: 'Documents', route: null, icon: 'receipts' },
+    { label: 'Avantages', mobileLabel: 'Avantages', route: null, icon: 'profile' },
   ];
+
+  /** La navigation mobile reste bornée à cinq destinations, comme l'exige le handoff. */
+  protected readonly mobileDestinations = this.destinations.slice(0, 5);
 }

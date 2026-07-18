@@ -1,6 +1,6 @@
 <cnpm-auth-shell>
   <div class="cnpm-login">
-    <h1 class="cnpm-login__title">Connexion</h1>
+    <h1 class="cnpm-login__title">Connexion à votre espace CNPM</h1>
     <p class="cnpm-login__subtitle">Choisissez votre espace, puis identifiez-vous.</p>
 
     <cnpm-tabs
@@ -85,9 +85,14 @@
         [block]="true"
         [loading]="state() === 'submitting'"
       >
-        Continuer
+        Se connecter
       </cnpm-button>
     </form>
+
+    <div class="cnpm-login__security-note">
+      <strong>Connexion sécurisée</strong>
+      <span>Une vérification en deux étapes vous sera demandée après vos identifiants.</span>
+    </div>
 
     <!-- BLOCKED (UX-DEC-011) : aucun canal de support n'est arbitré ; inventer une
          adresse ou un numéro serait une donnée institutionnelle fabriquée. -->

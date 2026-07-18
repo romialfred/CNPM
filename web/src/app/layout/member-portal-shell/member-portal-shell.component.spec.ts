@@ -30,7 +30,13 @@ describe('MemberPortalShellComponent', () => {
 
   it('ne transforme pas les destinations absentes en liens morts', () => {
     expect(host.querySelectorAll('nav a')).toHaveLength(2);
-    expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(8);
+    expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(10);
     expect(host.querySelectorAll('[aria-current="page"]')).toHaveLength(2);
+  });
+
+  it('reprend les sept destinations desktop et borne le mobile à cinq entrées', () => {
+    expect(host.querySelectorAll('.member-shell__desktop-nav > *')).toHaveLength(7);
+    expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
+    expect(host.querySelector('.member-shell__notification-count')?.textContent).toContain('3');
   });
 });

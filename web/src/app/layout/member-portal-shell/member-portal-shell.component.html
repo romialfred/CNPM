@@ -37,6 +37,11 @@
           aria-label="Notifications indisponibles dans cette démonstration"
         >
           <svg lucideBell aria-hidden="true"></svg>
+          @if (notificationCount() > 0) {
+            <span class="member-shell__notification-count" aria-hidden="true">{{
+              notificationCount()
+            }}</span>
+          }
         </button>
         <span class="member-shell__avatar" aria-hidden="true">
           <svg lucideBuilding2></svg>
@@ -52,7 +57,7 @@
   <ng-content />
 
   <nav class="member-shell__mobile-nav" aria-label="Navigation mobile du portail membre">
-    @for (destination of destinations; track destination.label) {
+    @for (destination of mobileDestinations; track destination.label) {
       @if (destination.route; as route) {
         <a [routerLink]="route" aria-current="page">
           @switch (destination.icon) {
