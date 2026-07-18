@@ -44,3 +44,6 @@ Thumbs.db
 infrastructure/docker/data/
 reports/
 visual-diff/
+
+# Artefacts temporaires (rendus de PDF, sorties de travail)
+tmp/
