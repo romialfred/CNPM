@@ -16,6 +16,7 @@ POST;/enrollment-applications;ENROLLMENT;createEnrollmentApplication;Créer un d
 GET;/enrollment-applications/{id};ENROLLMENT;getEnrollmentApplication;Consulter un dossier.
 PATCH;/enrollment-applications/{id};ENROLLMENT;updateEnrollmentApplication;Modifier un brouillon.
 POST;/enrollment-applications/{id}/submit;ENROLLMENT;submitEnrollmentApplication;Soumettre le dossier.
+POST;/enrollment-applications/{id}/start-review;ENROLLMENT;startEnrollmentReview;Prendre le dossier en charge pour contrôle.
 POST;/enrollment-applications/{id}/request-complement;ENROLLMENT;requestEnrollmentComplement;Demander un complément.
 POST;/enrollment-applications/{id}/approve;ENROLLMENT;approveEnrollmentApplication;Approuver et activer.
 POST;/enrollment-applications/{id}/reject;ENROLLMENT;rejectEnrollmentApplication;Rejeter avec motif.

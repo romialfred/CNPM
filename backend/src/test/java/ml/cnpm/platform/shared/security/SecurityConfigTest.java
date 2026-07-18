@@ -89,6 +89,7 @@ class SecurityConfigTest {
     }
 
     @Autowired private WebApplicationContext context;
+    @Autowired private PermissionDirectory permissionDirectory;
 
     private MockMvc mockMvc;
 
@@ -133,8 +134,8 @@ class SecurityConfigTest {
     }
 
     @Test
-    @DisplayName("Avec un jeton valide, /auth/me projette identité et rôles de realm")
-    void authenticatedUserSeesTheirRoles() throws Exception {
+    @DisplayName("Avec un jeton valide, /auth/me projette identité, rôles et permissions dérivées")
+    void authenticatedUserSeesTheirRolesAndDerivedPermissions() throws Exception {
         mockMvc.perform(
                         get("/auth/me")
                                 .with(
@@ -145,19 +146,35 @@ class SecurityConfigTest {
                                                                                 "preferred_username",
                                                                                 "acomptable")
                                                                         .claim(
+                                                                                "email",
+                                                                                "a.comptable@example.test")
+                                                                        .claim(
                                                                                 "realm_access",
                                                                                 Map.of(
                                                                                         "roles",
                                                                                         List.of(
                                                                                                 "COMPTABLE",
                                                                                                 "SUPPORT"))))
-                                                .authorities(new KeycloakRealmRoleConverter())))
+                                                .authorities(
+                                                        new KeycloakAuthoritiesConverter(
+                                                                permissionDirectory))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subject").value("user-123"))
                 .andExpect(jsonPath("$.username").value("acomptable"))
+                .andExpect(jsonPath("$.email").value("a.comptable@example.test"))
                 .andExpect(jsonPath("$.roles").isArray())
                 .andExpect(jsonPath("$.roles[0]").value("COMPTABLE"))
-                .andExpect(jsonPath("$.roles[1]").value("SUPPORT"));
+                .andExpect(jsonPath("$.roles[1]").value("SUPPORT"))
+                .andExpect(jsonPath("$.permissions").isArray())
+                .andExpect(
+                        jsonPath("$.permissions")
+                                .value(
+                                        org.hamcrest.Matchers.hasItems(
+                                                "IAM.USER.READ",
+                                                "MEMBER.READ",
+                                                "PAYMENT.CONFIRM")))
+                .andExpect(jsonPath("$.mfaLevel").doesNotExist())
+                .andExpect(jsonPath("$.organizationScope").doesNotExist());
     }
 
     @Test

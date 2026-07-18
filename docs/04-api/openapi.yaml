@@ -53,7 +53,7 @@ paths:
     get:
       tags:
       - AUTH
-      summary: Lire le profil, les rôles et le périmètre courant.
+      summary: Lire le profil, les rôles et les permissions du compte courant.
       operationId: getCurrentUser
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
@@ -75,7 +75,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/CurrentUser'
   /auth/step-up:
     post:
       tags:
@@ -3616,6 +3616,47 @@ components:
         maximum: 100
         default: 20
   schemas:
+    CurrentUser:
+      type: object
+      description: >-
+        Projection du jeton authentifié et des autorités dérivées par le serveur.
+        Les permissions proviennent exclusivement du mapping RBAC serveur ; cette
+        réponse ne déclare ni périmètre ABAC, ni niveau MFA.
+      required:
+      - subject
+      - username
+      - email
+      - roles
+      - permissions
+      properties:
+        subject:
+          type: string
+          minLength: 1
+          description: Identifiant immuable du sujet dans le fournisseur d'identité.
+        username:
+          type: string
+          nullable: true
+          description: Nom utilisateur préféré lorsque la revendication est présente.
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Adresse e-mail lorsque la revendication est présente.
+        roles:
+          type: array
+          uniqueItems: true
+          description: Rôles de realm sans le préfixe technique ROLE_, triés par code.
+          items:
+            type: string
+        permissions:
+          type: array
+          uniqueItems: true
+          description: >-
+            Permissions RBAC dérivées côté serveur, sans le préfixe technique
+            PERM_, triées par code.
+          items:
+            type: string
+      additionalProperties: false
     Uuid:
       type: string
       format: uuid
