@@ -93,7 +93,8 @@ test.describe('PublicShell — navigation mobile', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
 
-    const trigger = page.getByRole('button', { name: 'Ouvrir le menu' });
+    const trigger = page.locator('.cnpm-public__menu-button');
+    await expect(trigger).toHaveAccessibleName('Ouvrir le menu');
     await trigger.click();
     const drawer = page.getByRole('dialog', { name: 'Site du CNPM' });
     await expect(drawer).toBeVisible();
