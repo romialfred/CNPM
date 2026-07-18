@@ -59,6 +59,39 @@ const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS: readonly string[] = ['.pdf', '.jpg', '.jpeg', '.png'];
 
 /**
+ * Brouillon strictement fictif repris par la démonstration visuelle.
+ *
+ * Les valeurs reprennent la densité de BO-009 sans représenter un membre réel :
+ * domaines `.example`, références inventées et aucun résultat officiel de registre.
+ * Le mode HTTP ne compose jamais cet adaptateur.
+ */
+const DEMO_DRAFT: EnrollmentDraft = {
+  id: 'ENR-BROUILLON-DEMO-0001',
+  savedAt: '2024-05-27T10:15:00Z',
+  values: {
+    legalName: 'SOCIÉTÉ MALIENNE DE LOGISTIQUE',
+    tradeName: 'SML',
+    legalForm: 'societe-anonyme-sa',
+    rccm: 'MA.BKO.2024.B.1234',
+    nif: '081234567A',
+    creationDate: '2015-06-12',
+    contactName: 'Awa Dembélé',
+    contactRole: 'Directrice administrative',
+    contactEmail: 'awa.dembele@sml.example',
+    contactPhone: '+223 76 00 12 34',
+    address: 'Rue 395, quartier du Fleuve, Bamako',
+    city: 'Bamako',
+    category: 'grande-entreprise',
+    group: 'commerce-et-distribution',
+    workforce: '152',
+    periodicity: 'trimestrielle',
+    startDate: '2024-01-01',
+    notes: 'Brouillon fictif réservé à la démonstration visuelle.',
+    certified: false,
+  },
+};
+
+/**
  * Adaptateur de démonstration du port `ENROLLMENT_GATEWAY`.
  *
  * Il tient le rôle de l'API : référentiels, sauvegarde de brouillon, analyse des
@@ -70,7 +103,7 @@ const ACCEPTED_EXTENSIONS: readonly string[] = ['.pdf', '.jpg', '.jpeg', '.png']
  */
 @Injectable()
 export class DemoEnrollmentGateway implements EnrollmentGateway {
-  private draft: EnrollmentDraft | null = null;
+  private draft: EnrollmentDraft | null = DEMO_DRAFT;
   private sequence = 0;
 
   load(): Observable<EnrollmentContext> {
@@ -123,8 +156,8 @@ export class DemoEnrollmentGateway implements EnrollmentGateway {
           },
         ],
       },
-      // Aucun brouillon repris en démonstration : le dossier part vide. L'écran gère
-      // les deux cas, la reprise comprise.
+      // Le brouillon fictif exerce la reprise et restitue la densité de la maquette.
+      // Un adaptateur HTTP reste seul habilité à fournir un véritable dossier.
       draft: this.draft,
     };
 
