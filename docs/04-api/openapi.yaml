@@ -695,23 +695,23 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Opération effectuée
+          description: Rejeu idempotent — dossier déjà existant
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/EnrollmentApplicationView'
         '201':
-          description: Ressource créée
+          description: Dossier créé au statut DRAFT
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/EnrollmentApplicationView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/EnrollmentApplicationInput'
       x-requirements:
       - ENR-001
       - ENR-002
@@ -752,7 +752,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/EnrollmentApplicationView'
       x-requirements:
       - ENR-001
       - ENR-002
@@ -846,19 +846,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
-        '201':
-          description: Ressource créée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Resource'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResourceInput'
+                $ref: '#/components/schemas/EnrollmentApplicationView'
       x-requirements:
       - ENR-001
       - ENR-002
@@ -868,6 +856,44 @@ paths:
       - ENR-006
       - ENR-007
       - ENR-008
+  /enrollment-applications/{id}/start-review:
+    post:
+      tags:
+      - ENROLLMENT
+      summary: Prendre le dossier en charge pour contrôle.
+      description: >-
+        Fait passer le dossier de SUBMITTED à UNDER_REVIEW et l'assigne au contrôleur. La
+        machine à états normative (docs/07-processes/state-machines.md) impose le passage par
+        UNDER_REVIEW avant toute décision : cette opération en est le seul point d'entrée,
+        ce qui rend le contrôle (ENROLLMENT.REVIEW) prérequis de la décision
+        (ENROLLMENT.APPROVE). Elle comble une opération absente du catalogue initial.
+      operationId: startEnrollmentReview
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Dossier pris en charge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentApplicationView'
+      x-requirements:
+      - ENR-005
   /enrollment-applications/{id}/request-complement:
     post:
       tags:
@@ -899,19 +925,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
-        '201':
-          description: Ressource créée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/EnrollmentApplicationView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/EnrollmentComplementRequest'
       x-requirements:
       - ENR-001
       - ENR-002
@@ -953,19 +973,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
-        '201':
-          description: Ressource créée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/EnrollmentApplicationView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/EnrollmentApprovalInput'
       x-requirements:
       - ENR-001
       - ENR-002
@@ -1006,19 +1020,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
-        '201':
-          description: Ressource créée
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/EnrollmentApplicationView'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResourceInput'
+              $ref: '#/components/schemas/EnrollmentRejectionInput'
       x-requirements:
       - ENR-001
       - ENR-002
@@ -3854,6 +3862,101 @@ components:
         totalPages:
           type: integer
       additionalProperties: false
+    EnrollmentApplicationInput:
+      type: object
+      description: >-
+        Corps de création d'un dossier d'adhésion. Aucun contrôle de format n'est appliqué
+        aux identifiants métier (ENR-003 différé : aucun masque RCCM/NIF n'est fourni par
+        les sources) ; le statut initial DRAFT est imposé par le serveur.
+      required:
+      - caseNumber
+      - organizationId
+      - channel
+      properties:
+        caseNumber:
+          type: string
+          minLength: 1
+          maxLength: 60
+          description: Identité métier du dossier, unique — clé naturelle d'idempotence.
+        organizationId:
+          $ref: '#/components/schemas/Uuid'
+        channel:
+          type: string
+          minLength: 1
+          maxLength: 30
+      additionalProperties: false
+    EnrollmentApplicationView:
+      type: object
+      description: Dossier d'adhésion — état courant dans la machine à états d'enrôlement.
+      required:
+      - id
+      - caseNumber
+      - organizationId
+      - channel
+      - status
+      - version
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        caseNumber:
+          type: string
+          maxLength: 60
+        organizationId:
+          $ref: '#/components/schemas/Uuid'
+        channel:
+          type: string
+          maxLength: 30
+        status:
+          type: string
+          enum: [DRAFT, SUBMITTED, UNDER_REVIEW, COMPLEMENT_REQUIRED, APPROVED, REJECTED]
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        assignedTo:
+          type: string
+          format: uuid
+          nullable: true
+        version:
+          type: integer
+          format: int64
+      additionalProperties: false
+    EnrollmentComplementRequest:
+      type: object
+      description: Demande de complément (ENR-005) — le motif est obligatoire.
+      required:
+      - comment
+      properties:
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      additionalProperties: false
+    EnrollmentApprovalInput:
+      type: object
+      description: Corps d'une approbation d'enrôlement — le commentaire est facultatif.
+      properties:
+        comment:
+          type: string
+          maxLength: 2000
+      additionalProperties: false
+    EnrollmentRejectionInput:
+      type: object
+      description: >-
+        Corps d'un rejet d'enrôlement. Le motif (comment) est OBLIGATOIRE : une décision
+        défavorable non motivée n'est pas opposable au demandeur. reasonCode reste libre, le
+        référentiel des motifs n'étant pas fourni par les sources (ENR-DEC-001).
+      required:
+      - comment
+      properties:
+        reasonCode:
+          type: string
+          maxLength: 60
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      additionalProperties: false
     MembershipStatusChangeView:
       type: object
       description: Changement de statut d'une adhésion (entrée d'historique append-only).
@@ -3948,7 +4051,10 @@ components:
           type: string
           minLength: 1
           maxLength: 40
-          description: Type d'identifiant métier (ex. RCCM, NINA, IFU — nomenclature à confirmer).
+          description: >-
+            Type d'identifiant métier. Le BRS n'exige que RCCM et NIF (les termes NINA et IFU
+            n'y figurent pas) ; la nomenclature exacte et le caractère obligatoire par forme
+            juridique restent à confirmer (DATA-DEC-008).
         identifierValue:
           type: string
           minLength: 1

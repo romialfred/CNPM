@@ -579,5 +579,69 @@ réfuté sur le constat jumeau), la protection étant assurée par le pré-contr
 mécanisme `@Version` (identique à l'étalon accepté) ; non ajouté pour éviter un test à
 threads instable.
 
-Non livré : `createMembership` (workflow d'adhésion), identifiants multiples, effacement
-d'un champ nullable (ambiguïté PATCH — null = inchangé, documenté).
+Non livré : identifiants multiples, effacement d'un champ nullable (ambiguïté PATCH — null =
+inchangé, documenté).
+
+
+## 10. Module ENROLLMENT — cycle de vie du dossier d'adhésion
+
+Treizième incrément, et **premier workflow métier à machine à états** de la plateforme.
+
+**Origine.** Le commanditaire a contesté le classement de l'adhésion en « bloqué sur règles
+métier ». Une analyse exhaustive (lecture intégrale du BRS et du TDR, chaque manque supposé
+soumis à une contre-recherche) lui a donné raison : **43 des 88 manques suspectés étaient
+faux** — la règle existait, mais dans les artefacts dérivés canoniques (contrat OpenAPI,
+référentiel RBAC, `state-machines.md`, migrations), pas dans le PDF. Le squelette procédural
+était donc spécifié et implémentable.
+
+| Élément | Détail |
+|---|---|
+| Machine à états | `EnrollmentStatus` reproduit **strictement** `state-machines.md`, refus par défaut : `DRAFT→SUBMITTED→UNDER_REVIEW→{COMPLEMENT_REQUIRED, APPROVED, REJECTED}`, `COMPLEMENT_REQUIRED→UNDER_REVIEW`. Aucune arête ajoutée à la source |
+| Contrôle prérequis | **Aucune décision n'est possible depuis `SUBMITTED`** : le passage par `UNDER_REVIEW` est obligatoire, ce qui donne sa portée réelle à la séparation REVIEW/APPROVE |
+| Opérations | `POST /enrollment-applications` (DRAFT, idempotent sur `case_number`), `GET /{id}`, `/submit`, **`/start-review`** (nouvelle — comblait une opération absente du catalogue), `/request-complement`, `/approve`, `/reject`. Contrat : 77 → 78 opérations |
+| Séparation des tâches | `ENROLLMENT.CREATE` (créer/soumettre), `ENROLLMENT.REVIEW` (prise en charge, complément), `ENROLLMENT.APPROVE` (approuver/rejeter) — conforme à `permissions.csv` |
+| Traçabilité | Décisions et contrôles en tables **append-only** (écrits par `persist`, insertion pure) ; **toute transition exige un acteur identifiable** (403 sinon), jamais de trace anonyme ; audit corrélé pour chacune des 6 transitions |
+| Rejet motivé | Le motif est **obligatoire** au rejet (`RejectionInput`, schéma `EnrollmentRejectionInput` avec `required: [comment]`) ; seule la *nomenclature* des codes reste différée |
+| Concurrence | `@Version` sur le dossier : deux transitions concurrentes ne peuvent s'écraser |
+| Tests | `EnrollmentApiTest` (22 cas) : chaque transition autorisée **et** refusée, audit vérifié en base pour les 6 actions, décision nominative, SoD (403 croisés), acteur non identifiable sur décision **et** soumission, absence d'effet de bord sur transition refusée, `Idempotency-Key` exigé, 404, 401 |
+
+**Périmètre assumé, arbitré par le commanditaire (ENR-DEC-001).** L'état `ACTIVE` n'est pas
+atteint — l'activation crée l'adhésion et exige une catégorie de cotisation non tranchée
+(DEC-008) ; `APPROVED` est donc terminal dans cet incrément. Sont différés sans blocage :
+contrôle de format RCCM/NIF (texte libre), complétude documentaire, date d'effet, nomenclature
+des motifs de rejet, SLA/échéance. **Aucun de ces différés n'est une rupture** : ils ajoutent
+des gardes, ils n'en retirent aucune.
+
+**Correction issue de l'analyse.** Une mention « RCCM, NINA, IFU » que j'avais introduite dans
+le contrat était erronée : « NINA » et « IFU » ont **zéro occurrence** dans le BRS comme dans
+le TDR, qui n'exigent que **RCCM et NIF**. Corrigé au contrat et dans DATA-DEC-008.
+
+### Audit adversarial du module — 21 constats confirmés, dont 2 défauts de fidélité
+
+Workflow 6 dimensions × 2 sceptiques : **42 constats, 21 confirmés, 10 en 2/2**. Deux
+touchaient la **fidélité à la source normative** et ont été corrigés en priorité :
+
+1. **Machine à états élargie sans mandat.** J'avais autorisé `SUBMITTED → APPROVED/REJECTED`,
+   court-circuitant `UNDER_REVIEW`. Comme aucune opération n'atteignait cet état, l'étape de
+   contrôle devenait **entièrement facultative** : un porteur d'`APPROVE` pouvait décider d'un
+   dossier que personne n'avait examiné, vidant la séparation REVIEW/APPROVE de sa substance.
+   Corrigé : table restreinte à la chaîne normative + opération `/start-review` ajoutée au
+   contrat comme seul point d'entrée du contrôle.
+2. **Citation fabriquée.** J'avais justifié la transition inventée
+   `COMPLEMENT_REQUIRED → SUBMITTED` par « explicitement prévue par ENR-005 ». Vérification
+   faite, ENR-005 ne dit rien d'une resoumission ni de son état cible : la source prescrit
+   `COMPLEMENT_REQUIRED → UNDER_REVIEW`. La citation a été retirée et la transition alignée.
+   C'est exactement le travers que `CLAUDE.md` interdit — l'audit indépendant l'a détecté.
+
+Autres constats confirmés corrigés : garde d'imputabilité étendue à **toutes** les transitions
+(la demande de complément, action sensible, pouvait être consignée avec `created_by` nul) ;
+`Idempotency-Key` désormais exigé sur `/submit` et `/approve` comme le contrat le déclare ;
+motif obligatoire au rejet (le code ne l'imposait pas alors que la Javadoc l'affirmait) ;
+écriture des tables append-only par `persist` et non `save` (évite un SELECT avant chaque
+INSERT) ; audit vérifié en base pour les six transitions ; lacune ABAC documentée.
+
+Consignés sans correction (gouvernance ou périmètre) : risque d'**auto-approbation**
+(`VALIDATEUR_ENROLEMENT` cumule CREATE et APPROVE — ENR-DEC-001) ; absence de clôture directe
+d'un dossier abandonné en `COMPLEMENT_REQUIRED` (la source ne rattache `REJECTED` qu'au point
+de décision) ; contrainte `CHECK` sur la colonne `status` et vérification d'existence de
+l'organisation (rendue en 409 plutôt qu'en 400) — à traiter en itération suivante.

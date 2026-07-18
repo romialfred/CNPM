@@ -426,12 +426,23 @@ l'unicité est garantie par `uq_member_identifier_type_value`.
 Le statut initial (`PROSPECT`) et le niveau de risque (`NORMAL`) ne sont pas fournis par
 le client : ce sont les valeurs par défaut du schéma.
 
-**Ce qui reste à trancher (n'est PAS inventé ici).** La liste des **types d'identifiants
-valides et obligatoires** (RCCM, NINA, IFU, autres) et lesquels sont requis selon la forme
-juridique : l'implémentation accepte tout `identifierType`/`identifierValue` non vide sans
-valider le type contre une nomenclature. La **détection de doublons** (MEM-002, ex. deux
-raisons sociales proches sans identifiant commun) et la **saisie de plusieurs identifiants**
-en une création relèvent d'incréments suivants.
+**Ce qui reste à trancher (n'est PAS inventé ici).** Les **types d'identifiants valides et
+obligatoires** selon la forme juridique : l'implémentation accepte tout
+`identifierType`/`identifierValue` non vide sans valider le type contre une nomenclature.
+**Correction du 2026-07-18** (analyse intégrale du BRS et du TDR) : les seuls identifiants
+exigés par les sources sont **RCCM et NIF** — les termes « NINA » et « IFU » ont **zéro
+occurrence** dans le BRS comme dans le TDR et ne doivent pas être exigés. Une mention
+erronée les citant a été retirée du contrat.
+
+**Contrôle de format différé (arbitrage du commanditaire, 2026-07-18).** ENR-003 exige le
+refus des formats invalides, mais aucun masque RCCM/NIF n'est fourni. Décision : les
+identifiants restent en **texte libre** ; le contrôle de format sera ajouté à une itération
+ultérieure. Cette évolution n'est pas une rupture — elle ajoute une garde, elle n'en retire
+aucune.
+
+La **détection de doublons** (MEM-002, ex. deux raisons sociales proches sans identifiant
+commun) et la **saisie de plusieurs identifiants** en une création relèvent d'incréments
+suivants.
 
 **Arbitrage demandé.** Fournir la nomenclature des types d'identifiants et les règles
 d'obligation par forme juridique ; confirmer que l'identifiant métier est la clé
@@ -457,6 +468,41 @@ générique positionnant `updated_at = now()` sur les tables mutables, et un mé
 `updated_by` (variable de session `SET LOCAL app.current_user_id` lue par le trigger, ou
 mapping explicite des colonnes d'audit dans les entités). À traiter **une fois pour tout le
 schéma**, pas table par table.
+
+## ENR-DEC-001 — paramètres du workflow d'adhésion non fournis par les sources
+
+**Propriétaire.** Direction produit / Secrétariat général.
+**Impact.** Module ENROLLMENT, activation des membres, premier appel de cotisation.
+**Statut.** Cycle de vie livré ; paramètres différés par arbitrage du commanditaire (2026-07-18).
+
+**Constat.** Une analyse exhaustive du BRS et du TDR (lecture intégrale, chaque manque
+soumis à une contre-recherche) établit que le **squelette procédural est spécifié** — machine
+à états (`state-machines.md`), 8 exigences ENR-001..008, séparation des tâches
+`ENROLLMENT.CREATE/REVIEW/APPROVE`, opérations au contrat, idempotence, audit — mais que le
+**paramétrage métier opposable ne l'est pas**. Le BRS énonce la forme de la règle sans son
+contenu : « pièces obligatoires selon le type d'entreprise » sans la matrice, « contrôle de
+format » sans le format, « calcul du barème applicable » sans le barème.
+
+**Points à trancher.**
+
+| # | Sujet | Conséquence tant que non tranché |
+|---|---|---|
+| 1 | **Barème et catégorisation** (renvoi à **DEC-008**) | L'activation (`APPROVED → ACTIVE`) est impossible : créer l'adhésion exige une catégorie |
+| 2 | **Matrice pièces × forme juridique** | ENR-004 (blocage de soumission si pièce manquante) non calculable |
+| 3 | **Formats RCCM / NIF** | ENR-003 non applicable — identifiants en texte libre (accepté, cf. DATA-DEC-008) |
+| 4 | **Date d'effet de l'adhésion** | Impact financier : le barème « prorata selon le mois d'adhésion » n'est pas calculable |
+| 5 | **Critères d'acceptation/rejet et nomenclature des motifs** | La décision est enregistrée mais non assistée ni contrôlée ; `reason_code` reste libre |
+| 6 | **SLA, échéance de complément, relances, recours** | `COMPLEMENT_REQUIRED` n'a pas de sortie automatique ; « recours » a **zéro occurrence** dans le BRS |
+
+**Décision du commanditaire (2026-07-18).** Ne pas bloquer l'implémentation sur ces points :
+livrer le cycle de vie du dossier, corriger ces paramètres à une itération ultérieure ou
+après la démonstration. Aucun de ces différés ne crée de rupture : ils ajoutent des gardes
+et des données, ils n'en retirent aucune.
+
+**Point de gouvernance à ouvrir séparément.** `separation-of-duties.md` (SOD-001..008) **ne
+couvre pas** le couple `ENROLLMENT.CREATE` / `ENROLLMENT.APPROVE`, alors que le rôle
+`VALIDATEUR_ENROLEMENT` détient les deux : un même agent peut créer puis approuver un
+dossier. À arbitrer avant mise en production.
 
 ## ARCH-DEC-001 — propriété des tables de groupements professionnels
 
