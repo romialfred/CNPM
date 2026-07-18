@@ -117,7 +117,7 @@ export interface PublicFooterContact {
             type="button"
             aria-controls="navigation-mobile"
             [attr.aria-expanded]="menuOpen()"
-            [attr.aria-label]="menuOpen() ? 'Fermer le menu' : 'Ouvrir le menu'"
+            [attr.aria-label]="menuOpen() ? 'Fermer la navigation principale' : 'Ouvrir le menu'"
             (click)="openMenu()"
           >
             <svg lucideMenu [size]="iconSize.navigation" aria-hidden="true"></svg>

@@ -72,6 +72,9 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
     expect(host.querySelector('[role="dialog"]')).not.toBeNull();
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Fermer le menu');
+    expect(fixture.nativeElement.querySelector('.cnpm-public__menu-button')?.getAttribute('aria-label')).toBe(
+      'Fermer la navigation principale',
+    );
     expect(host.querySelector('main')?.hasAttribute('inert')).toBe(true);
     expect(document.body.style.overflow).toBe('hidden');
   });
