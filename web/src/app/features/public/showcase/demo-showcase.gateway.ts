@@ -102,7 +102,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       category: 'Routes et infrastructures',
       visual: {
         shape: 'road',
-        alt: 'Schéma d’une route bitumée en perspective, aux couleurs du CNPM.',
+        alt: 'Illustration, et non photographie : une route bitumée vue en perspective, marquage axial jaune, bandes de rive blanches, accotements de latérite, poteaux électriques et arbres jusqu’à l’horizon.',
         label: 'Route bitumée — 42 km',
       },
     },
@@ -112,7 +112,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       category: 'Ouvrages d’art',
       visual: {
         shape: 'bridge',
-        alt: 'Schéma d’un pont à arche et haubans, aux couleurs du CNPM.',
+        alt: 'Illustration, et non photographie : un pont en béton à trois arches franchissant une rivière, avec garde-corps, lampadaires, reflets sur l’eau, berges plantées et une pirogue.',
         label: 'Ouvrage d’art — 180 m',
       },
     },
@@ -122,7 +122,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       category: 'Bâtiments',
       visual: {
         shape: 'tower',
-        alt: 'Schéma d’un immeuble de bureaux de six niveaux, aux couleurs du CNPM.',
+        alt: 'Illustration, et non photographie : un immeuble de bureaux de six étages à façade vitrée quadrillée, avec auvent d’entrée, parvis, arbres, mât et passants au premier plan.',
         label: 'Immeuble de bureaux R+6',
       },
     },
@@ -131,37 +131,39 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
   /**
    * Galerie de démonstration.
    *
-   * Quatre vignettes schématiques : aucune photographie de chantier n'est disponible
-   * et aucune ne sera inventée. Le compteur de la dernière vignette annonce le reste
-   * du fonds tel qu'il figure à la maquette.
+   * Quatre vignettes illustrées : aucune photographie de chantier n'est disponible et
+   * aucune ne sera inventée. Chaque vignette porte un sujet distinct — un engin, une
+   * équipe, un ferraillage, une vue d'installation de chantier — pour que la galerie
+   * se lise d'un coup d'œil au lieu de répéter les visuels des réalisations. Le
+   * compteur de la dernière vignette annonce le reste du fonds, comme à la maquette.
    */
   private static readonly GALLERY: readonly ShowcaseGalleryItem[] = [
     {
       visual: {
-        shape: 'grid',
-        alt: 'Schéma d’un plan de masse quadrillé, aux couleurs du CNPM.',
-        label: 'Plan de masse',
+        shape: 'machine',
+        alt: 'Illustration, et non photographie : une pelle mécanique jaune sur ses chenilles, godet abaissé devant un tas de terre.',
+        label: 'Engin de chantier',
       },
     },
     {
       visual: {
-        shape: 'tower',
-        alt: 'Schéma d’une façade de bâtiment, aux couleurs du CNPM.',
-        label: 'Façade livrée',
+        shape: 'crew',
+        alt: 'Illustration, et non photographie : trois ouvriers casqués en gilet de chantier devant un plan technique.',
+        label: 'Équipe sur site',
       },
     },
     {
       visual: {
-        shape: 'road',
-        alt: 'Schéma d’un tracé routier, aux couleurs du CNPM.',
-        label: 'Tracé routier',
+        shape: 'rebar',
+        alt: 'Illustration, et non photographie : des armatures en acier dressées entre deux panneaux de coffrage, sur une dalle de béton.',
+        label: 'Coffrage et armatures',
       },
     },
     {
       visual: {
-        shape: 'bridge',
-        alt: 'Schéma d’un ouvrage franchissant un cours d’eau, aux couleurs du CNPM.',
-        label: 'Franchissement',
+        shape: 'yard',
+        alt: 'Illustration, et non photographie : une vue d’installation de chantier avec base-vie, clôture, grue, buses en béton et tas de sable.',
+        label: 'Installation de chantier',
       },
       moreCount: 25,
     },
@@ -265,8 +267,8 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       memberSince: 'mai 2022',
 
       heroVisual: {
-        shape: 'grid',
-        alt: 'Schéma abstrait d’un chantier d’infrastructure, aux couleurs du CNPM.',
+        shape: 'site',
+        alt: 'Illustration, et non photographie : un chantier de pont en construction au coucher du soleil. Le tablier repose sur trois piles en béton au-dessus d’une rivière ; la dernière travée laisse voir ses armatures. Une grue à tour jaune lève une poutre, un camion-benne et des ouvriers casqués travaillent sur la berge.',
         label: 'Infrastructures et génie civil',
       },
 

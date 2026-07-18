@@ -19,21 +19,23 @@ export type PublicationStatus =
 export type VerificationStatus = 'VERIFIED' | 'PENDING' | 'EXPIRED' | 'SUSPENDED';
 
 /**
- * Motif géométrique d'un visuel de vitrine.
+ * Sujet illustré d'un visuel de vitrine.
  *
  * La photothèque et les droits d'usage relèvent d'UX-DEC-003 : aucune photographie
- * n'est disponible et la règle interdit l'image générée en production. Le contrat ne
- * porte donc pas d'URL d'image mais un motif schématique, rendu en SVG aux couleurs
- * de la marque. Quand la photothèque sera arbitrée, ce champ cédera la place à un
- * média porteur de ses métadonnées de droits et de son texte alternatif.
+ * n'est disponible et la règle interdit l'image bitmap générée en production. Le
+ * contrat ne porte donc pas d'URL d'image mais le SUJET à illustrer, rendu en SVG
+ * vectoriel par l'écran. Quand la photothèque sera arbitrée, ce champ cédera la place
+ * à un média porteur de ses métadonnées de droits et de son texte alternatif.
  */
-export type ShowcaseVisualShape = 'road' | 'bridge' | 'tower' | 'grid';
+export type ShowcaseVisualShape =
+  'site' | 'road' | 'bridge' | 'tower' | 'machine' | 'crew' | 'rebar' | 'yard' | 'grid';
 
 export interface ShowcaseVisual {
   readonly shape: ShowcaseVisualShape;
   /**
-   * Texte alternatif. Il décrit un schéma, jamais une photographie : annoncer une
-   * vue réelle là où le rendu est abstrait tromperait l'utilisateur de lecteur d'écran.
+   * Texte alternatif. Il décrit une illustration, jamais une photographie : annoncer
+   * une vue réelle là où le rendu est dessiné tromperait l'utilisateur de lecteur
+   * d'écran. Chaque texte le dit explicitement.
    */
   readonly alt: string;
   /** Libellé lisible superposé au visuel. */

@@ -276,8 +276,7 @@
 }
 
 .cnpm-showcase__fact-icon,
-.cnpm-showcase__tile-icon,
-.cnpm-showcase__partner-mark {
+.cnpm-showcase__tile-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -363,9 +362,10 @@
   cursor: pointer;
 }
 
-/* VISUELS SCHÉMATIQUES
-   Dégradé sobre de la marque ; le libellé repose sur un bandeau opaque, seul moyen de
-   garantir son contraste au-dessus d'un motif clair. */
+/* ILLUSTRATIONS
+   Le cadre ne porte plus qu'un fond de repli : l'illustration couvre toute la surface
+   et apporte ses propres couleurs. Le libellé repose sur un bandeau opaque, seul moyen
+   de garantir son contraste au-dessus d'un dessin clair. */
 .cnpm-visual {
   position: relative;
   display: flex;
@@ -375,11 +375,7 @@
   min-width: 0;
   overflow: hidden;
   border-radius: var(--cnpm-radius-lg);
-  background-image: linear-gradient(
-    150deg,
-    var(--cnpm-color-brand-blue-800),
-    var(--cnpm-color-brand-blue-600)
-  );
+  background-color: var(--cnpm-color-brand-blue-800);
   color: var(--cnpm-color-text-inverse);
   aspect-ratio: 16 / 9;
 }
@@ -393,7 +389,16 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  fill: currentColor;
+}
+
+/* Illustrations de petit format (couverture de brochure, avatar, monogramme
+   partenaire) : leur taille intrinsèque vient des attributs `width`/`height` du SVG,
+   la feuille se borne à les empêcher de déborder d'une colonne étroite. */
+.cnpm-showcase__mark,
+.cnpm-showcase__partner-mark {
+  flex: none;
+  max-width: 100%;
+  height: auto;
 }
 
 .cnpm-visual__label {

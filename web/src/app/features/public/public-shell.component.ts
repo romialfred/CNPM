@@ -65,20 +65,22 @@ export interface PublicFooterContact {
       <header class="cnpm-public__header">
         <div class="cnpm-public__bar">
           <div class="cnpm-public__brand">
-            <a class="cnpm-public__wordmark" routerLink="/">
-              <!-- L'emblème officiel reste une décision ouverte (UX-DEC-002) et n'est
-                   pas inventé. S'il est déposé dans les assets, il s'affiche ; sinon,
-                   le mot-symbole textuel prend le relais plutôt qu'une image cassée. -->
-              @if (logoFailed()) {
-                <abbr title="Conseil National du Patronat du Mali">CNPM</abbr>
-              } @else {
-                <img
-                  class="cnpm-public__logo"
-                  src="/assets/brand/logo-CNPM.png"
-                  alt="Conseil National du Patronat du Mali"
-                  (error)="logoFailed.set(true)"
-                />
-              }
+            <!-- L'emblème officiel est isolé de l'actif source (texte matriciel illisible
+                 à cette taille) ; la raison sociale est composée en texte réel, net et
+                 redimensionnable. Le nom accessible du lien reste porté par aria-label,
+                 y compris lorsque le bloc texte est masqué sur petit écran. -->
+            <a
+              class="cnpm-public__brand-link"
+              routerLink="/"
+              aria-label="Conseil National du Patronat du Mali — accueil"
+            >
+              <span class="cnpm-public__emblem" aria-hidden="true"></span>
+              <span class="cnpm-public__lockup" aria-hidden="true">
+                <span class="cnpm-public__wordmark-name">
+                  Conseil National du Patronat du Mali
+                </span>
+                <span class="cnpm-public__wordmark-tagline">Invest In Mali</span>
+              </span>
             </a>
             @if (memberBadge(); as badge) {
               <p class="cnpm-public__member">{{ badge }}</p>
@@ -277,7 +279,6 @@ export class PublicShellComponent {
   readonly contact = input<PublicFooterContact | null>(null);
 
   protected readonly iconSize = CNPM_ICON_SIZE;
-  protected readonly logoFailed = signal(false);
   protected readonly subscribed = signal(false);
 
   /**

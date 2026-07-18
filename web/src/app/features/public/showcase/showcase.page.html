@@ -1,108 +1,590 @@
 <!-- Visuels de vitrine.
      Aucune photothèque n'est arbitrée (UX-DEC-003) et la règle interdit l'image
-     générée en production : les visuels sont des schémas SVG aux couleurs de la
-     marque, porteurs d'un texte alternatif qui annonce leur nature. Le gabarit est
-     factorisé pour que le héros, les réalisations et la galerie partagent le même
-     traitement. Le SVG est répété par motif plutôt que découpé en fragments, afin de
-     rester dans l'espace de noms SVG sans ambiguïté. -->
+     bitmap générée en production : les visuels sont des ILLUSTRATIONS VECTORIELLES
+     dessinées à la main, en aplats francs, et leur texte alternatif annonce
+     explicitement qu'il s'agit d'une illustration et non d'une photographie.
+     Les couleurs sont des littéraux : ce sont des données graphiques (comme le
+     seraient les pixels d'une image), pas du style d'interface — la feuille SCSS de
+     l'écran, elle, reste intégralement sur les tokens.
+     Les identifiants de dégradé sont uniques car chaque motif n'est instancié qu'une
+     fois : aucun doublon d'`id` n'est introduit dans le document. -->
 <ng-template #visualTpl let-v="v" let-thumb="thumb" let-more="more">
   <figure class="cnpm-visual" [class.cnpm-visual--thumb]="thumb">
     @switch (v.shape) {
+      <!-- HÉROS — chantier de pont en construction. Le plus détaillé : ciel chaud,
+           rivière, piles, tablier en cours de bétonnage, grue à tour et silhouettes
+           d'ouvriers qui donnent l'échelle. -->
+      @case ('site') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 640 360"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <defs>
+            <linearGradient id="cnpmSkySite" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FFF0D6" />
+              <stop offset=".55" stop-color="#FFCB94" />
+              <stop offset="1" stop-color="#F2A074" />
+            </linearGradient>
+            <linearGradient id="cnpmRiverSite" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5268B3" />
+              <stop offset="1" stop-color="#1D286C" />
+            </linearGradient>
+          </defs>
+          <rect width="640" height="360" fill="url(#cnpmSkySite)" />
+          <circle cx="504" cy="86" r="54" fill="#FFDFA6" />
+          <circle cx="504" cy="86" r="34" fill="#FFF2CE" />
+          <path d="M58 70h58a11 11 0 0 0 0-22 19 19 0 0 0-35-6 13 13 0 0 0-23 28z" fill="#FFF7E7" />
+          <path d="M392 44h42a8 8 0 0 0 0-17 15 15 0 0 0-27-4 10 10 0 0 0-15 21z" fill="#FFF7E7" />
+          <!-- Collines et ligne d'horizon -->
+          <path d="M0 222v-40q66-30 134-9t148-5v54z" fill="#CDAC71" />
+          <path d="M290 222v-30q72-28 156-8t194-6v44z" fill="#B08F55" />
+          <path d="M0 222h640v6H0z" fill="#8C7142" />
+          <!-- Rivière -->
+          <rect y="228" width="640" height="64" fill="url(#cnpmRiverSite)" />
+          <path
+            d="M36 244h122v5H36zM300 258h96v5h-96zM452 240h134v5H452zM104 274h158v5H104zM420 278h122v5H420z"
+            fill="#93A6DE"
+          />
+          <!-- Berge de premier plan -->
+          <rect y="292" width="640" height="68" fill="#CDAF75" />
+          <path d="M0 292h640v7H0z" fill="#A78850" />
+          <!-- Piles en béton -->
+          <path d="M118 152h40v148h-40zM296 152h40v148h-40zM474 152h40v148h-40z" fill="#DEE2E9" />
+          <path d="M146 152h12v148h-12zM324 152h12v148h-12zM502 152h12v148h-12z" fill="#AEB5C2" />
+          <path d="M108 138h60v16h-60zM286 138h60v16h-60zM464 138h60v16h-60z" fill="#C3C9D4" />
+          <!-- Tablier livré : dalle, sous-face, garde-corps -->
+          <path d="M0 110h540v20H0z" fill="#EFF1F5" />
+          <path d="M0 130h540v10H0z" fill="#9BA3B2" />
+          <path d="M0 86h540v5H0z" fill="#6E7688" />
+          <path
+            d="M24 110V91h5v19zM64 110V91h5v19zM104 110V91h5v19zM144 110V91h5v19zM184 110V91h5v19zM224 110V91h5v19zM264 110V91h5v19zM304 110V91h5v19zM344 110V91h5v19zM384 110V91h5v19zM424 110V91h5v19zM464 110V91h5v19zM504 110V91h5v19z"
+            fill="#6E7688"
+          />
+          <!-- Travée en cours : armatures apparentes et coffrage -->
+          <path d="M540 110h48v20h-48z" fill="#EFF1F5" />
+          <path d="M540 122h100v7H540z" fill="#B0563A" />
+          <path d="M540 134h100v6H540z" fill="#9BA3B2" />
+          <path
+            d="M552 112v22h5v-22zM572 112v22h5v-22zM592 112v22h5v-22zM612 112v22h5v-22zM632 112v22h5v-22z"
+            fill="#B0563A"
+          />
+          <!-- Grue à tour -->
+          <path d="M576 30h22v270h-22z" fill="#F2B417" />
+          <path
+            d="M576 60l22 28M598 60l-22 28M576 116l22 28M598 116l-22 28M576 172l22 28M598 172l-22 28M576 228l22 28M598 228l-22 28"
+            stroke="#C88F0B"
+            stroke-width="3"
+            fill="none"
+          />
+          <path d="M560 292h54v14h-54z" fill="#5C6472" />
+          <path d="M583 6h8v26h-8z" fill="#F2B417" />
+          <path d="M332 28h254v10H332zM598 28h38v10h-38z" fill="#F2B417" />
+          <path d="M614 18h20v26h-20z" fill="#5C6472" />
+          <path d="M587 10L340 28M587 10l40 10" stroke="#C88F0B" stroke-width="2" fill="none" />
+          <path d="M550 40h26v22h-26z" fill="#EFF1F5" />
+          <path d="M554 44h18v11h-18z" fill="#5268B3" />
+          <path d="M392 30h18v12h-18z" fill="#5C6472" />
+          <path d="M400 42v46h3V42z" fill="#5C6472" />
+          <path d="M372 88h58v13h-58z" fill="#9BA3B2" />
+          <!-- Camion-benne sur la berge. Groupé à gauche avec les ouvriers et les
+               cônes : au-delà de x≈314 la carte flottante du badge recouvre le visuel
+               sur grand écran, et le premier plan y disparaîtrait. -->
+          <g transform="translate(232,322)">
+            <path d="M-58-32h40v24h-40z" fill="#C9613F" />
+            <path d="M-18-26h24v18h-24z" fill="#3A4E9E" />
+            <path d="M-14-22h13v9h-13z" fill="#B7C4E8" />
+            <path d="M-60-8h68v6h-68z" fill="#5C6472" />
+            <circle cx="-45" cy="-1" r="8" fill="#333B49" />
+            <circle cx="-1" cy="-1" r="8" fill="#333B49" />
+          </g>
+          <!-- Ouvriers : deux sur la berge, deux sur le tablier (échelle) -->
+          <g fill="#1D286C">
+            <g transform="translate(96,322)">
+              <path d="M-8 0v-18h6v18zM2 0v-18h6v18z" />
+              <path d="M-10-36h20v20h-20z" fill="#F2B417" />
+              <path d="M-10-30h20v4h-20z" fill="#EFF1F5" />
+              <path d="M-14-35h4v16h-4zM10-35h4v16h-4z" fill="#3A4E9E" />
+              <circle cy="-42" r="6" fill="#E0B489" />
+              <path d="M-9-44a9 9 0 0 1 18 0z" fill="#F2B417" />
+              <path d="M-11-45h22v3h-22z" fill="#D69A0C" />
+            </g>
+            <g transform="translate(140,322)">
+              <path d="M-8 0v-18h6v18zM2 0v-18h6v18z" />
+              <path d="M-10-36h20v20h-20z" fill="#C9613F" />
+              <path d="M-10-30h20v4h-20z" fill="#EFF1F5" />
+              <path d="M-14-35h4v16h-4zM10-35h4v16h-4z" fill="#3A4E9E" />
+              <circle cy="-42" r="6" fill="#C08B5A" />
+              <path d="M-9-44a9 9 0 0 1 18 0z" fill="#F2B417" />
+              <path d="M-11-45h22v3h-22z" fill="#D69A0C" />
+            </g>
+            <g transform="translate(300,110) scale(.62)">
+              <path d="M-8 0v-18h6v18zM2 0v-18h6v18z" />
+              <path d="M-10-36h20v20h-20z" fill="#F2B417" />
+              <path d="M-14-35h4v16h-4zM10-35h4v16h-4z" fill="#3A4E9E" />
+              <circle cy="-42" r="6" fill="#E0B489" />
+              <path d="M-9-44a9 9 0 0 1 18 0z" fill="#F2B417" />
+            </g>
+            <g transform="translate(470,110) scale(.62)">
+              <path d="M-8 0v-18h6v18zM2 0v-18h6v18z" />
+              <path d="M-10-36h20v20h-20z" fill="#C9613F" />
+              <path d="M-14-35h4v16h-4zM10-35h4v16h-4z" fill="#3A4E9E" />
+              <circle cy="-42" r="6" fill="#8A5A34" />
+              <path d="M-9-44a9 9 0 0 1 18 0z" fill="#F2B417" />
+            </g>
+          </g>
+          <!-- Balisage et matériaux -->
+          <path d="M252 322l8-26h5l8 26zM284 322l8-26h5l8 26z" fill="#D2694A" />
+          <path d="M255 306h15v5h-15zM287 306h15v5h-15z" fill="#FFF3E0" />
+          <path d="M36 322q22-26 44 0zM342 322q16-18 32 0z" fill="#A78850" />
+        </svg>
+      }
+
+      <!-- RÉALISATION — route bitumée en perspective. -->
       @case ('road') {
         <svg
           class="cnpm-visual__art"
-          viewBox="0 0 320 200"
+          viewBox="0 0 480 270"
           preserveAspectRatio="xMidYMid slice"
           role="img"
           [attr.aria-label]="v.alt"
         >
-          <circle cx="160" cy="50" r="28" opacity=".16" />
-          <path d="M96 200 146 62 174 62 224 200Z" opacity=".22" />
-          <path d="M158 74h5l-1 16h-5zM154 102h7l-2 20h-7zM149 136h9l-3 28h-9z" opacity=".55" />
+          <defs>
+            <linearGradient id="cnpmSkyRoad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#BFD6FF" />
+              <stop offset="1" stop-color="#FFE7C4" />
+            </linearGradient>
+          </defs>
+          <rect width="480" height="112" fill="url(#cnpmSkyRoad)" />
+          <circle cx="330" cy="80" r="26" fill="#FFDFA6" />
+          <path d="M70 40h44a8 8 0 0 0 0-16 14 14 0 0 0-26-4 9 9 0 0 0-18 20z" fill="#FFFFFF" />
+          <path d="M0 112V92q56-22 108-4t120-2 116-16 136 10v32z" fill="#B79E77" />
+          <rect y="112" width="480" height="158" fill="#CBB275" />
+          <path d="M0 150h480v120H0z" fill="#C0A667" />
+          <!-- Accotements puis chaussée -->
+          <path d="M186 112h20L52 270H0zM274 112h20l186 158h-52z" fill="#DCC793" />
+          <path d="M200 112h80l150 158H50z" fill="#4E545F" />
+          <path d="M232 112h16l40 158h-96z" fill="#575E6B" />
+          <path d="M198 112h6L62 270H44zM276 112h6l156 158h-18z" fill="#F4F6FF" />
+          <!-- Marquage axial -->
           <path
-            d="M96 200 146 62M174 62 224 200"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            opacity=".4"
+            d="M238 116h4l1 10h-6zM236 134h8l1 14h-10zM233 156h13l2 20h-17zM230 184h19l3 28h-25zM225 220h29l4 44h-37z"
+            fill="#F2C24A"
           />
-          <path d="M0 186h320v14H0z" opacity=".12" />
+          <!-- Poteaux et ligne électrique -->
+          <path
+            d="M300 124v-26h3v26zM330 152v-38h3v38zM376 194v-56h3v56zM446 252v-78h3v78z"
+            fill="#8A9099"
+          />
+          <path
+            d="M294 100h15v3h-15zM322 116h19v3h-19zM366 140h23v3h-23zM434 176h27v3h-27z"
+            fill="#8A9099"
+          />
+          <path d="M301 100l30 16 46 24 70 36" stroke="#8A9099" stroke-width="2" fill="none" />
+          <!-- Arbres -->
+          <g fill="#7A5A32">
+            <path d="M118 152v-14h4v14z" />
+            <path d="M64 200v-22h6v22z" />
+            <path d="M10 264v-34h8v34z" />
+          </g>
+          <ellipse cx="120" cy="134" rx="18" ry="9" fill="#2F8F5B" />
+          <ellipse cx="67" cy="174" rx="27" ry="13" fill="#37A067" />
+          <ellipse cx="14" cy="224" rx="38" ry="18" fill="#2F8F5B" />
+          <ellipse cx="120" cy="129" rx="12" ry="6" fill="#46B378" />
+          <ellipse cx="67" cy="167" rx="17" ry="8" fill="#57C489" />
+          <!-- Buissons et cailloux -->
+          <path
+            d="M400 140q12-14 24 0zM432 168q14-16 28 0zM160 186q16-18 32 0zM120 246q20-22 40 0z"
+            fill="#37A067"
+          />
+          <path d="M340 210h12v5h-12zM414 232h16v6h-16z" fill="#A78850" />
+          <!-- Véhicule au loin -->
+          <path d="M244 108h12v8h-12z" fill="#EFF1F5" />
+          <path d="M245 114h10v4h-10z" fill="#5C6472" />
+          <path d="M52 34l10 4-10 4 3-4zM88 22l9 4-9 4 3-4z" fill="#7F91CF" />
         </svg>
       }
+
+      <!-- RÉALISATION — pont en béton sur une rivière. -->
       @case ('bridge') {
         <svg
           class="cnpm-visual__art"
-          viewBox="0 0 320 200"
+          viewBox="0 0 480 270"
           preserveAspectRatio="xMidYMid slice"
           role="img"
           [attr.aria-label]="v.alt"
         >
-          <path d="M0 168h320v32H0z" opacity=".12" />
+          <defs>
+            <!-- Le rideau d'arbres masquait la partie chaude du ciel : la bascule vers
+                 l'ocre est avancée pour que la scène ne soit pas bleue de bout en bout. -->
+            <linearGradient id="cnpmSkyBridge" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#B8D2FF" />
+              <stop offset=".45" stop-color="#FFDCAC" />
+              <stop offset="1" stop-color="#FFC48A" />
+            </linearGradient>
+            <linearGradient id="cnpmRiverBridge" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#6E86C8" />
+              <stop offset="1" stop-color="#22307A" />
+            </linearGradient>
+            <!-- Les arches sont évidées, pas bombées : leur remplissage part du noir
+                 bleuté sous la voûte et s'éclaircit vers l'eau. Sans ce dégradé
+                 inversé, la demi-lune se lisait comme un dôme bleu posé sur le pont. -->
+            <linearGradient id="cnpmArchBridge" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#232F76" />
+              <stop offset="1" stop-color="#4E64AC" />
+            </linearGradient>
+          </defs>
+          <rect width="480" height="150" fill="url(#cnpmSkyBridge)" />
+          <circle cx="416" cy="46" r="24" fill="#FFDFA6" />
+          <!-- Rideau d'arbres et rivière -->
+          <path d="M0 150v-26q28-18 56-2t60-6 64 8 72-12 74 6 72-8 62 12v28z" fill="#2C7A50" />
+          <path d="M0 144h480v6H0z" fill="#215F3E" />
+          <rect y="150" width="480" height="102" fill="url(#cnpmRiverBridge)" />
+          <path d="M14 190h60v5H14zM422 206h50v5h-50zM8 226h44v5H8z" fill="#93A6DE" />
+          <!-- Corps du pont : bandeau plein, puis arches évidées jusqu'à l'eau -->
+          <path d="M24 128h432v124H24z" fill="#D8DDE5" />
+          <path d="M24 128h432v10H24z" fill="#C0C6D1" />
           <path
-            d="M24 126Q160 26 296 126"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="6"
-            opacity=".5"
+            d="M70 252a52 84 0 0 1 104 0zM188 252a52 84 0 0 1 104 0zM306 252a52 84 0 0 1 104 0z"
+            fill="url(#cnpmArchBridge)"
           />
+          <path d="M24 162h432v7H24z" fill="#C0C6D1" />
+          <path d="M174 169h14v83h-14zM292 169h14v83h-14z" fill="#C0C6D1" />
+          <!-- Reflets sous les voûtes et pirogue au fil de l'eau -->
+          <path d="M86 238h72v5H86zM204 244h72v5h-72zM322 236h72v5h-72z" fill="#8FA3DB" />
+          <path d="M212 230h42l-7 10h-28z" fill="#B7502F" />
+          <path d="M231 230v-16h3v16z" fill="#7A5A32" />
+          <path d="M234 214h14l-14 9z" fill="#EFF1F5" />
+          <!-- Tablier, garde-corps et lampadaires -->
+          <path d="M0 100h480v20H0z" fill="#EFF1F5" />
+          <path d="M0 120h480v8H0z" fill="#AEB5C2" />
+          <path d="M0 84h480v4H0z" fill="#6E7688" />
           <path
-            d="M70 98v26M110 74v50M160 60v64M210 74v50M250 98v26"
-            stroke="currentColor"
-            stroke-width="2"
-            opacity=".4"
+            d="M20 100V88h4v12zM60 100V88h4v12zM100 100V88h4v12zM140 100V88h4v12zM180 100V88h4v12zM220 100V88h4v12zM260 100V88h4v12zM300 100V88h4v12zM340 100V88h4v12zM380 100V88h4v12zM420 100V88h4v12zM460 100V88h4v12z"
+            fill="#6E7688"
           />
-          <path d="M0 122h320v10H0z" opacity=".38" />
-          <path d="M58 132h12v46H58zM250 132h12v46h-12z" opacity=".26" />
+          <path d="M88 84V44h4v40zM238 84V44h4v40zM388 84V44h4v40z" fill="#5C6472" />
+          <path d="M84 40h16v7H84zM234 40h16v7h-16zM384 40h16v7h-16z" fill="#F2C24A" />
+          <!-- Berges : remblais d'accès en latérite de part et d'autre du pont, plus la
+               berge de premier plan. Ces masses ocres équilibrent le bleu du ciel, de
+               l'eau et du béton. -->
+          <path d="M0 252V186q14-10 24 0v66z" fill="#CDAF75" />
+          <path d="M456 252v-66q14-10 24 0v66z" fill="#CDAF75" />
+          <path d="M0 194q12-8 24 0v8q-12-8-24 0zM456 194q12-8 24 0v8q-12-8-24 0z" fill="#A78850" />
+          <rect y="246" width="480" height="24" fill="#CDAF75" />
+          <path d="M0 246h480v6H0z" fill="#A78850" />
+          <path d="M22 246q14-16 28 0zM414 246q16-18 32 0zM120 246q12-14 24 0z" fill="#37A067" />
+          <path d="M52 34l12 5-12 5 4-5zM88 22l10 4-10 4 3-4z" fill="#7F91CF" />
         </svg>
       }
+
+      <!-- RÉALISATION — immeuble de bureaux R+6 à façade vitrée. -->
       @case ('tower') {
         <svg
           class="cnpm-visual__art"
-          viewBox="0 0 320 200"
+          viewBox="0 0 480 270"
           preserveAspectRatio="xMidYMid slice"
           role="img"
           [attr.aria-label]="v.alt"
         >
-          <path d="M36 96h52v104H36z" opacity=".22" />
-          <path d="M184 118h48v82h-48z" opacity=".2" />
-          <path d="M100 52h72v148h-72z" opacity=".34" />
+          <defs>
+            <!-- Ciel franchement chaud sous l'azur : sans cette bande ocre, la scène
+                 (verre bleu + béton bleuté + ciel bleu) virait au camaïeu monochrome. -->
+            <linearGradient id="cnpmSkyTower" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#BCD5FF" />
+              <stop offset=".55" stop-color="#FFE0B4" />
+              <stop offset="1" stop-color="#FFCE96" />
+            </linearGradient>
+          </defs>
+          <rect width="480" height="238" fill="url(#cnpmSkyTower)" />
+          <circle cx="66" cy="48" r="26" fill="#FFE9C0" />
+          <path d="M356 40h44a9 9 0 0 0 0-18 15 15 0 0 0-28-4 10 10 0 0 0-16 22z" fill="#FFF6E6" />
+          <!-- Immeubles voisins : l'un en enduit terre cuite, l'autre en béton bleuté,
+               pour que le quartier ne soit pas d'une seule teinte. -->
+          <path d="M18 238V118h114v120z" fill="#C98A5A" />
+          <path d="M18 238V118h30v120z" fill="#B0713F" />
+          <path d="M356 238V98h116v140z" fill="#AEBBE8" />
           <path
-            d="M100 78h72M100 102h72M100 126h72M100 150h72M100 174h72M124 52v148M148 52v148"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            opacity=".3"
+            d="M56 132h20v14H56zM88 132h20v14H88zM56 160h20v14H56zM88 160h20v14H88zM56 188h20v14H56zM88 188h20v14H88z"
+            fill="#F6E0C2"
           />
           <path
-            d="M262 200V64h48M262 72h34"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="3"
-            opacity=".35"
+            d="M370 112h22v16h-22zM404 112h22v16h-22zM438 112h22v16h-22zM370 144h22v16h-22zM404 144h22v16h-22zM438 144h22v16h-22zM370 176h22v16h-22zM404 176h22v16h-22zM438 176h22v16h-22z"
+            fill="#7F91CF"
           />
+          <!-- Immeuble principal -->
+          <path d="M150 238V38h186v200z" fill="#EFF1F5" />
+          <path d="M306 238V38h30v200z" fill="#C7CCD6" />
+          <path d="M144 28h198v12H144z" fill="#D6DAE2" />
+          <path d="M180 8h60v20h-60z" fill="#C7CCD6" />
+          <path d="M222 8h18v20h-18z" fill="#AEB5C2" />
+          <!-- Façade vitrée quadrillée : six niveaux de bureaux au-dessus du rez, soit
+               le R+6 annoncé par la réalisation. -->
+          <path
+            d="M158 48h26v20h-26zM188 48h26v20h-26zM218 48h26v20h-26zM248 48h26v20h-26zM278 48h26v20h-26zM158 74h26v20h-26zM188 74h26v20h-26zM218 74h26v20h-26zM248 74h26v20h-26zM278 74h26v20h-26zM158 100h26v20h-26zM188 100h26v20h-26zM218 100h26v20h-26zM248 100h26v20h-26zM278 100h26v20h-26zM158 126h26v20h-26zM188 126h26v20h-26zM218 126h26v20h-26zM248 126h26v20h-26zM278 126h26v20h-26zM158 152h26v20h-26zM188 152h26v20h-26zM218 152h26v20h-26zM248 152h26v20h-26zM278 152h26v20h-26zM158 178h26v20h-26zM188 178h26v20h-26zM218 178h26v20h-26zM248 178h26v20h-26zM278 178h26v20h-26z"
+            fill="#3E56A6"
+          />
+          <path
+            d="M188 48h26v20h-26zM278 74h26v20h-26zM218 100h26v20h-26zM158 126h26v20h-26zM248 152h26v20h-26zM188 178h26v20h-26z"
+            fill="#6E86C8"
+          />
+          <!-- Entrée, auvent et parvis -->
+          <path d="M186 206h114v9H186z" fill="#D6DAE2" />
+          <path d="M196 215h94v23h-94z" fill="#33468F" />
+          <path d="M242 215v23h4v-23z" fill="#EFF1F5" />
+          <rect y="238" width="480" height="32" fill="#DCCEB6" />
+          <path d="M0 238h480v6H0z" fill="#BCAB8E" />
+          <path d="M60 254h360v3H60z" fill="#C9B99C" />
+          <!-- Mât et fanion (accent de marque, en petit) -->
+          <path d="M350 238v-84h4v84z" fill="#8A9099" />
+          <path d="M354 156h22l-6 8 6 8h-22z" fill="#E40C20" />
+          <!-- Arbres et passants. Les troncs montent haut et les houppiers sont
+               remontés d'autant : posés plus bas, le bandeau de légende avalait le
+               tronc et il ne restait que des ronds verts flottants. -->
+          <g fill="#7A5A32">
+            <path d="M100 238v-34h6v34zM394 238v-30h6v30zM130 238v-26h5v26z" />
+          </g>
+          <circle cx="103" cy="200" r="18" fill="#2F8F5B" />
+          <circle cx="397" cy="204" r="15" fill="#37A067" />
+          <circle cx="132" cy="208" r="12" fill="#46B378" />
+          <g fill="#1D286C">
+            <g transform="translate(324,238)">
+              <path d="M-5 0v-13h4v13zM1 0v-13h4v13z" />
+              <path d="M-7-27h12v15h-12z" fill="#3A4E9E" />
+              <circle cy="-32" r="5" fill="#C08B5A" />
+            </g>
+            <g transform="translate(342,238)">
+              <path d="M-5 0v-13h4v13zM1 0v-13h4v13z" />
+              <path d="M-7-27h12v15h-12z" fill="#C9613F" />
+              <circle cy="-32" r="5" fill="#8A5A34" />
+            </g>
+          </g>
+          <path d="M160 238h34v-8h-34z" fill="#C08B4B" />
         </svg>
       }
+
+      <!-- GALERIE — engin de chantier (pelle mécanique). -->
+      @case ('machine') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 200 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <!-- Horizon bas : sur une vignette carrée, un ciel à mi-hauteur laissait un
+               grand vide bleu et l'engin paraissait minuscule. -->
+          <rect width="200" height="78" fill="#CFE0FF" />
+          <rect y="78" width="200" height="122" fill="#CBAF77" />
+          <path d="M0 78h200v6H0z" fill="#A78850" />
+          <circle cx="36" cy="30" r="20" fill="#FFDFA6" />
+          <path d="M0 176q34-52 74 0z" fill="#A78850" />
+          <!-- Flèche, balancier et godet -->
+          <path d="M124 126l30-46 12 8-30 46z" fill="#F2B417" />
+          <path d="M154 80l14-6 14 54-13 4z" fill="#F2B417" />
+          <path d="M166 126h24l-4 22h-24z" fill="#5C6472" />
+          <path d="M166 148h24v6h-24z" fill="#333B49" />
+          <circle cx="160" cy="82" r="5" fill="#333B49" />
+          <circle cx="130" cy="126" r="5" fill="#333B49" />
+          <!-- Corps et cabine -->
+          <path d="M62 112h76v34H62z" fill="#F2B417" />
+          <path d="M62 112h20v34H62z" fill="#D69A0C" />
+          <path d="M84 78h34v36H84z" fill="#F2B417" />
+          <path d="M88 84h26v22H88z" fill="#8FB6F0" />
+          <path d="M120 84h6v14h-6z" fill="#5C6472" />
+          <!-- Chenilles -->
+          <path d="M56 146h94v10H56z" fill="#5C6472" />
+          <path d="M50 156h106a12 12 0 0 1 0 24H50a12 12 0 0 1 0-24z" fill="#333B49" />
+          <g fill="#6E7688">
+            <circle cx="62" cy="168" r="6" />
+            <circle cx="84" cy="168" r="6" />
+            <circle cx="106" cy="168" r="6" />
+            <circle cx="128" cy="168" r="6" />
+            <circle cx="146" cy="168" r="6" />
+          </g>
+          <path d="M188 166l6-20h4l6 20z" fill="#D2694A" />
+          <path d="M190 154h12v5h-12z" fill="#FFF3E0" />
+        </svg>
+      }
+
+      <!-- GALERIE — équipe d'ouvriers casqués devant un plan. -->
+      @case ('crew') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 200 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <rect width="200" height="200" fill="#E9EDFF" />
+          <path d="M16 14h168v104H16z" fill="#2F3F91" />
+          <g fill="#8FA3DB">
+            <path
+              d="M16 40h168v2H16zM16 66h168v2H16zM16 92h168v2H16zM56 14h2v104h-2zM100 14h2v104h-2zM144 14h2v104h-2z"
+            />
+          </g>
+          <path
+            d="M40 56h56v40H40zM40 56h56v4H40zM40 92h56v4H40zM40 56h4v40h-4zM92 56h4v40h-4z"
+            fill="#FFFFFF"
+          />
+          <path d="M112 32h56v6h-56zM112 74h44v6h-44z" fill="#FFFFFF" />
+          <!-- Trois ouvriers -->
+          <g>
+            <path d="M22 200v-40a30 30 0 0 1 60 0v40z" fill="#F2B417" />
+            <path d="M40 200v-40h24v40z" fill="#D69A0C" />
+            <circle cx="52" cy="132" r="20" fill="#C08B5A" />
+            <path d="M30 130a22 22 0 0 1 44 0z" fill="#F2B417" />
+            <path d="M26 128h52v7H26z" fill="#D69A0C" />
+          </g>
+          <g>
+            <path d="M118 200v-40a30 30 0 0 1 60 0v40z" fill="#2F8F5B" />
+            <path d="M136 200v-40h24v40z" fill="#25764A" />
+            <circle cx="148" cy="132" r="20" fill="#8A5A34" />
+            <path d="M126 130a22 22 0 0 1 44 0z" fill="#EFF1F5" />
+            <path d="M122 128h52v7h-52z" fill="#C7CCD6" />
+          </g>
+          <g>
+            <path d="M68 200v-34a32 32 0 0 1 64 0v34z" fill="#C9613F" />
+            <path d="M88 200v-34h24v34z" fill="#A64C2E" />
+            <circle cx="100" cy="140" r="22" fill="#E0B489" />
+            <path d="M76 138a24 24 0 0 1 48 0z" fill="#F2B417" />
+            <path d="M72 136h56v8H72z" fill="#D69A0C" />
+          </g>
+          <path d="M150 172h34v28h-34z" fill="#C08B4B" />
+          <path d="M156 180h22v3h-22zM156 188h16v3h-16z" fill="#FFFFFF" />
+        </svg>
+      }
+
+      <!-- GALERIE — coffrage et armatures en attente de bétonnage. -->
+      @case ('rebar') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 200 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <rect width="200" height="200" fill="#F0E3C7" />
+          <rect width="200" height="54" fill="#DCE9FF" />
+          <path d="M0 148h200v52H0z" fill="#C7CCD6" />
+          <path d="M0 148h200v8H0z" fill="#DEE2E9" />
+          <!-- Panneaux de coffrage -->
+          <path d="M6 66h44v88H6z" fill="#C08B4B" />
+          <path d="M150 66h44v88h-44z" fill="#C08B4B" />
+          <g fill="#9C6C33">
+            <path
+              d="M6 88h44v4H6zM6 112h44v4H6zM6 136h44v4H6zM150 88h44v4h-44zM150 112h44v4h-44zM150 136h44v4h-44z"
+            />
+          </g>
+          <path d="M6 66h44v6H6zM150 66h44v6h-44z" fill="#D9A560" />
+          <!-- Armatures verticales à crosse -->
+          <g fill="#B0563A">
+            <path d="M64 152V56h6v96zM86 152V50h6v102zM108 152V54h6v98zM130 152V48h6v104z" />
+            <path d="M64 56h14v6H64zM86 50h14v6H86zM108 54h14v6h-14zM130 48h14v6h-14z" />
+          </g>
+          <!-- Armatures horizontales et ligatures -->
+          <g fill="#C97350">
+            <path d="M58 76h84v6H58zM58 102h84v6H58zM58 128h84v6H58z" />
+          </g>
+          <g fill="#8C4126">
+            <path d="M62 74h4v10h-4zM128 74h4v10h-4zM84 100h4v10h-4zM106 126h4v10h-4z" />
+          </g>
+          <!-- Étais -->
+          <path d="M52 154l-14-40 6-2 14 40zM148 154l14-40-6-2-14 40z" fill="#6E7688" />
+          <path d="M28 166h30v6H28zM142 166h30v6h-30z" fill="#8A9099" />
+          <!-- Graviers -->
+          <g fill="#A78850">
+            <path d="M18 182h12v5H18zM44 190h14v5H44zM160 184h14v5h-14z" />
+          </g>
+        </svg>
+      }
+
+      <!-- GALERIE — vue de chantier au sol : base-vie, matériaux, clôture. -->
+      @case ('yard') {
+        <svg
+          class="cnpm-visual__art"
+          viewBox="0 0 200 200"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          [attr.aria-label]="v.alt"
+        >
+          <rect width="200" height="94" fill="#CFE0FF" />
+          <rect y="94" width="200" height="106" fill="#CBAF77" />
+          <path d="M0 94h200v6H0z" fill="#A78850" />
+          <circle cx="170" cy="26" r="18" fill="#FFDFA6" />
+          <!-- Grue en arrière-plan -->
+          <path d="M22 122V26h6v96z" fill="#F2B417" />
+          <path d="M10 22h84v7H10z" fill="#F2B417" />
+          <path d="M8 16h14v14H8z" fill="#5C6472" />
+          <path d="M78 29v18h3V29z" fill="#5C6472" />
+          <path d="M70 47h20v9H70z" fill="#9BA3B2" />
+          <!-- Base-vie -->
+          <path d="M104 62h84v56h-84z" fill="#3A4E9E" />
+          <path d="M104 56h84v8h-84z" fill="#27357E" />
+          <path d="M114 74h26v18h-26z" fill="#8FB6F0" />
+          <path d="M152 74h26v18h-26z" fill="#8FB6F0" />
+          <path d="M132 96h28v22h-28z" fill="#1D286C" />
+          <path d="M154 106h4v4h-4z" fill="#F2B417" />
+          <!-- Clôture de chantier -->
+          <path d="M0 78h94v40H0z" fill="#C7CCD6" />
+          <g fill="#8A9099">
+            <path
+              d="M0 78h94v5H0zM0 113h94v5H0zM12 78h5v40h-5zM40 78h5v40h-5zM68 78h5v40h-5zM90 78h4v40h-4z"
+            />
+          </g>
+          <path d="M18 88h20v6H18zM48 98h30v6H48z" fill="#F2B417" />
+          <!-- Tas de sable et buses -->
+          <path d="M0 168q34-40 68 0z" fill="#B79552" />
+          <path d="M30 132l4 34h-5l-3-34z" fill="#7A5A32" />
+          <path d="M26 126h14v8H26z" fill="#8A9099" />
+          <g fill="#6E7688">
+            <circle cx="120" cy="164" r="14" />
+            <circle cx="150" cy="164" r="14" />
+            <circle cx="135" cy="140" r="14" />
+          </g>
+          <g fill="#C7CCD6">
+            <circle cx="120" cy="164" r="6" />
+            <circle cx="150" cy="164" r="6" />
+            <circle cx="135" cy="140" r="6" />
+          </g>
+          <path d="M182 180l7-24h4l7 24z" fill="#D2694A" />
+          <path d="M184 166h14v5h-14z" fill="#FFF3E0" />
+        </svg>
+      }
+
+      <!-- Motif de repli : plan de masse. -->
       @default {
         <svg
           class="cnpm-visual__art"
-          viewBox="0 0 320 200"
+          viewBox="0 0 480 270"
           preserveAspectRatio="xMidYMid slice"
           role="img"
           [attr.aria-label]="v.alt"
         >
-          <path
-            d="M0 52h320M0 104h320M0 156h320M68 0v200M132 0v200M196 0v200M260 0v200"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1"
-            opacity=".28"
-          />
-          <path d="M0 196 216 0h34L14 200z" opacity=".16" />
-          <path
-            d="M80 64h40v28H80zM144 64h40v28h-40zM80 116h40v28H80zM208 116h40v28h-40z"
-            opacity=".26"
-          />
-          <circle cx="164" cy="130" r="16" opacity=".3" />
+          <rect width="480" height="270" fill="#E9EDFF" />
+          <g fill="#C3CDF2">
+            <path
+              d="M0 54h480v2H0zM0 108h480v2H0zM0 162h480v2H0zM0 216h480v2H0zM60 0h2v270h-2zM140 0h2v270h-2zM220 0h2v270h-2zM300 0h2v270h-2zM380 0h2v270h-2z"
+            />
+          </g>
+          <path d="M0 176h480v34H0z" fill="#8A9099" />
+          <path d="M0 190h480v6H0z" fill="#F2C24A" />
+          <path d="M40 40h150v110H40z" fill="#3A4E9E" />
+          <path d="M56 56h54v40H56zM126 56h48v40h-48zM56 110h118v24H56z" fill="#8FA3DB" />
+          <path d="M230 62h110v88H230z" fill="#2F8F5B" />
+          <path d="M246 78h78v56h-78z" fill="#7FC79E" />
+          <path d="M370 40h80v110h-80z" fill="#C08B4B" />
+          <path d="M384 58h52v74h-52z" fill="#E0B489" />
+          <g fill="#2F8F5B">
+            <circle cx="60" cy="238" r="14" />
+            <circle cx="120" cy="242" r="11" />
+            <circle cx="330" cy="238" r="14" />
+            <circle cx="404" cy="242" r="11" />
+          </g>
+          <path d="M430 226h34v6h-34zM430 218h6v14h-6zM458 218h6v14h-6z" fill="#1D286C" />
+          <path d="M44 250l14-26 14 26-14-8z" fill="#1D286C" />
         </svg>
       }
     }
@@ -392,7 +874,25 @@
             <section class="cnpm-showcase__section" aria-labelledby="brochure">
               <h2 class="cnpm-showcase__section-title" id="brochure">Brochure de l’entreprise</h2>
               <p class="cnpm-showcase__brochure">
-                <svg lucideFileText [size]="iconSize.empty" aria-hidden="true"></svg>
+                <!-- Couverture illustrée : page inclinée en arrière-plan, bandeau de
+                     titre, lignes de texte simulées et pastille de couleur. -->
+                <svg
+                  class="cnpm-showcase__mark"
+                  width="60"
+                  height="76"
+                  viewBox="0 0 120 152"
+                  role="img"
+                  aria-label="Illustration (et non photographie) d’une couverture de brochure : page inclinée en arrière-plan, bandeau de titre bleu, lignes de texte simulées et pastille ocre."
+                >
+                  <path d="M30 10h84v132H30z" fill="#D5DCFA" transform="rotate(7 72 76)" />
+                  <path d="M8 6h92v140H8z" fill="#FFFFFF" />
+                  <path d="M8 6h92v46H8z" fill="#273481" />
+                  <path d="M20 22h56v7H20zM20 35h38v6H20z" fill="#FFFFFF" />
+                  <circle cx="78" cy="70" r="14" fill="#E8A33D" />
+                  <path d="M20 64h40v6H20zM20 78h44v5H20zM20 89h34v5H20z" fill="#C7CCD6" />
+                  <path d="M20 106h64v5H20zM20 117h56v5H20zM20 128h44v5H20z" fill="#DEE2E9" />
+                  <path d="M8 6h92v140H8z" fill="none" stroke="#AEB5C2" stroke-width="3" />
+                </svg>
                 Présentation détaillée des métiers, références et moyens techniques.
               </p>
               <cnpm-button
@@ -415,15 +915,121 @@
                 <h2 class="cnpm-showcase__section-title" id="partenaires">
                   Ils nous font confiance
                 </h2>
-                <!-- Aucun logo de tiers n'est reproduit : publier une marque suppose
-                     une autorisation d'usage que la vitrine ne porte pas. Le
-                     monogramme tient lieu de repère visuel. -->
+                <!-- Aucun logo de tiers réel n'est reproduit : publier une marque
+                     existante suppose une autorisation d'usage que la vitrine ne porte
+                     pas. Les monogrammes ci-dessous sont des marques FICTIVES, dessinées
+                     pour la démonstration, et le nom qui les accompagne porte déjà la
+                     mention « exemple ». Ils sont décoratifs : le nom lisible juste à
+                     côté est la seule information, la doubler en `aria-label` ferait
+                     répéter chaque partenaire deux fois au lecteur d'écran. -->
                 <ul class="cnpm-showcase__partners">
                   @for (partner of member.partners; track partner.name) {
                     <li class="cnpm-showcase__partner">
-                      <span class="cnpm-showcase__partner-mark" aria-hidden="true">
-                        {{ partner.initials }}
-                      </span>
+                      @switch (partner.initials) {
+                        @case ('AN') {
+                          <svg
+                            class="cnpm-showcase__partner-mark"
+                            width="48"
+                            height="48"
+                            viewBox="0 0 48 48"
+                            aria-hidden="true"
+                          >
+                            <path d="M24 2l19 11v22L24 46 5 35V13z" fill="#273481" />
+                            <path d="M24 8l14 8v16l-14 8-14-8V16z" fill="#3A4E9E" />
+                            <path
+                              d="M13 32v-6a11 11 0 0 1 22 0v6h-5v-6a6 6 0 0 0-12 0v6z"
+                              fill="#FFFFFF"
+                            />
+                            <path d="M11 33h26v4H11z" fill="#AEBBE8" />
+                          </svg>
+                        }
+                        @case ('FR') {
+                          <svg
+                            class="cnpm-showcase__partner-mark"
+                            width="48"
+                            height="48"
+                            viewBox="0 0 48 48"
+                            aria-hidden="true"
+                          >
+                            <circle cx="24" cy="24" r="22" fill="#24704A" />
+                            <circle
+                              cx="24"
+                              cy="24"
+                              r="16"
+                              fill="none"
+                              stroke="#7FC79E"
+                              stroke-width="2"
+                            />
+                            <path
+                              d="M15 32V25h5v7zM21.5 32V19h5v13zM28 32V13h5v19z"
+                              fill="#FFFFFF"
+                            />
+                          </svg>
+                        }
+                        @case ('GI') {
+                          <svg
+                            class="cnpm-showcase__partner-mark"
+                            width="48"
+                            height="48"
+                            viewBox="0 0 48 48"
+                            aria-hidden="true"
+                          >
+                            <path d="M24 1l23 23-23 23L1 24z" fill="#9C5E1B" />
+                            <path d="M24 9l15 15-15 15L9 24z" fill="#C77C2B" />
+                            <path
+                              d="M24 12l10 8h-6l-4-3-4 3h-6zM24 22l10 8h-6l-4-3-4 3h-6z"
+                              fill="#FFFFFF"
+                            />
+                            <path d="M14 33h20v4H14z" fill="#FFFFFF" />
+                          </svg>
+                        }
+                        @case ('CP') {
+                          <svg
+                            class="cnpm-showcase__partner-mark"
+                            width="48"
+                            height="48"
+                            viewBox="0 0 48 48"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="M12 2h24a10 10 0 0 1 10 10v24a10 10 0 0 1-10 10H12A10 10 0 0 1 2 36V12A10 10 0 0 1 12 2z"
+                              fill="#17708C"
+                            />
+                            <path d="M22 8h4v18h-4z" fill="#FFFFFF" />
+                            <path d="M14 16h20v4H14z" fill="#FFFFFF" />
+                            <path
+                              d="M8 30q5-6 10 0t10 0 10 0v5q-5 6-10 0t-10 0-10 0z"
+                              fill="#9AD6E8"
+                            />
+                            <path d="M8 37q5-6 10 0t10 0 10 0v4H8z" fill="#FFFFFF" />
+                          </svg>
+                        }
+                        @case ('CE') {
+                          <svg
+                            class="cnpm-showcase__partner-mark"
+                            width="48"
+                            height="48"
+                            viewBox="0 0 48 48"
+                            aria-hidden="true"
+                          >
+                            <path d="M16 2h16l11 11v16L32 46H16L5 35V19z" fill="#8A6108" />
+                            <circle cx="24" cy="24" r="15" fill="#D9A404" />
+                            <path d="M26 8l-12 20h8l-2 12 12-20h-8z" fill="#FFFFFF" />
+                          </svg>
+                        }
+                        @default {
+                          <svg
+                            class="cnpm-showcase__partner-mark"
+                            width="48"
+                            height="48"
+                            viewBox="0 0 48 48"
+                            aria-hidden="true"
+                          >
+                            <circle cx="24" cy="24" r="22" fill="#273481" />
+                            <path d="M14 30l10-14 10 14z" fill="#FFFFFF" />
+                          </svg>
+                        }
+                      }
                       <span class="cnpm-showcase__partner-name">{{ partner.name }}</span>
                     </li>
                   }
@@ -435,7 +1041,51 @@
               <section class="cnpm-showcase__section" aria-labelledby="temoignages">
                 <h2 class="cnpm-showcase__section-title" id="temoignages">Témoignages clients</h2>
                 <blockquote class="cnpm-showcase__quote">
-                  <svg lucideQuote [size]="iconSize.empty" aria-hidden="true"></svg>
+                  <!-- Avatar illustré. Décoratif : l'auteur et son rôle sont écrits
+                       sous la citation, et aucune personne réelle n'est représentée. -->
+                  <svg
+                    class="cnpm-showcase__mark"
+                    width="52"
+                    height="52"
+                    viewBox="0 0 52 52"
+                    aria-hidden="true"
+                  >
+                    @switch (testimonialIndex()) {
+                      @case (1) {
+                        <circle cx="26" cy="26" r="26" fill="#D9EEE1" />
+                        <path
+                          d="M26 30a14 14 0 0 1 14 14v8H12v-8a14 14 0 0 1 14-14z"
+                          fill="#2F8F5B"
+                        />
+                        <path d="M20 44h12v8H20z" fill="#FFFFFF" />
+                        <circle cx="26" cy="20" r="10" fill="#C08B5A" />
+                        <path d="M16 19a10 10 0 0 1 20 0v-2a10 10 0 0 0-20 0z" fill="#3C3226" />
+                        <path d="M16 18a10 10 0 0 1 20 0z" fill="#4A3D2E" />
+                      }
+                      @case (2) {
+                        <circle cx="26" cy="26" r="26" fill="#F6E4C6" />
+                        <path
+                          d="M26 30a14 14 0 0 1 14 14v8H12v-8a14 14 0 0 1 14-14z"
+                          fill="#C9613F"
+                        />
+                        <path d="M22 44h8v8h-8z" fill="#FFF3E0" />
+                        <circle cx="26" cy="20" r="10" fill="#8A5A34" />
+                        <path d="M14 20a12 12 0 0 1 24 0q0-6-4-8-8-4-16 2z" fill="#2F2A24" />
+                        <path d="M14 20h4v8h-4zM34 20h4v8h-4z" fill="#2F2A24" />
+                      }
+                      @default {
+                        <circle cx="26" cy="26" r="26" fill="#D5DCFA" />
+                        <path
+                          d="M26 30a14 14 0 0 1 14 14v8H12v-8a14 14 0 0 1 14-14z"
+                          fill="#273481"
+                        />
+                        <path d="M22 42h8v10h-8z" fill="#FFFFFF" />
+                        <path d="M24 42h4v10h-4z" fill="#5268B3" />
+                        <circle cx="26" cy="20" r="10" fill="#E0B489" />
+                        <path d="M15 18a11 11 0 0 1 22 0q-4-4-11-4t-11 4z" fill="#33302B" />
+                      }
+                    }
+                  </svg>
                   <p class="cnpm-showcase__quote-text">{{ quote.quote }}</p>
                   <footer class="cnpm-showcase__quote-author">
                     {{ quote.author }} — {{ quote.role }}
@@ -475,7 +1125,8 @@
             Contenu publié sous la responsabilité de {{ member.name }}.
             @if (member.isDemoContent) {
               Entreprise, réalisations, partenaires et témoignages sont fictifs&nbsp;: ils
-              illustrent le gabarit et ne désignent aucune organisation réelle.
+              illustrent le gabarit et ne désignent aucune organisation réelle. Les visuels sont des
+              illustrations, non des photographies de chantier.
             }
           </p>
         </article>

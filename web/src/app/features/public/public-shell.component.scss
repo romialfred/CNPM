@@ -53,11 +53,59 @@
   }
 }
 
-.cnpm-public__logo {
+// L'actif officiel est un ensemble horizontal de 300x212 px : emblème à gauche, raison
+// sociale et signature en texte matriciel à droite. À hauteur d'en-tête, ce texte intégré
+// est illisible (moins de 3 px par caractère). On isole donc l'emblème — mesuré dans
+// l'image : x 12→80, y 49→168 — et la raison sociale est composée en texte réel, net à
+// toute taille et lisible par les lecteurs d'écran. L'actif source n'est pas modifié.
+.cnpm-public__emblem {
+  --emblem-height: var(--cnpm-space-12);
+  --emblem-scale: calc(var(--emblem-height) / 119);
+
   display: block;
-  height: var(--cnpm-space-10);
-  width: auto;
-  max-width: 100%;
+  block-size: var(--emblem-height);
+  inline-size: calc(69 * var(--emblem-scale));
+  background-image: url('/assets/brand/logo-CNPM.png');
+  background-repeat: no-repeat;
+  background-size: calc(300 * var(--emblem-scale)) calc(212 * var(--emblem-scale));
+  background-position: calc(-12 * var(--emblem-scale)) calc(-49 * var(--emblem-scale));
+}
+
+.cnpm-public__brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  text-decoration: none;
+  min-inline-size: 0;
+}
+
+.cnpm-public__lockup {
+  display: flex;
+  flex-flow: column;
+  gap: calc(var(--cnpm-space-1) / 2);
+  min-inline-size: 0;
+}
+
+.cnpm-public__wordmark-name {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--cnpm-color-primary-700);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.cnpm-public__wordmark-tagline {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+@media (max-width: 48rem) {
+  .cnpm-public__lockup {
+    display: none;
+  }
 }
 
 /* Mention d'adhésion : texte explicite, jamais une pastille de couleur seule. */
