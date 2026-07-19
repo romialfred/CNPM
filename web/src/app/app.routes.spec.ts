@@ -30,6 +30,8 @@ describe('routes racine', () => {
         'users',
         'showcase',
         'directory',
+        // Repli du catalogue, en dernier : /member rendait un corps vide sans lui.
+        '',
       ],
       [''],
       [''],

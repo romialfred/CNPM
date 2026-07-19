@@ -69,8 +69,15 @@ describe('memberRoutes', () => {
   it('expose MP-015 à MP-017 sous une composition locale commune et sans garde factice', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'showcase');
     expect(route?.providers).toHaveLength(4);
-    expect(route?.children?.map((child) => child.path)).toEqual(['edit', 'preview', 'analytics']);
-    expect(route?.children?.every((child) => child.loadComponent)).toBe(true);
+    expect(route?.children?.map((child) => child.path)).toEqual([
+      '',
+      'edit',
+      'preview',
+      'analytics',
+    ]);
+    // Sans ce repli, /member/showcase rendait une page blanche.
+    expect(route?.children?.[0]).toMatchObject({ pathMatch: 'full', redirectTo: 'edit' });
+    expect(route?.children?.slice(1).every((child) => child.loadComponent)).toBe(true);
     expect(route?.canActivate).toBeUndefined();
   });
 
@@ -80,5 +87,30 @@ describe('memberRoutes', () => {
     expect(route?.loadComponent).toBeTypeOf('function');
     expect(route?.canActivate).toBeUndefined();
     expect(route?.children).toBeUndefined();
+  });
+
+  it('rend /member sur un écran plutôt que sur un corps vide', () => {
+    // Défaut constaté en exécution : sans route de repli, /member ne correspondait à
+    // aucune route et rendait un document entièrement vide — ni coquille, ni message.
+    // Le '**' racine ne rattrape pas ce cas, le préfixe 'member' étant déjà consommé.
+    const fallback = memberRoutes.find((candidate) => candidate.path === '');
+    expect(fallback).toMatchObject({ pathMatch: 'full', redirectTo: 'home' });
+    // Le repli doit rester en dernier : place plus haut, il capterait le catalogue.
+    expect(memberRoutes.indexOf(fallback!)).toBe(memberRoutes.length - 1);
+  });
+
+  it('donne une destination par défaut à chaque groupe de routes enfants', () => {
+    // Tout groupe exposant des enfants doit rendre quelque chose sur son propre chemin,
+    // sinon l'URL du groupe est une impasse blanche.
+    for (const route of memberRoutes.filter((candidate) => candidate.children?.length)) {
+      const children = route.children ?? [];
+      const byDefault = children.find((child) => child.path === '');
+      expect(
+        byDefault,
+        `le groupe « ${route.path} » n'a aucune destination par défaut`,
+      ).toBeDefined();
+      expect(byDefault?.pathMatch).toBe('full');
+      expect(Boolean(byDefault?.redirectTo || byDefault?.loadComponent)).toBe(true);
+    }
   });
 });

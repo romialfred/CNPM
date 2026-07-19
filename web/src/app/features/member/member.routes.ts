@@ -268,6 +268,9 @@ export const memberRoutes: Routes = [
       },
     ],
     children: [
+      // Même défaut que le catalogue : sans ce repli, /member/showcase rendait une page
+      // blanche alors que ses trois écrans fonctionnent juste en dessous.
+      { path: '', pathMatch: 'full', redirectTo: 'edit' },
       {
         path: 'edit',
         loadComponent: () =>
@@ -311,4 +314,9 @@ export const memberRoutes: Routes = [
     title: 'Annuaire privé et opportunités — CNPM',
   },
   // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
+  // Repli du catalogue : sans lui, /member ne correspond à aucune route et rend un
+  // corps entièrement vide — ni coquille, ni message, ni redirection. Le '**' racine
+  // ne rattrape pas ce cas, le préfixe 'member' ayant déjà été consommé.
+  // `pathMatch: 'full'` est impératif : sans lui la route vide capterait tout le catalogue.
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
 ];
