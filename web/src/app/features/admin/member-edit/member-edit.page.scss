@@ -265,6 +265,12 @@
   }
 }
 
+@media (max-width: 767px) {
+  .cnpm-member-edit__actions {
+    position: static;
+  }
+}
+
 @media (max-width: 479px) {
   .cnpm-member-edit__identity,
   .cnpm-member-edit__section-heading,
