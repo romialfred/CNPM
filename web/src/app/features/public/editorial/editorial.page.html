@@ -1,0 +1,219 @@
+<cnpm-public-shell>
+  <section class="editorial-hero" [class.editorial-hero--article]="mode() === 'article'">
+    <div class="editorial-hero__inner">
+      @if (mode() === 'article') {
+        <a class="editorial-back" routerLink="/actualites">
+          <svg lucideArrowLeft [size]="iconSize.compact" aria-hidden="true"></svg>
+          Toutes les actualités
+        </a>
+      }
+      <p class="editorial-eyebrow">
+        {{ mode() === 'agenda' ? 'Agenda public' : 'Information et réseau' }}
+      </p>
+      @if (mode() === 'agenda') {
+        <h1 #pageTitle tabindex="-1">Agenda de démonstration</h1>
+        <p>Des rendez-vous entièrement fictifs pour prévisualiser la future expérience publique.</p>
+      } @else if (mode() === 'article' && article(); as current) {
+        <p class="editorial-category">{{ current.category }}</p>
+        <h1 #pageTitle tabindex="-1">{{ current.title }}</h1>
+        <p>{{ current.summary }}</p>
+      } @else if (mode() === 'article' && state() === 'not-found') {
+        <h1 #pageTitle tabindex="-1">Actualité introuvable</h1>
+      } @else {
+        <h1 #pageTitle tabindex="-1">Actualités de démonstration</h1>
+        <p>Des publications fictives pour présenter la future information publique du CNPM.</p>
+      }
+    </div>
+  </section>
+
+  <div class="editorial-page">
+    <aside class="editorial-demo" role="note" aria-label="Avertissement de démonstration">
+      <svg lucideNewspaper [size]="iconSize.control" aria-hidden="true"></svg>
+      <div>
+        <strong>Contenus 100 % fictifs</strong>
+        <p>
+          Ces dates, lieux et publications ne constituent ni une annonce, ni une invitation, ni
+          un engagement officiel du CNPM.
+        </p>
+      </div>
+    </aside>
+
+    @if (state() === 'loading') {
+      <section class="editorial-loading" aria-label="Chargement du contenu" aria-busy="true">
+        <cnpm-skeleton width="42%" height="28px" />
+        <div class="editorial-grid">
+          <cnpm-skeleton height="250px" />
+          <cnpm-skeleton height="250px" />
+          <cnpm-skeleton height="250px" />
+        </div>
+      </section>
+    } @else if (state() === 'error') {
+      <cnpm-error-state
+        variant="recoverable"
+        title="Contenu temporairement indisponible"
+        description="La source éditoriale n’est pas disponible. Aucun contenu fictif n’a été substitué."
+        titleAs="h2"
+      >
+        <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+      </cnpm-error-state>
+    } @else if (state() === 'not-found') {
+      <cnpm-error-state
+        variant="not-found"
+        title="Actualité introuvable"
+        description="Cette publication n’existe pas dans le jeu de démonstration."
+        titleAs="h2"
+      >
+        <cnpm-button variant="secondary" routerLink="/actualites">Voir les actualités</cnpm-button>
+      </cnpm-error-state>
+    } @else if (state() === 'empty') {
+      <cnpm-empty-state
+        title="Aucun contenu de démonstration"
+        description="La collection fictive est actuellement vide."
+      />
+    } @else if (mode() === 'article' && article(); as current) {
+      <article class="editorial-article">
+        <div class="editorial-article__meta" aria-label="Informations de publication">
+          <span>
+            <svg lucideCalendarDays [size]="iconSize.compact" aria-hidden="true"></svg>
+            {{ current.publishedOn | date: 'd MMMM y' : 'UTC' }}
+          </span>
+          <span>
+            <svg lucideClock3 [size]="iconSize.compact" aria-hidden="true"></svg>
+            {{ current.readingMinutes }} min de lecture
+          </span>
+        </div>
+        @for (paragraph of current.body; track $index) {
+          <p>{{ paragraph }}</p>
+        }
+        <aside class="editorial-article__notice">
+          <strong>Portée de cette page</strong>
+          <p>
+            Cette composition valide uniquement le rendu de la démonstration. La publication
+            institutionnelle reste soumise au workflow éditorial EVT-004.
+          </p>
+        </aside>
+        <cnpm-button variant="secondary" routerLink="/actualites">
+          Retour aux actualités
+        </cnpm-button>
+      </article>
+    } @else if (mode() === 'agenda') {
+      <section aria-labelledby="agenda-title">
+        <div class="editorial-section-heading">
+          <div>
+            <p class="editorial-eyebrow">Prochains repères fictifs</p>
+            <h2 id="agenda-title">Rendez-vous à venir</h2>
+          </div>
+          <p>{{ events().length }} événements fictifs</p>
+        </div>
+        <ol class="event-list">
+          @for (event of events(); track event.id) {
+            <li class="event-card">
+              <time [attr.datetime]="event.startsOn">
+                <strong>{{ event.startsOn | date: 'dd' : 'UTC' }}</strong>
+                <span>{{ event.startsOn | date: 'MMM' : 'UTC' }}</span>
+                <span>{{ event.startsOn | date: 'y' : 'UTC' }}</span>
+              </time>
+              <div class="event-card__content">
+                <span class="editorial-chip">{{ event.kind }}</span>
+                <h3>{{ event.title }}</h3>
+                <p>{{ event.summary }}</p>
+                <ul aria-label="Informations du rendez-vous">
+                  <li>
+                    <svg lucideClock3 [size]="iconSize.compact" aria-hidden="true"></svg>
+                    {{ event.startsOn | date: 'HH:mm' : 'UTC' }}–{{
+                      event.endsOn | date: 'HH:mm' : 'UTC'
+                    }} UTC
+                  </li>
+                  <li>
+                    <svg lucideMapPin [size]="iconSize.compact" aria-hidden="true"></svg>
+                    {{ event.location }}
+                  </li>
+                </ul>
+              </div>
+              <p class="event-card__status">Inscription non ouverte</p>
+            </li>
+          }
+        </ol>
+      </section>
+    } @else {
+      <section aria-labelledby="news-title">
+        <div class="editorial-section-heading">
+          <div>
+            <p class="editorial-eyebrow">Publications fictives</p>
+            <h2 id="news-title" tabindex="-1">Toutes les actualités</h2>
+          </div>
+          <p>{{ filteredArticles().length }} résultat(s)</p>
+        </div>
+
+        <form class="editorial-filters" (ngSubmit)="applyFilters()">
+          <label>
+            <span>Rechercher</span>
+            <span class="editorial-field">
+              <svg lucideSearch [size]="iconSize.compact" aria-hidden="true"></svg>
+              <input
+                type="search"
+                name="q"
+                maxlength="120"
+                placeholder="Titre, sujet…"
+                [ngModel]="qDraft()"
+                (ngModelChange)="qDraft.set($event)"
+              />
+            </span>
+          </label>
+          <label>
+            <span>Catégorie</span>
+            <select
+              name="category"
+              [ngModel]="categoryDraft()"
+              (ngModelChange)="categoryDraft.set($event)"
+            >
+              <option value="">Toutes les catégories</option>
+              @for (category of categories(); track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+          </label>
+          <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
+          @if (hasFilters()) {
+            <button class="editorial-clear" type="button" (click)="clearFilters()">
+              <svg lucideRotateCcw [size]="iconSize.compact" aria-hidden="true"></svg>
+              Effacer
+            </button>
+          }
+        </form>
+
+        @if (filteredArticles().length === 0) {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucune actualité ne correspond"
+            description="Modifiez les critères ou effacez les filtres."
+          >
+            <cnpm-button variant="secondary" (click)="clearFilters()">Effacer les filtres</cnpm-button>
+          </cnpm-empty-state>
+        } @else {
+          <div class="editorial-grid">
+            @for (item of filteredArticles(); track item.slug) {
+              <article class="news-card">
+                <div class="news-card__visual" aria-hidden="true">
+                  <svg lucideNewspaper [size]="iconSize.empty"></svg>
+                </div>
+                <div class="news-card__body">
+                  <span class="editorial-chip">{{ item.category }}</span>
+                  <p class="news-card__date">
+                    {{ item.publishedOn | date: 'd MMMM y' : 'UTC' }}
+                  </p>
+                  <h3><a [routerLink]="['/actualites', item.slug]">{{ item.title }}</a></h3>
+                  <p>{{ item.summary }}</p>
+                  <a class="news-card__link" [routerLink]="['/actualites', item.slug]">
+                    Lire l’actualité
+                    <svg lucideArrowRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                  </a>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
+  </div>
+</cnpm-public-shell>

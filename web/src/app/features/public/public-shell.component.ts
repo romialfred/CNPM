@@ -43,8 +43,8 @@ export interface PublicFooterContact {
  * LAY-003 / NAV-003 — cadre institutionnel commun aux pages publiques.
  *
  * Le logo est l'actif officiel versionné dans `docs/00-sources`, copié à l'identique
- * dans les assets Web. Les destinations publiques non implémentées (adhésion,
- * actualités, pages légales) ne deviennent jamais des liens factices.
+ * dans les assets Web. Les destinations publiques non implémentées (adhésion et
+ * pages légales) ne deviennent jamais des liens factices.
  */
 @Component({
   selector: 'cnpm-public-shell',
@@ -112,6 +112,22 @@ export interface PublicFooterContact {
             >
               Annuaire
             </a>
+            <a
+              class="cnpm-public__nav-link"
+              routerLink="/actualites"
+              routerLinkActive="cnpm-public__nav-link--active"
+              ariaCurrentWhenActive="page"
+            >
+              Actualités
+            </a>
+            <a
+              class="cnpm-public__nav-link"
+              routerLink="/agenda"
+              routerLinkActive="cnpm-public__nav-link--active"
+              ariaCurrentWhenActive="page"
+            >
+              Agenda
+            </a>
             @for (section of sections(); track section.id) {
               <a class="cnpm-public__nav-link" [href]="'#' + section.id">{{ section.label }}</a>
             }
@@ -173,6 +189,14 @@ export interface PublicFooterContact {
                 </a>
                 <a class="cnpm-public__drawer-link" routerLink="/membres" (click)="closeMenu()">
                   <span>Annuaire</span>
+                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+                <a class="cnpm-public__drawer-link" routerLink="/actualites" (click)="closeMenu()">
+                  <span>Actualités</span>
+                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+                <a class="cnpm-public__drawer-link" routerLink="/agenda" (click)="closeMenu()">
+                  <span>Agenda</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
                 </a>
                 @for (section of sections(); track section.id) {
@@ -293,6 +317,8 @@ export interface PublicFooterContact {
             <ul>
               <li><a routerLink="/">Accueil</a></li>
               <li><a routerLink="/membres">Annuaire des membres</a></li>
+              <li><a routerLink="/actualites">Actualités</a></li>
+              <li><a routerLink="/agenda">Agenda</a></li>
               @for (section of sections(); track section.id) {
                 <li>
                   <a [href]="'#' + section.id">{{ section.label }}</a>

@@ -1,0 +1,200 @@
+.editorial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.news-card {
+  overflow: hidden;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: 12px;
+  background: var(--cnpm-color-surface-primary);
+}
+
+.news-card__visual {
+  display: grid;
+  min-height: 142px;
+  place-items: center;
+  border-bottom: 1px solid var(--cnpm-color-brand-blue-100);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.news-card__body {
+  display: flex;
+  min-height: 286px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px;
+}
+
+.editorial-chip {
+  display: inline-flex;
+  padding: 5px 9px;
+  border: 1px solid var(--cnpm-color-brand-blue-100);
+  border-radius: 999px;
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.news-card__date {
+  margin: 15px 0 6px;
+  color: var(--cnpm-color-text-muted);
+  font-size: 0.8rem;
+}
+
+.news-card h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.news-card h3 a {
+  color: var(--cnpm-color-text-primary);
+  text-decoration: none;
+}
+
+.news-card h3 a:hover {
+  color: var(--cnpm-color-text-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.news-card__body > p:not(.news-card__date) {
+  margin: 12px 0 20px;
+  color: var(--cnpm-color-text-secondary);
+  line-height: 1.55;
+}
+
+.news-card__link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  color: var(--cnpm-color-text-link);
+  font-weight: 700;
+}
+
+.event-list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  padding: 22px;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-left: 4px solid var(--cnpm-color-brand-blue-700);
+  border-radius: 10px;
+  background: var(--cnpm-color-surface-primary);
+}
+
+.event-card time {
+  display: grid;
+  justify-items: center;
+  color: var(--cnpm-color-text-brand);
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.event-card time strong {
+  font-size: 2rem;
+}
+
+.event-card time span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.event-card h3 {
+  margin: 9px 0 6px;
+  font-size: 1.2rem;
+}
+
+.event-card__content > p {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+}
+
+.event-card ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 14px 0 0;
+  padding: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: 0.86rem;
+  list-style: none;
+}
+
+.event-card li {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.event-card__status {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.editorial-article {
+  max-width: 780px;
+  margin-inline: auto;
+  padding: clamp(24px, 5vw, 54px);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: 12px;
+  background: var(--cnpm-color-surface-primary);
+}
+
+.editorial-article__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin-bottom: 32px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-muted);
+}
+
+.editorial-article__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.editorial-article > p {
+  margin: 0 0 22px;
+  color: var(--cnpm-color-text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.editorial-article__notice {
+  margin: 30px 0;
+  padding: 18px;
+  border-left: 4px solid var(--cnpm-color-brand-blue-600);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.editorial-article__notice p {
+  margin: 5px 0 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: 1.55;
+}

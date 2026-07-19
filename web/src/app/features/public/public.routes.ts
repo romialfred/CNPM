@@ -3,10 +3,13 @@ import type { Routes } from '@angular/router';
 import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoHomeGateway } from './home/demo-home.gateway';
 import { HOME_GATEWAY } from './home/home-gateway';
+import { DemoEditorialGateway } from './editorial/demo-editorial.gateway';
+import { EDITORIAL_GATEWAY } from './editorial/editorial-gateway';
 import { DemoShowcaseGateway } from './showcase/demo-showcase.gateway';
 import { SHOWCASE_GATEWAY } from './showcase/showcase-gateway';
 import {
   UNAVAILABLE_HOME_GATEWAY,
+  UNAVAILABLE_EDITORIAL_GATEWAY,
   UNAVAILABLE_SHOWCASE_GATEWAY,
 } from './unavailable-public-gateways';
 
@@ -17,6 +20,52 @@ import {
  * promue, le profil HTTP expose son indisponibilité sans repli vers les fixtures.
  */
 export const publicRoutes: Routes = [
+  {
+    path: 'actualites',
+    providers: [
+      DemoEditorialGateway,
+      {
+        provide: EDITORIAL_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoEditorialGateway)
+            : UNAVAILABLE_EDITORIAL_GATEWAY,
+      },
+    ],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        data: { mode: 'news' },
+        loadComponent: () =>
+          import('./editorial/editorial.page').then((m) => m.EditorialPage),
+        title: 'Actualités — CNPM',
+      },
+      {
+        path: ':slug',
+        data: { mode: 'article' },
+        loadComponent: () =>
+          import('./editorial/editorial.page').then((m) => m.EditorialPage),
+        title: 'Actualité — CNPM',
+      },
+    ],
+  },
+  {
+    path: 'agenda',
+    providers: [
+      DemoEditorialGateway,
+      {
+        provide: EDITORIAL_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoEditorialGateway)
+            : UNAVAILABLE_EDITORIAL_GATEWAY,
+      },
+    ],
+    data: { mode: 'agenda' },
+    loadComponent: () => import('./editorial/editorial.page').then((m) => m.EditorialPage),
+    title: 'Agenda — CNPM',
+  },
   {
     path: '',
     pathMatch: 'full',

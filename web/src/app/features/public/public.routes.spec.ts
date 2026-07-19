@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { showcaseRoutes } from './public.routes';
+import { publicRoutes, showcaseRoutes } from './public.routes';
+
+describe('publicRoutes', () => {
+  it('déclare PUB-009/PUB-010/PUB-011 avant la route d’accueil vide', () => {
+    expect(publicRoutes.map((route) => route.path)).toEqual(['actualites', 'agenda', '']);
+    expect(publicRoutes[0]?.children?.map((route) => route.path)).toEqual(['', ':slug']);
+    expect(publicRoutes[0]?.providers).toBeDefined();
+    expect(publicRoutes[1]?.providers).toBeDefined();
+  });
+});
 
 describe('showcaseRoutes', () => {
   it('place les routes PUB-004/PUB-005/PUB-007/PUB-008 avant le slug PUB-006', () => {
