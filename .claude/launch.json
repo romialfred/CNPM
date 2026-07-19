@@ -4,7 +4,7 @@
     {
       "name": "web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "start", "--prefix", "web"],
+      "runtimeArgs": ["run", "start", "--prefix", "web", "--", "--host", "::"],
       "port": 4200
     }
   ]
