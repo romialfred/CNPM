@@ -1,0 +1,206 @@
+<cnpm-member-portal-shell
+  organization="Entreprise Démo Sahel"
+  userName="Membre de démonstration"
+  memberCode="CNPM-DEMO-0001"
+  [notificationCount]="0"
+>
+  <main class="member-users" id="contenu-principal">
+    <cnpm-page-header
+      title="Utilisateurs de l’entreprise"
+      description="Consultez les métadonnées fictives des utilisateurs de votre scénario membre."
+    />
+
+    <cnpm-alert tone="warning" title="Gestion des accès non disponible" [live]="false">
+      Inviter un utilisateur, attribuer un rôle, réinitialiser un second facteur ou révoquer une
+      session reste désactivé. Ces opérations exigent un contrat serveur typé, un périmètre
+      d’organisation vérifié et une réauthentification.
+    </cnpm-alert>
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeFilter($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="member-users__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <div class="member-users__field member-users__field--search">
+          <label for="member-user-search">Recherche</label>
+          <input
+            id="member-user-search"
+            type="search"
+            formControlName="search"
+            placeholder="Référence, libellé ou adresse fictive"
+          />
+        </div>
+        <div class="member-users__field">
+          <label for="member-user-status">État</label>
+          <select id="member-user-status" formControlName="status">
+            <option value="">Tous les états</option>
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ statusLabel(status) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-users__field">
+          <label for="member-user-sort">Tri et ordre</label>
+          <select id="member-user-sort" formControlName="sortOption">
+            <option value="displayLabel:asc">Utilisateur — alphabétique</option>
+            <option value="displayLabel:desc">Utilisateur — alphabétique inverse</option>
+            <option value="roleLabel:asc">Profil déclaré — alphabétique</option>
+            <option value="roleLabel:desc">Profil déclaré — alphabétique inverse</option>
+            <option value="lastActivityOn:desc">Activité — plus récente</option>
+            <option value="lastActivityOn:asc">Activité — plus ancienne</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <section class="member-users__panel" aria-labelledby="member-users-results-title">
+      <div class="member-users__toolbar">
+        <div>
+          <h2 id="member-users-results-title" #resultsTitle tabindex="-1">Utilisateurs fictifs</h2>
+          <p>Lecture seule, auto-scopée au scénario Entreprise Démo Sahel.</p>
+        </div>
+        @if (data()) {
+          <p class="member-users__count" aria-live="polite">
+            {{ totalItems() | number }}
+            {{ totalItems() === 1 ? 'utilisateur fictif' : 'utilisateurs fictifs' }}
+          </p>
+        }
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <cnpm-skeleton
+            variant="table"
+            [rows]="pageSize()"
+            [columns]="columns.length"
+            label="Chargement des utilisateurs fictifs…"
+          />
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Les utilisateurs n’ont pas pu être chargés"
+            description="La source locale est momentanément indisponible. Aucune opération IAM n’a été déclenchée."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('unavailable') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Utilisateurs indisponibles en mode HTTP"
+            description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible. Aucune fixture n’est injectée dans ce mode."
+          />
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucun utilisateur"
+            description="Aucune métadonnée utilisateur n’est disponible pour cette session."
+          />
+        }
+        @case ('no-result') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucun utilisateur ne correspond"
+            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+              Réinitialiser les filtres
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('ready') {
+          <div class="member-users__desktop-table">
+            <cnpm-data-table
+              caption="Utilisateurs fictifs : référence, libellé, adresse de démonstration, profil déclaré, dernière activité et état, sans action IAM."
+              [columns]="columns"
+              [rows]="users()"
+              [rowKey]="rowKey"
+            >
+              <ng-template #row let-user>
+                <td class="cnpm-table__cell">
+                  <code>{{ user.reference }}</code>
+                </td>
+                <td class="cnpm-table__cell member-users__identity">
+                  <strong>{{ user.displayLabel }}</strong>
+                  <span>{{ user.email }}</span>
+                </td>
+                <td class="cnpm-table__cell">{{ user.roleLabel }}</td>
+                <td class="cnpm-table__cell member-users__date">
+                  @if (user.lastActivityOn) {
+                    <time [attr.datetime]="user.lastActivityOn">
+                      {{ user.lastActivityOn | date: 'dd/MM/yyyy' : 'UTC' }}
+                    </time>
+                  } @else {
+                    Jamais — scénario
+                  }
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="statusTone(user.status)">
+                    {{ statusLabel(user.status) }}
+                  </cnpm-badge>
+                </td>
+              </ng-template>
+            </cnpm-data-table>
+          </div>
+
+          <ol class="member-users__mobile-list" aria-label="Utilisateurs fictifs">
+            @for (user of users(); track user.id) {
+              <li>
+                <article [attr.aria-labelledby]="'member-user-' + user.id">
+                  <header>
+                    <div>
+                      <h3 [id]="'member-user-' + user.id">{{ user.displayLabel }}</h3>
+                      <p>{{ user.reference }}</p>
+                    </div>
+                    <cnpm-badge [tone]="statusTone(user.status)">
+                      {{ statusLabel(user.status) }}
+                    </cnpm-badge>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>Adresse fictive</dt>
+                      <dd>{{ user.email }}</dd>
+                    </div>
+                    <div>
+                      <dt>Profil déclaré</dt>
+                      <dd>{{ user.roleLabel }}</dd>
+                    </div>
+                    <div>
+                      <dt>Dernière activité fictive</dt>
+                      <dd>
+                        @if (user.lastActivityOn) {
+                          <time [attr.datetime]="user.lastActivityOn">
+                            {{ user.lastActivityOn | date: 'dd/MM/yyyy' : 'UTC' }}
+                          </time>
+                        } @else {
+                          Jamais — scénario
+                        }
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
+              </li>
+            }
+          </ol>
+        }
+      }
+
+      @if (state() === 'ready') {
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    </section>
+  </main>
+</cnpm-member-portal-shell>

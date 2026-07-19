@@ -2,8 +2,10 @@ import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type { MemberContributionsGateway } from './contributions/member-contributions-gateway';
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
 import type { MemberHomeGateway } from './home/member-home-gateway';
+import type { MemberProfileGateway } from './profile/member-profile-gateway';
 import type { MemberReceiptsGateway } from './receipts/member-receipts-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
+import type { MemberUsersGateway } from './users/member-users-gateway';
 
 export const UNAVAILABLE_MEMBER_HOME_GATEWAY: MemberHomeGateway = {
   load: () => unavailableFeature$('MP-001'),
@@ -36,4 +38,14 @@ export const UNAVAILABLE_MEMBER_REQUESTS_GATEWAY: MemberRequestsGateway = {
 /** `/portal/documents` ne décrit encore aucune projection documentaire membre typée. */
 export const UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY: MemberDocumentsGateway = {
   list: () => unavailableFeature$('MP-012'),
+};
+
+/** Aucun endpoint typé et auto-scopé ne porte encore le profil membre. */
+export const UNAVAILABLE_MEMBER_PROFILE_GATEWAY: MemberProfileGateway = {
+  load: () => unavailableFeature$('MP-013'),
+};
+
+/** Aucun endpoint membre ne garantit encore le périmètre d’organisation IAM. */
+export const UNAVAILABLE_MEMBER_USERS_GATEWAY: MemberUsersGateway = {
+  list: () => unavailableFeature$('MP-014'),
 };

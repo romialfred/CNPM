@@ -45,4 +45,15 @@ describe('memberRoutes', () => {
     expect(route?.canActivate).toBeUndefined();
     expect(route?.children).toBeUndefined();
   });
+
+  it.each([
+    ['profile', 'MP-013'],
+    ['users', 'MP-014'],
+  ])('expose %s (%s) en lecture seule sans garde membre fictive', (path) => {
+    const route = memberRoutes.find((candidate) => candidate.path === path);
+    expect(route?.providers).toHaveLength(2);
+    expect(route?.loadComponent).toBeTypeOf('function');
+    expect(route?.canActivate).toBeUndefined();
+    expect(route?.children).toBeUndefined();
+  });
 });

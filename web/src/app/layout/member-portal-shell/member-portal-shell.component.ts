@@ -62,6 +62,13 @@ export class MemberPortalShellComponent {
       route: '/member/documents',
       icon: 'receipts',
     },
+    { label: 'Profil', mobileLabel: 'Profil', route: '/member/profile', icon: 'profile' },
+    {
+      label: 'Utilisateurs',
+      mobileLabel: 'Utilisateurs',
+      route: '/member/users',
+      icon: 'profile',
+    },
     { label: 'Avantages', mobileLabel: 'Avantages', route: null, icon: 'profile' },
   ];
 

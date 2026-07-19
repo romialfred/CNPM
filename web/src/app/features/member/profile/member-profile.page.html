@@ -1,0 +1,115 @@
+<cnpm-member-portal-shell
+  organization="Entreprise Démo Sahel"
+  userName="Membre de démonstration"
+  memberCode="CNPM-DEMO-0001"
+  [notificationCount]="0"
+>
+  <main class="member-profile" id="contenu-principal">
+    <cnpm-page-header
+      title="Profil entreprise"
+      description="Consultez l’identité fictive et l’adhésion associées à votre espace membre."
+    />
+
+    <cnpm-alert tone="warning" title="Profil local fictif" [live]="false">
+      Aucune identité, coordonnée, photographie ou donnée membre réelle n’est affichée. Cette vue de
+      démonstration ne permet aucune modification.
+    </cnpm-alert>
+
+    @switch (result().kind) {
+      @case ('loading') {
+        <section class="member-profile__panel" aria-label="Chargement du profil entreprise fictif">
+          <cnpm-skeleton
+            variant="card"
+            [rows]="5"
+            label="Chargement du profil entreprise fictif…"
+          />
+        </section>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le profil n’a pas pu être chargé"
+          description="La source locale est momentanément indisponible. Aucune donnée ni modification n’a été transmise."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Profil entreprise indisponible en mode HTTP"
+          description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible. Aucune fixture n’est injectée dans ce mode."
+        />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucun profil entreprise"
+          description="Aucune information de profil n’est disponible pour cette session."
+        />
+      }
+      @case ('ready') {
+        @if (profile(); as profile) {
+          <section class="member-profile__summary" aria-labelledby="member-profile-summary-title">
+            <div>
+              <p class="member-profile__eyebrow">Espace auto-scopé — démonstration</p>
+              <h2 id="member-profile-summary-title">{{ profile.organizationName }}</h2>
+              <p>{{ profile.memberReference }}</p>
+            </div>
+            <cnpm-badge tone="success">{{ profile.membershipLabel }}</cnpm-badge>
+          </section>
+
+          <div class="member-profile__grid">
+            <section class="member-profile__panel" aria-labelledby="member-profile-identity-title">
+              <h2 id="member-profile-identity-title">Identité de la session</h2>
+              <dl>
+                <div>
+                  <dt>Libellé affiché</dt>
+                  <dd>{{ profile.displayLabel }}</dd>
+                </div>
+                <div>
+                  <dt>Profil déclaré</dt>
+                  <dd>{{ profile.roleLabel }}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section class="member-profile__panel" aria-labelledby="member-profile-company-title">
+              <h2 id="member-profile-company-title">Entreprise et adhésion</h2>
+              <dl>
+                <div>
+                  <dt>Organisation</dt>
+                  <dd>{{ profile.organizationName }}</dd>
+                </div>
+                <div>
+                  <dt>Référence membre fictive</dt>
+                  <dd>
+                    <code>{{ profile.memberReference }}</code>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Type</dt>
+                  <dd>{{ profile.organizationTypeLabel }}</dd>
+                </div>
+                <div>
+                  <dt>Adhésion depuis</dt>
+                  <dd>
+                    <time [attr.datetime]="profile.membershipSince">
+                      {{ profile.membershipSince | date: 'dd/MM/yyyy' : 'UTC' }}
+                    </time>
+                  </dd>
+                </div>
+              </dl>
+            </section>
+          </div>
+
+          <cnpm-alert tone="info" title="Modification non disponible" [live]="false">
+            {{ profile.disclosure }} Les changements soumis à validation resteront désactivés tant
+            que le contrat serveur, le périmètre d’organisation et la réauthentification ne seront
+            pas définis.
+          </cnpm-alert>
+        }
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

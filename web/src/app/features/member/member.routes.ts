@@ -7,17 +7,23 @@ import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.ga
 import { MEMBER_DOCUMENTS_GATEWAY } from './documents/member-documents-gateway';
 import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
+import { DemoMemberProfileGateway } from './profile/demo-member-profile.gateway';
+import { MEMBER_PROFILE_GATEWAY } from './profile/member-profile-gateway';
 import { DemoMemberReceiptsGateway } from './receipts/demo-member-receipts.gateway';
 import { MEMBER_RECEIPTS_GATEWAY } from './receipts/member-receipts-gateway';
 import { DemoMemberRequestsGateway } from './requests/demo-member-requests.gateway';
 import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
 import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
+import { DemoMemberUsersGateway } from './users/demo-member-users.gateway';
+import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
   UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
+  UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
   UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
+  UNAVAILABLE_MEMBER_USERS_GATEWAY,
 } from './unavailable-member-gateways';
 
 /**
@@ -158,6 +164,38 @@ export const memberRoutes: Routes = [
     loadComponent: () =>
       import('./documents/member-documents.page').then((module) => module.MemberDocumentsPage),
     title: 'Mes documents — CNPM',
+  },
+  {
+    path: 'profile',
+    providers: [
+      DemoMemberProfileGateway,
+      {
+        provide: MEMBER_PROFILE_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberProfileGateway)
+            : UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
+      },
+    ],
+    loadComponent: () =>
+      import('./profile/member-profile.page').then((module) => module.MemberProfilePage),
+    title: 'Profil entreprise — CNPM',
+  },
+  {
+    path: 'users',
+    providers: [
+      DemoMemberUsersGateway,
+      {
+        provide: MEMBER_USERS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberUsersGateway)
+            : UNAVAILABLE_MEMBER_USERS_GATEWAY,
+      },
+    ],
+    loadComponent: () =>
+      import('./users/member-users.page').then((module) => module.MemberUsersPage),
+    title: 'Utilisateurs de l’entreprise — CNPM',
   },
   // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
 ];
