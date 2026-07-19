@@ -39,6 +39,18 @@ describe('DemoShowcaseGateway (PUB-004/PUB-005)', () => {
       expect(published.showcase.contacts).toEqual({});
       expect(published.showcase.contactConsent).toBeNull();
       expect(published.showcase.allowIndexing).toBe(false);
+      expect(published.showcase.activities.map((item) => item.id)).toEqual([
+        'diagnostic-pilote',
+        'atelier-demonstration',
+        'suivi-simule',
+      ]);
+      expect(published.showcase.projects.map((item) => item.id)).toEqual([
+        'parcours-pilote-2026',
+        'atelier-temoin-2026',
+      ]);
+      expect(
+        published.showcase.projects.every((item) => /ficti|démonstration/i.test(item.title)),
+      ).toBe(true);
     }
 
     const draft = await firstValueFrom(gateway.findBySlug('cooperative-demo-brouillon'));

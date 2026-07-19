@@ -173,31 +173,37 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
 
   private static readonly ACTIVITIES: readonly ShowcaseActivity[] = [
     {
+      id: 'travaux-publics-infrastructures',
       title: 'Travaux publics et infrastructures',
       description: 'Routes, ponts et ouvrages d’art.',
       icon: 'roads',
     },
     {
+      id: 'batiment-genie-civil',
       title: 'Bâtiment et génie civil',
       description: 'Bâtiments et ouvrages industriels.',
       icon: 'building',
     },
     {
+      id: 'amenagement-urbain',
       title: 'Aménagement urbain',
       description: 'Voirie, réseaux et éclairage public.',
       icon: 'urban',
     },
     {
+      id: 'etudes-ingenierie',
       title: 'Études et ingénierie',
       description: 'Études techniques et contrôle qualité.',
       icon: 'studies',
     },
     {
+      id: 'materiaux-equipements',
       title: 'Matériaux et équipements',
       description: 'Matériaux et équipements BTP.',
       icon: 'materials',
     },
     {
+      id: 'maintenance-rehabilitation',
       title: 'Maintenance et réhabilitation',
       description: 'Entretien et réhabilitation d’infrastructures.',
       icon: 'maintenance',
@@ -206,6 +212,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
 
   private static readonly PROJECTS: readonly ShowcaseProject[] = [
     {
+      id: 'route-kati-koulikoro',
       title: 'Route Kati–Koulikoro',
       summary:
         'Construction de 42 km de route bitumée, avec ouvrages de drainage et signalisation.',
@@ -217,6 +224,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       },
     },
     {
+      id: 'pont-de-senou',
       title: 'Pont de Sénou',
       summary: 'Construction d’un pont en béton armé de 180 m, avec culées et voies d’accès.',
       category: 'Ouvrages d’art',
@@ -227,6 +235,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       },
     },
     {
+      id: 'immeuble-somaplaza',
       title: 'Immeuble SOMAPLAZA',
       summary: 'Construction d’un immeuble de bureaux R+6, livré avec ses lots techniques.',
       category: 'Bâtiments',
@@ -414,8 +423,8 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       },
       contacts: {},
       contactConsent: null,
-      activities: [],
-      projects: [],
+      activities: this.toDirectoryActivities(record),
+      projects: this.toDirectoryProjects(record),
       gallery: [],
       certifications: [],
       partners: [],
@@ -485,6 +494,59 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       isDemoContent: true,
       publicationStatus: 'PUBLISHED',
     };
+  }
+
+  private toDirectoryActivities(record: DemoDirectoryRecord): readonly ShowcaseActivity[] {
+    return [
+      {
+        id: 'diagnostic-pilote',
+        title: 'Diagnostic pilote fictif',
+        description: `Analyse simulée de besoins dans le secteur « ${record.sector} », sans client ni mission réels.`,
+        icon: 'studies',
+      },
+      {
+        id: 'atelier-demonstration',
+        title: 'Atelier de démonstration',
+        description:
+          'Mise en situation entièrement inventée pour éprouver la présentation publique du service.',
+        icon: 'maintenance',
+      },
+      {
+        id: 'suivi-simule',
+        title: 'Suivi simulé de service',
+        description:
+          'Scénario fictif de suivi qualité, sans engagement commercial ni résultat attribué à un tiers.',
+        icon: 'materials',
+      },
+    ];
+  }
+
+  private toDirectoryProjects(record: DemoDirectoryRecord): readonly ShowcaseProject[] {
+    return [
+      {
+        id: 'parcours-pilote-2026',
+        title: 'Parcours pilote 2026 — réalisation fictive',
+        summary: `Scénario de démonstration imaginé pour ${record.name}. Il illustre un parcours dans le secteur « ${record.sector} » sans client, site ni résultat réels.`,
+        category: `${record.sector} — démonstration`,
+        visual: {
+          shape: 'grid',
+          alt: 'Illustration vectorielle géométrique de démonstration, et non photographie d’une réalisation.',
+          label: 'Parcours pilote fictif',
+        },
+      },
+      {
+        id: 'atelier-temoin-2026',
+        title: 'Atelier témoin 2026 — réalisation fictive',
+        summary:
+          'Cas d’usage inventé pour valider le gabarit de détail. Aucun partenaire, bénéficiaire ou ouvrage réel n’est représenté.',
+        category: 'Scénario de démonstration',
+        visual: {
+          shape: 'yard',
+          alt: 'Illustration vectorielle abstraite d’un atelier fictif, et non photographie d’un site réel.',
+          label: 'Atelier témoin fictif',
+        },
+      },
+    ];
   }
 
   private respond(result: ShowcaseResult): Observable<ShowcaseResult> {

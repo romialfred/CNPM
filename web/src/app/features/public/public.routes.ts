@@ -61,6 +61,20 @@ export const showcaseRoutes: Routes = [
         title: 'Rechercher un membre — CNPM',
       },
       {
+        path: ':slug/activites',
+        data: { mode: 'activities' },
+        loadComponent: () =>
+          import('./showcase-detail/showcase-detail.page').then((m) => m.ShowcaseDetailPage),
+        title: 'Activités et réalisations — CNPM',
+      },
+      {
+        path: ':slug/realisations/:id',
+        data: { mode: 'project' },
+        loadComponent: () =>
+          import('./showcase-detail/showcase-detail.page').then((m) => m.ShowcaseDetailPage),
+        title: 'Détail d’une réalisation — CNPM',
+      },
+      {
         path: ':slug',
         loadComponent: () => import('./showcase/showcase.page').then((m) => m.ShowcasePage),
         // Le titre définitif est posé par la page à partir des données SEO de la vitrine.

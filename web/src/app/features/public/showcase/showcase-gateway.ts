@@ -51,6 +51,8 @@ export interface ShowcaseKeyFact {
 }
 
 export interface ShowcaseActivity {
+  /** Identifiant éditorial stable, utilisable dans une URL sans exposer d'identifiant technique. */
+  readonly id: string;
   readonly title: string;
   readonly description: string;
   /**
@@ -61,6 +63,8 @@ export interface ShowcaseActivity {
 }
 
 export interface ShowcaseProject {
+  /** Identifiant éditorial stable dans le périmètre de la vitrine. */
+  readonly id: string;
   readonly title: string;
   readonly summary: string;
   readonly category: string;

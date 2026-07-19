@@ -1,0 +1,254 @@
+<cnpm-public-shell [sections]="navSections()" [memberBadge]="memberBadge()">
+  <div class="cnpm-showcase-detail">
+    @switch (state()) {
+      @case ('loading') {
+        <div class="cnpm-showcase-detail__loading">
+          <cnpm-skeleton variant="text" [rows]="3" label="Chargement de la vitrine publiée…" />
+          <div class="cnpm-showcase-detail__loading-grid">
+            @for (item of [1, 2, 3]; track item) {
+              <cnpm-skeleton variant="card" [rows]="4" label="Chargement d’un contenu publié…" />
+            }
+          </div>
+        </div>
+      }
+      @case ('error') {
+        <div class="cnpm-showcase-detail__state">
+          <cnpm-error-state
+            variant="recoverable"
+            titleAs="h1"
+            title="Le contenu est indisponible"
+            description="La vitrine publiée n’a pas pu être chargée. Vous pouvez réessayer."
+          >
+            <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        </div>
+      }
+      @case ('not-public') {
+        <div class="cnpm-showcase-detail__state">
+          <cnpm-error-state
+            variant="not-found"
+            titleAs="h1"
+            title="Vitrine non publiée"
+            description="Les activités et réalisations restent privées tant que la vitrine n’est pas publiée."
+          >
+            <cnpm-button variant="secondary" routerLink="/membres">Retour à l’annuaire</cnpm-button>
+          </cnpm-error-state>
+        </div>
+      }
+      @case ('showcase-not-found') {
+        <div class="cnpm-showcase-detail__state">
+          <cnpm-error-state
+            variant="not-found"
+            titleAs="h1"
+            title="Vitrine introuvable"
+            description="Cette vitrine n’existe pas dans l’annuaire public."
+          >
+            <cnpm-button variant="secondary" routerLink="/membres">Retour à l’annuaire</cnpm-button>
+          </cnpm-error-state>
+        </div>
+      }
+      @case ('project-not-found') {
+        <div class="cnpm-showcase-detail__state">
+          <cnpm-error-state
+            variant="not-found"
+            titleAs="h1"
+            title="Réalisation introuvable"
+            description="Cette réalisation n’appartient pas aux contenus publiés de la vitrine."
+          >
+            @if (showcase(); as member) {
+              <cnpm-button
+                variant="secondary"
+                [routerLink]="['/membres', member.slug, 'activites']"
+              >
+                Voir les activités et réalisations
+              </cnpm-button>
+            }
+          </cnpm-error-state>
+        </div>
+      }
+      @case ('ready') {
+        @if (showcase(); as member) {
+          <div class="cnpm-showcase-detail__content">
+            <nav class="cnpm-showcase-detail__breadcrumb" aria-label="Fil d’Ariane">
+              <ol>
+                <li><a routerLink="/">Accueil</a></li>
+                <li><a routerLink="/membres">Annuaire</a></li>
+                <li>
+                  <a [routerLink]="['/membres', member.slug]">{{ member.name }}</a>
+                </li>
+                <li aria-current="page">
+                  {{ isProjectMode() ? 'Détail de réalisation' : 'Activités et réalisations' }}
+                </li>
+              </ol>
+            </nav>
+
+            @if (!isProjectMode()) {
+              <header class="cnpm-showcase-detail__hero">
+                <p class="cnpm-showcase-detail__eyebrow">{{ member.name }}</p>
+                <h1 #pageTitle tabindex="-1">Activités et réalisations</h1>
+                <p>{{ member.tagline }}</p>
+              </header>
+
+              <cnpm-alert tone="info" title="Contenus fictifs de démonstration">
+                Aucun client, partenaire, site, résultat ou média réel n’est présenté sur cette
+                page.
+              </cnpm-alert>
+
+              <section
+                class="cnpm-showcase-detail__section"
+                id="activites"
+                aria-labelledby="activites-titre"
+              >
+                <div class="cnpm-showcase-detail__section-heading">
+                  <div>
+                    <p class="cnpm-showcase-detail__eyebrow">Savoir-faire de démonstration</p>
+                    <h2 id="activites-titre">Activités</h2>
+                  </div>
+                  <span>{{ member.activities.length }} activités fictives</span>
+                </div>
+
+                @if (member.activities.length) {
+                  <ul class="cnpm-showcase-detail__activity-grid">
+                    @for (activity of member.activities; track activity.id) {
+                      <li>
+                        <article class="cnpm-showcase-detail__activity-card">
+                          <span class="cnpm-showcase-detail__activity-icon" aria-hidden="true">
+                            @switch (activity.icon) {
+                              @case ('studies') {
+                                <svg lucideRuler [size]="iconSize.navigation"></svg>
+                              }
+                              @case ('maintenance') {
+                                <svg lucideWrench [size]="iconSize.navigation"></svg>
+                              }
+                              @default {
+                                <svg lucideLayers [size]="iconSize.navigation"></svg>
+                              }
+                            }
+                          </span>
+                          <h3>{{ activity.title }}</h3>
+                          <p>{{ activity.description }}</p>
+                        </article>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <cnpm-empty-state
+                    variant="no-data"
+                    title="Aucune activité publiée"
+                    description="La section reste masquée tant que la vitrine publiée ne contient aucune activité."
+                  />
+                }
+              </section>
+
+              <section
+                class="cnpm-showcase-detail__section"
+                id="realisations"
+                aria-labelledby="realisations-titre"
+              >
+                <div class="cnpm-showcase-detail__section-heading">
+                  <div>
+                    <p class="cnpm-showcase-detail__eyebrow">Cas d’usage inventés</p>
+                    <h2 id="realisations-titre">Réalisations</h2>
+                  </div>
+                  <span>{{ member.projects.length }} réalisations fictives</span>
+                </div>
+
+                @if (member.projects.length) {
+                  <ul class="cnpm-showcase-detail__project-grid">
+                    @for (item of member.projects; track item.id) {
+                      <li>
+                        <article class="cnpm-showcase-detail__project-card">
+                          <div class="cnpm-showcase-detail__project-mark" aria-hidden="true">
+                            <svg lucideBuilding2 [size]="iconSize.empty"></svg>
+                          </div>
+                          <div class="cnpm-showcase-detail__project-copy">
+                            <p class="cnpm-showcase-detail__category">{{ item.category }}</p>
+                            <h3>{{ item.title }}</h3>
+                            <p>{{ item.summary }}</p>
+                          </div>
+                          <a
+                            class="cnpm-showcase-detail__project-link"
+                            [routerLink]="['/membres', member.slug, 'realisations', item.id]"
+                            [attr.aria-label]="'Consulter ' + item.title"
+                          >
+                            Consulter la réalisation
+                            <svg
+                              lucideArrowRight
+                              [size]="iconSize.compact"
+                              aria-hidden="true"
+                            ></svg>
+                          </a>
+                        </article>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <cnpm-empty-state
+                    variant="no-data"
+                    title="Aucune réalisation publiée"
+                    description="Aucun détail n’est accessible tant que la vitrine publiée ne contient aucune réalisation."
+                  />
+                }
+              </section>
+            } @else if (project(); as item) {
+              <article class="cnpm-showcase-detail__project-detail">
+                <a
+                  class="cnpm-showcase-detail__back-link"
+                  [routerLink]="['/membres', member.slug, 'activites']"
+                  fragment="realisations"
+                >
+                  <svg lucideArrowLeft [size]="iconSize.compact" aria-hidden="true"></svg>
+                  Retour aux activités et réalisations
+                </a>
+
+                <header class="cnpm-showcase-detail__hero">
+                  <p class="cnpm-showcase-detail__eyebrow">{{ item.category }}</p>
+                  <h1 #pageTitle tabindex="-1">{{ item.title }}</h1>
+                  <p>Réalisation fictive présentée par {{ member.name }}</p>
+                </header>
+
+                <cnpm-alert tone="info" title="Scénario entièrement fictif">
+                  Ce détail ne décrit aucun client, partenaire, site, ouvrage ou résultat réel.
+                </cnpm-alert>
+
+                <div class="cnpm-showcase-detail__project-layout">
+                  <div
+                    class="cnpm-showcase-detail__vector"
+                    role="img"
+                    [attr.aria-label]="item.visual.alt"
+                  >
+                    <svg lucideBuilding2 [size]="iconSize.empty" aria-hidden="true"></svg>
+                    <span>{{ item.visual.label }}</span>
+                    <small>Illustration vectorielle — aucune photographie</small>
+                  </div>
+                  <div class="cnpm-showcase-detail__project-body">
+                    <p class="cnpm-showcase-detail__lead">{{ item.summary }}</p>
+                    <dl>
+                      <div>
+                        <dt>Vitrine</dt>
+                        <dd>{{ member.name }}</dd>
+                      </div>
+                      <div>
+                        <dt>Secteur</dt>
+                        <dd>{{ member.sector }}</dd>
+                      </div>
+                      <div>
+                        <dt>Publication</dt>
+                        <dd>Vitrine publiée — données de démonstration</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              </article>
+            }
+
+            <p class="cnpm-showcase-detail__attribution">
+              Contenu entièrement fictif, fourni uniquement pour valider le gabarit R4 de
+              démonstration. Il ne peut pas être attribué à une organisation réelle.
+            </p>
+          </div>
+        }
+      }
+    }
+  </div>
+</cnpm-public-shell>
