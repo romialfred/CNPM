@@ -2646,7 +2646,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageResource'
+                $ref: '#/components/schemas/ProfessionalGroupPage'
       x-requirements:
       - GRP-001
       - GRP-002
@@ -3976,6 +3976,65 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EnrollmentApplicationView'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+    ProfessionalGroupView:
+      type: object
+      description: Groupement professionnel issu du référentiel CNPM.
+      required:
+      - id
+      - code
+      - name
+      - status
+      - version
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        code:
+          type: string
+          minLength: 1
+          maxLength: 60
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        sectorCode:
+          type: string
+          maxLength: 80
+          nullable: true
+        status:
+          type: string
+          maxLength: 30
+        version:
+          type: integer
+          format: int64
+      additionalProperties: false
+    ProfessionalGroupPage:
+      type: object
+      description: Page typée de groupements, ordonnée de façon stable par code.
+      required:
+      - items
+      - page
+      - size
+      - totalElements
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfessionalGroupView'
         page:
           type: integer
           minimum: 0
