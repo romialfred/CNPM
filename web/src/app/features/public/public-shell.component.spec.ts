@@ -17,6 +17,7 @@ async function setup() {
         { path: 'services', children: [] },
         { path: 'actualites', children: [] },
         { path: 'agenda', children: [] },
+        { path: 'verification/:code', children: [] },
       ]),
     ],
   }).compileComponents();
@@ -66,6 +67,7 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(hrefs).toContain('/services');
     expect(hrefs).toContain('/actualites');
     expect(hrefs).toContain('/agenda');
+    expect(hrefs).toContain('/verification/DEMO-VERIF-2026-001');
     expect(hrefs).toContain('#services');
     expect(hrefs).toContain('#chiffres');
     expect(hrefs).not.toContain('#');

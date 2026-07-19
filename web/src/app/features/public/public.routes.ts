@@ -7,10 +7,13 @@ import { DemoEditorialGateway } from './editorial/demo-editorial.gateway';
 import { EDITORIAL_GATEWAY } from './editorial/editorial-gateway';
 import { DemoShowcaseGateway } from './showcase/demo-showcase.gateway';
 import { SHOWCASE_GATEWAY } from './showcase/showcase-gateway';
+import { DemoReceiptVerificationGateway } from './verification/demo-receipt-verification.gateway';
+import { RECEIPT_VERIFICATION_GATEWAY } from './verification/receipt-verification-gateway';
 import {
   UNAVAILABLE_HOME_GATEWAY,
   UNAVAILABLE_EDITORIAL_GATEWAY,
   UNAVAILABLE_SHOWCASE_GATEWAY,
+  UNAVAILABLE_RECEIPT_VERIFICATION_GATEWAY,
 } from './unavailable-public-gateways';
 
 /**
@@ -20,6 +23,24 @@ import {
  * promue, le profil HTTP expose son indisponibilité sans repli vers les fixtures.
  */
 export const publicRoutes: Routes = [
+  {
+    path: 'verification/:code',
+    providers: [
+      DemoReceiptVerificationGateway,
+      {
+        provide: RECEIPT_VERIFICATION_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoReceiptVerificationGateway)
+            : UNAVAILABLE_RECEIPT_VERIFICATION_GATEWAY,
+      },
+    ],
+    loadComponent: () =>
+      import('./verification/receipt-verification.page').then(
+        (m) => m.ReceiptVerificationPage,
+      ),
+    title: 'Vérification d’un reçu — CNPM',
+  },
   {
     path: 'le-cnpm',
     data: { mode: 'about' },

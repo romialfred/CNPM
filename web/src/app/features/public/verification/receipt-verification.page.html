@@ -1,0 +1,120 @@
+<cnpm-public-shell>
+  <section class="verification-hero">
+    <div class="verification-hero__inner">
+      <div>
+        <p class="verification-eyebrow">Contrôle public limité</p>
+        <h1 #pageTitle tabindex="-1">Vérifier un aperçu de reçu</h1>
+        <p>
+          Saisissez un code de démonstration pour prévisualiser un résultat minimal, sans identité
+          de membre ni document téléchargeable.
+        </p>
+      </div>
+      <span class="verification-hero__mark" aria-hidden="true">
+        <svg lucideFileSearch2 [size]="iconSize.empty"></svg>
+      </span>
+    </div>
+  </section>
+
+  <div class="verification-page">
+    <aside class="verification-warning" role="note">
+      <svg lucideInfo [size]="iconSize.control" aria-hidden="true"></svg>
+      <div>
+        <strong>Démonstration non probante</strong>
+        <p>
+          Aucun reçu officiel, QR, cachet ou signature n’est vérifié ici. Le résultat ci-dessous
+          est produit uniquement par un jeu de données fictif local.
+        </p>
+      </div>
+    </aside>
+
+    <div class="verification-layout">
+      <section class="verification-search" aria-labelledby="verification-form-title">
+        <p class="verification-step">01</p>
+        <h2 id="verification-form-title">Saisir le code</h2>
+        <p>Utilisez le code fictif transmis avec la démonstration.</p>
+        <form (ngSubmit)="submitCode()">
+          <label for="verification-code">Code de vérification</label>
+          <span class="verification-field">
+            <svg lucideSearch [size]="iconSize.compact" aria-hidden="true"></svg>
+            <input
+              id="verification-code"
+              name="verificationCode"
+              autocomplete="off"
+              maxlength="96"
+              spellcheck="false"
+              required
+              [ngModel]="codeDraft()"
+              (ngModelChange)="codeDraft.set($event)"
+            />
+          </span>
+          <p class="verification-hint">Code démo : DEMO-VERIF-2026-001</p>
+          <cnpm-button type="submit" variant="primary" [block]="true">
+            Vérifier cet aperçu
+          </cnpm-button>
+        </form>
+      </section>
+
+      <section class="verification-result" aria-labelledby="verification-result-title">
+        <p class="verification-step">02</p>
+        <h2 id="verification-result-title">Résultat du contrôle fictif</h2>
+
+        @if (state() === 'loading') {
+          <div class="verification-loading" aria-label="Vérification en cours" aria-busy="true">
+            <cnpm-skeleton width="56%" height="28px" />
+            <cnpm-skeleton height="74px" />
+            <cnpm-skeleton height="74px" />
+          </div>
+        } @else if (state() === 'error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Vérification temporairement indisponible"
+            description="Le contrat de vérification n’est pas disponible. Aucun résultat fictif n’a été substitué."
+          >
+            <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        } @else if (state() === 'not-found') {
+          <cnpm-error-state
+            variant="not-found"
+            title="Aucun aperçu correspondant"
+            description="Ce code ne correspond à aucun élément du jeu de démonstration."
+          />
+        } @else if (result(); as verification) {
+          <div class="verification-success" role="status">
+            <span aria-hidden="true">
+              <svg lucideBadgeCheck [size]="iconSize.empty"></svg>
+            </span>
+            <div>
+              <strong>{{ verification.statusLabel }}</strong>
+              <p>Résultat local — ne constitue pas une preuve de paiement.</p>
+            </div>
+          </div>
+          <dl class="verification-facts">
+            <div>
+              <dt>Référence fictive</dt>
+              <dd>{{ verification.receiptReference }}</dd>
+            </div>
+            <div>
+              <dt>Montant fictif</dt>
+              <dd>{{ verification.amountXof | currency: 'XOF' : 'code' : '1.0-0' }}</dd>
+            </div>
+            <div>
+              <dt>Date du scénario</dt>
+              <dd>{{ verification.scenarioDate | date: 'd MMMM y' : 'UTC' }}</dd>
+            </div>
+            <div>
+              <dt>Identité du membre</dt>
+              <dd>Non exposée</dd>
+            </div>
+          </dl>
+          <div class="verification-scope">
+            <svg lucideShieldCheck [size]="iconSize.control" aria-hidden="true"></svg>
+            <p>
+              La vérification réelle devra confirmer authenticité, statut et montant sans donnée
+              excessive, conformément à REC-006.
+            </p>
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+</cnpm-public-shell>

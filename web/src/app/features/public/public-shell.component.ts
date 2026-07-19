@@ -367,6 +367,9 @@ export interface PublicFooterContact {
               L'adhésion en ligne et les pages légales seront reliées dès publication de leurs
               destinations officielles.
             </p>
+            <a routerLink="/verification/DEMO-VERIF-2026-001">
+              Vérifier un aperçu fictif
+            </a>
           </section>
         </div>
 
