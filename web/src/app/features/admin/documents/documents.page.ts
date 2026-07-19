@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { CNPM_DATA_MODE } from '../../../core/api/api.config';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -57,7 +56,6 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', t
   imports: [
     FormsModule,
     AdminShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,

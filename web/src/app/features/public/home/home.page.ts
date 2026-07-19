@@ -15,7 +15,6 @@ import {
   LucideBriefcaseBusiness,
   LucideBuilding2,
   LucideChartColumnIncreasing,
-  LucideFileText,
   LucideLandmark,
   LucideNetwork,
   LucideReceiptText,
@@ -27,7 +26,15 @@ import {
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
+import {
+  type CnpmTileAccent,
+  FeatureTileComponent,
+} from '../../../design-system/feature-tile/feature-tile.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
+import {
+  type CnpmSceneName,
+  SceneComponent,
+} from '../../../design-system/scene/scene.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { PublicShellComponent } from '../public-shell.component';
 import { HOME_GATEWAY, type PublicHighlights } from './home-gateway';
@@ -39,6 +46,8 @@ type PageState = 'loading' | 'ready' | 'empty' | 'error';
   selector: 'cnpm-home-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    FeatureTileComponent,
+    SceneComponent,
     ButtonComponent,
     DecimalPipe,
     EmptyStateComponent,
@@ -51,8 +60,7 @@ type PageState = 'loading' | 'ready' | 'empty' | 'error';
     LucideBriefcaseBusiness,
     LucideBuilding2,
     LucideChartColumnIncreasing,
-    LucideFileText,
-    LucideLandmark,
+      LucideLandmark,
     LucideNetwork,
     LucideReceiptText,
     LucideRoute,
@@ -88,26 +96,40 @@ export class HomePage {
     { id: 'connecter', label: 'Connecter pour développer' },
   ];
 
-  protected readonly benefits = [
+  /**
+   * Les accents distinguent les axes d'action sans leur prêter de sens : ils viennent de
+   * la palette catégorielle du handoff, prévue exactement pour cela. Aucun ne signale un
+   * statut — la couleur ne porte donc jamais d'information seule (WCAG 2.2 AA).
+   */
+  protected readonly benefits: readonly {
+    id: string;
+    title: string;
+    text: string;
+    accent: CnpmTileAccent;
+  }[] = [
     {
       id: 'representation',
       title: 'Représentation et plaidoyer',
       text: 'Porter la voix des entreprises et défendre leurs intérêts dans un cadre structuré.',
+      accent: 'indigo',
     },
     {
       id: 'accompagnement',
       title: 'Accompagnement et services',
       text: 'Simplifier les démarches courantes et rendre les services plus faciles à suivre.',
+      accent: 'teal',
     },
     {
       id: 'reseau',
       title: 'Réseau et opportunités',
       text: 'Relier groupements, conseils régionaux et entreprises autour d’un réseau commun.',
+      accent: 'sky',
     },
     {
       id: 'information',
       title: 'Information économique',
       text: 'Mettre à disposition des repères utiles dans un espace numérique cohérent.',
+      accent: 'amber',
     },
   ];
 
@@ -130,6 +152,18 @@ export class HomePage {
       text: 'Valoriser une entreprise selon les règles de publication.',
     },
   ];
+
+  /**
+   * Illustration d'une actualité, choisie selon son sujet.
+   *
+   * Le rattachement vit ici et non dans le port : la scène relève de la présentation,
+   * une autre page pourrait illustrer la même actualité autrement.
+   */
+  protected newsScene(id: string): CnpmSceneName {
+    return (
+      { 'prise-en-main': 'training', 'services-numeriques': 'digital', reseau: 'network' } as const
+    )[id as 'prise-en-main' | 'services-numeriques' | 'reseau'] ?? 'assembly';
+  }
 
   constructor() {
     this.title.setTitle('Conseil National du Patronat du Mali');

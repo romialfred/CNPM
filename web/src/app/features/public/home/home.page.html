@@ -119,7 +119,7 @@
 
     <section class="cnpm-home__metrics" id="chiffres" aria-labelledby="chiffres-titre">
       <div class="cnpm-home__section-heading cnpm-home__section-heading--metrics">
-        <p class="cnpm-home__section-kicker">Le CNPM en chiffres</p>
+        <p class="cnpm-home__section-kicker">Repères</p>
         <h2 id="chiffres-titre">Le CNPM en chiffres</h2>
       </div>
 
@@ -209,27 +209,24 @@
       </div>
       <ul class="cnpm-home__benefit-list">
         @for (benefit of benefits; track benefit.id) {
-          <li class="cnpm-home__benefit">
-            <span class="cnpm-home__benefit-icon" aria-hidden="true">
+          <li>
+            <cnpm-feature-tile [heading]="benefit.title" [accent]="benefit.accent">
               @switch (benefit.id) {
                 @case ('representation') {
-                  <svg lucideLandmark [size]="iconSize.navigation"></svg>
+                  <svg tileIcon lucideLandmark [size]="iconSize.navigation"></svg>
                 }
                 @case ('accompagnement') {
-                  <svg lucideRoute [size]="iconSize.navigation"></svg>
+                  <svg tileIcon lucideRoute [size]="iconSize.navigation"></svg>
                 }
                 @case ('reseau') {
-                  <svg lucideNetwork [size]="iconSize.navigation"></svg>
+                  <svg tileIcon lucideNetwork [size]="iconSize.navigation"></svg>
                 }
                 @default {
-                  <svg lucideChartColumnIncreasing [size]="iconSize.navigation"></svg>
+                  <svg tileIcon lucideChartColumnIncreasing [size]="iconSize.navigation"></svg>
                 }
               }
-            </span>
-            <div>
-              <h3>{{ benefit.title }}</h3>
-              <p>{{ benefit.text }}</p>
-            </div>
+              {{ benefit.text }}
+            </cnpm-feature-tile>
           </li>
         }
       </ul>
@@ -287,9 +284,11 @@
             @for (item of data.news; track item.id) {
               @if (item.fictionalDemo) {
                 <li class="cnpm-home__news-card">
-                  <div class="cnpm-home__news-visual" aria-hidden="true">
-                    <svg lucideFileText [size]="iconSize.empty"></svg>
-                  </div>
+                  <cnpm-scene
+                    class="cnpm-home__news-visual"
+                    [name]="newsScene(item.id)"
+                    [decorative]="true"
+                  />
                   <div class="cnpm-home__news-copy">
                     <span>{{ item.category }}</span>
                     <h3>{{ item.title }}</h3>

@@ -89,11 +89,6 @@
 }
 
 .cnpm-home__metric-icon,
-.cnpm-home__benefit-icon {
-  width: var(--cnpm-space-10);
-  height: var(--cnpm-space-10);
-}
-
 .cnpm-home__metric-copy {
   display: flex;
   flex-direction: column;
@@ -152,16 +147,9 @@
   list-style: none;
 }
 
-.cnpm-home__benefit {
-  display: flex;
-  gap: var(--cnpm-space-4);
-  min-width: 0;
-  padding: var(--cnpm-space-5);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-}
-
-.cnpm-home__benefit h3,
+/* La carte des axes d'action est désormais rendue par `cnpm-feature-tile`, qui porte
+   sa propre bordure, son rayon et son accent. Ne restent ici que la grille et les
+   règles partagées avec les modules et les actualités. */
 .cnpm-home__module h3,
 .cnpm-home__news-card h3 {
   margin: 0;
@@ -170,7 +158,6 @@
   line-height: var(--cnpm-font-lineHeight-md);
 }
 
-.cnpm-home__benefit p,
 .cnpm-home__module p,
 .cnpm-home__news-card p {
   margin: var(--cnpm-space-2) 0 0;
@@ -236,9 +223,12 @@
   list-style: none;
 }
 
+/* Bandeau illustré au-dessus du texte, et non colonne latérale : les scènes sont
+   cadrées en 16/9 ; une colonne de 7 rem les écrasait à 112 px de large pour toute la
+   hauteur de la carte, ne laissant voir qu'une tranche verticale rognée. */
 .cnpm-home__news-card {
   display: grid;
-  grid-template-columns: 7rem minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--cnpm-color-border-subtle);
@@ -247,12 +237,9 @@
 }
 
 .cnpm-home__news-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 10rem;
-  background: var(--cnpm-color-brand-blue-50);
-  color: var(--cnpm-color-brand-blue-700);
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
 }
 
 .cnpm-home__news-copy {

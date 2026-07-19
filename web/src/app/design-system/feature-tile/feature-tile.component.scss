@@ -31,15 +31,17 @@
 
 .cnpm-tile__heading {
   margin: 0;
-  color: var(--cnpm-color-text-primary);
+  color: var(--cnpm-color-text-brand);
   font-size: var(--cnpm-font-size-md);
   font-weight: var(--cnpm-font-weight-semibold);
+  line-height: var(--cnpm-font-lineHeight-md);
 }
 
 .cnpm-tile__text {
   margin: 0;
   color: var(--cnpm-color-text-secondary);
   font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
 }
 
 /* Accents issus de `chart.categorical` du handoff, exprimés via les tokens existants

@@ -1,0 +1,15 @@
+.cnpm-scene {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--cnpm-radius-md);
+  line-height: 0;
+}
+
+.cnpm-scene svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Les scenes sont cadrees en 16/9 ; `cover` evite les bandes vides quand le
+     conteneur est plus etroit, au prix d'un rognage lateral prevu par les auteurs. */
+  object-fit: cover;
+}
