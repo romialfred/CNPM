@@ -235,13 +235,9 @@
 }
 
 .institutional-story__visual {
-  display: flex;
+  display: block;
+  aspect-ratio: 16 / 9;
   min-height: 220px;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  background: var(--cnpm-color-brand-blue-50);
-  color: var(--cnpm-color-brand-blue-700);
 }
 
 .institutional-story a,

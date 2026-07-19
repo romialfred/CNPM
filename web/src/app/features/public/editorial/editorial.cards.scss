@@ -11,13 +11,12 @@
   background: var(--cnpm-color-surface-primary);
 }
 
+/* Bandeau illustré : l'aplat `brand-blue-50` avec icône centrée tenait lieu d'image. */
 .news-card__visual {
-  display: grid;
-  min-height: 142px;
-  place-items: center;
-  border-bottom: 1px solid var(--cnpm-color-brand-blue-100);
-  background: var(--cnpm-color-brand-blue-50);
-  color: var(--cnpm-color-brand-blue-700);
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-block-end: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: 0;
 }
 
 .news-card__body {

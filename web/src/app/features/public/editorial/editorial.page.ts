@@ -20,7 +20,6 @@ import {
   LucideCalendarDays,
   LucideClock3,
   LucideMapPin,
-  LucideNewspaper,
   LucideRotateCcw,
   LucideSearch,
 } from '@lucide/angular';
@@ -30,6 +29,7 @@ import { ButtonComponent } from '../../../design-system/button/button.component'
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
+import { type CnpmSceneName, SceneComponent } from '../../../design-system/scene/scene.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { PublicShellComponent } from '../public-shell.component';
 import {
@@ -57,6 +57,7 @@ type LoadOutcome =
   selector: 'cnpm-editorial-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SceneComponent,
     ButtonComponent,
     DatePipe,
     EmptyStateComponent,
@@ -67,7 +68,6 @@ type LoadOutcome =
     LucideCalendarDays,
     LucideClock3,
     LucideMapPin,
-    LucideNewspaper,
     LucideRotateCcw,
     LucideSearch,
     PublicShellComponent,
@@ -88,6 +88,24 @@ export class EditorialPage {
   private readonly pageTitle = viewChild<ElementRef<HTMLElement>>('pageTitle');
 
   protected readonly iconSize = CNPM_ICON_SIZE;
+
+  /**
+   * Illustration d'un article, déduite de sa rubrique.
+   *
+   * Le repli sur `assembly` couvre toute rubrique future : une carte sans scène
+   * retomberait sur l'aplat de couleur que ces illustrations remplacent.
+   */
+  protected articleScene(category: string): CnpmSceneName {
+    const parRubrique: Readonly<Record<string, CnpmSceneName>> = {
+      'Services numériques': 'digital',
+      Réseau: 'network',
+      Annuaire: 'network',
+      Expérience: 'training',
+      Repère: 'assembly',
+      Document: 'assembly',
+    };
+    return parRubrique[category] ?? 'assembly';
+  }
   protected readonly mode = signal<EditorialMode>('news');
   protected readonly state = signal<EditorialState>('loading');
   protected readonly articles = signal<readonly PublicDemoArticle[]>([]);

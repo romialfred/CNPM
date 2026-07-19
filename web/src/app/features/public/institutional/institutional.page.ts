@@ -11,7 +11,6 @@ import {
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   LucideArrowRight,
-  LucideBriefcaseBusiness,
   LucideBuilding2,
   LucideChartNoAxesCombined,
   LucideFileCheck2,
@@ -26,6 +25,7 @@ import {
 import { PageSeoService } from '../../../core/seo/page-seo.service';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
+import { SceneComponent } from '../../../design-system/scene/scene.component';
 import { PublicShellComponent } from '../public-shell.component';
 
 type InstitutionalMode = 'about' | 'services';
@@ -35,9 +35,9 @@ type InstitutionalMode = 'about' | 'services';
   selector: 'cnpm-institutional-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    SceneComponent,
     ButtonComponent,
     LucideArrowRight,
-    LucideBriefcaseBusiness,
     LucideBuilding2,
     LucideChartNoAxesCombined,
     LucideFileCheck2,

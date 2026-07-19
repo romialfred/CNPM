@@ -182,9 +182,11 @@
           <div class="editorial-grid">
             @for (item of filteredArticles(); track item.slug) {
               <article class="news-card">
-                <div class="news-card__visual" aria-hidden="true">
-                  <svg lucideNewspaper [size]="iconSize.empty"></svg>
-                </div>
+                <cnpm-scene
+                  class="news-card__visual"
+                  [name]="articleScene(item.category)"
+                  [decorative]="true"
+                />
                 <div class="news-card__body">
                   <span class="editorial-chip">{{ item.category }}</span>
                   <p class="news-card__date">
