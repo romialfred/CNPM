@@ -222,6 +222,14 @@ class _MemberDashboardContent extends StatelessWidget {
           child: Column(
             children: [
               _QuickAction(
+                key: const Key('home-contributions-action'),
+                icon: Icons.file_copy_outlined,
+                title: 'Mes cotisations',
+                subtitle: 'Consulter les appels et échéances fictifs',
+                onTap: () => context.go('/contributions'),
+              ),
+              const Divider(height: 1),
+              _QuickAction(
                 key: const Key('home-payments-action'),
                 icon: Icons.account_balance_wallet_outlined,
                 title: 'Mes paiements',

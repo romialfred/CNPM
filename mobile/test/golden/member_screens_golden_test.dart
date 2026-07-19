@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import '../helpers/test_app.dart';
 
@@ -24,12 +25,44 @@ void main() {
     testWidgets('MOB-008 ${viewport.key}', (tester) async {
       await pumpCnpmApp(tester, size: viewport.value);
       await completeDemoSignIn(tester);
-      await tester.tap(find.text('Paiements'));
+      await tester.tap(find.text('Finances'));
       await tester.pumpAndSettle();
 
       await expectLater(
         find.byKey(const Key('app-surface')),
         matchesGoldenFile('goldens/mob_008_payments_${viewport.key}.png'),
+      );
+    });
+
+    testWidgets('MOB-004 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/contributions');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile('goldens/mob_004_contributions_${viewport.key}.png'),
+      );
+    });
+
+    testWidgets('MOB-005 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/contributions/demo-contribution-2026-001');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile(
+          'goldens/mob_005_contribution_detail_${viewport.key}.png',
+        ),
       );
     });
 

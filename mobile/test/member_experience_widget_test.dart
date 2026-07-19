@@ -29,7 +29,7 @@ void main() {
     await pumpCnpmApp(tester);
     await completeDemoSignIn(tester);
 
-    await tester.tap(find.text('Paiements'));
+    await tester.tap(find.text('Finances'));
     await tester.pumpAndSettle();
 
     expect(find.text('Historique des paiements'), findsOneWidget);
@@ -87,7 +87,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
 
-      await tester.tap(find.text('Paiements'));
+      await tester.tap(find.text('Finances'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
@@ -105,7 +105,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
 
-      await tester.tap(find.text('Paiements'));
+      await tester.tap(find.text('Finances'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 

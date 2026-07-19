@@ -6,6 +6,10 @@ import 'package:cnpm_mobile/core/presentation/content_controller.dart';
 import 'package:cnpm_mobile/features/auth/presentation/auth_flow_controller.dart';
 import 'package:cnpm_mobile/features/auth/presentation/login_screen.dart';
 import 'package:cnpm_mobile/features/auth/presentation/verify_two_factor_screen.dart';
+import 'package:cnpm_mobile/features/contributions/application/load_member_contribution.dart';
+import 'package:cnpm_mobile/features/contributions/domain/member_contribution.dart';
+import 'package:cnpm_mobile/features/contributions/presentation/contribution_detail_screen.dart';
+import 'package:cnpm_mobile/features/contributions/presentation/contribution_list_screen.dart';
 import 'package:cnpm_mobile/features/home/domain/member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/presentation/member_home_screen.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
@@ -16,12 +20,19 @@ import 'package:cnpm_mobile/features/requests/presentation/member_request_list_s
 GoRouter buildAppRouter({
   required AppConfig config,
   required AuthFlowController authController,
+  required ContentController<List<MemberContribution>> contributionController,
+  required LoadMemberContribution loadMemberContribution,
   required ContentController<MemberDashboard> dashboardController,
   required ContentController<List<MemberPayment>> paymentController,
   required ContentController<List<MemberRequest>> requestController,
   required VoidCallback onSignOut,
 }) {
-  const authenticatedPaths = {'/home', '/payments', '/requests'};
+  const authenticatedPaths = {
+    '/home',
+    '/payments',
+    '/requests',
+    '/contributions',
+  };
 
   return GoRouter(
     initialLocation: '/login',
@@ -37,7 +48,9 @@ GoRouter buildAppRouter({
       if (path == '/verify' && !hasChallenge) {
         return '/login';
       }
-      if (authenticatedPaths.contains(path) && !hasSession) {
+      final isContributionPath = path.startsWith('/contributions/');
+      if ((authenticatedPaths.contains(path) || isContributionPath) &&
+          !hasSession) {
         return '/login';
       }
       return null;
@@ -64,6 +77,26 @@ GoRouter buildAppRouter({
           controller: dashboardController,
           displayName:
               authController.session?.displayName ?? 'Membre indisponible',
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/contributions',
+        name: 'mobile-contributions',
+        builder: (context, state) => ContributionListScreen(
+          controller: contributionController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/contributions/:id',
+        name: 'mobile-contribution-detail',
+        builder: (context, state) => ContributionDetailScreen(
+          key: ValueKey(state.pathParameters['id']),
+          contributionId: state.pathParameters['id']!,
+          loadContribution: loadMemberContribution,
           isDemo: config.isDemo,
           onSignOut: onSignOut,
         ),

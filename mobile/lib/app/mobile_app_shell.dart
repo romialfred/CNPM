@@ -9,6 +9,7 @@ class MobileAppShell extends StatelessWidget {
     required this.body,
     required this.onSignOut,
     this.selectedIndex = 0,
+    this.leading,
     super.key,
   });
 
@@ -16,11 +17,13 @@ class MobileAppShell extends StatelessWidget {
   final Widget body;
   final VoidCallback onSignOut;
   final int selectedIndex;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: leading,
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         actions: [
           IconButton(
@@ -69,28 +72,37 @@ class MobileAppShell extends StatelessWidget {
                   );
             }
           },
-          destinations: const [
-            NavigationDestination(
+          destinations: [
+            const NavigationDestination(
               icon: Icon(Icons.home_outlined),
               selectedIcon: Icon(Icons.home),
               label: 'Accueil',
             ),
             NavigationDestination(
-              icon: Icon(Icons.account_balance_wallet_outlined),
-              selectedIcon: Icon(Icons.account_balance_wallet),
-              label: 'Paiements',
+              icon: Semantics(
+                label: 'Cotisations et paiements',
+                excludeSemantics: true,
+                child: const Icon(Icons.account_balance_wallet_outlined),
+              ),
+              selectedIcon: Semantics(
+                label: 'Cotisations et paiements',
+                excludeSemantics: true,
+                child: const Icon(Icons.account_balance_wallet),
+              ),
+              label: 'Finances',
+              tooltip: 'Cotisations et paiements',
             ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.receipt_long_outlined),
               selectedIcon: Icon(Icons.receipt_long),
               label: 'Reçus',
             ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.forum_outlined),
               selectedIcon: Icon(Icons.forum),
               label: 'Requêtes',
             ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.person_outline),
               selectedIcon: Icon(Icons.person),
               label: 'Profil',

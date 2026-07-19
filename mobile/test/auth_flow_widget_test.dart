@@ -91,7 +91,7 @@ void main() {
       expect(find.text('Entreprise Démo Sahel'), findsOneWidget);
       for (final label in [
         'Accueil',
-        'Paiements',
+        'Finances',
         'Reçus',
         'Requêtes',
         'Profil',

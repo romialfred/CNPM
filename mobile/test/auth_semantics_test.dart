@@ -77,7 +77,7 @@ void main() {
       greaterThanOrEqualTo(44),
     );
 
-    await tester.tap(find.text('Paiements'));
+    await tester.tap(find.text('Finances'));
     await tester.pumpAndSettle();
     expect(
       find.bySemanticsLabel(RegExp('DEMO-PAY-0002.*montant déclaré')),

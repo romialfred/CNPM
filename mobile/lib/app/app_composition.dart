@@ -6,6 +6,12 @@ import 'package:cnpm_mobile/features/auth/domain/auth_gateway.dart';
 import 'package:cnpm_mobile/features/auth/infrastructure/demo_auth_gateway.dart';
 import 'package:cnpm_mobile/features/auth/infrastructure/unavailable_auth_gateway.dart';
 import 'package:cnpm_mobile/features/auth/presentation/auth_flow_controller.dart';
+import 'package:cnpm_mobile/features/contributions/application/load_member_contribution.dart';
+import 'package:cnpm_mobile/features/contributions/application/load_member_contributions.dart';
+import 'package:cnpm_mobile/features/contributions/domain/member_contribution.dart';
+import 'package:cnpm_mobile/features/contributions/domain/member_contribution_gateway.dart';
+import 'package:cnpm_mobile/features/contributions/infrastructure/demo_member_contribution_gateway.dart';
+import 'package:cnpm_mobile/features/contributions/infrastructure/unavailable_member_contribution_gateway.dart';
 import 'package:cnpm_mobile/features/home/application/load_member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/domain/member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/domain/member_dashboard_gateway.dart';
@@ -25,6 +31,8 @@ import 'package:cnpm_mobile/features/requests/infrastructure/unavailable_member_
 final class AppComposition {
   AppComposition._({
     required this.authController,
+    required this.contributionController,
+    required this.loadMemberContribution,
     required this.dashboardController,
     required this.paymentController,
     required this.requestController,
@@ -37,6 +45,9 @@ final class AppComposition {
     final MemberDashboardGateway dashboardGateway = config.isDemo
         ? const DemoMemberDashboardGateway()
         : const UnavailableMemberDashboardGateway();
+    final MemberContributionGateway contributionGateway = config.isDemo
+        ? const DemoMemberContributionGateway()
+        : const UnavailableMemberContributionGateway();
     final MemberPaymentGateway paymentGateway = config.isDemo
         ? const DemoMemberPaymentGateway()
         : const UnavailableMemberPaymentGateway();
@@ -49,6 +60,11 @@ final class AppComposition {
         startDemoSignIn: StartDemoSignIn(authGateway),
         verifySecondFactor: VerifySecondFactor(authGateway),
       ),
+      contributionController: ContentController<List<MemberContribution>>(
+        load: LoadMemberContributions(contributionGateway).call,
+        isEmpty: (contributions) => contributions.isEmpty,
+      ),
+      loadMemberContribution: LoadMemberContribution(contributionGateway),
       dashboardController: ContentController<MemberDashboard>(
         load: LoadMemberDashboard(dashboardGateway).call,
         isEmpty: (dashboard) => false,
@@ -65,12 +81,15 @@ final class AppComposition {
   }
 
   final AuthFlowController authController;
+  final ContentController<List<MemberContribution>> contributionController;
+  final LoadMemberContribution loadMemberContribution;
   final ContentController<MemberDashboard> dashboardController;
   final ContentController<List<MemberPayment>> paymentController;
   final ContentController<List<MemberRequest>> requestController;
 
   void signOut() {
     dashboardController.reset();
+    contributionController.reset();
     paymentController.reset();
     requestController.reset();
     authController.reset();
@@ -78,6 +97,7 @@ final class AppComposition {
 
   void dispose() {
     authController.dispose();
+    contributionController.dispose();
     dashboardController.dispose();
     paymentController.dispose();
     requestController.dispose();
