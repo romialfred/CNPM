@@ -37,4 +37,12 @@ describe('memberRoutes', () => {
     expect(route?.children?.[1]?.loadComponent).toBeTypeOf('function');
     expect(route?.children?.[2]?.loadComponent).toBeTypeOf('function');
   });
+
+  it('expose MP-012 en lecture seule sans garde membre fictive', () => {
+    const route = memberRoutes.find((candidate) => candidate.path === 'documents');
+    expect(route?.providers).toHaveLength(2);
+    expect(route?.loadComponent).toBeTypeOf('function');
+    expect(route?.canActivate).toBeUndefined();
+    expect(route?.children).toBeUndefined();
+  });
 });

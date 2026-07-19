@@ -56,10 +56,21 @@ export class MemberPortalShellComponent {
       route: '/member/requests',
       icon: 'requests',
     },
-    { label: 'Documents', mobileLabel: 'Documents', route: null, icon: 'receipts' },
+    {
+      label: 'Documents',
+      mobileLabel: 'Documents',
+      route: '/member/documents',
+      icon: 'receipts',
+    },
     { label: 'Avantages', mobileLabel: 'Avantages', route: null, icon: 'profile' },
   ];
 
-  /** La navigation mobile reste bornée à cinq destinations, comme l'exige le handoff. */
-  protected readonly mobileDestinations = this.destinations.slice(0, 5);
+  /**
+   * La navigation mobile reste bornée à cinq destinations, comme l'exige le handoff.
+   * Une destination encore indisponible ne doit toutefois jamais prendre la place
+   * d'un écran réellement livré : les liens actifs sont donc prioritaires.
+   */
+  protected readonly mobileDestinations = this.destinations
+    .filter((destination) => destination.route !== null)
+    .slice(0, 5);
 }

@@ -1,5 +1,6 @@
 import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type { MemberContributionsGateway } from './contributions/member-contributions-gateway';
+import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
 import type { MemberHomeGateway } from './home/member-home-gateway';
 import type { MemberReceiptsGateway } from './receipts/member-receipts-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
@@ -30,4 +31,9 @@ export const UNAVAILABLE_MEMBER_REQUESTS_GATEWAY: MemberRequestsGateway = {
   create: () => unavailableFeature$('MP-010'),
   loadDetail: () => unavailableFeature$('MP-011'),
   addMessage: () => unavailableFeature$('MP-011'),
+};
+
+/** `/portal/documents` ne décrit encore aucune projection documentaire membre typée. */
+export const UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY: MemberDocumentsGateway = {
+  list: () => unavailableFeature$('MP-012'),
 };

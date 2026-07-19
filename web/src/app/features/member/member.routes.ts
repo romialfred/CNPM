@@ -3,6 +3,8 @@ import type { Routes } from '@angular/router';
 import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoMemberContributionsGateway } from './contributions/demo-member-contributions.gateway';
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
+import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.gateway';
+import { MEMBER_DOCUMENTS_GATEWAY } from './documents/member-documents-gateway';
 import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
 import { DemoMemberReceiptsGateway } from './receipts/demo-member-receipts.gateway';
@@ -12,6 +14,7 @@ import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
 import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
 import {
   UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
+  UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
   UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
@@ -139,6 +142,22 @@ export const memberRoutes: Routes = [
         title: 'Détail de la requête — CNPM',
       },
     ],
+  },
+  {
+    path: 'documents',
+    providers: [
+      DemoMemberDocumentsGateway,
+      {
+        provide: MEMBER_DOCUMENTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberDocumentsGateway)
+            : UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
+      },
+    ],
+    loadComponent: () =>
+      import('./documents/member-documents.page').then((module) => module.MemberDocumentsPage),
+    title: 'Mes documents — CNPM',
   },
   // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
 ];

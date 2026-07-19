@@ -18,6 +18,7 @@ describe('MemberPortalShellComponent', () => {
           { path: 'member/contributions', children: [] },
           { path: 'member/receipts', children: [] },
           { path: 'member/requests', children: [] },
+          { path: 'member/documents', children: [] },
         ]),
       ],
     }).compileComponents();
@@ -37,8 +38,8 @@ describe('MemberPortalShellComponent', () => {
   });
 
   it('ne transforme pas les destinations absentes en liens morts', () => {
-    expect(host.querySelectorAll('nav a')).toHaveLength(8);
-    expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(4);
+    expect(host.querySelectorAll('nav a')).toHaveLength(10);
+    expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(2);
     expect(host.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
   });
 
@@ -57,5 +58,16 @@ describe('MemberPortalShellComponent', () => {
     expect(current).toHaveLength(2);
     expect(current.every((link) => link.textContent?.trim() === 'Cotisations')).toBe(true);
     expect(host.querySelectorAll('.member-shell__link--active')).toHaveLength(2);
+  });
+
+  it('active Documents sur desktop et mobile sans ajouter une sixième destination', async () => {
+    await TestBed.inject(Router).navigateByUrl('/member/documents');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const current = Array.from(host.querySelectorAll<HTMLAnchorElement>('[aria-current="page"]'));
+    expect(current).toHaveLength(2);
+    expect(current.every((link) => link.textContent?.trim() === 'Documents')).toBe(true);
+    expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
   });
 });

@@ -80,13 +80,16 @@ describe('MemberHomePage', () => {
 
     const links = Array.from(host.querySelectorAll<HTMLAnchorElement>('a'));
     expect(links.length).toBeGreaterThan(0);
-    expect(
-      links.every(
-        (link) =>
-          link.getAttribute('href') === '/member/home' ||
-          link.getAttribute('href') === '#contenu-principal',
-      ),
-    ).toBe(true);
+    expect(new Set(links.map((link) => link.getAttribute('href')))).toEqual(
+      new Set([
+        '#contenu-principal',
+        '/member/home',
+        '/member/contributions',
+        '/member/receipts',
+        '/member/requests',
+        '/member/documents',
+      ]),
+    );
   });
 
   it('rend les indisponibilités explicites au lieu de simuler une opération', async () => {
