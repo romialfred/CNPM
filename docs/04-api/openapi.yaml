@@ -2654,6 +2654,40 @@ paths:
       - GRP-004
       - GRP-005
       - GRP-006
+  /professional-groups/{id}:
+    get:
+      tags:
+      - GROUP
+      summary: Consulter un groupement professionnel.
+      description: >-
+        Retourne uniquement l'identité descriptive du groupement déjà disponible dans
+        le référentiel : code, nom, secteur éventuel, statut et version. La composition,
+        les mandats, les objectifs et le tableau sectoriel relèvent d'autres incréments.
+      operationId: getProfessionalGroup
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Fiche descriptive du groupement professionnel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfessionalGroupView'
+      x-requirements:
+      - GRP-001
   /professional-groups/{id}/dashboard:
     get:
       tags:

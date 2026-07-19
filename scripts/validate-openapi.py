@@ -8,7 +8,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SPECS = [
-    ("OpenAPI canonique", ROOT / "docs/04-api/openapi.yaml", 78),
+    ("OpenAPI canonique", ROOT / "docs/04-api/openapi.yaml", 79),
     ("Addendum vitrine R4", ROOT / "docs/12-member-showcase/api-addendum.yaml", 11),
 ]
 HTTP_METHODS = {"get", "post", "put", "patch", "delete", "options", "head"}

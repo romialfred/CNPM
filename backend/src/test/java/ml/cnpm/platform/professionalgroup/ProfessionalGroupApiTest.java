@@ -1,17 +1,22 @@
 package ml.cnpm.platform.professionalgroup;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -47,6 +52,7 @@ class ProfessionalGroupApiTest {
 
     @Autowired private WebApplicationContext context;
     @Autowired private ml.cnpm.platform.shared.api.CorrelationIdFilter correlationIdFilter;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     private MockMvc mockMvc;
 
@@ -98,14 +104,74 @@ class ProfessionalGroupApiTest {
     }
 
     @Test
+    void getsASeededGroupByItsTechnicalIdentifier() throws Exception {
+        UUID id =
+                jdbcTemplate.queryForObject(
+                        "SELECT id FROM member.professional_group WHERE code = 'ACRCM'",
+                        UUID.class);
+
+        mockMvc.perform(
+                        get("/professional-groups/{id}", id)
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("PERM_GROUP.READ"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.code").value("ACRCM"))
+                .andExpect(jsonPath("$.name").isNotEmpty())
+                .andExpect(jsonPath("$.sectorCode").value(nullValue()))
+                .andExpect(jsonPath("$.status").value("ACTIVE"))
+                .andExpect(jsonPath("$.version").value(0));
+    }
+
+    @Test
+    void returnsNormalizedErrorsForMalformedAndUnknownIdentifiers() throws Exception {
+        mockMvc.perform(
+                        get("/professional-groups/{id}", "not-a-uuid")
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("PERM_GROUP.READ"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+
+        mockMvc.perform(
+                        get(
+                                        "/professional-groups/{id}",
+                                        "00000000-0000-4000-8000-000000000000")
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("PERM_GROUP.READ"))))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
+    }
+
+    @Test
     void protectsTheDirectoryWithTheDedicatedPermission() throws Exception {
         mockMvc.perform(get("/professional-groups")).andExpect(status().isUnauthorized());
+
+        mockMvc.perform(
+                        get(
+                                "/professional-groups/{id}",
+                                "00000000-0000-4000-8000-000000000000"))
+                .andExpect(status().isUnauthorized());
 
         mockMvc.perform(
                         get("/professional-groups")
                                 .with(
                                         jwt().authorities(
                                                         new SimpleGrantedAuthority("PERM_MEMBER.READ"))))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+
+        mockMvc.perform(
+                        get(
+                                        "/professional-groups/{id}",
+                                        "00000000-0000-4000-8000-000000000000")
+                                .with(
+                                        jwt().authorities(
+                                                new SimpleGrantedAuthority("PERM_MEMBER.READ"))))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("FORBIDDEN"));
     }
