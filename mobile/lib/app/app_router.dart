@@ -18,6 +18,8 @@ import 'package:cnpm_mobile/features/notifications/domain/member_notification.da
 import 'package:cnpm_mobile/features/notifications/presentation/member_notification_list_screen.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/presentation/payment_history_screen.dart';
+import 'package:cnpm_mobile/features/profile/domain/member_profile.dart';
+import 'package:cnpm_mobile/features/profile/presentation/member_profile_screen.dart';
 import 'package:cnpm_mobile/features/requests/application/add_shared_request_message.dart';
 import 'package:cnpm_mobile/features/requests/application/create_member_request.dart';
 import 'package:cnpm_mobile/features/requests/application/load_member_request.dart';
@@ -29,6 +31,8 @@ import 'package:cnpm_mobile/features/receipts/application/load_member_receipt.da
 import 'package:cnpm_mobile/features/receipts/domain/member_receipt.dart';
 import 'package:cnpm_mobile/features/receipts/presentation/receipt_detail_screen.dart';
 import 'package:cnpm_mobile/features/receipts/presentation/receipt_list_screen.dart';
+import 'package:cnpm_mobile/features/security/domain/member_security.dart';
+import 'package:cnpm_mobile/features/security/presentation/member_security_screen.dart';
 
 GoRouter buildAppRouter({
   required AppConfig config,
@@ -40,9 +44,11 @@ GoRouter buildAppRouter({
   required ContentController<MemberNotificationCollection>
   notificationController,
   required ContentController<List<MemberPayment>> paymentController,
+  required ContentController<MemberProfileResult> profileController,
   required ContentController<MemberReceiptCollection> receiptController,
   required LoadMemberReceipt loadMemberReceipt,
   required ContentController<List<MemberRequest>> requestController,
+  required ContentController<MemberSecurityResult> securityController,
   required LoadMemberRequest loadMemberRequest,
   required CreateMemberRequest createMemberRequest,
   required AddSharedRequestMessage addSharedRequestMessage,
@@ -55,7 +61,9 @@ GoRouter buildAppRouter({
     '/contributions',
     '/documents',
     '/notifications',
+    '/profile',
     '/receipts',
+    '/security',
   };
 
   return GoRouter(
@@ -133,6 +141,24 @@ GoRouter buildAppRouter({
         name: 'mobile-notifications',
         builder: (context, state) => MemberNotificationListScreen(
           controller: notificationController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/profile',
+        name: 'mobile-profile',
+        builder: (context, state) => MemberProfileScreen(
+          controller: profileController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/security',
+        name: 'mobile-security',
+        builder: (context, state) => MemberSecurityScreen(
+          controller: securityController,
           isDemo: config.isDemo,
           onSignOut: onSignOut,
         ),

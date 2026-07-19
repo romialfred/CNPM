@@ -55,7 +55,7 @@ void main() {
     expect(find.textContaining('SLA cible'), findsNothing);
   });
 
-  testWidgets('Profil reste explicitement indisponible', (tester) async {
+  testWidgets('Profil ouvre la projection membre fictive', (tester) async {
     await pumpCnpmApp(tester);
     await completeDemoSignIn(tester);
 
@@ -63,12 +63,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('more-profile-action')));
     await tester.pumpAndSettle();
-    expect(
-      find.text(
-        'Cette destination n’est pas encore disponible dans la démonstration.',
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('Mon profil membre'), findsOneWidget);
+    expect(find.text('Membre de démonstration'), findsOneWidget);
   });
 
   for (final size in const [Size(360, 800), Size(390, 844), Size(430, 932)]) {

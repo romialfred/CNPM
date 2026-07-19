@@ -171,5 +171,35 @@ void main() {
         matchesGoldenFile('goldens/mob_015_notifications_${viewport.key}.png'),
       );
     });
+
+    testWidgets('MOB-016 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/profile');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile('goldens/mob_016_profile_${viewport.key}.png'),
+      );
+    });
+
+    testWidgets('MOB-017 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/security');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile('goldens/mob_017_security_${viewport.key}.png'),
+      );
+    });
   }
 }
