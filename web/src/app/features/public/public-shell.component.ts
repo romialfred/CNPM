@@ -105,6 +105,22 @@ export interface PublicFooterContact {
             </a>
             <a
               class="cnpm-public__nav-link"
+              routerLink="/le-cnpm"
+              routerLinkActive="cnpm-public__nav-link--active"
+              ariaCurrentWhenActive="page"
+            >
+              Le CNPM
+            </a>
+            <a
+              class="cnpm-public__nav-link"
+              routerLink="/services"
+              routerLinkActive="cnpm-public__nav-link--active"
+              ariaCurrentWhenActive="page"
+            >
+              Services
+            </a>
+            <a
+              class="cnpm-public__nav-link"
               routerLink="/membres"
               routerLinkActive="cnpm-public__nav-link--active"
               [routerLinkActiveOptions]="{ exact: true }"
@@ -185,6 +201,14 @@ export interface PublicFooterContact {
               >
                 <a class="cnpm-public__drawer-link" routerLink="/" (click)="closeMenu()">
                   <span>Accueil</span>
+                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+                <a class="cnpm-public__drawer-link" routerLink="/le-cnpm" (click)="closeMenu()">
+                  <span>Le CNPM</span>
+                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+                <a class="cnpm-public__drawer-link" routerLink="/services" (click)="closeMenu()">
+                  <span>Services</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
                 </a>
                 <a class="cnpm-public__drawer-link" routerLink="/membres" (click)="closeMenu()">
@@ -316,6 +340,8 @@ export interface PublicFooterContact {
             <h2 class="cnpm-public__footer-title">Parcourir</h2>
             <ul>
               <li><a routerLink="/">Accueil</a></li>
+              <li><a routerLink="/le-cnpm">Le CNPM</a></li>
+              <li><a routerLink="/services">Services</a></li>
               <li><a routerLink="/membres">Annuaire des membres</a></li>
               <li><a routerLink="/actualites">Actualités</a></li>
               <li><a routerLink="/agenda">Agenda</a></li>

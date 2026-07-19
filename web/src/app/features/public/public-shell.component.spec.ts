@@ -13,6 +13,8 @@ async function setup() {
         { path: '', children: [] },
         { path: 'auth/login', children: [] },
         { path: 'membres', children: [] },
+        { path: 'le-cnpm', children: [] },
+        { path: 'services', children: [] },
         { path: 'actualites', children: [] },
         { path: 'agenda', children: [] },
       ]),
@@ -60,6 +62,8 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(hrefs).toContain('/');
     expect(hrefs).toContain('/auth/login');
     expect(hrefs).toContain('/membres');
+    expect(hrefs).toContain('/le-cnpm');
+    expect(hrefs).toContain('/services');
     expect(hrefs).toContain('/actualites');
     expect(hrefs).toContain('/agenda');
     expect(hrefs).toContain('#services');

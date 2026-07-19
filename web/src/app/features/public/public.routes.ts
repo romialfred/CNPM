@@ -21,6 +21,20 @@ import {
  */
 export const publicRoutes: Routes = [
   {
+    path: 'le-cnpm',
+    data: { mode: 'about' },
+    loadComponent: () =>
+      import('./institutional/institutional.page').then((m) => m.InstitutionalPage),
+    title: 'Le CNPM — Présentation',
+  },
+  {
+    path: 'services',
+    data: { mode: 'services' },
+    loadComponent: () =>
+      import('./institutional/institutional.page').then((m) => m.InstitutionalPage),
+    title: 'Services numériques — CNPM',
+  },
+  {
     path: 'actualites',
     providers: [
       DemoEditorialGateway,

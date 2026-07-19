@@ -1,0 +1,79 @@
+@media (max-width: 960px) {
+  .institutional-hero__inner {
+    grid-template-columns: 1fr minmax(220px, 0.45fr);
+    gap: 36px;
+  }
+
+  .role-grid,
+  .service-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .institutional-hero__inner,
+  .institutional-page {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .institutional-hero__inner,
+  .institutional-story,
+  .institutional-band {
+    grid-template-columns: 1fr;
+  }
+
+  .institutional-hero__inner {
+    gap: 30px;
+    padding-block: 42px;
+  }
+
+  .institutional-hero h1 {
+    font-size: clamp(2rem, 11vw, 2.75rem);
+  }
+
+  .institutional-mark {
+    min-height: 190px;
+  }
+
+  .institutional-page {
+    padding-block: 22px 52px;
+  }
+
+  .institutional-notice {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 44px;
+  }
+
+  .role-grid,
+  .service-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-card,
+  .service-card {
+    min-height: 0;
+  }
+
+  .institutional-story,
+  .institutional-band {
+    gap: 24px;
+    margin-top: 42px;
+    padding: 22px 18px;
+  }
+
+  .institutional-story__visual {
+    min-height: 160px;
+  }
+}
+
+@media (forced-colors: active) {
+  .institutional-mark,
+  .institutional-notice,
+  .role-card,
+  .service-card,
+  .institutional-story,
+  .institutional-band {
+    border: 1px solid CanvasText;
+  }
+}

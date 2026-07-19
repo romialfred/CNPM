@@ -3,10 +3,16 @@ import { publicRoutes, showcaseRoutes } from './public.routes';
 
 describe('publicRoutes', () => {
   it('déclare PUB-009/PUB-010/PUB-011 avant la route d’accueil vide', () => {
-    expect(publicRoutes.map((route) => route.path)).toEqual(['actualites', 'agenda', '']);
-    expect(publicRoutes[0]?.children?.map((route) => route.path)).toEqual(['', ':slug']);
-    expect(publicRoutes[0]?.providers).toBeDefined();
-    expect(publicRoutes[1]?.providers).toBeDefined();
+    expect(publicRoutes.map((route) => route.path)).toEqual([
+      'le-cnpm',
+      'services',
+      'actualites',
+      'agenda',
+      '',
+    ]);
+    expect(publicRoutes[2]?.children?.map((route) => route.path)).toEqual(['', ':slug']);
+    expect(publicRoutes[2]?.providers).toBeDefined();
+    expect(publicRoutes[3]?.providers).toBeDefined();
   });
 });
 

@@ -1,0 +1,141 @@
+<cnpm-public-shell>
+  <section class="institutional-hero">
+    <div class="institutional-hero__inner">
+      <div>
+        <p class="institutional-eyebrow">
+          {{ mode() === 'services' ? 'Services aux membres' : 'Conseil National du Patronat du Mali' }}
+        </p>
+        @if (mode() === 'services') {
+          <h1 #pageTitle tabindex="-1">Des services numériques plus lisibles</h1>
+          <p>
+            Un point d’entrée cohérent pour consulter ses démarches, documents et informations
+            autorisées.
+          </p>
+        } @else {
+          <h1 #pageTitle tabindex="-1">Une plateforme au service des entreprises</h1>
+          <p>
+            Le CNPM réunit les entreprises et leurs groupements autour de la représentation, de
+            l’accompagnement et du développement économique du Mali.
+          </p>
+        }
+        <div class="institutional-hero__actions">
+          <cnpm-button variant="public-cta" size="lg" routerLink="/auth/login">
+            Accéder au portail membre
+          </cnpm-button>
+          <cnpm-button
+            variant="secondary"
+            [routerLink]="mode() === 'services' ? '/le-cnpm' : '/services'"
+          >
+            {{ mode() === 'services' ? 'Découvrir le CNPM' : 'Voir les services' }}
+          </cnpm-button>
+        </div>
+      </div>
+      <div class="institutional-mark" aria-hidden="true">
+        <span><svg lucideShieldCheck [size]="iconSize.empty"></svg></span>
+        <strong>{{ mode() === 'services' ? 'Services' : 'CNPM' }}</strong>
+        <small>Expérience digitale</small>
+      </div>
+    </div>
+  </section>
+
+  <div class="institutional-page">
+    <aside class="institutional-notice" role="note">
+      <strong>Présentation de la plateforme</strong>
+      <p>
+        Cette page décrit l’expérience numérique de démonstration. Elle ne remplace aucun texte
+        statutaire, règlement, barème ou procédure officielle du CNPM.
+      </p>
+    </aside>
+
+    @if (mode() === 'services') {
+      <section aria-labelledby="services-title">
+        <div class="institutional-heading">
+          <p class="institutional-eyebrow">Catalogue de démonstration</p>
+          <h2 id="services-title">Les principaux espaces de service</h2>
+          <p>
+            Chaque service sensible reste protégé par l’authentification et les permissions du
+            backend. La disponibilité réelle dépend des contrats et décisions validés.
+          </p>
+        </div>
+        <div class="service-grid">
+          @for (service of services; track service.title; let index = $index) {
+            <article class="service-card">
+              <span class="service-card__icon" aria-hidden="true">
+                @switch (index) {
+                  @case (0) { <svg lucideReceiptText [size]="iconSize.control"></svg> }
+                  @case (1) { <svg lucideFileCheck2 [size]="iconSize.control"></svg> }
+                  @case (2) { <svg lucideMessagesSquare [size]="iconSize.control"></svg> }
+                  @case (3) { <svg lucideBuilding2 [size]="iconSize.control"></svg> }
+                  @case (4) { <svg lucideUsers [size]="iconSize.control"></svg> }
+                  @default { <svg lucideChartNoAxesCombined [size]="iconSize.control"></svg> }
+                }
+              </span>
+              <span class="service-card__label">{{ service.label }}</span>
+              <h3>{{ service.title }}</h3>
+              <p>{{ service.text }}</p>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section class="institutional-band" aria-labelledby="public-services-title">
+        <div>
+          <p class="institutional-eyebrow">Accès public</p>
+          <h2 id="public-services-title">Découvrir le réseau avant de se connecter</h2>
+          <p>Consultez les vitrines fictives publiées dans l’annuaire de démonstration.</p>
+        </div>
+        <a routerLink="/membres">
+          Ouvrir l’annuaire
+          <svg lucideArrowRight [size]="iconSize.control" aria-hidden="true"></svg>
+        </a>
+      </section>
+    } @else {
+      <section aria-labelledby="role-title">
+        <div class="institutional-heading">
+          <p class="institutional-eyebrow">Un rôle structurant</p>
+          <h2 id="role-title">Représenter, accompagner et connecter</h2>
+          <p>
+            La plateforme traduit ces orientations en parcours sobres, traçables et accessibles,
+            sans modifier les responsabilités institutionnelles.
+          </p>
+        </div>
+        <div class="role-grid">
+          @for (role of roles; track role.title; let index = $index) {
+            <article class="role-card">
+              <span class="role-card__number">0{{ index + 1 }}</span>
+              <span class="role-card__icon" aria-hidden="true">
+                @switch (index) {
+                  @case (0) { <svg lucideLandmark [size]="iconSize.control"></svg> }
+                  @case (1) { <svg lucideHandshake [size]="iconSize.control"></svg> }
+                  @case (2) { <svg lucideNetwork [size]="iconSize.control"></svg> }
+                  @default { <svg lucideChartNoAxesCombined [size]="iconSize.control"></svg> }
+                }
+              </span>
+              <h3>{{ role.title }}</h3>
+              <p>{{ role.text }}</p>
+            </article>
+          }
+        </div>
+      </section>
+
+      <section class="institutional-story" aria-labelledby="digital-title">
+        <div class="institutional-story__visual" aria-hidden="true">
+          <svg lucideBriefcaseBusiness [size]="iconSize.empty"></svg>
+          <svg lucideNetwork [size]="iconSize.empty"></svg>
+        </div>
+        <div>
+          <p class="institutional-eyebrow">Transformation digitale</p>
+          <h2 id="digital-title">Une continuité entre information publique et espace sécurisé</h2>
+          <p>
+            Le site public donne les repères essentiels. Le portail membre réunit ensuite les
+            démarches et documents accessibles selon les habilitations de chaque utilisateur.
+          </p>
+          <a routerLink="/services">
+            Explorer les services
+            <svg lucideArrowRight [size]="iconSize.compact" aria-hidden="true"></svg>
+          </a>
+        </div>
+      </section>
+    }
+  </div>
+</cnpm-public-shell>

@@ -1,0 +1,274 @@
+:host {
+  display: block;
+  background: var(--cnpm-color-surface-page);
+  color: var(--cnpm-color-text-primary);
+}
+
+.institutional-hero {
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.institutional-hero__inner,
+.institutional-page {
+  width: min(100% - 40px, 1180px);
+  margin-inline: auto;
+}
+
+.institutional-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.55fr);
+  align-items: center;
+  gap: 72px;
+  min-height: 440px;
+  padding-block: 66px;
+}
+
+.institutional-eyebrow {
+  margin: 0;
+  color: var(--cnpm-color-text-brand);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.institutional-hero h1 {
+  max-width: 780px;
+  margin: 10px 0 18px;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.institutional-hero__inner > div > p:not(.institutional-eyebrow) {
+  max-width: 700px;
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+.institutional-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.institutional-mark {
+  display: grid;
+  min-height: 260px;
+  place-content: center;
+  justify-items: center;
+  border: 1px solid var(--cnpm-color-brand-blue-200);
+  border-top: 5px solid var(--cnpm-color-brand-blue-700);
+  border-radius: 12px;
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+  text-align: center;
+}
+
+.institutional-mark span {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--cnpm-color-surface-primary);
+}
+
+.institutional-mark strong {
+  font-size: 1.45rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.institutional-mark small {
+  margin-top: 4px;
+  color: var(--cnpm-color-text-secondary);
+}
+
+.institutional-page {
+  padding-block: 32px 80px;
+}
+
+.institutional-notice {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 64px;
+  padding: 15px 18px;
+  border: 1px solid var(--cnpm-color-semantic-info-100);
+  border-radius: 9px;
+  background: var(--cnpm-color-semantic-info-50);
+}
+
+.institutional-notice strong {
+  flex: 0 0 auto;
+}
+
+.institutional-notice p {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: 1.55;
+}
+
+.institutional-heading {
+  max-width: 760px;
+  margin-bottom: 32px;
+}
+
+.institutional-heading h2,
+.institutional-story h2,
+.institutional-band h2 {
+  margin: 7px 0 12px;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.institutional-heading > p:not(.institutional-eyebrow),
+.institutional-story p,
+.institutional-band p {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: 1.7;
+}
+
+.role-grid,
+.service-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.role-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.service-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.role-card,
+.service-card {
+  position: relative;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: 12px;
+  background: var(--cnpm-color-surface-primary);
+}
+
+.role-card {
+  min-height: 292px;
+  padding: 24px;
+}
+
+.role-card__number {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  color: var(--cnpm-color-brand-blue-500);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.role-card__icon,
+.service-card__icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+}
+
+.role-card h3,
+.service-card h3 {
+  margin: 22px 0 10px;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.role-card p,
+.service-card p {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: 1.6;
+}
+
+.service-card {
+  min-height: 286px;
+  padding: 24px;
+}
+
+.service-card__label {
+  display: inline-flex;
+  margin: 18px 0 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.service-card h3 {
+  margin-top: 13px;
+}
+
+.institutional-story,
+.institutional-band {
+  display: grid;
+  align-items: center;
+  gap: 50px;
+  margin-top: 64px;
+  border-radius: 12px;
+}
+
+.institutional-story {
+  grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
+  padding: 42px;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.institutional-story__visual {
+  display: flex;
+  min-height: 220px;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.institutional-story a,
+.institutional-band a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  color: var(--cnpm-color-text-link);
+  font-weight: 700;
+}
+
+.institutional-band {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 34px 38px;
+  background: var(--cnpm-color-surface-inverse);
+  color: var(--cnpm-color-text-inverse);
+}
+
+.institutional-band .institutional-eyebrow,
+.institutional-band p,
+.institutional-band a {
+  color: var(--cnpm-color-text-inverse);
+}
+
+:is(a, h1):focus-visible {
+  outline: 3px solid var(--cnpm-color-border-focus);
+  outline-offset: 3px;
+}
