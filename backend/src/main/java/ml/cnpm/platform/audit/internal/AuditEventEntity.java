@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -23,6 +24,9 @@ class AuditEventEntity {
     @Id
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
+
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
+    private Instant createdAt;
 
     @Column(name = "actor_user_id")
     private UUID actorUserId;
@@ -75,5 +79,45 @@ class AuditEventEntity {
         this.beforeHash = beforeHash;
         this.afterHash = afterHash;
         this.correlationId = correlationId;
+    }
+
+    UUID getId() {
+        return id;
+    }
+
+    Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    UUID getActorUserId() {
+        return actorUserId;
+    }
+
+    String getActorType() {
+        return actorType;
+    }
+
+    String getActionCode() {
+        return actionCode;
+    }
+
+    String getEntityType() {
+        return entityType;
+    }
+
+    UUID getEntityId() {
+        return entityId;
+    }
+
+    String getBeforeHash() {
+        return beforeHash;
+    }
+
+    String getAfterHash() {
+        return afterHash;
+    }
+
+    UUID getCorrelationId() {
+        return correlationId;
     }
 }
