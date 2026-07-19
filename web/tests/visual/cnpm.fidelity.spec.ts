@@ -6,6 +6,7 @@ interface FidelityScreen {
   readonly id: string;
   readonly route: string;
   readonly heading: string | RegExp;
+  readonly prepare?: (page: Page) => Promise<void>;
 }
 
 const screens: readonly FidelityScreen[] = [
@@ -19,12 +20,22 @@ const screens: readonly FidelityScreen[] = [
   { id: 'REF-BO-001', route: '/admin/dashboard', heading: 'Tableau de bord' },
   { id: 'REF-BO-002', route: '/admin/members', heading: 'Membres' },
   { id: 'REF-BO-003', route: '/admin/members/MEM-0001', heading: 'SOMACOP SA' },
-  { id: 'REF-BO-009', route: '/admin/enrollments/new', heading: 'Nouvel enrôlement' },
+  {
+    id: 'REF-BO-009',
+    route: '/admin/enrollments/new',
+    heading: 'Nouvel enrôlement',
+    // Le profil démo reprend légitimement la première étape incomplète. La référence
+    // BO-009 documente toutefois l’état Identification : on rejoint cet état par le
+    // stepper public de l’écran avant de mesurer sa fidélité.
+    prepare: async (page) => {
+      await page.getByRole('button', { name: /Identification/ }).click();
+    },
+  },
   { id: 'REF-BO-011', route: '/admin/contributions', heading: 'Cotisations' },
   {
     id: 'REF-BO-014',
     route: '/admin/payments/reconciliation',
-    heading: 'Rapprochement des paiements',
+    heading: 'Paiement, rapprochement et reçu',
   },
   {
     id: 'REF-MP-001',
@@ -71,6 +82,7 @@ test.describe('captures de fidélité — références 1672×941', () => {
 
       await page.goto(screen.route, { waitUntil: 'networkidle' });
       await expect(page.getByRole('heading', { level: 1, name: screen.heading })).toBeVisible();
+      await screen.prepare?.(page);
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.evaluate(() => document.fonts.ready);
       await page.waitForTimeout(900);

@@ -31,9 +31,7 @@ test.describe('BO-002 — table accessible', () => {
     await expect(headers).toHaveCount(11);
   });
 
-  test('le tri est annoncé par aria-sort et pas seulement par un pictogramme', async ({
-    page,
-  }) => {
+  test('le tri est annoncé par aria-sort et pas seulement par un pictogramme', async ({ page }) => {
     await open(page);
     const codeHeader = page.locator('th', { hasText: 'Code membre' });
     await expect(codeHeader).toHaveAttribute('aria-sort', 'none');
@@ -86,9 +84,7 @@ test.describe('BO-002 — statut', () => {
 });
 
 test.describe('BO-002 — cohérence des totaux', () => {
-  test('actifs et dormants composent la base ; les prospects en sont exclus', async ({
-    page,
-  }) => {
+  test('actifs et dormants composent la base ; les prospects en sont exclus', async ({ page }) => {
     // Critère d'acceptation explicite. La maquette échoue à ce test : elle annonce
     // 1 126 membres au total pour 3 842 actifs.
     await open(page);
@@ -116,7 +112,11 @@ test.describe('BO-002 — cohérence des totaux', () => {
 
   test('le total du tableau ne contredit pas le panneau', async ({ page }) => {
     await open(page);
-    const totalText = (await page.locator('.cnpm-members__total').textContent()) ?? '';
+    const total = page.locator('.cnpm-members__total');
+    // Le cadre du tableau est monté pendant le chargement. Attendre explicitement
+    // la valeur évite de transformer une course réseau en faux défaut métier.
+    await expect(total).toContainText(/Total\s*:\s*\d+/);
+    const totalText = (await total.textContent()) ?? '';
     const tableTotal = Number(totalText.replace(/[^\d]/g, ''));
 
     const base = Number(

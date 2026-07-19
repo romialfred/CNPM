@@ -1,7 +1,17 @@
 @use '../../../styles/tokens' as tokens;
 
+:host {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
 .cnpm-table__scroll {
   overflow-x: auto;
+  /* Chrome inclut sinon le contenu interne de la table dans le `scrollWidth` de
+     l'élément racine, malgré le scroller local. La contention de mise en page borne
+     ce contenu à sa région sans le masquer et conserve le défilement au clavier. */
+  contain: layout inline-size;
   /* La bordure encadre la zone défilante, pas la table : sinon le cadre défilerait
      avec le contenu et le tableau paraîtrait déborder de sa carte. */
   border: 1px solid var(--cnpm-color-border-subtle);
