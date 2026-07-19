@@ -251,6 +251,36 @@
   gap: var(--cnpm-space-3);
 }
 
+.cnpm-contributions__detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-contributions__detail-link {
+  display: inline-flex;
+  min-height: var(--cnpm-size-control-md);
+  align-items: center;
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-strong);
+  border-radius: var(--cnpm-radius-md);
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: none;
+}
+
+.cnpm-contributions__detail-link:hover {
+  background: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-contributions__detail-link:focus-visible {
+  outline: 3px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
 .cnpm-contributions__detail h2,
 .cnpm-contributions__chart h2 {
   margin: 0;

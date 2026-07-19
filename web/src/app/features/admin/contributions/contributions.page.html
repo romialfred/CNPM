@@ -304,7 +304,15 @@
               <strong>{{ call.memberName }}</strong
               ><small>{{ call.reference }}</small>
             </div>
-            <cnpm-badge [tone]="statusTone(call.status)">{{ statusLabel(call.status) }}</cnpm-badge>
+            <div class="cnpm-contributions__detail-actions">
+              <cnpm-badge [tone]="statusTone(call.status)">{{ statusLabel(call.status) }}</cnpm-badge>
+              <a
+                class="cnpm-contributions__detail-link"
+                [routerLink]="['/admin/contributions', call.id]"
+              >
+                Ouvrir la fiche complète
+              </a>
+            </div>
             <p>
               <span>Reste à payer</span
               ><strong>{{ call.outstandingAmount | number: '1.0-0' }} FCFA</strong>
@@ -340,7 +348,15 @@
                 constitue aucun barème CNPM.
               </p>
             </div>
-            <cnpm-badge [tone]="statusTone(call.status)">{{ statusLabel(call.status) }}</cnpm-badge>
+            <div class="cnpm-contributions__detail-actions">
+              <cnpm-badge [tone]="statusTone(call.status)">{{ statusLabel(call.status) }}</cnpm-badge>
+              <a
+                class="cnpm-contributions__detail-link"
+                [routerLink]="['/admin/contributions', call.id]"
+              >
+                Ouvrir la fiche complète
+              </a>
+            </div>
           </header>
           <dl class="cnpm-contributions__summary">
             <div>

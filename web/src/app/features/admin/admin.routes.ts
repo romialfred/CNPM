@@ -319,6 +319,14 @@ export const adminRoutes: Routes = [
         title: 'Fiche membre — Administration CNPM',
       },
       {
+        path: 'contributions/:id',
+        loadComponent: () =>
+          import('./contributions/contribution-detail.page').then(
+            (m) => m.ContributionDetailPage,
+        ),
+        title: 'Détail d’une cotisation — Administration CNPM',
+      },
+      {
         path: 'contributions',
         loadComponent: () =>
           import('./contributions/contributions.page').then((m) => m.ContributionsPage),

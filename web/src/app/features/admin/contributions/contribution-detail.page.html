@@ -1,0 +1,139 @@
+<cnpm-admin-shell>
+  <main class="contribution-detail" id="contenu-principal">
+    <a class="contribution-detail__back" routerLink="/admin/contributions">
+      <span aria-hidden="true">←</span>
+      Retour aux cotisations
+    </a>
+
+    <cnpm-page-header
+      title="Détail d’une cotisation"
+      description="Lecture structurée de l’appel, de son échéance et de son solde."
+    />
+
+    @switch (state().kind) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="4" label="Chargement de la cotisation…" />
+      }
+      @case ('not-found') {
+        <cnpm-error-state
+          variant="not-found"
+          titleAs="h2"
+          title="Cotisation introuvable"
+          description="Cette référence fictive n’existe pas ou n’est plus disponible."
+        />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" titleAs="h2" />
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="Détail indisponible en mode connecté"
+          description="Le contrat HTTP du détail de cotisation n’est pas encore publié. Aucun jeu fictif n’est utilisé en remplacement."
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="La cotisation n’a pas pu être chargée"
+          description="Une erreur temporaire est survenue. La référence consultée est conservée."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (call(); as item) {
+          <cnpm-alert tone="warning" title="Données financières fictives" [live]="false">
+            Cette fiche sert uniquement la démonstration visuelle. Elle ne constitue ni un appel
+            officiel, ni une preuve de dette, ni un échéancier CNPM.
+          </cnpm-alert>
+
+          <section class="contribution-detail__hero" aria-labelledby="reference-appel">
+            <div>
+              <p class="contribution-detail__eyebrow">BO-013 · Consultation</p>
+              <h2 id="reference-appel">{{ item.reference }}</h2>
+              <p>{{ item.memberName }} · {{ item.memberCode }}</p>
+            </div>
+            <cnpm-badge [tone]="statusTone(item.status)">{{ statusLabel(item.status) }}</cnpm-badge>
+          </section>
+
+          <section class="contribution-detail__metrics" aria-label="Montants de la cotisation">
+            <article>
+              <span>Montant appelé</span>
+              <strong>{{ item.calledAmount | number: '1.0-0' }} FCFA</strong>
+            </article>
+            <article>
+              <span>Montant réglé</span>
+              <strong>{{ item.paidAmount | number: '1.0-0' }} FCFA</strong>
+            </article>
+            <article>
+              <span>Ajustement explicite</span>
+              <strong>{{ item.adjustmentAmount | number: '1.0-0' }} FCFA</strong>
+            </article>
+            <article class="contribution-detail__metric--accent">
+              <span>Reste à payer</span>
+              <strong>{{ item.outstandingAmount | number: '1.0-0' }} FCFA</strong>
+            </article>
+          </section>
+
+          <div class="contribution-detail__grid">
+            <section class="contribution-detail__card" aria-labelledby="situation-appel">
+              <div class="contribution-detail__card-head">
+                <div>
+                  <p class="contribution-detail__eyebrow">Situation</p>
+                  <h2 id="situation-appel">Progression du règlement</h2>
+                </div>
+                <strong>{{ settledShare() | number: '1.0-0' }} %</strong>
+              </div>
+              <div
+                class="contribution-detail__progress"
+                role="progressbar"
+                aria-label="Part réglée ou ajustée"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-valuenow]="settledShare() | number: '1.0-0'"
+              >
+                <span [style.width.%]="settledShare()"></span>
+              </div>
+              <p class="contribution-detail__equation">
+                <strong>{{ item.calledAmount | number: '1.0-0' }}</strong>
+                appelé =
+                <strong>{{ item.paidAmount | number: '1.0-0' }}</strong>
+                réglé +
+                <strong>{{ item.adjustmentAmount | number: '1.0-0' }}</strong>
+                ajusté +
+                <strong>{{ item.outstandingAmount | number: '1.0-0' }}</strong>
+                restant (FCFA)
+              </p>
+            </section>
+
+            <section class="contribution-detail__card" aria-labelledby="informations-appel">
+              <p class="contribution-detail__eyebrow">Référentiel de lecture</p>
+              <h2 id="informations-appel">Informations de l’appel</h2>
+              <dl class="contribution-detail__definitions">
+                <div><dt>Période</dt><dd>{{ periodLabel(item) }}</dd></div>
+                <div><dt>Échéance</dt><dd>{{ item.dueDate | date: 'dd/MM/yyyy' }}</dd></div>
+                <div>
+                  <dt>État de l’échéance</dt>
+                  <dd>{{ item.pastDue ? 'Échue dans le scénario' : 'À venir dans le scénario' }}</dd>
+                </div>
+                <div><dt>Devise</dt><dd>Franc CFA (XOF)</dd></div>
+              </dl>
+            </section>
+          </div>
+
+          <section class="contribution-detail__notice" aria-labelledby="actions-appel">
+            <h2 id="actions-appel">Actions financières non disponibles</h2>
+            <p>
+              L’émission, l’annulation, la relance, le paiement et la génération de document
+              suivent des workflows séparés avec permissions, idempotence et audit. Cette fiche
+              n’en simule aucun.
+            </p>
+          </section>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

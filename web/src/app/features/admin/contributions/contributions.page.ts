@@ -2,7 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   LucideChartColumnIncreasing,
   LucideDownload,
@@ -95,6 +95,7 @@ interface InstallmentView {
     DatePipe,
     DecimalPipe,
     FormsModule,
+    RouterLink,
     AdminShellComponent,
     BadgeComponent,
     ButtonComponent,
