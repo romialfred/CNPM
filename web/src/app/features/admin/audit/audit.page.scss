@@ -46,6 +46,18 @@
   align-items: center;
 }
 
+.cnpm-audit__record-head {
+  flex-wrap: wrap;
+}
+
+.cnpm-audit__record-head > div {
+  min-width: 0;
+}
+
+.cnpm-audit__record h3 {
+  overflow-wrap: anywhere;
+}
+
 .cnpm-audit__summary p {
   margin: 0;
   white-space: nowrap;
