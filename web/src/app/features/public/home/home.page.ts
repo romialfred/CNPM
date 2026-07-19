@@ -31,10 +31,6 @@ import {
   FeatureTileComponent,
 } from '../../../design-system/feature-tile/feature-tile.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
-import {
-  type CnpmSceneName,
-  SceneComponent,
-} from '../../../design-system/scene/scene.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { PublicShellComponent } from '../public-shell.component';
 import { HOME_GATEWAY, type PublicHighlights } from './home-gateway';
@@ -47,7 +43,6 @@ type PageState = 'loading' | 'ready' | 'empty' | 'error';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FeatureTileComponent,
-    SceneComponent,
     ButtonComponent,
     DecimalPipe,
     EmptyStateComponent,
@@ -89,12 +84,29 @@ export class HomePage {
       'Une union de groupements d’employeurs pour la défense et l’intérêt des entreprises du Mali.',
   };
 
-  protected readonly promises = [
-    { id: 'representer', label: 'Représenter les entreprises' },
-    { id: 'defendre', label: 'Défendre leurs intérêts' },
-    { id: 'faciliter', label: 'Faciliter les démarches' },
-    { id: 'connecter', label: 'Connecter pour développer' },
+  protected readonly promises: readonly { id: string; label: string; accent: CnpmTileAccent }[] = [
+    { id: 'representer', label: 'Représenter les entreprises', accent: 'indigo' },
+    { id: 'defendre', label: 'Défendre leurs intérêts', accent: 'teal' },
+    { id: 'faciliter', label: 'Faciliter les démarches', accent: 'sky' },
+    { id: 'connecter', label: 'Connecter pour développer', accent: 'amber' },
   ];
+
+  /**
+   * Accent d'un chiffre clé.
+   *
+   * Comme pour les axes d'action, la couleur distingue les tuiles sans rien signifier :
+   * un taux de recouvrement en ambre n'est pas une alerte.
+   */
+  protected metricAccent(id: string): CnpmTileAccent {
+    const parIndicateur: Readonly<Record<string, CnpmTileAccent>> = {
+      membres: 'indigo',
+      actifs: 'teal',
+      cotisations: 'blue',
+      recouvrement: 'sky',
+      recus: 'amber',
+    };
+    return parIndicateur[id] ?? 'indigo';
+  }
 
   /**
    * Les accents distinguent les axes d'action sans leur prêter de sens : ils viennent de
@@ -154,15 +166,28 @@ export class HomePage {
   ];
 
   /**
-   * Illustration d'une actualité, choisie selon son sujet.
+   * Photographie d'une actualité, choisie selon son sujet.
    *
-   * Le rattachement vit ici et non dans le port : la scène relève de la présentation,
-   * une autre page pourrait illustrer la même actualité autrement.
+   * Le rattachement vit ici et non dans le port : l'illustration relève de la
+   * présentation, une autre page pourrait illustrer la même actualité autrement.
+   * Le texte alternatif décrit la scène, il ne répète pas le titre déjà lu juste après.
    */
-  protected newsScene(id: string): CnpmSceneName {
-    return (
-      { 'prise-en-main': 'training', 'services-numeriques': 'digital', reseau: 'network' } as const
-    )[id as 'prise-en-main' | 'services-numeriques' | 'reseau'] ?? 'assembly';
+  protected newsPhoto(id: string): { src: string; alt: string } {
+    const parSujet: Readonly<Record<string, { src: string; alt: string }>> = {
+      'prise-en-main': {
+        src: '/assets/photos/atelier-portail.webp',
+        alt: 'Un intervenant commente un tableau de bord projeté devant des participants réunis en salle.',
+      },
+      'services-numeriques': {
+        src: '/assets/photos/services-numeriques.webp',
+        alt: 'Quatre collaborateurs consultent ensemble un portail numérique sur écran, tablette et ordinateur portable.',
+      },
+      reseau: {
+        src: '/assets/photos/reseau-entreprises.webp',
+        alt: 'Un intervenant désigne une carte régionale reliant le Mali à ses pays voisins.',
+      },
+    };
+    return parSujet[id] ?? parSujet['prise-en-main'];
   }
 
   constructor() {

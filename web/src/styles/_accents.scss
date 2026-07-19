@@ -1,0 +1,66 @@
+/* Accents décoratifs partagés.
+   ---------------------------------------------------------------------------
+   Ces classes ne posent qu'une variable : `--cnpm-tile-accent`. Chaque composant
+   décide ensuite ce qu'il en fait — couleur d'icône, teinte de fond, liseré.
+   Une seule couleur source par variante, donc tous les éléments d'une même tuile
+   restent accordés sans qu'aucune valeur ne soit répétée.
+
+   Les valeurs viennent de `chart.categorical` du handoff, seule palette normative
+   destinée à différencier SANS donner de sens : une tuile ambre ne signale pas une
+   alerte, une tuile verte ne signale pas une conformité. Le rouge de marque en est
+   volontairement exclu, il reste réservé aux actions critiques.
+
+   Chaque accent renvoie au token auquel la valeur du handoff correspond exactement ;
+   aucun hexadécimal n'est écrit ici. */
+
+.cnpm-tile-accent--indigo {
+  --cnpm-tile-accent: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-tile-accent--blue {
+  --cnpm-tile-accent: var(--cnpm-color-brand-blue-500);
+}
+
+.cnpm-tile-accent--sky {
+  --cnpm-tile-accent: var(--cnpm-color-semantic-info-500);
+}
+
+.cnpm-tile-accent--teal {
+  --cnpm-tile-accent: var(--cnpm-color-semantic-success-500);
+}
+
+.cnpm-tile-accent--amber {
+  --cnpm-tile-accent: var(--cnpm-color-semantic-warning-600);
+}
+
+/* Élévation au survol.
+   Portée par une classe partagée pour que toutes les tuiles du site bougent de la
+   même façon. `will-change` est volontairement absent : sur une grille de cartes il
+   promeut autant de calques qu'il y a d'éléments, pour un gain nul ici.
+   Le mouvement est désactivé lorsque l'utilisateur a demandé à le réduire. */
+.cnpm-liftable {
+  transition:
+    transform var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard),
+    box-shadow var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard),
+    border-color var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+}
+
+.cnpm-liftable:hover {
+  border-color: color-mix(in srgb, var(--cnpm-tile-accent, currentcolor) 35%, transparent);
+  box-shadow: var(--cnpm-shadow-md);
+  transform: translateY(-4px) scale(1.02);
+}
+
+.cnpm-liftable:focus-within {
+  box-shadow: var(--cnpm-shadow-md);
+  transform: translateY(-4px) scale(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-liftable,
+  .cnpm-liftable:hover,
+  .cnpm-liftable:focus-within {
+    transition: none;
+    transform: none;
+  }
+}

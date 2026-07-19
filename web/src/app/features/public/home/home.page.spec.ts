@@ -97,6 +97,56 @@ describe('HomePage (PUB-001)', () => {
     expect(news.querySelectorAll('a')).toHaveLength(0);
   });
 
+  it('illustre chaque actualité d’une photographie décrite et allégée', async () => {
+    const { fixture, gateway, host } = await setup();
+    gateway.latest.next(READY);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const photos = Array.from(host.querySelectorAll<HTMLImageElement>('.cnpm-home__news-visual'));
+    expect(photos.length).toBeGreaterThan(0);
+
+    for (const photo of photos) {
+      expect(photo.getAttribute('src')).toMatch(/^\/assets\/photos\/[a-z-]+\.webp$/);
+      // Un alternatif vide rendrait la photographie muette ; un alternatif qui répète
+      // le titre le ferait lire deux fois. Il doit décrire la scène.
+      expect((photo.getAttribute('alt') ?? '').length).toBeGreaterThan(30);
+      // Les dimensions intrinsèques réservent le cadre avant chargement : sans elles,
+      // la page saute au moment où l'image arrive.
+      expect(photo.getAttribute('width')).toBe('1100');
+      expect(photo.getAttribute('height')).toBe('619');
+      expect(photo.getAttribute('loading')).toBe('lazy');
+    }
+
+    expect(new Set(photos.map((photo) => photo.getAttribute('src'))).size).toBe(photos.length);
+  });
+
+  it('accentue les rôles et les chiffres clés et les rend survolables', async () => {
+    const { fixture, gateway, host } = await setup();
+    gateway.latest.next(READY);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const accentue = (selecteur: string) =>
+      Array.from(host.querySelectorAll(selecteur)).map((element) =>
+        Array.from(element.classList).find((classe) => classe.startsWith('cnpm-tile-accent--')),
+      );
+
+    const roles = accentue('.cnpm-home__promise');
+    const chiffres = accentue('.cnpm-home__metric');
+
+    expect(roles).toHaveLength(4);
+    // Chaque tuile d'une même rangée doit porter un accent distinct, sinon la
+    // différenciation recherchée disparaît.
+    expect(new Set(roles).size).toBe(roles.length);
+    expect(roles.every(Boolean)).toBe(true);
+    expect(new Set(chiffres).size).toBe(chiffres.length);
+
+    expect(
+      host.querySelectorAll('.cnpm-home__promise.cnpm-liftable, .cnpm-home__metric.cnpm-liftable'),
+    ).toHaveLength(roles.length + chiffres.length);
+  });
+
   it('distingue la source vide d’une panne récupérable', async () => {
     const { fixture, gateway, host } = await setup();
     gateway.latest.next({ ...READY, metrics: [], news: [] });

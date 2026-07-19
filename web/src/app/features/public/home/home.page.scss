@@ -87,25 +87,30 @@
   grid-area: promises;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--cnpm-space-2);
+  gap: var(--cnpm-space-3);
   margin: 0;
-  padding: var(--cnpm-space-3) 0 0;
-  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+  padding: var(--cnpm-space-5) 0 0;
   list-style: none;
 }
 
-.cnpm-home__promises li {
+/* Les roles etaient une simple rangee de libelles derriere un filet. Ils deviennent
+   des tuiles a part entiere : fond teinte derive de l'accent, icone a la couleur de
+   ce meme accent, elevation au survol. */
+.cnpm-home__promise {
   display: flex;
   align-items: center;
-  gap: var(--cnpm-space-2);
+  gap: var(--cnpm-space-3);
   min-width: 0;
+  padding: var(--cnpm-space-3);
+  border: 1px solid color-mix(in srgb, var(--cnpm-tile-accent) 18%, transparent);
+  border-radius: var(--cnpm-radius-lg);
+  background: color-mix(in srgb, var(--cnpm-tile-accent) 6%, var(--cnpm-color-surface-primary));
   color: var(--cnpm-color-text-brand);
   font-size: var(--cnpm-font-size-xs);
   font-weight: var(--cnpm-font-weight-semibold);
   line-height: var(--cnpm-font-lineHeight-xs);
 }
 
-.cnpm-home__promise-icon,
 .cnpm-home__metric-icon,
 .cnpm-home__module > span {
   display: inline-flex;
@@ -118,8 +123,15 @@
 }
 
 .cnpm-home__promise-icon {
-  width: var(--cnpm-space-8);
-  height: var(--cnpm-space-8);
+  display: inline-flex;
+  width: var(--cnpm-space-10);
+  height: var(--cnpm-space-10);
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: var(--cnpm-radius-md);
+  background: color-mix(in srgb, var(--cnpm-tile-accent) 14%, transparent);
+  color: var(--cnpm-tile-accent);
 }
 
 .cnpm-home__preview {

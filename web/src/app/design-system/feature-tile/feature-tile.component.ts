@@ -21,7 +21,7 @@ export type CnpmTileAccent = 'indigo' | 'blue' | 'sky' | 'teal' | 'amber';
   selector: 'cnpm-feature-tile',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <article class="cnpm-tile" [class]="accentClass()">
+    <article class="cnpm-tile cnpm-liftable" [class]="accentClass()">
       <span class="cnpm-tile__icon" aria-hidden="true">
         <ng-content select="[tileIcon]" />
       </span>
