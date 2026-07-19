@@ -4,6 +4,52 @@ import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { AUTH_GATEWAY } from './auth-gateway';
 import { DemoAuthGateway } from './demo-auth.gateway';
 import { UnavailableAuthGateway } from './unavailable-auth.gateway';
+import type { BlockedAuthContent } from './blocked-auth.page';
+
+const BLOCKED_AUTH_SCREENS = {
+  method: {
+    screenId: 'AUTH-003',
+    eyebrow: 'Vérification renforcée',
+    title: 'Choix de la méthode 2FA',
+    description:
+      "Le choix d'une autre méthode sera disponible après validation des facteurs autorisés pour votre profil.",
+    decision: 'Méthodes alternatives et codes de secours à valider par la DSI et la Sécurité.',
+  },
+  forgot: {
+    screenId: 'AUTH-004',
+    eyebrow: 'Accès au compte',
+    title: 'Mot de passe oublié',
+    description:
+      "La récupération sera activée lorsque le CNPM aura choisi le parcours du fournisseur d'identité et son canal d'assistance.",
+    decision:
+      'Destination Keycloak ou parcours CNPM natif, ainsi que le canal de support, à arbitrer.',
+  },
+  reset: {
+    screenId: 'AUTH-005',
+    eyebrow: 'Accès au compte',
+    title: 'Réinitialiser le mot de passe',
+    description:
+      "Aucun jeton de réinitialisation n'est accepté par l'application tant que le flux d'identité n'est pas provisionné.",
+    decision:
+      "Cycle de vie, durée et validation des jetons à porter par le fournisseur d'identité.",
+  },
+  activate: {
+    screenId: 'AUTH-006',
+    eyebrow: 'Première connexion',
+    title: 'Activation du compte',
+    description:
+      "L'activation en libre-service reste fermée jusqu'au raccordement du fournisseur d'identité et des invitations CNPM.",
+    decision: "Canal d'invitation, preuve d'identité et durée du lien à valider.",
+  },
+  enrollment: {
+    screenId: 'AUTH-007',
+    eyebrow: 'Sécurité du compte',
+    title: 'Enrôlement 2FA',
+    description:
+      "L'enrôlement TOTP ou passkey sera ouvert après validation de la politique applicable à chaque rôle sensible.",
+    decision: 'Priorité WebAuthn/passkey, TOTP, secours et récupération à confirmer.',
+  },
+} as const satisfies Record<string, BlockedAuthContent>;
 
 /**
  * Routes AUTH-001, chargées à la demande.
@@ -36,6 +82,36 @@ export const authRoutes: Routes = [
         path: 'verify',
         loadComponent: () => import('./verify.page').then((m) => m.VerifyPage),
         title: 'Vérification — CNPM',
+      },
+      {
+        path: 'verify/method',
+        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        title: 'Méthode de vérification — CNPM',
+        data: { blockedAuth: BLOCKED_AUTH_SCREENS.method },
+      },
+      {
+        path: 'forgot-password',
+        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        title: 'Mot de passe oublié — CNPM',
+        data: { blockedAuth: BLOCKED_AUTH_SCREENS.forgot },
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        title: 'Réinitialiser le mot de passe — CNPM',
+        data: { blockedAuth: BLOCKED_AUTH_SCREENS.reset },
+      },
+      {
+        path: 'activate',
+        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        title: 'Activer le compte — CNPM',
+        data: { blockedAuth: BLOCKED_AUTH_SCREENS.activate },
+      },
+      {
+        path: '2fa-enrollment',
+        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        title: 'Enrôlement 2FA — CNPM',
+        data: { blockedAuth: BLOCKED_AUTH_SCREENS.enrollment },
       },
       {
         // AUTH-008 : atteint après expiration de session. Aucun garde de gateway —
