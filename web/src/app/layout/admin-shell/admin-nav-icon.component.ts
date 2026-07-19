@@ -9,7 +9,9 @@ import {
   LucideMegaphone,
   LucideMessagesSquare,
   LucideReceiptText,
+  LucideScrollText,
   LucideSettings,
+  LucideSlidersHorizontal,
   LucideUsers,
   LucideWalletCards,
 } from '@lucide/angular';
@@ -48,7 +50,9 @@ import type { AdminNavIconName } from './admin-nav';
     LucideMegaphone,
     LucideMessagesSquare,
     LucideReceiptText,
+    LucideScrollText,
     LucideSettings,
+    LucideSlidersHorizontal,
     LucideUsers,
     LucideWalletCards,
   ],
@@ -86,6 +90,12 @@ import type { AdminNavIconName } from './admin-nav';
       }
       @case ('reporting') {
         <svg lucideChartNoAxesCombined [size]="size"></svg>
+      }
+      @case ('audit') {
+        <svg lucideScrollText [size]="size"></svg>
+      }
+      @case ('settings') {
+        <svg lucideSlidersHorizontal [size]="size"></svg>
       }
       @case ('administration') {
         <svg lucideSettings [size]="size"></svg>

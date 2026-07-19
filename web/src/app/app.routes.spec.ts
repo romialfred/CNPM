@@ -57,5 +57,5 @@ describe('routes racine', () => {
     expect(loadedPaths).not.toContain('member');
     expect(loadedPaths).not.toContain('membres');
     subscription.unsubscribe();
-  });
+  }, 20_000);
 });

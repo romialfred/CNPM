@@ -27,6 +27,9 @@ export class DemoSessionGateway implements SessionGateway {
       'ENROLLMENT.REVIEW',
       'ENROLLMENT.APPROVE',
       'GROUP.READ',
+      'AUDIT.READ',
+      'ADMIN.REFERENTIAL.READ',
+      'ADMIN.REFERENTIAL.WRITE',
     ],
   });
 }

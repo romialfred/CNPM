@@ -1,0 +1,235 @@
+<cnpm-admin-shell>
+  <div class="cnpm-audit">
+    <cnpm-page-header
+      title="Journaux d’audit"
+      description="Consultez la piste immuable des événements, réservée aux profils Audit et Sécurité habilités AUDIT.READ."
+    />
+
+    <cnpm-alert tone="info" title="Périmètre contractuel en lecture seule" [live]="false">
+      Cette vue restitue uniquement les champs servis par <code>GET /audit-events</code>. Les
+      contenus avant/après ne sont jamais révélés&nbsp;: seules leurs empreintes sont affichées.
+      Aucun filtre de période, export, résultat, adresse IP, appareil, alerte ou paramètre de
+      conservation n’est disponible dans ce contrat de consultation.
+    </cnpm-alert>
+
+    <section class="cnpm-audit__panel" aria-labelledby="journal-audit-title">
+      <div class="cnpm-audit__toolbar">
+        <div>
+          <h2 id="journal-audit-title" #journalTitle class="cnpm-audit__title" tabindex="-1">
+            Événements enregistrés
+          </h2>
+          <p class="cnpm-audit__subtitle">Du plus récent au plus ancien</p>
+        </div>
+        <div class="cnpm-audit__summary">
+          <cnpm-badge tone="neutral">Lecture seule</cnpm-badge>
+          @if (data()) {
+            <p aria-live="polite">
+              {{ totalItems() | number }}
+              {{ totalItems() === 1 ? 'événement' : 'événements' }}
+            </p>
+          }
+        </div>
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <cnpm-skeleton
+            variant="table"
+            [rows]="pageSize()"
+            [columns]="columns.length"
+            label="Chargement des journaux d’audit…"
+          />
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            [title]="
+              totalItems() > 0 ? 'Aucun événement sur cette page' : 'Aucun événement d’audit'
+            "
+            [description]="
+              totalItems() > 0
+                ? 'Revenez à une page précédente pour poursuivre la consultation.'
+                : 'Le journal ne contient encore aucun événement.'
+            "
+          />
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Les journaux n’ont pas pu être chargés"
+            description="Le service d’audit est momentanément indisponible. La page demandée est conservée."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="retry()"> Réessayer </cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('authentication') {
+          <cnpm-error-state variant="session-ended">
+            <cnpm-button variant="primary" size="lg" routerLink="/auth/login">
+              Se reconnecter
+            </cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('forbidden') {
+          <cnpm-error-state
+            variant="forbidden"
+            description="La permission AUDIT.READ est requise pour consulter ces journaux."
+          />
+        }
+        @case ('ready') {
+          <div class="cnpm-audit__desktop-table">
+            <cnpm-data-table
+              caption="Journaux d’audit, du plus récent au plus ancien : horodatage, événement, acteur, action, objet, empreintes avant et après, puis identifiant de corrélation."
+              [columns]="columns"
+              [rows]="events()"
+              [rowKey]="rowKey"
+            >
+              <ng-template #row let-event>
+                <td class="cnpm-table__cell cnpm-audit__date">
+                  <time [attr.datetime]="event.createdAt">
+                    {{ formatTimestamp(event.createdAt) }}
+                  </time>
+                </td>
+                <td class="cnpm-table__cell">
+                  <code class="cnpm-audit__identifier">{{ event.id }}</code>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-audit__stack">
+                    <strong>{{ event.actorType }}</strong>
+                    @if (event.actorUserId) {
+                      <code class="cnpm-audit__identifier">{{ event.actorUserId }}</code>
+                    } @else {
+                      <span class="cnpm-audit__muted">Utilisateur non attribué</span>
+                    }
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <code class="cnpm-audit__code">{{ event.actionCode }}</code>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-audit__stack">
+                    <strong>{{ event.entityType }}</strong>
+                    @if (event.entityId) {
+                      <code class="cnpm-audit__identifier">{{ event.entityId }}</code>
+                    } @else {
+                      <span class="cnpm-audit__muted">Sans identifiant</span>
+                    }
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-audit__hashes">
+                    <span>
+                      <span class="cnpm-audit__hash-label">Avant</span>
+                      @if (event.beforeHash) {
+                        <code>{{ event.beforeHash }}</code>
+                      } @else {
+                        <span class="cnpm-audit__muted">Non fournie</span>
+                      }
+                    </span>
+                    <span>
+                      <span class="cnpm-audit__hash-label">Après</span>
+                      @if (event.afterHash) {
+                        <code>{{ event.afterHash }}</code>
+                      } @else {
+                        <span class="cnpm-audit__muted">Non fournie</span>
+                      }
+                    </span>
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <code class="cnpm-audit__identifier">{{ event.correlationId }}</code>
+                </td>
+              </ng-template>
+            </cnpm-data-table>
+          </div>
+
+          <!-- DAT-002 : sous 768 px, le tableau devient une liste de fiches. Les deux
+               représentations partagent le même jeu et CSS n'en expose qu'une à la fois. -->
+          <ol class="cnpm-audit__mobile-list" aria-label="Journaux d’audit">
+            @for (event of events(); track event.id) {
+              <li>
+                <article class="cnpm-audit__record" [attr.aria-labelledby]="'audit-' + event.id">
+                  <header class="cnpm-audit__record-head">
+                    <div>
+                      <h3 [id]="'audit-' + event.id">{{ event.actionCode }}</h3>
+                      <time [attr.datetime]="event.createdAt">
+                        {{ formatTimestamp(event.createdAt) }}
+                      </time>
+                    </div>
+                    <cnpm-badge tone="neutral">{{ event.actorType }}</cnpm-badge>
+                  </header>
+
+                  <dl class="cnpm-audit__details">
+                    <div>
+                      <dt>Événement</dt>
+                      <dd>
+                        <code>{{ event.id }}</code>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Utilisateur acteur</dt>
+                      <dd>
+                        @if (event.actorUserId) {
+                          <code>{{ event.actorUserId }}</code>
+                        } @else {
+                          <span>Non attribué</span>
+                        }
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Objet</dt>
+                      <dd>
+                        <strong>{{ event.entityType }}</strong>
+                        @if (event.entityId) {
+                          <code>{{ event.entityId }}</code>
+                        } @else {
+                          <span>Sans identifiant</span>
+                        }
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Empreinte avant</dt>
+                      <dd>
+                        @if (event.beforeHash) {
+                          <code>{{ event.beforeHash }}</code>
+                        } @else {
+                          <span>Non fournie</span>
+                        }
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Empreinte après</dt>
+                      <dd>
+                        @if (event.afterHash) {
+                          <code>{{ event.afterHash }}</code>
+                        } @else {
+                          <span>Non fournie</span>
+                        }
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Corrélation</dt>
+                      <dd>
+                        <code>{{ event.correlationId }}</code>
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
+              </li>
+            }
+          </ol>
+        }
+      }
+
+      @if (state() === 'ready' || (state() === 'empty' && totalItems() > 0)) {
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    </section>
+  </div>
+</cnpm-admin-shell>

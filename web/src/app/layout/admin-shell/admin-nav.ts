@@ -10,6 +10,8 @@ export type AdminNavIconName =
   | 'requests'
   | 'groups'
   | 'reporting'
+  | 'audit'
+  | 'settings'
   | 'administration';
 
 export interface AdminNavEntry {
@@ -51,6 +53,18 @@ export const ADMIN_NAV: readonly AdminNavEntry[] = [
     requiredPermission: 'GROUP.READ',
   },
   { label: 'Reporting', route: '/admin/reporting', icon: 'reporting' },
+  {
+    label: 'Audit',
+    route: '/admin/security/audit',
+    icon: 'audit',
+    requiredPermission: 'AUDIT.READ',
+  },
+  {
+    label: 'Paramétrage',
+    route: '/admin/settings',
+    icon: 'settings',
+    requiredPermission: 'ADMIN.REFERENTIAL.READ',
+  },
   { label: 'Administration', route: '/admin/security/users', icon: 'administration' },
 ];
 

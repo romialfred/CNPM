@@ -4,6 +4,10 @@ import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoSessionGateway } from '../../layout/admin-shell/demo-session.gateway';
 import { HttpSessionGateway } from '../../layout/admin-shell/http-session.gateway';
 import { SESSION_GATEWAY } from '../../layout/admin-shell/session-gateway';
+import { AUDIT_GATEWAY } from './audit/audit-gateway';
+import { auditReadGuard } from './audit/audit-read.guard';
+import { DemoAuditGateway } from './audit/demo-audit.gateway';
+import { HttpAuditGateway } from './audit/http-audit.gateway';
 import { CONTRIBUTIONS_GATEWAY } from './contributions/contributions-gateway';
 import { DemoContributionsGateway } from './contributions/demo-contributions.gateway';
 import { DASHBOARD_GATEWAY } from './dashboard/dashboard-gateway';
@@ -39,6 +43,11 @@ import { DemoReportingGateway } from './reporting/demo-reporting.gateway';
 import { REPORTING_GATEWAY } from './reporting/reporting-gateway';
 import { ADMIN_SECURITY_GATEWAY } from './security/admin-security-gateway';
 import { DemoAdminSecurityGateway } from './security/demo-admin-security.gateway';
+import { DemoSettingsGateway } from './settings/demo-settings.gateway';
+import { HttpSettingsGateway } from './settings/http-settings.gateway';
+import { pendingSettingsChangesGuard } from './settings/pending-settings-changes.guard';
+import { SETTINGS_GATEWAY } from './settings/settings-gateway';
+import { settingsReadGuard } from './settings/settings-read.guard';
 import { adminSessionGuard } from './admin-session.guard';
 import {
   UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
@@ -97,6 +106,22 @@ export const adminRoutes: Routes = [
         provide: GROUPS_GATEWAY,
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo' ? inject(DemoGroupsGateway) : inject(HttpGroupsGateway),
+      },
+      DemoAuditGateway,
+      HttpAuditGateway,
+      {
+        provide: AUDIT_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo' ? inject(DemoAuditGateway) : inject(HttpAuditGateway),
+      },
+      DemoSettingsGateway,
+      HttpSettingsGateway,
+      {
+        provide: SETTINGS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoSettingsGateway)
+            : inject(HttpSettingsGateway),
       },
       {
         provide: DASHBOARD_GATEWAY,
@@ -287,6 +312,19 @@ export const adminRoutes: Routes = [
         loadComponent: () =>
           import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
         title: 'Sécurité — Administration CNPM',
+      },
+      {
+        path: 'security/audit',
+        canActivate: [auditReadGuard],
+        loadComponent: () => import('./audit/audit.page').then((m) => m.AuditPage),
+        title: 'Journal d’audit — Administration CNPM',
+      },
+      {
+        path: 'settings',
+        canActivate: [settingsReadGuard],
+        canDeactivate: [pendingSettingsChangesGuard],
+        loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
+        title: 'Paramétrage fonctionnel — Administration CNPM',
       },
       // Compatibilité des favoris et captures antérieurs à l'alignement sur
       // l'inventaire UI. Les nouveaux liens utilisent exclusivement les routes canoniques.

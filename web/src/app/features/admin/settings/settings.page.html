@@ -1,0 +1,442 @@
+<cnpm-admin-shell>
+  <div class="cnpm-settings">
+    <cnpm-page-header
+      title="Paramétrage fonctionnel"
+      description="Gérez les valeurs de référentiel autorisées par le contrat d’administration."
+    >
+      @if (canWrite()) {
+        <cnpm-button variant="primary" size="lg" (click)="openCreate()">
+          Créer une valeur
+        </cnpm-button>
+      }
+    </cnpm-page-header>
+
+    @if (isDemo) {
+      <cnpm-alert tone="info" title="Données de démonstration" [live]="false">
+        Les domaines, codes et libellés préfixés par « DEMO_ » sont entièrement fictifs et ne
+        constituent aucune nomenclature officielle CNPM.
+      </cnpm-alert>
+    }
+
+    <section class="cnpm-settings__filter" aria-labelledby="settings-filter-title">
+      <div>
+        <h2 id="settings-filter-title">Filtrer le registre</h2>
+        <p>
+          Le domaine reste un texte libre : aucune liste officielle n’est définie par le contrat. Le
+          filtre est conservé dans l’URL partageable.
+        </p>
+      </div>
+      <form role="search" [formGroup]="filterForm" (ngSubmit)="applyDomainFilter()">
+        <div class="cnpm-settings__field">
+          <label for="settings-filter-domain">Domaine</label>
+          <input
+            id="settings-filter-domain"
+            formControlName="domain"
+            maxlength="80"
+            autocomplete="off"
+            placeholder="Saisir un domaine existant"
+            aria-describedby="settings-filter-domain-help"
+          />
+          <span id="settings-filter-domain-help">80 caractères maximum.</span>
+        </div>
+        <div class="cnpm-settings__filter-actions">
+          <cnpm-button
+            type="submit"
+            variant="secondary"
+            size="lg"
+            [block]="true"
+            [disabled]="saving()"
+          >
+            Appliquer
+          </cnpm-button>
+          @if (hasDomainFilter()) {
+            <cnpm-button
+              variant="tertiary"
+              size="lg"
+              [block]="true"
+              [disabled]="saving()"
+              (click)="clearDomainFilter()"
+            >
+              Effacer
+            </cnpm-button>
+          }
+        </div>
+      </form>
+    </section>
+
+    @if (editorMode() !== 'closed') {
+      <section class="cnpm-settings__editor" aria-labelledby="settings-editor-title">
+        <div class="cnpm-settings__editor-heading">
+          <div>
+            <p class="cnpm-settings__eyebrow">
+              {{ editorMode() === 'create' ? 'Nouvelle valeur' : 'Modification sous verrou' }}
+            </p>
+            <h2 id="settings-editor-title" #editorHeading tabindex="-1">
+              {{
+                editorMode() === 'create'
+                  ? 'Créer une valeur de référentiel'
+                  : 'Modifier la valeur sélectionnée'
+              }}
+            </h2>
+          </div>
+          <cnpm-button variant="tertiary" size="lg" [disabled]="saving()" (click)="closeEditor()">
+            Fermer
+          </cnpm-button>
+        </div>
+
+        @if (editorMode() === 'edit'; as editing) {
+          @if (editing && selectedValue(); as value) {
+            <dl class="cnpm-settings__identity">
+              <div>
+                <dt>Domaine protégé</dt>
+                <dd>{{ value.domain }}</dd>
+              </div>
+              <div>
+                <dt>Code protégé</dt>
+                <dd>{{ value.code }}</dd>
+              </div>
+              <div>
+                <dt>Version chargée</dt>
+                <dd>{{ value.version }}</dd>
+              </div>
+            </dl>
+          }
+        }
+
+        @if (saveFailure()) {
+          <cnpm-alert
+            [tone]="saveFailure() === 'conflict' ? 'warning' : 'error'"
+            [title]="
+              saveFailure() === 'authentication'
+                ? 'Session expirée'
+                : saveFailure() === 'forbidden'
+                  ? 'Écriture refusée'
+                  : saveFailure() === 'notFound'
+                    ? 'Valeur introuvable'
+                    : saveFailure() === 'conflict'
+                      ? 'Conflit détecté'
+                      : 'Enregistrement impossible'
+            "
+          >
+            <p>{{ saveMessage() }}</p>
+            @if (saveFailure() === 'conflict' && editorMode() === 'edit') {
+              <cnpm-button variant="secondary" size="lg" (click)="abandonAndReload()">
+                Abandonner et recharger la liste
+              </cnpm-button>
+            }
+            @if (saveFailure() === 'authentication') {
+              <cnpm-button variant="primary" size="lg" routerLink="/auth/login">
+                Se reconnecter
+              </cnpm-button>
+            }
+            @if (saveFailure() === 'notFound') {
+              <cnpm-button variant="secondary" size="lg" (click)="abandonAndReload()">
+                Abandonner et recharger la liste
+              </cnpm-button>
+            }
+          </cnpm-alert>
+        }
+
+        <form
+          class="cnpm-settings__editor-form"
+          [formGroup]="editorForm"
+          novalidate
+          (ngSubmit)="submitEditor()"
+        >
+          <cnpm-inline-error-summary [errors]="formErrors()" />
+
+          <div class="cnpm-settings__fields">
+            @if (editorMode() === 'create') {
+              <div class="cnpm-settings__field">
+                <label for="settings-domain">Domaine <span aria-hidden="true">*</span></label>
+                <input
+                  id="settings-domain"
+                  formControlName="domain"
+                  required
+                  maxlength="80"
+                  autocomplete="off"
+                  [attr.aria-invalid]="fieldError('domain') ? 'true' : null"
+                  [attr.aria-describedby]="
+                    fieldError('domain') ? 'settings-domain-error' : 'settings-domain-help'
+                  "
+                />
+                <span id="settings-domain-help">
+                  Texte libre fourni par l’administrateur ; aucune liste n’est inventée par l’écran.
+                </span>
+                @if (fieldError('domain'); as error) {
+                  <p class="cnpm-settings__error" id="settings-domain-error">{{ error }}</p>
+                }
+              </div>
+
+              <div class="cnpm-settings__field">
+                <label for="settings-code">Code <span aria-hidden="true">*</span></label>
+                <input
+                  id="settings-code"
+                  formControlName="code"
+                  required
+                  maxlength="80"
+                  autocomplete="off"
+                  [attr.aria-invalid]="fieldError('code') ? 'true' : null"
+                  [attr.aria-describedby]="fieldError('code') ? 'settings-code-error' : null"
+                />
+                @if (fieldError('code'); as error) {
+                  <p class="cnpm-settings__error" id="settings-code-error">{{ error }}</p>
+                }
+              </div>
+            }
+
+            <div class="cnpm-settings__field cnpm-settings__field--wide">
+              <label for="settings-label">Libellé <span aria-hidden="true">*</span></label>
+              <input
+                id="settings-label"
+                formControlName="label"
+                required
+                maxlength="255"
+                [attr.aria-invalid]="fieldError('label') ? 'true' : null"
+                [attr.aria-describedby]="fieldError('label') ? 'settings-label-error' : null"
+              />
+              @if (fieldError('label'); as error) {
+                <p class="cnpm-settings__error" id="settings-label-error">{{ error }}</p>
+              }
+            </div>
+
+            <div class="cnpm-settings__field">
+              <label for="settings-sort-order">Ordre d’affichage</label>
+              <input
+                id="settings-sort-order"
+                type="number"
+                step="1"
+                formControlName="sortOrder"
+                inputmode="numeric"
+                [attr.aria-invalid]="fieldError('sortOrder') ? 'true' : null"
+                [attr.aria-describedby]="
+                  fieldError('sortOrder') ? 'settings-sort-order-error' : 'settings-sort-order-help'
+                "
+              />
+              <span id="settings-sort-order-help">Nombre entier, sans règle métier ajoutée.</span>
+              @if (fieldError('sortOrder'); as error) {
+                <p class="cnpm-settings__error" id="settings-sort-order-error">{{ error }}</p>
+              }
+            </div>
+
+            <div class="cnpm-settings__field cnpm-settings__field--toggle">
+              <label for="settings-active">
+                <input id="settings-active" type="checkbox" formControlName="active" />
+                Valeur active
+              </label>
+              <span>Désactiver conserve la valeur ; aucune suppression n’est proposée.</span>
+            </div>
+          </div>
+
+          <div class="cnpm-settings__editor-actions">
+            <cnpm-button
+              variant="secondary"
+              size="lg"
+              [block]="true"
+              [disabled]="saving()"
+              (click)="closeEditor()"
+            >
+              Annuler
+            </cnpm-button>
+            <cnpm-button
+              type="submit"
+              variant="primary"
+              size="lg"
+              [block]="true"
+              [loading]="saving()"
+              [disabled]="editorMode() === 'edit' && editorForm.pristine"
+            >
+              {{ editorMode() === 'create' ? 'Créer la valeur' : 'Enregistrer les modifications' }}
+            </cnpm-button>
+          </div>
+        </form>
+      </section>
+    }
+
+    <section class="cnpm-settings__registry" aria-labelledby="settings-registry-title">
+      <div class="cnpm-settings__registry-heading" aria-live="polite">
+        <div>
+          <p class="cnpm-settings__eyebrow">ADMIN.REFERENTIAL.READ</p>
+          <h2 id="settings-registry-title" #registryHeading tabindex="-1">
+            Valeurs de référentiel
+          </h2>
+        </div>
+        @if (state() === 'ready' || state() === 'empty' || state() === 'noResult') {
+          <p>
+            <strong>{{ totalItems() }}</strong>
+            {{ totalItems() === 1 ? 'valeur trouvée' : 'valeurs trouvées' }}
+          </p>
+        }
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <cnpm-skeleton
+            variant="table"
+            [rows]="pageSize()"
+            [columns]="columns.length"
+            label="Chargement des valeurs de référentiel…"
+          />
+        }
+        @case ('authentication') {
+          <cnpm-error-state variant="session-ended">
+            <cnpm-button variant="primary" size="lg" routerLink="/auth/login">
+              Se reconnecter
+            </cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('forbidden') {
+          <cnpm-error-state
+            variant="forbidden"
+            title="Lecture du référentiel refusée"
+            description="La permission ADMIN.REFERENTIAL.READ est requise. Le serveur reste la frontière d’autorisation."
+          />
+        }
+        @case ('notFound') {
+          <cnpm-error-state
+            variant="not-found"
+            title="Registre introuvable"
+            description="La ressource de paramétrage demandée n’est plus disponible."
+          />
+        }
+        @case ('invalidQuery') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Filtre invalide"
+            description="Le serveur a refusé les paramètres de recherche. Effacez le domaine puis réessayez."
+          >
+            <cnpm-button variant="secondary" size="lg" (click)="clearDomainFilter()">
+              Effacer le filtre
+            </cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Le référentiel n’a pas pu être chargé"
+            description="Le service de paramétrage est momentanément indisponible. Le filtre URL est conservé."
+          >
+            <cnpm-button variant="secondary" size="lg" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucune valeur enregistrée"
+            description="Le registre ne contient encore aucune valeur de référentiel consultable."
+          />
+        }
+        @case ('noResult') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucune valeur pour ce domaine"
+            description="Vérifiez le domaine saisi ou retirez le filtre."
+          >
+            <cnpm-button variant="secondary" size="lg" (click)="clearDomainFilter()">
+              Retirer le filtre
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('pageEmpty') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Cette page est vide"
+            description="Le registre a changé depuis l’ouverture de cette page."
+          >
+            <cnpm-button variant="secondary" size="lg" (click)="goToFirstPage()">
+              Revenir à la première page
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('ready') {
+          <div class="cnpm-settings__table">
+            <cnpm-data-table
+              caption="Valeurs de référentiel, domaines, codes, libellés, états et versions."
+              [columns]="columns"
+              [rows]="rows()"
+              state="ready"
+              [rowKey]="rowKey"
+            >
+              <ng-template #row let-value>
+                <td class="cnpm-table__cell">
+                  <code>{{ value.domain }}</code>
+                </td>
+                <td class="cnpm-table__cell">
+                  <code>{{ value.code }}</code>
+                </td>
+                <td class="cnpm-table__cell cnpm-settings__label-cell">{{ value.label }}</td>
+                <td class="cnpm-table__cell cnpm-table__cell--end">{{ value.sortOrder }}</td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="statusTone(value.active)">
+                    {{ statusLabel(value.active) }}
+                  </cnpm-badge>
+                </td>
+                <td class="cnpm-table__cell cnpm-table__cell--end">{{ value.version }}</td>
+                <td class="cnpm-table__cell">
+                  @if (canWrite()) {
+                    <cnpm-button variant="tertiary" size="lg" (click)="openEdit(value)">
+                      Modifier
+                    </cnpm-button>
+                  } @else {
+                    <span class="cnpm-settings__read-only">Lecture seule</span>
+                  }
+                </td>
+              </ng-template>
+            </cnpm-data-table>
+          </div>
+
+          <ul class="cnpm-settings__cards" aria-label="Valeurs de référentiel">
+            @for (value of rows(); track value.id) {
+              <li>
+                <div class="cnpm-settings__card-heading">
+                  <div>
+                    <code>{{ value.domain }}</code>
+                    <strong>{{ value.label }}</strong>
+                  </div>
+                  <cnpm-badge [tone]="statusTone(value.active)">
+                    {{ statusLabel(value.active) }}
+                  </cnpm-badge>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Code</dt>
+                    <dd>
+                      <code>{{ value.code }}</code>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Ordre</dt>
+                    <dd>{{ value.sortOrder }}</dd>
+                  </div>
+                  <div>
+                    <dt>Version</dt>
+                    <dd>{{ value.version }}</dd>
+                  </div>
+                </dl>
+                @if (canWrite()) {
+                  <cnpm-button
+                    variant="secondary"
+                    size="lg"
+                    [block]="true"
+                    (click)="openEdit(value)"
+                  >
+                    Modifier cette valeur
+                  </cnpm-button>
+                }
+              </li>
+            }
+          </ul>
+
+          <cnpm-pagination
+            [page]="page()"
+            [pageSize]="pageSize()"
+            [totalItems]="totalItems()"
+            [pageSizeOptions]="pageSizes"
+            (pageChange)="onPageChange($event)"
+            (pageSizeChange)="onPageSizeChange($event)"
+          />
+        }
+      }
+    </section>
+  </div>
+</cnpm-admin-shell>

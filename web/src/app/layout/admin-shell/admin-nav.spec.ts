@@ -17,6 +17,8 @@ describe('ADMIN_NAV', () => {
       Relances: '/admin/recovery/campaigns',
       Groupements: '/admin/groups',
       Reporting: '/admin/reporting',
+      Audit: '/admin/security/audit',
+      Paramétrage: '/admin/settings',
       Administration: '/admin/security/users',
     });
   });
@@ -33,5 +35,16 @@ describe('ADMIN_NAV', () => {
     expect(visibleAdminNav(['GROUP.READ']).some((entry) => entry.route === '/admin/groups')).toBe(
       true,
     );
+  });
+
+  it('filtre les rubriques sensibles selon la projection de permissions', () => {
+    expect(visibleAdminNav([]).map((entry) => entry.route)).not.toContain('/admin/security/audit');
+    expect(visibleAdminNav([]).map((entry) => entry.route)).not.toContain('/admin/settings');
+
+    const routes = visibleAdminNav(['AUDIT.READ', 'ADMIN.REFERENTIAL.READ']).map(
+      (entry) => entry.route,
+    );
+    expect(routes).toContain('/admin/security/audit');
+    expect(routes).toContain('/admin/settings');
   });
 });

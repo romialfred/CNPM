@@ -3,6 +3,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { adminRoutes } from '../../features/admin/admin.routes';
+import { AUDIT_GATEWAY } from '../../features/admin/audit/audit-gateway';
+import { DemoAuditGateway } from '../../features/admin/audit/demo-audit.gateway';
+import { HttpAuditGateway } from '../../features/admin/audit/http-audit.gateway';
 import { CONTRIBUTIONS_GATEWAY } from '../../features/admin/contributions/contributions-gateway';
 import { DASHBOARD_GATEWAY } from '../../features/admin/dashboard/dashboard-gateway';
 import { DemoDashboardGateway } from '../../features/admin/dashboard/demo-dashboard.gateway';
@@ -18,6 +21,9 @@ import { PAYMENTS_GATEWAY } from '../../features/admin/payments/payments-gateway
 import { RECOVERY_GATEWAY } from '../../features/admin/recovery/recovery-gateway';
 import { REPORTING_GATEWAY } from '../../features/admin/reporting/reporting-gateway';
 import { ADMIN_SECURITY_GATEWAY } from '../../features/admin/security/admin-security-gateway';
+import { DemoSettingsGateway } from '../../features/admin/settings/demo-settings.gateway';
+import { HttpSettingsGateway } from '../../features/admin/settings/http-settings.gateway';
+import { SETTINGS_GATEWAY } from '../../features/admin/settings/settings-gateway';
 import {
   UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
   UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
@@ -73,6 +79,8 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(AUTH_GATEWAY)).toBeInstanceOf(DemoAuthGateway);
     expect(TestBed.inject(MEMBERS_GATEWAY)).toBeInstanceOf(DemoMembersGateway);
     expect(TestBed.inject(GROUPS_GATEWAY)).toBeInstanceOf(DemoGroupsGateway);
+    expect(TestBed.inject(AUDIT_GATEWAY)).toBeInstanceOf(DemoAuditGateway);
+    expect(TestBed.inject(SETTINGS_GATEWAY)).toBeInstanceOf(DemoSettingsGateway);
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBeInstanceOf(DemoDashboardGateway);
     expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(DemoHomeGateway);
     expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(DemoMemberHomeGateway);
@@ -84,6 +92,8 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(AUTH_GATEWAY)).toBeInstanceOf(UnavailableAuthGateway);
     expect(TestBed.inject(MEMBERS_GATEWAY)).toBeInstanceOf(HttpMembersGateway);
     expect(TestBed.inject(GROUPS_GATEWAY)).toBeInstanceOf(HttpGroupsGateway);
+    expect(TestBed.inject(AUDIT_GATEWAY)).toBeInstanceOf(HttpAuditGateway);
+    expect(TestBed.inject(SETTINGS_GATEWAY)).toBeInstanceOf(HttpSettingsGateway);
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBe(UNAVAILABLE_DASHBOARD_GATEWAY);
     expect(TestBed.inject(MEMBER_DETAIL_GATEWAY)).toBe(UNAVAILABLE_MEMBER_DETAIL_GATEWAY);
     expect(TestBed.inject(ENROLLMENT_GATEWAY)).toBe(UNAVAILABLE_ENROLLMENT_GATEWAY);

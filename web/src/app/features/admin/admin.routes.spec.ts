@@ -32,6 +32,11 @@ describe('adminRoutes', () => {
     expect(child('recovery/campaigns')?.loadComponent).toBeTypeOf('function');
     expect(child('reporting')?.loadComponent).toBeTypeOf('function');
     expect(child('security/users')?.loadComponent).toBeTypeOf('function');
+    expect(child('security/audit')?.loadComponent).toBeTypeOf('function');
+    expect(child('security/audit')?.canActivate).toHaveLength(1);
+    expect(child('settings')?.loadComponent).toBeTypeOf('function');
+    expect(child('settings')?.canActivate).toHaveLength(1);
+    expect(child('settings')?.canDeactivate).toHaveLength(1);
   });
 
   it('redirige les anciens chemins courts vers les routes canoniques', () => {
