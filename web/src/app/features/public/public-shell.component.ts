@@ -43,8 +43,8 @@ export interface PublicFooterContact {
  * LAY-003 / NAV-003 — cadre institutionnel commun aux pages publiques.
  *
  * Le logo est l'actif officiel versionné dans `docs/00-sources`, copié à l'identique
- * dans les assets Web. Les destinations publiques non implémentées (adhésion et
- * pages légales) ne deviennent jamais des liens factices.
+ * dans les assets Web. La demande d'adhésion pointe vers la démonstration locale
+ * PUB-012 ; les pages légales restent du texte tant que leur contenu n'est pas publié.
  */
 @Component({
   selector: 'cnpm-public-shell',
@@ -144,6 +144,14 @@ export interface PublicFooterContact {
             >
               Agenda
             </a>
+            <a
+              class="cnpm-public__nav-link"
+              routerLink="/adhesion"
+              routerLinkActive="cnpm-public__nav-link--active"
+              ariaCurrentWhenActive="page"
+            >
+              Adhésion
+            </a>
             @for (section of sections(); track section.id) {
               <a class="cnpm-public__nav-link" [href]="'#' + section.id">{{ section.label }}</a>
             }
@@ -221,6 +229,10 @@ export interface PublicFooterContact {
                 </a>
                 <a class="cnpm-public__drawer-link" routerLink="/agenda" (click)="closeMenu()">
                   <span>Agenda</span>
+                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+                <a class="cnpm-public__drawer-link" routerLink="/adhesion" (click)="closeMenu()">
+                  <span>Adhésion</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
                 </a>
                 @for (section of sections(); track section.id) {
@@ -345,6 +357,7 @@ export interface PublicFooterContact {
               <li><a routerLink="/membres">Annuaire des membres</a></li>
               <li><a routerLink="/actualites">Actualités</a></li>
               <li><a routerLink="/agenda">Agenda</a></li>
+              <li><a routerLink="/adhesion">Demande d’adhésion fictive</a></li>
               @for (section of sections(); track section.id) {
                 <li>
                   <a [href]="'#' + section.id">{{ section.label }}</a>
@@ -364,12 +377,11 @@ export interface PublicFooterContact {
           <section class="cnpm-public__footer-pending" aria-labelledby="pied-information">
             <h2 class="cnpm-public__footer-title" id="pied-information">Information publique</h2>
             <p>
-              L'adhésion en ligne et les pages légales seront reliées dès publication de leurs
-              destinations officielles.
+              Le parcours d’adhésion est une démonstration locale. Il ne crée aucun dossier officiel
+              et ne remplace aucune procédure publiée.
             </p>
-            <a routerLink="/verification/DEMO-VERIF-2026-001">
-              Vérifier un aperçu fictif
-            </a>
+            <a routerLink="/adhesion">Préparer une demande fictive</a>
+            <a routerLink="/verification/DEMO-VERIF-2026-001"> Vérifier un aperçu fictif </a>
           </section>
         </div>
 

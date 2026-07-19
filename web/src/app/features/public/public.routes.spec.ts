@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { publicRoutes, showcaseRoutes } from './public.routes';
 
 describe('publicRoutes', () => {
-  it('déclare PUB-009/PUB-010/PUB-011 avant la route d’accueil vide', () => {
+  it('déclare PUB-012/PUB-013 et les contenus éditoriaux avant la route d’accueil vide', () => {
     expect(publicRoutes.map((route) => route.path)).toEqual([
+      'adhesion',
       'verification/:code',
       'le-cnpm',
       'services',
@@ -12,9 +13,12 @@ describe('publicRoutes', () => {
       '',
     ]);
     expect(publicRoutes[0]?.providers).toBeDefined();
-    expect(publicRoutes[3]?.children?.map((route) => route.path)).toEqual(['', ':slug']);
-    expect(publicRoutes[3]?.providers).toBeDefined();
+    expect(publicRoutes[0]?.children?.map((route) => route.path)).toEqual(['confirmation', '']);
+    expect(publicRoutes[0]?.children?.[1]?.canDeactivate).toBeDefined();
+    expect(publicRoutes[1]?.providers).toBeDefined();
+    expect(publicRoutes[4]?.children?.map((route) => route.path)).toEqual(['', ':slug']);
     expect(publicRoutes[4]?.providers).toBeDefined();
+    expect(publicRoutes[5]?.providers).toBeDefined();
   });
 });
 

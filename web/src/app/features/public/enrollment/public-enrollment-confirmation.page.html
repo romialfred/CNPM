@@ -1,0 +1,67 @@
+<cnpm-public-shell>
+  <div class="confirmation-page">
+    @if (!isDemo) {
+      <cnpm-error-state
+        variant="not-found"
+        title="Confirmation d’adhésion non raccordée"
+        description="Le profil HTTP public reste fermé tant qu’un contrat de collecte et de confirmation complet n’est pas publié."
+        titleAs="h1"
+      >
+        <cnpm-button variant="secondary" routerLink="/">Revenir à l’accueil</cnpm-button>
+      </cnpm-error-state>
+    } @else if (result(); as confirmation) {
+      <article class="confirmation-card">
+        <p class="confirmation-eyebrow">PUB-013 · Résultat local</p>
+        <span class="confirmation-mark" aria-hidden="true">✓</span>
+        <h1 #pageTitle tabindex="-1">Confirmation locale de démonstration</h1>
+        <p class="confirmation-lead">
+          Le parcours fictif pour <strong>{{ confirmation.organizationLabel }}</strong> est terminé
+          dans cette session.
+        </p>
+
+        <cnpm-alert tone="warning" title="Aucun dossier officiel créé">
+          Aucun serveur n’a été contacté, aucune donnée n’a été enregistrée et aucun consentement
+          juridique n’a été recueilli. Cette page n’est ni un récépissé ni une preuve de dépôt.
+        </cnpm-alert>
+
+        <dl class="confirmation-facts">
+          <div>
+            <dt>Référence fictive</dt>
+            <dd>{{ confirmation.reference }}</dd>
+          </div>
+          <div>
+            <dt>Canal</dt>
+            <dd>{{ confirmation.channelLabel }}</dd>
+          </div>
+          <div>
+            <dt>Dossier officiel</dt>
+            <dd>Non créé</dd>
+          </div>
+          <div>
+            <dt>Prochaine étape réelle</dt>
+            <dd>Indisponible tant que le parcours officiel n’est pas raccordé</dd>
+          </div>
+        </dl>
+
+        <div class="confirmation-actions">
+          <cnpm-button variant="primary" (click)="restart()">
+            Recommencer la démonstration
+          </cnpm-button>
+          <cnpm-button variant="secondary" routerLink="/">Revenir à l’accueil</cnpm-button>
+        </div>
+      </article>
+    } @else {
+      <section class="confirmation-empty">
+        <p class="confirmation-eyebrow">PUB-013 · Session locale</p>
+        <h1 #pageTitle tabindex="-1">Aucune confirmation locale disponible</h1>
+        <p>
+          Une confirmation n’existe qu’après avoir terminé le formulaire dans la même session. Elle
+          n’est volontairement enregistrée ni dans le navigateur ni sur un serveur.
+        </p>
+        <cnpm-button variant="primary" routerLink="/adhesion">
+          Ouvrir la démonstration
+        </cnpm-button>
+      </section>
+    }
+  </div>
+</cnpm-public-shell>

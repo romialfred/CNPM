@@ -158,6 +158,11 @@
   margin-block-start: var(--cnpm-space-4);
 }
 
+.cnpm-public__footer-pending a {
+  display: block;
+  margin-block-start: var(--cnpm-space-2);
+}
+
 .cnpm-public__legal-bar {
   display: flex;
   align-items: center;

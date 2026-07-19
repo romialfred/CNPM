@@ -1,0 +1,164 @@
+:host {
+  display: block;
+  background: var(--cnpm-color-surface-page);
+  color: var(--cnpm-color-text-primary);
+}
+
+.confirmation-page {
+  display: grid;
+  width: min(calc(100% - (2 * var(--cnpm-layout-pagePaddingDesktop))), 54rem);
+  min-height: 36rem;
+  margin-inline: auto;
+  padding-block: var(--cnpm-space-16) var(--cnpm-space-20);
+  place-items: center;
+}
+
+.confirmation-card,
+.confirmation-empty {
+  width: 100%;
+  padding: var(--cnpm-space-10);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-xl);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.confirmation-card {
+  text-align: center;
+}
+
+.confirmation-eyebrow {
+  margin: 0;
+  color: var(--cnpm-color-brand-red-700);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+}
+
+.confirmation-mark {
+  display: grid;
+  width: var(--cnpm-space-16);
+  height: var(--cnpm-space-16);
+  margin: var(--cnpm-space-5) auto;
+  place-items: center;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-semantic-success-50);
+  color: var(--cnpm-color-semantic-success-700);
+  font-size: var(--cnpm-font-size-3xl);
+  font-weight: var(--cnpm-font-weight-bold);
+}
+
+.confirmation-card h1,
+.confirmation-empty h1 {
+  margin: 0;
+  color: var(--cnpm-color-text-brand);
+  font-size: clamp(var(--cnpm-font-size-3xl), 5vw, var(--cnpm-font-size-4xl));
+  line-height: var(--cnpm-font-lineHeight-4xl);
+  letter-spacing: var(--cnpm-font-letterSpacing-tight);
+}
+
+.confirmation-lead,
+.confirmation-empty > p:not(.confirmation-eyebrow) {
+  margin: var(--cnpm-space-4) auto var(--cnpm-space-6);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-lg);
+  line-height: var(--cnpm-font-lineHeight-lg);
+}
+
+.confirmation-card cnpm-alert {
+  display: block;
+  margin-block-start: var(--cnpm-space-6);
+  text-align: start;
+}
+
+.confirmation-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: var(--cnpm-space-8) 0 0;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  text-align: start;
+}
+
+.confirmation-facts div {
+  min-width: 0;
+  padding: var(--cnpm-space-4);
+}
+
+.confirmation-facts div:nth-child(even) {
+  border-inline-start: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.confirmation-facts div:nth-child(n + 3) {
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.confirmation-facts dt,
+.confirmation-facts dd {
+  margin: 0;
+}
+
+.confirmation-facts dt {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.confirmation-facts dd {
+  margin-block-start: var(--cnpm-space-1);
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--cnpm-space-3);
+  margin-block-start: var(--cnpm-space-8);
+}
+
+.confirmation-empty {
+  text-align: start;
+}
+
+.confirmation-empty h1 {
+  margin-block-start: var(--cnpm-space-2);
+}
+
+h1:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+  box-shadow: var(--cnpm-shadow-focus);
+}
+
+@media (max-width: 47.9375rem) {
+  .confirmation-page {
+    width: min(calc(100% - (2 * var(--cnpm-layout-pagePaddingMobile))), 54rem);
+    min-height: 0;
+    padding-block: var(--cnpm-space-8) var(--cnpm-space-12);
+  }
+
+  .confirmation-card,
+  .confirmation-empty {
+    padding: var(--cnpm-space-5);
+  }
+
+  .confirmation-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .confirmation-facts div:nth-child(even) {
+    border-inline-start: 0;
+  }
+
+  .confirmation-facts div + div {
+    border-block-start: 1px solid var(--cnpm-color-border-subtle);
+  }
+
+  .confirmation-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

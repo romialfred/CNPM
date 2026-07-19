@@ -124,10 +124,11 @@ describe('HomePage (PUB-001)', () => {
     expect(host.querySelector('.cnpm-skeleton')).not.toBeNull();
   });
 
-  it('n’expose aucun lien d’adhésion tant que PUB-012 n’existe pas', async () => {
+  it('expose PUB-012 comme démonstration distincte de la connexion', async () => {
     const { host } = await setup();
     const links = Array.from(host.querySelectorAll<HTMLAnchorElement>('a[href]'));
-    expect(links.some((link) => /adhésion/i.test(link.textContent ?? ''))).toBe(false);
+    expect(links.some((link) => link.getAttribute('href') === '/adhesion')).toBe(true);
     expect(links.some((link) => link.getAttribute('href') === '/auth/login')).toBe(true);
+    expect(host.textContent).toContain('ne crée aucun dossier officiel');
   });
 });

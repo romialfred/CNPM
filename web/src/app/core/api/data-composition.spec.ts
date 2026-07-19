@@ -64,7 +64,7 @@ function configure(mode: CnpmDataMode): void {
       provideHttpClientTesting(),
       ...(adminRoutes[0]?.providers ?? []),
       ...(authRoutes[0]?.providers ?? []),
-      ...(publicRoutes[0]?.providers ?? []),
+      ...(publicRoutes.find((route) => route.path === '')?.providers ?? []),
       ...(showcaseRoutes[0]?.providers ?? []),
       ...(memberRoutes[0]?.providers ?? []),
     ],

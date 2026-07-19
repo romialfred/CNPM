@@ -9,6 +9,8 @@ import { DemoShowcaseGateway } from './showcase/demo-showcase.gateway';
 import { SHOWCASE_GATEWAY } from './showcase/showcase-gateway';
 import { DemoReceiptVerificationGateway } from './verification/demo-receipt-verification.gateway';
 import { RECEIPT_VERIFICATION_GATEWAY } from './verification/receipt-verification-gateway';
+import { pendingPublicEnrollmentChangesGuard } from './enrollment/pending-public-enrollment-changes.guard';
+import { PublicEnrollmentSession } from './enrollment/public-enrollment-session';
 import {
   UNAVAILABLE_HOME_GATEWAY,
   UNAVAILABLE_EDITORIAL_GATEWAY,
@@ -24,6 +26,28 @@ import {
  */
 export const publicRoutes: Routes = [
   {
+    path: 'adhesion',
+    providers: [PublicEnrollmentSession],
+    children: [
+      {
+        path: 'confirmation',
+        loadComponent: () =>
+          import('./enrollment/public-enrollment-confirmation.page').then(
+            (m) => m.PublicEnrollmentConfirmationPage,
+          ),
+        title: 'Confirmation locale d’adhésion — CNPM',
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        canDeactivate: [pendingPublicEnrollmentChangesGuard],
+        loadComponent: () =>
+          import('./enrollment/public-enrollment.page').then((m) => m.PublicEnrollmentPage),
+        title: 'Demande d’adhésion — démonstration CNPM',
+      },
+    ],
+  },
+  {
     path: 'verification/:code',
     providers: [
       DemoReceiptVerificationGateway,
@@ -36,9 +60,7 @@ export const publicRoutes: Routes = [
       },
     ],
     loadComponent: () =>
-      import('./verification/receipt-verification.page').then(
-        (m) => m.ReceiptVerificationPage,
-      ),
+      import('./verification/receipt-verification.page').then((m) => m.ReceiptVerificationPage),
     title: 'Vérification d’un reçu — CNPM',
   },
   {
@@ -72,15 +94,13 @@ export const publicRoutes: Routes = [
         path: '',
         pathMatch: 'full',
         data: { mode: 'news' },
-        loadComponent: () =>
-          import('./editorial/editorial.page').then((m) => m.EditorialPage),
+        loadComponent: () => import('./editorial/editorial.page').then((m) => m.EditorialPage),
         title: 'Actualités — CNPM',
       },
       {
         path: ':slug',
         data: { mode: 'article' },
-        loadComponent: () =>
-          import('./editorial/editorial.page').then((m) => m.EditorialPage),
+        loadComponent: () => import('./editorial/editorial.page').then((m) => m.EditorialPage),
         title: 'Actualité — CNPM',
       },
     ],

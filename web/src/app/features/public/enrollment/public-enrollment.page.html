@@ -1,0 +1,361 @@
+<cnpm-public-shell>
+  @if (!isDemo) {
+    <section class="enrollment-unavailable">
+      <cnpm-error-state
+        variant="not-found"
+        title="Demande d’adhésion non raccordée"
+        description="Le contrat HTTP public ne décrit pas encore la collecte de l’entreprise, des contacts, des pièces et du consentement. Le parcours reste fermé pour éviter une soumission incomplète."
+        titleAs="h1"
+      >
+        <cnpm-button variant="secondary" routerLink="/">Revenir à l’accueil</cnpm-button>
+      </cnpm-error-state>
+    </section>
+  } @else {
+    <header class="enrollment-hero">
+      <div class="enrollment-hero__inner">
+        <div>
+          <p class="enrollment-eyebrow">PUB-012 · Parcours fictif</p>
+          <h1 #pageTitle tabindex="-1">Préparer une demande d’adhésion de démonstration</h1>
+          <p class="enrollment-hero__intro">
+            Explorez les informations attendues sans créer de dossier officiel, sans envoyer de
+            données et sans enregistrer de brouillon.
+          </p>
+        </div>
+        <dl class="enrollment-hero__facts">
+          <div>
+            <dt>Transmission</dt>
+            <dd>Aucune</dd>
+          </div>
+          <div>
+            <dt>Stockage</dt>
+            <dd>Aucun</dd>
+          </div>
+          <div>
+            <dt>Référence finale</dt>
+            <dd>DEMO-*</dd>
+          </div>
+        </dl>
+      </div>
+    </header>
+
+    <div class="enrollment-page">
+      <cnpm-alert tone="warning" title="Démonstration sans données réelles">
+        Utilisez exclusivement des noms et coordonnées fictifs. Les saisies restent en mémoire le
+        temps de cette page et seront perdues à la fermeture.
+      </cnpm-alert>
+
+      @if (exitPrompt()) {
+        <section
+          #exitPanel
+          class="enrollment-exit"
+          role="alert"
+          tabindex="-1"
+          aria-labelledby="adhesion-sortie-titre"
+        >
+          <div>
+            <h2 id="adhesion-sortie-titre">Abandonner la saisie locale ?</h2>
+            <p>Aucun brouillon n’existe. Quitter cette page effacera les valeurs saisies.</p>
+          </div>
+          <div class="enrollment-exit__actions">
+            <cnpm-button variant="secondary" (click)="stay()">Rester sur la page</cnpm-button>
+            <cnpm-button variant="danger" (click)="discardAndLeave()">
+              Effacer et quitter
+            </cnpm-button>
+          </div>
+        </section>
+      }
+
+      <nav class="enrollment-stepper" aria-label="Étapes de la demande fictive">
+        <ol>
+          @for (step of steps; track step.id; let index = $index) {
+            <li [class]="'enrollment-step enrollment-step--' + stepStatus(step.id)">
+              <button
+                type="button"
+                [attr.aria-current]="current() === step.id ? 'step' : null"
+                (click)="goTo(step.id)"
+              >
+                <span class="enrollment-step__number" aria-hidden="true">{{ index + 1 }}</span>
+                <span class="enrollment-step__copy">
+                  <strong>{{ step.label }}</strong>
+                  <small>{{ stepStatusLabel(step.id) }}</small>
+                </span>
+              </button>
+            </li>
+          }
+        </ol>
+      </nav>
+
+      <form class="enrollment-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <div
+          tabindex="-1"
+          (click)="focusErrorField($event)"
+          (keydown.enter)="focusErrorField($event)"
+        >
+          <cnpm-inline-error-summary [errors]="errors()" />
+        </div>
+
+        <section class="enrollment-card" aria-labelledby="adhesion-etape-titre">
+          <header class="enrollment-card__header">
+            <p>Étape {{ currentIndex() + 1 }} sur {{ steps.length }}</p>
+            <h2 id="adhesion-etape-titre">{{ currentStep().heading }}</h2>
+            <span>{{ currentStep().hint }}</span>
+          </header>
+
+          @switch (current()) {
+            @case ('entreprise') {
+              <div class="enrollment-grid">
+                <div class="enrollment-field enrollment-field--wide">
+                  <label for="adhesion-legalName">
+                    Raison sociale fictive <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="adhesion-legalName"
+                    type="text"
+                    formControlName="legalName"
+                    autocomplete="off"
+                    placeholder="Ex. Entreprise Démo Sahel"
+                    aria-required="true"
+                    [attr.aria-invalid]="invalidAttr('legalName')"
+                    [attr.aria-describedby]="describedBy('legalName')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-legalName-aide">
+                    N’utilisez pas la raison sociale d’une entreprise réelle.
+                  </p>
+                  @if (errorFor('legalName'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-legalName-erreur">
+                      {{ error }}
+                    </p>
+                  }
+                </div>
+
+                <div class="enrollment-field">
+                  <label for="adhesion-tradeName">Nom commercial fictif</label>
+                  <input
+                    id="adhesion-tradeName"
+                    type="text"
+                    formControlName="tradeName"
+                    autocomplete="off"
+                    placeholder="Facultatif"
+                    [attr.aria-invalid]="invalidAttr('tradeName')"
+                    [attr.aria-describedby]="describedBy('tradeName')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-tradeName-aide">
+                    Champ facultatif de la démonstration.
+                  </p>
+                  @if (errorFor('tradeName'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-tradeName-erreur">
+                      {{ error }}
+                    </p>
+                  }
+                </div>
+
+                <div class="enrollment-field">
+                  <label for="adhesion-legalForm">
+                    Forme juridique déclarée <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="adhesion-legalForm"
+                    type="text"
+                    formControlName="legalForm"
+                    autocomplete="off"
+                    placeholder="Valeur fictive en texte libre"
+                    aria-required="true"
+                    [attr.aria-invalid]="invalidAttr('legalForm')"
+                    [attr.aria-describedby]="describedBy('legalForm')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-legalForm-aide">
+                    La nomenclature et l’adaptation des pièces ne sont pas arbitrées.
+                  </p>
+                  @if (errorFor('legalForm'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-legalForm-erreur">
+                      {{ error }}
+                    </p>
+                  }
+                </div>
+
+                <div class="enrollment-field">
+                  <label for="adhesion-rccm">
+                    Référence RCCM de démonstration <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="adhesion-rccm"
+                    type="text"
+                    formControlName="rccm"
+                    autocomplete="off"
+                    placeholder="DEMO-RCCM-001"
+                    aria-required="true"
+                    [attr.aria-invalid]="invalidAttr('rccm')"
+                    [attr.aria-describedby]="describedBy('rccm')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-rccm-aide">
+                    Texte libre : aucun masque RCCM officiel n’est fourni.
+                  </p>
+                  @if (errorFor('rccm'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-rccm-erreur">{{ error }}</p>
+                  }
+                </div>
+
+                <div class="enrollment-field">
+                  <label for="adhesion-nif">
+                    Référence NIF de démonstration <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="adhesion-nif"
+                    type="text"
+                    formControlName="nif"
+                    autocomplete="off"
+                    placeholder="DEMO-NIF-001"
+                    aria-required="true"
+                    [attr.aria-invalid]="invalidAttr('nif')"
+                    [attr.aria-describedby]="describedBy('nif')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-nif-aide">
+                    Texte libre : aucun masque NIF officiel n’est fourni.
+                  </p>
+                  @if (errorFor('nif'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-nif-erreur">{{ error }}</p>
+                  }
+                </div>
+              </div>
+            }
+
+            @case ('contact') {
+              <div class="enrollment-grid">
+                <div class="enrollment-field enrollment-field--wide">
+                  <label for="adhesion-contactName">
+                    Nom du contact fictif <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="adhesion-contactName"
+                    type="text"
+                    formControlName="contactName"
+                    autocomplete="off"
+                    placeholder="Ex. Awa Démo"
+                    aria-required="true"
+                    [attr.aria-invalid]="invalidAttr('contactName')"
+                    [attr.aria-describedby]="describedBy('contactName')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-contactName-aide">
+                    Aucun nom de personne réelle.
+                  </p>
+                  @if (errorFor('contactName'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-contactName-erreur">
+                      {{ error }}
+                    </p>
+                  }
+                </div>
+
+                <div class="enrollment-field">
+                  <label for="adhesion-contactEmail">
+                    Adresse e-mail fictive <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="adhesion-contactEmail"
+                    type="email"
+                    formControlName="contactEmail"
+                    autocomplete="off"
+                    inputmode="email"
+                    placeholder="contact@demo.invalid"
+                    aria-required="true"
+                    [attr.aria-invalid]="invalidAttr('contactEmail')"
+                    [attr.aria-describedby]="describedBy('contactEmail')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-contactEmail-aide">
+                    Utilisez le domaine réservé <code>.invalid</code>.
+                  </p>
+                  @if (errorFor('contactEmail'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-contactEmail-erreur">
+                      {{ error }}
+                    </p>
+                  }
+                </div>
+
+                <div class="enrollment-field">
+                  <label for="adhesion-contactPhone">
+                    Téléphone fictif <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    id="adhesion-contactPhone"
+                    type="tel"
+                    formControlName="contactPhone"
+                    autocomplete="off"
+                    placeholder="DEMO-TELEPHONE"
+                    aria-required="true"
+                    [attr.aria-invalid]="invalidAttr('contactPhone')"
+                    [attr.aria-describedby]="describedBy('contactPhone')"
+                  />
+                  <p class="enrollment-field__hint" id="adhesion-contactPhone-aide">
+                    Aucun format téléphonique officiel n’est simulé.
+                  </p>
+                  @if (errorFor('contactPhone'); as error) {
+                    <p class="enrollment-field__error" id="adhesion-contactPhone-erreur">
+                      {{ error }}
+                    </p>
+                  }
+                </div>
+              </div>
+            }
+
+            @case ('pieces') {
+              <cnpm-alert tone="info" title="Périmètre neutralisé">
+                Aucun fichier ne peut être sélectionné, lu ou transmis. La liste opposable des
+                pièces obligatoires, facultatives et conditionnelles doit encore être validée.
+              </cnpm-alert>
+              <ul class="enrollment-metadata" aria-label="Métadonnées du traitement des pièces">
+                <li>
+                  <span>Liste officielle par forme juridique</span>
+                  <strong>Non publiée</strong>
+                </li>
+                <li>
+                  <span>Lecture ou téléversement</span>
+                  <strong>Désactivé</strong>
+                </li>
+                <li>
+                  <span>GED et analyse antivirus</span>
+                  <strong>Sans objet dans cette démo</strong>
+                </li>
+                <li>
+                  <span>Blocage pour pièce manquante</span>
+                  <strong>Non calculable</strong>
+                </li>
+              </ul>
+            }
+
+            @case ('verification') {
+              <cnpm-alert tone="warning" title="Aucune soumission officielle">
+                La prochaine action ne vaut ni consentement juridique, ni dépôt, ni demande
+                d’adhésion. Elle affiche seulement une confirmation locale de démonstration.
+              </cnpm-alert>
+              <div class="enrollment-review">
+                <h3>Informations saisies</h3>
+                <cnpm-definition-list [items]="reviewItems()" />
+              </div>
+              <div class="enrollment-neutralized" role="note">
+                <strong>Consentement neutralisé</strong>
+                <p>
+                  Aucune case de consentement n’est proposée : le texte, sa version et sa base
+                  juridique ne sont pas validés dans les sources.
+                </p>
+              </div>
+            }
+          }
+        </section>
+
+        <div class="enrollment-actions">
+          <div>
+            <cnpm-button variant="secondary" [disabled]="currentIndex() === 0" (click)="previous()">
+              Étape précédente
+            </cnpm-button>
+            <cnpm-button variant="tertiary" (click)="requestCancel()"> Abandonner </cnpm-button>
+          </div>
+          <cnpm-button
+            type="submit"
+            [variant]="current() === 'verification' ? 'public-cta' : 'primary'"
+          >
+            {{ current() === 'verification' ? 'Créer la confirmation locale' : 'Étape suivante' }}
+          </cnpm-button>
+        </div>
+      </form>
+    </div>
+  }
+</cnpm-public-shell>
