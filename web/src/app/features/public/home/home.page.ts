@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  computed,
   inject,
   signal,
 } from '@angular/core';
@@ -30,7 +29,7 @@ import { EmptyStateComponent } from '../../../design-system/empty-state/empty-st
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
-import { PublicShellComponent, type PublicNavSection } from '../public-shell.component';
+import { PublicShellComponent } from '../public-shell.component';
 import { HOME_GATEWAY, type PublicHighlights } from './home-gateway';
 
 type PageState = 'loading' | 'ready' | 'empty' | 'error';
@@ -75,17 +74,6 @@ export class HomePage {
   protected readonly highlights = signal<PublicHighlights | null>(null);
   protected readonly chartBars = [42, 58, 50, 70, 64, 82, 74, 92];
 
-  protected readonly navSections = computed<readonly PublicNavSection[]>(() => {
-    const sections: PublicNavSection[] = [
-      { id: 'services', label: 'Le CNPM' },
-      { id: 'modules', label: 'Services' },
-      { id: 'chiffres', label: 'Chiffres clés' },
-    ];
-    if (this.highlights()?.news.some((item) => item.fictionalDemo)) {
-      sections.push({ id: 'actualites', label: 'Actualités' });
-    }
-    return sections;
-  });
 
   protected readonly institution = {
     title: 'La plateforme digitale du Conseil National du Patronat du Mali',

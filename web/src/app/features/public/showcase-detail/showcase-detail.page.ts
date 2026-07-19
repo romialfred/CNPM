@@ -28,7 +28,7 @@ import { EmptyStateComponent } from '../../../design-system/empty-state/empty-st
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
-import { PublicShellComponent, type PublicNavSection } from '../public-shell.component';
+import { PublicShellComponent } from '../public-shell.component';
 import {
   SHOWCASE_GATEWAY,
   type MemberShowcase,
@@ -97,16 +97,6 @@ export class ShowcaseDetailPage {
 
   protected readonly isProjectMode = computed(() => this.mode() === 'project');
   protected readonly memberBadge = computed(() => this.showcase()?.name ?? null);
-  protected readonly navSections = computed<readonly PublicNavSection[]>(() => {
-    const data = this.showcase();
-    if (this.mode() !== 'activities' || !data) {
-      return [];
-    }
-    return [
-      ...(data.activities.length ? [{ id: 'activites', label: 'Activités' }] : []),
-      ...(data.projects.length ? [{ id: 'realisations', label: 'Réalisations' }] : []),
-    ];
-  });
 
   constructor() {
     combineLatest([this.route.data, this.route.paramMap, this.retryRequest])

@@ -259,6 +259,17 @@
   border-block-start: 1px solid var(--cnpm-color-border-subtle);
 }
 
+/* Intitulé de groupe du tiroir : reprend en mobile le regroupement que les menus
+   déroulants portent en desktop. Décoratif, il n'est pas focusable. */
+.cnpm-public__drawer-group {
+  margin: var(--cnpm-space-4) 0 var(--cnpm-space-1);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .cnpm-public__drawer-link {
   display: flex;
   align-items: center;

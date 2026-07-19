@@ -37,6 +37,7 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-011 | Récupération, support et méthodes 2FA alternatives | Définir la destination réelle de « mot de passe oublié », du canal de support, des méthodes 2FA autorisées et des codes de secours | DSI + Sécurité + Communication | Élevé | Ouverte |
 | UX-DEC-012 | Sémantique du sélecteur d'espace (AUTH-001) | Trancher entre patron ARIA `tablist` et `radiogroup` pour le choix administration/membre | Produit / UX + Accessibilité | Moyen | Ouverte |
 | UX-DEC-013 | Modèle de consentement des contacts publics | Définir le recueil, la conservation, la révocation et la revérification du consentement à publier des coordonnées | Juridique / DPO + Communication | Élevé | Ouverte |
+| UX-DEC-015 | Nombre d'entrées de la navigation publique | Arbitrer entre les huit entrées de REF-PUB-001 et le regroupement en quatre menus déroulants demandé par le client | Produit / UX + Communication | Moyen | Ouverte |
 
 ## Décisions ouvertes — détail
 
@@ -83,6 +84,32 @@ vocabulaire de la fiche et le catalogue de composants, d'où l'arbitrage UX.
 **Impact si non tranché.** Le patron actuel reste incomplet (`tab` sans `tabpanel`,
 sans `aria-controls`). Défaut d'accessibilité MAJEUR ouvert, non bloquant pour le reste
 de l'écran.
+
+### UX-DEC-015 — Nombre d'entrées de la navigation publique
+
+**Contexte.** `docs/ui-handoff/docs/04-screens/reference-specs/ref-pub-001-public-home.md`
+décrit une navigation publique de huit entrées, dont deux à menu déroulant. Le catalogue
+`docs/ui-handoff/docs/02-components/navigation.md` ne prescrit, lui, que le header fixe,
+le tiroir mobile et un appel à l'action distinct : il ne fixe aucun nombre d'entrées.
+
+**Constat.** La barre livrée cumulait sept liens de site puis les ancres de la page
+courante, sans déduplication. Sur l'accueil, « Le CNPM », « Services » et « Actualités »
+apparaissaient donc deux fois, et les deux ancres homonymes pointaient vers des sections
+croisées. Quatre destinations réelles — `/contact`, `/membres/recherche`,
+`/verification/:code`, `/legal/:document` — n'étaient atteignables depuis aucun menu.
+
+**État actuel.** Le client a demandé explicitement quatre menus principaux à menus
+déroulants. Le regroupement retenu — Le CNPM, Services, Membres, Actualités — couvre
+l'intégralité des destinations déclarées dans `public.routes.ts` sans en inventer aucune ;
+l'accueil reste atteignable par le logo et le portail membre demeure un appel à l'action
+isolé. Les ancres de page ne sont plus projetées dans la coquille.
+
+**Divergence à arbitrer.** Quatre entrées au lieu des huit de REF-PUB-001. La demande
+client prime pour la démonstration ; l'arbitrage doit dire si REF-PUB-001 est mis à jour
+ou si la navigation revient à huit entrées.
+
+**Question.** Retient-on le regroupement en quatre menus déroulants, et met-on à jour
+REF-PUB-001 en conséquence ?
 
 ### UX-DEC-013 — Modèle de consentement des contacts publics
 

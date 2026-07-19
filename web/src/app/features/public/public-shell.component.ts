@@ -22,14 +22,10 @@ import {
   LucidePhone,
   LucideX,
 } from '@lucide/angular';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
-
-/** Ancre de section réellement rendue par la page hôte. */
-export interface PublicNavSection {
-  readonly id: string;
-  readonly label: string;
-}
+import { NavMenuComponent } from '../../design-system/nav-menu/nav-menu.component';
+import { PUBLIC_NAVIGATION } from './public-navigation';
 
 /** Coordonnées préfiltrées et publiables d'une vitrine membre. */
 export interface PublicFooterContact {
@@ -50,8 +46,8 @@ export interface PublicFooterContact {
   selector: 'cnpm-public-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    NavMenuComponent,
     RouterLink,
-    RouterLinkActive,
     LucideArrowRight,
     LucideChevronRight,
     LucideClock,
@@ -92,68 +88,10 @@ export interface PublicFooterContact {
 
           <nav
             class="cnpm-public__nav cnpm-public__nav--desktop"
-            [attr.aria-label]="memberBadge() ? 'Sections de la vitrine' : 'Navigation principale'"
+            aria-label="Navigation principale"
           >
-            <a
-              class="cnpm-public__nav-link"
-              routerLink="/"
-              routerLinkActive="cnpm-public__nav-link--active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              ariaCurrentWhenActive="page"
-            >
-              Accueil
-            </a>
-            <a
-              class="cnpm-public__nav-link"
-              routerLink="/le-cnpm"
-              routerLinkActive="cnpm-public__nav-link--active"
-              ariaCurrentWhenActive="page"
-            >
-              Le CNPM
-            </a>
-            <a
-              class="cnpm-public__nav-link"
-              routerLink="/services"
-              routerLinkActive="cnpm-public__nav-link--active"
-              ariaCurrentWhenActive="page"
-            >
-              Services
-            </a>
-            <a
-              class="cnpm-public__nav-link"
-              routerLink="/membres"
-              routerLinkActive="cnpm-public__nav-link--active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              ariaCurrentWhenActive="page"
-            >
-              Annuaire
-            </a>
-            <a
-              class="cnpm-public__nav-link"
-              routerLink="/actualites"
-              routerLinkActive="cnpm-public__nav-link--active"
-              ariaCurrentWhenActive="page"
-            >
-              Actualités
-            </a>
-            <a
-              class="cnpm-public__nav-link"
-              routerLink="/agenda"
-              routerLinkActive="cnpm-public__nav-link--active"
-              ariaCurrentWhenActive="page"
-            >
-              Agenda
-            </a>
-            <a
-              class="cnpm-public__nav-link"
-              routerLink="/adhesion"
-              routerLinkActive="cnpm-public__nav-link--active"
-              ariaCurrentWhenActive="page"
-            >
-              Adhésion
-            </a>
-            @for (section of sections(); track section.id) {
-              <a class="cnpm-public__nav-link" [href]="'#' + section.id">{{ section.label }}</a>
+            @for (group of navigation; track group.id) {
+              <cnpm-nav-menu [menuId]="group.id" [label]="group.label" [items]="group.items" />
             }
             <a class="cnpm-public__portal-link" routerLink="/auth/login">
               <svg lucideLogIn [size]="iconSize.compact" aria-hidden="true"></svg>
@@ -205,49 +143,24 @@ export interface PublicFooterContact {
 
               <nav
                 class="cnpm-public__drawer-nav"
-                [attr.aria-label]="memberBadge() ? 'Sections de la vitrine' : 'Navigation mobile'"
+                aria-label="Navigation mobile"
               >
                 <a class="cnpm-public__drawer-link" routerLink="/" (click)="closeMenu()">
                   <span>Accueil</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
                 </a>
-                <a class="cnpm-public__drawer-link" routerLink="/le-cnpm" (click)="closeMenu()">
-                  <span>Le CNPM</span>
-                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                </a>
-                <a class="cnpm-public__drawer-link" routerLink="/services" (click)="closeMenu()">
-                  <span>Services</span>
-                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                </a>
-                <a class="cnpm-public__drawer-link" routerLink="/membres" (click)="closeMenu()">
-                  <span>Annuaire</span>
-                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                </a>
-                <a class="cnpm-public__drawer-link" routerLink="/actualites" (click)="closeMenu()">
-                  <span>Actualités</span>
-                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                </a>
-                <a class="cnpm-public__drawer-link" routerLink="/agenda" (click)="closeMenu()">
-                  <span>Agenda</span>
-                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                </a>
-                <a class="cnpm-public__drawer-link" routerLink="/contact" (click)="closeMenu()">
-                  <span>Contact (démonstration)</span>
-                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                </a>
-                <a class="cnpm-public__drawer-link" routerLink="/adhesion" (click)="closeMenu()">
-                  <span>Adhésion</span>
-                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                </a>
-                @for (section of sections(); track section.id) {
-                  <a
-                    class="cnpm-public__drawer-link"
-                    [href]="'#' + section.id"
-                    (click)="closeMenu()"
-                  >
-                    <span>{{ section.label }}</span>
-                    <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                  </a>
+                @for (group of navigation; track group.id) {
+                  <p class="cnpm-public__drawer-group">{{ group.label }}</p>
+                  @for (item of group.items; track item.routerLink) {
+                    <a
+                      class="cnpm-public__drawer-link"
+                      [routerLink]="item.routerLink"
+                      (click)="closeMenu()"
+                    >
+                      <span>{{ item.label }}</span>
+                      <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                    </a>
+                  }
                 }
               </nav>
 
@@ -356,17 +269,10 @@ export interface PublicFooterContact {
             <h2 class="cnpm-public__footer-title">Parcourir</h2>
             <ul>
               <li><a routerLink="/">Accueil</a></li>
-              <li><a routerLink="/le-cnpm">Le CNPM</a></li>
-              <li><a routerLink="/services">Services</a></li>
-              <li><a routerLink="/membres">Annuaire des membres</a></li>
-              <li><a routerLink="/actualites">Actualités</a></li>
-              <li><a routerLink="/agenda">Agenda</a></li>
-              <li><a routerLink="/contact">Contact — démonstration</a></li>
-              <li><a routerLink="/adhesion">Demande d’adhésion fictive</a></li>
-              @for (section of sections(); track section.id) {
-                <li>
-                  <a [href]="'#' + section.id">{{ section.label }}</a>
-                </li>
+              @for (group of navigation; track group.id) {
+                @for (item of group.items; track item.routerLink) {
+                  <li><a [routerLink]="item.routerLink">{{ item.label }}</a></li>
+                }
               }
             </ul>
           </nav>
@@ -411,10 +317,10 @@ export interface PublicFooterContact {
   styleUrls: ['./public-shell.component.scss', './public-shell.footer.scss'],
 })
 export class PublicShellComponent {
-  readonly sections = input<readonly PublicNavSection[]>([]);
   readonly memberBadge = input<string | null>(null);
   readonly contact = input<PublicFooterContact | null>(null);
 
+  protected readonly navigation = PUBLIC_NAVIGATION;
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly menuOpen = signal(false);
 

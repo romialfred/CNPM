@@ -21,15 +21,12 @@ async function setup() {
         { path: 'legal/:document', children: [] },
         { path: 'adhesion', children: [] },
         { path: 'verification/:code', children: [] },
+        { path: 'membres/recherche', children: [] },
       ]),
     ],
   }).compileComponents();
 
   const fixture = TestBed.createComponent(PublicShellComponent);
-  fixture.componentRef.setInput('sections', [
-    { id: 'services', label: 'Services' },
-    { id: 'chiffres', label: 'Chiffres clés' },
-  ]);
   fixture.detectChanges();
   await fixture.whenStable();
   return { fixture, host: fixture.nativeElement as HTMLElement };
@@ -60,6 +57,38 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     );
   });
 
+  it('n’expose aucun libellé dupliqué dans la navigation principale', async () => {
+    // Défaut constaté par le client, capture à l'appui : la barre concaténait sept
+    // liens de site puis les ancres de la page, si bien que « Le CNPM », « Services »
+    // et « Actualités » y figuraient deux fois — et les deux ancres homonymes
+    // pointaient en prime vers des sections croisées.
+    const { host } = await setup();
+    const nav = host.querySelector('.cnpm-public__nav--desktop')!;
+    const libelles = Array.from(nav.querySelectorAll<HTMLElement>('button, a'))
+      .map((element) => element.textContent?.trim())
+      .filter((label): label is string => Boolean(label));
+
+    expect(new Set(libelles).size).toBe(libelles.length);
+  });
+
+  it('regroupe la navigation de site en quatre menus déroulants', async () => {
+    const { host } = await setup();
+    const declencheurs = Array.from(
+      host.querySelectorAll<HTMLButtonElement>('.cnpm-nav-menu__trigger'),
+    );
+
+    expect(declencheurs.map((bouton) => bouton.textContent?.trim())).toEqual([
+      'Le CNPM',
+      'Services',
+      'Membres',
+      'Actualités',
+    ]);
+    // Replié par défaut : le déroulé ne doit pas encombrer la barre au chargement.
+    expect(declencheurs.every((bouton) => bouton.getAttribute('aria-expanded') === 'false')).toBe(
+      true,
+    );
+  });
+
   it('ne crée que des destinations réelles ou des ancres fournies par la page', async () => {
     const { host } = await setup();
     const hrefs = Array.from(host.querySelectorAll<HTMLAnchorElement>('a[href]')).map((link) =>
@@ -78,10 +107,12 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(hrefs).toContain('/legal/confidentialite');
     expect(hrefs).toContain('/legal/conditions-utilisation');
     expect(hrefs).toContain('/verification/DEMO-VERIF-2026-001');
-    expect(hrefs).toContain('#services');
-    expect(hrefs).toContain('#chiffres');
+    // Les ancres de page ne sont plus projetées dans la coquille : concaténées à la
+    // navigation de site, elles produisaient des libellés strictement dupliqués
+    // (« Le CNPM », « Services », « Actualités » apparaissaient deux fois).
+    expect(hrefs).not.toContain('#services');
+    expect(hrefs).not.toContain('#chiffres');
     expect(hrefs).not.toContain('#');
-    expect(host.textContent).toContain('Contact — démonstration');
     expect(
       host.querySelector('ul[aria-label="Statut des documents légaux non publiés"]'),
     ).not.toBeNull();

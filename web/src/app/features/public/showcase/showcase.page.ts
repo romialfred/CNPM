@@ -26,7 +26,6 @@ import { VerificationBadgeComponent } from '../../../design-system/verification-
 import {
   PublicShellComponent,
   type PublicFooterContact,
-  type PublicNavSection,
 } from '../public-shell.component';
 import {
   SHOWCASE_GATEWAY,
@@ -87,27 +86,6 @@ export class ShowcasePage {
   /** Index du témoignage affiché ; le carrousel n'expose qu'une citation à la fois. */
   protected readonly testimonialIndex = signal(0);
 
-  /**
-   * Ancres de la navigation locale.
-   *
-   * Seules les sections réellement rendues sont proposées : une ancre vers une
-   * section absente mènerait nulle part.
-   */
-  protected readonly sections = computed<readonly PublicNavSection[]>(() => {
-    const data = this.showcase();
-    if (!data) {
-      return [];
-    }
-    return [
-      { id: 'faits-cles', label: 'Faits clés', shown: this.keyFacts().length > 0 },
-      { id: 'activites', label: 'Activités', shown: data.activities.length > 0 },
-      { id: 'realisations', label: 'Réalisations', shown: data.projects.length > 0 },
-      { id: 'galerie', label: 'Galerie', shown: data.gallery.length > 0 },
-      { id: 'certifications', label: 'Certifications', shown: data.certifications.length > 0 },
-    ]
-      .filter((section) => section.shown)
-      .map(({ id, label }) => ({ id, label }));
-  });
 
   /**
    * Ancres proposées à la navigation principale.
@@ -118,16 +96,6 @@ export class ShowcasePage {
    * prévoit, mais aucune source ne les alimente et un onglet vide se remarque plus
    * qu'une absence.
    */
-  protected readonly navSections = computed<readonly PublicNavSection[]>(() => {
-    if (!this.showcase()) {
-      return [];
-    }
-    const anchors: PublicNavSection[] = [{ id: 'a-propos', label: 'À propos' }, ...this.sections()];
-    if (this.footerContact()) {
-      anchors.push({ id: 'contact-vitrine', label: 'Contact' });
-    }
-    return anchors;
-  });
 
   /** Bandeau de faits : seules les valeurs réellement renseignées sont exposées. */
   protected readonly keyFacts = computed<readonly ShowcaseKeyFact[]>(() => {

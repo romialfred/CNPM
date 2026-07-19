@@ -1,0 +1,104 @@
+.cnpm-nav-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.cnpm-nav-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  border: 0;
+  border-radius: var(--cnpm-radius-sm);
+  background: transparent;
+  color: var(--cnpm-color-text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-nav-menu__trigger:hover,
+.cnpm-nav-menu--open .cnpm-nav-menu__trigger {
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-nav-menu__trigger:focus-visible,
+.cnpm-nav-menu__link:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  box-shadow: var(--cnpm-shadow-focus);
+}
+
+.cnpm-nav-menu__chevron {
+  transition: transform var(--cnpm-duration-fast) ease;
+}
+
+.cnpm-nav-menu--open .cnpm-nav-menu__chevron {
+  transform: rotate(180deg);
+}
+
+.cnpm-nav-menu__panel {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: calc(100% + var(--cnpm-space-2));
+  inset-inline-start: 0;
+  min-inline-size: 15rem;
+  padding: var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  box-shadow: var(--cnpm-shadow-md);
+}
+
+.cnpm-nav-menu__list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  list-style: none;
+}
+
+.cnpm-nav-menu__link {
+  display: flex;
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-sm);
+  color: var(--cnpm-color-text-primary);
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  text-decoration: none;
+}
+
+.cnpm-nav-menu__link:hover {
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+}
+
+/* La destination active se distingue par un liseré ET par la couleur : la couleur
+   seule ne transmet jamais un statut (WCAG 2.2 AA). */
+.cnpm-nav-menu__link--active {
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-700);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-nav-menu__link-label {
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-nav-menu__link-hint {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-nav-menu__link--active .cnpm-nav-menu__link-hint {
+  color: var(--cnpm-color-text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-nav-menu__chevron {
+    transition: none;
+  }
+}
