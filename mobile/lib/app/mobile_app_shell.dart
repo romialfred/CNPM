@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:cnpm_mobile/design_system/cnpm_theme.dart';
 
@@ -20,10 +21,7 @@ class MobileAppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         actions: [
           IconButton(
             tooltip: 'Se déconnecter',
@@ -52,15 +50,24 @@ class MobileAppShell extends StatelessWidget {
             if (index == selectedIndex) {
               return;
             }
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Cette destination n’est pas incluse dans le lot MOB-001/MOB-002.',
-                  ),
-                ),
-              );
+            switch (index) {
+              case 0:
+                context.go('/home');
+              case 1:
+                context.go('/payments');
+              case 3:
+                context.go('/requests');
+              case 2 || 4:
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Cette destination n’est pas encore disponible dans la démonstration.',
+                      ),
+                    ),
+                  );
+            }
           },
           destinations: const [
             NavigationDestination(

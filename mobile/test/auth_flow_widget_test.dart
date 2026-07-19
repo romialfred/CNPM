@@ -87,7 +87,8 @@ void main() {
       await tester.tap(find.byKey(const Key('verify-submit')));
       await tester.pumpAndSettle();
 
-      expect(find.text('Connexion terminée'), findsOneWidget);
+      expect(find.text('Bonjour'), findsOneWidget);
+      expect(find.text('Entreprise Démo Sahel'), findsOneWidget);
       for (final label in [
         'Accueil',
         'Paiements',

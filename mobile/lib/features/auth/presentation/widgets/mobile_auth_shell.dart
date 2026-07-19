@@ -74,9 +74,7 @@ class MobileAuthShell extends StatelessWidget {
                           screenId,
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(
-                                color: CnpmColors.textMuted,
-                              ),
+                              ?.copyWith(color: CnpmColors.textMuted),
                         ),
                       ],
                     ),

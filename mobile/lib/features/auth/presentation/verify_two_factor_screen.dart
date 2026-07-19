@@ -64,10 +64,7 @@ class _VerifyTwoFactorScreenState extends State<VerifyTwoFactorScreen> {
                   ),
                 const SizedBox(height: CnpmSpacing.x5),
                 if (errorMessage != null) ...[
-                  CnpmNotice(
-                    tone: CnpmNoticeTone.error,
-                    message: errorMessage,
-                  ),
+                  CnpmNotice(tone: CnpmNoticeTone.error, message: errorMessage),
                   const SizedBox(height: CnpmSpacing.x4),
                 ],
                 CnpmOtpInput(

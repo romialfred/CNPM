@@ -33,6 +33,17 @@ Future<void> openTwoFactorScreen(WidgetTester tester) async {
     find.byKey(const Key('password-input')),
     'mot-de-passe-fictif',
   );
+  await tester.ensureVisible(find.byKey(const Key('login-submit')));
+  await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('login-submit')));
+  await tester.pumpAndSettle();
+}
+
+Future<void> completeDemoSignIn(WidgetTester tester) async {
+  await openTwoFactorScreen(tester);
+  await tester.enterText(find.byKey(const Key('otp-input')), '123456');
+  await tester.ensureVisible(find.byKey(const Key('verify-submit')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('verify-submit')));
   await tester.pumpAndSettle();
 }

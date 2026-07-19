@@ -15,7 +15,9 @@ abstract final class CnpmColors {
   static const border = Color(0xFFD0D5DD);
   static const borderSubtle = Color(0xFFEAECF0);
   static const success = Color(0xFF039855);
+  static const successSurface = Color(0xFFECFDF3);
   static const warning = Color(0xFFDC6803);
+  static const warningSurface = Color(0xFFFFFAEB);
   static const error = Color(0xFFD92D20);
   static const errorSurface = Color(0xFFFEF3F2);
   static const info = Color(0xFF1570EF);
@@ -119,9 +121,7 @@ ThemeData buildCnpmTheme() {
         disabledForegroundColor: CnpmColors.textMuted,
         elevation: 0,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(CnpmRadii.control),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(CnpmRadii.control)),
         ),
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
       ),
@@ -132,9 +132,7 @@ ThemeData buildCnpmTheme() {
         foregroundColor: CnpmColors.brandBlue,
         side: const BorderSide(color: CnpmColors.brandBlue),
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(CnpmRadii.control),
-          ),
+          borderRadius: BorderRadius.all(Radius.circular(CnpmRadii.control)),
         ),
       ),
     ),

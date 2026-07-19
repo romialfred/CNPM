@@ -26,6 +26,10 @@ class _CnpmAppState extends State<CnpmApp> {
     _router = buildAppRouter(
       config: widget.config,
       authController: _composition.authController,
+      dashboardController: _composition.dashboardController,
+      paymentController: _composition.paymentController,
+      requestController: _composition.requestController,
+      onSignOut: _composition.signOut,
     );
   }
 
