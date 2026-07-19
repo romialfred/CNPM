@@ -1,0 +1,233 @@
+<cnpm-admin-shell>
+  <div class="cnpm-organizations">
+    <cnpm-page-header
+      title="Entreprises"
+      description="Consultez le registre des entreprises et leur état de cycle de vie."
+    />
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeChip($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="cnpm-organizations__filters" role="search" (ngSubmit)="applyTextFilters()">
+        <div class="cnpm-organizations__field">
+          <label for="organization-status">Statut</label>
+          <select
+            id="organization-status"
+            name="status"
+            [ngModel]="status() ?? ''"
+            (ngModelChange)="setStatus($event)"
+          >
+            <option value="">Tous les statuts</option>
+            @if (status() && !statusIsKnown()) {
+              <option [value]="status()">{{ statusLabel(status()!) }}</option>
+            }
+            @for (value of statuses; track value) {
+              <option [value]="value">{{ statusLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="cnpm-organizations__field cnpm-organizations__field--search">
+          <label for="organization-search">Recherche</label>
+          <input
+            id="organization-search"
+            type="search"
+            name="search"
+            autocomplete="off"
+            maxlength="120"
+            placeholder="Raison sociale ou nom commercial"
+            [ngModel]="searchDraft()"
+            (ngModelChange)="searchDraft.set($event)"
+          />
+        </div>
+        <div class="cnpm-organizations__field">
+          <label for="organization-type">Type d’entreprise</label>
+          <input
+            id="organization-type"
+            name="organizationType"
+            maxlength="40"
+            placeholder="Type enregistré"
+            [ngModel]="typeDraft()"
+            (ngModelChange)="typeDraft.set($event)"
+          />
+        </div>
+        <div class="cnpm-organizations__field">
+          <label for="organization-sector">Code secteur</label>
+          <input
+            id="organization-sector"
+            name="sectorCode"
+            maxlength="80"
+            placeholder="Code enregistré"
+            [ngModel]="sectorDraft()"
+            (ngModelChange)="sectorDraft.set($event)"
+          />
+        </div>
+        <cnpm-button type="submit" variant="secondary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <div class="cnpm-organizations__toolbar" aria-live="polite">
+      @if (state() === 'ready' || state() === 'noResult' || state() === 'empty') {
+        <p>
+          <strong>{{ totalItems() }}</strong>
+          {{ totalItems() === 1 ? 'entreprise trouvée' : 'entreprises trouvées' }}
+        </p>
+      }
+    </div>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton
+          variant="table"
+          [rows]="pageSize()"
+          [columns]="columns.length"
+          label="Chargement des entreprises…"
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le registre n’a pas pu être chargé"
+          description="Le service des entreprises est momentanément indisponible. Vos filtres sont conservés."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucune entreprise enregistrée"
+          description="Le registre ne contient encore aucune entreprise consultable."
+        />
+      }
+      @case ('noResult') {
+        <cnpm-empty-state
+          variant="no-results"
+          title="Aucune entreprise ne correspond"
+          description="Retirez un filtre ou élargissez la recherche."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="resetFilters()"
+            >Réinitialiser les filtres</cnpm-button
+          >
+        </cnpm-empty-state>
+      }
+      @case ('ready') {
+        <div class="cnpm-organizations__table">
+          <cnpm-data-table
+            caption="Entreprises, types, secteurs, statuts et niveaux de risque."
+            [columns]="columns"
+            [rows]="rows()"
+            state="ready"
+            [sort]="sort()"
+            [rowKey]="rowKey"
+            (sortChange)="onSortChange($event)"
+          >
+            <ng-template #row let-organization>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-organizations__identity">
+                  <strong>{{ organization.legalName }}</strong>
+                  @if (organization.tradeName) {
+                    <span>{{ organization.tradeName }}</span>
+                  }
+                </span>
+              </td>
+              <td class="cnpm-table__cell">{{ organization.organizationType }}</td>
+              <td class="cnpm-table__cell">{{ sectorLabel(organization.sectorCode) }}</td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="statusTone(organization.status)">{{
+                  statusLabel(organization.status)
+                }}</cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="riskTone(organization.riskLevel)">{{
+                  riskLabel(organization.riskLevel)
+                }}</cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-organizations__actions">
+                  <a
+                    class="cnpm-organizations__icon-link"
+                    [routerLink]="['/admin/organizations', organization.id]"
+                    [queryParams]="listQueryParams()"
+                    [attr.aria-label]="'Voir ' + organization.legalName"
+                    title="Voir la fiche"
+                    ><svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg
+                  ></a>
+                  <a
+                    class="cnpm-organizations__icon-link"
+                    [routerLink]="['/admin/organizations', organization.id, 'edit']"
+                    [queryParams]="listQueryParams()"
+                    [attr.aria-label]="'Modifier ' + organization.legalName"
+                    title="Modifier l’entreprise"
+                    ><svg lucidePencil [size]="iconSize.compact" aria-hidden="true"></svg
+                  ></a>
+                </span>
+              </td>
+            </ng-template>
+          </cnpm-data-table>
+        </div>
+
+        <ul class="cnpm-organizations__cards" aria-label="Entreprises">
+          @for (organization of rows(); track organization.id) {
+            <li>
+              <div class="cnpm-organizations__card-head">
+                <div>
+                  <strong>{{ organization.legalName }}</strong>
+                  @if (organization.tradeName) {
+                    <span>{{ organization.tradeName }}</span>
+                  }
+                </div>
+                <cnpm-badge [tone]="statusTone(organization.status)">{{
+                  statusLabel(organization.status)
+                }}</cnpm-badge>
+              </div>
+              <dl>
+                <div>
+                  <dt>Type</dt>
+                  <dd>{{ organization.organizationType }}</dd>
+                </div>
+                <div>
+                  <dt>Secteur</dt>
+                  <dd>{{ sectorLabel(organization.sectorCode) }}</dd>
+                </div>
+                <div>
+                  <dt>Risque</dt>
+                  <dd>{{ riskLabel(organization.riskLevel) }}</dd>
+                </div>
+              </dl>
+              <div class="cnpm-organizations__card-actions">
+                <cnpm-button
+                  variant="secondary"
+                  size="sm"
+                  (click)="viewOrganization(organization.id)"
+                  >Voir la fiche</cnpm-button
+                >
+                <cnpm-button
+                  variant="tertiary"
+                  size="sm"
+                  (click)="editOrganization(organization.id)"
+                  >Modifier</cnpm-button
+                >
+              </div>
+            </li>
+          }
+        </ul>
+
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    }
+  </div>
+</cnpm-admin-shell>

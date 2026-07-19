@@ -1,0 +1,176 @@
+.cnpm-organization-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+.cnpm-organization-edit__crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organization-edit__crumbs li + li::before {
+  content: '/';
+  margin-right: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-disabled);
+}
+
+.cnpm-organization-edit__crumbs a {
+  color: var(--cnpm-color-text-link);
+  text-decoration: underline;
+}
+
+.cnpm-organization-edit__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-organization-edit__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.7fr);
+  align-items: start;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-organization-edit__card {
+  min-width: 0;
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-organization-edit__card h2 {
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organization-edit__intro,
+.cnpm-organization-edit__card > p {
+  margin: var(--cnpm-space-2) 0 var(--cnpm-space-4);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organization-edit__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-organization-edit__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-organization-edit__field--wide {
+  grid-column: 1 / -1;
+}
+
+.cnpm-organization-edit__field label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organization-edit__field label span,
+.cnpm-organization-edit__error {
+  color: var(--cnpm-color-text-critical);
+}
+
+.cnpm-organization-edit__field input {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-lg);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+}
+
+.cnpm-organization-edit__field input[aria-invalid='true'] {
+  border-color: var(--cnpm-color-border-critical);
+}
+
+.cnpm-organization-edit__field input:focus-visible,
+.cnpm-organization-edit__crumbs a:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
+.cnpm-organization-edit__error,
+.cnpm-organization-edit__help {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-organization-edit__help {
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-organization-edit__protected {
+  display: grid;
+  gap: var(--cnpm-space-3);
+  margin: var(--cnpm-space-4) 0;
+}
+
+.cnpm-organization-edit__protected > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  padding-bottom: var(--cnpm-space-3);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-organization-edit__protected dt {
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organization-edit__protected dd {
+  margin: 0;
+}
+
+.cnpm-organization-edit__actions {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--cnpm-zIndex-sticky);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3) 0;
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+  background: var(--cnpm-color-surface-page);
+}
+
+@media (max-width: 899px) {
+  .cnpm-organization-edit__layout,
+  .cnpm-organization-edit__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-organization-edit__field--wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 479px) {
+  .cnpm-organization-edit__actions cnpm-button {
+    flex: 1 1 100%;
+  }
+}

@@ -1,0 +1,98 @@
+<cnpm-admin-shell>
+  <div class="cnpm-organization-detail">
+    <nav aria-label="Fil d’Ariane">
+      <ol class="cnpm-organization-detail__crumbs">
+        <li>
+          <a routerLink="/admin/organizations" [queryParams]="listQueryParams()">Entreprises</a>
+        </li>
+        <li aria-current="page">Fiche entreprise</li>
+      </ol>
+    </nav>
+
+    <cnpm-page-header
+      [title]="pageTitle()"
+      description="Identité et état courant de l’entreprise dans le registre CNPM."
+    >
+      @if (organization(); as organization) {
+        <cnpm-button variant="primary" (click)="edit()">
+          <svg lucidePencil [size]="iconSize.compact" aria-hidden="true"></svg>
+          Modifier
+        </cnpm-button>
+      }
+    </cnpm-page-header>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la fiche entreprise…" />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" />
+      }
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          title="Entreprise introuvable"
+          description="Cette entreprise n’existe pas ou n’est plus accessible."
+        >
+          <cnpm-button variant="secondary" routerLink="/admin/organizations"
+            >Retour au registre</cnpm-button
+          >
+        </cnpm-error-state>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="La fiche n’a pas pu être chargée"
+          description="Le service des entreprises est momentanément indisponible."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (organization(); as organization) {
+          <cnpm-alert tone="info" title="Périmètre de la fiche">
+            Cette vue présente le cœur contractuel de l’entreprise. Les contacts, l’adhésion,
+            l’historique et les données financières relèvent de parcours séparés.
+          </cnpm-alert>
+
+          <div class="cnpm-organization-detail__grid">
+            <section
+              class="cnpm-organization-detail__card"
+              aria-labelledby="organization-identity-title"
+            >
+              <h2 id="organization-identity-title">Identité descriptive</h2>
+              <cnpm-definition-list [items]="facts()" />
+            </section>
+
+            <aside
+              class="cnpm-organization-detail__card"
+              aria-labelledby="organization-state-title"
+            >
+              <h2 id="organization-state-title">État courant</h2>
+              <div class="cnpm-organization-detail__badges">
+                <div>
+                  <span>Statut</span>
+                  <cnpm-badge [tone]="statusTone(organization.status)">{{
+                    statusLabel(organization.status)
+                  }}</cnpm-badge>
+                </div>
+                <div>
+                  <span>Niveau de risque</span>
+                  <cnpm-badge [tone]="riskTone(organization.riskLevel)">{{
+                    riskLabel(organization.riskLevel)
+                  }}</cnpm-badge>
+                </div>
+              </div>
+              <p>
+                Version de la fiche&nbsp;: <strong>{{ organization.version }}</strong>
+              </p>
+              <p class="cnpm-organization-detail__note">
+                Le statut et le risque ne sont pas modifiables depuis le formulaire descriptif.
+              </p>
+            </aside>
+          </div>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>

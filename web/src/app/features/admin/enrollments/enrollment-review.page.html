@@ -1,0 +1,461 @@
+<cnpm-admin-shell>
+  <div class="cnpm-review">
+    <nav aria-label="Fil d’Ariane">
+      <a
+        class="cnpm-review__back"
+        routerLink="/admin/enrollments"
+        [queryParams]="listQueryParams()"
+      >
+        <svg lucideArrowLeft [size]="iconSize.compact" aria-hidden="true"></svg>
+        Dossiers d’enrôlement
+      </a>
+    </nav>
+
+    <cnpm-page-header
+      [title]="pageTitle()"
+      description="Contrôlez l’état du dossier puis enregistrez une transition autorisée."
+    />
+
+    @switch (screenState()) {
+      @case ('loading') {
+        <div class="cnpm-review__loading">
+          <cnpm-skeleton variant="card" [rows]="6" label="Chargement du dossier d’enrôlement…" />
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement des actions disponibles…" />
+        </div>
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" />
+      }
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          title="Dossier introuvable"
+          description="Le dossier n’existe pas ou n’est plus accessible. Revenez à la liste pour poursuivre."
+        >
+          <cnpm-button variant="secondary" routerLink="/admin/enrollments">
+            Retour à la liste
+          </cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le dossier n’a pas pu être chargé"
+          description="Le service d’enrôlement est momentanément indisponible."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (application(); as enrollment) {
+          @if (successMessage()) {
+            <cnpm-alert tone="success" title="Action enregistrée">
+              <p>{{ successMessage() }}</p>
+            </cnpm-alert>
+          }
+
+          @if (actionError()) {
+            <cnpm-alert tone="error" title="Action non enregistrée">
+              <p>{{ actionError() }}</p>
+              <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                <svg lucideRefreshCw [size]="iconSize.compact" aria-hidden="true"></svg>
+                Recharger le dossier
+              </cnpm-button>
+            </cnpm-alert>
+          }
+
+          <div class="cnpm-review__layout">
+            <div class="cnpm-review__main">
+              <section class="cnpm-review__identity" aria-labelledby="dossier-resume-title">
+                <div class="cnpm-review__identity-heading">
+                  <div>
+                    <p class="cnpm-review__eyebrow">Dossier d’adhésion</p>
+                    <h2 id="dossier-resume-title">{{ enrollment.caseNumber }}</h2>
+                  </div>
+                  <cnpm-badge [tone]="statusTone(enrollment.status)">
+                    {{ statusLabel(enrollment.status) }}
+                  </cnpm-badge>
+                </div>
+
+                <dl class="cnpm-review__definitions">
+                  <div>
+                    <dt>Entreprise</dt>
+                    <dd class="cnpm-review__technical-id">{{ enrollment.organizationId }}</dd>
+                  </div>
+                  <div>
+                    <dt>Canal</dt>
+                    <dd>{{ enrollment.channel }}</dd>
+                  </div>
+                  <div>
+                    <dt>Soumission</dt>
+                    <dd>
+                      @if (enrollment.submittedAt) {
+                        {{ enrollment.submittedAt | date: 'dd/MM/yyyy HH:mm' }}
+                      } @else {
+                        Non soumis
+                      }
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Contrôleur affecté</dt>
+                    <dd [class.cnpm-review__technical-id]="enrollment.assignedTo">
+                      {{ enrollment.assignedTo ?? 'Non affecté' }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Version</dt>
+                    <dd>{{ enrollment.version }}</dd>
+                  </div>
+                </dl>
+              </section>
+
+              <section class="cnpm-review__card" aria-labelledby="controle-title">
+                <div class="cnpm-review__section-heading">
+                  <svg lucideClipboardCheck [size]="iconSize.navigation" aria-hidden="true"></svg>
+                  <div>
+                    <h2 id="controle-title">Éléments de contrôle disponibles</h2>
+                    <p>Données exposées par le contrat actuel du dossier.</p>
+                  </div>
+                </div>
+                <cnpm-alert tone="warning" title="Périmètre contractuel limité" [live]="false">
+                  <p>
+                    Le détail actuel ne fournit ni pièces, ni contacts, ni RCCM/NIF, ni catégorie
+                    proposée. L’écran n’invente aucun de ces éléments et ne conclut pas à leur
+                    place.
+                  </p>
+                </cnpm-alert>
+              </section>
+            </div>
+
+            <aside class="cnpm-review__aside" aria-label="État et décisions">
+              <section class="cnpm-review__card" aria-labelledby="workflow-title">
+                <h2 id="workflow-title">État du workflow</h2>
+                <cnpm-badge [tone]="statusTone(enrollment.status)">
+                  {{ statusLabel(enrollment.status) }}
+                </cnpm-badge>
+                <p class="cnpm-review__guidance">{{ workflowGuidance(enrollment.status) }}</p>
+              </section>
+
+              <section class="cnpm-review__card" aria-labelledby="actions-title">
+                <h2 id="actions-title">Décision</h2>
+
+                @if (enrollment.status === 'SUBMITTED') {
+                  @if (canReview()) {
+                    <p class="cnpm-review__guidance">
+                      La prise en charge fait passer le dossier à l’état « En cours de contrôle ».
+                    </p>
+                    <cnpm-button
+                      [loading]="actionPending()"
+                      [disabled]="actionPending()"
+                      (click)="startReview()"
+                    >
+                      Prendre en charge
+                    </cnpm-button>
+                  } @else {
+                    <cnpm-alert tone="info" title="Action non disponible" [live]="false">
+                      <p>
+                        La permission ENROLLMENT.REVIEW est requise pour prendre en charge ce
+                        dossier.
+                      </p>
+                    </cnpm-alert>
+                  }
+                } @else if (enrollment.status === 'UNDER_REVIEW') {
+                  @if (canReview() || canApprove()) {
+                    <div class="cnpm-review__action-picker" aria-label="Choisir une décision">
+                      @if (canReview()) {
+                        <button
+                          type="button"
+                          class="cnpm-review__choice"
+                          [class.cnpm-review__choice--active]="activeAction() === 'complement'"
+                          [attr.aria-pressed]="activeAction() === 'complement'"
+                          (click)="chooseAction('complement')"
+                        >
+                          Demander un complément
+                        </button>
+                      }
+                      @if (canApprove()) {
+                        <button
+                          type="button"
+                          class="cnpm-review__choice"
+                          [class.cnpm-review__choice--active]="activeAction() === 'approve'"
+                          [attr.aria-pressed]="activeAction() === 'approve'"
+                          (click)="chooseAction('approve')"
+                        >
+                          Approuver
+                        </button>
+                        <button
+                          type="button"
+                          class="cnpm-review__choice cnpm-review__choice--danger"
+                          [class.cnpm-review__choice--active]="activeAction() === 'reject'"
+                          [attr.aria-pressed]="activeAction() === 'reject'"
+                          (click)="chooseAction('reject')"
+                        >
+                          Rejeter
+                        </button>
+                      }
+                    </div>
+
+                    @switch (activeAction()) {
+                      @case ('complement') {
+                        <form
+                          class="cnpm-review__form"
+                          [formGroup]="complementForm"
+                          (ngSubmit)="submitComplement()"
+                        >
+                          <cnpm-inline-error-summary [errors]="complementErrors()" />
+                          <div class="cnpm-review__field">
+                            <label for="complement-comment"
+                              >Motif du complément <span aria-hidden="true">*</span></label
+                            >
+                            <textarea
+                              id="complement-comment"
+                              formControlName="comment"
+                              maxlength="2000"
+                              [attr.aria-invalid]="
+                                fieldInvalid(
+                                  complementForm.controls.comment,
+                                  complementErrors().length > 0
+                                )
+                              "
+                              [attr.aria-describedby]="
+                                complementErrors().length
+                                  ? 'complement-comment-error'
+                                  : 'complement-comment-help'
+                              "
+                            ></textarea>
+                            <p id="complement-comment-help" class="cnpm-review__help">
+                              Décrivez précisément ce qui est attendu. Aucune échéance automatique
+                              ne sera ajoutée.
+                            </p>
+                            @if (complementErrors().length) {
+                              <p id="complement-comment-error" class="cnpm-review__field-error">
+                                {{ complementErrors()[0].message }}
+                              </p>
+                            }
+                          </div>
+                          <cnpm-button
+                            type="submit"
+                            [loading]="actionPending()"
+                            [disabled]="actionPending()"
+                          >
+                            Envoyer la demande
+                          </cnpm-button>
+                        </form>
+                      }
+                      @case ('approve') {
+                        <form
+                          class="cnpm-review__form"
+                          [formGroup]="approvalForm"
+                          (ngSubmit)="submitApproval()"
+                        >
+                          <cnpm-inline-error-summary [errors]="approvalErrors()" />
+                          <p class="cnpm-review__form-intro">
+                            Le décideur fournit explicitement le numéro d’adhésion et le code
+                            catégorie. Aucun des deux n’est calculé par l’écran.
+                          </p>
+                          <div class="cnpm-review__field">
+                            <label for="approval-membership-number"
+                              >Numéro d’adhésion <span aria-hidden="true">*</span></label
+                            >
+                            <input
+                              id="approval-membership-number"
+                              type="text"
+                              formControlName="membershipNumber"
+                              maxlength="60"
+                              autocomplete="off"
+                              [attr.aria-invalid]="
+                                fieldInvalid(
+                                  approvalForm.controls.membershipNumber,
+                                  approvalErrors().length > 0
+                                )
+                              "
+                              [attr.aria-describedby]="
+                                fieldError(approvalErrors(), 'approval-membership-number')
+                                  ? 'approval-membership-number-error'
+                                  : null
+                              "
+                            />
+                            @if (
+                              fieldError(approvalErrors(), 'approval-membership-number');
+                              as error
+                            ) {
+                              <p
+                                id="approval-membership-number-error"
+                                class="cnpm-review__field-error"
+                              >
+                                {{ error }}
+                              </p>
+                            }
+                          </div>
+                          <div class="cnpm-review__field">
+                            <label for="approval-category-code"
+                              >Code catégorie <span aria-hidden="true">*</span></label
+                            >
+                            <input
+                              id="approval-category-code"
+                              type="text"
+                              formControlName="categoryCode"
+                              maxlength="50"
+                              autocomplete="off"
+                              [attr.aria-invalid]="
+                                fieldInvalid(
+                                  approvalForm.controls.categoryCode,
+                                  approvalErrors().length > 0
+                                )
+                              "
+                              [attr.aria-describedby]="
+                                fieldError(approvalErrors(), 'approval-category-code')
+                                  ? 'approval-category-code-error'
+                                  : null
+                              "
+                            />
+                            @if (fieldError(approvalErrors(), 'approval-category-code'); as error) {
+                              <p id="approval-category-code-error" class="cnpm-review__field-error">
+                                {{ error }}
+                              </p>
+                            }
+                          </div>
+                          <div class="cnpm-review__field">
+                            <label for="approval-comment"
+                              >Commentaire
+                              <span class="cnpm-review__optional">(facultatif)</span></label
+                            >
+                            <textarea
+                              id="approval-comment"
+                              formControlName="comment"
+                              maxlength="2000"
+                              [attr.aria-invalid]="
+                                fieldInvalid(
+                                  approvalForm.controls.comment,
+                                  approvalErrors().length > 0
+                                )
+                              "
+                              [attr.aria-describedby]="
+                                fieldError(approvalErrors(), 'approval-comment')
+                                  ? 'approval-comment-error'
+                                  : null
+                              "
+                            ></textarea>
+                            @if (fieldError(approvalErrors(), 'approval-comment'); as error) {
+                              <p id="approval-comment-error" class="cnpm-review__field-error">
+                                {{ error }}
+                              </p>
+                            }
+                          </div>
+                          <cnpm-button
+                            type="submit"
+                            [loading]="actionPending()"
+                            [disabled]="actionPending()"
+                          >
+                            <svg
+                              lucideCheckCircle
+                              [size]="iconSize.compact"
+                              aria-hidden="true"
+                            ></svg>
+                            Approuver et activer
+                          </cnpm-button>
+                        </form>
+                      }
+                      @case ('reject') {
+                        <form
+                          class="cnpm-review__form"
+                          [formGroup]="rejectionForm"
+                          (ngSubmit)="submitRejection()"
+                        >
+                          <cnpm-inline-error-summary [errors]="rejectionErrors()" />
+                          <div class="cnpm-review__field">
+                            <label for="rejection-reason-code">
+                              Code motif
+                              <span class="cnpm-review__optional">(facultatif, texte libre)</span>
+                            </label>
+                            <input
+                              id="rejection-reason-code"
+                              type="text"
+                              formControlName="reasonCode"
+                              maxlength="60"
+                              autocomplete="off"
+                              [attr.aria-invalid]="
+                                fieldInvalid(
+                                  rejectionForm.controls.reasonCode,
+                                  rejectionErrors().length > 0
+                                )
+                              "
+                              [attr.aria-describedby]="
+                                fieldError(rejectionErrors(), 'rejection-reason-code')
+                                  ? 'rejection-reason-code-help rejection-reason-code-error'
+                                  : 'rejection-reason-code-help'
+                              "
+                            />
+                            <p id="rejection-reason-code-help" class="cnpm-review__help">
+                              Aucune nomenclature officielle de motifs n’est disponible à ce stade.
+                            </p>
+                            @if (fieldError(rejectionErrors(), 'rejection-reason-code'); as error) {
+                              <p id="rejection-reason-code-error" class="cnpm-review__field-error">
+                                {{ error }}
+                              </p>
+                            }
+                          </div>
+                          <div class="cnpm-review__field">
+                            <label for="rejection-comment"
+                              >Motif du rejet <span aria-hidden="true">*</span></label
+                            >
+                            <textarea
+                              id="rejection-comment"
+                              formControlName="comment"
+                              maxlength="2000"
+                              [attr.aria-invalid]="
+                                fieldInvalid(
+                                  rejectionForm.controls.comment,
+                                  rejectionErrors().length > 0
+                                )
+                              "
+                              [attr.aria-describedby]="
+                                fieldError(rejectionErrors(), 'rejection-comment')
+                                  ? 'rejection-comment-error'
+                                  : null
+                              "
+                            ></textarea>
+                            @if (fieldError(rejectionErrors(), 'rejection-comment'); as error) {
+                              <p id="rejection-comment-error" class="cnpm-review__field-error">
+                                {{ error }}
+                              </p>
+                            }
+                          </div>
+                          <cnpm-button
+                            type="submit"
+                            variant="danger"
+                            [loading]="actionPending()"
+                            [disabled]="actionPending()"
+                          >
+                            <svg lucideXCircle [size]="iconSize.compact" aria-hidden="true"></svg>
+                            Confirmer le rejet
+                          </cnpm-button>
+                        </form>
+                      }
+                    }
+                  } @else {
+                    <cnpm-alert tone="info" title="Décision non disponible" [live]="false">
+                      <p>
+                        Les permissions ENROLLMENT.REVIEW ou ENROLLMENT.APPROVE sont requises selon
+                        la transition. Le backend les vérifie à chaque requête.
+                      </p>
+                    </cnpm-alert>
+                  }
+                } @else {
+                  <p class="cnpm-review__guidance">
+                    Aucune transition de contrôle n’est disponible depuis cet état sur BO-010.
+                  </p>
+                }
+              </section>
+
+              <p class="cnpm-review__security-note">
+                Les permissions UI sont informatives. Toute transition reste autorisée et auditée
+                par le backend.
+              </p>
+            </aside>
+          </div>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>

@@ -20,6 +20,12 @@ export class DemoSessionGateway implements SessionGateway {
     exerciseLabel: '2024',
     notificationCount: 8,
     demoMode: true,
-    permissions: ['MEMBER.READ', 'ENROLLMENT.CREATE'],
+    permissions: [
+      'MEMBER.READ',
+      'MEMBER.WRITE',
+      'ENROLLMENT.CREATE',
+      'ENROLLMENT.REVIEW',
+      'ENROLLMENT.APPROVE',
+    ],
   });
 }

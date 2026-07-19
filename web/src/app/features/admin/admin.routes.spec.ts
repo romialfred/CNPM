@@ -13,8 +13,14 @@ describe('adminRoutes', () => {
     expect(child('dashboard')?.loadComponent).toBeTypeOf('function');
     expect(child('members')?.loadComponent).toBeTypeOf('function');
     expect(child('members/:id')?.loadComponent).toBeTypeOf('function');
+    expect(child('organizations')?.loadComponent).toBeTypeOf('function');
+    expect(child('organizations/:id')?.loadComponent).toBeTypeOf('function');
+    expect(child('organizations/:id/edit')?.loadComponent).toBeTypeOf('function');
+    expect(child('organizations/:id/edit')?.canDeactivate).toHaveLength(1);
+    expect(child('enrollments')?.loadComponent).toBeTypeOf('function');
     expect(child('enrollments/new')?.loadComponent).toBeTypeOf('function');
     expect(child('enrollments/new')?.canDeactivate).toHaveLength(1);
+    expect(child('enrollments/:id/review')?.loadComponent).toBeTypeOf('function');
     expect(child('contributions')?.loadComponent).toBeTypeOf('function');
     expect(child('payments/reconciliation')?.loadComponent).toBeTypeOf('function');
     expect(child('recovery/campaigns')?.loadComponent).toBeTypeOf('function');

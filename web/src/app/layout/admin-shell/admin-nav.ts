@@ -35,8 +35,8 @@ export interface AdminNavEntry {
 export const ADMIN_NAV: readonly AdminNavEntry[] = [
   { label: 'Tableau de bord', route: '/admin/dashboard', icon: 'dashboard' },
   { label: 'Membres', route: '/admin/members', icon: 'members' },
-  { label: 'Entreprises', route: '/admin/organizations', icon: 'companies', pending: true },
-  { label: 'Enrôlements', route: '/admin/enrollments/new', icon: 'enrolments' },
+  { label: 'Entreprises', route: '/admin/organizations', icon: 'companies' },
+  { label: 'Enrôlements', route: '/admin/enrollments', icon: 'enrolments' },
   { label: 'Cotisations', route: '/admin/contributions', icon: 'contributions' },
   { label: 'Paiements', route: '/admin/payments/reconciliation', icon: 'payments' },
   { label: 'Reçus', route: '/admin/receipts', icon: 'receipts', pending: true },

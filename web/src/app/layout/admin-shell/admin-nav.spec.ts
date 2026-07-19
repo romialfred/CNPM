@@ -10,7 +10,8 @@ describe('ADMIN_NAV', () => {
     expect(Object.fromEntries(delivered)).toEqual({
       'Tableau de bord': '/admin/dashboard',
       Membres: '/admin/members',
-      Enrôlements: '/admin/enrollments/new',
+      Entreprises: '/admin/organizations',
+      Enrôlements: '/admin/enrollments',
       Cotisations: '/admin/contributions',
       Paiements: '/admin/payments/reconciliation',
       Relances: '/admin/recovery/campaigns',
@@ -22,14 +23,8 @@ describe('ADMIN_NAV', () => {
   it('conserve les rubriques non livrées comme indisponibles explicites', () => {
     const pending = ADMIN_NAV.filter((entry) => entry.pending);
 
-    expect(pending.map((entry) => entry.label)).toEqual([
-      'Entreprises',
-      'Reçus',
-      'Requêtes',
-      'Groupements',
-    ]);
+    expect(pending.map((entry) => entry.label)).toEqual(['Reçus', 'Requêtes', 'Groupements']);
     expect(pending.map((entry) => entry.route)).toEqual([
-      '/admin/organizations',
       '/admin/receipts',
       '/admin/requests',
       '/admin/groups',

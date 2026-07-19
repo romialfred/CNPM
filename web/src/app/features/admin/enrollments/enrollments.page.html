@@ -1,0 +1,151 @@
+<cnpm-admin-shell>
+  <div class="cnpm-enrollments">
+    <cnpm-page-header
+      title="Dossiers d’enrôlement"
+      description="Consultez les dossiers, leur état de contrôle et leur affectation."
+    >
+      @if (canCreate()) {
+        <cnpm-button [routerLink]="['/admin/enrollments/new']">
+          <svg lucidePlus [size]="iconSize.compact" aria-hidden="true"></svg>
+          Nouvel enrôlement
+        </cnpm-button>
+      }
+    </cnpm-page-header>
+
+    <section class="cnpm-enrollments__card" aria-labelledby="enrollments-list-title">
+      <div class="cnpm-enrollments__card-heading">
+        <div>
+          <h2 id="enrollments-list-title">File des dossiers</h2>
+          <p>Pagination serveur · aucune échéance ou priorité n’est calculée par l’écran.</p>
+        </div>
+        @if (data()) {
+          <p class="cnpm-enrollments__total">
+            {{ totalItems() }} {{ totalItems() === 1 ? 'dossier' : 'dossiers' }}
+          </p>
+        }
+      </div>
+
+      <cnpm-data-table
+        caption="Dossiers d’enrôlement avec leur entreprise, canal, date de soumission, affectation et statut."
+        [columns]="columns"
+        [rows]="rows()"
+        [state]="tableState()"
+        [rowKey]="rowKey"
+      >
+        <ng-template #row let-enrollment>
+          <td class="cnpm-table__cell">
+            <span class="cnpm-enrollments__case">{{ enrollment.caseNumber }}</span>
+          </td>
+          <td class="cnpm-table__cell">
+            <span class="cnpm-enrollments__technical-id">{{ enrollment.organizationId }}</span>
+          </td>
+          <td class="cnpm-table__cell">{{ enrollment.channel }}</td>
+          <td class="cnpm-table__cell">
+            @if (enrollment.submittedAt) {
+              {{ enrollment.submittedAt | date: 'dd/MM/yyyy HH:mm' }}
+            } @else {
+              <span class="cnpm-enrollments__missing">Non soumis</span>
+            }
+          </td>
+          <td class="cnpm-table__cell">
+            @if (enrollment.assignedTo) {
+              <span class="cnpm-enrollments__technical-id">{{ enrollment.assignedTo }}</span>
+            } @else {
+              <span class="cnpm-enrollments__missing">Non affecté</span>
+            }
+          </td>
+          <td class="cnpm-table__cell">
+            <cnpm-badge [tone]="statusTone(enrollment.status)">
+              {{ statusLabel(enrollment.status) }}
+            </cnpm-badge>
+          </td>
+          <td class="cnpm-table__cell">
+            <button
+              type="button"
+              class="cnpm-enrollments__row-action"
+              (click)="openReview(enrollment.id)"
+              [attr.aria-label]="'Consulter le dossier ' + enrollment.caseNumber"
+            >
+              <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
+              <span>Consulter</span>
+            </button>
+          </td>
+        </ng-template>
+
+        <div data-table-status>
+          @switch (tableState()) {
+            @case ('loading') {
+              <cnpm-skeleton
+                variant="table"
+                [rows]="pageSize()"
+                [columns]="columns.length"
+                label="Chargement des dossiers d’enrôlement…"
+              />
+            }
+            @case ('empty') {
+              <cnpm-empty-state
+                variant="first-use"
+                title="Aucun dossier d’enrôlement"
+                description="La file d’enrôlement est vide."
+              >
+                @if (canCreate()) {
+                  <cnpm-button
+                    variant="secondary"
+                    size="sm"
+                    [routerLink]="['/admin/enrollments/new']"
+                  >
+                    Créer un dossier
+                  </cnpm-button>
+                }
+              </cnpm-empty-state>
+            }
+            @case ('noResult') {
+              <cnpm-empty-state
+                variant="no-results"
+                title="Cette page ne contient aucun dossier"
+                description="Le numéro de page dépasse la collection disponible."
+              >
+                <cnpm-button variant="secondary" size="sm" (click)="onPageChange(1)">
+                  Revenir à la première page
+                </cnpm-button>
+              </cnpm-empty-state>
+            }
+            @case ('error') {
+              <cnpm-error-state
+                variant="recoverable"
+                title="La liste n’a pas pu être chargée"
+                description="Le service d’enrôlement est momentanément indisponible. La page demandée est conservée."
+              >
+                <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                  Réessayer
+                </cnpm-button>
+              </cnpm-error-state>
+            }
+            @case ('forbidden') {
+              <cnpm-error-state variant="forbidden" />
+            }
+          }
+        </div>
+      </cnpm-data-table>
+
+      @if (tableState() === 'ready') {
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    </section>
+
+    <aside class="cnpm-enrollments__principle" aria-label="Rappel sur les autorisations">
+      <svg lucideClipboardCheck [size]="iconSize.control" aria-hidden="true"></svg>
+      <p>
+        Les actions visibles reflètent les permissions de la session. Le backend contrôle chaque
+        transition et reste la frontière de sécurité.
+      </p>
+    </aside>
+  </div>
+</cnpm-admin-shell>

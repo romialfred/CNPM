@@ -1,0 +1,177 @@
+.cnpm-organizations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+.cnpm-organizations__filters {
+  display: grid;
+  grid-template-columns:
+    minmax(10rem, 0.8fr) minmax(16rem, 1.5fr) minmax(12rem, 1fr) minmax(12rem, 1fr)
+    auto;
+  align-items: end;
+  gap: var(--cnpm-space-3);
+  width: 100%;
+}
+
+.cnpm-organizations__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-organizations__field label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organizations__field input,
+.cnpm-organizations__field select {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+}
+
+.cnpm-organizations__field input:focus-visible,
+.cnpm-organizations__field select:focus-visible,
+.cnpm-organizations__icon-link:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
+.cnpm-organizations__toolbar {
+  min-height: var(--cnpm-space-5);
+}
+
+.cnpm-organizations__toolbar p {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organizations__identity,
+.cnpm-organizations__card-head > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 12rem;
+}
+
+.cnpm-organizations__identity strong,
+.cnpm-organizations__card-head strong {
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cnpm-organizations__identity span,
+.cnpm-organizations__card-head span {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-organizations__actions {
+  display: flex;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-organizations__icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-control-sm);
+  height: var(--cnpm-size-control-sm);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  color: var(--cnpm-color-text-brand);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-organizations__icon-link:hover {
+  border-color: var(--cnpm-color-brand-blue-300);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-organizations__cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 1199px) {
+  .cnpm-organizations__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-organizations__filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-organizations__field input,
+  .cnpm-organizations__field select {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  .cnpm-organizations__table {
+    display: none;
+  }
+
+  .cnpm-organizations__cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-organizations__cards > li {
+    padding: var(--cnpm-space-4);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-lg);
+    background: var(--cnpm-color-surface-primary);
+  }
+
+  .cnpm-organizations__card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-organizations__cards dl {
+    display: grid;
+    gap: var(--cnpm-space-2);
+    margin: var(--cnpm-space-4) 0;
+  }
+
+  .cnpm-organizations__cards dl > div {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--cnpm-space-2);
+  }
+
+  .cnpm-organizations__cards dt {
+    color: var(--cnpm-color-text-muted);
+  }
+
+  .cnpm-organizations__cards dd {
+    margin: 0;
+    color: var(--cnpm-color-text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  .cnpm-organizations__card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cnpm-space-2);
+  }
+}

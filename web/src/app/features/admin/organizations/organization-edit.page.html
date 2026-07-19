@@ -1,0 +1,223 @@
+<cnpm-admin-shell>
+  <div class="cnpm-organization-edit">
+    <nav aria-label="Fil d’Ariane">
+      <ol class="cnpm-organization-edit__crumbs">
+        <li>
+          <a routerLink="/admin/organizations" [queryParams]="listQueryParams()">Entreprises</a>
+        </li>
+        @if (organization(); as organization) {
+          <li>
+            <a
+              [routerLink]="['/admin/organizations', organization.id]"
+              [queryParams]="listQueryParams()"
+              >{{ organization.legalName }}</a
+            >
+          </li>
+        }
+        <li aria-current="page">Modifier</li>
+      </ol>
+    </nav>
+
+    <cnpm-page-header
+      [title]="pageTitle()"
+      description="Mettez à jour uniquement les informations descriptives autorisées."
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="6" label="Chargement du formulaire entreprise…" />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" />
+      }
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          title="Entreprise introuvable"
+          description="Cette entreprise n’existe pas ou n’est plus accessible."
+        >
+          <cnpm-button variant="secondary" routerLink="/admin/organizations"
+            >Retour au registre</cnpm-button
+          >
+        </cnpm-error-state>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le formulaire n’a pas pu être chargé"
+          description="Le service des entreprises est momentanément indisponible."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (organization(); as organization) {
+          <cnpm-alert tone="info" title="Champs protégés">
+            Le statut, le niveau de risque et l’identifiant métier ne peuvent pas être modifiés ici.
+            Aucun écran de création n’est proposé tant que les règles d’identification ne sont pas
+            arbitrées.
+          </cnpm-alert>
+
+          @if (saveFailure()) {
+            <cnpm-alert
+              [tone]="saveFailure() === 'conflict' ? 'warning' : 'error'"
+              title="Enregistrement impossible"
+            >
+              <p>{{ saveMessage() }}</p>
+              @if (saveFailure() === 'conflict') {
+                <cnpm-button variant="secondary" size="sm" (click)="reload()"
+                  >Recharger la version courante</cnpm-button
+                >
+              }
+            </cnpm-alert>
+          }
+
+          <form
+            class="cnpm-organization-edit__form"
+            [formGroup]="form"
+            novalidate
+            (ngSubmit)="submit()"
+          >
+            <cnpm-inline-error-summary [errors]="formErrors()" />
+
+            <div class="cnpm-organization-edit__layout">
+              <section
+                class="cnpm-organization-edit__card"
+                aria-labelledby="organization-edit-fields-title"
+              >
+                <h2 id="organization-edit-fields-title">Informations descriptives</h2>
+                <p class="cnpm-organization-edit__intro">
+                  Les champs marqués d’un astérisque sont obligatoires.
+                </p>
+
+                <div class="cnpm-organization-edit__fields">
+                  <div class="cnpm-organization-edit__field cnpm-organization-edit__field--wide">
+                    <label for="organization-legal-name"
+                      >Raison sociale <span aria-hidden="true">*</span></label
+                    >
+                    <input
+                      id="organization-legal-name"
+                      formControlName="legalName"
+                      maxlength="255"
+                      autocomplete="organization"
+                      [attr.aria-invalid]="fieldError('legalName') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('legalName') ? 'organization-legal-name-error' : null
+                      "
+                    />
+                    @if (fieldError('legalName'); as error) {
+                      <p class="cnpm-organization-edit__error" id="organization-legal-name-error">
+                        {{ error }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="cnpm-organization-edit__field cnpm-organization-edit__field--wide">
+                    <label for="organization-trade-name">Nom commercial</label>
+                    <input
+                      id="organization-trade-name"
+                      formControlName="tradeName"
+                      maxlength="255"
+                      [attr.aria-invalid]="fieldError('tradeName') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('tradeName') ? 'organization-trade-name-error' : null
+                      "
+                    />
+                    @if (fieldError('tradeName'); as error) {
+                      <p class="cnpm-organization-edit__error" id="organization-trade-name-error">
+                        {{ error }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="cnpm-organization-edit__field">
+                    <label for="organization-type-edit"
+                      >Type d’entreprise <span aria-hidden="true">*</span></label
+                    >
+                    <input
+                      id="organization-type-edit"
+                      formControlName="organizationType"
+                      maxlength="40"
+                      [attr.aria-invalid]="fieldError('organizationType') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('organizationType') ? 'organization-type-edit-error' : null
+                      "
+                    />
+                    @if (fieldError('organizationType'); as error) {
+                      <p class="cnpm-organization-edit__error" id="organization-type-edit-error">
+                        {{ error }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="cnpm-organization-edit__field">
+                    <label for="organization-sector-edit">Code secteur</label>
+                    <input
+                      id="organization-sector-edit"
+                      formControlName="sectorCode"
+                      maxlength="80"
+                      [attr.aria-invalid]="fieldError('sectorCode') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('sectorCode')
+                          ? 'organization-sector-edit-error'
+                          : 'organization-sector-help'
+                      "
+                    />
+                    <p class="cnpm-organization-edit__help" id="organization-sector-help">
+                      Conservez le code déjà attribué par le référentiel.
+                    </p>
+                    @if (fieldError('sectorCode'); as error) {
+                      <p class="cnpm-organization-edit__error" id="organization-sector-edit-error">
+                        {{ error }}
+                      </p>
+                    }
+                  </div>
+                </div>
+              </section>
+
+              <aside
+                class="cnpm-organization-edit__card"
+                aria-labelledby="organization-protected-title"
+              >
+                <h2 id="organization-protected-title">État protégé</h2>
+                <dl class="cnpm-organization-edit__protected">
+                  <div>
+                    <dt>Statut</dt>
+                    <dd>
+                      <cnpm-badge [tone]="statusTone(organization.status)">
+                        {{ statusLabel(organization.status) }}
+                      </cnpm-badge>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Niveau de risque</dt>
+                    <dd>
+                      <cnpm-badge tone="success">
+                        {{ riskLabel(organization.riskLevel) }}
+                      </cnpm-badge>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Version</dt>
+                    <dd>{{ organization.version }}</dd>
+                  </div>
+                </dl>
+                <p>
+                  La version est contrôlée à l’enregistrement pour éviter d’écraser une modification
+                  concurrente.
+                </p>
+              </aside>
+            </div>
+
+            <div class="cnpm-organization-edit__actions">
+              <cnpm-button variant="secondary" (click)="cancel()">Annuler</cnpm-button>
+              <cnpm-button type="submit" variant="primary" [loading]="saving()">
+                Enregistrer les modifications
+              </cnpm-button>
+            </div>
+          </form>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>

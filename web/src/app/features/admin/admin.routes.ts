@@ -11,11 +11,18 @@ import { DemoDashboardGateway } from './dashboard/demo-dashboard.gateway';
 import { DemoEnrollmentGateway } from './enrollment-form/demo-enrollment.gateway';
 import { ENROLLMENT_GATEWAY } from './enrollment-form/enrollment-gateway';
 import { pendingEnrollmentChangesGuard } from './enrollment-form/pending-enrollment-changes.guard';
+import { DemoEnrollmentsGateway } from './enrollments/demo-enrollments.gateway';
+import { ENROLLMENTS_GATEWAY } from './enrollments/enrollments-gateway';
+import { HttpEnrollmentsGateway } from './enrollments/http-enrollments.gateway';
 import { DemoMemberDetailGateway } from './member-detail/demo-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from './member-detail/member-detail-gateway';
 import { DemoMembersGateway } from './members/demo-members.gateway';
 import { HttpMembersGateway } from './members/http-members.gateway';
 import { MEMBERS_GATEWAY } from './members/members-gateway';
+import { DemoOrganizationsGateway } from './organizations/demo-organizations.gateway';
+import { HttpOrganizationsGateway } from './organizations/http-organizations.gateway';
+import { ORGANIZATIONS_GATEWAY } from './organizations/organizations-gateway';
+import { pendingOrganizationChangesGuard } from './organizations/pending-organization-changes.guard';
 import { DemoPaymentsGateway } from './payments/demo-payments.gateway';
 import { PAYMENTS_GATEWAY } from './payments/payments-gateway';
 import { DemoRecoveryGateway } from './recovery/demo-recovery.gateway';
@@ -67,6 +74,15 @@ export const adminRoutes: Routes = [
             ? inject(DemoMembersGateway)
             : inject(HttpMembersGateway),
       },
+      DemoOrganizationsGateway,
+      HttpOrganizationsGateway,
+      {
+        provide: ORGANIZATIONS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoOrganizationsGateway)
+            : inject(HttpOrganizationsGateway),
+      },
       {
         provide: DASHBOARD_GATEWAY,
         useFactory: () =>
@@ -87,6 +103,15 @@ export const adminRoutes: Routes = [
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoEnrollmentGateway)
             : UNAVAILABLE_ENROLLMENT_GATEWAY,
+      },
+      DemoEnrollmentsGateway,
+      HttpEnrollmentsGateway,
+      {
+        provide: ENROLLMENTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoEnrollmentsGateway)
+            : inject(HttpEnrollmentsGateway),
       },
       {
         provide: CONTRIBUTIONS_GATEWAY,
@@ -145,12 +170,44 @@ export const adminRoutes: Routes = [
         title: 'Membres — Administration CNPM',
       },
       {
+        path: 'organizations',
+        loadComponent: () =>
+          import('./organizations/organizations.page').then((m) => m.OrganizationsPage),
+        title: 'Entreprises — Administration CNPM',
+      },
+      {
+        // La route d'édition précède la fiche paramétrée et ne propose aucune création.
+        path: 'organizations/:id/edit',
+        canDeactivate: [pendingOrganizationChangesGuard],
+        loadComponent: () =>
+          import('./organizations/organization-edit.page').then((m) => m.OrganizationEditPage),
+        title: 'Modifier une entreprise — Administration CNPM',
+      },
+      {
+        path: 'organizations/:id',
+        loadComponent: () =>
+          import('./organizations/organization-detail.page').then((m) => m.OrganizationDetailPage),
+        title: 'Fiche entreprise — Administration CNPM',
+      },
+      {
+        path: 'enrollments',
+        loadComponent: () =>
+          import('./enrollments/enrollments.page').then((m) => m.EnrollmentsPage),
+        title: 'Enrôlements — Administration CNPM',
+      },
+      {
         // Chemin fixe déclaré avant la route paramétrée du même segment.
         path: 'enrollments/new',
         canDeactivate: [pendingEnrollmentChangesGuard],
         loadComponent: () =>
           import('./enrollment-form/enrollment-form.page').then((m) => m.EnrollmentFormPage),
         title: 'Nouvel enrôlement — Administration CNPM',
+      },
+      {
+        path: 'enrollments/:id/review',
+        loadComponent: () =>
+          import('./enrollments/enrollment-review.page').then((m) => m.EnrollmentReviewPage),
+        title: 'Validation d’un enrôlement — Administration CNPM',
       },
       {
         path: 'members/:id',
