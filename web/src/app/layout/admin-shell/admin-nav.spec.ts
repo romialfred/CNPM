@@ -17,6 +17,7 @@ describe('ADMIN_NAV', () => {
       Reçus: '/admin/receipts',
       Relances: '/admin/recovery/campaigns',
       Requêtes: '/admin/requests',
+      Documents: '/admin/documents',
       Groupements: '/admin/groups',
       Reporting: '/admin/reporting',
       Audit: '/admin/security/audit',
@@ -34,6 +35,13 @@ describe('ADMIN_NAV', () => {
   it('n’expose Groupements qu’avec GROUP.READ', () => {
     expect(visibleAdminNav([]).some((entry) => entry.route === '/admin/groups')).toBe(false);
     expect(visibleAdminNav(['GROUP.READ']).some((entry) => entry.route === '/admin/groups')).toBe(
+      true,
+    );
+  });
+
+  it('n’expose Documents qu’avec DOCUMENT.READ', () => {
+    expect(visibleAdminNav([]).some((entry) => entry.label === 'Documents')).toBe(false);
+    expect(visibleAdminNav(['DOCUMENT.READ']).some((entry) => entry.label === 'Documents')).toBe(
       true,
     );
   });

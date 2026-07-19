@@ -1,6 +1,7 @@
 import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type { ContributionsGateway } from './contributions/contributions-gateway';
 import type { DashboardGateway } from './dashboard/dashboard-gateway';
+import type { DocumentsGateway } from './documents/documents-gateway';
 import type { EnrollmentGateway } from './enrollment-form/enrollment-gateway';
 import type { MemberDetailGateway } from './member-detail/member-detail-gateway';
 import type { PaymentsGateway } from './payments/payments-gateway';
@@ -13,6 +14,11 @@ import type { AdminSecurityGateway } from './security/admin-security-gateway';
 export const UNAVAILABLE_DASHBOARD_GATEWAY: DashboardGateway = {
   exercises: [],
   load: () => unavailableFeature$('BO-001'),
+};
+
+/** Les routes GED exposent encore Resource/PageResource, sans projection métier stable. */
+export const UNAVAILABLE_DOCUMENTS_GATEWAY: DocumentsGateway = {
+  search: () => unavailableFeature$('BO-023'),
 };
 
 export const UNAVAILABLE_MEMBER_DETAIL_GATEWAY: MemberDetailGateway = {

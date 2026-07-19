@@ -1,0 +1,290 @@
+<cnpm-admin-shell>
+  <div class="documents-page">
+    <cnpm-page-header
+      title="GED et documents"
+      description="Consultez les métadonnées documentaires accessibles dans votre périmètre."
+    />
+
+    @if (demoMode) {
+      <cnpm-alert tone="info" title="Bibliothèque 100 % fictive et consultative">
+        Les références DEMO, titres, objets métier, auteurs, versions et dates sont des scénarios.
+        Aucun fichier réel n’est stocké, ouvert, téléversé, analysé, généré ou téléchargé.
+      </cnpm-alert>
+    }
+
+    <section class="documents-page__boundary" aria-labelledby="documents-boundary-title">
+      <div>
+        <h2 id="documents-boundary-title">Périmètre sécurisé de BO-023</h2>
+        <p>La démonstration couvre la recherche de métadonnées sans simuler les contrôles GED.</p>
+      </div>
+      <ul>
+        <li>aucun contenu, aperçu, URL de stockage ou OCR ;</li>
+        <li>aucun dépôt avant quarantaine et antivirus réels ;</li>
+        <li>aucune suppression ou durée de conservation inventée.</li>
+      </ul>
+    </section>
+
+    @if (overview(); as summary) {
+      <section class="documents-page__overview" aria-label="Synthèse des métadonnées fictives">
+        <div>
+          <span>Métadonnées</span><strong>{{ summary.total }}</strong>
+        </div>
+        <div>
+          <span>Échéance proche</span><strong>{{ summary.expiring }}</strong>
+        </div>
+        <div>
+          <span>Expirées — scénario</span><strong>{{ summary.expired }}</strong>
+        </div>
+        <div>
+          <span>Classification restreinte</span><strong>{{ summary.restricted }}</strong>
+        </div>
+      </section>
+    }
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeChip($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="documents-page__filters" role="search" (ngSubmit)="applySearch()">
+        <div class="documents-page__field documents-page__field--search">
+          <label for="document-search">Recherche</label>
+          <input
+            id="document-search"
+            type="search"
+            name="search"
+            autocomplete="off"
+            maxlength="120"
+            placeholder="Référence, titre ou objet fictif"
+            [ngModel]="searchDraft()"
+            (ngModelChange)="searchDraft.set($event)"
+          />
+        </div>
+        <div class="documents-page__field">
+          <label for="document-classification">Classification</label>
+          <select
+            id="document-classification"
+            name="classification"
+            [ngModel]="classification() ?? ''"
+            (ngModelChange)="setClassification($event)"
+          >
+            <option value="">Toutes</option>
+            @for (value of classifications; track value) {
+              <option [value]="value">{{ classificationLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="documents-page__field">
+          <label for="document-lifecycle">Cycle de vie</label>
+          <select
+            id="document-lifecycle"
+            name="lifecycle"
+            [ngModel]="lifecycle() ?? ''"
+            (ngModelChange)="setLifecycle($event)"
+          >
+            <option value="">Tous les statuts</option>
+            @for (value of lifecycles; track value) {
+              <option [value]="value">{{ lifecycleLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="documents-page__field">
+          <label for="document-kind">Type</label>
+          <select
+            id="document-kind"
+            name="kind"
+            [ngModel]="kind() ?? ''"
+            (ngModelChange)="setKind($event)"
+          >
+            <option value="">Tous les types</option>
+            @for (value of kinds; track value) {
+              <option [value]="value">{{ kindLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="documents-page__field">
+          <label for="document-sort">Trier par</label>
+          <select
+            id="document-sort"
+            name="sort"
+            [ngModel]="sortOption()"
+            (ngModelChange)="setSortOption($event)"
+          >
+            <option value="updatedAt:desc">Mise à jour — récente</option>
+            <option value="updatedAt:asc">Mise à jour — ancienne</option>
+            <option value="expiresAt:asc">Échéance — proche</option>
+            <option value="title:asc">Titre — A à Z</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="secondary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <div class="documents-page__count" aria-live="polite">
+      @if (state() === 'ready' || state() === 'empty' || state() === 'noResult') {
+        <p>
+          <strong>{{ totalItems() }}</strong>
+          {{ totalItems() === 1 ? 'métadonnée trouvée' : 'métadonnées trouvées' }}
+        </p>
+      }
+    </div>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton
+          variant="table"
+          [rows]="pageSize()"
+          [columns]="columns.length"
+          label="Chargement des métadonnées documentaires…"
+        />
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Bibliothèque indisponible en mode HTTP"
+          description="Le contrat Resource générique ne permet pas de projeter les classifications, versions et échéances sans conjecture."
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="La bibliothèque n’a pas pu être chargée"
+          description="Une erreur temporaire est survenue. Les filtres de l’URL sont conservés."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('forbidden') {
+        <cnpm-error-state
+          variant="forbidden"
+          title="Accès refusé aux documents"
+          description="La permission DOCUMENT.READ et le périmètre serveur sont requis."
+        />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucune métadonnée accessible"
+          description="Aucun document n’est référencé dans votre périmètre."
+        />
+      }
+      @case ('noResult') {
+        <cnpm-empty-state
+          variant="no-results"
+          title="Aucune métadonnée ne correspond"
+          description="Retirez un filtre ou élargissez la recherche."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="resetFilters()"
+            >Réinitialiser les filtres</cnpm-button
+          >
+        </cnpm-empty-state>
+      }
+      @case ('ready') {
+        <div class="documents-page__table">
+          <cnpm-data-table
+            caption="Bibliothèque fictive de métadonnées documentaires, sans contenu ni téléchargement."
+            [columns]="columns"
+            [rows]="rows()"
+            state="ready"
+            [sort]="sort()"
+            [rowKey]="rowKey"
+            (sortChange)="onSortChange($event)"
+          >
+            <ng-template #row let-document>
+              <td class="cnpm-table__cell">
+                <span class="documents-page__identity"
+                  ><strong>{{ document.title }}</strong
+                  ><span>{{ document.demonstrationReference }}</span
+                  ><span>{{ kindLabel(document.kind) }}</span></span
+                >
+              </td>
+              <td class="cnpm-table__cell">{{ document.businessObjectLabel }}</td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="classificationTone(document.classification)">{{
+                  classificationLabel(document.classification)
+                }}</cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="lifecycleTone(document.lifecycle)">{{
+                  lifecycleLabel(document.lifecycle)
+                }}</cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <span class="documents-page__identity"
+                  ><strong>{{ document.versionLabel }}</strong
+                  ><span>{{ document.authorLabel }}</span></span
+                >
+              </td>
+              <td class="cnpm-table__cell">{{ formatDate(document.updatedAt) }}</td>
+              <td class="cnpm-table__cell">
+                <span class="documents-page__identity"
+                  ><strong>{{ formatDate(document.expiresAt) }}</strong
+                  ><span>Conservation non configurée</span></span
+                >
+              </td>
+            </ng-template>
+          </cnpm-data-table>
+        </div>
+
+        <ul class="documents-page__cards" aria-label="Métadonnées documentaires fictives">
+          @for (document of rows(); track document.id) {
+            <li>
+              <div class="documents-page__card-head">
+                <div>
+                  <strong>{{ document.title }}</strong
+                  ><span>{{ document.demonstrationReference }}</span>
+                </div>
+                <cnpm-badge [tone]="lifecycleTone(document.lifecycle)">{{
+                  lifecycleLabel(document.lifecycle)
+                }}</cnpm-badge>
+              </div>
+              <dl>
+                <div>
+                  <dt>Objet fictif</dt>
+                  <dd>{{ document.businessObjectLabel }}</dd>
+                </div>
+                <div>
+                  <dt>Type</dt>
+                  <dd>{{ kindLabel(document.kind) }}</dd>
+                </div>
+                <div>
+                  <dt>Classification</dt>
+                  <dd>{{ classificationLabel(document.classification) }}</dd>
+                </div>
+                <div>
+                  <dt>Version</dt>
+                  <dd>{{ document.versionLabel }}</dd>
+                </div>
+                <div>
+                  <dt>Auteur fictif</dt>
+                  <dd>{{ document.authorLabel }}</dd>
+                </div>
+                <div>
+                  <dt>Mise à jour</dt>
+                  <dd>{{ formatDate(document.updatedAt) }}</dd>
+                </div>
+                <div>
+                  <dt>Échéance</dt>
+                  <dd>{{ formatDate(document.expiresAt) }}</dd>
+                </div>
+              </dl>
+              <p class="documents-page__no-content">
+                Métadonnées uniquement — contenu indisponible
+              </p>
+            </li>
+          }
+        </ul>
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    }
+  </div>
+</cnpm-admin-shell>

@@ -8,6 +8,7 @@ export type AdminNavIconName =
   | 'receipts'
   | 'reminders'
   | 'requests'
+  | 'documents'
   | 'groups'
   | 'reporting'
   | 'audit'
@@ -46,6 +47,12 @@ export const ADMIN_NAV: readonly AdminNavEntry[] = [
   { label: 'Reçus', route: '/admin/receipts', icon: 'receipts' },
   { label: 'Relances', route: '/admin/recovery/campaigns', icon: 'reminders' },
   { label: 'Requêtes', route: '/admin/requests', icon: 'requests' },
+  {
+    label: 'Documents',
+    route: '/admin/documents',
+    icon: 'documents',
+    requiredPermission: 'DOCUMENT.READ',
+  },
   {
     label: 'Groupements',
     route: '/admin/groups',

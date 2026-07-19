@@ -4,6 +4,7 @@ import {
   LucideChartNoAxesCombined,
   LucideClipboardCheck,
   LucideFileBadge,
+  LucideFolderArchive,
   LucideHandshake,
   LucideLayoutDashboard,
   LucideMegaphone,
@@ -45,6 +46,7 @@ import type { AdminNavIconName } from './admin-nav';
     LucideChartNoAxesCombined,
     LucideClipboardCheck,
     LucideFileBadge,
+    LucideFolderArchive,
     LucideHandshake,
     LucideLayoutDashboard,
     LucideMegaphone,
@@ -84,6 +86,9 @@ import type { AdminNavIconName } from './admin-nav';
       }
       @case ('requests') {
         <svg lucideMessagesSquare [size]="size"></svg>
+      }
+      @case ('documents') {
+        <svg lucideFolderArchive [size]="size"></svg>
       }
       @case ('groups') {
         <svg lucideHandshake [size]="size"></svg>

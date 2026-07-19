@@ -12,6 +12,9 @@ import { CONTRIBUTIONS_GATEWAY } from './contributions/contributions-gateway';
 import { DemoContributionsGateway } from './contributions/demo-contributions.gateway';
 import { DASHBOARD_GATEWAY } from './dashboard/dashboard-gateway';
 import { DemoDashboardGateway } from './dashboard/demo-dashboard.gateway';
+import { DemoDocumentsGateway } from './documents/demo-documents.gateway';
+import { documentReadGuard } from './documents/document-read.guard';
+import { DOCUMENTS_GATEWAY } from './documents/documents-gateway';
 import { DemoEnrollmentGateway } from './enrollment-form/demo-enrollment.gateway';
 import { ENROLLMENT_GATEWAY } from './enrollment-form/enrollment-gateway';
 import { pendingEnrollmentChangesGuard } from './enrollment-form/pending-enrollment-changes.guard';
@@ -59,6 +62,7 @@ import {
   UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
   UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_DASHBOARD_GATEWAY,
+  UNAVAILABLE_DOCUMENTS_GATEWAY,
   UNAVAILABLE_ENROLLMENT_GATEWAY,
   UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
   UNAVAILABLE_PAYMENTS_GATEWAY,
@@ -137,6 +141,13 @@ export const adminRoutes: Routes = [
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoDashboardGateway)
             : UNAVAILABLE_DASHBOARD_GATEWAY,
+      },
+      {
+        provide: DOCUMENTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoDocumentsGateway)
+            : UNAVAILABLE_DOCUMENTS_GATEWAY,
       },
       {
         provide: MEMBER_DETAIL_GATEWAY,
@@ -220,6 +231,7 @@ export const adminRoutes: Routes = [
             : UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
       },
       DemoDashboardGateway,
+      DemoDocumentsGateway,
       DemoMemberDetailGateway,
       DemoEnrollmentGateway,
       DemoContributionsGateway,
@@ -349,6 +361,12 @@ export const adminRoutes: Routes = [
         loadComponent: () =>
           import('./requests/request-detail.page').then((m) => m.RequestDetailPage),
         title: 'Traitement d’un dossier — Administration CNPM',
+      },
+      {
+        path: 'documents',
+        canActivate: [documentReadGuard],
+        loadComponent: () => import('./documents/documents.page').then((m) => m.DocumentsPage),
+        title: 'GED et documents — Administration CNPM',
       },
       {
         path: 'security/users',
