@@ -86,29 +86,30 @@
 .cnpm-home__promises {
   grid-area: promises;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--cnpm-space-3);
+  /* Deux colonnes et non quatre : la colonne du heros fait 534 px, quatre tuiles y
+     tenaient en 124 px et ne laissaient que 48 px au texte, qui se brisait en quatre
+     lignes. En 2 x 2, chaque objectif dispose d'environ 260 px. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cnpm-space-4) var(--cnpm-space-5);
   margin: 0;
   padding: var(--cnpm-space-5) 0 0;
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
   list-style: none;
 }
 
-/* Les roles etaient une simple rangee de libelles derriere un filet. Ils deviennent
-   des tuiles a part entiere : fond teinte derive de l'accent, icone a la couleur de
-   ce meme accent, elevation au survol. */
+/* Les objectifs sont un propos, pas une donnee chiffree : ni cadre, ni fond teinte.
+   Les encadrer les rendait indiscernables des tuiles de chiffres situees juste en
+   dessous, et les deux rangees se lisaient comme une seule zone de pastilles.
+   Seule l'icone porte l'accent ; le libelle reste du texte. */
 .cnpm-home__promise {
   display: flex;
   align-items: center;
   gap: var(--cnpm-space-3);
   min-width: 0;
-  padding: var(--cnpm-space-3);
-  border: 1px solid color-mix(in srgb, var(--cnpm-tile-accent) 18%, transparent);
-  border-radius: var(--cnpm-radius-lg);
-  background: color-mix(in srgb, var(--cnpm-tile-accent) 6%, var(--cnpm-color-surface-primary));
   color: var(--cnpm-color-text-brand);
-  font-size: var(--cnpm-font-size-xs);
+  font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-semibold);
-  line-height: var(--cnpm-font-lineHeight-xs);
+  line-height: var(--cnpm-font-lineHeight-sm);
 }
 
 .cnpm-home__metric-icon,

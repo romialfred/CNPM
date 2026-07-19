@@ -76,26 +76,25 @@
   list-style: none;
 }
 
-/* Les chiffres cles etaient separes par un simple filet vertical. Ils deviennent des
-   tuiles pleines, empilees verticalement pour laisser respirer la valeur, qui est ce
-   que l'oeil doit atteindre en premier. */
+/* Seules tuiles pleines de la page, donc les seules a porter un fond teinte.
+   Disposition horizontale : empilees, elles portaient 39 px de vide vertical mesure
+   pour 100 px de contenu reel. */
 .cnpm-home__metric {
   display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+  align-items: center;
   gap: var(--cnpm-space-3);
   min-width: 0;
-  padding: var(--cnpm-space-5);
-  border: 1px solid color-mix(in srgb, var(--cnpm-tile-accent) 20%, transparent);
+  padding: var(--cnpm-space-4);
+  border: 1px solid color-mix(in srgb, var(--cnpm-tile-accent) 22%, transparent);
   border-radius: var(--cnpm-radius-lg);
-  background: color-mix(in srgb, var(--cnpm-tile-accent) 7%, var(--cnpm-color-surface-primary));
+  background: color-mix(in srgb, var(--cnpm-tile-accent) 8%, var(--cnpm-color-surface-primary));
 }
 
 .cnpm-home__metric .cnpm-home__metric-icon {
-  width: var(--cnpm-space-12);
-  height: var(--cnpm-space-12);
+  width: var(--cnpm-space-10);
+  height: var(--cnpm-space-10);
   border-radius: var(--cnpm-radius-md);
-  background: color-mix(in srgb, var(--cnpm-tile-accent) 14%, transparent);
+  background: color-mix(in srgb, var(--cnpm-tile-accent) 16%, transparent);
   color: var(--cnpm-tile-accent);
 }
 
@@ -106,15 +105,23 @@
   min-width: 0;
 }
 
+/* La taille est dictée par la valeur la plus longue, « 2 145 780 000 FCFA » : la colonne
+   de texte d'une tuile fait 130 px, et en `xl` cette valeur se brisait en trois lignes.
+   `lg` la fait tenir. Le filet de sécurité `overflow-wrap` reste en place : le groupement
+   de milliers français emploie une espace fine insécable, qui n'offre aucun point de
+   coupure — sans lui, une valeur trop longue déborderait de sa tuile au lieu de se replier. */
 .cnpm-home__metric-copy strong {
   color: var(--cnpm-color-text-brand);
-  font-size: var(--cnpm-font-size-2xl);
-  line-height: var(--cnpm-font-lineHeight-2xl);
+  font-size: var(--cnpm-font-size-lg);
+  line-height: var(--cnpm-font-lineHeight-lg);
   overflow-wrap: anywhere;
 }
 
+/* L'unite appartient a la grandeur : elle reste sur la ligne du nombre. En bloc, le
+   « % » se retrouvait orphelin sous son chiffre. */
 .cnpm-home__metric-copy strong small {
   font-size: var(--cnpm-font-size-sm);
+  white-space: nowrap;
 }
 
 .cnpm-home__metric-copy > span {
@@ -275,4 +282,26 @@
   margin-block-start: var(--cnpm-space-3);
   color: var(--cnpm-color-text-muted);
   font-size: var(--cnpm-font-size-xs);
+}
+
+/* Ces paliers vivent ici et non dans home.page.scss : ce fichier est charge APRES,
+   et sa regle de base `repeat(5, ...)` ecrasait les media queries de l'autre a
+   specificite egale. Mesure avant correction : a 375 px, les tuiles conservaient
+   cinq colonnes et tombaient a 51 px de large. */
+@media (max-width: 79.9375rem) {
+  .cnpm-home__metric-list,
+  .cnpm-home__metric-skeletons {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .cnpm-home__metric-list,
+  .cnpm-home__metric-skeletons {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-home__promises {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

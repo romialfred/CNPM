@@ -21,7 +21,7 @@
 
       <ul class="cnpm-home__promises" aria-label="Rôles du CNPM">
         @for (promise of promises; track promise.id) {
-          <li [class]="'cnpm-home__promise cnpm-liftable cnpm-tile-accent--' + promise.accent">
+          <li [class]="'cnpm-home__promise cnpm-tile-accent--' + promise.accent">
             <span class="cnpm-home__promise-icon" aria-hidden="true">
               @switch (promise.id) {
                 @case ('representer') {

@@ -142,9 +142,13 @@ describe('HomePage (PUB-001)', () => {
     expect(roles.every(Boolean)).toBe(true);
     expect(new Set(chiffres).size).toBe(chiffres.length);
 
-    expect(
-      host.querySelectorAll('.cnpm-home__promise.cnpm-liftable, .cnpm-home__metric.cnpm-liftable'),
-    ).toHaveLength(roles.length + chiffres.length);
+    // Seuls les chiffres clés sont des tuiles pleines. Encadrer aussi les objectifs
+    // rendait les deux rangées indiscernables — l'œil lisait une seule zone de
+    // pastilles, ce que le client a qualifié de rudimentaire.
+    expect(host.querySelectorAll('.cnpm-home__metric.cnpm-liftable')).toHaveLength(
+      chiffres.length,
+    );
+    expect(host.querySelectorAll('.cnpm-home__promise.cnpm-liftable')).toHaveLength(0);
   });
 
   it('distingue la source vide d’une panne récupérable', async () => {
