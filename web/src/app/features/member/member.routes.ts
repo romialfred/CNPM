@@ -5,12 +5,15 @@ import { DemoMemberContributionsGateway } from './contributions/demo-member-cont
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
 import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
+import { DemoMemberReceiptsGateway } from './receipts/demo-member-receipts.gateway';
+import { MEMBER_RECEIPTS_GATEWAY } from './receipts/member-receipts-gateway';
 import { DemoMemberRequestsGateway } from './requests/demo-member-requests.gateway';
 import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
 import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
 import {
   UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
+  UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
 } from './unavailable-member-gateways';
 
@@ -65,6 +68,36 @@ export const memberRoutes: Routes = [
             (module) => module.MemberContributionDetailPage,
           ),
         title: 'Détail de la cotisation — CNPM',
+      },
+    ],
+  },
+  {
+    path: 'receipts',
+    providers: [
+      DemoMemberReceiptsGateway,
+      {
+        provide: MEMBER_RECEIPTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberReceiptsGateway)
+            : UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
+      },
+    ],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./receipts/member-receipts.page').then((module) => module.MemberReceiptsPage),
+        title: 'Mes reçus — CNPM',
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./receipts/member-receipt-detail.page').then(
+            (module) => module.MemberReceiptDetailPage,
+          ),
+        title: 'Aperçu du reçu — CNPM',
       },
     ],
   },

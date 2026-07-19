@@ -1,0 +1,126 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-receipt-detail" id="contenu-principal">
+    <a
+      class="member-receipt-detail__back"
+      routerLink="/member/receipts"
+      [queryParams]="listQueryParams()"
+    >
+      ← Retour à mes reçus
+    </a>
+
+    <cnpm-page-header
+      title="Aperçu du reçu"
+      description="Résumé HTML en lecture seule, distinct de toute preuve officielle."
+    />
+
+    <cnpm-alert tone="warning" title="Démonstration — aperçu sans valeur probante" [live]="false">
+      Cet écran ne confirme aucun paiement et ne constitue ni un reçu CNPM ni un document signé.
+    </cnpm-alert>
+
+    @switch (state()) {
+      @case ('loading') {
+        <section class="member-receipt-detail__loading" aria-label="Chargement de l’aperçu fictif">
+          <cnpm-skeleton variant="card" [rows]="6" label="Chargement de l’aperçu du reçu…" />
+          <cnpm-skeleton variant="card" [rows]="3" label="" />
+        </section>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="L’aperçu n’a pas pu être chargé"
+          description="La source locale est momentanément indisponible. Aucune opération financière n’a été relancée."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="Aperçu indisponible en mode HTTP"
+          description="OpenAPI ne publie pas encore de projection membre ni de contrat documentaire typé. Aucune donnée de démonstration n’est injectée dans ce mode."
+        />
+      }
+      @case ('not-found') {
+        <cnpm-error-state
+          variant="not-found"
+          titleAs="h2"
+          title="Aperçu introuvable"
+          description="Cette référence n’est pas disponible dans la projection membre fictive."
+        >
+          <cnpm-button variant="secondary" routerLink="/member/receipts">
+            Retour aux reçus
+          </cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (detail(); as receipt) {
+          <article
+            class="member-receipt-detail__preview"
+            [attr.aria-labelledby]="'receipt-preview-' + receipt.id"
+          >
+            <header>
+              <div>
+                <p class="member-receipt-detail__eyebrow">APERÇU DE DÉMONSTRATION</p>
+                <h2 [id]="'receipt-preview-' + receipt.id">{{ receipt.reference }}</h2>
+                <p>{{ receipt.periodLabel }}</p>
+              </div>
+              <cnpm-badge [tone]="statusTone(receipt.status)">
+                {{ statusLabel(receipt.status) }}
+              </cnpm-badge>
+            </header>
+
+            <dl class="member-receipt-detail__facts">
+              <div>
+                <dt>Période du scénario</dt>
+                <dd>{{ receipt.periodLabel }}</dd>
+              </div>
+              <div>
+                <dt>Montant du scénario</dt>
+                <dd>{{ receipt.amountXof | number: '1.0-0' }} FCFA</dd>
+              </div>
+              <div>
+                <dt>Date du scénario</dt>
+                <dd>
+                  <time [attr.datetime]="receipt.scenarioDate">
+                    {{ receipt.scenarioDate | date: 'dd/MM/yyyy' }}
+                  </time>
+                </dd>
+              </div>
+            </dl>
+          </article>
+
+          <div class="member-receipt-detail__layout">
+            <section class="member-receipt-detail__card" aria-labelledby="receipt-origin-title">
+              <h2 id="receipt-origin-title">Provenance démonstrative</h2>
+              <div class="member-receipt-detail__disclosure">
+                <h3>Source fictive</h3>
+                <p>{{ receipt.sourceDisclosure }}</p>
+              </div>
+              <div class="member-receipt-detail__disclosure">
+                <h3>Paiement non reproduit</h3>
+                <p>{{ receipt.paymentDisclosure }}</p>
+              </div>
+            </section>
+
+            <section class="member-receipt-detail__card" aria-labelledby="official-proof-title">
+              <h2 id="official-proof-title">Preuve officielle</h2>
+              <cnpm-alert tone="info" title="Téléchargement et vérification indisponibles">
+                {{ receipt.proofDisclosure }}
+              </cnpm-alert>
+              <p class="member-receipt-detail__note">
+                Aucun bouton de téléchargement, partage, émission ou vérification n’est proposé.
+              </p>
+            </section>
+          </div>
+        }
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

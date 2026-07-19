@@ -1,0 +1,215 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-receipts" id="contenu-principal">
+    <cnpm-page-header
+      title="Mes reçus"
+      description="Consultez des aperçus HTML strictement fictifs et sans valeur probante."
+    />
+
+    <cnpm-alert tone="warning" title="Démonstration — aucune preuve officielle" [live]="false">
+      Aucun élément affiché n’est un reçu CNPM, une preuve de paiement ou un document signé. Aucun
+      PDF, QR, cachet ou téléchargement n’est produit.
+    </cnpm-alert>
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeFilter($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="member-receipts__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <div class="member-receipts__field member-receipts__field--search">
+          <label for="member-receipt-search">Recherche</label>
+          <input
+            id="member-receipt-search"
+            type="search"
+            formControlName="search"
+            placeholder="Référence DEMO ou période"
+          />
+        </div>
+        <div class="member-receipts__field">
+          <label for="member-receipt-status">Statut</label>
+          <select id="member-receipt-status" formControlName="status">
+            <option value="">Tous les statuts</option>
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ statusLabel(status) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-receipts__field">
+          <label for="member-receipt-exercise">Exercice</label>
+          <select id="member-receipt-exercise" formControlName="exercise">
+            <option value="">Tous les exercices</option>
+            @for (exercise of exercises(); track exercise) {
+              <option [value]="exercise">{{ exercise }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-receipts__field">
+          <label for="member-receipt-sort">Tri et ordre</label>
+          <select id="member-receipt-sort" formControlName="sortOption">
+            <option value="scenarioDate:desc">Date — plus récente</option>
+            <option value="scenarioDate:asc">Date — plus ancienne</option>
+            <option value="reference:asc">Référence — croissante</option>
+            <option value="reference:desc">Référence — décroissante</option>
+            <option value="amountXof:desc">Montant — décroissant</option>
+            <option value="amountXof:asc">Montant — croissant</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <section class="member-receipts__panel" aria-labelledby="member-receipts-results-title">
+      <div class="member-receipts__toolbar">
+        <div>
+          <h2 id="member-receipts-results-title" #resultsTitle tabindex="-1">Aperçus fictifs</h2>
+          <p>Résumé textuel en lecture seule, distinct de tout document officiel.</p>
+        </div>
+        @if (data()) {
+          <p class="member-receipts__count" aria-live="polite">
+            {{ totalItems() | number }}
+            {{ totalItems() === 1 ? 'aperçu fictif' : 'aperçus fictifs' }}
+          </p>
+        }
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <cnpm-skeleton
+            variant="table"
+            [rows]="pageSize()"
+            [columns]="columns.length"
+            label="Chargement des aperçus de reçus fictifs…"
+          />
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Les aperçus n’ont pas pu être chargés"
+            description="La source locale est momentanément indisponible. Aucune opération financière n’a été relancée."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('unavailable') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Reçus indisponibles en mode HTTP"
+            description="OpenAPI expose encore des ressources génériques sans projection membre ni contrat documentaire typé. Aucune fixture n’est injectée dans ce mode."
+          />
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucun aperçu de reçu"
+            description="La projection fictive ne contient aucun aperçu pour ce membre de démonstration."
+          />
+        }
+        @case ('no-result') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucun aperçu ne correspond"
+            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+              Réinitialiser les filtres
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('ready') {
+          <div class="member-receipts__desktop-table">
+            <cnpm-data-table
+              caption="Aperçus de reçus fictifs : référence, période, date, montant du scénario, statut et lien de consultation."
+              [columns]="columns"
+              [rows]="receipts()"
+              [rowKey]="rowKey"
+            >
+              <ng-template #row let-receipt>
+                <td class="cnpm-table__cell">
+                  <code>{{ receipt.reference }}</code>
+                </td>
+                <td class="cnpm-table__cell">{{ receipt.periodLabel }}</td>
+                <td class="cnpm-table__cell">
+                  <time [attr.datetime]="receipt.scenarioDate">
+                    {{ receipt.scenarioDate | date: 'dd/MM/yyyy' }}
+                  </time>
+                </td>
+                <td class="cnpm-table__cell member-receipts__amount">
+                  {{ receipt.amountXof | number: '1.0-0' }} FCFA
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="statusTone(receipt.status)">
+                    {{ statusLabel(receipt.status) }}
+                  </cnpm-badge>
+                </td>
+                <td class="cnpm-table__cell">
+                  <a
+                    class="member-receipts__detail-link"
+                    [routerLink]="['/member/receipts', receipt.id]"
+                    [queryParams]="detailQueryParams()"
+                    [attr.aria-label]="'Consulter l’aperçu fictif ' + receipt.reference"
+                  >
+                    Consulter
+                  </a>
+                </td>
+              </ng-template>
+            </cnpm-data-table>
+          </div>
+
+          <ol class="member-receipts__mobile-list" aria-label="Aperçus de reçus fictifs">
+            @for (receipt of receipts(); track receipt.id) {
+              <li>
+                <article [attr.aria-labelledby]="'member-receipt-' + receipt.id">
+                  <header>
+                    <div>
+                      <h3 [id]="'member-receipt-' + receipt.id">{{ receipt.reference }}</h3>
+                      <p>{{ receipt.periodLabel }}</p>
+                    </div>
+                    <cnpm-badge [tone]="statusTone(receipt.status)">
+                      {{ statusLabel(receipt.status) }}
+                    </cnpm-badge>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>Date du scénario</dt>
+                      <dd>{{ receipt.scenarioDate | date: 'dd/MM/yyyy' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Montant du scénario</dt>
+                      <dd>{{ receipt.amountXof | number: '1.0-0' }} FCFA</dd>
+                    </div>
+                  </dl>
+                  <a
+                    class="member-receipts__detail-link"
+                    [routerLink]="['/member/receipts', receipt.id]"
+                    [queryParams]="detailQueryParams()"
+                    [attr.aria-label]="'Consulter l’aperçu fictif ' + receipt.reference"
+                  >
+                    Consulter l’aperçu
+                  </a>
+                </article>
+              </li>
+            }
+          </ol>
+        }
+      }
+
+      @if (state() === 'ready') {
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    </section>
+  </main>
+</cnpm-member-portal-shell>
