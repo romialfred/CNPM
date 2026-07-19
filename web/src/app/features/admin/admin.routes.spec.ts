@@ -17,6 +17,8 @@ describe('adminRoutes', () => {
     expect(child('members/:id')?.loadComponent).toBeTypeOf('function');
     expect(child('organizations')?.loadComponent).toBeTypeOf('function');
     expect(child('organizations/:id')?.loadComponent).toBeTypeOf('function');
+    expect(child('organizations/:id/contacts')?.loadComponent).toBeTypeOf('function');
+    expect(child('organizations/:id/contacts')?.canActivate).toHaveLength(1);
     expect(child('organizations/:id/edit')?.loadComponent).toBeTypeOf('function');
     expect(child('organizations/:id/edit')?.canDeactivate).toHaveLength(1);
     expect(child('groups')?.loadComponent).toBeTypeOf('function');

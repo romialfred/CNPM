@@ -3,6 +3,7 @@ import type { MemberContributionsGateway } from './contributions/member-contribu
 import type { MemberDirectoryGateway } from './directory/member-directory.gateway';
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
 import type { MemberHomeGateway } from './home/member-home-gateway';
+import type { MemberPaymentsGateway } from './payments/member-payments-gateway';
 import type { MemberProfileGateway } from './profile/member-profile-gateway';
 import type { MemberReceiptsGateway } from './receipts/member-receipts-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
@@ -22,6 +23,18 @@ export const UNAVAILABLE_MEMBER_HOME_GATEWAY: MemberHomeGateway = {
 export const UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY: MemberContributionsGateway = {
   list: () => unavailableFeature$('MP-002'),
   loadDetail: () => unavailableFeature$('MP-003'),
+};
+
+/**
+ * `GET /portal/payments` reste un `Resource` générique et aucune commande
+ * d’initiation membre n’existe. Les routes financières d’administration ne doivent
+ * jamais servir de repli au portail.
+ */
+export const UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY: MemberPaymentsGateway = {
+  list: () => unavailableFeature$('MP-006'),
+  listContributionOptions: () => unavailableFeature$('MP-004'),
+  prepareDemo: () => unavailableFeature$('MP-004'),
+  loadStatus: () => unavailableFeature$('MP-005'),
 };
 
 /** `/receipts*` reste générique et ne fournit aucun document membre typé. */

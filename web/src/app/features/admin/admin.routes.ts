@@ -40,6 +40,7 @@ import { MEMBERS_GATEWAY } from './members/members-gateway';
 import { DemoOrganizationsGateway } from './organizations/demo-organizations.gateway';
 import { HttpOrganizationsGateway } from './organizations/http-organizations.gateway';
 import { ORGANIZATIONS_GATEWAY } from './organizations/organizations-gateway';
+import { organizationContactsReadGuard } from './organizations/contacts/organization-contacts-read.guard';
 import { pendingOrganizationChangesGuard } from './organizations/pending-organization-changes.guard';
 import { DemoPaymentsGateway } from './payments/demo-payments.gateway';
 import { PAYMENTS_GATEWAY } from './payments/payments-gateway';
@@ -284,6 +285,15 @@ export const adminRoutes: Routes = [
         loadComponent: () =>
           import('./organizations/organizations.page').then((m) => m.OrganizationsPage),
         title: 'Entreprises — Administration CNPM',
+      },
+      {
+        path: 'organizations/:id/contacts',
+        canActivate: [organizationContactsReadGuard],
+        loadComponent: () =>
+          import('./organizations/contacts/organization-contacts.page').then(
+            (m) => m.OrganizationContactsPage,
+          ),
+        title: 'Contacts de l’entreprise — Administration CNPM',
       },
       {
         // La route d'édition précède la fiche paramétrée et ne propose aucune création.

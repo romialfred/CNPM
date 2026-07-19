@@ -22,6 +22,7 @@ describe('routes racine', () => {
       [
         'home',
         'contributions',
+        'payments',
         'receipts',
         'requests',
         'documents',

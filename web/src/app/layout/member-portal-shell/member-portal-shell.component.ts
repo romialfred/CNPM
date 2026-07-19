@@ -66,6 +66,12 @@ export class MemberPortalShellComponent {
       route: '/member/contributions',
       icon: 'payments',
     },
+    {
+      label: 'Paiements',
+      mobileLabel: 'Paiements',
+      route: '/member/payments',
+      icon: 'payments',
+    },
     { label: 'Reçus', mobileLabel: 'Reçus', route: '/member/receipts', icon: 'receipts' },
     {
       label: 'Requêtes',

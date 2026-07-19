@@ -18,6 +18,15 @@ describe('memberRoutes', () => {
     expect(route?.children?.[1]?.loadComponent).toBeTypeOf('function');
   });
 
+  it('expose MP-006, MP-004 puis MP-005 sous une composition de paiement fermée en HTTP', () => {
+    const route = memberRoutes.find((candidate) => candidate.path === 'payments');
+    expect(route?.providers).toHaveLength(2);
+    expect(route?.children?.map((child) => child.path)).toEqual(['', 'new', ':id/status']);
+    expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
+    expect(route?.children?.every((child) => child.loadComponent)).toBe(true);
+    expect(route?.canActivate).toBeUndefined();
+  });
+
   it('expose MP-007 et MP-008 sous une composition de données commune', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'receipts');
     expect(route?.providers).toHaveLength(2);

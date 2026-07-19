@@ -14,6 +14,13 @@
       description="Identité et état courant de l’entreprise dans le registre CNPM."
     >
       @if (organization(); as organization) {
+        <cnpm-button
+          variant="secondary"
+          [routerLink]="['/admin/organizations', organization.id, 'contacts']"
+          [queryParams]="listQueryParams()"
+        >
+          Voir les contacts
+        </cnpm-button>
         <cnpm-button variant="primary" (click)="edit()">
           <svg lucidePencil [size]="iconSize.compact" aria-hidden="true"></svg>
           Modifier
@@ -51,8 +58,8 @@
       @case ('ready') {
         @if (organization(); as organization) {
           <cnpm-alert tone="info" title="Périmètre de la fiche">
-            Cette vue présente le cœur contractuel de l’entreprise. Les contacts, l’adhésion,
-            l’historique et les données financières relèvent de parcours séparés.
+            Cette vue présente le cœur contractuel de l’entreprise. Les contacts disposent de leur
+            parcours dédié ; l’adhésion, l’historique et les données financières restent séparés.
           </cnpm-alert>
 
           <div class="cnpm-organization-detail__grid">

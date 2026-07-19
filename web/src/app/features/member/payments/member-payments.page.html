@@ -1,0 +1,251 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-payments" id="contenu-principal">
+    <cnpm-page-header
+      title="Mes paiements"
+      description="Consultez des scénarios de suivi sans les confondre avec des encaissements CNPM."
+    >
+      <cnpm-button routerLink="/member/payments/new">Préparer un suivi fictif</cnpm-button>
+    </cnpm-page-header>
+
+    <cnpm-alert tone="warning" title="Démonstration — aucun encaissement officiel" [live]="false">
+      Les références, montants et statuts sont fictifs. Aucun scénario affiché n’est confirmé par le
+      CNPM et aucun reçu n’est disponible.
+    </cnpm-alert>
+
+    @if (data(); as pageData) {
+      <section class="member-payments__metrics" aria-label="Synthèse des scénarios filtrés" tabindex="0">
+        <article>
+          <span>Scénarios trouvés</span>
+          <strong>{{ pageData.totalElements | number }}</strong>
+          <small>dans la projection fictive</small>
+        </article>
+        <article>
+          <span>Montants affichés</span>
+          <strong>{{ pageData.summary.displayedAmountXof | number: '1.0-0' }} FCFA</strong>
+          <small>sans valeur comptable</small>
+        </article>
+        <article>
+          <span>En examen</span>
+          <strong>{{ pageData.summary.processingCount | number }}</strong>
+          <small>scénarios visuels</small>
+        </article>
+        <article>
+          <span>Attention requise</span>
+          <strong>{{ pageData.summary.attentionCount | number }}</strong>
+          <small>avec explication</small>
+        </article>
+      </section>
+    }
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeFilter($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="member-payments__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <div class="member-payments__field member-payments__field--search">
+          <label for="member-payment-search">Recherche</label>
+          <input
+            id="member-payment-search"
+            type="search"
+            maxlength="80"
+            formControlName="search"
+            placeholder="Référence de suivi ou cotisation"
+          />
+        </div>
+        <div class="member-payments__field">
+          <label for="member-payment-status">Statut</label>
+          <select id="member-payment-status" formControlName="status">
+            <option value="">Tous les statuts</option>
+            @for (item of statuses; track item) {
+              <option [value]="item">{{ statusLabel(item) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-payments__field">
+          <label for="member-payment-channel">Aperçu du canal</label>
+          <select id="member-payment-channel" formControlName="channel">
+            <option value="">Tous les aperçus</option>
+            @for (item of channels; track item) {
+              <option [value]="item">{{ channelLabel(item) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-payments__field">
+          <label for="member-payment-sort">Tri et ordre</label>
+          <select id="member-payment-sort" formControlName="sortOption">
+            <option value="updatedAt:desc">Mise à jour — plus récente</option>
+            <option value="updatedAt:asc">Mise à jour — plus ancienne</option>
+            <option value="reference:asc">Référence — croissante</option>
+            <option value="reference:desc">Référence — décroissante</option>
+            <option value="amountXof:desc">Montant — décroissant</option>
+            <option value="amountXof:asc">Montant — croissant</option>
+            <option value="status:asc">Statut — croissant</option>
+          </select>
+        </div>
+        <cnpm-button type="submit">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <section class="member-payments__panel" aria-labelledby="member-payments-results-title">
+      <div class="member-payments__toolbar">
+        <div>
+          <h2 id="member-payments-results-title" #resultsTitle tabindex="-1">Historique fictif</h2>
+          <p>Chaque statut explicite ce qui n’a pas été transmis ou confirmé.</p>
+        </div>
+        @if (data()) {
+          <p class="member-payments__count" aria-live="polite">
+            {{ totalItems() | number }}
+            {{ totalItems() === 1 ? 'scénario fictif' : 'scénarios fictifs' }}
+          </p>
+        }
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <cnpm-skeleton
+            variant="table"
+            [rows]="pageSize()"
+            [columns]="columns.length"
+            label="Chargement des scénarios de paiement fictifs…"
+          />
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="L’historique n’a pas pu être chargé"
+            description="Aucune transaction n’a été relancée. Réessayez uniquement la lecture."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('unavailable') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Paiements indisponibles en mode HTTP"
+            description="GET /portal/payments ne décrit pas encore une projection membre typée. Aucune fixture n’est injectée dans ce mode."
+          />
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucun scénario fictif"
+            description="La projection de démonstration ne contient aucun suivi pour ce membre fictif."
+          >
+            <cnpm-button routerLink="/member/payments/new">Préparer un suivi fictif</cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('no-results') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucun scénario ne correspond"
+            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+              Réinitialiser les filtres
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('ready') {
+          <div class="member-payments__desktop-table">
+            <cnpm-data-table
+              caption="Scénarios de paiements fictifs : référence, cotisation, date, montant, canal, statut et lien de suivi."
+              [columns]="columns"
+              [rows]="payments()"
+              [rowKey]="rowKey"
+            >
+              <ng-template #row let-payment>
+                <td class="cnpm-table__cell"><code>{{ payment.reference }}</code></td>
+                <td class="cnpm-table__cell"><code>{{ payment.contributionReference }}</code></td>
+                <td class="cnpm-table__cell">
+                  <time [attr.datetime]="payment.updatedAt">
+                    {{ payment.updatedAt | date: 'dd/MM/yyyy' }}
+                  </time>
+                </td>
+                <td class="cnpm-table__cell member-payments__amount">
+                  {{ payment.amountXof | number: '1.0-0' }} FCFA
+                </td>
+                <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="statusTone(payment.status)">
+                    {{ statusLabel(payment.status) }}
+                  </cnpm-badge>
+                </td>
+                <td class="cnpm-table__cell">
+                  <a
+                    class="member-payments__detail-link"
+                    [routerLink]="['/member/payments', payment.id, 'status']"
+                    [queryParams]="detailQueryParams()"
+                    [attr.aria-label]="'Suivre le scénario fictif ' + payment.reference"
+                  >
+                    Suivre
+                  </a>
+                </td>
+              </ng-template>
+            </cnpm-data-table>
+          </div>
+
+          <ol class="member-payments__mobile-list" aria-label="Scénarios de paiements fictifs">
+            @for (payment of payments(); track payment.id) {
+              <li>
+                <article [attr.aria-labelledby]="'member-payment-' + payment.id">
+                  <header>
+                    <div>
+                      <h3 [id]="'member-payment-' + payment.id">{{ payment.reference }}</h3>
+                      <p>{{ payment.contributionReference }}</p>
+                    </div>
+                    <cnpm-badge [tone]="statusTone(payment.status)">
+                      {{ statusLabel(payment.status) }}
+                    </cnpm-badge>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>Montant fictif</dt>
+                      <dd>{{ payment.amountXof | number: '1.0-0' }} FCFA</dd>
+                    </div>
+                    <div>
+                      <dt>Aperçu du canal</dt>
+                      <dd>{{ channelLabel(payment.channel) }}</dd>
+                    </div>
+                    <div>
+                      <dt>Mise à jour</dt>
+                      <dd>{{ payment.updatedAt | date: 'dd/MM/yyyy' }}</dd>
+                    </div>
+                  </dl>
+                  @if (payment.failureExplanation) {
+                    <p class="member-payments__failure">{{ payment.failureExplanation }}</p>
+                  }
+                  <a
+                    class="member-payments__detail-link"
+                    [routerLink]="['/member/payments', payment.id, 'status']"
+                    [queryParams]="detailQueryParams()"
+                  >
+                    Voir le suivi expliqué
+                  </a>
+                </article>
+              </li>
+            }
+          </ol>
+        }
+      }
+
+      @if (state() === 'ready') {
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    </section>
+  </main>
+</cnpm-member-portal-shell>

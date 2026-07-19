@@ -1,0 +1,215 @@
+<cnpm-admin-shell>
+  <main class="cnpm-contacts" id="main-content">
+    <cnpm-page-header
+      title="Contacts de l’entreprise"
+      description="Identifiez les interlocuteurs principal et financier, leurs rôles et la période de validité de leur mandat."
+    />
+
+    <nav class="cnpm-contacts__breadcrumb" aria-label="Fil d’Ariane">
+      <a routerLink="/admin/organizations">Entreprises</a><span aria-hidden="true">/</span>
+      <a [routerLink]="['/admin/organizations', organizationId()]">Fiche entreprise</a
+      ><span aria-hidden="true">/</span>
+      <span aria-current="page">Contacts</span>
+    </nav>
+
+    <cnpm-alert tone="info" title="Démonstration sans donnée personnelle réelle">
+      Les identités et coordonnées affichées sont fictives. L’ajout et la modification restent
+      neutralisés tant que le contrat API des contacts n’est pas publié.
+    </cnpm-alert>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton variant="table" [rows]="5" [columns]="5" label="Chargement des contacts…" />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Les contacts n’ont pas pu être chargés"
+          description="Le service de contacts n’est pas disponible dans ce mode de données."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        <section class="cnpm-contacts__hero" aria-labelledby="organization-contacts-title">
+          <div>
+            <p class="cnpm-contacts__eyebrow">Entreprise de démonstration</p>
+            <h2 id="organization-contacts-title">{{ view()?.organizationName }}</h2>
+            <p>{{ view()?.updatedAt }}</p>
+          </div>
+          <dl aria-label="Synthèse des contacts">
+            <div>
+              <dt>Contacts actifs</dt>
+              <dd>{{ activeCount() }}</dd>
+            </div>
+            <div>
+              <dt>Contact principal</dt>
+              <dd>1</dd>
+            </div>
+            <div>
+              <dt>Contact financier</dt>
+              <dd>1</dd>
+            </div>
+          </dl>
+          <button
+            type="button"
+            class="cnpm-contacts__disabled-action"
+            disabled
+            title="Contrat API non publié"
+          >
+            Ajouter un contact
+          </button>
+        </section>
+
+        <form class="cnpm-contacts__filters" [formGroup]="filters" (ngSubmit)="applyFilters()">
+          <div>
+            <label for="contact-search">Rechercher</label>
+            <input
+              id="contact-search"
+              type="search"
+              formControlName="q"
+              maxlength="80"
+              placeholder="Nom, fonction ou adresse fictive"
+            />
+          </div>
+          <div>
+            <label for="contact-role">Rôle</label>
+            <select id="contact-role" formControlName="role">
+              <option value="">Tous les rôles</option>
+              <option value="DIRECTION">Direction</option>
+              <option value="FINANCE">Finance</option>
+              <option value="ADMINISTRATION">Administration</option>
+              <option value="TECHNIQUE">Technique</option>
+            </select>
+          </div>
+          <div>
+            <label for="contact-status">Statut</label>
+            <select id="contact-status" formControlName="status">
+              <option value="">Tous les statuts</option>
+              <option value="ACTIVE">Actif</option>
+              <option value="INACTIVE">Historique</option>
+            </select>
+          </div>
+          <div class="cnpm-contacts__filter-actions">
+            <cnpm-button type="submit" size="sm">Filtrer</cnpm-button>
+            @if (hasFilters()) {
+              <cnpm-button type="button" variant="secondary" size="sm" (click)="resetFilters()"
+                >Réinitialiser</cnpm-button
+              >
+            }
+          </div>
+        </form>
+
+        <p class="cnpm-contacts__result" role="status" aria-live="polite">
+          <strong>{{ contacts().length }}</strong>
+          {{ contacts().length === 1 ? 'contact affiché' : 'contacts affichés' }} sur
+          {{ view()?.contacts?.length }}.
+        </p>
+
+        @if (contacts().length === 0) {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucun contact ne correspond"
+            description="Élargissez les critères ou réinitialisez les filtres."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()"
+              >Effacer les filtres</cnpm-button
+            >
+          </cnpm-empty-state>
+        } @else {
+          <div class="cnpm-contacts__table-wrap">
+            <table>
+              <caption>
+                Contacts fictifs de l’entreprise, rôles et validité.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Contact</th>
+                  <th scope="col">Rôle</th>
+                  <th scope="col">Coordonnées</th>
+                  <th scope="col">Mandat</th>
+                  <th scope="col">Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (contact of contacts(); track contact.id) {
+                  <tr>
+                    <td>
+                      <strong>{{ contact.displayName }}</strong
+                      ><span>{{ contact.functionLabel }}</span>
+                    </td>
+                    <td>
+                      <cnpm-badge tone="info">{{ roleLabel(contact.role) }}</cnpm-badge>
+                      <div class="cnpm-contacts__markers">
+                        @if (contact.primary) {
+                          <span>Principal</span>
+                        }
+                        @if (contact.financial) {
+                          <span>Financier</span>
+                        }
+                      </div>
+                    </td>
+                    <td>
+                      <a [href]="'mailto:' + contact.email">{{ contact.email }}</a
+                      ><span>{{ contact.phone }}</span>
+                    </td>
+                    <td>
+                      <span>Depuis le</span><strong>{{ contact.validFrom }}</strong>
+                    </td>
+                    <td>
+                      <cnpm-badge [tone]="statusTone(contact)">{{
+                        contact.active ? 'Actif' : 'Historique'
+                      }}</cnpm-badge>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <ul class="cnpm-contacts__cards" aria-label="Contacts fictifs de l’entreprise">
+            @for (contact of contacts(); track contact.id) {
+              <li>
+                <div class="cnpm-contacts__card-head">
+                  <div>
+                    <strong>{{ contact.displayName }}</strong
+                    ><span>{{ contact.functionLabel }}</span>
+                  </div>
+                  <cnpm-badge [tone]="statusTone(contact)">{{
+                    contact.active ? 'Actif' : 'Historique'
+                  }}</cnpm-badge>
+                </div>
+                <div class="cnpm-contacts__card-tags">
+                  <cnpm-badge tone="info">{{ roleLabel(contact.role) }}</cnpm-badge>
+                  @if (contact.primary) {
+                    <span>Contact principal</span>
+                  }
+                  @if (contact.financial) {
+                    <span>Contact financier</span>
+                  }
+                </div>
+                <dl>
+                  <div>
+                    <dt>Adresse fictive</dt>
+                    <dd>{{ contact.email }}</dd>
+                  </div>
+                  <div>
+                    <dt>Téléphone fictif</dt>
+                    <dd>{{ contact.phone }}</dd>
+                  </div>
+                  <div>
+                    <dt>Mandat</dt>
+                    <dd>Depuis le {{ contact.validFrom }}</dd>
+                  </div>
+                </dl>
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

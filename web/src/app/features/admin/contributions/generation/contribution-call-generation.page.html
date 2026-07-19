@@ -1,0 +1,246 @@
+<cnpm-admin-shell>
+  <main class="contribution-generation">
+    <cnpm-page-header
+      title="Génération des appels"
+      description="Cadrez un scénario, contrôlez ses exceptions et préparez une future validation financière."
+    >
+      <cnpm-button variant="secondary" routerLink="/admin/contributions">
+        Retour aux cotisations
+      </cnpm-button>
+    </cnpm-page-header>
+
+    <cnpm-alert tone="warning" title="Simulation locale non opposable">
+      DEC-008 reste ouverte : aucun barème officiel n’est configuré. Les volumes et montants ci-dessous
+      sont fictifs, aucun appel n’est créé, publié, transmis ou enregistré en comptabilité.
+    </cnpm-alert>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="6" label="Chargement du scénario de génération…" />
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Génération indisponible en mode HTTP"
+          description="Le barème officiel et la projection métier de BO-012 ne sont pas disponibles. Le profil HTTP échoue fermé et ne reprend jamais les données de démonstration."
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Impossible de charger le cadrage"
+          description="Aucune donnée de simulation n’a été affichée. Revenez à la liste des cotisations puis réessayez."
+        />
+      }
+      @case ('ready') {
+        <section class="contribution-generation__progress" aria-labelledby="generation-progress-title">
+          <div class="contribution-generation__progress-copy">
+            <div>
+              <span class="contribution-generation__eyebrow">Parcours BO-012</span>
+              <h2 id="generation-progress-title">Préparation contrôlée</h2>
+            </div>
+            <strong>{{ progress() }} %</strong>
+          </div>
+          <div
+            class="contribution-generation__progress-track"
+            role="progressbar"
+            aria-label="Progression de la préparation"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="progress()"
+          >
+            <span [style.width.%]="progress()"></span>
+          </div>
+          <ol class="contribution-generation__stepper" aria-label="Étapes de préparation">
+            <li>
+              <button
+                type="button"
+                [class.is-current]="step() === 'scope'"
+                [class.is-complete]="step() !== 'scope'"
+                [attr.aria-current]="step() === 'scope' ? 'step' : null"
+                (click)="goToStep('scope')"
+              >
+                <span>1</span><span><strong>Cadrage</strong><small>Exercice et audience</small></span>
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                [class.is-current]="step() === 'simulation'"
+                [class.is-complete]="step() === 'review'"
+                [attr.aria-current]="step() === 'simulation' ? 'step' : null"
+                (click)="goToStep('simulation')"
+              >
+                <span>2</span><span><strong>Simulation</strong><small>Volumes et exceptions</small></span>
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                [class.is-current]="step() === 'review'"
+                [attr.aria-current]="step() === 'review' ? 'step' : null"
+                [attr.aria-disabled]="simulation() ? null : 'true'"
+                (click)="goToStep('review')"
+              >
+                <span>3</span><span><strong>Revue</strong><small>Contrôle sans émission</small></span>
+              </button>
+            </li>
+          </ol>
+        </section>
+
+        @if (step() === 'scope') {
+          <div class="contribution-generation__layout">
+            <form class="contribution-generation__panel" [formGroup]="form" (ngSubmit)="simulate()">
+              <header>
+                <span class="contribution-generation__panel-index" aria-hidden="true">01</span>
+                <div>
+                  <h2>Cadrez le jeu de simulation</h2>
+                  <p>Les choix sont conservés dans l’URL lorsque vous lancez la simulation.</p>
+                </div>
+              </header>
+
+              <div class="contribution-generation__fields">
+                <div class="contribution-generation__field">
+                  <label for="generation-year">Exercice</label>
+                  <select id="generation-year" formControlName="fiscalYear">
+                    @for (year of context()?.fiscalYears ?? []; track year) {
+                      <option [value]="year">{{ year }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="contribution-generation__field">
+                  <label for="generation-period">Période</label>
+                  <select id="generation-period" formControlName="period">
+                    @for (period of context()?.periods ?? []; track period) {
+                      <option [value]="period">{{ periodLabel(period) }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="contribution-generation__field contribution-generation__field--wide">
+                  <label for="generation-audience">Audience fictive</label>
+                  <select id="generation-audience" formControlName="audience">
+                    @for (audience of context()?.audiences ?? []; track audience) {
+                      <option [value]="audience">{{ audienceLabel(audience) }}</option>
+                    }
+                  </select>
+                  <small>Aucune entreprise réelle n’est incluse dans ce scénario.</small>
+                </div>
+              </div>
+
+              <section class="contribution-generation__scale-lock" aria-labelledby="scale-lock-title">
+                <span aria-hidden="true">!</span>
+                <div>
+                  <h3 id="scale-lock-title">Barème officiel non disponible</h3>
+                  <p>
+                    Le moteur utilise exclusivement un scénario visuel synthétique. La future action
+                    d’émission restera bloquée jusqu’à validation de la grille, des paliers et des
+                    dérogations.
+                  </p>
+                </div>
+              </section>
+
+              <footer>
+                <span>Arrêté fictif au 30 juin 2024</span>
+                <cnpm-button type="submit" variant="primary" [loading]="simulating()">
+                  Lancer la simulation locale
+                </cnpm-button>
+              </footer>
+            </form>
+
+            <aside class="contribution-generation__aside" aria-labelledby="generation-guardrails-title">
+              <span class="contribution-generation__eyebrow">Garde-fous</span>
+              <h2 id="generation-guardrails-title">Ce que ce parcours garantit</h2>
+              <ul>
+                <li><span>1</span><p><strong>Calcul isolé</strong> Aucun écriture financière.</p></li>
+                <li><span>2</span><p><strong>Exceptions visibles</strong> Aucun blocage silencieux.</p></li>
+                <li><span>3</span><p><strong>Revue explicite</strong> Aucun bouton de publication.</p></li>
+              </ul>
+              <p class="contribution-generation__aside-note">
+                Permission attendue en production : <code>CONTRIBUTION.GENERATE</code>.
+              </p>
+            </aside>
+          </div>
+        } @else if (simulation(); as result) {
+          <section class="contribution-generation__summary" aria-labelledby="simulation-summary-title">
+            <header>
+              <div>
+                <span class="contribution-generation__eyebrow">{{ result.scenarioReference }}</span>
+                <h2 id="simulation-summary-title">Résultat du scénario fictif</h2>
+                <p>{{ result.fiscalYear }} · {{ periodLabel(result.period) }} · {{ audienceLabel(result.audience) }}</p>
+              </div>
+              <cnpm-badge tone="warning">Non opposable</cnpm-badge>
+            </header>
+
+            <div class="contribution-generation__kpis" tabindex="0" aria-label="Indicateurs fictifs de simulation">
+              <article><span>Membres éligibles</span><strong>{{ result.eligibleMembers | number: '1.0-0' }}</strong><small>Jeu Démo</small></article>
+              <article><span>Appels simulés</span><strong>{{ result.draftCalls | number: '1.0-0' }}</strong><small>Aucun enregistré</small></article>
+              <article><span>Exclusions</span><strong>{{ result.excludedMembers | number: '1.0-0' }}</strong><small>Hors calcul local</small></article>
+              <article class="is-critical"><span>Blocages</span><strong>{{ result.blockingIssues }}</strong><small>Revue obligatoire</small></article>
+              <article><span>Total illustratif</span><strong>{{ result.illustrativeTotal | number: '1.0-0' }}</strong><small>XOF fictifs</small></article>
+            </div>
+          </section>
+
+          <section class="contribution-generation__exceptions" aria-labelledby="exceptions-title">
+            <header>
+              <div><span class="contribution-generation__eyebrow">Contrôle préalable</span><h2 id="exceptions-title">Exceptions à traiter</h2></div>
+              <span>{{ result.issues.length }} signalements fictifs</span>
+            </header>
+            <div class="contribution-generation__table-scroll" tabindex="0" aria-label="Tableau des exceptions, défilement horizontal possible">
+              <table>
+                <thead><tr><th scope="col">Membre fictif</th><th scope="col">Niveau</th><th scope="col">Motif</th><th scope="col">Traitement attendu</th></tr></thead>
+                <tbody>
+                  @for (issue of result.issues; track issue.id) {
+                    <tr>
+                      <th scope="row"><strong>{{ issue.organizationName }}</strong><small>{{ issue.memberCode }}</small></th>
+                      <td><cnpm-badge [tone]="severityTone(issue.severity)">{{ severityLabel(issue.severity) }}</cnpm-badge></td>
+                      <td>{{ issue.reason }}</td><td>{{ issue.treatment }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          @if (step() === 'simulation') {
+            <div class="contribution-generation__actions">
+              <cnpm-button variant="secondary" (click)="goToStep('scope')">Modifier le cadrage</cnpm-button>
+              <cnpm-button variant="primary" (click)="openReview()">Poursuivre vers la revue</cnpm-button>
+            </div>
+          } @else {
+            <section class="contribution-generation__review" aria-labelledby="generation-review-title">
+              <div>
+                <span class="contribution-generation__eyebrow">Dernière étape locale</span>
+                <h2 id="generation-review-title">Attestation de revue</h2>
+                <p>
+                  Cette validation ferme uniquement le scénario d’interface. Elle ne vaut ni
+                  approbation financière, ni émission, ni publication.
+                </p>
+              </div>
+              <label class="contribution-generation__confirmation">
+                <input type="checkbox" [formControl]="reviewAccepted" />
+                <span>Je confirme avoir identifié le caractère fictif et les {{ result.blockingIssues }} blocages.</span>
+              </label>
+              @if (reviewAccepted.invalid && reviewAccepted.touched) {
+                <p class="contribution-generation__validation" role="alert">Cochez la confirmation avant de clore la revue locale.</p>
+              }
+              @if (reviewComplete()) {
+                <cnpm-alert tone="success" title="Revue locale terminée">
+                  Le scénario reste sans effet : aucun appel n’a été créé ou transmis.
+                </cnpm-alert>
+              } @else {
+                <div class="contribution-generation__actions">
+                  <cnpm-button variant="secondary" (click)="goToStep('simulation')">Retour à la simulation</cnpm-button>
+                  <cnpm-button variant="primary" (click)="completeLocalReview()">Clore la revue locale</cnpm-button>
+                </div>
+              }
+            </section>
+          }
+        } @else if (simulating()) {
+          <cnpm-skeleton variant="table" [rows]="5" [columns]="4" label="Calcul du scénario fictif…" />
+        } @else if (simulationError()) {
+          <cnpm-error-state variant="recoverable" title="La simulation locale a échoué" description="Aucun appel n’a été créé. Revenez au cadrage pour relancer le scénario." />
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

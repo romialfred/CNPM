@@ -1,11 +1,13 @@
 import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type { ContributionsGateway } from './contributions/contributions-gateway';
+import type { ContributionCallGenerationGateway } from './contributions/generation/contribution-call-generation-gateway';
 import type { DashboardGateway } from './dashboard/dashboard-gateway';
 import type { DocumentsGateway } from './documents/documents-gateway';
 import type { EnrollmentGateway } from './enrollment-form/enrollment-gateway';
 import type { IntegrationsGateway } from './integrations/integrations-gateway';
 import type { MemberDetailGateway } from './member-detail/member-detail-gateway';
 import type { PaymentsGateway } from './payments/payments-gateway';
+import type { BankStatementImportGateway } from './payments/import/bank-statement-import-gateway';
 import type { RecoveryGateway } from './recovery/recovery-gateway';
 import type { ReceiptsGateway } from './receipts/receipts-gateway';
 import type { ReportingGateway } from './reporting/reporting-gateway';
@@ -38,10 +40,22 @@ export const UNAVAILABLE_CONTRIBUTIONS_GATEWAY: ContributionsGateway = {
   searchCalls: () => unavailableFeature$('BO-011'),
 };
 
+/** DEC-008 interdit tout repli sur un barème fictif dans le profil HTTP. */
+export const UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY: ContributionCallGenerationGateway = {
+  loadContext: () => unavailableFeature$('BO-012'),
+  simulate: () => unavailableFeature$('BO-012'),
+};
+
 export const UNAVAILABLE_PAYMENTS_GATEWAY: PaymentsGateway = {
   search: () => unavailableFeature$('BO-014'),
   reconcile: () => unavailableFeature$('BO-014'),
   reportAnomaly: () => unavailableFeature$('BO-014'),
+};
+
+/** DEC-003 interdit d'interpréter ou d'importer un format bancaire non validé. */
+export const UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY: BankStatementImportGateway = {
+  loadContext: () => unavailableFeature$('BO-015'),
+  inspectLocalDemo: () => unavailableFeature$('BO-015'),
 };
 
 export const UNAVAILABLE_RECOVERY_GATEWAY: RecoveryGateway = {

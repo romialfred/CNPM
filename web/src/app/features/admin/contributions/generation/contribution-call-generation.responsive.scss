@@ -1,0 +1,80 @@
+@media (max-width: 1279px) {
+  .contribution-generation__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contribution-generation__aside {
+    position: static;
+  }
+
+  .contribution-generation__kpis {
+    overflow-x: auto;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(12rem, 1fr);
+    padding-bottom: var(--cnpm-space-2);
+    scroll-snap-type: x proximity;
+  }
+
+  .contribution-generation__kpis article {
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 767px) {
+  .contribution-generation {
+    gap: var(--cnpm-space-4);
+  }
+
+  .contribution-generation__progress,
+  .contribution-generation__panel,
+  .contribution-generation__aside,
+  .contribution-generation__summary,
+  .contribution-generation__exceptions,
+  .contribution-generation__review {
+    padding: var(--cnpm-space-4);
+  }
+
+  .contribution-generation__stepper {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contribution-generation__stepper button {
+    min-height: var(--cnpm-size-control-lg);
+  }
+
+  .contribution-generation__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contribution-generation__field--wide {
+    grid-column: auto;
+  }
+
+  .contribution-generation__field select {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  .contribution-generation__progress-copy,
+  .contribution-generation__panel > footer,
+  .contribution-generation__summary > header,
+  .contribution-generation__exceptions > header,
+  .contribution-generation__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .contribution-generation__kpis {
+    grid-auto-columns: minmax(78vw, 1fr);
+  }
+
+  .contribution-generation__confirmation {
+    min-height: var(--cnpm-size-control-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contribution-generation__progress-track span {
+    transition: none;
+  }
+}

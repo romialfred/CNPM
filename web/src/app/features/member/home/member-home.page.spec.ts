@@ -85,6 +85,7 @@ describe('MemberHomePage', () => {
         '#contenu-principal',
         '/member/home',
         '/member/contributions',
+        '/member/payments',
         '/member/receipts',
         '/member/requests',
         '/member/documents',

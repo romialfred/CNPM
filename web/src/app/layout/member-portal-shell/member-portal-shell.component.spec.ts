@@ -43,13 +43,17 @@ describe('MemberPortalShellComponent', () => {
   });
 
   it('ne transforme pas les destinations absentes en liens morts', () => {
-    expect(host.querySelectorAll('nav a')).toHaveLength(14);
+    // 11 destinations desktop + les 4 premières reprises en mobile (la 5e entrée
+    // mobile est le déclencheur « Plus », pas un lien).
+    expect(host.querySelectorAll('nav a')).toHaveLength(15);
     expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(0);
     expect(host.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
   });
 
-  it('reprend les dix destinations desktop et borne le mobile à cinq entrées', () => {
-    expect(host.querySelectorAll('.member-shell__desktop-nav > *')).toHaveLength(10);
+  it('reprend les onze destinations desktop et borne le mobile à cinq entrées', () => {
+    // L'ajout du parcours Paiements porte le desktop à 11 ; le bornage mobile à 5,
+    // lui, ne bouge pas — c'est l'invariant que ce test protège.
+    expect(host.querySelectorAll('.member-shell__desktop-nav > *')).toHaveLength(11);
     expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
     expect(host.querySelector('.member-shell__notification-count')?.textContent).toContain('3');
   });
@@ -117,7 +121,16 @@ describe('MemberPortalShellComponent', () => {
       Array.from(panel?.querySelectorAll<HTMLAnchorElement>('nav a') ?? []).map((link) =>
         link.textContent?.trim(),
       ),
-    ).toEqual(['Annuaire', 'Documents', 'Vitrine', 'Statistiques', 'Profil', 'Utilisateurs']);
+    // Paiements prend la 3e place fixe en mobile : Requêtes bascule donc dans « Plus ».
+    ).toEqual([
+      'Requêtes',
+      'Annuaire',
+      'Documents',
+      'Vitrine',
+      'Statistiques',
+      'Profil',
+      'Utilisateurs',
+    ]);
 
     close?.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }),
