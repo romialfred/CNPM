@@ -40,6 +40,8 @@ describe('adminRoutes', () => {
     expect(child('requests/:id')?.loadComponent).toBeTypeOf('function');
     expect(child('requests/:id')?.canActivate).toHaveLength(1);
     expect(child('security/users')?.loadComponent).toBeTypeOf('function');
+    expect(child('security/roles')?.loadComponent).toBeTypeOf('function');
+    expect(child('security/roles')?.data?.['defaultTab']).toBe('roles');
     expect(child('security/audit')?.loadComponent).toBeTypeOf('function');
     expect(child('security/audit')?.canActivate).toHaveLength(1);
     expect(child('settings')?.loadComponent).toBeTypeOf('function');

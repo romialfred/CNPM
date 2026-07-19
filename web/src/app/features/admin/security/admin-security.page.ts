@@ -194,6 +194,17 @@ export class AdminSecurityPage {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  /**
+   * BO-030 et BO-031 partagent le même espace de travail. La route canonique
+   * `/security/roles` ouvre directement la matrice, sans dupliquer son rendu ni
+   * introduire un second état local concurrent de l'URL.
+   */
+  private readonly defaultTab: SecurityTabId = TAB_IDS.includes(
+    this.route.snapshot.data['defaultTab'] as SecurityTabId,
+  )
+    ? (this.route.snapshot.data['defaultTab'] as SecurityTabId)
+    : DEFAULT_TAB;
+
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly tabs = TABS;
 
@@ -210,7 +221,7 @@ export class AdminSecurityPage {
     const value = this.params().get('onglet');
     return value && (TAB_IDS as readonly string[]).includes(value)
       ? (value as SecurityTabId)
-      : DEFAULT_TAB;
+      : this.defaultTab;
   });
 
   protected readonly search = computed(() => this.params().get('q') ?? '');
@@ -446,7 +457,7 @@ export class AdminSecurityPage {
    */
   protected onTabChange(tab: string): void {
     this.searchDraft.set('');
-    this.patch({ onglet: tab === DEFAULT_TAB ? null : tab, q: null });
+    this.patch({ onglet: tab === this.defaultTab ? null : tab, q: null });
   }
 
   protected applySearch(): void {

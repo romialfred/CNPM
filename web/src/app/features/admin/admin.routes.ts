@@ -369,6 +369,13 @@ export const adminRoutes: Routes = [
         title: 'GED et documents — Administration CNPM',
       },
       {
+        path: 'security/roles',
+        data: { defaultTab: 'roles' },
+        loadComponent: () =>
+          import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
+        title: 'Rôles et permissions — Administration CNPM',
+      },
+      {
         path: 'security/users',
         loadComponent: () =>
           import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
