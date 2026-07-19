@@ -16,6 +16,8 @@ import 'package:cnpm_mobile/features/home/domain/member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/presentation/member_home_screen.dart';
 import 'package:cnpm_mobile/features/notifications/domain/member_notification.dart';
 import 'package:cnpm_mobile/features/notifications/presentation/member_notification_list_screen.dart';
+import 'package:cnpm_mobile/features/offline/domain/member_offline_status.dart';
+import 'package:cnpm_mobile/features/offline/presentation/member_offline_status_screen.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/presentation/payment_history_screen.dart';
 import 'package:cnpm_mobile/features/profile/domain/member_profile.dart';
@@ -33,6 +35,8 @@ import 'package:cnpm_mobile/features/receipts/presentation/receipt_detail_screen
 import 'package:cnpm_mobile/features/receipts/presentation/receipt_list_screen.dart';
 import 'package:cnpm_mobile/features/security/domain/member_security.dart';
 import 'package:cnpm_mobile/features/security/presentation/member_security_screen.dart';
+import 'package:cnpm_mobile/features/sync/domain/pending_sync.dart';
+import 'package:cnpm_mobile/features/sync/presentation/pending_sync_screen.dart';
 
 GoRouter buildAppRouter({
   required AppConfig config,
@@ -43,12 +47,14 @@ GoRouter buildAppRouter({
   required ContentController<MemberDocumentCollection> documentController,
   required ContentController<MemberNotificationCollection>
   notificationController,
+  required ContentController<MemberOfflineStatusResult> offlineStatusController,
   required ContentController<List<MemberPayment>> paymentController,
   required ContentController<MemberProfileResult> profileController,
   required ContentController<MemberReceiptCollection> receiptController,
   required LoadMemberReceipt loadMemberReceipt,
   required ContentController<List<MemberRequest>> requestController,
   required ContentController<MemberSecurityResult> securityController,
+  required ContentController<PendingSyncResult> pendingSyncController,
   required LoadMemberRequest loadMemberRequest,
   required CreateMemberRequest createMemberRequest,
   required AddSharedRequestMessage addSharedRequestMessage,
@@ -61,9 +67,11 @@ GoRouter buildAppRouter({
     '/contributions',
     '/documents',
     '/notifications',
+    '/offline',
     '/profile',
     '/receipts',
     '/security',
+    '/sync',
   };
 
   return GoRouter(
@@ -146,6 +154,15 @@ GoRouter buildAppRouter({
         ),
       ),
       GoRoute(
+        path: '/offline',
+        name: 'mobile-offline',
+        builder: (context, state) => MemberOfflineStatusScreen(
+          controller: offlineStatusController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
         path: '/profile',
         name: 'mobile-profile',
         builder: (context, state) => MemberProfileScreen(
@@ -159,6 +176,15 @@ GoRouter buildAppRouter({
         name: 'mobile-security',
         builder: (context, state) => MemberSecurityScreen(
           controller: securityController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/sync',
+        name: 'mobile-sync',
+        builder: (context, state) => PendingSyncScreen(
+          controller: pendingSyncController,
           isDemo: config.isDemo,
           onSignOut: onSignOut,
         ),

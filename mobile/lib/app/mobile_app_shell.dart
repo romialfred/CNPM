@@ -102,7 +102,8 @@ class MobileAppShell extends StatelessWidget {
               icon: Icon(Icons.more_horiz),
               selectedIcon: Icon(Icons.more),
               label: 'Plus',
-              tooltip: 'Documents, notifications, profil et sécurité',
+              tooltip:
+                  'Documents, notifications, profil, sécurité et mode hors connexion',
             ),
           ],
         ),
@@ -182,6 +183,28 @@ class MobileAppShell extends StatelessWidget {
                     onTap: () {
                       Navigator.of(sheetContext).pop();
                       context.go('/security');
+                    },
+                  ),
+                  ListTile(
+                    key: const Key('more-offline-action'),
+                    leading: const Icon(Icons.cloud_off_outlined),
+                    title: const Text('Hors connexion'),
+                    subtitle: const Text('Capacités et limites locales'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      context.go('/offline');
+                    },
+                  ),
+                  ListTile(
+                    key: const Key('more-sync-action'),
+                    leading: const Icon(Icons.sync_outlined),
+                    title: const Text('Synchronisation'),
+                    subtitle: const Text('File locale en attente'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      context.go('/sync');
                     },
                   ),
                 ],

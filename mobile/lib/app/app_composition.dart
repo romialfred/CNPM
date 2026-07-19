@@ -27,6 +27,11 @@ import 'package:cnpm_mobile/features/notifications/domain/member_notification.da
 import 'package:cnpm_mobile/features/notifications/domain/member_notification_gateway.dart';
 import 'package:cnpm_mobile/features/notifications/infrastructure/demo_member_notification_gateway.dart';
 import 'package:cnpm_mobile/features/notifications/infrastructure/unavailable_member_notification_gateway.dart';
+import 'package:cnpm_mobile/features/offline/application/load_member_offline_status.dart';
+import 'package:cnpm_mobile/features/offline/domain/member_offline_status.dart';
+import 'package:cnpm_mobile/features/offline/domain/member_offline_status_gateway.dart';
+import 'package:cnpm_mobile/features/offline/infrastructure/demo_member_offline_status_gateway.dart';
+import 'package:cnpm_mobile/features/offline/infrastructure/unavailable_member_offline_status_gateway.dart';
 import 'package:cnpm_mobile/features/payments/application/load_member_payments.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment_gateway.dart';
@@ -56,6 +61,11 @@ import 'package:cnpm_mobile/features/security/domain/member_security.dart';
 import 'package:cnpm_mobile/features/security/domain/member_security_gateway.dart';
 import 'package:cnpm_mobile/features/security/infrastructure/demo_member_security_gateway.dart';
 import 'package:cnpm_mobile/features/security/infrastructure/unavailable_member_security_gateway.dart';
+import 'package:cnpm_mobile/features/sync/application/load_pending_sync.dart';
+import 'package:cnpm_mobile/features/sync/domain/pending_sync.dart';
+import 'package:cnpm_mobile/features/sync/domain/pending_sync_gateway.dart';
+import 'package:cnpm_mobile/features/sync/infrastructure/demo_pending_sync_gateway.dart';
+import 'package:cnpm_mobile/features/sync/infrastructure/unavailable_pending_sync_gateway.dart';
 
 final class AppComposition {
   AppComposition._({
@@ -65,12 +75,14 @@ final class AppComposition {
     required this.dashboardController,
     required this.documentController,
     required this.notificationController,
+    required this.offlineStatusController,
     required this.paymentController,
     required this.profileController,
     required this.receiptController,
     required this.loadMemberReceipt,
     required this.requestController,
     required this.securityController,
+    required this.pendingSyncController,
     required this.loadMemberRequest,
     required this.createMemberRequest,
     required this.addSharedRequestMessage,
@@ -89,6 +101,9 @@ final class AppComposition {
     final MemberNotificationGateway notificationGateway = config.isDemo
         ? const DemoMemberNotificationGateway()
         : const UnavailableMemberNotificationGateway();
+    final MemberOfflineStatusGateway offlineStatusGateway = config.isDemo
+        ? const DemoMemberOfflineStatusGateway()
+        : const UnavailableMemberOfflineStatusGateway();
     final MemberContributionGateway contributionGateway = config.isDemo
         ? const DemoMemberContributionGateway()
         : const UnavailableMemberContributionGateway();
@@ -107,6 +122,9 @@ final class AppComposition {
     final MemberSecurityGateway securityGateway = config.isDemo
         ? const DemoMemberSecurityGateway()
         : const UnavailableMemberSecurityGateway();
+    final PendingSyncGateway pendingSyncGateway = config.isDemo
+        ? const DemoPendingSyncGateway()
+        : const UnavailablePendingSyncGateway();
 
     return AppComposition._(
       authController: AuthFlowController(
@@ -130,6 +148,10 @@ final class AppComposition {
         load: LoadMemberNotifications(notificationGateway).call,
         isEmpty: (collection) => false,
       ),
+      offlineStatusController: ContentController<MemberOfflineStatusResult>(
+        load: LoadMemberOfflineStatus(offlineStatusGateway).call,
+        isEmpty: (result) => result is MemberOfflineStatusEmpty,
+      ),
       paymentController: ContentController<List<MemberPayment>>(
         load: LoadMemberPayments(paymentGateway).call,
         isEmpty: (payments) => payments.isEmpty,
@@ -151,6 +173,10 @@ final class AppComposition {
         load: LoadMemberSecurity(securityGateway).call,
         isEmpty: (result) => result is MemberSecurityEmpty,
       ),
+      pendingSyncController: ContentController<PendingSyncResult>(
+        load: LoadPendingSync(pendingSyncGateway).call,
+        isEmpty: (result) => result is PendingSyncEmpty,
+      ),
       loadMemberRequest: LoadMemberRequest(requestGateway),
       createMemberRequest: CreateMemberRequest(requestGateway),
       addSharedRequestMessage: AddSharedRequestMessage(requestGateway),
@@ -163,12 +189,14 @@ final class AppComposition {
   final ContentController<MemberDashboard> dashboardController;
   final ContentController<MemberDocumentCollection> documentController;
   final ContentController<MemberNotificationCollection> notificationController;
+  final ContentController<MemberOfflineStatusResult> offlineStatusController;
   final ContentController<List<MemberPayment>> paymentController;
   final ContentController<MemberProfileResult> profileController;
   final ContentController<MemberReceiptCollection> receiptController;
   final LoadMemberReceipt loadMemberReceipt;
   final ContentController<List<MemberRequest>> requestController;
   final ContentController<MemberSecurityResult> securityController;
+  final ContentController<PendingSyncResult> pendingSyncController;
   final LoadMemberRequest loadMemberRequest;
   final CreateMemberRequest createMemberRequest;
   final AddSharedRequestMessage addSharedRequestMessage;
@@ -178,11 +206,13 @@ final class AppComposition {
     contributionController.reset();
     documentController.reset();
     notificationController.reset();
+    offlineStatusController.reset();
     paymentController.reset();
     profileController.reset();
     receiptController.reset();
     requestController.reset();
     securityController.reset();
+    pendingSyncController.reset();
     authController.reset();
   }
 
@@ -192,10 +222,12 @@ final class AppComposition {
     dashboardController.dispose();
     documentController.dispose();
     notificationController.dispose();
+    offlineStatusController.dispose();
     paymentController.dispose();
     profileController.dispose();
     receiptController.dispose();
     requestController.dispose();
     securityController.dispose();
+    pendingSyncController.dispose();
   }
 }
