@@ -94,6 +94,13 @@
   outline-offset: 2px;
 }
 
+.cnpm-enrollments__cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .cnpm-enrollments__principle {
   display: flex;
   align-items: flex-start;
@@ -124,5 +131,51 @@
 
   .cnpm-enrollments__row-action {
     min-height: var(--cnpm-size-control-lg);
+  }
+
+  .cnpm-enrollments__table--ready {
+    display: none;
+  }
+
+  .cnpm-enrollments__cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-enrollments__cards > li {
+    padding: var(--cnpm-space-4);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-lg);
+    background: var(--cnpm-color-surface-primary);
+  }
+
+  .cnpm-enrollments__card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-enrollments__cards dl {
+    display: grid;
+    gap: var(--cnpm-space-2);
+    margin: var(--cnpm-space-4) 0;
+  }
+
+  .cnpm-enrollments__cards dl > div {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--cnpm-space-2);
+  }
+
+  .cnpm-enrollments__cards dt {
+    color: var(--cnpm-color-text-muted);
+  }
+
+  .cnpm-enrollments__cards dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
   }
 }

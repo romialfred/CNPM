@@ -128,9 +128,12 @@ describe('EnrollmentsPage', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const button = Array.from(host.querySelectorAll('button')).find((candidate) =>
-      candidate.textContent?.includes('Consulter'),
-    );
+    const mobileCards = host.querySelector('.cnpm-enrollments__cards');
+    expect(mobileCards).not.toBeNull();
+    expect(mobileCards?.textContent).toContain('ENR-DEMO-0001');
+    expect(mobileCards?.textContent).toContain('20000000-0000-4000-8000-000000000001');
+
+    const button = mobileCards?.querySelector('button');
     button?.click();
 
     expect(navigate).toHaveBeenCalledWith(
