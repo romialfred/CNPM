@@ -663,7 +663,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PageResource'
+                $ref: '#/components/schemas/EnrollmentApplicationPage'
       x-requirements:
       - ENR-001
       - ENR-002
@@ -3961,6 +3961,34 @@ components:
         version:
           type: integer
           format: int64
+      additionalProperties: false
+    EnrollmentApplicationPage:
+      type: object
+      description: Page typée de dossiers d'adhésion, ordonnée de façon stable par numéro de dossier.
+      required:
+      - items
+      - page
+      - size
+      - totalElements
+      - totalPages
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnrollmentApplicationView'
+        page:
+          type: integer
+          minimum: 0
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          minimum: 0
       additionalProperties: false
     EnrollmentComplementRequest:
       type: object

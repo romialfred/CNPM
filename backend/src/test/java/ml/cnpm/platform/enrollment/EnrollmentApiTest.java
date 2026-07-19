@@ -206,6 +206,40 @@ class EnrollmentApiTest {
     }
 
     @Test
+    void listsApplicationsWithStablePaginationForEveryEnrollmentRole() throws Exception {
+        String first = createCase("AAA-LIST-ENR-0001");
+        String second = createCase("AAA-LIST-ENR-0002");
+
+        mockMvc.perform(get("/enrollment-applications?page=0&size=1").with(asCreator()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].id").value(first))
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(1))
+                .andExpect(jsonPath("$.totalElements").value(org.hamcrest.Matchers.greaterThanOrEqualTo(2)))
+                .andExpect(jsonPath("$.totalPages").value(org.hamcrest.Matchers.greaterThanOrEqualTo(2)));
+
+        mockMvc.perform(get("/enrollment-applications?page=1&size=1").with(asReviewer()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].id").value(second));
+
+        mockMvc.perform(get("/enrollment-applications?page=0&size=1").with(asApprover()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void boundsAndProtectsTheEnrollmentList() throws Exception {
+        mockMvc.perform(get("/enrollment-applications?page=-1&size=0").with(asCreator()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"));
+
+        mockMvc.perform(get("/enrollment-applications"))
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/enrollment-applications").with(as("PERM_MEMBER.READ")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void replaysAnIdenticalCreationIdempotently() throws Exception {
         String first = createCase("ENR-2026-0002");
 

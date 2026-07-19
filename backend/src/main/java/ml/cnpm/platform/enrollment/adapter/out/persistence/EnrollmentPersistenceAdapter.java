@@ -10,6 +10,10 @@ import ml.cnpm.platform.enrollment.application.EnrollmentCaseDraft;
 import ml.cnpm.platform.enrollment.application.port.out.EnrollmentCaseRepository;
 import ml.cnpm.platform.enrollment.domain.EnrollmentCase;
 import ml.cnpm.platform.enrollment.domain.EnrollmentStatus;
+import ml.cnpm.platform.shared.api.PageResult;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -45,6 +49,24 @@ class EnrollmentPersistenceAdapter implements EnrollmentCaseRepository {
     @Override
     public Optional<EnrollmentCase> findById(UUID id) {
         return caseRepository.findById(id).map(EnrollmentPersistenceAdapter::toDomain);
+    }
+
+    @Override
+    public PageResult<EnrollmentCase> findAll(int page, int size) {
+        Page<EnrollmentCaseEntity> result =
+                caseRepository.findAll(
+                        PageRequest.of(
+                                page,
+                                size,
+                                Sort.by(
+                                        Sort.Order.asc("caseNumber"),
+                                        Sort.Order.asc("id"))));
+        return new PageResult<>(
+                result.getContent().stream().map(EnrollmentPersistenceAdapter::toDomain).toList(),
+                result.getNumber(),
+                result.getSize(),
+                result.getTotalElements(),
+                result.getTotalPages());
     }
 
     @Override

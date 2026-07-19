@@ -2,6 +2,8 @@ package ml.cnpm.platform.enrollment.adapter.in.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import ml.cnpm.platform.enrollment.application.EnrollmentCaseCreation;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -49,6 +52,14 @@ public class EnrollmentController {
     @GetMapping("/enrollment-applications/{id}")
     public EnrollmentApplicationView get(@PathVariable("id") UUID id) {
         return EnrollmentApplicationView.from(service.get(id));
+    }
+
+    /** Liste paginée des dossiers ; la taille est bornée côté serveur. */
+    @GetMapping("/enrollment-applications")
+    public EnrollmentApplicationPageView list(
+            @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+            @RequestParam(name = "size", defaultValue = "20") @Min(1) @Max(100) int size) {
+        return EnrollmentApplicationPageView.from(service.list(page, size));
     }
 
     /**

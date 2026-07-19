@@ -6,6 +6,7 @@ import java.util.UUID;
 import ml.cnpm.platform.enrollment.application.EnrollmentCaseDraft;
 import ml.cnpm.platform.enrollment.domain.EnrollmentCase;
 import ml.cnpm.platform.enrollment.domain.EnrollmentStatus;
+import ml.cnpm.platform.shared.api.PageResult;
 
 /**
  * Port sortant du module ENROLLMENT : persistance des dossiers, des contrôles et des
@@ -17,6 +18,9 @@ public interface EnrollmentCaseRepository {
     Optional<EnrollmentCase> findByCaseNumber(String caseNumber);
 
     Optional<EnrollmentCase> findById(UUID id);
+
+    /** Liste paginée dans un ordre stable défini par l'adaptateur de persistance. */
+    PageResult<EnrollmentCase> findAll(int page, int size);
 
     EnrollmentCase create(EnrollmentCaseDraft draft);
 

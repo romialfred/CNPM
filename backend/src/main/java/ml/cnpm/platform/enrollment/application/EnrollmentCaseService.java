@@ -9,6 +9,7 @@ import ml.cnpm.platform.enrollment.application.port.out.EnrollmentCaseRepository
 import ml.cnpm.platform.enrollment.domain.EnrollmentCase;
 import ml.cnpm.platform.enrollment.domain.EnrollmentStatus;
 import ml.cnpm.platform.shared.api.Hashing;
+import ml.cnpm.platform.shared.api.PageResult;
 import ml.cnpm.platform.shared.api.ResourceNotFoundException;
 import ml.cnpm.platform.shared.api.StateConflictException;
 import org.springframework.security.access.AccessDeniedException;
@@ -105,6 +106,18 @@ public class EnrollmentCaseService {
     @Transactional(readOnly = true)
     public EnrollmentCase get(UUID id) {
         return load(id);
+    }
+
+    /**
+     * Liste les dossiers dans un ordre stable et avec une pagination bornée au bord HTTP.
+     * Le référentiel ne définit pas de permission de lecture dédiée : la même union de
+     * permissions que la consultation unitaire est appliquée, sans créer un droit implicite.
+     */
+    @PreAuthorize(
+            "hasAnyAuthority('PERM_ENROLLMENT.CREATE','PERM_ENROLLMENT.REVIEW','PERM_ENROLLMENT.APPROVE')")
+    @Transactional(readOnly = true)
+    public PageResult<EnrollmentCase> list(int page, int size) {
+        return repository.findAll(page, size);
     }
 
     /**
