@@ -15,17 +15,17 @@ const DEMO_LATENCY_MS = 90;
  * uniquement aux tests et aux captures de démonstration.
  */
 const DEMO_GROUPS: readonly ProfessionalGroup[] = [
-  demoGroup(1, 'DEMO-AGRI', 'Groupement agricole de démonstration', 'SECTEUR_FICTIF_AGRI'),
-  demoGroup(2, 'DEMO-ART', 'Collectif artisanal fictif', 'SECTEUR_FICTIF_ARTISANAT'),
-  demoGroup(3, 'DEMO-BTP', 'Groupement construction scénario', 'SECTEUR_FICTIF_BTP'),
-  demoGroup(4, 'DEMO-COM', 'Réseau commerce de démonstration', 'SECTEUR_FICTIF_COMMERCE'),
-  demoGroup(5, 'DEMO-ENE', 'Collectif énergie prototype', 'SECTEUR_FICTIF_ENERGIE'),
-  demoGroup(6, 'DEMO-HOT', 'Groupement hôtellerie fictif', 'SECTEUR_FICTIF_HOTELLERIE'),
-  demoGroup(7, 'DEMO-IND', 'Réseau industriel de démonstration', 'SECTEUR_FICTIF_INDUSTRIE'),
-  demoGroup(8, 'DEMO-LOG', 'Collectif logistique scénario', 'SECTEUR_FICTIF_LOGISTIQUE'),
-  demoGroup(9, 'DEMO-NUM', 'Groupement numérique prototype', 'SECTEUR_FICTIF_NUMERIQUE'),
-  demoGroup(10, 'DEMO-SER', 'Réseau services de démonstration', 'SECTEUR_FICTIF_SERVICES'),
-  demoGroup(11, 'DEMO-TEX', 'Collectif textile fictif', 'SECTEUR_FICTIF_TEXTILE'),
+  demoGroup(1, 'DEMO-AGRI', 'Groupement agricole de démonstration', 'DEMO-AGRI'),
+  demoGroup(2, 'DEMO-ART', 'Collectif artisanal fictif', 'DEMO-ARTISANAT'),
+  demoGroup(3, 'DEMO-BTP', 'Groupement construction scénario', 'DEMO-BTP'),
+  demoGroup(4, 'DEMO-COM', 'Réseau commerce de démonstration', 'DEMO-COMMERCE'),
+  demoGroup(5, 'DEMO-ENE', 'Collectif énergie prototype', 'DEMO-ENERGIE'),
+  demoGroup(6, 'DEMO-HOT', 'Groupement hôtellerie fictif', 'DEMO-HOTELLERIE'),
+  demoGroup(7, 'DEMO-IND', 'Réseau industriel de démonstration', 'DEMO-INDUSTRIE'),
+  demoGroup(8, 'DEMO-LOG', 'Collectif logistique scénario', 'DEMO-LOGISTIQUE'),
+  demoGroup(9, 'DEMO-NUM', 'Groupement numérique prototype', 'DEMO-NUMERIQUE'),
+  demoGroup(10, 'DEMO-SER', 'Réseau services de démonstration', 'DEMO-SERVICES'),
+  demoGroup(11, 'DEMO-TEX', 'Collectif textile fictif', 'DEMO-TEXTILE'),
   demoGroup(12, 'DEMO-TRA', 'Groupement transport scénario', null),
 ];
 

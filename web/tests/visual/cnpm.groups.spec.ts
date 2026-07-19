@@ -41,7 +41,10 @@ test('BO-024 → BO-025 → BO-024 conserve la page dans l’URL', async ({ page
   await expect(page.getByRole('button', { name: /Modifier|Créer/ })).toHaveCount(0);
   await expectNoBlockingViolation(page);
 
-  await page.getByRole('link', { name: 'Groupements', exact: true }).click();
+  await page
+    .getByLabel('Fil d’Ariane')
+    .getByRole('link', { name: 'Groupements', exact: true })
+    .click();
   await expect(page).toHaveURL(/\/admin\/groups\?page=2/);
   await expect(page.locator('.cnpm-pagination__range')).toContainText('11–12 sur 12');
 });
