@@ -1,0 +1,74 @@
+@media (max-width: 1279px) {
+  .recovery-portfolio-page__kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .recovery-portfolio-page__performance,
+  .recovery-portfolio-page__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .recovery-portfolio-page__performance dl,
+  .recovery-portfolio-page__filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 899px) {
+  .recovery-portfolio-page__table {
+    display: none;
+  }
+
+  .recovery-portfolio-page__cards {
+    display: grid;
+    gap: var(--cnpm-space-3);
+  }
+
+  .recovery-portfolio-page__cards > li {
+    display: grid;
+    gap: var(--cnpm-space-3);
+    padding: var(--cnpm-space-4);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-md);
+    background: var(--cnpm-color-surface-subtle);
+  }
+
+  .recovery-portfolio-page__cards > li.recovery-portfolio-page__card--selected {
+    border-color: var(--cnpm-color-border-focus);
+    background: var(--cnpm-color-brand-blue-50);
+  }
+}
+
+@media (max-width: 599px) {
+  .recovery-portfolio-page__kpis,
+  .recovery-portfolio-page__performance dl,
+  .recovery-portfolio-page__filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .recovery-portfolio-page__field :is(input, select) {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  .recovery-portfolio-page__detail-head,
+  .recovery-portfolio-page__cards > li > div {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 359px) {
+  .recovery-portfolio-page__list,
+  .recovery-portfolio-page__detail {
+    padding: var(--cnpm-space-3);
+  }
+
+  .recovery-portfolio-page
+    :is(
+      .recovery-portfolio-page__definitions,
+      .recovery-portfolio-page__promise dl,
+      .recovery-portfolio-page__cards dl
+    )
+    > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

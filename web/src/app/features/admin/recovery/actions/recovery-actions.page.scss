@@ -1,0 +1,289 @@
+.recovery-actions-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.recovery-actions-page__scope {
+  margin: 0 0 calc(var(--cnpm-space-2) * -1);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.recovery-actions-page__kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--cnpm-space-3);
+}
+
+.recovery-actions-page__kpis article,
+.recovery-actions-page__list,
+.recovery-actions-page__detail {
+  min-width: 0;
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.recovery-actions-page__kpis article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+}
+
+.recovery-actions-page__kpis span,
+.recovery-actions-page__subline,
+.recovery-actions-page__identity span {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.recovery-actions-page__kpis strong {
+  font-size: var(--cnpm-font-size-xl);
+}
+
+.recovery-actions-page__filters {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.5fr) repeat(4, minmax(9rem, 1fr)) auto;
+  align-items: end;
+  gap: var(--cnpm-space-3);
+  width: 100%;
+}
+
+.recovery-actions-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.recovery-actions-page__field label {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.recovery-actions-page__field :is(input, select) {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-md);
+  padding-inline: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+}
+
+.recovery-actions-page__field :is(input, select):focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
+.recovery-actions-page__count {
+  min-height: var(--cnpm-space-5);
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.recovery-actions-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.35fr);
+  align-items: start;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.recovery-actions-page__list,
+.recovery-actions-page__detail,
+.recovery-actions-page__definitions,
+.recovery-actions-page__promise,
+.recovery-actions-page__promise dl,
+.recovery-actions-page__locked-actions {
+  display: grid;
+  gap: var(--cnpm-space-3);
+}
+
+.recovery-actions-page__table {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.recovery-actions-page__identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 10rem;
+}
+
+.recovery-actions-page__subline {
+  display: block;
+  margin-top: var(--cnpm-space-1);
+}
+
+.recovery-actions-page__cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recovery-actions-page__detail-head,
+.recovery-actions-page__cards > li > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.recovery-actions-page__detail-head :is(p, h2),
+.recovery-actions-page__detail-name,
+.recovery-actions-page__promise h3,
+.recovery-actions-page__locked-actions :is(h3, p),
+.recovery-actions-page__cards p {
+  margin: 0;
+}
+
+.recovery-actions-page__detail-head p {
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.recovery-actions-page__detail-head h2 {
+  font-size: var(--cnpm-font-size-lg);
+}
+
+.recovery-actions-page__detail-head h2:focus-visible {
+  border-radius: var(--cnpm-radius-sm);
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 3px;
+}
+
+.recovery-actions-page__detail-name {
+  color: var(--cnpm-color-text-secondary);
+}
+
+.recovery-actions-page__definitions,
+.recovery-actions-page__promise dl,
+.recovery-actions-page__cards dl {
+  margin: 0;
+}
+
+.recovery-actions-page
+  :is(
+    .recovery-actions-page__definitions,
+    .recovery-actions-page__promise dl,
+    .recovery-actions-page__cards dl
+  )
+  > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.7fr) minmax(0, 1fr);
+  gap: var(--cnpm-space-2);
+}
+
+.recovery-actions-page dt {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.recovery-actions-page dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.recovery-actions-page__promise,
+.recovery-actions-page__locked-actions {
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-subtle);
+}
+
+.recovery-actions-page__locked-actions p {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+@media (max-width: 1279px) {
+  .recovery-actions-page__kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .recovery-actions-page__filters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .recovery-actions-page__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 899px) {
+  .recovery-actions-page__table {
+    display: none;
+  }
+
+  .recovery-actions-page__cards {
+    display: grid;
+    gap: var(--cnpm-space-3);
+  }
+
+  .recovery-actions-page__cards > li {
+    display: grid;
+    gap: var(--cnpm-space-3);
+    padding: var(--cnpm-space-4);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-md);
+    background: var(--cnpm-color-surface-subtle);
+  }
+
+  .recovery-actions-page__cards > li.recovery-actions-page__card--selected {
+    border-color: var(--cnpm-color-border-focus);
+    background: var(--cnpm-color-brand-blue-50);
+  }
+}
+
+@media (max-width: 599px) {
+  .recovery-actions-page__kpis,
+  .recovery-actions-page__filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .recovery-actions-page__field :is(input, select) {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  .recovery-actions-page__detail-head,
+  .recovery-actions-page__cards > li > div {
+    flex-direction: column;
+  }
+
+  .recovery-actions-page__filters cnpm-button,
+  .recovery-actions-page__cards cnpm-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 359px) {
+  .recovery-actions-page__list,
+  .recovery-actions-page__detail {
+    padding: var(--cnpm-space-3);
+  }
+
+  .recovery-actions-page
+    :is(
+      .recovery-actions-page__definitions,
+      .recovery-actions-page__promise dl,
+      .recovery-actions-page__cards dl
+    )
+    > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

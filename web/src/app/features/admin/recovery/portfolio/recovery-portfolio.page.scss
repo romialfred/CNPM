@@ -1,0 +1,214 @@
+.recovery-portfolio-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.recovery-portfolio-page__kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--cnpm-space-3);
+}
+
+.recovery-portfolio-page__kpis article,
+.recovery-portfolio-page__performance,
+.recovery-portfolio-page__list,
+.recovery-portfolio-page__detail {
+  min-width: 0;
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.recovery-portfolio-page__kpis article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+}
+
+.recovery-portfolio-page__kpis span,
+.recovery-portfolio-page__subline,
+.recovery-portfolio-page__identity span,
+.recovery-portfolio-page__performance small {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.recovery-portfolio-page__performance {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.4fr) minmax(0, 1fr);
+  gap: var(--cnpm-space-5);
+}
+
+.recovery-portfolio-page__performance :is(p, h2, dl, dd) {
+  margin: 0;
+}
+
+.recovery-portfolio-page__performance dl {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--cnpm-space-3);
+}
+
+.recovery-portfolio-page dt {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.recovery-portfolio-page__filters {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.5fr) repeat(4, minmax(9rem, 1fr)) auto;
+  align-items: end;
+  gap: var(--cnpm-space-3);
+  width: 100%;
+}
+
+.recovery-portfolio-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.recovery-portfolio-page__field label {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.recovery-portfolio-page__field :is(input, select) {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-md);
+  padding-inline: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+}
+
+.recovery-portfolio-page__field :is(input, select):focus-visible,
+.recovery-portfolio-page__detail-head h2:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
+.recovery-portfolio-page__count {
+  min-height: var(--cnpm-space-5);
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.recovery-portfolio-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.35fr);
+  align-items: start;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.recovery-portfolio-page__list,
+.recovery-portfolio-page__detail,
+.recovery-portfolio-page__definitions,
+.recovery-portfolio-page__promise,
+.recovery-portfolio-page__promise dl,
+.recovery-portfolio-page__locked-actions {
+  display: grid;
+  gap: var(--cnpm-space-3);
+}
+
+.recovery-portfolio-page__table {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.recovery-portfolio-page__identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 10rem;
+}
+
+.recovery-portfolio-page__subline {
+  display: block;
+  margin-top: var(--cnpm-space-1);
+}
+
+.recovery-portfolio-page__cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recovery-portfolio-page__detail-head,
+.recovery-portfolio-page__cards > li > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.recovery-portfolio-page__detail-head :is(p, h2),
+.recovery-portfolio-page__detail-name,
+.recovery-portfolio-page__promise h3,
+.recovery-portfolio-page__locked-actions :is(h3, p),
+.recovery-portfolio-page__cards p {
+  margin: 0;
+}
+
+.recovery-portfolio-page__detail-head p {
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-transform: uppercase;
+}
+
+.recovery-portfolio-page__detail-head h2 {
+  font-size: var(--cnpm-font-size-lg);
+}
+
+.recovery-portfolio-page__detail-name {
+  color: var(--cnpm-color-text-secondary);
+}
+
+.recovery-portfolio-page__definitions,
+.recovery-portfolio-page__promise dl,
+.recovery-portfolio-page__cards dl {
+  margin: 0;
+}
+
+.recovery-portfolio-page
+  :is(
+    .recovery-portfolio-page__definitions,
+    .recovery-portfolio-page__promise dl,
+    .recovery-portfolio-page__cards dl
+  )
+  > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.7fr) minmax(0, 1fr);
+  gap: var(--cnpm-space-2);
+}
+
+.recovery-portfolio-page dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.recovery-portfolio-page__promise,
+.recovery-portfolio-page__locked-actions {
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-subtle);
+}
+
+.recovery-portfolio-page__locked-actions p {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}

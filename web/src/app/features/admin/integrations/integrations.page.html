@@ -1,0 +1,517 @@
+<cnpm-admin-shell>
+  <div class="cnpm-integrations">
+    <cnpm-page-header
+      title="Supervision des intégrations"
+      description="État des échanges de démonstration, versions de contrat et journaux techniques sans données sensibles."
+    />
+
+    <cnpm-alert tone="info" title="Environnement fictif en lecture seule">
+      Les partenaires, canaux et événements affichés sont entièrement synthétiques. Aucun service
+      externe n’est joint et aucune charge utile, URL, clé, identité ou coordonnée n’est exposée.
+    </cnpm-alert>
+
+    @if (state() === 'loading') {
+      <section class="cnpm-integrations__metrics" aria-label="Chargement de la synthèse">
+        @for (item of [1, 2, 3, 4, 5]; track item) {
+          <cnpm-skeleton
+            variant="card"
+            [rows]="2"
+            [label]="item === 1 ? 'Chargement de la supervision…' : ''"
+          />
+        }
+      </section>
+    } @else if (summary(); as metrics) {
+      <section class="cnpm-integrations__metrics" aria-label="Synthèse de supervision" tabindex="0">
+        <article class="cnpm-integrations__metric">
+          <span class="cnpm-integrations__metric-mark" aria-hidden="true">P</span>
+          <div>
+            <p class="cnpm-integrations__metric-label">Partenaires fictifs</p>
+            <p class="cnpm-integrations__metric-value">{{ metrics.totalPartners }}</p>
+            <p class="cnpm-integrations__metric-note">Périmètre simulé</p>
+          </div>
+        </article>
+        <article class="cnpm-integrations__metric">
+          <span
+            class="cnpm-integrations__metric-mark cnpm-integrations__metric-mark--success"
+            aria-hidden="true"
+            >✓</span
+          >
+          <div>
+            <p class="cnpm-integrations__metric-label">Opérationnels</p>
+            <p class="cnpm-integrations__metric-value">{{ metrics.healthyPartners }}</p>
+            <p class="cnpm-integrations__metric-note">Contrôles conformes</p>
+          </div>
+        </article>
+        <article class="cnpm-integrations__metric">
+          <span
+            class="cnpm-integrations__metric-mark cnpm-integrations__metric-mark--warning"
+            aria-hidden="true"
+            >!</span
+          >
+          <div>
+            <p class="cnpm-integrations__metric-label">À surveiller</p>
+            <p class="cnpm-integrations__metric-value">{{ metrics.attentionPartners }}</p>
+            <p class="cnpm-integrations__metric-note">Service dégradé</p>
+          </div>
+        </article>
+        <article class="cnpm-integrations__metric">
+          <span
+            class="cnpm-integrations__metric-mark cnpm-integrations__metric-mark--error"
+            aria-hidden="true"
+            >×</span
+          >
+          <div>
+            <p class="cnpm-integrations__metric-label">Bloqués ou suspendus</p>
+            <p class="cnpm-integrations__metric-value">{{ metrics.blockedPartners }}</p>
+            <p class="cnpm-integrations__metric-note">Aucun échange autorisé</p>
+          </div>
+        </article>
+        <article class="cnpm-integrations__metric">
+          <span class="cnpm-integrations__metric-mark" aria-hidden="true">24h</span>
+          <div>
+            <p class="cnpm-integrations__metric-label">Événements fictifs</p>
+            <p class="cnpm-integrations__metric-value">{{ metrics.events24h }}</p>
+            <p class="cnpm-integrations__metric-note">{{ metrics.failedEvents24h }} à contrôler</p>
+          </div>
+        </article>
+      </section>
+    }
+
+    <div class="cnpm-integrations__layout">
+      <section class="cnpm-integrations__workspace" aria-labelledby="integrations-workspace-title">
+        <h2 class="cnpm-integrations__sr" id="integrations-workspace-title">
+          Espace de supervision consultative
+        </h2>
+
+        <cnpm-tabs
+          [tabs]="views"
+          ariaLabel="Vues de la supervision des intégrations"
+          panelId="integrations-view-panel"
+          [selected]="view()"
+          (selectedChange)="selectView($event)"
+        />
+
+        <section class="cnpm-integrations__filters" aria-label="Filtres de la supervision">
+          @if (view() === 'partners') {
+            <div class="cnpm-integrations__field">
+              <label for="integration-health">État de santé</label>
+              <select
+                id="integration-health"
+                name="etat"
+                [ngModel]="health()"
+                (ngModelChange)="setHealth($event)"
+              >
+                <option value="all">Tous les états</option>
+                <option value="HEALTHY">Opérationnel</option>
+                <option value="DEGRADED">Dégradé</option>
+                <option value="PAUSED">Suspendu</option>
+                <option value="UNAVAILABLE">Indisponible</option>
+              </select>
+            </div>
+          } @else {
+            <div class="cnpm-integrations__field">
+              <label for="integration-direction">Sens de l’échange</label>
+              <select
+                id="integration-direction"
+                name="sens"
+                [ngModel]="direction()"
+                (ngModelChange)="setDirection($event)"
+              >
+                <option value="all">Tous les sens</option>
+                <option value="INBOUND">Entrant</option>
+                <option value="OUTBOUND">Sortant</option>
+              </select>
+            </div>
+          }
+
+          <form class="cnpm-integrations__search" role="search" (ngSubmit)="applySearch()">
+            <label for="integration-search">Rechercher dans la vue</label>
+            <div class="cnpm-integrations__search-row">
+              <input
+                id="integration-search"
+                type="search"
+                name="recherche"
+                autocomplete="off"
+                maxlength="80"
+                placeholder="Partenaire fictif, version, corrélation…"
+                [ngModel]="searchDraft()"
+                (ngModelChange)="searchDraft.set($event)"
+              />
+              <cnpm-button variant="secondary" size="sm" type="submit">Filtrer</cnpm-button>
+            </div>
+          </form>
+
+          @if (hasFilters()) {
+            <cnpm-button variant="tertiary" size="sm" (click)="resetFilters()">
+              Réinitialiser
+            </cnpm-button>
+          }
+        </section>
+
+        <p class="cnpm-integrations__sr" role="status" aria-live="polite" aria-atomic="true">
+          {{ resultsAnnouncement() }}
+        </p>
+
+        <section
+          id="integrations-view-panel"
+          class="cnpm-integrations__panel"
+          role="tabpanel"
+          tabindex="0"
+          [attr.aria-labelledby]="'tab-' + view()"
+        >
+          @switch (state()) {
+            @case ('loading') {
+              <div class="cnpm-integrations__loading-grid">
+                @for (item of [1, 2, 3, 4]; track item) {
+                  <cnpm-skeleton
+                    variant="card"
+                    [rows]="5"
+                    [label]="item === 1 ? 'Chargement des intégrations…' : ''"
+                  />
+                }
+              </div>
+            }
+            @case ('forbidden') {
+              <cnpm-error-state
+                variant="forbidden"
+                title="Supervision non autorisée"
+                description="La permission de lecture de la supervision technique est requise."
+              />
+            }
+            @case ('unavailable') {
+              <cnpm-error-state
+                variant="recoverable"
+                title="Projection HTTP indisponible"
+                description="Le contrat actuel ne fournit pas encore les états de santé et journaux typés nécessaires. Aucun jeu fictif n’est affiché en remplacement."
+              />
+            }
+            @case ('error') {
+              <cnpm-error-state
+                [variant]="offline() ? 'offline' : 'recoverable'"
+                [title]="
+                  offline() ? 'Connexion indisponible' : 'La supervision n’a pas pu être chargée'
+                "
+                [description]="
+                  offline()
+                    ? 'Rétablissez la connexion avant de relancer la supervision.'
+                    : 'Une erreur temporaire est survenue. Les filtres présents dans l’URL sont conservés.'
+                "
+              >
+                <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                  Réessayer
+                </cnpm-button>
+              </cnpm-error-state>
+            }
+            @case ('ready') {
+              @if (view() === 'partners') {
+                @if (partners().length === 0) {
+                  <cnpm-empty-state
+                    [variant]="hasFilters() ? 'no-results' : 'no-data'"
+                    [title]="
+                      hasFilters()
+                        ? 'Aucun partenaire ne correspond'
+                        : 'Aucune intégration supervisée'
+                    "
+                    [description]="
+                      hasFilters()
+                        ? 'Élargissez la recherche ou retirez le filtre d’état.'
+                        : 'Aucun partenaire fictif n’est présent dans ce périmètre de démonstration.'
+                    "
+                  >
+                    @if (hasFilters()) {
+                      <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                        Réinitialiser les filtres
+                      </cnpm-button>
+                    }
+                  </cnpm-empty-state>
+                } @else {
+                  <div class="cnpm-integrations__partner-head">
+                    <div>
+                      <h2>Partenaires et flux fictifs</h2>
+                      <p>
+                        {{ partners().length }} sur {{ snapshot()?.totalPartners }} partenaires
+                        affichés
+                      </p>
+                    </div>
+                    @if (snapshot(); as data) {
+                      <p class="cnpm-integrations__updated">
+                        Actualisé le
+                        <time [attr.datetime]="data.updatedAt">{{ data.updatedAtLabel }}</time>
+                      </p>
+                    }
+                  </div>
+
+                  <div class="cnpm-integrations__partners">
+                    @for (partner of partners(); track partner.id) {
+                      <article class="cnpm-integrations__partner">
+                        <header class="cnpm-integrations__partner-title">
+                          <div>
+                            <p class="cnpm-integrations__partner-kicker">
+                              {{ partner.environmentLabel }}
+                            </p>
+                            <h3>{{ partner.name }}</h3>
+                          </div>
+                          <cnpm-badge [tone]="healthTone(partner.health)">
+                            {{ healthLabel(partner.health) }}
+                          </cnpm-badge>
+                        </header>
+
+                        <p class="cnpm-integrations__purpose">{{ partner.purpose }}</p>
+                        <p class="cnpm-integrations__channel">{{ partner.channelLabel }}</p>
+
+                        <dl class="cnpm-integrations__partner-stats">
+                          <div>
+                            <dt>Contrat</dt>
+                            <dd>{{ partner.contractVersion }}</dd>
+                          </div>
+                          <div>
+                            <dt>Événements · 24 h</dt>
+                            <dd>{{ partner.events24h }}</dd>
+                          </div>
+                          <div>
+                            <dt>Taux de succès</dt>
+                            <dd>
+                              @if (partner.successRate24h === null) {
+                                <span aria-label="Donnée indisponible">—</span>
+                              } @else {
+                                {{ partner.successRate24h }}&nbsp;%
+                              }
+                            </dd>
+                          </div>
+                        </dl>
+
+                        <dl class="cnpm-integrations__details">
+                          <div>
+                            <dt>Autorisation</dt>
+                            <dd>
+                              <cnpm-badge [tone]="authorizationTone(partner.authorization)">
+                                {{ partner.authorizationLabel }}
+                              </cnpm-badge>
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Correspondances</dt>
+                            <dd>
+                              {{ mappingLabel(partner.externalMappings) }} · identifiant CNPM
+                              préservé
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Provenance et qualité</dt>
+                            <dd>{{ partner.sourceLabel }} · {{ partner.qualityLabel }}</dd>
+                          </div>
+                          <div>
+                            <dt>Dernier contrôle</dt>
+                            <dd>
+                              <time [attr.datetime]="partner.lastCheckAt">{{
+                                partner.lastCheckLabel
+                              }}</time>
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Dernier échange</dt>
+                            <dd>
+                              @if (partner.lastExchangeAt) {
+                                <time [attr.datetime]="partner.lastExchangeAt">
+                                  {{ partner.lastExchangeLabel }}
+                                </time>
+                              } @else {
+                                {{ partner.lastExchangeLabel }}
+                              }
+                            </dd>
+                          </div>
+                        </dl>
+
+                        <p class="cnpm-integrations__status-detail">{{ partner.statusDetail }}</p>
+                      </article>
+                    }
+                  </div>
+                }
+              } @else {
+                <div class="cnpm-integrations__partner-head">
+                  <div>
+                    <h2>Journal technique fictif</h2>
+                    <p>
+                      {{ logs().length }} événements détaillés sur
+                      {{ summary()?.events24h }} événements agrégés sur 24 h
+                    </p>
+                  </div>
+                  <p class="cnpm-integrations__updated">
+                    Métadonnées uniquement · aucune charge utile
+                  </p>
+                </div>
+
+                @if (logs().length === 0) {
+                  <cnpm-empty-state
+                    [variant]="hasFilters() ? 'no-results' : 'no-data'"
+                    [title]="
+                      hasFilters() ? 'Aucun événement ne correspond' : 'Journal technique vide'
+                    "
+                    [description]="
+                      hasFilters()
+                        ? 'Élargissez la recherche ou retirez le filtre de sens.'
+                        : 'Aucun événement fictif n’est disponible pour ce périmètre.'
+                    "
+                  >
+                    @if (hasFilters()) {
+                      <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                        Réinitialiser les filtres
+                      </cnpm-button>
+                    }
+                  </cnpm-empty-state>
+                } @else {
+                  <div class="cnpm-integrations__desktop-table">
+                    <cnpm-data-table
+                      caption="Journal technique fictif, du plus récent au plus ancien, sans charge utile ni donnée sensible."
+                      [columns]="logColumns"
+                      [rows]="logs()"
+                      [state]="tableState()"
+                      [rowKey]="logKey"
+                    >
+                      <ng-template #row let-entry>
+                        <td class="cnpm-table__cell">
+                          <time [attr.datetime]="entry.occurredAt">{{
+                            entry.occurredAtLabel
+                          }}</time>
+                        </td>
+                        <td class="cnpm-table__cell">
+                          <strong>{{ entry.partnerName }}</strong>
+                        </td>
+                        <td class="cnpm-table__cell">
+                          <span class="cnpm-integrations__exchange">{{ entry.exchangeLabel }}</span>
+                          <small>{{ entry.detail }}</small>
+                        </td>
+                        <td class="cnpm-table__cell">{{ directionLabel(entry.direction) }}</td>
+                        <td class="cnpm-table__cell">
+                          <cnpm-badge [tone]="outcomeTone(entry.outcome)">
+                            {{ outcomeLabel(entry.outcome) }}
+                          </cnpm-badge>
+                        </td>
+                        <td class="cnpm-table__cell">
+                          <code>{{ entry.correlationLabel }}</code>
+                          <small>{{ entry.contractVersion }} · {{ entry.qualityLabel }}</small>
+                        </td>
+                      </ng-template>
+                    </cnpm-data-table>
+                  </div>
+
+                  <ul class="cnpm-integrations__mobile-log" aria-label="Journal technique fictif">
+                    @for (entry of logs(); track entry.id) {
+                      <li>
+                        <article>
+                          <header>
+                            <div>
+                              <h3>{{ entry.partnerName }}</h3>
+                              <time [attr.datetime]="entry.occurredAt">{{
+                                entry.occurredAtLabel
+                              }}</time>
+                            </div>
+                            <cnpm-badge [tone]="outcomeTone(entry.outcome)">
+                              {{ outcomeLabel(entry.outcome) }}
+                            </cnpm-badge>
+                          </header>
+                          <p>{{ entry.exchangeLabel }} · {{ directionLabel(entry.direction) }}</p>
+                          <dl>
+                            <div>
+                              <dt>Corrélation</dt>
+                              <dd>
+                                <code>{{ entry.correlationLabel }}</code>
+                              </dd>
+                            </div>
+                            <div>
+                              <dt>Contrat</dt>
+                              <dd>{{ entry.contractVersion }}</dd>
+                            </div>
+                            <div>
+                              <dt>Provenance</dt>
+                              <dd>{{ entry.provenanceLabel }}</dd>
+                            </div>
+                            <div>
+                              <dt>Qualité</dt>
+                              <dd>{{ entry.qualityLabel }}</dd>
+                            </div>
+                          </dl>
+                          <small>{{ entry.detail }}</small>
+                        </article>
+                      </li>
+                    }
+                  </ul>
+                }
+              }
+            }
+          }
+        </section>
+      </section>
+
+      <aside class="cnpm-integrations__aside" aria-label="Garde-fous de la supervision">
+        <section class="cnpm-integrations__aside-card" aria-labelledby="sensitive-actions-title">
+          <p class="cnpm-integrations__aside-kicker">Lecture seule</p>
+          <h2 id="sensitive-actions-title">Opérations sensibles neutralisées</h2>
+          <p class="cnpm-integrations__aside-intro">
+            Ces capacités exigent un contrat typé, une permission dédiée, une réauthentification et
+            une trace d’audit. Aucun contrôle exécutable n’est exposé ici.
+          </p>
+          <ul class="cnpm-integrations__locks">
+            <li>
+              <div>
+                <strong>Créer un webhook</strong><span>Abonnement sortant non raccordé.</span>
+              </div>
+              <cnpm-badge tone="neutral">Indisponible</cnpm-badge>
+            </li>
+            <li>
+              <div>
+                <strong>Rejouer un échange</strong><span>Flux de rejeu contrôlé absent.</span>
+              </div>
+              <cnpm-badge tone="neutral">Indisponible</cnpm-badge>
+            </li>
+            <li>
+              <div>
+                <strong>Faire tourner une clé</strong
+                ><span>Coffre-fort et double contrôle non raccordés.</span>
+              </div>
+              <cnpm-badge tone="neutral">Indisponible</cnpm-badge>
+            </li>
+            <li>
+              <div>
+                <strong>Activer une intégration</strong
+                ><span>Validation contractuelle et juridique requise.</span>
+              </div>
+              <cnpm-badge tone="neutral">Indisponible</cnpm-badge>
+            </li>
+          </ul>
+        </section>
+
+        <section class="cnpm-integrations__aside-card" aria-labelledby="exchange-controls-title">
+          <p class="cnpm-integrations__aside-kicker">Conformité des échanges</p>
+          <h2 id="exchange-controls-title">Contrôles rendus visibles</h2>
+          <ul class="cnpm-integrations__controls">
+            <li>
+              <span aria-hidden="true">✓</span>
+              <p><strong>Correspondances</strong> L’identifiant CNPM n’est jamais remplacé.</p>
+            </li>
+            <li>
+              <span aria-hidden="true">✓</span>
+              <p><strong>Versions</strong> Chaque échange indique son contrat.</p>
+            </li>
+            <li>
+              <span aria-hidden="true">✓</span>
+              <p><strong>Autorisation</strong> Un flux non validé reste bloqué.</p>
+            </li>
+            <li>
+              <span aria-hidden="true">✓</span>
+              <p><strong>Provenance</strong> Source, date et qualité restent consultables.</p>
+            </li>
+            <li>
+              <span aria-hidden="true">✓</span>
+              <p><strong>Conflits</strong> Aucun scénario n’écrase une donnée validée.</p>
+            </li>
+            <li>
+              <span aria-hidden="true">✓</span>
+              <p><strong>Bac à sable</strong> Jeux et journaux sont strictement fictifs.</p>
+            </li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </div>
+</cnpm-admin-shell>

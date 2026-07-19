@@ -1,11 +1,13 @@
 import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type { MemberContributionsGateway } from './contributions/member-contributions-gateway';
+import type { MemberDirectoryGateway } from './directory/member-directory.gateway';
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
 import type { MemberHomeGateway } from './home/member-home-gateway';
 import type { MemberProfileGateway } from './profile/member-profile-gateway';
 import type { MemberReceiptsGateway } from './receipts/member-receipts-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
 import type { MemberShowcaseGateway } from './showcase/member-showcase-gateway';
+import type { MemberShowcaseAnalyticsGateway } from './showcase-analytics/member-showcase-analytics.gateway';
 import type { MemberUsersGateway } from './users/member-users-gateway';
 
 export const UNAVAILABLE_MEMBER_HOME_GATEWAY: MemberHomeGateway = {
@@ -55,4 +57,14 @@ export const UNAVAILABLE_MEMBER_USERS_GATEWAY: MemberUsersGateway = {
 export const UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY: MemberShowcaseGateway = {
   loadDraft: (feature) => unavailableFeature$(feature),
   storeLocalDraft: () => unavailableFeature$('MP-015'),
+};
+
+/** L’addendum analytics R4 n’est pas promu ; aucun agrégat HTTP n’est supposé sûr. */
+export const UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY: MemberShowcaseAnalyticsGateway = {
+  load: () => unavailableFeature$('MP-017'),
+};
+
+/** MP-018 ne dispose d’aucun contrat ni périmètre ABAC canonique. */
+export const UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY: MemberDirectoryGateway = {
+  list: () => unavailableFeature$('MP-018'),
 };

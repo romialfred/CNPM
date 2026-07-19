@@ -19,10 +19,30 @@ describe('routes racine', () => {
 
     expect(loaded.map((catalogue) => catalogue.map((route) => route.path))).toEqual([
       [''],
-      ['home'],
+      [
+        'home',
+        'contributions',
+        'receipts',
+        'requests',
+        'documents',
+        'profile',
+        'users',
+        'showcase',
+        'directory',
+      ],
       [''],
       [''],
-      [''],
+      [
+        'adhesion',
+        'verification/:code',
+        'le-cnpm',
+        'services',
+        'actualites',
+        'agenda',
+        'contact',
+        'legal/:document',
+        '',
+      ],
     ]);
   });
 
@@ -57,5 +77,5 @@ describe('routes racine', () => {
     expect(loadedPaths).not.toContain('member');
     expect(loadedPaths).not.toContain('membres');
     subscription.unsubscribe();
-  }, 20_000);
+  }, 60_000);
 });

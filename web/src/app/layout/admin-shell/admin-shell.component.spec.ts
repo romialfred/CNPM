@@ -50,6 +50,13 @@ describe('AdminShellComponent — drawer accessible', () => {
     );
   });
 
+  it('rend BO-037 découvrable pour la persona de démonstration autorisée', async () => {
+    const { host } = await setup();
+
+    const link = host.querySelector<HTMLAnchorElement>('a[href="/admin/showcases/moderation"]');
+    expect(link?.textContent).toContain('Vitrines');
+  });
+
   it('ouvre un dialogue modal, neutralise le contenu et place le focus sur Fermer', async () => {
     const { fixture, host } = await setup();
     await openDrawer(fixture, host);

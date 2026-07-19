@@ -166,8 +166,132 @@ export interface RecoveryPage {
   readonly segments: readonly string[];
 }
 
+export type RecoveryActionKind = 'EMAIL' | 'SMS' | 'CALL' | 'VISIT' | 'MEETING';
+export type RecoveryActionStatus =
+  'PLANNED' | 'DUE_TODAY' | 'OVERDUE' | 'SUSPENDED' | 'BLOCKED_CONSENT';
+export type RecoverySuspensionKind = 'DISPUTE' | 'PROMISE';
+export type CommunicationAuthorization =
+  'AUTHORIZED_DEMO' | 'BLOCKED_NO_CONSENT' | 'NOT_APPLICABLE';
+
+/** Projection d'une promesse existante ; aucune commande de création/modification. */
+export interface RecoveryPromiseSnapshot {
+  readonly amount: number;
+  readonly dueDate: string;
+  readonly comment: string;
+  readonly status: PledgeStatus;
+}
+
+/** Suspension datée exigée par REL-004/RG-009. */
+export interface RecoverySuspensionSnapshot {
+  readonly kind: RecoverySuspensionKind;
+  readonly suspendedAt: string;
+  readonly reasonLabel: string;
+}
+
+export interface RecoveryActionRow {
+  readonly id: string;
+  readonly reference: string;
+  readonly memberCode: string;
+  readonly organization: string;
+  readonly agentLabel: 'Agent Démo Recouvrement';
+  readonly kind: RecoveryActionKind;
+  readonly status: RecoveryActionStatus;
+  readonly scheduledAt: string;
+  readonly campaignReference: string;
+  readonly campaignLabel: string;
+  readonly segment: string;
+  readonly contactDisclosure: 'Contact masqué — démonstration';
+  readonly communicationAuthorization: CommunicationAuthorization;
+  readonly suspension: RecoverySuspensionSnapshot | null;
+  readonly promise: RecoveryPromiseSnapshot | null;
+  readonly executionAvailable: false;
+}
+
+export type RecoveryActionSortKey = 'scheduledAt' | 'organization' | 'kind' | 'status';
+
+export interface RecoveryActionsQuery {
+  readonly search: string;
+  readonly kind: RecoveryActionKind | null;
+  readonly status: RecoveryActionStatus | null;
+  readonly suspension: RecoverySuspensionKind | null;
+  readonly sort: { readonly key: RecoveryActionSortKey; readonly direction: 'asc' | 'desc' };
+  readonly page: number;
+  readonly pageSize: number;
+}
+
+export interface RecoveryActionsPage {
+  readonly items: readonly RecoveryActionRow[];
+  readonly totalItems: number;
+  readonly overview: {
+    readonly total: number;
+    readonly dueToday: number;
+    readonly overdue: number;
+    readonly suspended: number;
+    readonly blockedNoConsent: number;
+  };
+}
+
+export type RecoveryPortfolioStatus = 'ACTIVE' | 'SUSPENDED';
+export type RecoveryPortfolioSortKey =
+  'nextActionAt' | 'organization' | 'outstandingAmount' | 'daysOverdue';
+
+export interface RecoveryPortfolioCase {
+  readonly id: string;
+  readonly reference: string;
+  readonly memberCode: string;
+  readonly organization: string;
+  readonly agentLabel: 'Agent Démo Recouvrement';
+  readonly segment: string;
+  readonly campaignReference: string;
+  readonly campaignLabel: string;
+  readonly status: RecoveryPortfolioStatus;
+  readonly outstandingAmount: number;
+  readonly daysOverdue: number;
+  readonly nextActionKind: RecoveryActionKind;
+  readonly nextActionAt: string;
+  readonly contactDisclosure: 'Contact masqué — démonstration';
+  readonly communicationAuthorization: CommunicationAuthorization;
+  readonly suspension: RecoverySuspensionSnapshot | null;
+  readonly promise: RecoveryPromiseSnapshot | null;
+  /** Libellé purement calendaire ; aucun score analytique ou sanction automatique. */
+  readonly calendarBucket: 'Aujourd’hui' | 'Cette semaine' | 'Suivi suspendu';
+}
+
+export interface RecoveryPortfolioQuery {
+  readonly search: string;
+  readonly status: RecoveryPortfolioStatus | null;
+  readonly suspension: RecoverySuspensionKind | null;
+  readonly segment: string | null;
+  readonly sort: { readonly key: RecoveryPortfolioSortKey; readonly direction: 'asc' | 'desc' };
+  readonly page: number;
+  readonly pageSize: number;
+}
+
+export interface RecoveryPortfolioPage {
+  readonly items: readonly RecoveryPortfolioCase[];
+  readonly totalItems: number;
+  readonly segments: readonly string[];
+  readonly overview: {
+    readonly assignedCases: number;
+    readonly activeCases: number;
+    readonly suspendedCases: number;
+    readonly activePromises: number;
+    readonly outstandingAmount: number;
+    /** Indicateurs historiques fictifs REL-007, jamais utilisés comme score individuel. */
+    readonly contactRate: number;
+    readonly conversionRate: number;
+    readonly recoveredAmount: number;
+    readonly estimatedCost: number;
+    readonly averageDelayDays: number;
+  };
+}
+
 export interface RecoveryGateway {
   search(query: RecoveryQuery): Observable<RecoveryPage>;
+  /** Optionnel tant qu'OpenAPI ne porte pas la projection BO-019. */
+  searchActions?(query: RecoveryActionsQuery): Observable<RecoveryActionsPage>;
+  /** Optionnel tant qu'OpenAPI/ABAC ne portent pas la projection agent BO-020. */
+  searchPortfolio?(query: RecoveryPortfolioQuery): Observable<RecoveryPortfolioPage>;
 }
 
 export const RECOVERY_GATEWAY = new InjectionToken<RecoveryGateway>('RECOVERY_GATEWAY');

@@ -1,0 +1,96 @@
+.cnpm-table__cell {
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-table__cell time,
+.cnpm-table__cell code {
+  white-space: nowrap;
+}
+
+.cnpm-table__cell code,
+.cnpm-integrations__mobile-log code {
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-table__cell small {
+  display: block;
+  min-width: 0;
+  margin-top: var(--cnpm-space-1);
+  overflow-wrap: anywhere;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-integrations__exchange {
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-integrations__mobile-log {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-integrations__mobile-log article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-integrations__mobile-log header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-integrations__mobile-log h3,
+.cnpm-integrations__mobile-log p,
+.cnpm-integrations__mobile-log dl {
+  margin: 0;
+}
+
+.cnpm-integrations__mobile-log h3 {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-integrations__mobile-log time,
+.cnpm-integrations__mobile-log small {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-integrations__mobile-log p {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-integrations__mobile-log dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-integrations__mobile-log dt {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-integrations__mobile-log dd {
+  min-width: 0;
+  margin: var(--cnpm-space-1) 0 0;
+  overflow-wrap: anywhere;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-primary);
+}

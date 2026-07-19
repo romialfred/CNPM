@@ -63,6 +63,50 @@
 
   <ng-content />
 
+  @if (moreOpen()) {
+    <div class="member-shell__more-backdrop" aria-hidden="true" (click)="closeMore()"></div>
+    <aside
+      #morePanel
+      class="member-shell__more-panel"
+      id="member-shell-more-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="member-shell-more-title"
+      (keydown.escape)="closeMore()"
+      (keydown)="trapMorePanelFocus($event)"
+    >
+      <header>
+        <div>
+          <p>Navigation membre</p>
+          <h2 id="member-shell-more-title">Plus de services</h2>
+        </div>
+        <button
+          type="button"
+          class="member-shell__more-close"
+          aria-label="Fermer le menu Plus"
+          (click)="closeMore()"
+        >
+          <svg lucideX aria-hidden="true"></svg>
+        </button>
+      </header>
+      <nav aria-label="Autres services du portail membre">
+        @for (destination of moreDestinations; track destination.label) {
+          @if (destination.route; as route) {
+            <a
+              [routerLink]="route"
+              routerLinkActive="member-shell__more-link--active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              ariaCurrentWhenActive="page"
+              (click)="closeMore(false)"
+            >
+              {{ destination.label }}
+            </a>
+          }
+        }
+      </nav>
+    </aside>
+  }
+
   <nav class="member-shell__mobile-nav" aria-label="Navigation mobile du portail membre">
     @for (destination of mobileDestinations; track destination.label) {
       @if (destination.route; as route) {
@@ -119,5 +163,17 @@
         </span>
       }
     }
+    <button
+      #moreButton
+      type="button"
+      class="member-shell__more-button"
+      [class.member-shell__link--active]="moreOpen()"
+      [attr.aria-expanded]="moreOpen()"
+      aria-controls="member-shell-more-panel"
+      (click)="toggleMore()"
+    >
+      <svg lucideMenu aria-hidden="true"></svg>
+      <span>Plus</span>
+    </button>
   </nav>
 </div>

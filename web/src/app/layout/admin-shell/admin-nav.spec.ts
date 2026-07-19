@@ -1,5 +1,7 @@
+import { firstValueFrom } from 'rxjs';
 import { describe, expect, it } from 'vitest';
 import { ADMIN_NAV, visibleAdminNav } from './admin-nav';
+import { DemoSessionGateway } from './demo-session.gateway';
 
 describe('ADMIN_NAV', () => {
   it('pointe chaque écran livré vers sa route canonique', () => {
@@ -20,6 +22,7 @@ describe('ADMIN_NAV', () => {
       Documents: '/admin/documents',
       Groupements: '/admin/groups',
       Vitrines: '/admin/showcases/moderation',
+      Intégrations: '/admin/integrations',
       Reporting: '/admin/reporting',
       Audit: '/admin/security/audit',
       Paramétrage: '/admin/settings',
@@ -51,6 +54,26 @@ describe('ADMIN_NAV', () => {
     expect(visibleAdminNav([]).some((entry) => entry.label === 'Vitrines')).toBe(false);
     expect(
       visibleAdminNav(['SHOWCASE.MODERATION.READ']).some((entry) => entry.label === 'Vitrines'),
+    ).toBe(true);
+  });
+
+  it('n’expose la supervision des intégrations qu’avec OPS.MONITOR.READ', () => {
+    expect(visibleAdminNav([]).some((entry) => entry.label === 'Intégrations')).toBe(false);
+    expect(
+      visibleAdminNav(['OPS.MONITOR.READ']).some((entry) => entry.label === 'Intégrations'),
+    ).toBe(true);
+  });
+
+  it('expose BO-038 à la persona démo sans lui accorder de permission d’écriture', async () => {
+    const identity = await firstValueFrom(new DemoSessionGateway().identity);
+    expect(identity?.permissions).toContain('OPS.MONITOR.READ');
+    expect(
+      identity?.permissions.filter((permission) => permission.startsWith('INTEGRATION.')),
+    ).toEqual([]);
+    expect(
+      visibleAdminNav(identity?.permissions ?? []).some(
+        (entry) => entry.route === '/admin/integrations',
+      ),
     ).toBe(true);
   });
 

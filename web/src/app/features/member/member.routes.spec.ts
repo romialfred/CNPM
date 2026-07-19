@@ -57,11 +57,19 @@ describe('memberRoutes', () => {
     expect(route?.children).toBeUndefined();
   });
 
-  it('expose MP-015 et MP-016 sous une composition locale commune et sans garde factice', () => {
+  it('expose MP-015 à MP-017 sous une composition locale commune et sans garde factice', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'showcase');
-    expect(route?.providers).toHaveLength(2);
-    expect(route?.children?.map((child) => child.path)).toEqual(['edit', 'preview']);
+    expect(route?.providers).toHaveLength(4);
+    expect(route?.children?.map((child) => child.path)).toEqual(['edit', 'preview', 'analytics']);
     expect(route?.children?.every((child) => child.loadComponent)).toBe(true);
     expect(route?.canActivate).toBeUndefined();
+  });
+
+  it('expose MP-018 sous une composition locale dédiée et sans garde factice', () => {
+    const route = memberRoutes.find((candidate) => candidate.path === 'directory');
+    expect(route?.providers).toHaveLength(2);
+    expect(route?.loadComponent).toBeTypeOf('function');
+    expect(route?.canActivate).toBeUndefined();
+    expect(route?.children).toBeUndefined();
   });
 });

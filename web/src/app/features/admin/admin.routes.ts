@@ -25,6 +25,9 @@ import { DemoGroupsGateway } from './groups/demo-groups.gateway';
 import { groupReadGuard } from './groups/group-read.guard';
 import { GROUPS_GATEWAY } from './groups/groups-gateway';
 import { HttpGroupsGateway } from './groups/http-groups.gateway';
+import { DemoIntegrationsGateway } from './integrations/demo-integrations.gateway';
+import { INTEGRATIONS_GATEWAY } from './integrations/integrations-gateway';
+import { integrationsReadGuard } from './integrations/integrations-read.guard';
 import { DemoMemberDetailGateway } from './member-detail/demo-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from './member-detail/member-detail-gateway';
 import { DemoMemberEditGateway } from './member-edit/demo-member-edit.gateway';
@@ -69,6 +72,7 @@ import {
   UNAVAILABLE_DASHBOARD_GATEWAY,
   UNAVAILABLE_DOCUMENTS_GATEWAY,
   UNAVAILABLE_ENROLLMENT_GATEWAY,
+  UNAVAILABLE_INTEGRATIONS_GATEWAY,
   UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
   UNAVAILABLE_PAYMENTS_GATEWAY,
   UNAVAILABLE_RECEIPTS_GATEWAY,
@@ -243,6 +247,13 @@ export const adminRoutes: Routes = [
             ? inject(DemoAdminSecurityGateway)
             : UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
       },
+      {
+        provide: INTEGRATIONS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoIntegrationsGateway)
+            : UNAVAILABLE_INTEGRATIONS_GATEWAY,
+      },
       DemoDashboardGateway,
       DemoDocumentsGateway,
       DemoMemberDetailGateway,
@@ -254,6 +265,7 @@ export const adminRoutes: Routes = [
       DemoReportingGateway,
       DemoRequestsGateway,
       DemoAdminSecurityGateway,
+      DemoIntegrationsGateway,
     ],
     canActivate: [adminSessionGuard],
     children: [
@@ -334,9 +346,7 @@ export const adminRoutes: Routes = [
       {
         path: 'contributions/:id',
         loadComponent: () =>
-          import('./contributions/contribution-detail.page').then(
-            (m) => m.ContributionDetailPage,
-        ),
+          import('./contributions/contribution-detail.page').then((m) => m.ContributionDetailPage),
         title: 'Détail d’une cotisation — Administration CNPM',
       },
       {
@@ -374,6 +384,20 @@ export const adminRoutes: Routes = [
         title: 'Campagnes de relance — Administration CNPM',
       },
       {
+        path: 'recovery/actions',
+        loadComponent: () =>
+          import('./recovery/actions/recovery-actions.page').then((m) => m.RecoveryActionsPage),
+        title: 'File des actions de relance — Administration CNPM',
+      },
+      {
+        path: 'recovery/portfolio',
+        loadComponent: () =>
+          import('./recovery/portfolio/recovery-portfolio.page').then(
+            (m) => m.RecoveryPortfolioPage,
+          ),
+        title: 'Portefeuille agent de recouvrement — Administration CNPM',
+      },
+      {
         path: 'reporting',
         loadComponent: () => import('./reporting/reporting.page').then((m) => m.ReportingPage),
         title: 'Reporting — Administration CNPM',
@@ -404,6 +428,13 @@ export const adminRoutes: Routes = [
             (m) => m.ShowcaseModerationPage,
           ),
         title: 'Modération des vitrines membres — Administration CNPM',
+      },
+      {
+        path: 'integrations',
+        canActivate: [integrationsReadGuard],
+        loadComponent: () =>
+          import('./integrations/integrations.page').then((m) => m.IntegrationsPage),
+        title: 'Supervision des intégrations — Administration CNPM',
       },
       {
         path: 'security/roles',

@@ -1,0 +1,221 @@
+<cnpm-member-portal-shell
+  organization="Entreprise Démo Sahel"
+  userName="Membre de démonstration"
+  memberCode="CNPM-DEMO-0001"
+  [notificationCount]="0"
+>
+  <main class="showcase-analytics" id="contenu-principal">
+    <cnpm-page-header
+      title="Statistiques de la vitrine"
+      description="Suivez uniquement des tendances agrégées dans cet atelier fictif."
+    >
+      <cnpm-button routerLink="/member/showcase/preview" variant="secondary">
+        Revoir l’aperçu
+      </cnpm-button>
+    </cnpm-page-header>
+
+    <cnpm-alert tone="warning" title="Agrégats fictifs et anonymes" [live]="false">
+      Aucun cookie analytique, IP, contact, appareil, compte ou identifiant de visiteur n’est
+      collecté. Les valeurs restent locales et ne mesurent aucune vitrine réelle.
+    </cnpm-alert>
+
+    <section class="showcase-analytics__controls" aria-labelledby="analytics-controls-title">
+      <div>
+        <h2 id="analytics-controls-title">Cadre d’analyse</h2>
+        <p>La période et la présentation sont conservées dans l’adresse partageable.</p>
+      </div>
+      <div class="showcase-analytics__control-group">
+        <label for="showcase-analytics-period">Période fictive</label>
+        <select
+          #periodSelect
+          id="showcase-analytics-period"
+          [value]="period()"
+          (change)="selectPeriod(periodSelect.value)"
+        >
+          <option value="7d">7 jours</option>
+          <option value="30d">30 jours</option>
+          <option value="90d">90 jours</option>
+        </select>
+      </div>
+      <div class="showcase-analytics__display" role="group" aria-label="Présentation des données">
+        <button
+          type="button"
+          [class.showcase-analytics__display-button--active]="display() === 'chart'"
+          [attr.aria-pressed]="display() === 'chart'"
+          (click)="selectDisplay('chart')"
+        >
+          Graphique
+        </button>
+        <button
+          type="button"
+          [class.showcase-analytics__display-button--active]="display() === 'table'"
+          [attr.aria-pressed]="display() === 'table'"
+          (click)="selectDisplay('table')"
+        >
+          Tableau
+        </button>
+      </div>
+    </section>
+
+    @switch (result().kind) {
+      @case ('loading') {
+        <section class="showcase-analytics__loading" aria-label="Chargement des agrégats fictifs">
+          <cnpm-skeleton
+            variant="chart"
+            [rows]="4"
+            [columns]="12"
+            label="Chargement des agrégats fictifs…"
+          />
+        </section>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Les statistiques n’ont pas pu être chargées"
+          description="La source locale est indisponible. Aucun suivi n’a été déclenché."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Statistiques indisponibles en mode HTTP"
+          description="L’addendum R4, SHOWCASE.OWN.ANALYTICS.READ et le périmètre d’organisation ne sont pas promus dans les contrats canoniques. Aucune fixture n’est injectée."
+        />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucun agrégat disponible"
+          description="Aucune mesure fictive n’est disponible pour cette période. Aucun visiteur individuel n’est recherché."
+        />
+      }
+      @case ('ready') {
+        @if (snapshot(); as data) {
+          <section class="showcase-analytics__metrics" aria-label="Synthèse des agrégats">
+            <article>
+              <span>Vues agrégées</span>
+              <strong>{{ totalViews() | number }}</strong>
+              <small>{{ plottedPeriodLabel() }}</small>
+            </article>
+            <article>
+              <span>Moyenne journalière</span>
+              <strong>{{ averageViews() | number }}</strong>
+              <small>Calcul local sur les {{ plottedDays().length }} jours tracés</small>
+            </article>
+            <article>
+              <span>Pic journalier</span>
+              <strong>{{ peakDay()?.views | number }}</strong>
+              <small>
+                @if (peakDay(); as peak) {
+                  <time [attr.datetime]="peak.date">{{
+                    peak.date | date: 'dd/MM/yyyy' : 'UTC'
+                  }}</time>
+                }
+              </small>
+            </article>
+            <article>
+              <span>Actions de contact</span>
+              <strong>0</strong>
+              <small>Suivi désactivé dans la démonstration</small>
+            </article>
+          </section>
+
+          <section class="showcase-analytics__panel" aria-labelledby="analytics-trend-title">
+            <header>
+              <div>
+                <p class="showcase-analytics__eyebrow">Agrégation {{ data.aggregation }}</p>
+                <h2 id="analytics-trend-title">Tendance des vues fictives</h2>
+              </div>
+              <cnpm-badge tone="info">Anonyme · local</cnpm-badge>
+            </header>
+
+            <p class="showcase-analytics__window" role="status">
+              <strong>Fenêtre tracée :</strong> {{ plottedPeriodLabel() }}.
+              @if (period() === '90d') {
+                Les 60 jours antérieurs ne sont ni tracés ni inclus dans les métriques affichées.
+              }
+            </p>
+
+            @if (display() === 'chart') {
+              <div class="showcase-analytics__chart" role="img" [attr.aria-label]="chartLabel()">
+                <div
+                  class="showcase-analytics__plot"
+                  [style.--analytics-columns]="plottedDays().length"
+                  aria-hidden="true"
+                >
+                  @for (day of plottedDays(); track day.date) {
+                    <span
+                      class="showcase-analytics__bar"
+                      [style.height.%]="(day.views / maxViews()) * 100"
+                      [title]="day.date + ' : ' + day.views + ' vues fictives'"
+                    ></span>
+                  }
+                </div>
+                <div class="showcase-analytics__axis" aria-hidden="true">
+                  <span>{{ plottedDays()[0]?.date | date: 'dd/MM' : 'UTC' }}</span>
+                  <span>{{
+                    plottedDays()[plottedDays().length - 1]?.date | date: 'dd/MM' : 'UTC'
+                  }}</span>
+                </div>
+              </div>
+              <details class="showcase-analytics__alternative">
+                <summary>Consulter le tableau accessible</summary>
+                <ng-container *ngTemplateOutlet="analyticsTable" />
+              </details>
+            } @else {
+              <ng-container *ngTemplateOutlet="analyticsTable" />
+            }
+
+            <ng-template #analyticsTable>
+              <div class="showcase-analytics__table-wrap">
+                <table>
+                  <caption>
+                    {{
+                      plottedPeriodLabel()
+                    }}
+                    — agrégats fictifs sans identifiant visiteur
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Vues agrégées</th>
+                      <th scope="col">Actions de contact</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (day of plottedDays(); track day.date) {
+                      <tr>
+                        <th scope="row">
+                          <time [attr.datetime]="day.date">{{
+                            day.date | date: 'dd/MM/yyyy' : 'UTC'
+                          }}</time>
+                        </th>
+                        <td>{{ day.views | number }}</td>
+                        <td>{{ day.contactActions | number }} — suivi désactivé</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </ng-template>
+          </section>
+
+          <section class="showcase-analytics__privacy" aria-labelledby="analytics-privacy-title">
+            <div>
+              <h2 id="analytics-privacy-title">Ce que cet écran ne mesure pas</h2>
+              <p>Visiteurs uniques, provenance, appareil, parcours, contact et conversion.</p>
+            </div>
+            <p>
+              Dernier agrégat fictif :
+              <time [attr.datetime]="data.generatedOn">{{
+                data.generatedOn | date: 'dd/MM/yyyy' : 'UTC'
+              }}</time>
+            </p>
+          </section>
+        }
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

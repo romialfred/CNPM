@@ -7,14 +7,14 @@
     "start:test": "ng serve --port 4200 --host 127.0.0.1",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "test": "ng test --runner-config=vitest.config.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:visual": "playwright test tests/visual",
     "capture:fidelity": "playwright test tests/visual/cnpm.fidelity.spec.ts --project=chromium-reference --workers=1",
     "test:a11y": "playwright test tests/visual/cnpm.a11y.spec.ts",
-    "test:ci": "ng test --watch=false"
+    "test:ci": "ng test --watch=false --runner-config=vitest.config.ts"
   },
   "private": true,
   "packageManager": "npm@10.9.2",

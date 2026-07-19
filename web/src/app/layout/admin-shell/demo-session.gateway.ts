@@ -29,6 +29,7 @@ export class DemoSessionGateway implements SessionGateway {
       'DOCUMENT.READ',
       'GROUP.READ',
       'SHOWCASE.MODERATION.READ',
+      'OPS.MONITOR.READ',
       'AUDIT.READ',
       'ADMIN.REFERENTIAL.READ',
       'ADMIN.REFERENTIAL.WRITE',

@@ -3,6 +3,8 @@ import type { Routes } from '@angular/router';
 import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoMemberContributionsGateway } from './contributions/demo-member-contributions.gateway';
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
+import { DemoMemberDirectoryGateway } from './directory/demo-member-directory.gateway';
+import { MEMBER_DIRECTORY_GATEWAY } from './directory/member-directory.gateway';
 import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.gateway';
 import { MEMBER_DOCUMENTS_GATEWAY } from './documents/member-documents-gateway';
 import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
@@ -16,16 +18,20 @@ import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
 import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
 import { DemoMemberShowcaseGateway } from './showcase/demo-member-showcase.gateway';
 import { MEMBER_SHOWCASE_GATEWAY } from './showcase/member-showcase-gateway';
+import { DemoMemberShowcaseAnalyticsGateway } from './showcase-analytics/demo-member-showcase-analytics.gateway';
+import { MEMBER_SHOWCASE_ANALYTICS_GATEWAY } from './showcase-analytics/member-showcase-analytics.gateway';
 import { DemoMemberUsersGateway } from './users/demo-member-users.gateway';
 import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
   UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
+  UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
   UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
   UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
+  UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
   UNAVAILABLE_MEMBER_USERS_GATEWAY,
 } from './unavailable-member-gateways';
 
@@ -204,12 +210,20 @@ export const memberRoutes: Routes = [
     path: 'showcase',
     providers: [
       DemoMemberShowcaseGateway,
+      DemoMemberShowcaseAnalyticsGateway,
       {
         provide: MEMBER_SHOWCASE_GATEWAY,
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoMemberShowcaseGateway)
             : UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
+      },
+      {
+        provide: MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberShowcaseAnalyticsGateway)
+            : UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
       },
     ],
     children: [
@@ -229,7 +243,31 @@ export const memberRoutes: Routes = [
           ),
         title: 'Aperçu privé de la vitrine — CNPM',
       },
+      {
+        path: 'analytics',
+        loadComponent: () =>
+          import('./showcase-analytics/member-showcase-analytics.page').then(
+            (module) => module.MemberShowcaseAnalyticsPage,
+          ),
+        title: 'Statistiques privées de la vitrine — CNPM',
+      },
     ],
+  },
+  {
+    path: 'directory',
+    providers: [
+      DemoMemberDirectoryGateway,
+      {
+        provide: MEMBER_DIRECTORY_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberDirectoryGateway)
+            : UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
+      },
+    ],
+    loadComponent: () =>
+      import('./directory/member-directory.page').then((module) => module.MemberDirectoryPage),
+    title: 'Annuaire privé et opportunités — CNPM',
   },
   // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
 ];

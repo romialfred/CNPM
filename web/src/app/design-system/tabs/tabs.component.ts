@@ -26,6 +26,7 @@ export interface CnpmTab {
           [id]="'tab-' + tab.id"
           [class.cnpm-tabs__tab--active]="tab.id === selected()"
           [attr.aria-selected]="tab.id === selected() ? 'true' : 'false'"
+          [attr.aria-controls]="panelId()"
           [attr.tabindex]="tab.id === selected() ? 0 : -1"
           (click)="select(tab.id)"
           (keydown)="onKeydown($event)"
@@ -40,6 +41,8 @@ export interface CnpmTab {
 export class TabsComponent {
   readonly tabs = input.required<readonly CnpmTab[]>();
   readonly ariaLabel = input.required<string>();
+  /** Panneau unique piloté par le groupe ; optionnel pour préserver les usages existants. */
+  readonly panelId = input<string | null>(null);
   readonly selected = model.required<string>();
 
   protected select(id: string): void {

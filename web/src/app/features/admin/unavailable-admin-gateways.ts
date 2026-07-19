@@ -3,6 +3,7 @@ import type { ContributionsGateway } from './contributions/contributions-gateway
 import type { DashboardGateway } from './dashboard/dashboard-gateway';
 import type { DocumentsGateway } from './documents/documents-gateway';
 import type { EnrollmentGateway } from './enrollment-form/enrollment-gateway';
+import type { IntegrationsGateway } from './integrations/integrations-gateway';
 import type { MemberDetailGateway } from './member-detail/member-detail-gateway';
 import type { PaymentsGateway } from './payments/payments-gateway';
 import type { RecoveryGateway } from './recovery/recovery-gateway';
@@ -71,4 +72,12 @@ export const UNAVAILABLE_REQUESTS_GATEWAY: RequestsGateway = {
 
 export const UNAVAILABLE_ADMIN_SECURITY_GATEWAY: AdminSecurityGateway = {
   load: () => unavailableFeature$('BO-030'),
+};
+
+/**
+ * `/integration-partners` ne fournit qu'un `PageResource` générique et aucun contrat
+ * de santé/journal typé. Le profil HTTP échoue fermé au lieu d'afficher les fixtures.
+ */
+export const UNAVAILABLE_INTEGRATIONS_GATEWAY: IntegrationsGateway = {
+  load: () => unavailableFeature$('BO-038'),
 };

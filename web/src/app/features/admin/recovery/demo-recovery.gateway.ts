@@ -5,9 +5,15 @@ import type {
   CampaignRow,
   DeliveryRow,
   PledgeRow,
+  RecoveryActionRow,
+  RecoveryActionsPage,
+  RecoveryActionsQuery,
   RecoveryGateway,
   RecoveryOverview,
   RecoveryPage,
+  RecoveryPortfolioCase,
+  RecoveryPortfolioPage,
+  RecoveryPortfolioQuery,
   RecoveryQuery,
   RecoveryRows,
 } from './recovery-gateway';
@@ -678,6 +684,216 @@ const PLEDGES: readonly PledgeRow[] = [
   },
 ];
 
+/** File BO-019 : scénarios locaux, sans destination ni exécution de communication. */
+const RECOVERY_ACTIONS: readonly RecoveryActionRow[] = [
+  {
+    id: 'demo-recovery-action-0001',
+    reference: 'DEMO-ACT-2026-0001',
+    memberCode: 'DEMO-MEMBRE-0001',
+    organization: 'Organisation Démo Alpha',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'EMAIL',
+    status: 'DUE_TODAY',
+    scheduledAt: '2026-07-19T09:00:00+00:00',
+    campaignReference: 'DEMO-CAMP-0001',
+    campaignLabel: 'Campagne Démo — échéances de juillet',
+    segment: 'Segment Démo A',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'AUTHORIZED_DEMO',
+    suspension: null,
+    promise: null,
+    executionAvailable: false,
+  },
+  {
+    id: 'demo-recovery-action-0002',
+    reference: 'DEMO-ACT-2026-0002',
+    memberCode: 'DEMO-MEMBRE-0002',
+    organization: 'Organisation Démo Bêta',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'SMS',
+    status: 'BLOCKED_CONSENT',
+    scheduledAt: '2026-07-19T10:30:00+00:00',
+    campaignReference: 'DEMO-CAMP-0001',
+    campaignLabel: 'Campagne Démo — échéances de juillet',
+    segment: 'Segment Démo A',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'BLOCKED_NO_CONSENT',
+    suspension: null,
+    promise: null,
+    executionAvailable: false,
+  },
+  {
+    id: 'demo-recovery-action-0003',
+    reference: 'DEMO-ACT-2026-0003',
+    memberCode: 'DEMO-MEMBRE-0003',
+    organization: 'Organisation Démo Gamma',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'CALL',
+    status: 'OVERDUE',
+    scheduledAt: '2026-07-18T15:00:00+00:00',
+    campaignReference: 'DEMO-CAMP-0002',
+    campaignLabel: 'Campagne Démo — suivi manuel',
+    segment: 'Segment Démo B',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'NOT_APPLICABLE',
+    suspension: null,
+    promise: null,
+    executionAvailable: false,
+  },
+  {
+    id: 'demo-recovery-action-0004',
+    reference: 'DEMO-ACT-2026-0004',
+    memberCode: 'DEMO-MEMBRE-0004',
+    organization: 'Organisation Démo Delta',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'VISIT',
+    status: 'SUSPENDED',
+    scheduledAt: '2026-07-19T11:00:00+00:00',
+    campaignReference: 'DEMO-CAMP-0002',
+    campaignLabel: 'Campagne Démo — suivi manuel',
+    segment: 'Segment Démo B',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'NOT_APPLICABLE',
+    suspension: {
+      kind: 'DISPUTE',
+      suspendedAt: '2026-07-17T08:20:00+00:00',
+      reasonLabel: 'Litige bloquant fictif',
+    },
+    promise: null,
+    executionAvailable: false,
+  },
+  {
+    id: 'demo-recovery-action-0005',
+    reference: 'DEMO-ACT-2026-0005',
+    memberCode: 'DEMO-MEMBRE-0005',
+    organization: 'Organisation Démo Epsilon',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'MEETING',
+    status: 'SUSPENDED',
+    scheduledAt: '2026-07-20T10:00:00+00:00',
+    campaignReference: 'DEMO-CAMP-0003',
+    campaignLabel: 'Campagne Démo — engagements',
+    segment: 'Segment Démo C',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'NOT_APPLICABLE',
+    suspension: {
+      kind: 'PROMISE',
+      suspendedAt: '2026-07-16T16:10:00+00:00',
+      reasonLabel: 'Promesse active fictive',
+    },
+    promise: {
+      amount: 750_000,
+      dueDate: '2026-07-25',
+      comment: 'Engagement fictif consigné pour la démonstration.',
+      status: 'PENDING',
+    },
+    executionAvailable: false,
+  },
+  {
+    id: 'demo-recovery-action-0006',
+    reference: 'DEMO-ACT-2026-0006',
+    memberCode: 'DEMO-MEMBRE-0006',
+    organization: 'Organisation Démo Zêta',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'EMAIL',
+    status: 'PLANNED',
+    scheduledAt: '2026-07-21T08:30:00+00:00',
+    campaignReference: 'DEMO-CAMP-0001',
+    campaignLabel: 'Campagne Démo — échéances de juillet',
+    segment: 'Segment Démo A',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'AUTHORIZED_DEMO',
+    suspension: null,
+    promise: null,
+    executionAvailable: false,
+  },
+  {
+    id: 'demo-recovery-action-0007',
+    reference: 'DEMO-ACT-2026-0007',
+    memberCode: 'DEMO-MEMBRE-0007',
+    organization: 'Organisation Démo Êta',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'CALL',
+    status: 'DUE_TODAY',
+    scheduledAt: '2026-07-19T14:00:00+00:00',
+    campaignReference: 'DEMO-CAMP-0002',
+    campaignLabel: 'Campagne Démo — suivi manuel',
+    segment: 'Segment Démo B',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'NOT_APPLICABLE',
+    suspension: null,
+    promise: null,
+    executionAvailable: false,
+  },
+  {
+    id: 'demo-recovery-action-0008',
+    reference: 'DEMO-ACT-2026-0008',
+    memberCode: 'DEMO-MEMBRE-0008',
+    organization: 'Organisation Démo Thêta',
+    agentLabel: 'Agent Démo Recouvrement',
+    kind: 'SMS',
+    status: 'SUSPENDED',
+    scheduledAt: '2026-07-20T13:30:00+00:00',
+    campaignReference: 'DEMO-CAMP-0003',
+    campaignLabel: 'Campagne Démo — engagements',
+    segment: 'Segment Démo C',
+    contactDisclosure: 'Contact masqué — démonstration',
+    communicationAuthorization: 'AUTHORIZED_DEMO',
+    suspension: {
+      kind: 'PROMISE',
+      suspendedAt: '2026-07-18T12:15:00+00:00',
+      reasonLabel: 'Promesse active fictive',
+    },
+    promise: {
+      amount: 320_000,
+      dueDate: '2026-07-22',
+      comment: 'Promesse fictive à suivre sans relance automatique.',
+      status: 'PENDING',
+    },
+    executionAvailable: false,
+  },
+];
+
+const OUTSTANDING_BY_ACTION: Readonly<Record<string, { amount: number; days: number }>> = {
+  'demo-recovery-action-0001': { amount: 1_250_000, days: 45 },
+  'demo-recovery-action-0002': { amount: 980_000, days: 32 },
+  'demo-recovery-action-0003': { amount: 760_000, days: 61 },
+  'demo-recovery-action-0004': { amount: 1_100_000, days: 50 },
+  'demo-recovery-action-0005': { amount: 750_000, days: 20 },
+  'demo-recovery-action-0006': { amount: 620_000, days: 12 },
+  'demo-recovery-action-0007': { amount: 440_000, days: 27 },
+  'demo-recovery-action-0008': { amount: 320_000, days: 15 },
+};
+
+const RECOVERY_PORTFOLIO: readonly RecoveryPortfolioCase[] = RECOVERY_ACTIONS.map((action) => {
+  const financial = OUTSTANDING_BY_ACTION[action.id];
+  if (!financial) throw new Error(`Montant fictif manquant pour ${action.id}`);
+  return {
+    id: action.id.replace('action', 'case'),
+    reference: action.reference.replace('ACT', 'DOS'),
+    memberCode: action.memberCode,
+    organization: action.organization,
+    agentLabel: action.agentLabel,
+    segment: action.segment,
+    campaignReference: action.campaignReference,
+    campaignLabel: action.campaignLabel,
+    status: action.suspension ? 'SUSPENDED' : 'ACTIVE',
+    outstandingAmount: financial.amount,
+    daysOverdue: financial.days,
+    nextActionKind: action.kind,
+    nextActionAt: action.scheduledAt,
+    contactDisclosure: action.contactDisclosure,
+    communicationAuthorization: action.communicationAuthorization,
+    suspension: action.suspension ? { ...action.suspension } : null,
+    promise: action.promise ? { ...action.promise } : null,
+    calendarBucket: action.suspension
+      ? 'Suivi suspendu'
+      : action.status === 'DUE_TODAY' || action.status === 'BLOCKED_CONSENT'
+        ? 'Aujourd’hui'
+        : 'Cette semaine',
+  } satisfies RecoveryPortfolioCase;
+});
+
 /**
  * Comparaison insensible à la casse et aux diacritiques.
  *
@@ -700,6 +916,22 @@ function matchesTerm(term: string, fields: readonly string[]): boolean {
 
 function ratio(part: number, whole: number): number | null {
   return whole === 0 ? null : (part / whole) * 100;
+}
+
+function cloneAction(action: RecoveryActionRow): RecoveryActionRow {
+  return {
+    ...action,
+    suspension: action.suspension ? { ...action.suspension } : null,
+    promise: action.promise ? { ...action.promise } : null,
+  };
+}
+
+function clonePortfolioCase(item: RecoveryPortfolioCase): RecoveryPortfolioCase {
+  return {
+    ...item,
+    suspension: item.suspension ? { ...item.suspension } : null,
+    promise: item.promise ? { ...item.promise } : null,
+  };
 }
 
 /**
@@ -756,6 +988,107 @@ export class DemoRecoveryGateway implements RecoveryGateway {
     // Latence simulée : sans elle, l'état de chargement ne serait jamais peint et ne
     // serait donc jamais éprouvé.
     return of(page).pipe(delay(140));
+  }
+
+  searchActions(query: RecoveryActionsQuery): Observable<RecoveryActionsPage> {
+    const term = fold(query.search.trim());
+    const filtered = RECOVERY_ACTIONS.filter((action) => {
+      if (query.kind && action.kind !== query.kind) return false;
+      if (query.status && action.status !== query.status) return false;
+      if (query.suspension && action.suspension?.kind !== query.suspension) return false;
+      return matchesTerm(term, [
+        action.reference,
+        action.memberCode,
+        action.organization,
+        action.campaignReference,
+        action.campaignLabel,
+      ]);
+    });
+    const factor = query.sort.direction === 'asc' ? 1 : -1;
+    const sorted = [...filtered].sort((left, right) => {
+      switch (query.sort.key) {
+        case 'organization':
+          return factor * left.organization.localeCompare(right.organization, 'fr');
+        case 'kind':
+          return factor * left.kind.localeCompare(right.kind);
+        case 'status':
+          return factor * left.status.localeCompare(right.status);
+        case 'scheduledAt':
+        default:
+          return factor * left.scheduledAt.localeCompare(right.scheduledAt);
+      }
+    });
+    const start = (query.page - 1) * query.pageSize;
+
+    return of({
+      items: sorted.slice(start, start + query.pageSize).map(cloneAction),
+      totalItems: filtered.length,
+      overview: {
+        total: RECOVERY_ACTIONS.length,
+        dueToday: RECOVERY_ACTIONS.filter((item) => item.status === 'DUE_TODAY').length,
+        overdue: RECOVERY_ACTIONS.filter((item) => item.status === 'OVERDUE').length,
+        suspended: RECOVERY_ACTIONS.filter((item) => item.status === 'SUSPENDED').length,
+        blockedNoConsent: RECOVERY_ACTIONS.filter(
+          (item) => item.communicationAuthorization === 'BLOCKED_NO_CONSENT',
+        ).length,
+      },
+    }).pipe(delay(100));
+  }
+
+  searchPortfolio(query: RecoveryPortfolioQuery): Observable<RecoveryPortfolioPage> {
+    const term = fold(query.search.trim());
+    const filtered = RECOVERY_PORTFOLIO.filter((item) => {
+      if (query.status && item.status !== query.status) return false;
+      if (query.suspension && item.suspension?.kind !== query.suspension) return false;
+      if (query.segment && item.segment !== query.segment) return false;
+      return matchesTerm(term, [
+        item.reference,
+        item.memberCode,
+        item.organization,
+        item.campaignReference,
+        item.campaignLabel,
+      ]);
+    });
+    const factor = query.sort.direction === 'asc' ? 1 : -1;
+    const sorted = [...filtered].sort((left, right) => {
+      switch (query.sort.key) {
+        case 'organization':
+          return factor * left.organization.localeCompare(right.organization, 'fr');
+        case 'outstandingAmount':
+          return factor * (left.outstandingAmount - right.outstandingAmount);
+        case 'daysOverdue':
+          return factor * (left.daysOverdue - right.daysOverdue);
+        case 'nextActionAt':
+        default:
+          return factor * left.nextActionAt.localeCompare(right.nextActionAt);
+      }
+    });
+    const start = (query.page - 1) * query.pageSize;
+    const outstandingAmount = RECOVERY_PORTFOLIO.reduce(
+      (total, item) => total + item.outstandingAmount,
+      0,
+    );
+
+    return of({
+      items: sorted.slice(start, start + query.pageSize).map(clonePortfolioCase),
+      totalItems: filtered.length,
+      segments: [...new Set(RECOVERY_PORTFOLIO.map((item) => item.segment))].sort((a, b) =>
+        a.localeCompare(b, 'fr'),
+      ),
+      overview: {
+        assignedCases: RECOVERY_PORTFOLIO.length,
+        activeCases: RECOVERY_PORTFOLIO.filter((item) => item.status === 'ACTIVE').length,
+        suspendedCases: RECOVERY_PORTFOLIO.filter((item) => item.status === 'SUSPENDED').length,
+        activePromises: RECOVERY_PORTFOLIO.filter((item) => item.promise?.status === 'PENDING')
+          .length,
+        outstandingAmount,
+        contactRate: 42.5,
+        conversionRate: 18.75,
+        recoveredAmount: 1_250_000,
+        estimatedCost: 18_500,
+        averageDelayDays: 4.2,
+      },
+    }).pipe(delay(100));
   }
 
   private selectRows(query: RecoveryQuery): { rows: RecoveryRows; totalItems: number } {

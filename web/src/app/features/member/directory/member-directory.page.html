@@ -1,0 +1,237 @@
+<cnpm-member-portal-shell
+  organization="Entreprise Démo Sahel"
+  userName="Membre de démonstration"
+  memberCode="CNPM-DEMO-0001"
+  [notificationCount]="0"
+>
+  <main class="member-directory" id="contenu-principal">
+    <cnpm-page-header
+      title="Annuaire privé et opportunités"
+      description="Explorez un jeu local d’organisations entièrement fictives."
+    />
+
+    <cnpm-alert tone="warning" title="Démonstration privée sans mise en relation" [live]="false">
+      Aucun contact, adresse, identifiant métier, message, devis, vente ou action commerciale n’est
+      disponible. Les thèmes d’opportunité sont des scénarios informatifs non opposables.
+    </cnpm-alert>
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeFilter($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="member-directory__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <div class="member-directory__field member-directory__field--search">
+          <label for="directory-search">Recherche</label>
+          <input
+            id="directory-search"
+            type="search"
+            formControlName="search"
+            maxlength="80"
+            placeholder="Nom ou description fictive"
+          />
+        </div>
+        <div class="member-directory__field">
+          <label for="directory-sector">Secteur fictif</label>
+          <select id="directory-sector" formControlName="sector">
+            <option value="">Tous les secteurs</option>
+            @for (sector of sectors; track sector) {
+              <option [value]="sector">{{ sectorLabel(sector) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-directory__field">
+          <label for="directory-zone">Zone fictive</label>
+          <select id="directory-zone" formControlName="zone">
+            <option value="">Toutes les zones</option>
+            @for (zone of zones; track zone) {
+              <option [value]="zone">{{ zoneLabel(zone) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-directory__field">
+          <label for="directory-theme">Thème simulé</label>
+          <select id="directory-theme" formControlName="theme">
+            <option value="">Tous les thèmes</option>
+            @for (theme of themes; track theme) {
+              <option [value]="theme">{{ themeLabel(theme) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-directory__field">
+          <label for="directory-sort">Tri</label>
+          <select id="directory-sort" formControlName="sort">
+            <option value="name">Nom fictif</option>
+            <option value="sector">Secteur fictif</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <section class="member-directory__panel" aria-labelledby="directory-results-title">
+      <div class="member-directory__toolbar">
+        <div>
+          <p class="member-directory__eyebrow">Espace membre · local</p>
+          <h2 id="directory-results-title" #resultsTitle tabindex="-1">Organisations fictives</h2>
+          <p>Les filtres et la présentation restent dans l’adresse partageable.</p>
+        </div>
+        <div class="member-directory__toolbar-end">
+          @if (snapshot(); as data) {
+            <p class="member-directory__count" aria-live="polite">
+              {{ data.total }} {{ data.total === 1 ? 'résultat fictif' : 'résultats fictifs' }}
+            </p>
+          }
+          <div class="member-directory__view" role="group" aria-label="Présentation des résultats">
+            <button
+              type="button"
+              [class.member-directory__view-button--active]="view() === 'cards'"
+              [attr.aria-pressed]="view() === 'cards'"
+              (click)="selectView('cards')"
+            >
+              Cartes
+            </button>
+            <button
+              type="button"
+              [class.member-directory__view-button--active]="view() === 'compact'"
+              [attr.aria-pressed]="view() === 'compact'"
+              (click)="selectView('compact')"
+            >
+              Compacte
+            </button>
+          </div>
+        </div>
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <div class="member-directory__loading" aria-label="Chargement de l’annuaire fictif">
+            <cnpm-skeleton variant="card" [rows]="5" label="Chargement de l’annuaire fictif…" />
+            <cnpm-skeleton
+              variant="card"
+              [rows]="5"
+              label="Chargement d’une autre fiche fictive…"
+            />
+          </div>
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="L’annuaire n’a pas pu être chargé"
+            description="La source locale est indisponible. Aucun contact ou échange n’a été déclenché."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('unavailable') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Annuaire indisponible en mode HTTP"
+            description="Aucun contrat, permission ni périmètre ABAC canonique ne garantit encore cet annuaire privé. Aucune fixture n’est injectée."
+          />
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucune organisation fictive"
+            description="Le jeu local ne contient actuellement aucune fiche de démonstration."
+          />
+        }
+        @case ('no-result') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucune organisation ne correspond"
+            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+              Réinitialiser les filtres
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('ready') {
+          @if (view() === 'cards') {
+            <ol
+              class="member-directory__grid"
+              aria-label="Organisations fictives de l’annuaire privé"
+            >
+              @for (organization of organizations(); track organization.id) {
+                <li>
+                  <article [attr.aria-labelledby]="'directory-organization-' + organization.id">
+                    <header>
+                      <div>
+                        <p>{{ sectorLabel(organization.sector) }}</p>
+                        <h3 [id]="'directory-organization-' + organization.id">
+                          {{ organization.name }}
+                        </h3>
+                      </div>
+                      <cnpm-badge tone="info">Fictif</cnpm-badge>
+                    </header>
+                    <p class="member-directory__summary">{{ organization.summary }}</p>
+                    <dl>
+                      <div>
+                        <dt>Zone</dt>
+                        <dd>{{ zoneLabel(organization.zone) }}</dd>
+                      </div>
+                      <div>
+                        <dt>Effectif</dt>
+                        <dd>{{ organization.sizeLabel }}</dd>
+                      </div>
+                    </dl>
+                    <div class="member-directory__themes">
+                      <h4>Thèmes d’opportunité simulés</h4>
+                      <ul>
+                        @for (theme of organization.themes; track theme) {
+                          <li>{{ themeLabel(theme) }}</li>
+                        }
+                      </ul>
+                    </div>
+                    <footer>Exploration informative uniquement · aucune mise en relation</footer>
+                  </article>
+                </li>
+              }
+            </ol>
+          } @else {
+            <ol
+              class="member-directory__compact"
+              aria-label="Vue compacte des organisations fictives"
+            >
+              @for (organization of organizations(); track organization.id) {
+                <li>
+                  <div>
+                    <h3>{{ organization.name }}</h3>
+                    <p>{{ organization.summary }}</p>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>Secteur</dt>
+                      <dd>{{ sectorLabel(organization.sector) }}</dd>
+                    </div>
+                    <div>
+                      <dt>Zone</dt>
+                      <dd>{{ zoneLabel(organization.zone) }}</dd>
+                    </div>
+                    <div>
+                      <dt>Thèmes</dt>
+                      <dd>
+                        @for (theme of organization.themes; track theme; let last = $last) {
+                          {{ themeLabel(theme) }}{{ last ? '' : ' · ' }}
+                        }
+                      </dd>
+                    </div>
+                  </dl>
+                </li>
+              }
+            </ol>
+          }
+        }
+      }
+    </section>
+
+    <cnpm-alert tone="info" title="Opportunités neutralisées" [live]="false">
+      Les besoins affichés ne constituent ni une offre, ni une recommandation, ni une sollicitation.
+      Messagerie, favoris, partage externe et mise en relation restent absents.
+    </cnpm-alert>
+  </main>
+</cnpm-member-portal-shell>

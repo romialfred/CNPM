@@ -238,7 +238,8 @@
   }
 
   .member-shell__mobile-nav a,
-  .member-shell__mobile-nav > span {
+  .member-shell__mobile-nav > span,
+  .member-shell__mobile-nav > button {
     position: relative;
     display: grid;
     min-width: 0;
@@ -253,7 +254,14 @@
     text-decoration: none;
   }
 
-  .member-shell__mobile-nav a.member-shell__link--active {
+  .member-shell__mobile-nav > button {
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .member-shell__mobile-nav :is(a, button).member-shell__link--active {
     color: var(--cnpm-color-text-brand);
     background: var(--cnpm-color-brand-blue-50);
     font-weight: var(--cnpm-font-weight-semibold);

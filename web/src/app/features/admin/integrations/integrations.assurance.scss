@@ -1,0 +1,101 @@
+.cnpm-integrations__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-integrations__aside-card {
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-integrations__aside-kicker {
+  margin: 0 0 var(--cnpm-space-1);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-brand);
+  text-transform: uppercase;
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+}
+
+.cnpm-integrations__aside-card h2 {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-integrations__aside-intro {
+  margin: var(--cnpm-space-2) 0 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-integrations__locks,
+.cnpm-integrations__controls {
+  margin: var(--cnpm-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-integrations__locks li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-3) 0;
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-integrations__locks li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.cnpm-integrations__locks div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-integrations__locks strong,
+.cnpm-integrations__controls strong {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-integrations__locks span {
+  overflow-wrap: anywhere;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-integrations__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-integrations__controls li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--cnpm-space-2);
+  align-items: start;
+}
+
+.cnpm-integrations__controls > li > span {
+  color: var(--cnpm-color-semantic-success-700);
+  font-weight: var(--cnpm-font-weight-bold);
+}
+
+.cnpm-integrations__controls p {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-integrations__controls strong {
+  display: block;
+}

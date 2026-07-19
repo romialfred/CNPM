@@ -88,6 +88,11 @@ describe('MemberHomePage', () => {
         '/member/receipts',
         '/member/requests',
         '/member/documents',
+        '/member/profile',
+        '/member/users',
+        '/member/showcase/edit',
+        '/member/showcase/analytics',
+        '/member/directory',
       ]),
     );
   });

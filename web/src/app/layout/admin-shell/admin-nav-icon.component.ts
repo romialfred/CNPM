@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import {
   LucideBuilding2,
+  LucideCable,
   LucideChartNoAxesCombined,
   LucideClipboardCheck,
   LucideFileBadge,
@@ -43,6 +44,7 @@ import type { AdminNavIconName } from './admin-nav';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     LucideBuilding2,
+    LucideCable,
     LucideChartNoAxesCombined,
     LucideClipboardCheck,
     LucideFileBadge,
@@ -95,6 +97,9 @@ import type { AdminNavIconName } from './admin-nav';
       }
       @case ('showcases') {
         <svg lucideMegaphone [size]="size"></svg>
+      }
+      @case ('integrations') {
+        <svg lucideCable [size]="size"></svg>
       }
       @case ('reporting') {
         <svg lucideChartNoAxesCombined [size]="size"></svg>

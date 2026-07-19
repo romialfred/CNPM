@@ -68,7 +68,11 @@
       </a>
     }
 
-    <div class="cnpm-topbar__identity" [attr.aria-label]="user.displayName + ', ' + user.roleLabel">
+    <div
+      class="cnpm-topbar__identity"
+      role="group"
+      [attr.aria-label]="user.displayName + ', ' + user.roleLabel"
+    >
       <span class="cnpm-topbar__avatar" aria-hidden="true">{{ initials(user.displayName) }}</span>
       <span class="cnpm-topbar__identity-copy">
         <span class="cnpm-topbar__name">{{ user.displayName }}</span>

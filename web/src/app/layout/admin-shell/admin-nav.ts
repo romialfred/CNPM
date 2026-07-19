@@ -11,6 +11,7 @@ export type AdminNavIconName =
   | 'documents'
   | 'groups'
   | 'showcases'
+  | 'integrations'
   | 'reporting'
   | 'audit'
   | 'settings'
@@ -65,6 +66,12 @@ export const ADMIN_NAV: readonly AdminNavEntry[] = [
     route: '/admin/showcases/moderation',
     icon: 'showcases',
     requiredPermission: 'SHOWCASE.MODERATION.READ',
+  },
+  {
+    label: 'Intégrations',
+    route: '/admin/integrations',
+    icon: 'integrations',
+    requiredPermission: 'OPS.MONITOR.READ',
   },
   { label: 'Reporting', route: '/admin/reporting', icon: 'reporting' },
   {

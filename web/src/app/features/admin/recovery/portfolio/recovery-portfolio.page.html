@@ -1,0 +1,460 @@
+<cnpm-admin-shell>
+  <div class="recovery-portfolio-page">
+    <cnpm-page-header
+      title="Portefeuille agent de recouvrement"
+      description="Consultez les dossiers fictifs affectés, leur prochaine échéance et les protections actives."
+    >
+      <cnpm-button variant="secondary" routerLink="/admin/recovery/campaigns">
+        Campagnes
+      </cnpm-button>
+      <cnpm-button variant="secondary" routerLink="/admin/recovery/actions">
+        File des actions
+      </cnpm-button>
+    </cnpm-page-header>
+
+    <cnpm-alert tone="warning" title="Portefeuille fictif en lecture seule">
+      Le portefeuille n’exécute aucun message, appel, rendez-vous ou visite. Les contacts sont
+      masqués, les promesses ne sont pas modifiables et aucun score ne sanctionne ni ne classe un
+      membre.
+    </cnpm-alert>
+
+    @if (overview(); as summary) {
+      <p class="recovery-portfolio-page__count">Vue globale fictive · tous filtres confondus</p>
+      <section
+        class="recovery-portfolio-page__kpis"
+        aria-label="Synthèse globale du portefeuille fictif, tous filtres confondus"
+      >
+        <article>
+          <span>Dossiers affectés au total</span><strong>{{ summary.assignedCases }}</strong>
+        </article>
+        <article>
+          <span>Suivis actifs</span><strong>{{ summary.activeCases }}</strong>
+        </article>
+        <article>
+          <span>Suivis suspendus</span><strong>{{ summary.suspendedCases }}</strong>
+        </article>
+        <article>
+          <span>Promesses actives</span><strong>{{ summary.activePromises }}</strong>
+        </article>
+        <article>
+          <span>Solde fictif suivi</span>
+          <strong>{{ summary.outstandingAmount | number: '1.0-0' }} FCFA</strong>
+        </article>
+      </section>
+
+      <section
+        class="recovery-portfolio-page__performance"
+        aria-labelledby="portfolio-performance-title"
+      >
+        <div>
+          <p>Historique agrégé fictif · REL-007</p>
+          <h2 id="portfolio-performance-title">Performance de l’agent Démo</h2>
+          <small
+            >Indicateurs descriptifs uniquement ; aucun score individuel ni décision
+            automatique.</small
+          >
+        </div>
+        <dl>
+          <div>
+            <dt>Taux de contact</dt>
+            <dd>{{ summary.contactRate | number: '1.0-1' }} %</dd>
+          </div>
+          <div>
+            <dt>Conversion</dt>
+            <dd>{{ summary.conversionRate | number: '1.0-2' }} %</dd>
+          </div>
+          <div>
+            <dt>Montant récupéré fictif</dt>
+            <dd>{{ summary.recoveredAmount | number: '1.0-0' }} FCFA</dd>
+          </div>
+          <div>
+            <dt>Coût fictif</dt>
+            <dd>{{ summary.estimatedCost | number: '1.0-0' }} FCFA</dd>
+          </div>
+          <div>
+            <dt>Délai moyen</dt>
+            <dd>{{ summary.averageDelayDays | number: '1.0-1' }} jours</dd>
+          </div>
+        </dl>
+      </section>
+    }
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeChip($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="recovery-portfolio-page__filters" role="search" (ngSubmit)="applyFilters()">
+        <div class="recovery-portfolio-page__field recovery-portfolio-page__field--search">
+          <label for="recovery-portfolio-search">Recherche</label>
+          <input
+            id="recovery-portfolio-search"
+            type="search"
+            name="search"
+            autocomplete="off"
+            maxlength="120"
+            placeholder="Dossier ou organisation Démo"
+            [ngModel]="searchDraft()"
+            (ngModelChange)="searchDraft.set($event)"
+          />
+        </div>
+        <div class="recovery-portfolio-page__field">
+          <label for="recovery-portfolio-status">État</label>
+          <select
+            id="recovery-portfolio-status"
+            name="status"
+            [ngModel]="statusDraft()"
+            (ngModelChange)="statusDraft.set($event)"
+          >
+            <option value="">Tous</option>
+            @for (value of statuses; track value) {
+              <option [value]="value">{{ statusLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="recovery-portfolio-page__field">
+          <label for="recovery-portfolio-suspension">Suspension</label>
+          <select
+            id="recovery-portfolio-suspension"
+            name="suspension"
+            [ngModel]="suspensionDraft()"
+            (ngModelChange)="suspensionDraft.set($event)"
+          >
+            <option value="">Toutes</option>
+            @for (value of suspensions; track value) {
+              <option [value]="value">{{ suspensionLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="recovery-portfolio-page__field">
+          <label for="recovery-portfolio-segment">Segment fictif</label>
+          <select
+            id="recovery-portfolio-segment"
+            name="segment"
+            [ngModel]="segmentDraft()"
+            (ngModelChange)="segmentDraft.set($event)"
+          >
+            <option value="">Tous</option>
+            @for (value of segments(); track value) {
+              <option [value]="value">{{ value }}</option>
+            }
+          </select>
+        </div>
+        <div class="recovery-portfolio-page__field">
+          <label for="recovery-portfolio-sort">Trier par</label>
+          <select
+            id="recovery-portfolio-sort"
+            name="sort"
+            [ngModel]="sortDraft()"
+            (ngModelChange)="sortDraft.set($event)"
+          >
+            <option value="nextActionAt:asc">Prochaine action — proche</option>
+            <option value="nextActionAt:desc">Prochaine action — lointaine</option>
+            <option value="organization:asc">Organisation — A à Z</option>
+            <option value="outstandingAmount:desc">Solde fictif — décroissant</option>
+            <option value="daysOverdue:desc">Retard — décroissant</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="secondary" [block]="true">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <p class="recovery-portfolio-page__count" aria-live="polite">
+      @if (state() === 'ready' || state() === 'noResult' || state() === 'empty') {
+        <strong>{{ totalItems() }}</strong>
+        {{ totalItems() === 1 ? 'dossier fictif trouvé' : 'dossiers fictifs trouvés' }}
+      }
+    </p>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton
+          variant="table"
+          [rows]="pageSize()"
+          [columns]="columns.length"
+          label="Chargement du portefeuille fictif…"
+        />
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Portefeuille indisponible en mode HTTP"
+          description="OpenAPI et les règles ABAC ne fournissent pas la projection agent BO-020. Aucun repli sur les fixtures n’est autorisé."
+        />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" title="Accès refusé au portefeuille" />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le portefeuille n’a pas pu être chargé"
+          description="Une erreur temporaire est survenue. Les filtres de l’URL restent conservés."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucun dossier fictif affecté"
+          description="L’affectation est une règle serveur absente de ce prototype."
+        />
+      }
+      @case ('noResult') {
+        <cnpm-empty-state
+          variant="no-results"
+          title="Aucun dossier ne correspond"
+          description="Retirez un filtre ou élargissez la recherche."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+            Réinitialiser les filtres
+          </cnpm-button>
+        </cnpm-empty-state>
+      }
+      @case ('ready') {
+        <div class="recovery-portfolio-page__layout">
+          <section
+            class="recovery-portfolio-page__list"
+            aria-label="Dossiers fictifs du portefeuille"
+          >
+            <div class="recovery-portfolio-page__table">
+              <cnpm-data-table
+                caption="Portefeuille fictif de l’agent Démo, sans score ni action de contact."
+                [columns]="columns"
+                [rows]="items()"
+                state="ready"
+                [rowKey]="rowKey"
+              >
+                <ng-template #row let-item>
+                  <td class="cnpm-table__cell">
+                    <span class="recovery-portfolio-page__identity">
+                      <strong>{{ item.organization }}</strong
+                      ><span>{{ item.reference }} · {{ item.memberCode }}</span>
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <strong>{{ item.outstandingAmount | number: '1.0-0' }} FCFA</strong>
+                  </td>
+                  <td class="cnpm-table__cell">{{ item.daysOverdue }} jours</td>
+                  <td class="cnpm-table__cell">
+                    <strong>{{ kindLabel(item.nextActionKind) }}</strong>
+                    <span class="recovery-portfolio-page__subline">{{
+                      formatDate(item.nextActionAt)
+                    }}</span>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <span class="recovery-portfolio-page__identity"
+                      ><strong>{{ item.campaignReference }}</strong
+                      ><span>{{ item.segment }}</span></span
+                    >
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <cnpm-badge [tone]="statusTone(item.status)">{{
+                      statusLabel(item.status)
+                    }}</cnpm-badge>
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <cnpm-button
+                      [variant]="selected()?.id === item.id ? 'secondary' : 'tertiary'"
+                      size="sm"
+                      [accessibleLabel]="
+                        selected()?.id === item.id
+                          ? 'Sélection active : ' + item.reference
+                          : 'Examiner ' + item.reference
+                      "
+                      (click)="select(item.id)"
+                      >{{ selected()?.id === item.id ? 'Sélectionné' : 'Examiner' }}</cnpm-button
+                    >
+                  </td>
+                </ng-template>
+              </cnpm-data-table>
+            </div>
+
+            <ul class="recovery-portfolio-page__cards">
+              @for (item of items(); track item.id) {
+                <li [class.recovery-portfolio-page__card--selected]="selected()?.id === item.id">
+                  <div>
+                    <strong>{{ item.organization }}</strong
+                    ><cnpm-badge [tone]="statusTone(item.status)">{{
+                      statusLabel(item.status)
+                    }}</cnpm-badge>
+                  </div>
+                  <p>{{ item.reference }} · {{ item.calendarBucket }}</p>
+                  <dl>
+                    <div>
+                      <dt>Solde fictif</dt>
+                      <dd>{{ item.outstandingAmount | number: '1.0-0' }} FCFA</dd>
+                    </div>
+                    <div>
+                      <dt>Prochaine action</dt>
+                      <dd>
+                        {{ kindLabel(item.nextActionKind) }} · {{ formatDate(item.nextActionAt) }}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Contact</dt>
+                      <dd>{{ item.contactDisclosure }}</dd>
+                    </div>
+                  </dl>
+                  <cnpm-button
+                    [variant]="selected()?.id === item.id ? 'secondary' : 'tertiary'"
+                    size="sm"
+                    [block]="true"
+                    [accessibleLabel]="
+                      selected()?.id === item.id
+                        ? 'Sélection active : ' + item.reference
+                        : 'Examiner ' + item.reference
+                    "
+                    (click)="select(item.id)"
+                    >{{ selected()?.id === item.id ? 'Sélectionné' : 'Examiner' }}</cnpm-button
+                  >
+                </li>
+              }
+            </ul>
+
+            <cnpm-pagination
+              [page]="page()"
+              [pageSize]="pageSize()"
+              [totalItems]="totalItems()"
+              [pageSizeOptions]="pageSizes"
+              (pageChange)="onPageChange($event)"
+              (pageSizeChange)="onPageSizeChange($event)"
+            />
+          </section>
+
+          <aside
+            class="recovery-portfolio-page__detail"
+            aria-labelledby="recovery-portfolio-detail-title"
+          >
+            @if (selected(); as item) {
+              <div class="recovery-portfolio-page__detail-head">
+                <div>
+                  <p>Portefeuille Agent Démo</p>
+                  <h2 #detailTitle id="recovery-portfolio-detail-title" tabindex="-1">
+                    {{ item.reference }} · détail affiché
+                  </h2>
+                </div>
+                <cnpm-badge [tone]="statusTone(item.status)">{{
+                  statusLabel(item.status)
+                }}</cnpm-badge>
+              </div>
+              <p class="recovery-portfolio-page__detail-name">{{ item.organization }}</p>
+              <dl class="recovery-portfolio-page__definitions">
+                <div>
+                  <dt>Solde fictif</dt>
+                  <dd>{{ item.outstandingAmount | number: '1.0-0' }} FCFA</dd>
+                </div>
+                <div>
+                  <dt>Retard observé</dt>
+                  <dd>{{ item.daysOverdue }} jours</dd>
+                </div>
+                <div>
+                  <dt>Prochaine action</dt>
+                  <dd>
+                    {{ kindLabel(item.nextActionKind) }} · {{ formatDate(item.nextActionAt) }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Contact</dt>
+                  <dd>{{ item.contactDisclosure }}</dd>
+                </div>
+                <div>
+                  <dt>Canal / consentement</dt>
+                  <dd>{{ authorizationLabel(item.communicationAuthorization) }}</dd>
+                </div>
+                <div>
+                  <dt>Campagne</dt>
+                  <dd>{{ item.campaignLabel }}</dd>
+                </div>
+              </dl>
+
+              @if (item.suspension; as hold) {
+                <cnpm-alert tone="warning" title="Suivi suspendu" [live]="false">
+                  {{ hold.reasonLabel }} · suspension datée du {{ formatDate(hold.suspendedAt) }}.
+                </cnpm-alert>
+              }
+              @if (item.promise; as promise) {
+                <section
+                  class="recovery-portfolio-page__promise"
+                  aria-labelledby="recovery-portfolio-promise-title"
+                >
+                  <h3 id="recovery-portfolio-promise-title">Promesse existante fictive</h3>
+                  <dl>
+                    <div>
+                      <dt>Montant</dt>
+                      <dd>{{ promise.amount | number: '1.0-0' }} FCFA</dd>
+                    </div>
+                    <div>
+                      <dt>Échéance</dt>
+                      <dd>{{ formatDay(promise.dueDate) }}</dd>
+                    </div>
+                    <div>
+                      <dt>Statut</dt>
+                      <dd>{{ promiseStatusLabel(promise.status) }}</dd>
+                    </div>
+                    <div>
+                      <dt>Commentaire</dt>
+                      <dd>{{ promise.comment }}</dd>
+                    </div>
+                  </dl>
+                </section>
+              }
+
+              <div
+                class="recovery-portfolio-page__locked-actions"
+                aria-labelledby="recovery-portfolio-locked-title"
+              >
+                <h3 id="recovery-portfolio-locked-title">Actions neutralisées</h3>
+                <p id="recovery-portfolio-actions-disabled">
+                  Indisponible sans contrat typé, ABAC, consentement vérifié et audit serveur.
+                </p>
+                <cnpm-button
+                  variant="secondary"
+                  size="sm"
+                  [block]="true"
+                  [disabled]="true"
+                  describedBy="recovery-portfolio-actions-disabled"
+                  >Planifier une action</cnpm-button
+                >
+                <cnpm-button
+                  variant="secondary"
+                  size="sm"
+                  [block]="true"
+                  [disabled]="true"
+                  describedBy="recovery-portfolio-actions-disabled"
+                  >Appeler</cnpm-button
+                >
+                <cnpm-button
+                  variant="secondary"
+                  size="sm"
+                  [block]="true"
+                  [disabled]="true"
+                  describedBy="recovery-portfolio-actions-disabled"
+                  >Organiser une visite</cnpm-button
+                >
+                <cnpm-button
+                  variant="secondary"
+                  size="sm"
+                  [block]="true"
+                  [disabled]="true"
+                  describedBy="recovery-portfolio-actions-disabled"
+                  >Modifier la promesse</cnpm-button
+                >
+              </div>
+            } @else {
+              <h2 id="recovery-portfolio-detail-title">Détail du dossier</h2>
+              <cnpm-empty-state
+                variant="no-data"
+                title="Aucun dossier sélectionné"
+                description="Choisissez « Examiner ». La sélection sera conservée dans l’URL."
+              />
+            }
+          </aside>
+        </div>
+      }
+    }
+  </div>
+</cnpm-admin-shell>
