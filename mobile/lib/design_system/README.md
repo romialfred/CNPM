@@ -1,3 +1,8 @@
-# CNPM Flutter design system overlay
+# Design system mobile CNPM
 
-Copy these files into the mobile project, register `buildCnpmTheme()` and implement reusable widgets before feature screens. The `fontFamily: Inter` entry is a placeholder for the approved project font; this pack intentionally contains no font files.
+`cnpm_theme.dart` projette les tokens normatifs de
+`docs/ui-handoff/design-tokens/tokens.source.json`. Les widgets consomment ces
+valeurs sémantiques et conservent des cibles tactiles d'au moins 44 px.
+
+La police de production reste ouverte (`UX-DEC-001`) : aucune fonte non fournie
+n'est embarquée ou forcée par l'application.
