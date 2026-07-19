@@ -35,7 +35,7 @@ export const publicRoutes: Routes = [
 
 export const showcaseRoutes: Routes = [
   {
-    path: ':slug',
+    path: '',
     providers: [
       DemoShowcaseGateway,
       {
@@ -46,8 +46,26 @@ export const showcaseRoutes: Routes = [
             : UNAVAILABLE_SHOWCASE_GATEWAY,
       },
     ],
-    loadComponent: () => import('./showcase/showcase.page').then((m) => m.ShowcasePage),
-    // Le titre définitif est posé par la page à partir des données SEO de la vitrine.
-    title: 'Vitrine membre — CNPM',
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        data: { mode: 'directory' },
+        loadComponent: () => import('./directory/directory.page').then((m) => m.DirectoryPage),
+        title: 'Annuaire des membres — CNPM',
+      },
+      {
+        path: 'recherche',
+        data: { mode: 'search' },
+        loadComponent: () => import('./directory/directory.page').then((m) => m.DirectoryPage),
+        title: 'Rechercher un membre — CNPM',
+      },
+      {
+        path: ':slug',
+        loadComponent: () => import('./showcase/showcase.page').then((m) => m.ShowcasePage),
+        // Le titre définitif est posé par la page à partir des données SEO de la vitrine.
+        title: 'Vitrine membre — CNPM',
+      },
+    ],
   },
 ];

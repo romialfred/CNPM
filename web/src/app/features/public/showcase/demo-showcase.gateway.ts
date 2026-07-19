@@ -4,6 +4,10 @@ import fixtures from '../../../../assets/demo-fixtures.json';
 import type {
   ContactConsent,
   MemberShowcase,
+  PublicationStatus,
+  PublicShowcasePage,
+  PublicShowcaseQuery,
+  PublicShowcaseSummary,
   ShowcaseActivity,
   ShowcaseCertification,
   ShowcaseGalleryItem,
@@ -13,6 +17,16 @@ import type {
   ShowcaseResult,
   ShowcaseTestimonial,
 } from './showcase-gateway';
+
+interface DemoDirectoryRecord {
+  readonly slug: string;
+  readonly name: string;
+  readonly tagline: string;
+  readonly sector: string;
+  readonly location: string;
+  readonly summary: string;
+  readonly publicationStatus: PublicationStatus;
+}
 
 /**
  * Adaptateur de démonstration de la vitrine.
@@ -38,6 +52,102 @@ import type {
 @Injectable()
 export class DemoShowcaseGateway implements ShowcaseGateway {
   private static readonly LATENCY_MS = 300;
+  /**
+   * Jeu fermé de l'annuaire pilote. Chaque libellé indique sa nature fictive et
+   * aucune fiche ne porte de contact, de média ou de licence dans la projection
+   * publique de liste.
+   */
+  private static readonly DIRECTORY: readonly DemoDirectoryRecord[] = [
+    {
+      slug: 'atelier-kanu-demonstration',
+      name: 'Atelier Kanu — démonstration',
+      tagline: 'Un scénario fictif pour les services numériques',
+      sector: 'Services numériques',
+      location: 'Bamako — localisation fictive',
+      summary:
+        'Entreprise entièrement fictive créée pour valider la recherche et la consultation de l’annuaire public.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'horizon-sahel-demo',
+      name: 'Horizon Sahel — démo',
+      tagline: 'Une vitrine fictive consacrée à la logistique',
+      sector: 'Logistique',
+      location: 'Kayes — localisation fictive',
+      summary:
+        'Profil de démonstration sans activité réelle, utilisé uniquement pour éprouver le tri visuel des cartes.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'fabrique-nianan-fictive',
+      name: 'Fabrique Nianan — entreprise fictive',
+      tagline: 'Transformation agroalimentaire de démonstration',
+      sector: 'Agroalimentaire',
+      location: 'Sikasso — localisation fictive',
+      summary:
+        'Contenu inventé pour le prototype CNPM ; il ne décrit aucune entreprise ni production existante.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'studio-bolo-demo',
+      name: 'Studio Bolo — démonstration',
+      tagline: 'Conseil créatif dans un environnement fictif',
+      sector: 'Services aux entreprises',
+      location: 'Mopti — localisation fictive',
+      summary:
+        'Fiche de test destinée à vérifier la lisibilité des résultats publics sur toutes les tailles d’écran.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'energie-diarra-scenario',
+      name: 'Énergie Diarra — scénario fictif',
+      tagline: 'Maintenance énergétique simulée pour le pilote',
+      sector: 'Énergie',
+      location: 'Koutiala — localisation fictive',
+      summary:
+        'Organisation sans existence réelle, incluse pour tester un secteur et une localisation supplémentaires.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'batir-kora-demonstration',
+      name: 'Bâtir Kora — démonstration',
+      tagline: 'Construction responsable dans un scénario de test',
+      sector: 'BTP et génie civil',
+      location: 'Ségou — localisation fictive',
+      summary:
+        'Vitrine de démonstration ne représentant aucun chantier, client ou ouvrage réellement réalisé.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'sante-niela-demo',
+      name: 'Santé Niela — entreprise fictive',
+      tagline: 'Équipements professionnels simulés',
+      sector: 'Équipements professionnels',
+      location: 'Gao — localisation fictive',
+      summary:
+        'Profil factice conçu pour le parcours de recherche ; aucune offre commerciale réelle n’y est associée.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'conseil-faro-demonstration',
+      name: 'Conseil Faro — démonstration',
+      tagline: 'Accompagnement fictif des petites entreprises',
+      sector: 'Conseil',
+      location: 'Bamako — localisation fictive',
+      summary:
+        'Donnée de démonstration strictement réservée à la validation de l’interface publique CNPM.',
+      publicationStatus: 'PUBLISHED',
+    },
+    {
+      slug: 'cooperative-demo-brouillon',
+      name: 'Coopérative Démo — brouillon fictif',
+      tagline: 'Cette fiche ne doit jamais apparaître dans l’annuaire',
+      sector: 'Agriculture',
+      location: 'Localisation fictive',
+      summary: 'Enregistrement de contrôle pour prouver le retrait des contenus non publiés.',
+      publicationStatus: 'DRAFT',
+    },
+  ];
   /** Slug en brouillon, pour exercer l'état « non publiée » de la fiche. */
   private static readonly DRAFT_SLUG = 'somacop-sa-brouillon';
   /**
@@ -219,9 +329,54 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
     },
   ];
 
+  listPublished(query: PublicShowcaseQuery): Observable<PublicShowcasePage> {
+    const normalizedQuery = this.normalize(query.q ?? '');
+    const normalizedSector = this.normalize(query.sector ?? '');
+    const page = Math.max(0, Math.trunc(query.page));
+    const pageSize = Math.min(100, Math.max(1, Math.trunc(query.pageSize)));
+
+    const published = DemoShowcaseGateway.DIRECTORY.filter(
+      (record): record is DemoDirectoryRecord & { readonly publicationStatus: 'PUBLISHED' } =>
+        record.publicationStatus === 'PUBLISHED',
+    ).filter((record) => {
+      const searchable = this.normalize(
+        `${record.name} ${record.tagline} ${record.sector} ${record.location} ${record.summary}`,
+      );
+      return (
+        (!normalizedQuery || searchable.includes(normalizedQuery)) &&
+        (!normalizedSector || this.normalize(record.sector) === normalizedSector)
+      );
+    });
+
+    const offset = page * pageSize;
+    const items: PublicShowcaseSummary[] = published
+      .slice(offset, offset + pageSize)
+      .map((record) => ({ ...record, isDemoContent: true }));
+
+    return this.respondPage({
+      items,
+      page,
+      pageSize,
+      totalItems: published.length,
+      totalPages: published.length === 0 ? 0 : Math.ceil(published.length / pageSize),
+    });
+  }
+
   findBySlug(slug: string): Observable<ShowcaseResult> {
     const sample = fixtures.showcaseSample;
     const normalized = slug.trim().toLowerCase();
+    const directoryRecord = DemoShowcaseGateway.DIRECTORY.find(
+      (record) => record.slug === normalized,
+    );
+
+    if (directoryRecord) {
+      return directoryRecord.publicationStatus === 'PUBLISHED'
+        ? this.respond({
+            outcome: 'published',
+            showcase: this.toDirectoryShowcase(directoryRecord),
+          })
+        : this.respond({ outcome: 'not-public', status: directoryRecord.publicationStatus });
+    }
 
     if (normalized === DemoShowcaseGateway.DRAFT_SLUG) {
       return this.respond({ outcome: 'not-public', status: 'DRAFT' });
@@ -236,6 +391,42 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       return this.respond({ outcome: 'not-found' });
     }
     return this.respond({ outcome: 'published', showcase: this.toShowcase(sample) });
+  }
+
+  private toDirectoryShowcase(record: DemoDirectoryRecord): MemberShowcase {
+    return {
+      slug: record.slug,
+      name: record.name,
+      tagline: record.tagline,
+      sector: record.sector,
+      location: record.location,
+      employeeRange: 'Donnée fictive non publiée',
+      foundedYear: 2026,
+      legalForm: 'Structure fictive de démonstration',
+      verificationStatus: 'PENDING',
+      verifiedAt: null,
+      memberSince: '2026 — démonstration',
+      summary: record.summary,
+      heroVisual: {
+        shape: 'grid',
+        alt: 'Illustration géométrique de démonstration, et non photographie de l’entreprise.',
+        label: 'Vitrine fictive de démonstration',
+      },
+      contacts: {},
+      contactConsent: null,
+      activities: [],
+      projects: [],
+      gallery: [],
+      certifications: [],
+      partners: [],
+      testimonials: [],
+      brochureAvailable: false,
+      isDemoContent: true,
+      publicationStatus: 'PUBLISHED',
+      seoTitle: `${record.name} — annuaire de démonstration CNPM`,
+      seoDescription: record.summary,
+      allowIndexing: false,
+    };
   }
 
   private toShowcase(sample: typeof fixtures.showcaseSample): MemberShowcase {
@@ -298,5 +489,17 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
 
   private respond(result: ShowcaseResult): Observable<ShowcaseResult> {
     return of(result).pipe(delay(DemoShowcaseGateway.LATENCY_MS));
+  }
+
+  private respondPage(result: PublicShowcasePage): Observable<PublicShowcasePage> {
+    return of(result).pipe(delay(DemoShowcaseGateway.LATENCY_MS));
+  }
+
+  private normalize(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase();
   }
 }

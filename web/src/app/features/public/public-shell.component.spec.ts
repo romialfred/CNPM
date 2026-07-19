@@ -12,6 +12,7 @@ async function setup() {
       provideRouter([
         { path: '', children: [] },
         { path: 'auth/login', children: [] },
+        { path: 'membres', children: [] },
       ]),
     ],
   }).compileComponents();
@@ -56,6 +57,7 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
 
     expect(hrefs).toContain('/');
     expect(hrefs).toContain('/auth/login');
+    expect(hrefs).toContain('/membres');
     expect(hrefs).toContain('#services');
     expect(hrefs).toContain('#chiffres');
     expect(hrefs).not.toContain('#');

@@ -1,0 +1,189 @@
+<cnpm-public-shell>
+  <div class="cnpm-directory">
+    <header class="cnpm-directory__hero">
+      <div>
+        <p class="cnpm-directory__eyebrow">Annuaire public</p>
+        <h1>{{ isSearchMode() ? 'Rechercher un membre' : 'Découvrir les membres' }}</h1>
+        <p class="cnpm-directory__intro">
+          @if (isSearchMode()) {
+            Recherchez une vitrine publiée par nom, activité ou localisation, puis affinez par
+            secteur.
+          } @else {
+            Parcourez les vitrines que les membres ont choisi de rendre publiques.
+          }
+        </p>
+      </div>
+
+      @if (!isSearchMode()) {
+        <cnpm-button variant="primary" routerLink="/membres/recherche">
+          Rechercher dans l’annuaire
+        </cnpm-button>
+      }
+    </header>
+
+    <aside class="cnpm-directory__demo-note" aria-label="Information sur les données">
+      <strong>Données entièrement fictives de démonstration.</strong>
+      Aucun nom, contact, média ou document réel n’est présenté dans cet annuaire pilote.
+    </aside>
+
+    @if (isSearchMode()) {
+      <form
+        class="cnpm-directory__filters"
+        aria-labelledby="recherche-titre"
+        (ngSubmit)="applySearch()"
+      >
+        <div class="cnpm-directory__filter-heading">
+          <div>
+            <h2 id="recherche-titre">Critères de recherche</h2>
+            <p>
+              Le secteur attend son libellé complet. Les critères restent dans l’adresse partagée.
+            </p>
+          </div>
+          @if (hasFilters()) {
+            <button class="cnpm-directory__reset" type="button" (click)="clearFilters()">
+              <svg lucideRotateCcw [size]="iconSize.compact" aria-hidden="true"></svg>
+              Effacer les critères
+            </button>
+          }
+        </div>
+
+        <div class="cnpm-directory__fields">
+          <div class="cnpm-directory__field cnpm-directory__field--query">
+            <label for="annuaire-q">Nom, activité ou localisation</label>
+            <div class="cnpm-directory__input-wrap">
+              <svg lucideSearch [size]="iconSize.compact" aria-hidden="true"></svg>
+              <input
+                id="annuaire-q"
+                name="q"
+                type="search"
+                maxlength="120"
+                autocomplete="off"
+                [ngModel]="qDraft()"
+                (ngModelChange)="qDraft.set($event)"
+              />
+            </div>
+          </div>
+
+          <div class="cnpm-directory__field">
+            <label for="annuaire-secteur">Secteur</label>
+            <input
+              id="annuaire-secteur"
+              name="sector"
+              type="text"
+              maxlength="80"
+              autocomplete="off"
+              placeholder="Ex. Conseil"
+              [ngModel]="sectorDraft()"
+              (ngModelChange)="sectorDraft.set($event)"
+            />
+          </div>
+
+          <cnpm-button type="submit" variant="primary" [block]="true">Rechercher</cnpm-button>
+        </div>
+      </form>
+    }
+
+    <section class="cnpm-directory__results" aria-labelledby="resultats-titre">
+      <div class="cnpm-directory__results-heading">
+        <div>
+          <p class="cnpm-directory__eyebrow">Vitrines publiées</p>
+          <h2 id="resultats-titre" #resultsTitle tabindex="-1">Résultats de l’annuaire</h2>
+        </div>
+        @if (state() === 'ready' && result(); as page) {
+          <p class="cnpm-directory__count" role="status" aria-live="polite">
+            {{ page.totalItems | number: '1.0-0' }}
+            {{ page.totalItems > 1 ? 'membres publiés' : 'membre publié' }}
+          </p>
+        }
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <div class="cnpm-directory__skeletons">
+            @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+              <cnpm-skeleton variant="card" [rows]="4" label="Chargement d’une vitrine publiée…" />
+            }
+          </div>
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="L’annuaire est indisponible"
+            description="Les vitrines publiées n’ont pas pu être chargées. Vous pouvez réessayer sans perdre vos critères."
+          >
+            <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('ready') {
+          @if (result(); as page) {
+            @if (page.items.length > 0) {
+              <ul class="cnpm-directory__grid">
+                @for (member of page.items; track member.slug) {
+                  <li>
+                    <article class="cnpm-directory__card">
+                      <div class="cnpm-directory__card-mark" aria-hidden="true">
+                        <svg lucideBuilding2 [size]="iconSize.empty"></svg>
+                      </div>
+                      <div class="cnpm-directory__card-copy">
+                        <p class="cnpm-directory__demo-label">Profil fictif de démonstration</p>
+                        <h3>{{ member.name }}</h3>
+                        <p class="cnpm-directory__tagline">{{ member.tagline }}</p>
+                        <dl class="cnpm-directory__facts">
+                          <div>
+                            <dt>Secteur</dt>
+                            <dd>{{ member.sector }}</dd>
+                          </div>
+                          <div>
+                            <dt>
+                              <svg lucideMapPin [size]="iconSize.compact" aria-hidden="true"></svg>
+                              Localisation
+                            </dt>
+                            <dd>{{ member.location }}</dd>
+                          </div>
+                        </dl>
+                        <p class="cnpm-directory__summary">{{ member.summary }}</p>
+                      </div>
+                      <a
+                        class="cnpm-directory__detail-link"
+                        [routerLink]="['/membres', member.slug]"
+                        [attr.aria-label]="'Voir la vitrine de ' + member.name"
+                      >
+                        Voir la vitrine
+                        <svg lucideArrowRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                      </a>
+                    </article>
+                  </li>
+                }
+              </ul>
+
+              <cnpm-pagination
+                [page]="page.page + 1"
+                [pageSize]="page.pageSize"
+                [totalItems]="page.totalItems"
+                [pageSizeOptions]="pageSizeOptions()"
+                (pageChange)="changePage($event)"
+                (pageSizeChange)="changePageSize($event)"
+              />
+            } @else if (page.totalItems === 0 && hasFilters()) {
+              <cnpm-empty-state
+                variant="no-results"
+                title="Aucun membre ne correspond"
+                description="Modifiez le nom, l’activité, la localisation ou le secteur recherché."
+              >
+                <cnpm-button variant="secondary" (click)="clearFilters()">
+                  Effacer les critères
+                </cnpm-button>
+              </cnpm-empty-state>
+            } @else {
+              <cnpm-empty-state
+                variant="no-data"
+                title="Aucune vitrine publiée"
+                description="L’annuaire reste vide tant qu’aucun membre n’a rendu sa vitrine publique."
+              />
+            }
+          }
+        }
+      }
+    </section>
+  </div>
+</cnpm-public-shell>

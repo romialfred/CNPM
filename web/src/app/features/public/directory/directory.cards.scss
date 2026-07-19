@@ -1,0 +1,129 @@
+.cnpm-directory__grid,
+.cnpm-directory__skeletons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cnpm-space-5);
+  margin: var(--cnpm-space-6) 0 0;
+}
+
+.cnpm-directory__grid {
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-directory__grid > li {
+  min-width: 0;
+}
+
+.cnpm-directory__card {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 26rem;
+  overflow: hidden;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-directory__card-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--cnpm-space-20);
+  border-block-end: 1px solid var(--cnpm-color-brand-blue-100);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-directory__card-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--cnpm-space-5);
+}
+
+.cnpm-directory__demo-label {
+  color: var(--cnpm-color-brand-red-700);
+}
+
+.cnpm-directory__card h3 {
+  font-size: var(--cnpm-font-size-lg);
+  line-height: var(--cnpm-font-lineHeight-lg);
+}
+
+.cnpm-directory__tagline,
+.cnpm-directory__summary {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+}
+
+.cnpm-directory__tagline {
+  margin: var(--cnpm-space-2) 0 0;
+}
+
+.cnpm-directory__facts {
+  display: grid;
+  gap: var(--cnpm-space-2);
+  margin: var(--cnpm-space-4) 0 0;
+  padding-block: var(--cnpm-space-3);
+  border-block: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-directory__facts div {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.45fr) minmax(0, 1fr);
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-directory__facts dt,
+.cnpm-directory__facts dd {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  line-height: var(--cnpm-font-lineHeight-xs);
+}
+
+.cnpm-directory__facts dt {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-1);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-directory__facts dd {
+  overflow-wrap: anywhere;
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-directory__summary {
+  margin: var(--cnpm-space-4) 0 0;
+}
+
+.cnpm-directory__detail-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  min-height: var(--cnpm-size-control-lg);
+  padding: 0 var(--cnpm-space-5);
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-bold);
+  text-decoration: none;
+}
+
+.cnpm-directory__detail-link:hover {
+  background: var(--cnpm-color-brand-blue-50);
+  text-decoration: underline;
+}
+
+.cnpm-directory cnpm-pagination,
+.cnpm-directory cnpm-empty-state,
+.cnpm-directory cnpm-error-state {
+  display: block;
+  margin-block-start: var(--cnpm-space-8);
+}

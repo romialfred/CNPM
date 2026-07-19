@@ -44,7 +44,7 @@ export interface PublicFooterContact {
  *
  * Le logo est l'actif officiel versionné dans `docs/00-sources`, copié à l'identique
  * dans les assets Web. Les destinations publiques non implémentées (adhésion,
- * annuaire, actualités, pages légales) ne deviennent jamais des liens factices.
+ * actualités, pages légales) ne deviennent jamais des liens factices.
  */
 @Component({
   selector: 'cnpm-public-shell',
@@ -103,6 +103,15 @@ export interface PublicFooterContact {
             >
               Accueil
             </a>
+            <a
+              class="cnpm-public__nav-link"
+              routerLink="/membres"
+              routerLinkActive="cnpm-public__nav-link--active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              ariaCurrentWhenActive="page"
+            >
+              Annuaire
+            </a>
             @for (section of sections(); track section.id) {
               <a class="cnpm-public__nav-link" [href]="'#' + section.id">{{ section.label }}</a>
             }
@@ -160,6 +169,10 @@ export interface PublicFooterContact {
               >
                 <a class="cnpm-public__drawer-link" routerLink="/" (click)="closeMenu()">
                   <span>Accueil</span>
+                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+                <a class="cnpm-public__drawer-link" routerLink="/membres" (click)="closeMenu()">
+                  <span>Annuaire</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
                 </a>
                 @for (section of sections(); track section.id) {
@@ -279,6 +292,7 @@ export interface PublicFooterContact {
             <h2 class="cnpm-public__footer-title">Parcourir</h2>
             <ul>
               <li><a routerLink="/">Accueil</a></li>
+              <li><a routerLink="/membres">Annuaire des membres</a></li>
               @for (section of sections(); track section.id) {
                 <li>
                   <a [href]="'#' + section.id">{{ section.label }}</a>
@@ -298,8 +312,8 @@ export interface PublicFooterContact {
           <section class="cnpm-public__footer-pending" aria-labelledby="pied-information">
             <h2 class="cnpm-public__footer-title" id="pied-information">Information publique</h2>
             <p>
-              L'annuaire, l'adhésion en ligne et les pages légales seront reliés dès publication de
-              leurs destinations officielles.
+              L'adhésion en ligne et les pages légales seront reliées dès publication de leurs
+              destinations officielles.
             </p>
           </section>
         </div>

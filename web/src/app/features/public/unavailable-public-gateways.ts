@@ -7,5 +7,6 @@ export const UNAVAILABLE_HOME_GATEWAY: HomeGateway = {
 };
 
 export const UNAVAILABLE_SHOWCASE_GATEWAY: ShowcaseGateway = {
+  listPublished: () => unavailableFeature$('PUB-004/PUB-005'),
   findBySlug: () => unavailableFeature$('PUB-006'),
 };

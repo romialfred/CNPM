@@ -21,7 +21,7 @@ describe('routes racine', () => {
       [''],
       ['home'],
       [''],
-      [':slug'],
+      [''],
       [''],
     ]);
   });

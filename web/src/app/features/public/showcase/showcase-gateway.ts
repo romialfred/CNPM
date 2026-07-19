@@ -169,6 +169,40 @@ export type ShowcaseResult =
   | { readonly outcome: 'not-found' };
 
 /**
+ * Projection minimale d'une vitrine dans l'annuaire public (PUB-004/PUB-005).
+ *
+ * Elle exclut volontairement les contacts, médias, licences et données de
+ * consentement. Le statut littéral interdit à un adaptateur de livrer un brouillon à
+ * l'écran public sans rompre le contrat TypeScript.
+ */
+export interface PublicShowcaseSummary {
+  readonly slug: string;
+  readonly name: string;
+  readonly tagline: string;
+  readonly sector: string;
+  readonly location: string;
+  readonly summary: string;
+  readonly isDemoContent: boolean;
+  readonly publicationStatus: 'PUBLISHED';
+}
+
+/** Paramètres du draft R4. `page` est indexée à partir de zéro. */
+export interface PublicShowcaseQuery {
+  readonly q?: string;
+  readonly sector?: string;
+  readonly page: number;
+  readonly pageSize: number;
+}
+
+export interface PublicShowcasePage {
+  readonly items: readonly PublicShowcaseSummary[];
+  readonly page: number;
+  readonly pageSize: number;
+  readonly totalItems: number;
+  readonly totalPages: number;
+}
+
+/**
  * Port de lecture d'une vitrine publique (PUB-006).
  *
  * L'API R4 correspondante n'est pas promue dans le contrat canonique : la checklist
@@ -177,6 +211,7 @@ export type ShowcaseResult =
  * préempter ce contrat ; seul l'adaptateur changera.
  */
 export interface ShowcaseGateway {
+  listPublished(query: PublicShowcaseQuery): Observable<PublicShowcasePage>;
   findBySlug(slug: string): Observable<ShowcaseResult>;
 }
 

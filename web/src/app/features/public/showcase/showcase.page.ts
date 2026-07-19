@@ -17,8 +17,8 @@ import {
   LucideUsers,
   LucideWrench,
 } from '@lucide/angular';
-import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
+import { PageSeoService } from '../../../core/seo/page-seo.service';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
@@ -78,8 +78,7 @@ type PageState = 'loading' | 'published' | 'not-public' | 'not-found';
 export class ShowcasePage {
   private readonly gateway = inject(SHOWCASE_GATEWAY);
   private readonly route = inject(ActivatedRoute);
-  private readonly title = inject(Title);
-  private readonly meta = inject(Meta);
+  private readonly seo = inject(PageSeoService);
 
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly state = signal<PageState>('loading');
@@ -226,11 +225,11 @@ export class ShowcasePage {
       if (result.outcome === 'not-public') {
         this.publicationStatus.set(result.status);
         this.state.set('not-public');
-        this.blockIndexing();
+        this.blockIndexing(slug);
         return;
       }
       this.state.set('not-found');
-      this.blockIndexing();
+      this.blockIndexing(slug);
     });
   }
 
@@ -244,18 +243,23 @@ export class ShowcasePage {
   }
 
   private applySeo(showcase: MemberShowcase): void {
-    this.title.setTitle(showcase.seoTitle);
-    this.meta.updateTag({ name: 'description', content: showcase.seoDescription });
-    // L'indexation suit la donnée, jamais un défaut implicite.
-    this.meta.updateTag({
-      name: 'robots',
-      content: showcase.allowIndexing ? 'index,follow' : 'noindex,nofollow',
+    this.seo.apply({
+      title: showcase.seoTitle,
+      description: showcase.seoDescription,
+      // Une fixture de démonstration ne doit jamais être indexée, même si elle simule un consentement.
+      robots:
+        !showcase.isDemoContent && showcase.allowIndexing ? 'index,follow' : 'noindex,nofollow',
+      canonicalPath: `/membres/${encodeURIComponent(showcase.slug)}`,
     });
   }
 
   /** Une vitrine non publique ne doit jamais être indexée. */
-  private blockIndexing(): void {
-    this.title.setTitle('Vitrine indisponible — CNPM');
-    this.meta.updateTag({ name: 'robots', content: 'noindex,nofollow' });
+  private blockIndexing(slug: string): void {
+    this.seo.apply({
+      title: 'Vitrine indisponible — CNPM',
+      description: 'Cette vitrine membre n’est pas disponible publiquement.',
+      robots: 'noindex,nofollow',
+      canonicalPath: `/membres/${encodeURIComponent(slug)}`,
+    });
   }
 }

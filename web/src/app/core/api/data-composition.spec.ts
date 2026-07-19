@@ -45,6 +45,7 @@ import { UNAVAILABLE_MEMBER_HOME_GATEWAY } from '../../features/member/unavailab
 import { DemoHomeGateway } from '../../features/public/home/demo-home.gateway';
 import { HOME_GATEWAY } from '../../features/public/home/home-gateway';
 import { publicRoutes, showcaseRoutes } from '../../features/public/public.routes';
+import { DemoShowcaseGateway } from '../../features/public/showcase/demo-showcase.gateway';
 import { SHOWCASE_GATEWAY } from '../../features/public/showcase/showcase-gateway';
 import {
   UNAVAILABLE_HOME_GATEWAY,
@@ -83,6 +84,7 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(SETTINGS_GATEWAY)).toBeInstanceOf(DemoSettingsGateway);
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBeInstanceOf(DemoDashboardGateway);
     expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(DemoHomeGateway);
+    expect(TestBed.inject(SHOWCASE_GATEWAY)).toBeInstanceOf(DemoShowcaseGateway);
     expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(DemoMemberHomeGateway);
   });
 
