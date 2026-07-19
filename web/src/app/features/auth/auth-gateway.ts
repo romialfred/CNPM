@@ -33,7 +33,12 @@ export type VerificationResult =
  */
 export interface AuthGateway {
   submitCredentials(request: CredentialsRequest): Observable<CredentialsResult>;
-  verifyCode(challengeId: string, code: string): Observable<VerificationResult>;
+  /**
+   * `space` est indispensable ici : sans lui l'adaptateur ne peut pas honorer la
+   * destination annoncée par `AuthSpace` et renvoie une cible unique, quel que soit
+   * l'espace choisi à l'étape identifiants.
+   */
+  verifyCode(challengeId: string, code: string, space: AuthSpace): Observable<VerificationResult>;
   resendCode(challengeId: string): Observable<void>;
 }
 

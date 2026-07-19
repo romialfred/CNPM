@@ -147,6 +147,22 @@ describe('VerifyPage (AUTH-001 — 2FA)', () => {
     expect(verifySpy).not.toHaveBeenCalled();
   });
 
+  it('transmet au port l’espace choisi à l’étape identifiants', async () => {
+    // Sans ce passage, l'adaptateur ne peut pas honorer la destination annoncée par
+    // AuthSpace et renvoie la même cible pour l'administration et l'espace membre.
+    const { fixture } = await setup();
+    const verifySpy = vi.spyOn(gateway, 'verifyCode');
+    const page = fixture.componentInstance as unknown as {
+      form: { setValue: (value: { code: string }) => void };
+      submit: () => void;
+    };
+    page.form.setValue({ code: '123456' });
+
+    page.submit();
+
+    expect(verifySpy).toHaveBeenCalledWith('challenge-1', '123456', 'admin');
+  });
+
   it('n’expose aucun lien inerte (UX-DEC-011)', async () => {
     const { element } = await setup();
 

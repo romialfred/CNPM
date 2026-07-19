@@ -120,7 +120,7 @@ export class VerifyPage {
       return;
     }
     this.state.set('submitting');
-    this.gateway.verifyCode(challenge.id, this.form.getRawValue().code).subscribe({
+    this.gateway.verifyCode(challenge.id, this.form.getRawValue().code, challenge.space).subscribe({
       next: (result) => {
         if (result.outcome === 'authenticated') {
           this.state.set('success');

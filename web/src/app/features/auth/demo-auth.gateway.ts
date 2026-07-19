@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { delay, Observable, of } from 'rxjs';
 import type {
   AuthGateway,
+  AuthSpace,
   CredentialsRequest,
   CredentialsResult,
   VerificationResult,
@@ -41,11 +42,13 @@ export class DemoAuthGateway implements AuthGateway {
     return of(result).pipe(delay(DemoAuthGateway.LATENCY_MS));
   }
 
-  verifyCode(challengeId: string, code: string): Observable<VerificationResult> {
+  verifyCode(challengeId: string, code: string, space: AuthSpace): Observable<VerificationResult> {
     const valid =
       challengeId === DemoAuthGateway.CHALLENGE_ID && code === DemoAuthGateway.DEMO_CODE;
+    // Racine de l'espace plutôt qu'un écran en dur : chacune porte déjà sa propre
+    // destination par défaut, qui reste ainsi le seul endroit à maintenir.
     const result: VerificationResult = valid
-      ? { outcome: 'authenticated', redirectTo: '/' }
+      ? { outcome: 'authenticated', redirectTo: space === 'admin' ? '/admin' : '/member' }
       : { outcome: 'invalid-code' };
     return of(result).pipe(delay(DemoAuthGateway.LATENCY_MS));
   }
