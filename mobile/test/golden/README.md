@@ -1,6 +1,6 @@
-# Goldens MOB-001, MOB-002, MOB-003, MOB-004, MOB-005, MOB-008 et MOB-011
+# Goldens MOB-001, MOB-002, MOB-003, MOB-004, MOB-005, MOB-008, MOB-009, MOB-010 et MOB-011
 
-Les vingt et un PNG couvrent les largeurs normatives 360, 390 et 430 px. Ils sont
+Les vingt-sept PNG couvrent les largeurs normatives 360, 390 et 430 px. Ils sont
 produits par `flutter_test`, qui utilise la fonte Ahem déterministe : les glyphes
 sont volontairement représentés par des blocs pour stabiliser les différences de
 mise en page entre environnements. Les libellés réels sont contrôlés par les tests

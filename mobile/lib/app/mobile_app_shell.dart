@@ -58,9 +58,11 @@ class MobileAppShell extends StatelessWidget {
                 context.go('/home');
               case 1:
                 context.go('/payments');
+              case 2:
+                context.go('/receipts');
               case 3:
                 context.go('/requests');
-              case 2 || 4:
+              case 4:
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
                   ..showSnackBar(

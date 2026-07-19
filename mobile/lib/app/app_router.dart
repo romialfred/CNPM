@@ -16,6 +16,10 @@ import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/presentation/payment_history_screen.dart';
 import 'package:cnpm_mobile/features/requests/domain/member_request.dart';
 import 'package:cnpm_mobile/features/requests/presentation/member_request_list_screen.dart';
+import 'package:cnpm_mobile/features/receipts/application/load_member_receipt.dart';
+import 'package:cnpm_mobile/features/receipts/domain/member_receipt.dart';
+import 'package:cnpm_mobile/features/receipts/presentation/receipt_detail_screen.dart';
+import 'package:cnpm_mobile/features/receipts/presentation/receipt_list_screen.dart';
 
 GoRouter buildAppRouter({
   required AppConfig config,
@@ -24,6 +28,8 @@ GoRouter buildAppRouter({
   required LoadMemberContribution loadMemberContribution,
   required ContentController<MemberDashboard> dashboardController,
   required ContentController<List<MemberPayment>> paymentController,
+  required ContentController<MemberReceiptCollection> receiptController,
+  required LoadMemberReceipt loadMemberReceipt,
   required ContentController<List<MemberRequest>> requestController,
   required VoidCallback onSignOut,
 }) {
@@ -32,6 +38,7 @@ GoRouter buildAppRouter({
     '/payments',
     '/requests',
     '/contributions',
+    '/receipts',
   };
 
   return GoRouter(
@@ -49,7 +56,10 @@ GoRouter buildAppRouter({
         return '/login';
       }
       final isContributionPath = path.startsWith('/contributions/');
-      if ((authenticatedPaths.contains(path) || isContributionPath) &&
+      final isReceiptPath = path.startsWith('/receipts/');
+      if ((authenticatedPaths.contains(path) ||
+              isContributionPath ||
+              isReceiptPath) &&
           !hasSession) {
         return '/login';
       }
@@ -106,6 +116,26 @@ GoRouter buildAppRouter({
         name: 'mobile-payments',
         builder: (context, state) => PaymentHistoryScreen(
           controller: paymentController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/receipts',
+        name: 'mobile-receipts',
+        builder: (context, state) => ReceiptListScreen(
+          controller: receiptController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/receipts/:id',
+        name: 'mobile-receipt-detail',
+        builder: (context, state) => ReceiptDetailScreen(
+          key: ValueKey(state.pathParameters['id']),
+          receiptId: state.pathParameters['id']!,
+          loadReceipt: loadMemberReceipt,
           isDemo: config.isDemo,
           onSignOut: onSignOut,
         ),

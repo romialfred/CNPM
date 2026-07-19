@@ -55,20 +55,9 @@ void main() {
     expect(find.textContaining('SLA cible'), findsNothing);
   });
 
-  testWidgets('Reçus et Profil restent explicitement indisponibles', (
-    tester,
-  ) async {
+  testWidgets('Profil reste explicitement indisponible', (tester) async {
     await pumpCnpmApp(tester);
     await completeDemoSignIn(tester);
-
-    await tester.tap(find.text('Reçus'));
-    await tester.pump();
-    expect(
-      find.text(
-        'Cette destination n’est pas encore disponible dans la démonstration.',
-      ),
-      findsOneWidget,
-    );
 
     await tester.tap(find.text('Profil'));
     await tester.pump();
@@ -81,13 +70,19 @@ void main() {
   });
 
   for (final size in const [Size(360, 800), Size(390, 844), Size(430, 932)]) {
-    testWidgets('MOB-003/008/011 reflow ${size.width.toInt()}', (tester) async {
+    testWidgets('MOB-003/008/009/011 reflow ${size.width.toInt()}', (
+      tester,
+    ) async {
       await pumpCnpmApp(tester, size: size);
       await completeDemoSignIn(tester);
 
       expect(tester.takeException(), isNull);
 
       await tester.tap(find.text('Finances'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('Reçus'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
@@ -106,6 +101,10 @@ void main() {
       expect(tester.takeException(), isNull);
 
       await tester.tap(find.text('Finances'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('Reçus'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 

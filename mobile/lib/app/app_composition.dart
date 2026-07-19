@@ -27,6 +27,12 @@ import 'package:cnpm_mobile/features/requests/domain/member_request.dart';
 import 'package:cnpm_mobile/features/requests/domain/member_request_gateway.dart';
 import 'package:cnpm_mobile/features/requests/infrastructure/demo_member_request_gateway.dart';
 import 'package:cnpm_mobile/features/requests/infrastructure/unavailable_member_request_gateway.dart';
+import 'package:cnpm_mobile/features/receipts/application/load_member_receipt.dart';
+import 'package:cnpm_mobile/features/receipts/application/load_member_receipts.dart';
+import 'package:cnpm_mobile/features/receipts/domain/member_receipt.dart';
+import 'package:cnpm_mobile/features/receipts/domain/member_receipt_gateway.dart';
+import 'package:cnpm_mobile/features/receipts/infrastructure/demo_member_receipt_gateway.dart';
+import 'package:cnpm_mobile/features/receipts/infrastructure/unavailable_member_receipt_gateway.dart';
 
 final class AppComposition {
   AppComposition._({
@@ -35,6 +41,8 @@ final class AppComposition {
     required this.loadMemberContribution,
     required this.dashboardController,
     required this.paymentController,
+    required this.receiptController,
+    required this.loadMemberReceipt,
     required this.requestController,
   });
 
@@ -54,6 +62,9 @@ final class AppComposition {
     final MemberRequestGateway requestGateway = config.isDemo
         ? const DemoMemberRequestGateway()
         : const UnavailableMemberRequestGateway();
+    final MemberReceiptGateway receiptGateway = config.isDemo
+        ? const DemoMemberReceiptGateway()
+        : const UnavailableMemberReceiptGateway();
 
     return AppComposition._(
       authController: AuthFlowController(
@@ -73,6 +84,11 @@ final class AppComposition {
         load: LoadMemberPayments(paymentGateway).call,
         isEmpty: (payments) => payments.isEmpty,
       ),
+      receiptController: ContentController<MemberReceiptCollection>(
+        load: LoadMemberReceipts(receiptGateway).call,
+        isEmpty: (collection) => false,
+      ),
+      loadMemberReceipt: LoadMemberReceipt(receiptGateway),
       requestController: ContentController<List<MemberRequest>>(
         load: LoadMemberRequests(requestGateway).call,
         isEmpty: (requests) => requests.isEmpty,
@@ -85,12 +101,15 @@ final class AppComposition {
   final LoadMemberContribution loadMemberContribution;
   final ContentController<MemberDashboard> dashboardController;
   final ContentController<List<MemberPayment>> paymentController;
+  final ContentController<MemberReceiptCollection> receiptController;
+  final LoadMemberReceipt loadMemberReceipt;
   final ContentController<List<MemberRequest>> requestController;
 
   void signOut() {
     dashboardController.reset();
     contributionController.reset();
     paymentController.reset();
+    receiptController.reset();
     requestController.reset();
     authController.reset();
   }
@@ -100,6 +119,7 @@ final class AppComposition {
     contributionController.dispose();
     dashboardController.dispose();
     paymentController.dispose();
+    receiptController.dispose();
     requestController.dispose();
   }
 }

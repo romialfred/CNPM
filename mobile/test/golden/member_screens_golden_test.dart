@@ -66,6 +66,38 @@ void main() {
       );
     });
 
+    testWidgets('MOB-009 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/receipts');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile('goldens/mob_009_receipts_${viewport.key}.png'),
+      );
+    });
+
+    testWidgets('MOB-010 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/receipts/demo-receipt-preview-2026-001');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile(
+          'goldens/mob_010_receipt_preview_${viewport.key}.png',
+        ),
+      );
+    });
+
     testWidgets('MOB-011 ${viewport.key}', (tester) async {
       await pumpCnpmApp(tester, size: viewport.value);
       await completeDemoSignIn(tester);

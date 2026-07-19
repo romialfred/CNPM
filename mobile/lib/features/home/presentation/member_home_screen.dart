@@ -238,6 +238,14 @@ class _MemberDashboardContent extends StatelessWidget {
               ),
               const Divider(height: 1),
               _QuickAction(
+                key: const Key('home-receipts-action'),
+                icon: Icons.receipt_long_outlined,
+                title: 'Mes reçus',
+                subtitle: 'Voir les aperçus fictifs disponibles',
+                onTap: () => context.go('/receipts'),
+              ),
+              const Divider(height: 1),
+              _QuickAction(
                 key: const Key('home-requests-action'),
                 icon: Icons.forum_outlined,
                 title: 'Mes requêtes',

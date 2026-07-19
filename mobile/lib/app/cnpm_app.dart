@@ -30,6 +30,8 @@ class _CnpmAppState extends State<CnpmApp> {
       loadMemberContribution: _composition.loadMemberContribution,
       dashboardController: _composition.dashboardController,
       paymentController: _composition.paymentController,
+      receiptController: _composition.receiptController,
+      loadMemberReceipt: _composition.loadMemberReceipt,
       requestController: _composition.requestController,
       onSignOut: _composition.signOut,
     );
