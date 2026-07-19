@@ -1,18 +1,17 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Membre"
+  memberCode="CNPM-MEMBRE-000"
   [notificationCount]="0"
 >
   <main class="member-contributions" id="contenu-principal">
     <cnpm-page-header
       title="Mes cotisations"
-      description="Consultez les appels et échéanciers fictifs associés à cette démonstration."
+      description="Consultez les appels et échéanciers associés à votre organisation."
     />
 
-    <cnpm-alert tone="warning" title="Démonstration — données 100 % fictives" [live]="false">
-      Les références, dates, statuts et montants ci-dessous sont non officiels et non opposables.
-      Aucun taux, tranche ou barème CNPM n’est simulé tant que la décision DEC-008 reste ouverte.
+    <cnpm-alert tone="warning" title="Barème institutionnel non configuré" [live]="false">
+      Aucun taux, tranche ou barème CNPM n’est appliqué tant que la décision DEC-008 reste ouverte.
     </cnpm-alert>
 
     <cnpm-filter-bar
@@ -87,13 +86,13 @@
     <section class="member-contributions__panel" aria-labelledby="contributions-results-title">
       <div class="member-contributions__toolbar">
         <div>
-          <h2 id="contributions-results-title" #resultsTitle tabindex="-1">Appels fictifs</h2>
+          <h2 id="contributions-results-title" #resultsTitle tabindex="-1">Appels de cotisation</h2>
           <p>Projection de consultation en lecture seule</p>
         </div>
         @if (data()) {
           <p class="member-contributions__count" aria-live="polite">
             {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'cotisation fictive' : 'cotisations fictives' }}
+            {{ totalItems() === 1 ? 'cotisation' : 'cotisations' }}
           </p>
         }
       </div>
@@ -104,7 +103,7 @@
             variant="table"
             [rows]="pageSize()"
             [columns]="columns.length"
-            label="Chargement des cotisations fictives…"
+            label="Chargement des cotisations…"
           />
         }
         @case ('error') {
@@ -120,14 +119,14 @@
           <cnpm-error-state
             variant="recoverable"
             title="Consultation temporairement indisponible"
-            description="Le contrat GET /portal/contributions ne fournit pas encore de projection typée exploitable. Aucune donnée de démonstration n’est injectée dans ce mode."
+            description="Le contrat GET /portal/contributions ne fournit pas encore de projection typée exploitable."
           />
         }
         @case ('empty') {
           <cnpm-empty-state
             variant="no-data"
             title="Aucune cotisation à afficher"
-            description="La projection fictive ne contient aucun appel pour ce membre de démonstration."
+            description="Aucun appel de cotisation n’est enregistré pour ce membre."
           />
         }
         @case ('no-results') {
@@ -144,7 +143,7 @@
         @case ('ready') {
           <div class="member-contributions__desktop-table">
             <cnpm-data-table
-              caption="Cotisations fictives : référence, exercice, échéance, montants fournis, statut et lien vers le détail."
+              caption="Cotisations : référence, exercice, échéance, montants fournis, statut et lien vers le détail."
               [columns]="columns"
               [rows]="contributions()"
               [rowKey]="rowKey"
@@ -187,7 +186,7 @@
             </cnpm-data-table>
           </div>
 
-          <ol class="member-contributions__mobile-list" aria-label="Cotisations fictives">
+          <ol class="member-contributions__mobile-list" aria-label="Cotisations">
             @for (contribution of contributions(); track contribution.id) {
               <li>
                 <article [attr.aria-labelledby]="'contribution-' + contribution.id">

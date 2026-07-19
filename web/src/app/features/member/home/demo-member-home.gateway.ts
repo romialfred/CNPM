@@ -274,21 +274,21 @@ const ACTIVITIES: readonly MemberActivity[] = [
   },
   {
     id: 'activity-payment',
-    title: 'Paiement de démonstration enregistré',
-    description: 'Reçu REC-2026-0142-0047 disponible dans la fixture',
+    title: 'Paiement enregistré',
+    description: 'Reçu REC-2026-0142-0047 disponible',
     occurredOn: '2026-06-27',
     tone: 'info',
   },
   {
     id: 'activity-request',
     title: 'Requête mise à jour',
-    description: 'Des éléments fictifs ont été ajoutés au dossier',
+    description: 'Des éléments ont été ajoutés au dossier',
     occurredOn: '2026-06-18',
     tone: 'success',
   },
   {
     id: 'activity-receipt',
-    title: 'Nouveau reçu de démonstration',
+    title: 'Nouveau reçu disponible',
     description: 'REC-2026-0142-0031',
     occurredOn: '2026-03-28',
     tone: 'neutral',
@@ -298,7 +298,7 @@ const ACTIVITIES: readonly MemberActivity[] = [
 const SNAPSHOT: MemberHomeSnapshot = {
   identity: {
     organization: 'Sahel Agro SA',
-    memberCode: 'CNPM-DEMO-0142',
+    memberCode: 'CNPM-2026-0142',
     category: 'Grande entreprise',
     group: 'Agro-industrie',
     status: 'ACTIVE',

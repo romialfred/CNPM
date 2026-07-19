@@ -9,7 +9,7 @@ export interface ContributionGenerationContext {
   readonly fiscalYears: readonly string[];
   readonly periods: readonly ContributionGenerationPeriod[];
   readonly audiences: readonly ContributionAudience[];
-  /** Date d'arrêté déterministe du jeu de démonstration. */
+  /** Date d'arrêté déterministe du calcul. */
   readonly asOf: string;
   /** `false` tant que DEC-008 ne fournit aucun barème CNPM opposable. */
   readonly officialScaleAvailable: false;
@@ -39,7 +39,7 @@ export interface ContributionGenerationSimulation {
   readonly draftCalls: number;
   readonly excludedMembers: number;
   readonly blockingIssues: number;
-  /** Montant purement fictif, explicitement non opposable dans l'interface. */
+  /** Montant projeté, non opposable tant que DEC-008 reste ouverte. */
   readonly illustrativeTotal: number;
   readonly issues: readonly ContributionSimulationIssue[];
 }

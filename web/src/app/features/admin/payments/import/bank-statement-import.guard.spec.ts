@@ -12,7 +12,7 @@ import {
 import { bankStatementImportGuard } from './bank-statement-import.guard';
 
 const IDENTITY: SessionIdentity = {
-  displayName: 'Persona comptable fictive',
+  displayName: 'Agent comptable',
   roleLabel: 'Comptable',
   exerciseLabel: '2024',
   notificationCount: 0,

@@ -8,7 +8,7 @@
     @if (receipts().length) {
       <table>
         <caption class="member-home__sr-only">
-          Cinq reçus fictifs les plus récents
+          Cinq reçus les plus récents
         </caption>
         <thead>
           <tr>
@@ -41,7 +41,7 @@
                     receipt.reference +
                     ', ' +
                     receipt.fileFormat +
-                    ' fictif de ' +
+                    ' de ' +
                     receipt.fileSizeKb +
                     ' Ko'
                   "
@@ -62,14 +62,14 @@
         <svg lucideReceiptText aria-hidden="true"></svg>Voir tous les reçus
       </button>
     } @else {
-      <p class="member-home__empty">Aucun reçu de démonstration disponible.</p>
+      <p class="member-home__empty">Aucun reçu disponible.</p>
     }
   </section>
 
   <section class="member-home__panel member-home__request" aria-labelledby="request-title">
     <div class="member-home__section-heading member-home__section-heading--stacked">
       <h2 id="request-title">Soumettre une requête / réclamation</h2>
-      <span>Le brouillon de démonstration reste sur cet appareil.</span>
+      <span>Le brouillon reste sur cet appareil.</span>
     </div>
     <form [formGroup]="requestForm()" (ngSubmit)="saveDraftRequested.emit()">
       <div class="member-home__field">
@@ -174,7 +174,7 @@
         </div>
         <div>
           <strong>Profil presque complet</strong>
-          <p>Champs fictifs manquants :</p>
+          <p>Champs manquants :</p>
           <ul>
             @for (field of profile().missingFields; track field) {
               <li>{{ field }}</li>
@@ -194,7 +194,6 @@
     <section class="member-home__panel member-home__support" aria-labelledby="support-title">
       <div class="member-home__section-heading">
         <h2 id="support-title">Contact & assistance</h2>
-        <span>Démonstration</span>
       </div>
       <dl>
         <div>
@@ -207,14 +206,14 @@
         <div>
           <dt>
             <svg lucidePhone aria-hidden="true"></svg
-            ><span class="member-home__sr-only">Téléphone fictif</span>
+            ><span class="member-home__sr-only">Téléphone</span>
           </dt>
           <dd>{{ support().phone }}</dd>
         </div>
         <div>
           <dt>
             <svg lucideMail aria-hidden="true"></svg
-            ><span class="member-home__sr-only">Courriel fictif</span>
+            ><span class="member-home__sr-only">Courriel</span>
           </dt>
           <dd>{{ support().email }}</dd>
         </div>

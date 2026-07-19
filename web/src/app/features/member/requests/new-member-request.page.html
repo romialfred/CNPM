@@ -1,7 +1,7 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Membre"
+  memberCode="CNPM-MEMBRE-000"
   [notificationCount]="0"
 >
   <main class="new-member-request" id="contenu-principal">
@@ -9,7 +9,7 @@
 
     <cnpm-page-header
       title="Nouvelle requête"
-      description="Préparez un dossier fictif local pour tester le parcours membre."
+      description="Préparez et déposez une nouvelle requête auprès du CNPM."
     />
 
     @if (!demoMode) {
@@ -20,15 +20,6 @@
         description="Le contrat OpenAPI utilise un ResourceInput générique. Aucun formulaire ne lui est raccordé tant qu’un schéma métier typé n’est pas publié."
       />
     } @else {
-      <cnpm-alert
-        tone="warning"
-        title="Simulation locale — aucune soumission réelle"
-        [live]="false"
-      >
-        Le numéro de dossier, l’accusé et le délai cible seront fictifs. Aucun appel réseau,
-        stockage GED, analyse antivirus ou notification n’est effectué.
-      </cnpm-alert>
-
       <form class="new-member-request__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
         <cnpm-inline-error-summary [errors]="formErrors()" />
 
@@ -39,7 +30,7 @@
         <section class="new-member-request__card" aria-labelledby="new-request-details-title">
           <div class="new-member-request__section-head">
             <div>
-              <h2 id="new-request-details-title">Votre demande fictive</h2>
+              <h2 id="new-request-details-title">Votre demande</h2>
               <p>Les champs obligatoires sont signalés par « obligatoire ».</p>
             </div>
             <span>Étape unique</span>
@@ -55,8 +46,8 @@
                 aria-describedby="new-request-kind-error"
               >
                 <option value="">Sélectionner un type</option>
-                <option value="REQUEST">Requête fictive</option>
-                <option value="CLAIM">Réclamation fictive</option>
+                <option value="REQUEST">Requête</option>
+                <option value="CLAIM">Réclamation</option>
               </select>
               @if (submitted() && form.controls.kind.invalid) {
                 <p id="new-request-kind-error" class="new-member-request__error">
@@ -73,19 +64,16 @@
                 id="new-request-category"
                 formControlName="category"
                 [attr.aria-invalid]="submitted() && form.controls.category.invalid"
-                aria-describedby="new-request-category-help new-request-category-error"
+                aria-describedby="new-request-category-error"
               >
                 <option value="">Sélectionner une catégorie</option>
                 @for (category of categories; track category) {
                   <option [value]="category">{{ categoryLabel(category) }}</option>
                 }
               </select>
-              <p id="new-request-category-help" class="new-member-request__help">
-                Taxonomie fictive, sans valeur institutionnelle.
-              </p>
               @if (submitted() && form.controls.category.invalid) {
                 <p id="new-request-category-error" class="new-member-request__error">
-                  Choisissez une catégorie fictive.
+                  Choisissez une catégorie.
                 </p>
               } @else {
                 <span id="new-request-category-error"></span>
@@ -128,7 +116,7 @@
                 aria-describedby="new-request-description-help new-request-description-error"
               ></textarea>
               <p id="new-request-description-help" class="new-member-request__help">
-                De 20 à 2 000 caractères. N’indiquez aucune donnée réelle dans cette démonstration.
+                De 20 à 2 000 caractères.
               </p>
               @if (submitted() && form.controls.description.invalid) {
                 <p id="new-request-description-error" class="new-member-request__error">
@@ -150,14 +138,14 @@
         <section class="new-member-request__card" aria-labelledby="new-request-attachments-title">
           <div class="new-member-request__section-head">
             <div>
-              <h2 id="new-request-attachments-title">Pièces simulées</h2>
-              <p>Seules les métadonnées locales sont affichées ; le contenu n’est jamais lu.</p>
+              <h2 id="new-request-attachments-title">Pièces jointes</h2>
+              <p>Formats acceptés : PDF, PNG, JPG ou JPEG.</p>
             </div>
             <span>{{ attachments().length }} / {{ maxAttachments }}</span>
           </div>
 
           <div class="new-member-request__upload">
-            <label for="new-request-attachments">Choisir des fichiers de démonstration</label>
+            <label for="new-request-attachments">Choisir des fichiers</label>
             <input
               #fileInput
               id="new-request-attachments"
@@ -168,8 +156,7 @@
               (change)="selectFiles(fileInput)"
             />
             <p id="new-request-attachments-help" class="new-member-request__help">
-              PDF, PNG, JPG ou JPEG ; 5 Mo maximum par fichier ; trois métadonnées maximum. Aucun
-              upload, stockage, scan antivirus ou téléchargement ultérieur.
+              PDF, PNG, JPG ou JPEG ; 5 Mo maximum par fichier ; trois pièces jointes maximum.
             </p>
             @if (attachmentError()) {
               <p id="new-request-attachments-error" class="new-member-request__error" role="alert">
@@ -181,17 +168,17 @@
           </div>
 
           @if (attachments().length > 0) {
-            <ul class="new-member-request__attachments" aria-label="Métadonnées de pièces simulées">
+            <ul class="new-member-request__attachments" aria-label="Pièces jointes">
               @for (attachment of attachments(); track attachment.id) {
                 <li>
                   <span>
                     <strong>{{ attachment.fileName }}</strong>
-                    <small>{{ formatAttachmentSize(attachment.sizeBytes) }} — non téléversé</small>
+                    <small>{{ formatAttachmentSize(attachment.sizeBytes) }}</small>
                   </span>
                   <button
                     type="button"
                     (click)="removeAttachment(attachment.id)"
-                    [attr.aria-label]="'Retirer la pièce simulée ' + attachment.fileName"
+                    [attr.aria-label]="'Retirer la pièce jointe ' + attachment.fileName"
                   >
                     Retirer
                   </button>
@@ -208,7 +195,7 @@
             [loading]="submitting()"
             [disabled]="submitting()"
           >
-            Créer le dossier fictif
+            Créer le dossier
           </cnpm-button>
           <cnpm-button routerLink="/member/requests" variant="secondary">Annuler</cnpm-button>
         </div>

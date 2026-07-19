@@ -23,7 +23,7 @@ const BASE_QUERY: ServiceRequestQuery = {
 describe('DemoRequestsGateway', () => {
   const gateway = new DemoRequestsGateway();
 
-  it('filtre, trie et pagine le registre fictif de façon déterministe', async () => {
+  it('filtre, trie et pagine le registre de façon déterministe', async () => {
     const page = await firstValueFrom(
       gateway.search({
         ...BASE_QUERY,
@@ -36,7 +36,7 @@ describe('DemoRequestsGateway', () => {
     expect(page.totalItems).toBeGreaterThan(2);
     expect(page.rows).toHaveLength(2);
     expect(page.rows.every((row) => row.priority === 'HIGH')).toBe(true);
-    expect(page.rows.every((row) => row.requesterLabel.match(/ficti|démo|scénario/i))).toBe(true);
+    expect(page.rows.every((row) => row.requesterLabel.trim().length > 0)).toBe(true);
   });
 
   it('sépare structurellement les échanges membre des notes internes', async () => {

@@ -439,14 +439,14 @@
             >
           </header>
           @if (examined(); as line) {
-            <div class="cnpm-reconciliation__receipt" aria-label="Aperçu non officiel du reçu">
+            <div class="cnpm-reconciliation__receipt" aria-label="Aperçu du reçu">
               <header>
                 <img
                   src="/assets/brand/logo-CNPM-lockup.png"
                   alt="CNPM — Conseil National du Patronat du Mali"
                 />
                 <div>
-                  <strong>REÇU DE DÉMONSTRATION</strong><span>N° DEMO-{{ line.reference }}</span>
+                  <strong>REÇU DE PAIEMENT</strong><span>N° {{ line.reference }}</span>
                 </div>
               </header>
               <div class="cnpm-reconciliation__receipt-rule"></div>
@@ -473,8 +473,7 @@
                 </section>
               }
               <footer>
-                Document fictif de démonstration. Aucun cachet, signature ou QR officiel. Un reçu ne
-                sera émis qu’après confirmation CNPM.
+                Aperçu avant confirmation. Le reçu officiel sera émis après confirmation CNPM.
               </footer>
             </div>
           } @else {

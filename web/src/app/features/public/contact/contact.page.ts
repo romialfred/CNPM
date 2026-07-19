@@ -20,7 +20,6 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CNPM_DATA_MODE } from '../../../core/api/api.config';
 import { PageSeoService } from '../../../core/seo/page-seo.service';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import {
@@ -32,11 +31,11 @@ import { PublicShellComponent } from '../public-shell.component';
 type ContactField = 'fullName' | 'organization' | 'email' | 'subject' | 'message';
 
 const FIELD_LABELS: Readonly<Record<ContactField, string>> = {
-  fullName: 'Nom fictif',
-  organization: 'Organisation fictive',
-  email: 'Adresse e-mail fictive',
-  subject: 'Objet fictif',
-  message: 'Message fictif',
+  fullName: 'Nom',
+  organization: 'Organisation',
+  email: 'Adresse e-mail',
+  subject: 'Objet',
+  message: 'Message',
 };
 
 const trimmedRequired: ValidatorFn = (
@@ -44,12 +43,11 @@ const trimmedRequired: ValidatorFn = (
 ): ValidationErrors | null =>
   typeof control.value === 'string' && control.value.trim().length > 0 ? null : { required: true };
 
-/** PUB-014 — démonstration locale d'un formulaire de contact, sans transmission ni persistance. */
+/** PUB-014 — formulaire de contact vérifié localement, sans transmission ni persistance. */
 @Component({
   selector: 'cnpm-contact-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AlertComponent,
     ButtonComponent,
     ErrorStateComponent,
     InlineErrorSummaryComponent,
@@ -83,9 +81,9 @@ export class ContactPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Contact — démonstration CNPM',
+      title: 'Contact — CNPM',
       description:
-        'Démonstration locale du futur formulaire de contact CNPM, sans envoi ni conservation de coordonnées.',
+        'Formulaire de contact du CNPM, vérifié dans le navigateur sans conservation de coordonnées.',
       robots: 'noindex,nofollow',
       canonicalPath: '/contact',
     });
@@ -121,10 +119,10 @@ export class ContactPage {
       return null;
     }
     if (control.hasError('required')) {
-      return `${FIELD_LABELS[field]} : renseignez une valeur fictive.`;
+      return `${FIELD_LABELS[field]} : renseignez une valeur.`;
     }
     if (control.hasError('email')) {
-      return 'Adresse e-mail fictive : utilisez un format valide.';
+      return 'Adresse e-mail : utilisez un format valide.';
     }
     return `${FIELD_LABELS[field]} : la valeur est trop longue.`;
   }

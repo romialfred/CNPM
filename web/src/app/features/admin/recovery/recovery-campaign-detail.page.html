@@ -19,7 +19,7 @@
           variant="not-found"
           titleAs="h2"
           title="Campagne introuvable"
-          description="Cette référence fictive n’existe pas ou n’est plus disponible."
+          description="Cette référence n’existe pas ou n’est plus disponible."
         />
       }
       @case ('forbidden') {
@@ -30,7 +30,7 @@
           variant="recoverable"
           titleAs="h2"
           title="Détail indisponible en mode connecté"
-          description="Le contrat HTTP de la campagne n’est pas raccordé. Aucun jeu fictif n’est utilisé en remplacement."
+          description="Le contrat HTTP de la campagne n’est pas raccordé. Aucun jeu de données n’est utilisé en remplacement."
         />
       }
       @case ('error') {
@@ -45,9 +45,9 @@
       }
       @case ('ready') {
         @if (campaign(); as item) {
-          <cnpm-alert tone="warning" title="Scénario de démonstration" [live]="false">
-            Les campagnes, membres, montants et résultats présentés sont fictifs. Cette page ne
-            déclenche aucun message, aucune relance et aucune décision de recouvrement.
+          <cnpm-alert tone="warning" title="Consultation en lecture seule" [live]="false">
+            Cette page ne déclenche aucun message, aucune relance et aucune décision de
+            recouvrement.
           </cnpm-alert>
 
           <section class="campaign-detail__hero" aria-labelledby="reference-campagne">
@@ -126,7 +126,7 @@
                   <dd>{{ item.missingConsents | number }}</dd>
                 </div>
                 <div>
-                  <dt>Coût estimé fictif</dt>
+                  <dt>Coût estimé</dt>
                   <dd>{{ item.estimatedCost | number: '1.0-0' }} FCFA</dd>
                 </div>
               </dl>
@@ -191,7 +191,7 @@
             <p>
               Le lancement, la pause, la reprise, le ciblage et l’envoi exigent des permissions
               serveur, des consentements vérifiés et un journal d’audit. Cette fiche reste en
-              lecture seule et n’en simule aucun.
+              lecture seule.
             </p>
           </section>
         }

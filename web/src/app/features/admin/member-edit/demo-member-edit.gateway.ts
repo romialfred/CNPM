@@ -34,7 +34,7 @@ const DEMO_MEMBERS: readonly EditableMemberCore[] = (
   id: member.id,
   legalName: member.organization,
   tradeName: null,
-  organizationType: 'Entreprise membre — démo',
+  organizationType: 'Entreprise membre',
   sectorCode: null,
   status: member.status,
   riskLevel: 'NORMAL',

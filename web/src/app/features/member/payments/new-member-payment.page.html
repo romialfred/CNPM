@@ -1,29 +1,29 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Responsable cotisations"
+  memberCode="CNPM-MBR-0142"
   [notificationCount]="0"
 >
   <main class="new-member-payment" id="contenu-principal">
     <cnpm-page-header
       title="Payer une cotisation"
-      description="Préparez un suivi fictif sans transmettre de paiement ni de donnée sensible."
+      description="Préparez le règlement d’une cotisation de votre organisation."
     >
       <cnpm-button variant="secondary" routerLink="/member/payments">
         Voir l’historique
       </cnpm-button>
     </cnpm-page-header>
 
-    <cnpm-alert tone="warning" title="Démonstration financière strictement bornée" [live]="false">
-      Aucun opérateur, compte bancaire ou encaissement n’est raccordé. Ce parcours ne crée ni
-      transaction, ni confirmation CNPM, ni reçu. Les décisions DEC-002, DEC-003 et DEC-005 restent
-      ouvertes.
+    <cnpm-alert tone="info" title="Encaissement en ligne à venir" [live]="false">
+      Aucun opérateur ni compte bancaire n’est encore raccordé : ce parcours enregistre votre
+      demande sans donner lieu à une transaction, une confirmation CNPM ou un reçu. Les décisions
+      DEC-002, DEC-003 et DEC-005 restent ouvertes.
     </cnpm-alert>
 
     @switch (state()) {
       @case ('loading') {
         <section class="new-member-payment__loading" aria-label="Chargement du formulaire">
-          <cnpm-skeleton variant="card" [rows]="5" label="Chargement des scénarios fictifs…" />
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement des cotisations…" />
         </section>
       }
       @case ('unavailable') {
@@ -36,8 +36,8 @@
       @case ('error') {
         <cnpm-error-state
           variant="recoverable"
-          title="Les scénarios n’ont pas pu être chargés"
-          description="Aucune opération n’a été créée. Rechargez la page pour reprendre."
+          title="Les cotisations n’ont pas pu être chargées"
+          description="Rechargez la page pour reprendre."
         >
           <cnpm-button variant="secondary" size="sm" (click)="retry()">Recharger</cnpm-button>
         </cnpm-error-state>
@@ -48,8 +48,8 @@
             <div class="new-member-payment__section-heading">
               <span aria-hidden="true">1</span>
               <div>
-                <h2 id="payment-form-title">Préparer le scénario</h2>
-                <p>Les montants sont fournis par la fixture ; aucun barème n’est recalculé.</p>
+                <h2 id="payment-form-title">Préparer le règlement</h2>
+                <p>Les montants proviennent de votre appel de cotisation ; aucun barème n’est recalculé.</p>
               </div>
             </div>
 
@@ -58,13 +58,13 @@
             }
 
             @if (submitError()) {
-              <cnpm-alert tone="error" title="Le suivi fictif n’a pas pu être créé">
-                Aucun effet financier n’a eu lieu. Vérifiez la sélection puis réessayez.
+              <cnpm-alert tone="error" title="Le règlement n’a pas pu être préparé">
+                Vérifiez la sélection puis réessayez.
               </cnpm-alert>
             }
 
             <div class="new-member-payment__field">
-              <label for="payment-contribution">Cotisation fictive — obligatoire</label>
+              <label for="payment-contribution">Cotisation — obligatoire</label>
               <select
                 id="payment-contribution"
                 formControlName="contributionId"
@@ -78,7 +78,7 @@
                 <option value="">Sélectionner une cotisation</option>
                 @for (option of options(); track option.id) {
                   <option [value]="option.id">
-                    {{ option.reference }} — solde fictif
+                    {{ option.reference }} — solde
                     {{ option.outstandingAmountXof | number: '1.0-0' }} FCFA
                   </option>
                 }
@@ -88,16 +88,15 @@
               </p>
               @if (submitted() && form.controls.contributionId.invalid) {
                 <p class="new-member-payment__field-error" id="payment-contribution-error">
-                  Choisissez une cotisation fictive.
+                  Choisissez une cotisation.
                 </p>
               }
             </div>
 
             <fieldset class="new-member-payment__channels">
-              <legend>Aperçu du canal — obligatoire</legend>
+              <legend>Canal de règlement — obligatoire</legend>
               <p id="payment-channel-help">
-                Ces choix illustrent la composition future sans nommer de partenaire ni collecter
-                de numéro.
+                Aucun numéro ni coordonnée bancaire n’est collecté à cette étape.
               </p>
               <div class="new-member-payment__channel-grid" aria-describedby="payment-channel-help">
                 @for (channel of channels; track channel; let first = $first) {
@@ -110,13 +109,13 @@
                     />
                     <span>
                       <strong>{{ channelLabel(channel) }}</strong>
-                      <small>Aucun raccordement externe</small>
+                      <small>Raccordement à venir</small>
                     </span>
                   </label>
                 }
               </div>
               @if (submitted() && form.controls.channel.invalid) {
-                <p class="new-member-payment__field-error">Choisissez un aperçu de canal.</p>
+                <p class="new-member-payment__field-error">Choisissez un canal de règlement.</p>
               }
             </fieldset>
 
@@ -127,19 +126,19 @@
                 formControlName="simulationAcknowledged"
               />
               <span>
-                Je comprends que cette action crée uniquement un suivi fictif et qu’aucun paiement
-                ne sera réalisé.
+                Je comprends que cette demande ne constitue pas un paiement et qu’aucun montant ne
+                sera prélevé.
               </span>
             </label>
             @if (submitted() && form.controls.simulationAcknowledged.invalid) {
               <p class="new-member-payment__field-error">
-                Confirmez avoir compris qu’aucun paiement ne sera réalisé.
+                Confirmez avoir compris qu’aucun montant ne sera prélevé.
               </p>
             }
 
             <div class="new-member-payment__actions">
               <cnpm-button type="submit" [loading]="submitting()">
-                Créer le suivi fictif
+                Préparer le règlement
               </cnpm-button>
               <a routerLink="/member/contributions">Retour aux cotisations</a>
             </div>
@@ -147,7 +146,7 @@
 
           <aside class="new-member-payment__summary" aria-labelledby="payment-summary-title">
             <p class="new-member-payment__eyebrow">Aperçu avant création</p>
-            <h2 id="payment-summary-title">Résumé du scénario</h2>
+            <h2 id="payment-summary-title">Résumé du règlement</h2>
             @if (selectedContribution(); as contribution) {
               <dl>
                 <div>
@@ -159,11 +158,11 @@
                   <dd>{{ contribution.exercise }}</dd>
                 </div>
                 <div>
-                  <dt>Échéance fournie</dt>
+                  <dt>Échéance</dt>
                   <dd>{{ contribution.dueDate | date: 'dd/MM/yyyy' }}</dd>
                 </div>
                 <div class="new-member-payment__amount">
-                  <dt>Solde fictif</dt>
+                  <dt>Solde</dt>
                   <dd>{{ contribution.outstandingAmountXof | number: '1.0-0' }} FCFA</dd>
                 </div>
                 <div>
@@ -181,12 +180,12 @@
               </dl>
             } @else {
               <p class="new-member-payment__placeholder">
-                Sélectionnez une cotisation pour afficher son aperçu fictif.
+                Sélectionnez une cotisation pour afficher son aperçu.
               </p>
             }
             <div class="new-member-payment__guardrail">
               <strong>Résultat attendu</strong>
-              <span>Statut « Préparé localement » — jamais « Payé ».</span>
+              <span>Statut « Préparé » — la confirmation CNPM reste à venir.</span>
             </div>
           </aside>
         </form>

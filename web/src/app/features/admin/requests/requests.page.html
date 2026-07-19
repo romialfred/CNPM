@@ -5,13 +5,6 @@
       description="Qualifiez et suivez les dossiers accessibles à votre périmètre."
     />
 
-    @if (demoMode) {
-      <cnpm-alert tone="info" title="Jeu de démonstration borné">
-        Les dossiers, personnes et échéances affichés sont fictifs. Aucun SLA officiel et aucune
-        notification réelle ne sont engagés.
-      </cnpm-alert>
-    }
-
     <cnpm-filter-bar
       [expanded]="filtersExpanded()"
       [chips]="chips()"
@@ -71,7 +64,7 @@
           >
             <option value="submittedAt:desc">Plus récentes</option>
             <option value="submittedAt:asc">Plus anciennes</option>
-            <option value="targetAt:asc">Échéance fictive</option>
+            <option value="targetAt:asc">Échéance</option>
             <option value="priority:desc">Priorité décroissante</option>
           </select>
         </div>
@@ -134,7 +127,7 @@
       @case ('ready') {
         <div class="cnpm-requests__table">
           <cnpm-data-table
-            caption="Requêtes et réclamations, demandeurs, priorités, statuts et échéances fictives."
+            caption="Requêtes et réclamations, demandeurs, priorités, statuts et échéances."
             [columns]="columns"
             [rows]="rows()"
             state="ready"
@@ -211,7 +204,7 @@
                   <dd>{{ formatDate(request.submittedAt) }}</dd>
                 </div>
                 <div>
-                  <dt>Échéance fictive</dt>
+                  <dt>Échéance</dt>
                   <dd>{{ formatDate(request.targetAt) }}</dd>
                 </div>
               </dl>

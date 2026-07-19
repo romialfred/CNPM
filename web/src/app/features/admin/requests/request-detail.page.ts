@@ -109,7 +109,7 @@ export class RequestDetailPage {
     const request = this.request();
     if (!request) return [];
     return [
-      { label: 'Demandeur fictif', value: request.requesterLabel },
+      { label: 'Demandeur', value: request.requesterLabel },
       { label: 'Catégorie', value: request.categoryLabel },
       { label: 'Service', value: request.serviceLabel },
       { label: 'Priorité', value: this.priorityLabel(request.priority) },

@@ -60,33 +60,6 @@
   padding-block: 32px 72px;
 }
 
-.editorial-demo {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 32px;
-  padding: 16px 18px;
-  border: 1px solid var(--cnpm-color-semantic-warning-100);
-  border-radius: 10px;
-  background: var(--cnpm-color-semantic-warning-50);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.editorial-demo svg {
-  flex: 0 0 auto;
-  color: var(--cnpm-color-semantic-warning-700);
-}
-
-.editorial-demo strong {
-  display: block;
-  color: var(--cnpm-color-text-primary);
-}
-
-.editorial-demo p {
-  margin: 4px 0 0;
-  line-height: 1.55;
-}
-
 .editorial-section-heading {
   display: flex;
   align-items: flex-end;

@@ -193,14 +193,14 @@ export interface RecoveryActionRow {
   readonly reference: string;
   readonly memberCode: string;
   readonly organization: string;
-  readonly agentLabel: 'Agent Démo Recouvrement';
+  readonly agentLabel: 'Agent de recouvrement';
   readonly kind: RecoveryActionKind;
   readonly status: RecoveryActionStatus;
   readonly scheduledAt: string;
   readonly campaignReference: string;
   readonly campaignLabel: string;
   readonly segment: string;
-  readonly contactDisclosure: 'Contact masqué — démonstration';
+  readonly contactDisclosure: 'Contact masqué';
   readonly communicationAuthorization: CommunicationAuthorization;
   readonly suspension: RecoverySuspensionSnapshot | null;
   readonly promise: RecoveryPromiseSnapshot | null;
@@ -240,7 +240,7 @@ export interface RecoveryPortfolioCase {
   readonly reference: string;
   readonly memberCode: string;
   readonly organization: string;
-  readonly agentLabel: 'Agent Démo Recouvrement';
+  readonly agentLabel: 'Agent de recouvrement';
   readonly segment: string;
   readonly campaignReference: string;
   readonly campaignLabel: string;
@@ -249,7 +249,7 @@ export interface RecoveryPortfolioCase {
   readonly daysOverdue: number;
   readonly nextActionKind: RecoveryActionKind;
   readonly nextActionAt: string;
-  readonly contactDisclosure: 'Contact masqué — démonstration';
+  readonly contactDisclosure: 'Contact masqué';
   readonly communicationAuthorization: CommunicationAuthorization;
   readonly suspension: RecoverySuspensionSnapshot | null;
   readonly promise: RecoveryPromiseSnapshot | null;

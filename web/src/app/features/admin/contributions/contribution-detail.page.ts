@@ -4,7 +4,6 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
@@ -54,7 +53,7 @@ type DetailState =
   | { readonly kind: 'unavailable' }
   | { readonly kind: 'error' };
 
-/** BO-013 — fiche consultative d'un appel, sans opération financière simulée. */
+/** BO-013 — fiche consultative d'un appel, en lecture seule. */
 @Component({
   selector: 'cnpm-contribution-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -63,7 +62,6 @@ type DetailState =
     DecimalPipe,
     RouterLink,
     AdminShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     ErrorStateComponent,

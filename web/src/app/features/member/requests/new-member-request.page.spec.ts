@@ -15,11 +15,11 @@ import { NewMemberRequestPage } from './new-member-request.page';
 
 const CREATED: MemberRequestDetail = {
   id: 'demo-member-request-created-0007',
-  reference: 'DEMO-REQ-MEMBRE-2026-0007',
+  reference: 'CNPM-REQ-MEMBRE-2026-0007',
   kind: 'REQUEST',
   category: 'DEMO_DOCUMENT',
-  subject: 'Demande fictive complète',
-  description: 'Description fictive suffisamment longue pour le scénario.',
+  subject: 'Demande complète',
+  description: 'Description suffisamment longue pour le dossier.',
   status: 'SUBMITTED',
   createdAt: '2026-07-19T12:00:00Z',
   updatedAt: '2026-07-19T12:00:00Z',
@@ -101,32 +101,32 @@ describe('NewMemberRequestPage — MP-010', () => {
 
     setValue(host, '#new-request-kind', 'REQUEST', 'change');
     setValue(host, '#new-request-category', 'DEMO_DOCUMENT', 'change');
-    setValue(host, '#new-request-subject', 'Demande fictive complète');
+    setValue(host, '#new-request-subject', 'Demande complète');
     setValue(
       host,
       '#new-request-description',
-      'Description fictive suffisamment longue pour le scénario.',
+      'Description suffisamment longue pour le dossier.',
     );
     fixture.detectChanges();
     expect(host.querySelector('.cnpm-error-summary')).toBeNull();
   });
 
-  it('ne conserve que les métadonnées simulées puis crée localement le dossier', async () => {
+  it('ne conserve que les métadonnées de pièces jointes puis crée le dossier', async () => {
     const { fixture, gateway, navigate, host } = await setup();
     setValue(host, '#new-request-kind', 'REQUEST', 'change');
     setValue(host, '#new-request-category', 'DEMO_DOCUMENT', 'change');
-    setValue(host, '#new-request-subject', '  Demande fictive complète  ');
+    setValue(host, '#new-request-subject', '  Demande complète  ');
     setValue(
       host,
       '#new-request-description',
-      '  Description fictive suffisamment longue pour le scénario.  ',
+      '  Description suffisamment longue pour le dossier.  ',
     );
     const fileInput = host.querySelector<HTMLInputElement>('#new-request-attachments');
     if (!fileInput) throw new Error('Sélecteur de pièces absent');
     Object.defineProperty(fileInput, 'files', {
       configurable: true,
       value: Object.assign(
-        [new File(['non lu'], 'preuve-fictive.pdf', { type: 'application/pdf' })],
+        [new File(['non lu'], 'preuve-justificative.pdf', { type: 'application/pdf' })],
         {
           item: (index: number) => (index === 0 ? (fileInput.files?.[0] ?? null) : null),
         },
@@ -134,18 +134,21 @@ describe('NewMemberRequestPage — MP-010', () => {
     });
     fileInput.dispatchEvent(new Event('change'));
     fixture.detectChanges();
-    expect(host.textContent).toContain('preuve-fictive.pdf');
-    expect(host.textContent).toContain('non téléversé');
+    expect(host.textContent).toContain('preuve-justificative.pdf');
+    // La mention « non téléversé » a été retirée de l'affichage. L'invariant qu'elle
+    // signalait reste vérifié plus bas : seules les métadonnées partent au port, jamais
+    // le contenu du fichier.
+    expect(host.textContent).toContain('6 octets');
 
     submit(host);
     expect(gateway.input).toMatchObject({
       kind: 'REQUEST',
       category: 'DEMO_DOCUMENT',
-      subject: 'Demande fictive complète',
-      description: 'Description fictive suffisamment longue pour le scénario.',
+      subject: 'Demande complète',
+      description: 'Description suffisamment longue pour le dossier.',
     });
     expect(gateway.input?.attachments[0]).toMatchObject({
-      fileName: 'preuve-fictive.pdf',
+      fileName: 'preuve-justificative.pdf',
       simulated: true,
     });
     expect(Object.keys(gateway.input?.attachments[0] ?? {})).not.toContain('content');

@@ -215,13 +215,6 @@
   max-width: 22rem;
 }
 
-/* Mention de démonstration : reprend la pastille du héros, en ton d'avertissement.
-   Lisible sans dramatiser, et sans règle de mise en forme supplémentaire. */
-.cnpm-showcase__demo {
-  background-color: var(--cnpm-color-semantic-warning-50);
-  color: var(--cnpm-color-semantic-warning-700);
-}
-
 .cnpm-showcase__section {
   display: flex;
   flex-direction: column;

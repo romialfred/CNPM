@@ -49,7 +49,7 @@ const SORTS: readonly MemberReceiptSort[] = ['scenarioDate', 'reference', 'amoun
 
 type ReceiptListState = 'loading' | 'ready' | 'empty' | 'no-result' | 'error' | 'unavailable';
 
-/** MP-007 — collection d’aperçus fictifs en lecture seule pour le membre courant. */
+/** MP-007 — collection d’aperçus en lecture seule pour le membre courant. */
 @Component({
   selector: 'cnpm-member-receipts-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -90,10 +90,10 @@ export class MemberReceiptsPage {
     sortOption: 'scenarioDate:desc',
   });
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Aperçu fictif' },
+    { key: 'reference', label: 'Référence' },
     { key: 'periodLabel', label: 'Période' },
-    { key: 'scenarioDate', label: 'Date du scénario' },
-    { key: 'amountXof', label: 'Montant du scénario' },
+    { key: 'scenarioDate', label: 'Date' },
+    { key: 'amountXof', label: 'Montant' },
     { key: 'status', label: 'Statut' },
     { key: 'action', label: 'Aperçu' },
   ];

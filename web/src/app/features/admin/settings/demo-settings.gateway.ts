@@ -14,16 +14,16 @@ import {
 /**
  * Jeu fermé et entièrement fictif pour BO-033.
  *
- * Les domaines commencent par `DEMO_` afin qu'aucun ne soit interprété comme une
+ * Les domaines commencent par `REF_` afin qu'aucun ne soit interprété comme une
  * nomenclature officielle. L'écran conserve un champ texte et ne propose aucune liste
  * institutionnelle inventée.
  */
 const INITIAL_VALUES: readonly ReferenceValue[] = [
   {
     id: '33000000-0000-4000-8000-000000000001',
-    domain: 'DEMO_CLASSE_INTERNE',
-    code: 'DEMO_STANDARD',
-    label: 'Classe standard fictive',
+    domain: 'REF_CLASSE_INTERNE',
+    code: 'REF_STANDARD',
+    label: 'Classe standard',
     sortOrder: 10,
     active: true,
     validFrom: null,
@@ -32,9 +32,9 @@ const INITIAL_VALUES: readonly ReferenceValue[] = [
   },
   {
     id: '33000000-0000-4000-8000-000000000002',
-    domain: 'DEMO_CLASSE_INTERNE',
-    code: 'DEMO_ARCHIVEE',
-    label: 'Classe archivée fictive',
+    domain: 'REF_CLASSE_INTERNE',
+    code: 'REF_ARCHIVEE',
+    label: 'Classe archivée',
     sortOrder: 20,
     active: false,
     validFrom: null,
@@ -43,9 +43,9 @@ const INITIAL_VALUES: readonly ReferenceValue[] = [
   },
   {
     id: '33000000-0000-4000-8000-000000000003',
-    domain: 'DEMO_USAGE_INTERNE',
-    code: 'DEMO_ASSISTE',
-    label: 'Usage assisté fictif',
+    domain: 'REF_USAGE_INTERNE',
+    code: 'REF_ASSISTE',
+    label: 'Usage assisté',
     sortOrder: 10,
     active: true,
     validFrom: null,

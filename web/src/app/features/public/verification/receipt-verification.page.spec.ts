@@ -56,21 +56,22 @@ async function setup(code = 'DEMO-VERIF-2026-001') {
 describe('ReceiptVerificationPage (PUB-015 / REC-006)', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('affiche un chargement et avertit que le contrôle n’est pas probant', async () => {
+  it('affiche un chargement et annonce le périmètre limité du contrôle', async () => {
     const { gateway, host } = await setup();
     expect(gateway.calls[0].code).toBe('DEMO-VERIF-2026-001');
     expect(host.querySelectorAll('.cnpm-skeleton')).toHaveLength(3);
-    expect(host.textContent).toContain('Démonstration non probante');
+    expect(host.textContent).toContain('Contrôle public limité');
+    expect(host.textContent).toContain('sans identité de');
   });
 
-  it('limite strictement les données rendues dans un résultat fictif', async () => {
+  it('limite strictement les données rendues dans un résultat', async () => {
     const { fixture, gateway, host } = await setup();
     gateway.calls[0].result.next({
       outcome: 'found',
       verification: {
         verificationCode: 'DEMO-VERIF-2026-001',
         receiptReference: 'DEMO-APERCU-2026-001',
-        statusLabel: 'Aperçu valide — démonstration',
+        statusLabel: 'Aperçu valide',
         amountXof: 150000,
         scenarioDate: '2026-06-18',
         fictionalDemo: true,
@@ -79,7 +80,7 @@ describe('ReceiptVerificationPage (PUB-015 / REC-006)', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    expect(host.textContent).toContain('Aperçu valide — démonstration');
+    expect(host.textContent).toContain('Aperçu valide');
     expect(host.textContent).toContain('Non exposée');
     expect(host.querySelector('.verification-result')?.textContent).not.toContain('signature');
     expect(host.querySelector('.verification-result img, .verification-result canvas')).toBeNull();

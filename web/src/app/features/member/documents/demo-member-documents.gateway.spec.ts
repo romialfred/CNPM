@@ -19,7 +19,7 @@ describe('DemoMemberDocumentsGateway — MP-012', () => {
     expect(page.items).toHaveLength(5);
     expect(page.totalElements).toBe(6);
     expect(page.totalPages).toBe(2);
-    expect(page.items[0]?.reference).toBe('DEMO-DOC-0001');
+    expect(page.items[0]?.reference).toBe('CNPM-DOC-0001');
 
     const filtered = await firstValueFrom(
       gateway.list({
@@ -29,22 +29,22 @@ describe('DemoMemberDocumentsGateway — MP-012', () => {
         status: 'EXPIRED',
       }),
     );
-    expect(filtered.items.map((item) => item.reference)).toEqual(['DEMO-DOC-0003']);
+    expect(filtered.items.map((item) => item.reference)).toEqual(['CNPM-DOC-0003']);
 
     const secondPage = await firstValueFrom(
       gateway.list({ ...DEFAULT_QUERY, sort: 'reference', direction: 'asc', page: 2 }),
     );
-    expect(secondPage.items.map((item) => item.reference)).toEqual(['DEMO-DOC-0006']);
+    expect(secondPage.items.map((item) => item.reference)).toEqual(['CNPM-DOC-0006']);
   });
 
-  it('ne sert que des métadonnées publiques fictives, sans contenu ni attribut GED interne', async () => {
+  it('ne sert que des métadonnées publiques, sans contenu ni attribut GED interne', async () => {
     const gateway = new DemoMemberDocumentsGateway();
     const page = await firstValueFrom(gateway.list(DEFAULT_QUERY));
     const document = page.items[0];
     if (!document) throw new Error('Fixture documentaire absente');
 
-    expect(document.reference).toMatch(/^DEMO-DOC-/);
-    expect(document.availabilityDisclosure).toContain('Aucun fichier ni preuve officielle');
+    expect(document.reference).toMatch(/^CNPM-DOC-/);
+    expect(document.availabilityDisclosure).toContain('Document répertorié');
     expect(Object.keys(document)).not.toEqual(
       expect.arrayContaining([
         'classification',

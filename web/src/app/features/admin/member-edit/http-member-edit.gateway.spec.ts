@@ -16,10 +16,10 @@ import { HttpMemberEditGateway } from './http-member-edit.gateway';
 const MEMBER_ID = '10000000-0000-4000-8000-000000000001';
 const RESPONSE = {
   id: MEMBER_ID,
-  legalName: 'Ateliers Nimba Démonstration',
+  legalName: 'Ateliers Nimba',
   tradeName: null,
-  organizationType: 'Société de démonstration',
-  sectorCode: 'FABRICATION_DEMO',
+  organizationType: 'Société anonyme',
+  sectorCode: 'FABRICATION_01',
   status: 'ACTIVE',
   riskLevel: 'NORMAL',
   version: 4,
@@ -29,8 +29,8 @@ function problem(status: number) {
   return {
     timestamp: '2026-07-19T08:00:00Z',
     status,
-    code: `DEMO_${status}`,
-    message: `Erreur de démonstration ${status}`,
+    code: `ERR_${status}`,
+    message: `Erreur technique ${status}`,
     correlationId: '30000000-0000-4000-8000-000000000001',
   };
 }
@@ -62,10 +62,10 @@ describe('HttpMemberEditGateway', () => {
 
   it('envoie uniquement les quatre champs contractuels avec If-Match', async () => {
     const changes = {
-      legalName: 'Ateliers Nimba Démonstration révisés',
+      legalName: 'Ateliers Nimba révisés',
       tradeName: 'Nimba Atelier',
-      organizationType: 'Société de démonstration',
-      sectorCode: 'FABRICATION_DEMO',
+      organizationType: 'Société anonyme',
+      sectorCode: 'FABRICATION_01',
     };
     const resultPromise = firstValueFrom(gateway.update(MEMBER_ID, 4, changes));
     const request = http.expectOne(`/v1/organizations/${MEMBER_ID}`);
@@ -99,7 +99,7 @@ describe('HttpMemberEditGateway', () => {
           );
     http.expectOne(`/v1/organizations/${MEMBER_ID}`).flush(problem(status), {
       status,
-      statusText: 'Erreur de démonstration',
+      statusText: 'Erreur technique',
     });
     await expect(resultPromise).rejects.toBeInstanceOf(expectedType);
   });

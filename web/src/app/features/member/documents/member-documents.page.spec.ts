@@ -15,16 +15,15 @@ import { MemberDocumentsPage } from './member-documents.page';
 const READY_PAGE: MemberDocumentPage = {
   items: [
     {
-      id: 'demo-document-0003',
-      reference: 'DEMO-DOC-0003',
-      title: 'Attestation annuelle — scénario 2025',
+      id: 'document-0003',
+      reference: 'CNPM-DOC-0003',
+      title: 'Attestation annuelle 2025',
       type: 'ATTESTATION',
-      typeLabel: 'Attestation fictive',
-      versionLabel: 'Version de démonstration 1',
+      typeLabel: 'Attestation',
+      versionLabel: 'Version 1',
       metadataRecordedOn: '2025-12-18',
       status: 'EXPIRED',
-      availabilityDisclosure:
-        'Échéance fictive dépassée. Aucun renouvellement ni alerte réelle n’est déclenché.',
+      availabilityDisclosure: 'Échéance dépassée : document à renouveler.',
     },
   ],
   page: 2,
@@ -108,7 +107,7 @@ describe('MemberDocumentsPage — MP-012', () => {
       page: 2,
       size: 5,
     });
-    expect(host.textContent).toContain('Chargement du catalogue documentaire fictif');
+    expect(host.textContent).toContain('Chargement du catalogue documentaire');
   });
 
   it('rend table et fiches mobiles en lecture seule sans frontière GED interne', async () => {
@@ -119,10 +118,10 @@ describe('MemberDocumentsPage — MP-012', () => {
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.querySelector('table caption')?.textContent).toContain(
-      'Métadonnées documentaires fictives',
+      'Métadonnées documentaires',
     );
-    expect(host.textContent).toContain('DEMO-DOC-0003');
-    expect(host.textContent).toContain('Expiré — scénario');
+    expect(host.textContent).toContain('CNPM-DOC-0003');
+    expect(host.textContent).toContain('Expiré');
     expect(host.querySelector('.member-documents__mobile-list article dl')).not.toBeNull();
     expect(
       host.querySelectorAll('.member-documents a, .member-documents input[type="file"]'),
@@ -138,7 +137,7 @@ describe('MemberDocumentsPage — MP-012', () => {
 
     const search = host.querySelector<HTMLInputElement>('#member-document-search');
     if (!search) throw new Error('Recherche absente');
-    search.value = '  DEMO-DOC  ';
+    search.value = '  CNPM-DOC  ';
     search.dispatchEvent(new Event('input'));
     const type = host.querySelector<HTMLSelectElement>('#member-document-type');
     if (!type) throw new Error('Type absent');
@@ -153,7 +152,7 @@ describe('MemberDocumentsPage — MP-012', () => {
     expect(navigate).toHaveBeenCalledWith([], {
       relativeTo: expect.anything(),
       queryParams: expect.objectContaining({
-        q: 'DEMO-DOC',
+        q: 'CNPM-DOC',
         type: 'ATTESTATION',
         sort: 'reference',
         order: 'asc',

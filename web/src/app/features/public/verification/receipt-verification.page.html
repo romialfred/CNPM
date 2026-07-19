@@ -5,8 +5,8 @@
         <p class="verification-eyebrow">Contrôle public limité</p>
         <h1 #pageTitle tabindex="-1">Vérifier un aperçu de reçu</h1>
         <p>
-          Saisissez un code de démonstration pour prévisualiser un résultat minimal, sans identité
-          de membre ni document téléchargeable.
+          Saisissez un code de vérification pour consulter un résultat minimal, sans identité de
+          membre ni document téléchargeable.
         </p>
       </div>
       <span class="verification-hero__mark" aria-hidden="true">
@@ -16,22 +16,11 @@
   </section>
 
   <div class="verification-page">
-    <aside class="verification-warning" role="note">
-      <svg lucideInfo [size]="iconSize.control" aria-hidden="true"></svg>
-      <div>
-        <strong>Démonstration non probante</strong>
-        <p>
-          Aucun reçu officiel, QR, cachet ou signature n’est vérifié ici. Le résultat ci-dessous
-          est produit uniquement par un jeu de données fictif local.
-        </p>
-      </div>
-    </aside>
-
     <div class="verification-layout">
       <section class="verification-search" aria-labelledby="verification-form-title">
         <p class="verification-step">01</p>
         <h2 id="verification-form-title">Saisir le code</h2>
-        <p>Utilisez le code fictif transmis avec la démonstration.</p>
+        <p>Utilisez le code de vérification figurant sur le reçu.</p>
         <form (ngSubmit)="submitCode()">
           <label for="verification-code">Code de vérification</label>
           <span class="verification-field">
@@ -47,7 +36,7 @@
               (ngModelChange)="codeDraft.set($event)"
             />
           </span>
-          <p class="verification-hint">Code démo : DEMO-VERIF-2026-001</p>
+          <p class="verification-hint">Exemple de code : DEMO-VERIF-2026-001</p>
           <cnpm-button type="submit" variant="primary" [block]="true">
             Vérifier cet aperçu
           </cnpm-button>
@@ -56,7 +45,7 @@
 
       <section class="verification-result" aria-labelledby="verification-result-title">
         <p class="verification-step">02</p>
-        <h2 id="verification-result-title">Résultat du contrôle fictif</h2>
+        <h2 id="verification-result-title">Résultat du contrôle</h2>
 
         @if (state() === 'loading') {
           <div class="verification-loading" aria-label="Vérification en cours" aria-busy="true">
@@ -68,7 +57,7 @@
           <cnpm-error-state
             variant="recoverable"
             title="Vérification temporairement indisponible"
-            description="Le contrat de vérification n’est pas disponible. Aucun résultat fictif n’a été substitué."
+            description="Le service de vérification n’est pas joignable pour le moment. Aucun résultat n’a été substitué."
           >
             <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
           </cnpm-error-state>
@@ -76,7 +65,7 @@
           <cnpm-error-state
             variant="not-found"
             title="Aucun aperçu correspondant"
-            description="Ce code ne correspond à aucun élément du jeu de démonstration."
+            description="Ce code ne correspond à aucun aperçu de reçu."
           />
         } @else if (result(); as verification) {
           <div class="verification-success" role="status">
@@ -85,20 +74,20 @@
             </span>
             <div>
               <strong>{{ verification.statusLabel }}</strong>
-              <p>Résultat local — ne constitue pas une preuve de paiement.</p>
+              <p>Contrôle limité aux informations publiques du reçu.</p>
             </div>
           </div>
           <dl class="verification-facts">
             <div>
-              <dt>Référence fictive</dt>
+              <dt>Référence du reçu</dt>
               <dd>{{ verification.receiptReference }}</dd>
             </div>
             <div>
-              <dt>Montant fictif</dt>
+              <dt>Montant</dt>
               <dd>{{ verification.amountXof | currency: 'XOF' : 'code' : '1.0-0' }}</dd>
             </div>
             <div>
-              <dt>Date du scénario</dt>
+              <dt>Date du reçu</dt>
               <dd>{{ verification.scenarioDate | date: 'd MMMM y' : 'UTC' }}</dd>
             </div>
             <div>
@@ -109,8 +98,8 @@
           <div class="verification-scope">
             <svg lucideShieldCheck [size]="iconSize.control" aria-hidden="true"></svg>
             <p>
-              La vérification réelle devra confirmer authenticité, statut et montant sans donnée
-              excessive, conformément à REC-006.
+              Ce contrôle public confirme l’authenticité, le statut et le montant du reçu sans
+              exposer de donnée excessive, conformément à REC-006.
             </p>
           </div>
         }

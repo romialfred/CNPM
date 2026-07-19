@@ -5,7 +5,7 @@ import { DemoEditorialGateway } from './demo-editorial.gateway';
 describe('DemoEditorialGateway', () => {
   const gateway = new DemoEditorialGateway();
 
-  it('n’expose que des publications explicitement fictives', async () => {
+  it('expose des publications complètes et identifiables', async () => {
     const articles = await firstValueFrom(gateway.listArticles());
     expect(articles.length).toBeGreaterThan(0);
     expect(articles.every((article) => article.fictionalDemo)).toBe(true);
@@ -16,7 +16,7 @@ describe('DemoEditorialGateway', () => {
     await expect(firstValueFrom(gateway.findArticle('inconnu'))).resolves.toBeNull();
   });
 
-  it('n’expose que des rendez-vous fictifs et sans lien d’inscription', async () => {
+  it('n’expose aucun lien d’inscription sur les rendez-vous', async () => {
     const events = await firstValueFrom(gateway.listEvents());
     expect(events.every((event) => event.fictionalDemo)).toBe(true);
     expect(events.every((event) => !('registrationUrl' in event))).toBe(true);

@@ -227,7 +227,7 @@ export class RecoveryActionsPage {
   });
   protected readonly columns: readonly DataTableColumn[] = [
     { key: 'scheduledAt', label: 'Échéance' },
-    { key: 'case', label: 'Dossier fictif' },
+    { key: 'case', label: 'Dossier' },
     { key: 'action', label: 'Action prévue' },
     { key: 'campaign', label: 'Campagne / segment' },
     { key: 'protection', label: 'Protection' },

@@ -1,8 +1,8 @@
-<article class="showcase-template" aria-label="Gabarit public du brouillon fictif">
+<article class="showcase-template" aria-label="Gabarit public du brouillon">
   <header class="showcase-template__header">
     <div>
       <strong>Vitrine membre</strong>
-      <span>Aperçu privé de démonstration</span>
+      <span>Aperçu privé</span>
     </div>
     <nav aria-label="Navigation locale de l’aperçu">
       <a href="#showcase-preview-about">À propos</a>
@@ -17,7 +17,7 @@
 
   <section class="showcase-template__hero" aria-labelledby="showcase-preview-name">
     <div class="showcase-template__identity">
-      <p class="showcase-template__eyebrow">Entreprise fictive — contenu membre</p>
+      <p class="showcase-template__eyebrow">Profil d’entreprise</p>
       <h2 id="showcase-preview-name">{{ displayName() }}</h2>
       @if (draft().tagline) {
         <p class="showcase-template__tagline">{{ draft().tagline }}</p>
@@ -45,7 +45,7 @@
     <span>Le membre ne peut pas modifier ce statut.</span>
   </div>
 
-  <dl class="showcase-template__facts" aria-label="Faits clés fictifs">
+  <dl class="showcase-template__facts" aria-label="Faits clés">
     <div>
       <dt>Secteur</dt>
       <dd>{{ draft().sector }}</dd>
@@ -89,7 +89,7 @@
           <li>
             <span aria-hidden="true">◆</span>
             <strong>{{ activity }}</strong>
-            <small>Présentation fictive sans offre commerciale.</small>
+            <small>Présentation éditoriale sans offre commerciale.</small>
           </li>
         }
       </ul>
@@ -117,7 +117,7 @@
   }
 
   <footer class="showcase-template__footer">
-    <strong>Contenu fourni par le membre — scénario fictif</strong>
+    <strong>Contenu fourni par le membre</strong>
     <span>Aucun contact n’est rendu sans consentement vérifié.</span>
   </footer>
 </article>

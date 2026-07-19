@@ -15,7 +15,7 @@ import {
 import { MemberDirectoryPage } from './member-directory.page';
 
 const READY_SNAPSHOT: MemberDirectorySnapshot = {
-  visibility: 'PRIVATE_MEMBER_DEMO',
+  visibility: 'PRIVATE_MEMBER',
   items: DEMO_DIRECTORY_ORGANIZATIONS.slice(0, 2),
   total: 2,
 };
@@ -79,24 +79,24 @@ describe('MemberDirectoryPage — MP-018', () => {
 
   it('lit tous les filtres et la vue depuis l’URL', async () => {
     const { gateway, host } = await setup({
-      q: 'fictive',
-      sector: 'AGRI_DEMO',
-      zone: 'ZONE_C_DEMO',
-      theme: 'LOGISTICS_DEMO',
+      q: 'Sira',
+      sector: 'AGRI',
+      zone: 'ZONE_C',
+      theme: 'LOGISTICS',
       sort: 'sector',
       view: 'compact',
     });
     expect(gateway.calls[0].query).toEqual({
-      search: 'fictive',
-      sector: 'AGRI_DEMO',
-      zone: 'ZONE_C_DEMO',
-      theme: 'LOGISTICS_DEMO',
+      search: 'Sira',
+      sector: 'AGRI',
+      zone: 'ZONE_C',
+      theme: 'LOGISTICS',
       sort: 'sector',
     });
-    expect(host.textContent).toContain('Chargement de l’annuaire fictif');
+    expect(host.textContent).toContain('Chargement de l’annuaire');
   });
 
-  it('rend des fiches fictives sans contact ni action commerciale et porte noindex', async () => {
+  it('rend des fiches sans contact ni action commerciale et porte noindex', async () => {
     const { fixture, gateway, host } = await setup();
     gateway.latest.next(READY_SNAPSHOT);
     await fixture.whenStable();
@@ -104,8 +104,8 @@ describe('MemberDirectoryPage — MP-018', () => {
 
     expect(host.querySelector('.member-directory h1')).toBe(document.activeElement);
     expect(host.querySelectorAll('.member-directory__grid article')).toHaveLength(2);
-    expect(host.textContent).toContain('organisation fictive');
-    expect(host.textContent).toContain('Exploration informative uniquement');
+    expect(host.textContent).toContain('Atelier Kanu 01');
+    expect(host.textContent).toContain('Fiche informative');
     expect(TestBed.inject(Meta).getTag('name="robots"')?.content).toBe('noindex,nofollow');
     expect(
       host.querySelectorAll('a[href^="http"], a[href^="mailto"], a[href^="tel"]'),
@@ -133,14 +133,14 @@ describe('MemberDirectoryPage — MP-018', () => {
     search.dispatchEvent(new Event('input'));
     const sector = host.querySelector<HTMLSelectElement>('#directory-sector');
     if (!sector) throw new Error('Secteur absent');
-    sector.value = 'CRAFT_DEMO';
+    sector.value = 'CRAFT';
     sector.dispatchEvent(new Event('change'));
     button(host, 'Appliquer')?.click();
     button(host, 'Compacte')?.click();
 
     expect(navigate).toHaveBeenCalledWith([], {
       relativeTo: expect.anything(),
-      queryParams: expect.objectContaining({ q: 'Kanu', sector: 'CRAFT_DEMO' }),
+      queryParams: expect.objectContaining({ q: 'Kanu', sector: 'CRAFT' }),
       queryParamsHandling: 'merge',
     });
     expect(navigate).toHaveBeenCalledWith([], {
@@ -170,17 +170,17 @@ describe('MemberDirectoryPage — MP-018', () => {
 
   it('distingue aucun résultat, vide, erreur et indisponibilité HTTP', async () => {
     const filtered = await setup({ q: 'absent' });
-    filtered.gateway.latest.next({ visibility: 'PRIVATE_MEMBER_DEMO', items: [], total: 0 });
+    filtered.gateway.latest.next({ visibility: 'PRIVATE_MEMBER', items: [], total: 0 });
     await filtered.fixture.whenStable();
     filtered.fixture.detectChanges();
     expect(filtered.host.textContent).toContain('Aucune organisation ne correspond');
 
     TestBed.resetTestingModule();
     const empty = await setup();
-    empty.gateway.latest.next({ visibility: 'PRIVATE_MEMBER_DEMO', items: [], total: 0 });
+    empty.gateway.latest.next({ visibility: 'PRIVATE_MEMBER', items: [], total: 0 });
     await empty.fixture.whenStable();
     empty.fixture.detectChanges();
-    expect(empty.host.textContent).toContain('Aucune organisation fictive');
+    expect(empty.host.textContent).toContain('Aucune organisation');
 
     TestBed.resetTestingModule();
     const failed = await setup();

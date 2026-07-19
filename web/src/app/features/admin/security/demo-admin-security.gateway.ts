@@ -322,7 +322,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Consultation du journal d’audit',
     target: 'Journal d’audit',
     outcome: 'SUCCESS',
-    correlationId: 'DEMO-AUD-0114',
+    correlationId: 'CNPM-AUD-0114',
   },
   {
     id: 'aud-02',
@@ -332,7 +332,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Modification de rôle',
     target: 'Compte n.diallo@cnpm-demo.example',
     outcome: 'SUCCESS',
-    correlationId: 'DEMO-AUD-0113',
+    correlationId: 'CNPM-AUD-0113',
   },
   {
     id: 'aud-03',
@@ -342,7 +342,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Ouverture de session',
     target: 'Espace administration',
     outcome: 'SUCCESS',
-    correlationId: 'DEMO-AUD-0112',
+    correlationId: 'CNPM-AUD-0112',
   },
   {
     id: 'aud-04',
@@ -352,7 +352,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Tentative de connexion',
     target: 'Compte s.coulibaly@cnpm-demo.example',
     outcome: 'FAILURE',
-    correlationId: 'DEMO-AUD-0111',
+    correlationId: 'CNPM-AUD-0111',
   },
   {
     id: 'aud-05',
@@ -362,7 +362,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Tentative de connexion',
     target: 'Compte s.coulibaly@cnpm-demo.example',
     outcome: 'FAILURE',
-    correlationId: 'DEMO-AUD-0110',
+    correlationId: 'CNPM-AUD-0110',
   },
   {
     id: 'aud-06',
@@ -372,7 +372,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Suspension automatique après échecs répétés',
     target: 'Compte s.coulibaly@cnpm-demo.example',
     outcome: 'BLOCKED',
-    correlationId: 'DEMO-AUD-0109',
+    correlationId: 'CNPM-AUD-0109',
   },
   {
     id: 'aud-07',
@@ -382,7 +382,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Export de données de cotisations',
     target: 'Export approuvé, expirable',
     outcome: 'SUCCESS',
-    correlationId: 'DEMO-AUD-0108',
+    correlationId: 'CNPM-AUD-0108',
   },
   {
     id: 'aud-08',
@@ -392,7 +392,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Ouverture de session',
     target: 'Espace administration',
     outcome: 'SUCCESS',
-    correlationId: 'DEMO-AUD-0107',
+    correlationId: 'CNPM-AUD-0107',
   },
   {
     id: 'aud-09',
@@ -402,7 +402,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Réinitialisation du second facteur (motif consigné)',
     target: 'Compte n.diallo@cnpm-demo.example',
     outcome: 'SUCCESS',
-    correlationId: 'DEMO-AUD-0106',
+    correlationId: 'CNPM-AUD-0106',
   },
   {
     id: 'aud-10',
@@ -412,7 +412,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Accès depuis un appareil non reconnu',
     target: 'Espace administration',
     outcome: 'BLOCKED',
-    correlationId: 'DEMO-AUD-0105',
+    correlationId: 'CNPM-AUD-0105',
   },
 ];
 

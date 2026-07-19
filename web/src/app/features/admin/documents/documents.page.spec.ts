@@ -13,14 +13,14 @@ const DATA = {
   rows: [
     {
       id: 'demo',
-      demonstrationReference: 'DEMO-DOC-2026-0001',
-      title: 'Document fictif',
+      demonstrationReference: 'DOC-2026-0001',
+      title: 'Document',
       kind: 'MEMBERSHIP' as const,
-      businessObjectLabel: 'Membre DEMO',
+      businessObjectLabel: 'Membre 2026',
       classification: 'CONFIDENTIAL' as const,
       lifecycle: 'CURRENT' as const,
       versionLabel: 'v1.0 — scénario',
-      authorLabel: 'Agent fictif',
+      authorLabel: 'Agent',
       updatedAt: '2026-07-19T00:00:00Z',
       expiresAt: null,
       retentionDisclosure: 'POLICY_NOT_CONFIGURED' as const,
@@ -55,7 +55,7 @@ describe('DocumentsPage', () => {
   it('rend les métadonnées sans affordance de fichier', async () => {
     const fixture = await setup();
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('DEMO-DOC-2026-0001');
+    expect(text).toContain('DOC-2026-0001');
     expect(text).toContain('contenu indisponible');
     expect(
       fixture.nativeElement.querySelectorAll(
@@ -67,14 +67,14 @@ describe('DocumentsPage', () => {
   it('conserve les filtres dans l’URL', async () => {
     const fixture = await setup();
     const search = fixture.nativeElement.querySelector('#document-search') as HTMLInputElement;
-    search.value = 'DEMO';
+    search.value = '2026';
     search.dispatchEvent(new Event('input'));
     fixture.detectChanges();
     (fixture.nativeElement.querySelector('.documents-page form') as HTMLFormElement).dispatchEvent(
       new Event('submit'),
     );
     await fixture.whenStable();
-    expect(TestBed.inject(Router).url).toContain('q=DEMO');
+    expect(TestBed.inject(Router).url).toContain('q=2026');
   });
 
   it('distingue le profil HTTP indisponible', async () => {

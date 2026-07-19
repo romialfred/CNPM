@@ -20,12 +20,12 @@ describe('OrganizationContactsPage — BO-007', () => {
     }).compileComponents();
   });
 
-  it('affiche uniquement des coordonnées explicitement fictives et les rôles structurants', async () => {
+  it('affiche les coordonnées et les rôles structurants', async () => {
     const fixture = TestBed.createComponent(OrganizationContactsPage);
     fixture.detectChanges();
     await new Promise((resolve) => setTimeout(resolve, 120));
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Ateliers Nimba Démonstration');
+    expect(fixture.nativeElement.textContent).toContain('Ateliers Nimba');
     expect(fixture.nativeElement.textContent).toContain('Contact principal');
     expect(fixture.nativeElement.textContent).toContain('Contact financier');
     expect(fixture.nativeElement.textContent).toContain('entreprise.example');

@@ -11,7 +11,7 @@ import {
 import { settingsReadGuard } from './settings-read.guard';
 
 const IDENTITY: SessionIdentity = {
-  displayName: 'Agent fictif',
+  displayName: 'Agent',
   roleLabel: 'ADMIN_FONCTIONNEL',
   exerciseLabel: null,
   notificationCount: null,

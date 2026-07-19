@@ -41,11 +41,11 @@ import {
 } from './member-users-gateway';
 
 const PAGE_SIZES = [5, 10, 20] as const;
-const STATUSES: readonly MemberUserStatus[] = ['ACTIVE_DEMO', 'INACTIVE_DEMO'];
+const STATUSES: readonly MemberUserStatus[] = ['ACTIVE', 'INACTIVE'];
 const SORTS: readonly MemberUserSort[] = ['displayLabel', 'roleLabel', 'lastActivityOn'];
 type MemberUserListState = 'loading' | 'ready' | 'empty' | 'no-result' | 'error' | 'unavailable';
 
-/** MP-014 — utilisateurs fictifs auto-scopés, sans capacité IAM. */
+/** MP-014 — utilisateurs auto-scopés, sans capacité IAM. */
 @Component({
   selector: 'cnpm-member-users-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -84,10 +84,10 @@ export class MemberUsersPage {
     sortOption: 'displayLabel:asc',
   });
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Référence fictive' },
+    { key: 'reference', label: 'Référence' },
     { key: 'user', label: 'Utilisateur' },
     { key: 'role', label: 'Profil déclaré' },
-    { key: 'lastActivityOn', label: 'Dernière activité fictive' },
+    { key: 'lastActivityOn', label: 'Dernière activité' },
     { key: 'status', label: 'État' },
   ];
 

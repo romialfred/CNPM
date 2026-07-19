@@ -5,7 +5,7 @@ export type MemberReceiptStatus = 'DEMONSTRATION_AVAILABLE' | 'DEMONSTRATION_CAN
 export type MemberReceiptSort = 'scenarioDate' | 'reference' | 'amountXof';
 
 /**
- * Projection membre strictement démonstrative pour MP-007/MP-008.
+ * Projection membre pour MP-007/MP-008.
  *
  * Elle ne porte volontairement aucun contenu PDF, URL de téléchargement,
  * jeton de vérification, QR, signature ou cachet. Un aperçu HTML ne doit pas
@@ -13,7 +13,7 @@ export type MemberReceiptSort = 'scenarioDate' | 'reference' | 'amountXof';
  */
 export interface MemberReceiptSummary {
   readonly id: string;
-  readonly reference: `DEMO-${string}`;
+  readonly reference: `RCP-${string}`;
   readonly periodLabel: string;
   readonly amountXof: number;
   readonly scenarioDate: string;

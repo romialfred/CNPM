@@ -18,7 +18,7 @@ export class DemoReceiptVerificationGateway implements ReceiptVerificationGatewa
             verification: {
               verificationCode: DEMO_VERIFICATION_CODE,
               receiptReference: 'DEMO-APERCU-2026-001',
-              statusLabel: 'Aperçu valide — démonstration',
+              statusLabel: 'Aperçu valide',
               amountXof: 150000,
               scenarioDate: '2026-06-18',
               fictionalDemo: true,

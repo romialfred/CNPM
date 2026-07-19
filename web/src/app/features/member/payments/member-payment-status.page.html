@@ -1,13 +1,13 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Responsable cotisations"
+  memberCode="CNPM-MBR-0142"
   [notificationCount]="0"
 >
   <main class="member-payment-status" id="contenu-principal">
     <cnpm-page-header
       title="Suivi du paiement"
-      description="Vérifiez ce qui a réellement eu lieu — et les étapes qui restent bloquées."
+      description="Vérifiez l’avancement de votre règlement et les étapes restantes."
     >
       <cnpm-button variant="secondary" routerLink="/member/payments">
         Retour à l’historique
@@ -17,14 +17,14 @@
     @switch (state()) {
       @case ('loading') {
         <section class="member-payment-status__loading" aria-label="Chargement du suivi">
-          <cnpm-skeleton variant="card" [rows]="6" label="Actualisation du suivi fictif…" />
+          <cnpm-skeleton variant="card" [rows]="6" label="Actualisation du suivi…" />
         </section>
       }
       @case ('not-found') {
         <cnpm-error-state
           variant="not-found"
-          title="Suivi fictif introuvable"
-          description="Cette référence n’existe pas dans la projection de démonstration. Aucune information financière n’est exposée."
+          title="Suivi introuvable"
+          description="Cette référence n’existe pas dans votre espace membre."
           titleAs="h2"
         >
           <cnpm-button variant="secondary" routerLink="/member/payments">
@@ -43,7 +43,7 @@
         <cnpm-error-state
           variant="recoverable"
           title="Le statut n’a pas pu être actualisé"
-          description="Aucun nouvel ordre n’a été émis. Réessayez uniquement la lecture du scénario."
+          description="Réessayez la lecture de ce suivi."
         >
           <cnpm-button variant="secondary" size="sm" (click)="refresh()">Réessayer</cnpm-button>
         </cnpm-error-state>
@@ -51,19 +51,19 @@
       @case ('ready') {
         @if (detail(); as payment) {
           @if (createdLocally()) {
-            <cnpm-alert tone="success" title="Suivi fictif créé localement">
-              Le scénario est disponible pour la démonstration. Aucun paiement n’a été transmis.
+            <cnpm-alert tone="success" title="Suivi créé">
+              Votre demande de règlement est enregistrée.
             </cnpm-alert>
           }
 
-          <cnpm-alert tone="warning" title="Ceci n’est pas une confirmation de paiement" [live]="false">
-            Le statut ci-dessous décrit un scénario visuel. Il ne réduit aucun solde officiel et ne
-            permet ni reçu, ni QR, ni preuve de paiement.
+          <cnpm-alert tone="info" title="Ceci n’est pas une confirmation de paiement" [live]="false">
+            Le raccordement des canaux de paiement n’est pas encore actif : ce suivi ne réduit pas
+            encore votre solde et ne donne pas lieu à l’émission d’un reçu.
           </cnpm-alert>
 
           <section class="member-payment-status__hero" aria-labelledby="payment-reference-title">
             <div class="member-payment-status__identity">
-              <p class="member-payment-status__eyebrow">Référence de suivi fictive</p>
+              <p class="member-payment-status__eyebrow">Référence de suivi</p>
               <h2 id="payment-reference-title">{{ payment.reference }}</h2>
               <p>{{ payment.contributionReference }} · {{ channelLabel(payment.channel) }}</p>
             </div>
@@ -72,7 +72,7 @@
                 {{ statusLabel(payment.status) }}
               </cnpm-badge>
               <strong>{{ payment.amountXof | number: '1.0-0' }} FCFA</strong>
-              <span>Montant fictif, sans valeur comptable</span>
+              <span>Montant du règlement</span>
             </div>
           </section>
 
@@ -81,7 +81,7 @@
               <div class="member-payment-status__section-heading">
                 <div>
                   <p class="member-payment-status__eyebrow">Transparence des étapes</p>
-                  <h2 id="payment-timeline-title">Progression du scénario</h2>
+                  <h2 id="payment-timeline-title">Progression du règlement</h2>
                 </div>
                 <cnpm-button variant="secondary" size="sm" (click)="refresh()">
                   Actualiser le statut
@@ -106,7 +106,7 @@
               </ol>
 
               <p class="member-payment-status__checked" role="status">
-                Dernière vérification de démonstration :
+                Dernière vérification :
                 <time [attr.datetime]="payment.lastCheckedAt">
                   {{ payment.lastCheckedAt | date: 'dd/MM/yyyy à HH:mm' }}
                 </time>
@@ -140,7 +140,7 @@
                   <dd>Non</dd>
                 </div>
               </dl>
-              <a routerLink="/member/contributions">Consulter mes cotisations fictives</a>
+              <a routerLink="/member/contributions">Consulter mes cotisations</a>
             </aside>
           </div>
         }

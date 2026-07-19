@@ -97,7 +97,7 @@ export class MemberPaymentStatusPage {
     return result.kind === 'ready' ? result.detail : null;
   });
   protected readonly createdLocally = computed(
-    () => this.queryParams().get('source') === 'simulation',
+    () => this.queryParams().get('source') === 'creation',
   );
   protected readonly statusLabel = memberPaymentStatusLabel;
   protected readonly statusTone = memberPaymentStatusTone;

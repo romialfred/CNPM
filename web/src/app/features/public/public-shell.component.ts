@@ -39,8 +39,8 @@ export interface PublicFooterContact {
  * LAY-003 / NAV-003 — cadre institutionnel commun aux pages publiques.
  *
  * Le logo est l'actif officiel versionné dans `docs/00-sources`, copié à l'identique
- * dans les assets Web. La demande d'adhésion pointe vers la démonstration locale
- * PUB-012 ; les pages légales restent du texte tant que leur contenu n'est pas publié.
+ * dans les assets Web. La demande d'adhésion pointe vers le parcours PUB-012 ; les
+ * pages légales restent du texte tant que leur contenu n'est pas publié.
  */
 @Component({
   selector: 'cnpm-public-shell',
@@ -141,10 +141,7 @@ export interface PublicFooterContact {
                 </button>
               </div>
 
-              <nav
-                class="cnpm-public__drawer-nav"
-                aria-label="Navigation mobile"
-              >
+              <nav class="cnpm-public__drawer-nav" aria-label="Navigation mobile">
                 <a class="cnpm-public__drawer-link" routerLink="/" (click)="closeMenu()">
                   <span>Accueil</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
@@ -271,7 +268,9 @@ export interface PublicFooterContact {
               <li><a routerLink="/">Accueil</a></li>
               @for (group of navigation; track group.id) {
                 @for (item of group.items; track item.routerLink) {
-                  <li><a [routerLink]="item.routerLink">{{ item.label }}</a></li>
+                  <li>
+                    <a [routerLink]="item.routerLink">{{ item.label }}</a>
+                  </li>
                 }
               }
             </ul>
@@ -288,11 +287,11 @@ export interface PublicFooterContact {
           <section class="cnpm-public__footer-pending" aria-labelledby="pied-information">
             <h2 class="cnpm-public__footer-title" id="pied-information">Information publique</h2>
             <p>
-              Le parcours d’adhésion est une démonstration locale. Il ne crée aucun dossier officiel
-              et ne remplace aucune procédure publiée.
+              Préparez votre demande d’adhésion en ligne et vérifiez l’authenticité d’un reçu de
+              cotisation à partir de son code.
             </p>
-            <a routerLink="/adhesion">Préparer une demande fictive</a>
-            <a routerLink="/verification/DEMO-VERIF-2026-001"> Vérifier un aperçu fictif </a>
+            <a routerLink="/adhesion">Préparer une demande d’adhésion</a>
+            <a routerLink="/verification/DEMO-VERIF-2026-001">Vérifier un reçu</a>
           </section>
         </div>
 

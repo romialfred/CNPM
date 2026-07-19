@@ -11,13 +11,6 @@
       }
     </cnpm-page-header>
 
-    @if (isDemo) {
-      <cnpm-alert tone="info" title="Données de démonstration" [live]="false">
-        Les domaines, codes et libellés préfixés par « DEMO_ » sont entièrement fictifs et ne
-        constituent aucune nomenclature officielle CNPM.
-      </cnpm-alert>
-    }
-
     <section class="cnpm-settings__filter" aria-labelledby="settings-filter-title">
       <div>
         <h2 id="settings-filter-title">Filtrer le registre</h2>
@@ -161,7 +154,7 @@
                   "
                 />
                 <span id="settings-domain-help">
-                  Texte libre fourni par l’administrateur ; aucune liste n’est inventée par l’écran.
+                  Texte libre fourni par l’administrateur ; aucune liste n’est imposée par l’écran.
                 </span>
                 @if (fieldError('domain'); as error) {
                   <p class="cnpm-settings__error" id="settings-domain-error">{{ error }}</p>

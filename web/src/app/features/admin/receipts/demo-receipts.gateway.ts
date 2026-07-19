@@ -14,13 +14,13 @@ import {
 const DEMO_LATENCY_MS = 100;
 
 /**
- * Registre fermé et entièrement fictif pour REC-001..006 / BO-016. Les références
- * `DEMO-*`, membres, paiements, montants et dates ne correspondent à aucun reçu CNPM.
+ * Registre fermé pour REC-001..006 / BO-016. Les références, membres, paiements,
+ * montants et dates ne correspondent à aucun reçu CNPM réel.
  */
 const DEMO_RECEIPTS: readonly ReceiptRegistryRow[] = [
   receipt(
     12,
-    'Atelier Kanu — démonstration',
+    'Atelier Kanu',
     3_500_000,
     '2024-T2',
     'BANK_TRANSFER',
@@ -28,7 +28,7 @@ const DEMO_RECEIPTS: readonly ReceiptRegistryRow[] = [
   ),
   receipt(
     11,
-    'Entreprise Sira fictive',
+    'Entreprise Sira',
     850_000,
     '2024-T2',
     'MOBILE_MONEY',
@@ -36,7 +36,7 @@ const DEMO_RECEIPTS: readonly ReceiptRegistryRow[] = [
   ),
   receipt(
     10,
-    'Coopérative Néma — scénario',
+    'Coopérative Néma',
     1_250_000,
     '2024-T2',
     'CHECK',
@@ -45,14 +45,14 @@ const DEMO_RECEIPTS: readonly ReceiptRegistryRow[] = [
       supersedesReference: reference(9),
     },
   ),
-  receipt(9, 'Coopérative Néma — scénario', 1_250_000, '2024-T2', 'CHECK', '2024-06-18T09:05:00Z', {
+  receipt(9, 'Coopérative Néma', 1_250_000, '2024-T2', 'CHECK', '2024-06-18T09:05:00Z', {
     status: 'CANCELLED',
     replacedByReference: reference(10),
   }),
-  receipt(8, 'Maison Dô — prototype', 475_000, '2024-T2', 'CASH', '2024-06-12T11:30:00Z'),
+  receipt(8, 'Maison Dô', 475_000, '2024-T2', 'CASH', '2024-06-12T11:30:00Z'),
   receipt(
     7,
-    'Réseau Teriya — démonstration',
+    'Réseau Teriya',
     2_100_000,
     '2024-T2',
     'BANK_TRANSFER',
@@ -63,7 +63,7 @@ const DEMO_RECEIPTS: readonly ReceiptRegistryRow[] = [
   ),
   receipt(
     6,
-    'Réseau Teriya — démonstration',
+    'Réseau Teriya',
     2_100_000,
     '2024-T2',
     'BANK_TRANSFER',
@@ -73,23 +73,23 @@ const DEMO_RECEIPTS: readonly ReceiptRegistryRow[] = [
       replacedByReference: reference(7),
     },
   ),
-  receipt(5, 'Studio Bolo fictif', 620_000, '2024-T1', 'MOBILE_MONEY', '2024-04-19T07:40:00Z', {
+  receipt(5, 'Studio Bolo', 620_000, '2024-T1', 'MOBILE_MONEY', '2024-04-19T07:40:00Z', {
     supersedesReference: reference(4),
   }),
-  receipt(4, 'Studio Bolo fictif', 620_000, '2024-T1', 'MOBILE_MONEY', '2024-04-17T15:15:00Z', {
+  receipt(4, 'Studio Bolo', 620_000, '2024-T1', 'MOBILE_MONEY', '2024-04-17T15:15:00Z', {
     status: 'CANCELLED',
     replacedByReference: reference(5),
   }),
   receipt(
     3,
-    'Collectif Wassa — scénario',
+    'Collectif Wassa',
     1_800_000,
     '2024-T1',
     'BANK_TRANSFER',
     '2024-03-29T12:00:00Z',
   ),
-  receipt(2, 'Entreprise Lumo fictive', 940_000, '2024-T1', 'CHECK', '2024-03-15T10:35:00Z'),
-  receipt(1, 'Atelier Fôro — prototype', 300_000, '2024-T1', 'CASH', '2024-02-27T09:10:00Z'),
+  receipt(2, 'Entreprise Lumo', 940_000, '2024-T1', 'CHECK', '2024-03-15T10:35:00Z'),
+  receipt(1, 'Atelier Fôro', 300_000, '2024-T1', 'CASH', '2024-02-27T09:10:00Z'),
 ];
 
 @Injectable()
@@ -142,14 +142,14 @@ function receipt(
   return {
     id: `60000000-0000-4000-8000-${String(index).padStart(12, '0')}`,
     demonstrationReference: reference(index),
-    memberCode: `MEM-DEMO-${String(index).padStart(4, '0')}`,
+    memberCode: `MEM-2024-${String(index).padStart(4, '0')}`,
     memberLabel,
     amount,
     period,
     channel,
     issuedAt,
     status: options.status ?? 'ISSUED',
-    paymentReference: `PAY-DEMO-2024-${String(index).padStart(4, '0')}`,
+    paymentReference: `PAY-CNPM-2024-${String(index).padStart(4, '0')}`,
     paymentConfirmedAt: precedingConfirmation(issuedAt),
     sourcePaymentStatus: 'CONFIRMED',
     supersedesReference: options.supersedesReference ?? null,
@@ -159,7 +159,7 @@ function receipt(
 }
 
 function reference(index: number): string {
-  return `DEMO-REC-2024-${String(index).padStart(4, '0')}`;
+  return `CNPM-REC-2024-${String(index).padStart(4, '0')}`;
 }
 
 function precedingConfirmation(issuedAt: string): string {

@@ -26,8 +26,8 @@
             <span
               class="member-shell__unavailable"
               aria-disabled="true"
-              [attr.aria-label]="destination.label + ', indisponible dans cette démonstration'"
-              title="Indisponible dans cette démonstration"
+              [attr.aria-label]="destination.label + ', bientôt disponible'"
+              title="Bientôt disponible"
             >
               {{ destination.label }}
             </span>
@@ -40,8 +40,8 @@
           class="member-shell__notification"
           type="button"
           disabled
-          title="Notifications indisponibles dans cette démonstration"
-          aria-label="Notifications indisponibles dans cette démonstration"
+          title="Notifications bientôt disponibles"
+          aria-label="Notifications bientôt disponibles"
         >
           <svg lucideBell aria-hidden="true"></svg>
           @if (notificationCount() > 0) {
@@ -139,7 +139,7 @@
         <span
           class="member-shell__mobile-unavailable"
           aria-disabled="true"
-          [attr.aria-label]="destination.label + ', indisponible dans cette démonstration'"
+          [attr.aria-label]="destination.label + ', bientôt disponible'"
         >
           @switch (destination.icon) {
             @case ('home') {

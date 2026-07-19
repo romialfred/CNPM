@@ -20,7 +20,6 @@ import {
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
-import { CNPM_DATA_MODE } from '../../../core/api/api.config';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -90,7 +89,6 @@ interface EditorFormValue {
 export class SettingsPage {
   private readonly gateway = inject(SETTINGS_GATEWAY);
   private readonly session = inject(SESSION_GATEWAY);
-  private readonly dataMode = inject(CNPM_DATA_MODE);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -99,7 +97,6 @@ export class SettingsPage {
   private readonly toast = inject(ToastService);
 
   protected readonly pageSizes = PAGE_SIZES;
-  protected readonly isDemo = this.dataMode === 'demo';
 
   private readonly sessionIdentity = toSignal(
     this.session.identity.pipe(catchError(() => of(null))),

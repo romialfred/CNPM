@@ -129,11 +129,11 @@ export class MemberShowcaseAnalyticsPage {
   protected readonly plottedPeriodLabel = computed(() => {
     switch (this.period()) {
       case '7d':
-        return '7 derniers jours fictifs';
+        return '7 derniers jours';
       case '90d':
         return '30 derniers jours tracés sur 90 jours sélectionnés';
       default:
-        return '30 derniers jours fictifs';
+        return '30 derniers jours';
     }
   });
   protected readonly chartLabel = computed(
@@ -145,7 +145,7 @@ export class MemberShowcaseAnalyticsPage {
   constructor() {
     this.seo.apply({
       title: 'Statistiques privées de la vitrine — CNPM',
-      description: 'Statistiques agrégées fictives d’une vitrine membre.',
+      description: 'Statistiques agrégées et anonymes d’une vitrine membre.',
       robots: 'noindex,nofollow',
       canonicalPath: '/member/showcase/analytics',
     });

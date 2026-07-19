@@ -188,13 +188,13 @@ export class MemberRequestDetailPage {
           this.attachments.set([]);
           this.attachmentError.set(null);
           this.replySuccess.set(
-            'Message ajouté à la conversation fictive locale. Aucune notification n’a été envoyée.',
+            'Message ajouté à la conversation.',
           );
           queueMicrotask(() => this.conversationTitle()?.nativeElement.focus());
         },
         error: () => {
           this.replyError.set(
-            'Le message fictif n’a pas pu être ajouté. La saisie et les métadonnées sont conservées.',
+            'Le message n’a pas pu être ajouté. La saisie et les pièces jointes sont conservées.',
           );
         },
       });
@@ -227,7 +227,7 @@ export class MemberRequestDetailPage {
   }
 
   protected requestedDocumentLabel(state: 'REQUESTED' | 'PROVIDED'): string {
-    return state === 'REQUESTED' ? 'Pièce demandée' : 'Métadonnée fournie';
+    return state === 'REQUESTED' ? 'Pièce demandée' : 'Pièce fournie';
   }
 }
 

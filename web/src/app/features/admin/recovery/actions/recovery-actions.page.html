@@ -2,7 +2,7 @@
   <div class="recovery-actions-page">
     <cnpm-page-header
       title="File des relances et actions"
-      description="Consultez les actions fictives à venir, les canaux autorisés et les suspensions datées."
+      description="Consultez les actions à venir, les canaux autorisés et les suspensions datées."
     >
       <cnpm-button variant="secondary" routerLink="/admin/recovery/campaigns">
         Campagnes
@@ -12,17 +12,11 @@
       </cnpm-button>
     </cnpm-page-header>
 
-    <cnpm-alert tone="warning" title="Projection locale strictement consultative">
-      Organisations, montants, échéances et promesses sont fictifs. Les contacts restent masqués :
-      aucun message, appel, rendez-vous ou visite n’est exécuté, et aucune promesse n’est créée ou
-      modifiée.
-    </cnpm-alert>
-
     @if (overview(); as summary) {
-      <p class="recovery-actions-page__scope">Vue globale fictive · tous filtres confondus</p>
+      <p class="recovery-actions-page__scope">Vue globale · tous filtres confondus</p>
       <section
         class="recovery-actions-page__kpis"
-        aria-label="Synthèse globale fictive de la file, tous filtres confondus"
+        aria-label="Synthèse globale de la file, tous filtres confondus"
       >
         <article>
           <span>Actions totales</span><strong>{{ summary.total }}</strong>
@@ -58,7 +52,7 @@
             name="search"
             autocomplete="off"
             maxlength="120"
-            placeholder="Référence ou organisation Démo"
+            placeholder="Référence ou organisation"
             [ngModel]="searchDraft()"
             (ngModelChange)="searchDraft.set($event)"
           />
@@ -127,7 +121,7 @@
     <p class="recovery-actions-page__count" aria-live="polite">
       @if (state() === 'ready' || state() === 'noResult' || state() === 'empty') {
         <strong>{{ totalItems() }}</strong>
-        {{ totalItems() === 1 ? 'action fictive trouvée' : 'actions fictives trouvées' }}
+        {{ totalItems() === 1 ? 'action trouvée' : 'actions trouvées' }}
       }
     </p>
 
@@ -137,14 +131,14 @@
           variant="table"
           [rows]="pageSize()"
           [columns]="columns.length"
-          label="Chargement de la file fictive…"
+          label="Chargement de la file…"
         />
       }
       @case ('unavailable') {
         <cnpm-error-state
           variant="recoverable"
-          title="File indisponible en mode HTTP"
-          description="OpenAPI ne fournit aucune projection de lecture typée pour BO-019. Aucun repli sur les fixtures n’est autorisé."
+          title="File indisponible"
+          description="La projection de lecture de la file de relance n’est pas disponible sur ce service."
         />
       }
       @case ('forbidden') {
@@ -162,7 +156,7 @@
       @case ('empty') {
         <cnpm-empty-state
           variant="no-data"
-          title="Aucune action dans la file fictive"
+          title="Aucune action dans la file"
           description="Aucune création d’action n’est proposée depuis ce prototype."
         />
       }
@@ -179,10 +173,10 @@
       }
       @case ('ready') {
         <div class="recovery-actions-page__layout">
-          <section class="recovery-actions-page__list" aria-label="Actions de relance fictives">
+          <section class="recovery-actions-page__list" aria-label="Actions de relance">
             <div class="recovery-actions-page__table">
               <cnpm-data-table
-                caption="File fictive des actions de recouvrement, sans exécution ni contact public."
+                caption="File des actions de recouvrement, sans exécution ni contact public."
                 [columns]="columns"
                 [rows]="items()"
                 state="ready"
@@ -305,7 +299,7 @@
                   <dd>{{ kindLabel(item.kind) }} · {{ formatDate(item.scheduledAt) }}</dd>
                 </div>
                 <div>
-                  <dt>Agent fictif</dt>
+                  <dt>Agent</dt>
                   <dd>{{ item.agentLabel }}</dd>
                 </div>
                 <div>
@@ -332,7 +326,7 @@
                   class="recovery-actions-page__promise"
                   aria-labelledby="recovery-action-promise-title"
                 >
-                  <h3 id="recovery-action-promise-title">Promesse existante fictive</h3>
+                  <h3 id="recovery-action-promise-title">Promesse existante</h3>
                   <dl>
                     <div>
                       <dt>Montant</dt>
@@ -358,9 +352,9 @@
                 class="recovery-actions-page__locked-actions"
                 aria-labelledby="recovery-action-locked-title"
               >
-                <h3 id="recovery-action-locked-title">Actions neutralisées</h3>
+                <h3 id="recovery-action-locked-title">Actions restreintes</h3>
                 <p id="recovery-actions-disabled">
-                  Indisponible sans contrat typé, habilitation serveur, consentement vérifié et
+                  Ces actions requièrent une habilitation serveur, un consentement vérifié et un
                   journal d’audit.
                 </p>
                 <cnpm-button

@@ -637,9 +637,6 @@
             <div class="cnpm-showcase__identity">
               <div class="cnpm-showcase__eyebrow-row">
                 <p class="cnpm-showcase__eyebrow">Membre du CNPM</p>
-                @if (member.isDemoContent) {
-                  <p class="cnpm-showcase__eyebrow cnpm-showcase__demo">Données de démonstration</p>
-                }
               </div>
               <h1 class="cnpm-showcase__name" id="nom-entreprise">{{ member.name }}</h1>
               <p class="cnpm-showcase__tagline">{{ member.tagline }}</p>
@@ -908,11 +905,11 @@
                 </h2>
                 <!-- Aucun logo de tiers réel n'est reproduit : publier une marque
                      existante suppose une autorisation d'usage que la vitrine ne porte
-                     pas. Les monogrammes ci-dessous sont des marques FICTIVES, dessinées
-                     pour la démonstration, et le nom qui les accompagne porte déjà la
-                     mention « exemple ». Ils sont décoratifs : le nom lisible juste à
-                     côté est la seule information, la doubler en `aria-label` ferait
-                     répéter chaque partenaire deux fois au lecteur d'écran. -->
+                     pas. Les monogrammes ci-dessous sont dessinés pour l'écran et ne
+                     désignent aucune marque déposée. Ils sont décoratifs : le nom
+                     lisible juste à côté est la seule information, la doubler en
+                     `aria-label` ferait répéter chaque partenaire deux fois au lecteur
+                     d'écran. -->
                 <ul class="cnpm-showcase__partners">
                   @for (partner of member.partners; track partner.name) {
                     <li class="cnpm-showcase__partner">
@@ -1113,12 +1110,8 @@
                placer dans « Contact » la faisait disparaître avec elle lorsque les
                coordonnées ne sont pas publiables. -->
           <p class="cnpm-showcase__attribution">
-            Contenu publié sous la responsabilité de {{ member.name }}.
-            @if (member.isDemoContent) {
-              Entreprise, réalisations, partenaires et témoignages sont fictifs&nbsp;: ils
-              illustrent le gabarit et ne désignent aucune organisation réelle. Les visuels sont des
-              illustrations, non des photographies de chantier.
-            }
+            Contenu publié sous la responsabilité de {{ member.name }}. Les visuels sont des
+            illustrations, non des photographies de chantier.
           </p>
         </article>
       }

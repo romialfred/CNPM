@@ -114,7 +114,7 @@ export class MemberShowcaseEditorPage {
       case 'error':
         return 'Le stockage local a échoué ; les modifications restent dans cette page.';
       default:
-        return 'Brouillon local chargé. Aucune donnée n’est envoyée au serveur.';
+        return 'Brouillon local chargé.';
     }
   });
 
@@ -252,7 +252,7 @@ export class MemberShowcaseEditorPage {
       },
       disclosure:
         previous?.disclosure ??
-        'Brouillon local de démonstration, sans donnée membre réelle ni contenu officiel.',
+        'Brouillon local conservé dans ce navigateur, sans contenu publié.',
     };
   }
 }

@@ -16,10 +16,10 @@ const READY_PAGE: MemberRequestPage = {
   items: [
     {
       id: 'demo-member-request-1',
-      reference: 'DEMO-REQ-MEMBRE-2026-0006',
+      reference: 'CNPM-REQ-MEMBRE-2026-0006',
       kind: 'REQUEST',
       category: 'DEMO_DOCUMENT',
-      subject: 'Comprendre une pièce demandée dans le scénario',
+      subject: 'Comprendre une pièce demandée dans le dossier',
       status: 'WAITING_MEMBER',
       createdAt: '2026-07-18T09:20:00Z',
       updatedAt: '2026-07-19T08:45:00Z',
@@ -120,7 +120,7 @@ describe('MemberRequestsPage — MP-009', () => {
       page: 2,
       size: 5,
     });
-    expect(host.textContent).toContain('Chargement des requêtes fictives');
+    expect(host.textContent).toContain('Chargement des requêtes');
   });
 
   it('rend table et fiches mobiles sans transmettre de note interne', async () => {
@@ -131,7 +131,7 @@ describe('MemberRequestsPage — MP-009', () => {
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.querySelector('table caption')?.textContent).toContain('Requêtes et réclamations');
-    expect(host.textContent).toContain('DEMO-REQ-MEMBRE-2026-0006');
+    expect(host.textContent).toContain('CNPM-REQ-MEMBRE-2026-0006');
     expect(host.querySelector('.member-requests__mobile-list article dl')).not.toBeNull();
     expect(host.textContent).toContain('aucune note interne n’est transmise');
     expect(host.textContent).not.toContain('strictement interne');
@@ -145,7 +145,7 @@ describe('MemberRequestsPage — MP-009', () => {
 
     const search = host.querySelector<HTMLInputElement>('#member-request-search');
     if (!search) throw new Error('Champ de recherche absent');
-    search.value = '  document fictif  ';
+    search.value = '  document justificatif  ';
     search.dispatchEvent(new Event('input'));
     const kind = host.querySelector<HTMLSelectElement>('#member-request-kind');
     if (!kind) throw new Error('Filtre type absent');
@@ -156,7 +156,7 @@ describe('MemberRequestsPage — MP-009', () => {
     expect(navigate).toHaveBeenCalledWith([], {
       relativeTo: expect.anything(),
       queryParams: expect.objectContaining({
-        q: 'document fictif',
+        q: 'document justificatif',
         type: 'REQUEST',
         page: 1,
       }),
@@ -188,7 +188,7 @@ describe('MemberRequestsPage — MP-009', () => {
     });
     await empty.fixture.whenStable();
     empty.fixture.detectChanges();
-    expect(empty.host.textContent).toContain('Aucune requête fictive');
+    expect(empty.host.textContent).toContain('Aucune requête');
 
     TestBed.resetTestingModule();
     const failed = await setup();

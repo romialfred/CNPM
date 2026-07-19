@@ -16,17 +16,17 @@ import { RecoveryActionsPage } from './recovery-actions.page';
 const ACTIONS: readonly RecoveryActionRow[] = [
   {
     id: 'demo-recovery-action-0001',
-    reference: 'DEMO-ACTION-0001',
-    memberCode: 'DEMO-MEMBRE-0001',
-    organization: 'Organisation Démo Alpha',
-    agentLabel: 'Agent Démo Recouvrement',
+    reference: 'CNPM-ACTION-0001',
+    memberCode: 'CNPM-MEMBRE-0001',
+    organization: 'Organisation Alpha',
+    agentLabel: 'Agent de recouvrement',
     kind: 'EMAIL',
     status: 'DUE_TODAY',
     scheduledAt: '2026-07-19T08:30:00Z',
-    campaignReference: 'DEMO-CAMP-0001',
-    campaignLabel: 'Campagne Démo Alpha',
+    campaignReference: 'CNPM-CAMP-0001',
+    campaignLabel: 'Campagne Alpha',
     segment: 'Retard 31–60 jours',
-    contactDisclosure: 'Contact masqué — démonstration',
+    contactDisclosure: 'Contact masqué',
     communicationAuthorization: 'AUTHORIZED_DEMO',
     suspension: null,
     promise: null,
@@ -34,17 +34,17 @@ const ACTIONS: readonly RecoveryActionRow[] = [
   },
   {
     id: 'demo-recovery-action-0002',
-    reference: 'DEMO-ACTION-0002',
-    memberCode: 'DEMO-MEMBRE-0002',
-    organization: 'Organisation Démo Bêta',
-    agentLabel: 'Agent Démo Recouvrement',
+    reference: 'CNPM-ACTION-0002',
+    memberCode: 'CNPM-MEMBRE-0002',
+    organization: 'Organisation Bêta',
+    agentLabel: 'Agent de recouvrement',
     kind: 'MEETING',
     status: 'SUSPENDED',
     scheduledAt: '2026-07-20T10:00:00Z',
-    campaignReference: 'DEMO-CAMP-0002',
-    campaignLabel: 'Campagne Démo Bêta',
+    campaignReference: 'CNPM-CAMP-0002',
+    campaignLabel: 'Campagne Bêta',
     segment: 'Promesse active',
-    contactDisclosure: 'Contact masqué — démonstration',
+    contactDisclosure: 'Contact masqué',
     communicationAuthorization: 'NOT_APPLICABLE',
     suspension: {
       kind: 'PROMISE',
@@ -54,7 +54,7 @@ const ACTIONS: readonly RecoveryActionRow[] = [
     promise: {
       amount: 250_000,
       dueDate: '2026-07-25',
-      comment: 'Promesse fictive de démonstration.',
+      comment: 'Promesse consignée au dossier.',
       status: 'PENDING',
     },
     executionAvailable: false,
@@ -98,13 +98,13 @@ async function setup(
 describe('RecoveryActionsPage — BO-019', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('rend uniquement une consultation fictive aux contacts masqués', async () => {
+  it('rend uniquement une consultation aux contacts masqués', async () => {
     const { fixture } = await setup(gateway(), '/?selection=demo-recovery-action-0002');
     const root = fixture.nativeElement as HTMLElement;
 
-    expect(root.textContent).toContain('Organisation Démo Bêta');
-    expect(root.textContent).toContain('Contact masqué — démonstration');
-    expect(root.textContent).toContain('Promesse fictive de démonstration.');
+    expect(root.textContent).toContain('Organisation Bêta');
+    expect(root.textContent).toContain('Contact masqué');
+    expect(root.textContent).toContain('Promesse consignée au dossier.');
     expect(root.querySelectorAll('.recovery-actions-page__locked-actions button')).toHaveLength(4);
     expect(
       root.querySelectorAll('.recovery-actions-page__locked-actions button[aria-disabled="true"]'),
@@ -147,7 +147,7 @@ describe('RecoveryActionsPage — BO-019', () => {
     const { fixture, router } = await setup(gateway(), '/?page=99');
 
     expect(router.url).not.toContain('page=99');
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Organisation Démo Alpha');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Organisation Alpha');
   });
 
   it('rend chargement, vide, erreur et indisponibilité HTTP', async () => {
@@ -156,7 +156,7 @@ describe('RecoveryActionsPage — BO-019', () => {
     TestBed.resetTestingModule();
 
     const empty = await setup(gateway(() => of({ ...DATA, items: [], totalItems: 0 })));
-    expect(empty.fixture.nativeElement.textContent).toContain('Aucune action dans la file fictive');
+    expect(empty.fixture.nativeElement.textContent).toContain('Aucune action dans la file');
     TestBed.resetTestingModule();
 
     const error = await setup(gateway(() => throwError(() => new Error('temporaire'))));
@@ -165,7 +165,7 @@ describe('RecoveryActionsPage — BO-019', () => {
 
     const unavailable = await setup({ search: () => NEVER });
     expect(unavailable.fixture.nativeElement.textContent).toContain(
-      'File indisponible en mode HTTP',
+      'File indisponible',
     );
   });
 });

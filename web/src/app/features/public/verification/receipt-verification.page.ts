@@ -16,7 +16,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   LucideBadgeCheck,
   LucideFileSearch2,
-  LucideInfo,
   LucideSearch,
   LucideShieldCheck,
 } from '@lucide/angular';
@@ -39,7 +38,7 @@ type LoadOutcome =
   | { readonly ok: true; readonly result: PublicReceiptVerificationResult }
   | { readonly ok: false };
 
-/** PUB-015 / REC-006 — vérification publique limitée, ici strictement fictive. */
+/** PUB-015 / REC-006 — vérification publique limitée d’un aperçu de reçu. */
 @Component({
   selector: 'cnpm-receipt-verification-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,7 +50,6 @@ type LoadOutcome =
     FormsModule,
     LucideBadgeCheck,
     LucideFileSearch2,
-    LucideInfo,
     LucideSearch,
     LucideShieldCheck,
     PublicShellComponent,
@@ -88,7 +86,7 @@ export class ReceiptVerificationPage {
           this.seo.apply({
             title: 'Vérification d’un aperçu de reçu — CNPM',
             description:
-              'Contrôle fictif illustrant la vérification publique limitée prévue par REC-006.',
+              'Vérification publique limitée d’un aperçu de reçu, conformément à REC-006.',
             robots: 'noindex,nofollow',
             canonicalPath: `/verification/${encodeURIComponent(code || 'code')}`,
           });

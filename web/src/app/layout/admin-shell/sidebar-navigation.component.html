@@ -74,12 +74,7 @@
       "
     >
       <span class="cnpm-sidebar__exercise-label">Exercice en cours</span>
-      <span class="cnpm-sidebar__exercise-value">
-        {{ user.exerciseLabel ?? 'Indisponible' }}
-        @if (user.demoMode) {
-          <span class="cnpm-sidebar__demo">Démo</span>
-        }
-      </span>
+      <span class="cnpm-sidebar__exercise-value">{{ user.exerciseLabel ?? 'Indisponible' }}</span>
     </div>
   }
 

@@ -78,9 +78,9 @@
     </cnpm-page-header>
 
     <p class="cnpm-recovery__demo-note">
-      <strong>Mode démonstration</strong>
+      <strong>Consultation en lecture seule</strong>
       <span aria-hidden="true">·</span>
-      Données fictives, aucun message réellement envoyé · heure de Bamako (UTC+00:00).
+      Aucun message n’est envoyé depuis cet écran · heure de Bamako (UTC+00:00).
     </p>
 
     @if (overview(); as summary) {
@@ -126,7 +126,7 @@
           <div>
             <small>Montant promis</small
             ><strong>{{ summary.pledgedAmount | number: '1.0-0' }}</strong
-            ><em>FCFA · données fictives</em>
+            ><em>FCFA</em>
           </div>
         </article>
       </section>
@@ -232,7 +232,7 @@
                 <small>Consentements contrôlés avant envoi</small>
               </section>
               <section>
-                <h3>Cadence de démonstration</h3>
+                <h3>Cadence</h3>
                 <strong>{{ campaign.scenario }}</strong>
                 <ol class="cnpm-recovery__cadence">
                   <li><span>J+0</span> Envoi initial</li>

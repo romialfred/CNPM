@@ -15,14 +15,15 @@ import { MemberReceiptDetailPage } from './member-receipt-detail.page';
 
 const DETAIL: MemberReceiptDetail = {
   id: 'demo-receipt-preview-2026-001',
-  reference: 'DEMO-APERCU-2026-001',
-  periodLabel: 'Période fictive 2026',
+  reference: 'RCP-2026-001',
+  periodLabel: 'Exercice 2026',
   amountXof: 150000,
   scenarioDate: '2026-06-18',
   status: 'DEMONSTRATION_AVAILABLE',
-  sourceDisclosure: 'Source : scénario fictif local. Aucune donnée ne provient du CNPM.',
-  paymentDisclosure: 'Aucune transaction ni confirmation CNPM ne sont reproduites.',
-  proofDisclosure: 'Aucun PDF, QR, cachet ou signature n’est généré.',
+  sourceDisclosure:
+    'Récapitulatif établi à partir des éléments enregistrés sur votre espace membre.',
+  paymentDisclosure: 'Le règlement associé n’est pas encore rapproché.',
+  proofDisclosure: 'Le reçu officiel signé n’est pas encore émis.',
 };
 
 class ActivatedRouteStub {
@@ -71,24 +72,24 @@ describe('MemberReceiptDetailPage — MP-008', () => {
   it('charge l’identifiant et conserve la requête de retour', async () => {
     const { gateway, host } = await setup();
     expect(gateway.loadedId).toBe(DETAIL.id);
-    expect(host.textContent).toContain('Chargement de l’aperçu du reçu');
+    expect(host.textContent).toContain('Chargement du récapitulatif');
     const back = host.querySelector<HTMLAnchorElement>('.member-receipt-detail__back');
     expect(back?.href).toContain('q=2026');
     expect(back?.href).toContain('taille=5');
   });
 
-  it('rend un résumé textuel fictif et les disclosures de provenance', async () => {
+  it('rend un résumé textuel et les disclosures de provenance', async () => {
     const { fixture, gateway, host } = await setup();
     gateway.response.next(DETAIL);
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
-    expect(host.textContent).toContain('APERÇU DE DÉMONSTRATION');
+    expect(host.textContent).toContain('RÉCAPITULATIF DE RÈGLEMENT');
     expect(host.textContent).toContain(DETAIL.reference);
     expect(host.textContent).toMatch(/150(?:,|\s)000 FCFA/);
-    expect(host.textContent).toContain('Source : scénario fictif local');
-    expect(host.textContent).toContain('Aucun PDF, QR, cachet ou signature');
+    expect(host.textContent).toContain('Récapitulatif établi à partir des éléments enregistrés');
+    expect(host.textContent).toContain('Le reçu officiel signé n’est pas encore émis');
   });
 
   it('n’expose aucune action ni actif de preuve officielle', async () => {
@@ -111,20 +112,20 @@ describe('MemberReceiptDetailPage — MP-008', () => {
     missing.gateway.response.error(new MemberReceiptNotFoundError(DETAIL.id));
     await missing.fixture.whenStable();
     missing.fixture.detectChanges();
-    expect(missing.host.textContent).toContain('Aperçu introuvable');
+    expect(missing.host.textContent).toContain('Récapitulatif introuvable');
 
     TestBed.resetTestingModule();
     const failed = await setup();
     failed.gateway.response.error(new Error('indisponible'));
     await failed.fixture.whenStable();
     failed.fixture.detectChanges();
-    expect(failed.host.textContent).toContain('L’aperçu n’a pas pu être chargé');
+    expect(failed.host.textContent).toContain('Le récapitulatif n’a pas pu être chargé');
 
     TestBed.resetTestingModule();
     const unavailable = await setup();
     unavailable.gateway.response.error(new UnavailableHttpFeatureError('MP-008'));
     await unavailable.fixture.whenStable();
     unavailable.fixture.detectChanges();
-    expect(unavailable.host.textContent).toContain('Aperçu indisponible en mode HTTP');
+    expect(unavailable.host.textContent).toContain('Récapitulatif indisponible en mode HTTP');
   });
 });

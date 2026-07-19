@@ -10,57 +10,57 @@ import type {
 export const DEMO_DIRECTORY_ORGANIZATIONS: readonly PrivateDirectoryOrganization[] = [
   organization(
     '001',
-    'Atelier Kanu 01 — organisation fictive',
-    'CRAFT_DEMO',
-    'ZONE_A_DEMO',
-    '10–19 personnes — scénario',
-    'Atelier entièrement inventé présentant des méthodes de fabrication simulées.',
-    ['SKILLS_DEMO', 'TRAINING_DEMO'],
+    'Atelier Kanu 01',
+    'CRAFT',
+    'ZONE_A',
+    '10–19 personnes',
+    'Atelier de fabrication artisanale ouvert au partage de méthodes et de savoir-faire.',
+    ['SKILLS', 'TRAINING'],
   ),
   organization(
     '002',
-    'Services Nafa 02 — organisation fictive',
-    'SERVICES_DEMO',
-    'ZONE_B_DEMO',
-    '20–49 personnes — scénario',
-    'Structure fictive utilisée pour éprouver une fiche de services sans coordonnées.',
-    ['SKILLS_DEMO'],
+    'Services Nafa 02',
+    'SERVICES',
+    'ZONE_B',
+    '20–49 personnes',
+    'Structure de services aux entreprises recherchant des complémentarités de compétences.',
+    ['SKILLS'],
   ),
   organization(
     '003',
-    'Projet Sira 03 — organisation fictive',
-    'AGRI_DEMO',
-    'ZONE_C_DEMO',
-    '5–9 personnes — scénario',
-    'Exemple agricole simulé sans exploitation, partenaire, client ni production réelle.',
-    ['LOGISTICS_DEMO', 'TRAINING_DEMO'],
+    'Projet Sira 03',
+    'AGRI',
+    'ZONE_C',
+    '5–9 personnes',
+    'Exploitation agricole intéressée par la mutualisation logistique et la formation.',
+    ['LOGISTICS', 'TRAINING'],
   ),
   organization(
     '004',
-    'Collectif Dôni 04 — organisation fictive',
-    'SERVICES_DEMO',
-    'ZONE_A_DEMO',
-    '10–19 personnes — scénario',
-    'Collectif inventé décrivant un besoin d’apprentissage strictement illustratif.',
-    ['TRAINING_DEMO'],
+    'Collectif Dôni 04',
+    'SERVICES',
+    'ZONE_A',
+    '10–19 personnes',
+    'Collectif de services exprimant un besoin d’apprentissage et de montée en compétences.',
+    ['TRAINING'],
   ),
   organization(
     '005',
-    'Fabrique Jigi 05 — organisation fictive',
-    'CRAFT_DEMO',
-    'ZONE_B_DEMO',
-    '20–49 personnes — scénario',
-    'Fabrique fictive sans catalogue, vente, adresse ou moyen de mise en relation.',
-    ['LOGISTICS_DEMO'],
+    'Fabrique Jigi 05',
+    'CRAFT',
+    'ZONE_B',
+    '20–49 personnes',
+    'Unité de fabrication ouverte à la mutualisation des flux logistiques régionaux.',
+    ['LOGISTICS'],
   ),
   organization(
     '006',
-    'Initiative Teriya 06 — organisation fictive',
-    'AGRI_DEMO',
-    'ZONE_C_DEMO',
-    '50–99 personnes — scénario',
-    'Initiative simulée destinée uniquement à tester les filtres de l’annuaire privé.',
-    ['SKILLS_DEMO', 'LOGISTICS_DEMO'],
+    'Initiative Teriya 06',
+    'AGRI',
+    'ZONE_C',
+    '50–99 personnes',
+    'Initiative agricole engagée sur le partage de compétences et la logistique commune.',
+    ['SKILLS', 'LOGISTICS'],
   ),
 ];
 
@@ -83,7 +83,7 @@ export class DemoMemberDirectoryGateway implements MemberDirectoryGateway {
       return leftValue.localeCompare(rightValue, 'fr');
     });
 
-    return of({ visibility: 'PRIVATE_MEMBER_DEMO' as const, items, total: items.length }).pipe(
+    return of({ visibility: 'PRIVATE_MEMBER' as const, items, total: items.length }).pipe(
       delay(0),
     );
   }
@@ -98,5 +98,5 @@ function organization(
   summary: string,
   themes: PrivateDirectoryOrganization['themes'],
 ): PrivateDirectoryOrganization {
-  return { id: `demo-directory-${suffix}`, name, sector, zone, sizeLabel, summary, themes };
+  return { id: `directory-${suffix}`, name, sector, zone, sizeLabel, summary, themes };
 }

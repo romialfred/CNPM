@@ -38,7 +38,7 @@ const CATEGORIES: readonly MemberRequestCategory[] = [
   'DEMO_CLAIM',
 ];
 
-/** MP-010 — création locale et strictement fictive d'une requête membre. */
+/** MP-010 — création d'une requête membre. */
 @Component({
   selector: 'cnpm-new-member-request-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -90,7 +90,7 @@ export class NewMemberRequestPage {
     if (controls.category.invalid) {
       errors.push({
         fieldId: 'new-request-category',
-        message: 'Choisissez une catégorie fictive.',
+        message: 'Choisissez une catégorie.',
       });
     }
     if (controls.subject.hasError('required')) {
@@ -148,7 +148,7 @@ export class NewMemberRequestPage {
         },
         error: () => {
           this.submitError.set(
-            'La création locale a échoué. Votre saisie et les métadonnées simulées sont conservées.',
+            'La création a échoué. Votre saisie et vos pièces jointes sont conservées.',
           );
         },
       });
@@ -185,7 +185,7 @@ export class NewMemberRequestPage {
     ) {
       return true;
     }
-    return globalThis.confirm('Quitter sans conserver cette requête fictive ?');
+    return globalThis.confirm('Quitter sans conserver cette requête ?');
   }
 }
 

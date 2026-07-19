@@ -40,7 +40,7 @@ const CHANNELS: readonly MemberPaymentChannel[] = [
 
 type PreparationState = 'loading' | 'ready' | 'unavailable' | 'error';
 
-/** MP-004 — préparation locale bornée, sans ordre ni transaction de paiement. */
+/** MP-004 — préparation bornée, sans ordre ni transaction de paiement. */
 @Component({
   selector: 'cnpm-new-member-payment-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -119,15 +119,15 @@ export class NewMemberPaymentPage {
     if (!this.submitted()) return [];
     const errors: CnpmFieldError[] = [];
     if (this.form.controls.contributionId.invalid) {
-      errors.push({ fieldId: 'payment-contribution', message: 'Choisissez une cotisation fictive.' });
+      errors.push({ fieldId: 'payment-contribution', message: 'Choisissez une cotisation.' });
     }
     if (this.form.controls.channel.invalid) {
-      errors.push({ fieldId: 'payment-channel-mobile-money', message: 'Choisissez un aperçu de canal.' });
+      errors.push({ fieldId: 'payment-channel-mobile-money', message: 'Choisissez un canal de règlement.' });
     }
     if (this.form.controls.simulationAcknowledged.invalid) {
       errors.push({
         fieldId: 'payment-simulation-acknowledgement',
-        message: 'Confirmez avoir compris qu’aucun paiement ne sera réalisé.',
+        message: 'Confirmez avoir compris qu’aucun montant ne sera prélevé.',
       });
     }
     return errors;
@@ -183,7 +183,7 @@ export class NewMemberPaymentPage {
         next: (detail) => {
           this.submitting.set(false);
           void this.router.navigate(['/member/payments', detail.id, 'status'], {
-            queryParams: { source: 'simulation' },
+            queryParams: { source: 'creation' },
           });
         },
         error: () => {

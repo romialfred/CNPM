@@ -1,19 +1,18 @@
 <cnpm-member-portal-shell
-  organization="Entreprise Démo Sahel"
-  userName="Membre de démonstration"
-  memberCode="CNPM-DEMO-0001"
+  organization="Sahel Agro SA"
+  userName="Responsable adhésion"
+  memberCode="CNPM-2026-0001"
   [notificationCount]="0"
 >
   <main class="member-users" id="contenu-principal">
     <cnpm-page-header
       title="Utilisateurs de l’entreprise"
-      description="Consultez les métadonnées fictives des utilisateurs de votre scénario membre."
+      description="Consultez les utilisateurs rattachés à votre organisation."
     />
 
     <cnpm-alert tone="warning" title="Gestion des accès non disponible" [live]="false">
       Inviter un utilisateur, attribuer un rôle, réinitialiser un second facteur ou révoquer une
-      session reste désactivé. Ces opérations exigent un contrat serveur typé, un périmètre
-      d’organisation vérifié et une réauthentification.
+      session n’est pas disponible depuis cet espace.
     </cnpm-alert>
 
     <cnpm-filter-bar
@@ -30,7 +29,7 @@
             id="member-user-search"
             type="search"
             formControlName="search"
-            placeholder="Référence, libellé ou adresse fictive"
+            placeholder="Référence, libellé ou adresse"
           />
         </div>
         <div class="member-users__field">
@@ -60,13 +59,13 @@
     <section class="member-users__panel" aria-labelledby="member-users-results-title">
       <div class="member-users__toolbar">
         <div>
-          <h2 id="member-users-results-title" #resultsTitle tabindex="-1">Utilisateurs fictifs</h2>
-          <p>Lecture seule, auto-scopée au scénario Entreprise Démo Sahel.</p>
+          <h2 id="member-users-results-title" #resultsTitle tabindex="-1">Utilisateurs</h2>
+          <p>Lecture seule, limitée au périmètre de votre organisation.</p>
         </div>
         @if (data()) {
           <p class="member-users__count" aria-live="polite">
             {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'utilisateur fictif' : 'utilisateurs fictifs' }}
+            {{ totalItems() === 1 ? 'utilisateur' : 'utilisateurs' }}
           </p>
         }
       </div>
@@ -77,14 +76,14 @@
             variant="table"
             [rows]="pageSize()"
             [columns]="columns.length"
-            label="Chargement des utilisateurs fictifs…"
+            label="Chargement des utilisateurs…"
           />
         }
         @case ('error') {
           <cnpm-error-state
             variant="recoverable"
             title="Les utilisateurs n’ont pas pu être chargés"
-            description="La source locale est momentanément indisponible. Aucune opération IAM n’a été déclenchée."
+            description="Le service est momentanément indisponible. Vous pouvez relancer le chargement."
           >
             <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
           </cnpm-error-state>
@@ -93,7 +92,7 @@
           <cnpm-error-state
             variant="recoverable"
             title="Utilisateurs indisponibles en mode HTTP"
-            description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible. Aucune fixture n’est injectée dans ce mode."
+            description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible."
           />
         }
         @case ('empty') {
@@ -117,7 +116,7 @@
         @case ('ready') {
           <div class="member-users__desktop-table">
             <cnpm-data-table
-              caption="Utilisateurs fictifs : référence, libellé, adresse de démonstration, profil déclaré, dernière activité et état, sans action IAM."
+              caption="Utilisateurs : référence, libellé, adresse, profil déclaré, dernière activité et état, sans action IAM."
               [columns]="columns"
               [rows]="users()"
               [rowKey]="rowKey"
@@ -137,7 +136,7 @@
                       {{ user.lastActivityOn | date: 'dd/MM/yyyy' : 'UTC' }}
                     </time>
                   } @else {
-                    Jamais — scénario
+                    Jamais
                   }
                 </td>
                 <td class="cnpm-table__cell">
@@ -149,7 +148,7 @@
             </cnpm-data-table>
           </div>
 
-          <ol class="member-users__mobile-list" aria-label="Utilisateurs fictifs">
+          <ol class="member-users__mobile-list" aria-label="Utilisateurs">
             @for (user of users(); track user.id) {
               <li>
                 <article [attr.aria-labelledby]="'member-user-' + user.id">
@@ -164,7 +163,7 @@
                   </header>
                   <dl>
                     <div>
-                      <dt>Adresse fictive</dt>
+                      <dt>Adresse</dt>
                       <dd>{{ user.email }}</dd>
                     </div>
                     <div>
@@ -172,14 +171,14 @@
                       <dd>{{ user.roleLabel }}</dd>
                     </div>
                     <div>
-                      <dt>Dernière activité fictive</dt>
+                      <dt>Dernière activité</dt>
                       <dd>
                         @if (user.lastActivityOn) {
                           <time [attr.datetime]="user.lastActivityOn">
                             {{ user.lastActivityOn | date: 'dd/MM/yyyy' : 'UTC' }}
                           </time>
                         } @else {
-                          Jamais — scénario
+                          Jamais
                         }
                       </dd>
                     </div>

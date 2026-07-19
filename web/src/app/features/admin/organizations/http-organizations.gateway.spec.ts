@@ -12,8 +12,8 @@ import { HttpOrganizationsGateway } from './http-organizations.gateway';
 const QUERY: OrganizationQuery = {
   search: '  atelier  ',
   status: 'ACTIVE',
-  organizationType: 'Société de démonstration',
-  sectorCode: 'FABRICATION_DEMO',
+  organizationType: 'Société anonyme',
+  sectorCode: 'FABRICATION',
   sort: { key: 'legalName', direction: 'desc' },
   page: 2,
   pageSize: 25,
@@ -21,10 +21,10 @@ const QUERY: OrganizationQuery = {
 
 const RESPONSE = {
   id: '10000000-0000-4000-8000-000000000001',
-  legalName: 'Atelier Démo',
+  legalName: 'Atelier',
   tradeName: null,
-  organizationType: 'Société de démonstration',
-  sectorCode: 'FABRICATION_DEMO',
+  organizationType: 'Société anonyme',
+  sectorCode: 'FABRICATION',
   status: 'ACTIVE',
   riskLevel: 'NORMAL',
   version: 4,
@@ -55,8 +55,8 @@ describe('HttpOrganizationsGateway', () => {
     expect(request.request.params.get('size')).toBe('25');
     expect(request.request.params.get('search')).toBe('atelier');
     expect(request.request.params.get('status')).toBe('ACTIVE');
-    expect(request.request.params.get('organizationType')).toBe('Société de démonstration');
-    expect(request.request.params.get('sectorCode')).toBe('FABRICATION_DEMO');
+    expect(request.request.params.get('organizationType')).toBe('Société anonyme');
+    expect(request.request.params.get('sectorCode')).toBe('FABRICATION');
     expect(request.request.params.get('sort')).toBe('legalName,desc');
 
     request.flush({ items: [RESPONSE], page: 1, size: 25, totalElements: 1, totalPages: 1 });
@@ -71,10 +71,10 @@ describe('HttpOrganizationsGateway', () => {
 
   it('envoie PATCH avec la version dans If-Match', async () => {
     const changes = {
-      legalName: 'Atelier Démo révisé',
+      legalName: 'Atelier révisé',
       tradeName: '',
-      organizationType: 'Société de démonstration',
-      sectorCode: 'FABRICATION_DEMO',
+      organizationType: 'Société anonyme',
+      sectorCode: 'FABRICATION',
     };
     const resultPromise = firstValueFrom(gateway.update(RESPONSE.id, 4, changes));
     const request = http.expectOne(`/v1/organizations/${RESPONSE.id}`);

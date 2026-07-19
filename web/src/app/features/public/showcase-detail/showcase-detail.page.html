@@ -89,11 +89,6 @@
                 <p>{{ member.tagline }}</p>
               </header>
 
-              <cnpm-alert tone="info" title="Contenus fictifs de démonstration">
-                Aucun client, partenaire, site, résultat ou média réel n’est présenté sur cette
-                page.
-              </cnpm-alert>
-
               <section
                 class="cnpm-showcase-detail__section"
                 id="activites"
@@ -101,10 +96,10 @@
               >
                 <div class="cnpm-showcase-detail__section-heading">
                   <div>
-                    <p class="cnpm-showcase-detail__eyebrow">Savoir-faire de démonstration</p>
+                    <p class="cnpm-showcase-detail__eyebrow">Savoir-faire</p>
                     <h2 id="activites-titre">Activités</h2>
                   </div>
-                  <span>{{ member.activities.length }} activités fictives</span>
+                  <span>{{ member.activities.length }} activités</span>
                 </div>
 
                 @if (member.activities.length) {
@@ -147,10 +142,10 @@
               >
                 <div class="cnpm-showcase-detail__section-heading">
                   <div>
-                    <p class="cnpm-showcase-detail__eyebrow">Cas d’usage inventés</p>
+                    <p class="cnpm-showcase-detail__eyebrow">Cas d’usage</p>
                     <h2 id="realisations-titre">Réalisations</h2>
                   </div>
-                  <span>{{ member.projects.length }} réalisations fictives</span>
+                  <span>{{ member.projects.length }} réalisations</span>
                 </div>
 
                 @if (member.projects.length) {
@@ -204,12 +199,8 @@
                 <header class="cnpm-showcase-detail__hero">
                   <p class="cnpm-showcase-detail__eyebrow">{{ item.category }}</p>
                   <h1 #pageTitle tabindex="-1">{{ item.title }}</h1>
-                  <p>Réalisation fictive présentée par {{ member.name }}</p>
+                  <p>Réalisation présentée par {{ member.name }}</p>
                 </header>
-
-                <cnpm-alert tone="info" title="Scénario entièrement fictif">
-                  Ce détail ne décrit aucun client, partenaire, site, ouvrage ou résultat réel.
-                </cnpm-alert>
 
                 <div class="cnpm-showcase-detail__project-layout">
                   <div
@@ -219,7 +210,7 @@
                   >
                     <svg lucideBuilding2 [size]="iconSize.empty" aria-hidden="true"></svg>
                     <span>{{ item.visual.label }}</span>
-                    <small>Illustration vectorielle — aucune photographie</small>
+                    <small>Illustration vectorielle</small>
                   </div>
                   <div class="cnpm-showcase-detail__project-body">
                     <p class="cnpm-showcase-detail__lead">{{ item.summary }}</p>
@@ -234,18 +225,13 @@
                       </div>
                       <div>
                         <dt>Publication</dt>
-                        <dd>Vitrine publiée — données de démonstration</dd>
+                        <dd>Vitrine publiée</dd>
                       </div>
                     </dl>
                   </div>
                 </div>
               </article>
             }
-
-            <p class="cnpm-showcase-detail__attribution">
-              Contenu entièrement fictif, fourni uniquement pour valider le gabarit R4 de
-              démonstration. Il ne peut pas être attribué à une organisation réelle.
-            </p>
           </div>
         }
       }

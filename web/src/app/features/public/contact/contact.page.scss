@@ -17,7 +17,7 @@
 
 .contact-hero__inner {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: var(--cnpm-space-12);
   padding-block: var(--cnpm-space-12);
@@ -47,42 +47,6 @@
   color: var(--cnpm-color-text-secondary);
   font-size: var(--cnpm-font-size-lg);
   line-height: var(--cnpm-font-lineHeight-lg);
-}
-
-.contact-hero__facts {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  border: 1px solid var(--cnpm-color-brand-blue-200);
-  border-radius: var(--cnpm-radius-lg);
-  background: var(--cnpm-color-brand-blue-50);
-}
-
-.contact-hero__facts div {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--cnpm-space-4);
-  padding: var(--cnpm-space-4);
-}
-
-.contact-hero__facts div + div {
-  border-block-start: 1px solid var(--cnpm-color-brand-blue-200);
-}
-
-.contact-hero__facts dt,
-.contact-hero__facts dd {
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-}
-
-.contact-hero__facts dt {
-  color: var(--cnpm-color-text-secondary);
-}
-
-.contact-hero__facts dd {
-  color: var(--cnpm-color-text-brand);
-  font-weight: var(--cnpm-font-weight-bold);
-  text-align: end;
 }
 
 .contact-page {

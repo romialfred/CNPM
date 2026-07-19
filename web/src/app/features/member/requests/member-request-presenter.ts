@@ -23,10 +23,10 @@ const STATUS_TONES: Readonly<Record<MemberRequestStatus, CnpmBadgeTone>> = {
 };
 
 const CATEGORY_LABELS: Readonly<Record<MemberRequestCategory, string>> = {
-  DEMO_INFORMATION: 'Information — démonstration',
-  DEMO_DOCUMENT: 'Document — démonstration',
-  DEMO_PORTAL: 'Portail — démonstration',
-  DEMO_CLAIM: 'Réclamation — démonstration',
+  DEMO_INFORMATION: 'Demande d’information',
+  DEMO_DOCUMENT: 'Demande de document',
+  DEMO_PORTAL: 'Assistance portail',
+  DEMO_CLAIM: 'Réclamation',
 };
 
 export function memberRequestStatusLabel(status: MemberRequestStatus): string {
@@ -38,7 +38,7 @@ export function memberRequestStatusTone(status: MemberRequestStatus): CnpmBadgeT
 }
 
 export function memberRequestKindLabel(kind: MemberRequestKind): string {
-  return kind === 'CLAIM' ? 'Réclamation fictive' : 'Requête fictive';
+  return kind === 'CLAIM' ? 'Réclamation' : 'Requête';
 }
 
 export function memberRequestCategoryLabel(category: MemberRequestCategory): string {
@@ -47,9 +47,9 @@ export function memberRequestCategoryLabel(category: MemberRequestCategory): str
 
 export function memberRequestSlaLabel(state: MemberRequestSlaState): string {
   const labels: Record<MemberRequestSlaState, string> = {
-    ON_TRACK: 'Dans le délai fictif',
-    DUE_SOON: 'Échéance fictive proche',
-    OVERDUE: 'Délai fictif dépassé',
+    ON_TRACK: 'Dans le délai',
+    DUE_SOON: 'Échéance proche',
+    OVERDUE: 'Délai dépassé',
     NOT_APPLICABLE: 'Sans délai cible',
   };
   return labels[state];

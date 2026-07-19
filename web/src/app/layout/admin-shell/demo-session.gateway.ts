@@ -15,7 +15,7 @@ import type { SessionGateway, SessionIdentity } from './session-gateway';
 @Injectable()
 export class DemoSessionGateway implements SessionGateway {
   readonly identity: Observable<SessionIdentity | null> = of({
-    displayName: 'Agent de démonstration',
+    displayName: 'Aminata Traoré',
     roleLabel: 'Administrateur',
     exerciseLabel: '2024',
     notificationCount: 8,

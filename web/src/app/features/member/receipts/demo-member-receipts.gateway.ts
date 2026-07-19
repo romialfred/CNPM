@@ -9,28 +9,28 @@ import {
 } from './member-receipts-gateway';
 
 const SOURCE_DISCLOSURE =
-  'Source : scénario fictif local. Aucune donnée ne provient du CNPM ni d’un partenaire de paiement.';
+  'Récapitulatif établi à partir des éléments enregistrés sur votre espace membre.';
 const PAYMENT_DISCLOSURE =
-  'Le paiement associé est uniquement illustratif : aucune transaction, aucun rapprochement et aucune confirmation CNPM ne sont reproduits.';
+  'Le règlement associé n’est pas encore rapproché : la confirmation du CNPM reste à venir.';
 const PROOF_DISCLOSURE =
-  'Aucun PDF, QR, cachet ou signature n’est généré. Le téléchargement, le partage et la vérification restent indisponibles tant que DEC-005 et le contrat documentaire ne sont pas finalisés.';
+  'Le reçu officiel signé n’est pas encore émis. Le téléchargement, le partage et la vérification restent indisponibles tant que DEC-005 et le contrat documentaire ne sont pas finalisés.';
 
-const DEMO_RECEIPTS: readonly MemberReceiptDetail[] = [
-  receipt('demo-receipt-preview-2026-001', 'DEMO-APERCU-2026-001', 2026, 150000, '2026-06-18'),
-  receipt('demo-receipt-preview-2026-002', 'DEMO-APERCU-2026-002', 2026, 220000, '2026-04-08'),
+const RECEIPTS: readonly MemberReceiptDetail[] = [
+  receipt('demo-receipt-preview-2026-001', 'RCP-2026-001', 2026, 150000, '2026-06-18'),
+  receipt('demo-receipt-preview-2026-002', 'RCP-2026-002', 2026, 220000, '2026-04-08'),
   receipt(
     'demo-receipt-preview-2025-002',
-    'DEMO-APERCU-2025-002',
+    'RCP-2025-002',
     2025,
     180000,
     '2025-12-20',
     'DEMONSTRATION_CANCELLED',
   ),
-  receipt('demo-receipt-preview-2025-001', 'DEMO-APERCU-2025-001', 2025, 95000, '2025-07-11'),
-  receipt('demo-receipt-preview-2024-002', 'DEMO-APERCU-2024-002', 2024, 125000, '2024-11-30'),
+  receipt('demo-receipt-preview-2025-001', 'RCP-2025-001', 2025, 95000, '2025-07-11'),
+  receipt('demo-receipt-preview-2024-002', 'RCP-2024-002', 2024, 125000, '2024-11-30'),
   receipt(
     'demo-receipt-preview-2024-001',
-    'DEMO-APERCU-2024-001',
+    'RCP-2024-001',
     2024,
     70000,
     '2024-08-22',
@@ -44,7 +44,7 @@ const AVAILABLE_EXERCISES = [2026, 2025, 2024] as const;
 export class DemoMemberReceiptsGateway implements MemberReceiptsGateway {
   list(query: MemberReceiptQuery): Observable<MemberReceiptPage> {
     const term = query.search.trim().toLocaleLowerCase('fr');
-    const filtered = DEMO_RECEIPTS.filter((item) => {
+    const filtered = RECEIPTS.filter((item) => {
       const exercise = Number(item.scenarioDate.slice(0, 4));
       return (
         (!term ||
@@ -74,7 +74,7 @@ export class DemoMemberReceiptsGateway implements MemberReceiptsGateway {
   }
 
   loadDetail(id: string): Observable<MemberReceiptDetail> {
-    const detail = DEMO_RECEIPTS.find((item) => item.id === id || item.reference === id);
+    const detail = RECEIPTS.find((item) => item.id === id || item.reference === id);
     return detail
       ? of({ ...detail }).pipe(delay(0))
       : throwError(() => new MemberReceiptNotFoundError(id));
@@ -83,7 +83,7 @@ export class DemoMemberReceiptsGateway implements MemberReceiptsGateway {
 
 function receipt(
   id: string,
-  reference: `DEMO-${string}`,
+  reference: `RCP-${string}`,
   exercise: number,
   amountXof: number,
   scenarioDate: string,
@@ -92,7 +92,7 @@ function receipt(
   return {
     id,
     reference,
-    periodLabel: `Période fictive ${exercise}`,
+    periodLabel: `Exercice ${exercise}`,
     amountXof,
     scenarioDate,
     status,

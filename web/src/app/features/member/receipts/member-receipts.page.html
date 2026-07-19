@@ -1,18 +1,18 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Responsable cotisations"
+  memberCode="CNPM-MBR-0142"
   [notificationCount]="0"
 >
   <main class="member-receipts" id="contenu-principal">
     <cnpm-page-header
       title="Mes reçus"
-      description="Consultez des aperçus HTML strictement fictifs et sans valeur probante."
+      description="Consultez le récapitulatif de vos règlements de cotisation."
     />
 
-    <cnpm-alert tone="warning" title="Démonstration — aucune preuve officielle" [live]="false">
-      Aucun élément affiché n’est un reçu CNPM, une preuve de paiement ou un document signé. Aucun
-      PDF, QR, cachet ou téléchargement n’est produit.
+    <cnpm-alert tone="info" title="Reçus officiels à venir" [live]="false">
+      Les éléments affichés sont des récapitulatifs de lecture : le reçu CNPM signé, son
+      téléchargement et sa vérification ne sont pas encore disponibles.
     </cnpm-alert>
 
     <cnpm-filter-bar
@@ -29,7 +29,7 @@
             id="member-receipt-search"
             type="search"
             formControlName="search"
-            placeholder="Référence DEMO ou période"
+            placeholder="Référence ou période"
           />
         </div>
         <div class="member-receipts__field">
@@ -68,13 +68,13 @@
     <section class="member-receipts__panel" aria-labelledby="member-receipts-results-title">
       <div class="member-receipts__toolbar">
         <div>
-          <h2 id="member-receipts-results-title" #resultsTitle tabindex="-1">Aperçus fictifs</h2>
-          <p>Résumé textuel en lecture seule, distinct de tout document officiel.</p>
+          <h2 id="member-receipts-results-title" #resultsTitle tabindex="-1">Récapitulatifs</h2>
+          <p>Résumé en lecture seule, distinct du reçu officiel.</p>
         </div>
         @if (data()) {
           <p class="member-receipts__count" aria-live="polite">
             {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'aperçu fictif' : 'aperçus fictifs' }}
+            {{ totalItems() === 1 ? 'récapitulatif' : 'récapitulatifs' }}
           </p>
         }
       </div>
@@ -85,14 +85,14 @@
             variant="table"
             [rows]="pageSize()"
             [columns]="columns.length"
-            label="Chargement des aperçus de reçus fictifs…"
+            label="Chargement des récapitulatifs…"
           />
         }
         @case ('error') {
           <cnpm-error-state
             variant="recoverable"
-            title="Les aperçus n’ont pas pu être chargés"
-            description="La source locale est momentanément indisponible. Aucune opération financière n’a été relancée."
+            title="Les récapitulatifs n’ont pas pu être chargés"
+            description="Le service est momentanément indisponible. Réessayez dans un instant."
           >
             <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
           </cnpm-error-state>
@@ -107,14 +107,14 @@
         @case ('empty') {
           <cnpm-empty-state
             variant="no-data"
-            title="Aucun aperçu de reçu"
-            description="La projection fictive ne contient aucun aperçu pour ce membre de démonstration."
+            title="Aucun récapitulatif"
+            description="Aucun récapitulatif n’est encore disponible pour votre organisation."
           />
         }
         @case ('no-result') {
           <cnpm-empty-state
             variant="no-results"
-            title="Aucun aperçu ne correspond"
+            title="Aucun récapitulatif ne correspond"
             description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
           >
             <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
@@ -125,7 +125,7 @@
         @case ('ready') {
           <div class="member-receipts__desktop-table">
             <cnpm-data-table
-              caption="Aperçus de reçus fictifs : référence, période, date, montant du scénario, statut et lien de consultation."
+              caption="Récapitulatifs : référence, période, date, montant, statut et lien de consultation."
               [columns]="columns"
               [rows]="receipts()"
               [rowKey]="rowKey"
@@ -153,7 +153,7 @@
                     class="member-receipts__detail-link"
                     [routerLink]="['/member/receipts', receipt.id]"
                     [queryParams]="detailQueryParams()"
-                    [attr.aria-label]="'Consulter l’aperçu fictif ' + receipt.reference"
+                    [attr.aria-label]="'Consulter le récapitulatif ' + receipt.reference"
                   >
                     Consulter
                   </a>
@@ -162,7 +162,7 @@
             </cnpm-data-table>
           </div>
 
-          <ol class="member-receipts__mobile-list" aria-label="Aperçus de reçus fictifs">
+          <ol class="member-receipts__mobile-list" aria-label="Récapitulatifs">
             @for (receipt of receipts(); track receipt.id) {
               <li>
                 <article [attr.aria-labelledby]="'member-receipt-' + receipt.id">
@@ -177,11 +177,11 @@
                   </header>
                   <dl>
                     <div>
-                      <dt>Date du scénario</dt>
+                      <dt>Date</dt>
                       <dd>{{ receipt.scenarioDate | date: 'dd/MM/yyyy' }}</dd>
                     </div>
                     <div>
-                      <dt>Montant du scénario</dt>
+                      <dt>Montant</dt>
                       <dd>{{ receipt.amountXof | number: '1.0-0' }} FCFA</dd>
                     </div>
                   </dl>
@@ -189,9 +189,9 @@
                     class="member-receipts__detail-link"
                     [routerLink]="['/member/receipts', receipt.id]"
                     [queryParams]="detailQueryParams()"
-                    [attr.aria-label]="'Consulter l’aperçu fictif ' + receipt.reference"
+                    [attr.aria-label]="'Consulter le récapitulatif ' + receipt.reference"
                   >
-                    Consulter l’aperçu
+                    Consulter le récapitulatif
                   </a>
                 </article>
               </li>

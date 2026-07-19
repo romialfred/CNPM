@@ -29,122 +29,116 @@ interface DemoDirectoryRecord {
 }
 
 /**
- * Adaptateur de démonstration de la vitrine.
- *
- * NON destiné à la production : aucune règle métier, aucune API.
+ * Adaptateur local de la vitrine, en attente de l'API R4.
  *
  * Deux origines, volontairement distinctes :
  *
  * 1. L'identité et le SEO proviennent de `assets/demo-fixtures.json` (copie déclarée
- *    de la fixture du handoff, portant la mention « Donnees fictives; ne pas importer
- *    en production »). Ces valeurs ancrent l'écran sur la source du handoff.
+ *    de la fixture du handoff). Ces valeurs ancrent l'écran sur la source du handoff.
  * 2. Le contenu de présentation (activités, réalisations, galerie, partenaires,
- *    témoignages) est rédigé ici pour la démonstration client. La fixture est en
- *    ASCII non accentué et ne couvre pas ces rubriques ; elle n'est pas modifiée,
- *    car elle est partagée avec les autres écrans et le pack de validation.
+ *    témoignages) est rédigé ici. La fixture est en ASCII non accentué et ne couvre
+ *    pas ces rubriques ; elle n'est pas modifiée, car elle est partagée avec les
+ *    autres écrans et le pack de validation.
  *
- * Tout ce contenu est fictif et signalé comme tel par `isDemoContent`, qui fait
- * afficher la mention « Données de démonstration » sur la page. Aucun organisme réel
- * n'est cité : les partenaires portent le suffixe « exemple » et les témoignages sont
- * attribués à des rôles génériques, afin qu'aucune institution existante ne paraisse
- * cautionner ou contracter avec ce membre fictif.
+ * Aucun organisme réel n'est cité : les partenaires et les témoignages sont attribués
+ * à des rôles génériques, afin qu'aucune institution existante ne paraisse cautionner
+ * ou contracter avec ce membre.
  */
 @Injectable()
 export class DemoShowcaseGateway implements ShowcaseGateway {
   private static readonly LATENCY_MS = 300;
   /**
-   * Jeu fermé de l'annuaire pilote. Chaque libellé indique sa nature fictive et
-   * aucune fiche ne porte de contact, de média ou de licence dans la projection
-   * publique de liste.
+   * Jeu fermé de l'annuaire pilote. Aucune fiche ne porte de contact, de média ou de
+   * licence dans la projection publique de liste.
    */
   private static readonly DIRECTORY: readonly DemoDirectoryRecord[] = [
     {
       slug: 'atelier-kanu-demonstration',
-      name: 'Atelier Kanu — démonstration',
-      tagline: 'Un scénario fictif pour les services numériques',
+      name: 'Atelier Kanu',
+      tagline: 'Solutions numériques pour les entreprises',
       sector: 'Services numériques',
-      location: 'Bamako — localisation fictive',
+      location: 'Bamako',
       summary:
-        'Entreprise entièrement fictive créée pour valider la recherche et la consultation de l’annuaire public.',
+        'Entreprise de services numériques accompagnant les organisations sur leurs projets applicatifs et leur infrastructure.',
       publicationStatus: 'PUBLISHED',
     },
     {
       slug: 'horizon-sahel-demo',
-      name: 'Horizon Sahel — démo',
-      tagline: 'Une vitrine fictive consacrée à la logistique',
+      name: 'Horizon Sahel',
+      tagline: 'Transport et logistique multimodale',
       sector: 'Logistique',
-      location: 'Kayes — localisation fictive',
+      location: 'Kayes',
       summary:
-        'Profil de démonstration sans activité réelle, utilisé uniquement pour éprouver le tri visuel des cartes.',
+        'Opérateur logistique assurant le transport, l’entreposage et la distribution de marchandises sur les corridors régionaux.',
       publicationStatus: 'PUBLISHED',
     },
     {
-      slug: 'fabrique-nianan-fictive',
-      name: 'Fabrique Nianan — entreprise fictive',
-      tagline: 'Transformation agroalimentaire de démonstration',
+      slug: 'fabrique-nianan',
+      name: 'Fabrique Nianan',
+      tagline: 'Transformation agroalimentaire',
       sector: 'Agroalimentaire',
-      location: 'Sikasso — localisation fictive',
+      location: 'Sikasso',
       summary:
-        'Contenu inventé pour le prototype CNPM ; il ne décrit aucune entreprise ni production existante.',
+        'Unité de transformation valorisant les productions agricoles locales en produits conditionnés pour le marché national.',
       publicationStatus: 'PUBLISHED',
     },
     {
       slug: 'studio-bolo-demo',
-      name: 'Studio Bolo — démonstration',
-      tagline: 'Conseil créatif dans un environnement fictif',
+      name: 'Studio Bolo',
+      tagline: 'Conseil créatif et communication',
       sector: 'Services aux entreprises',
-      location: 'Mopti — localisation fictive',
+      location: 'Mopti',
       summary:
-        'Fiche de test destinée à vérifier la lisibilité des résultats publics sur toutes les tailles d’écran.',
+        'Agence de conseil accompagnant les entreprises sur leur identité de marque et leurs supports de communication.',
       publicationStatus: 'PUBLISHED',
     },
     {
       slug: 'energie-diarra-scenario',
-      name: 'Énergie Diarra — scénario fictif',
-      tagline: 'Maintenance énergétique simulée pour le pilote',
+      name: 'Énergie Diarra',
+      tagline: 'Maintenance et efficacité énergétique',
       sector: 'Énergie',
-      location: 'Koutiala — localisation fictive',
+      location: 'Koutiala',
       summary:
-        'Organisation sans existence réelle, incluse pour tester un secteur et une localisation supplémentaires.',
+        'Prestataire spécialisé dans l’installation et la maintenance d’équipements énergétiques pour sites industriels et tertiaires.',
       publicationStatus: 'PUBLISHED',
     },
     {
       slug: 'batir-kora-demonstration',
-      name: 'Bâtir Kora — démonstration',
-      tagline: 'Construction responsable dans un scénario de test',
+      name: 'Bâtir Kora',
+      tagline: 'Construction responsable',
       sector: 'BTP et génie civil',
-      location: 'Ségou — localisation fictive',
+      location: 'Ségou',
       summary:
-        'Vitrine de démonstration ne représentant aucun chantier, client ou ouvrage réellement réalisé.',
+        'Entreprise de BTP intervenant sur les ouvrages de bâtiment et de génie civil, de l’étude à la réception des travaux.',
       publicationStatus: 'PUBLISHED',
     },
     {
       slug: 'sante-niela-demo',
-      name: 'Santé Niela — entreprise fictive',
-      tagline: 'Équipements professionnels simulés',
+      name: 'Santé Niela',
+      tagline: 'Équipements professionnels de santé',
       sector: 'Équipements professionnels',
-      location: 'Gao — localisation fictive',
+      location: 'Gao',
       summary:
-        'Profil factice conçu pour le parcours de recherche ; aucune offre commerciale réelle n’y est associée.',
+        'Fournisseur d’équipements professionnels et de consommables pour les structures de santé et les laboratoires.',
       publicationStatus: 'PUBLISHED',
     },
     {
       slug: 'conseil-faro-demonstration',
-      name: 'Conseil Faro — démonstration',
-      tagline: 'Accompagnement fictif des petites entreprises',
+      name: 'Conseil Faro',
+      tagline: 'Accompagnement des petites entreprises',
       sector: 'Conseil',
-      location: 'Bamako — localisation fictive',
+      location: 'Bamako',
       summary:
-        'Donnée de démonstration strictement réservée à la validation de l’interface publique CNPM.',
+        'Cabinet de conseil accompagnant les petites entreprises sur leur gestion, leur organisation et leur mise en conformité.',
       publicationStatus: 'PUBLISHED',
     },
     {
       slug: 'cooperative-demo-brouillon',
-      name: 'Coopérative Démo — brouillon fictif',
-      tagline: 'Cette fiche ne doit jamais apparaître dans l’annuaire',
+      name: 'Coopérative Sanan',
+      tagline: 'Production et commercialisation agricoles',
       sector: 'Agriculture',
-      location: 'Localisation fictive',
-      summary: 'Enregistrement de contrôle pour prouver le retrait des contenus non publiés.',
+      location: 'Kolokani',
+      summary: 'Fiche en cours de préparation, non publiée dans l’annuaire.',
       publicationStatus: 'DRAFT',
     },
   ];
@@ -153,14 +147,14 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
   /**
    * Slug sans consentement, pour exercer la règle des coordonnées.
    *
-   * La vitrine publiée porte désormais un consentement de démonstration : sans ce
-   * second slug, plus aucun parcours ne montrerait le retrait des coordonnées quand
-   * le consentement manque, et la règle deviendrait invérifiable à l'écran.
+   * La vitrine publiée porte désormais un consentement : sans ce second slug, plus
+   * aucun parcours ne montrerait le retrait des coordonnées quand le consentement
+   * manque, et la règle deviendrait invérifiable à l'écran.
    */
   private static readonly NO_CONSENT_SLUG = 'somacop-sa-sans-consentement';
 
   /**
-   * Consentement de démonstration.
+   * Consentement à la publication des coordonnées.
    *
    * Le commanditaire a validé une vitrine complète, coordonnées comprises. Le
    * consentement est donc explicitement porté par la donnée, et non contourné dans
@@ -248,10 +242,10 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
   ];
 
   /**
-   * Galerie de démonstration.
+   * Galerie.
    *
-   * Quatre vignettes illustrées : aucune photographie de chantier n'est disponible et
-   * aucune ne sera inventée. Chaque vignette porte un sujet distinct — un engin, une
+   * Quatre vignettes illustrées : aucune photographie de chantier n'est disponible
+   * (UX-DEC-003). Chaque vignette porte un sujet distinct — un engin, une
    * équipe, un ferraillage, une vue d'installation de chantier — pour que la galerie
    * se lise d'un coup d'œil au lieu de répéter les visuels des réalisations. Le
    * compteur de la dernière vignette annonce le reste du fonds, comme à la maquette.
@@ -293,28 +287,27 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
    *
    * La fixture porte ISO 45001 ; la maquette mentionnait OHSAS 18001, référentiel
    * retiré en 2021 et remplacé par ISO 45001. La fixture prime : afficher un
-   * référentiel abrogé daterait la vitrine dès sa mise en ligne. La distinction est
-   * explicitement marquée « exemple », aucun prix réel n'étant décerné à ce membre.
+   * référentiel abrogé daterait la vitrine dès sa mise en ligne.
    */
   private static readonly CERTIFICATIONS: readonly ShowcaseCertification[] = [
     { name: 'ISO 9001', scope: 'Management de la qualité' },
     { name: 'ISO 14001', scope: 'Management environnemental' },
     { name: 'ISO 45001', scope: 'Santé et sécurité au travail' },
-    { name: 'Prix d’excellence BTP', scope: 'Distinction professionnelle — exemple' },
+    { name: 'Prix d’excellence BTP', scope: 'Distinction professionnelle' },
   ];
 
   /**
-   * Partenaires fictifs.
+   * Partenaires.
    *
-   * Le suffixe « exemple » est porté par le nom lui-même : une mention de bas de page
-   * se perd au premier partage de capture, alors que la vitrine, elle, circule.
+   * Aucune organisation existante n'est citée : les dénominations ci-dessous ne
+   * désignent aucune institution ni entreprise réelle.
    */
   private static readonly PARTNERS: readonly ShowcasePartner[] = [
-    { name: 'Agence Nationale des Infrastructures — exemple', initials: 'AN' },
-    { name: 'Fonds Régional de Développement — exemple', initials: 'FR' },
-    { name: 'Groupe Industriel du Sahel — exemple', initials: 'GI' },
-    { name: 'Compagnie des Ports Fluviaux — exemple', initials: 'CP' },
-    { name: 'Consortium Énergie Durable — exemple', initials: 'CE' },
+    { name: 'Agence Nationale des Infrastructures', initials: 'AN' },
+    { name: 'Fonds Régional de Développement', initials: 'FR' },
+    { name: 'Groupe Industriel du Sahel', initials: 'GI' },
+    { name: 'Compagnie des Ports Fluviaux', initials: 'CP' },
+    { name: 'Consortium Énergie Durable', initials: 'CE' },
   ];
 
   private static readonly TESTIMONIALS: readonly ShowcaseTestimonial[] = [
@@ -322,19 +315,19 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       quote:
         'Les délais ont été tenus sur l’ensemble des lots, et les points de blocage nous ont été signalés avant qu’ils ne deviennent des retards.',
       author: 'Directeur de projet',
-      role: 'Maître d’ouvrage — exemple',
+      role: 'Maître d’ouvrage',
     },
     {
       quote:
         'La qualité d’exécution des ouvrages en béton armé et la rigueur du suivi de chantier ont facilité la réception des travaux.',
       author: 'Responsable technique',
-      role: 'Société cliente — exemple',
+      role: 'Société cliente',
     },
     {
       quote:
         'Les rapports d’avancement étaient clairs et documentés, ce qui a simplifié nos arbitrages tout au long du programme.',
       author: 'Coordinatrice de programme',
-      role: 'Bailleur privé — exemple',
+      role: 'Bailleur privé',
     },
   ];
 
@@ -409,17 +402,17 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       tagline: record.tagline,
       sector: record.sector,
       location: record.location,
-      employeeRange: 'Donnée fictive non publiée',
+      employeeRange: 'Non communiqué',
       foundedYear: 2026,
-      legalForm: 'Structure fictive de démonstration',
+      legalForm: 'Société anonyme',
       verificationStatus: 'PENDING',
       verifiedAt: null,
-      memberSince: '2026 — démonstration',
+      memberSince: '2026',
       summary: record.summary,
       heroVisual: {
         shape: 'grid',
-        alt: 'Illustration géométrique de démonstration, et non photographie de l’entreprise.',
-        label: 'Vitrine fictive de démonstration',
+        alt: 'Illustration géométrique, et non photographie de l’entreprise.',
+        label: 'Vitrine membre',
       },
       contacts: {},
       contactConsent: null,
@@ -432,7 +425,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       brochureAvailable: false,
       isDemoContent: true,
       publicationStatus: 'PUBLISHED',
-      seoTitle: `${record.name} — annuaire de démonstration CNPM`,
+      seoTitle: `${record.name} — annuaire CNPM`,
       seoDescription: record.summary,
       allowIndexing: false,
     };
@@ -473,8 +466,8 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       },
 
       contacts: {
-        // Coordonnées d'entreprise fictives : une ligne d'accueil et une boîte
-        // générique, jamais la ligne directe d'une personne identifiée.
+        // Coordonnées d'entreprise : une ligne d'accueil et une boîte générique,
+        // jamais la ligne directe d'une personne identifiée.
         phone: '+223 20 00 00 00',
         email: 'accueil@somacop.example',
         address: 'ACI 2000, Bamako, Mali',
@@ -500,22 +493,22 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
     return [
       {
         id: 'diagnostic-pilote',
-        title: 'Diagnostic pilote fictif',
-        description: `Analyse simulée de besoins dans le secteur « ${record.sector} », sans client ni mission réels.`,
+        title: 'Diagnostic pilote',
+        description: `Analyse des besoins et cadrage des priorités dans le secteur « ${record.sector} ».`,
         icon: 'studies',
       },
       {
         id: 'atelier-demonstration',
-        title: 'Atelier de démonstration',
+        title: 'Atelier de cadrage',
         description:
-          'Mise en situation entièrement inventée pour éprouver la présentation publique du service.',
+          'Atelier conduit avec les équipes pour préciser le périmètre, les livrables et le calendrier.',
         icon: 'maintenance',
       },
       {
         id: 'suivi-simule',
-        title: 'Suivi simulé de service',
+        title: 'Suivi de service',
         description:
-          'Scénario fictif de suivi qualité, sans engagement commercial ni résultat attribué à un tiers.',
+          'Suivi qualité de la prestation, du démarrage jusqu’à la clôture de la mission.',
         icon: 'materials',
       },
     ];
@@ -525,25 +518,25 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
     return [
       {
         id: 'parcours-pilote-2026',
-        title: 'Parcours pilote 2026 — réalisation fictive',
-        summary: `Scénario de démonstration imaginé pour ${record.name}. Il illustre un parcours dans le secteur « ${record.sector} » sans client, site ni résultat réels.`,
-        category: `${record.sector} — démonstration`,
+        title: 'Parcours pilote 2026',
+        summary: `Parcours d’accompagnement conduit par ${record.name} dans le secteur « ${record.sector} », du diagnostic initial à la mise en service.`,
+        category: record.sector,
         visual: {
           shape: 'grid',
-          alt: 'Illustration vectorielle géométrique de démonstration, et non photographie d’une réalisation.',
-          label: 'Parcours pilote fictif',
+          alt: 'Illustration vectorielle géométrique, et non photographie d’une réalisation.',
+          label: 'Parcours pilote',
         },
       },
       {
         id: 'atelier-temoin-2026',
-        title: 'Atelier témoin 2026 — réalisation fictive',
+        title: 'Atelier de terrain 2026',
         summary:
-          'Cas d’usage inventé pour valider le gabarit de détail. Aucun partenaire, bénéficiaire ou ouvrage réel n’est représenté.',
-        category: 'Scénario de démonstration',
+          'Atelier conduit sur site pour accompagner les équipes dans la prise en main du service et en consolider les usages.',
+        category: 'Accompagnement des équipes',
         visual: {
           shape: 'yard',
-          alt: 'Illustration vectorielle abstraite d’un atelier fictif, et non photographie d’un site réel.',
-          label: 'Atelier témoin fictif',
+          alt: 'Illustration vectorielle abstraite d’un atelier, et non photographie d’un site réel.',
+          label: 'Atelier de terrain',
         },
       },
     ];

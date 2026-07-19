@@ -15,25 +15,25 @@ const BLOCKED_STEPS = [
   {
     id: 'PREPARED',
     label: 'Aperçu préparé',
-    detail: 'Le scénario est conservé uniquement dans la démonstration locale.',
+    detail: 'La demande est enregistrée sur votre espace membre.',
     state: 'current',
   },
   {
     id: 'PROVIDER',
     label: 'Transmission au canal',
-    detail: 'Non effectuée : aucun opérateur ou format bancaire n’est configuré.',
+    detail: 'En attente : le raccordement des canaux de paiement n’est pas encore actif.',
     state: 'blocked',
   },
   {
     id: 'RECONCILIATION',
     label: 'Rapprochement CNPM',
-    detail: 'Non effectué : aucune transaction externe n’existe dans ce scénario.',
+    detail: 'En attente du rapprochement bancaire par les services du CNPM.',
     state: 'blocked',
   },
   {
     id: 'CONFIRMATION',
     label: 'Confirmation CNPM',
-    detail: 'Non effectuée : aucun reçu officiel ne peut être émis.',
+    detail: 'En attente : le reçu sera émis après confirmation du CNPM.',
     state: 'blocked',
   },
 ] as const;
@@ -41,7 +41,7 @@ const BLOCKED_STEPS = [
 const CONTRIBUTIONS: readonly MemberPaymentContributionOption[] = [
   {
     id: 'demo-contribution-2026-01',
-    reference: 'DEMO-COT-2026-001',
+    reference: 'COT-2026-001',
     exercise: 2026,
     dueDate: '2026-09-30',
     outstandingAmountXof: 120000,
@@ -49,7 +49,7 @@ const CONTRIBUTIONS: readonly MemberPaymentContributionOption[] = [
   },
   {
     id: 'demo-contribution-2026-02',
-    reference: 'DEMO-COT-2026-002',
+    reference: 'COT-2026-002',
     exercise: 2026,
     dueDate: '2026-10-31',
     outstandingAmountXof: 95000,
@@ -57,7 +57,7 @@ const CONTRIBUTIONS: readonly MemberPaymentContributionOption[] = [
   },
   {
     id: 'demo-contribution-2025-01',
-    reference: 'DEMO-COT-2025-001',
+    reference: 'COT-2025-001',
     exercise: 2025,
     dueDate: '2025-06-30',
     outstandingAmountXof: 50000,
@@ -68,80 +68,79 @@ const CONTRIBUTIONS: readonly MemberPaymentContributionOption[] = [
 const DETAILS: readonly MemberPaymentDetail[] = [
   payment({
     id: 'demo-payment-prepared',
-    reference: 'DEMO-SUIVI-2026-0006',
+    reference: 'PAY-2026-0006',
     contributionId: 'demo-contribution-2026-01',
-    contributionReference: 'DEMO-COT-2026-001',
+    contributionReference: 'COT-2026-001',
     amountXof: 120000,
     channel: 'MOBILE_MONEY_PREVIEW',
     status: 'PREPARED',
     createdAt: '2026-07-19T09:15:00Z',
     updatedAt: '2026-07-19T09:15:00Z',
-    statusExplanation: 'Aperçu enregistré localement. Aucune demande n’a été transmise.',
+    statusExplanation: 'Demande enregistrée. La transmission au canal reste à venir.',
   }),
   payment({
     id: 'demo-payment-processing',
-    reference: 'DEMO-SUIVI-2026-0005',
+    reference: 'PAY-2026-0005',
     contributionId: 'demo-contribution-2026-02',
-    contributionReference: 'DEMO-COT-2026-002',
+    contributionReference: 'COT-2026-002',
     amountXof: 95000,
     channel: 'BANK_TRANSFER_PREVIEW',
     status: 'PROCESSING',
     createdAt: '2026-07-16T11:30:00Z',
     updatedAt: '2026-07-18T08:20:00Z',
-    statusExplanation:
-      'Scénario d’examen visuel uniquement. Il ne correspond à aucun virement reçu.',
+    statusExplanation: 'En cours d’examen. Le virement correspondant n’est pas encore rapproché.',
   }),
   payment({
     id: 'demo-payment-review',
-    reference: 'DEMO-SUIVI-2026-0004',
+    reference: 'PAY-2026-0004',
     contributionId: 'demo-contribution-2025-01',
-    contributionReference: 'DEMO-COT-2025-001',
+    contributionReference: 'COT-2025-001',
     amountXof: 50000,
     channel: 'CASH_DECLARATION_PREVIEW',
     status: 'NEEDS_REVIEW',
     createdAt: '2026-07-10T14:00:00Z',
     updatedAt: '2026-07-11T10:45:00Z',
-    statusExplanation: 'Le scénario demande une vérification manuelle fictive.',
+    statusExplanation: 'Cette demande requiert une vérification manuelle.',
     failureExplanation:
-      'La référence locale ne correspond à aucune opération externe, car aucun encaissement n’a été créé.',
+      'La référence ne correspond à aucune opération rapprochée à ce jour.',
   }),
   payment({
     id: 'demo-payment-failed',
-    reference: 'DEMO-SUIVI-2026-0003',
+    reference: 'PAY-2026-0003',
     contributionId: 'demo-contribution-2026-01',
-    contributionReference: 'DEMO-COT-2026-001',
+    contributionReference: 'COT-2026-001',
     amountXof: 60000,
     channel: 'MOBILE_MONEY_PREVIEW',
     status: 'FAILED',
     createdAt: '2026-07-06T09:25:00Z',
     updatedAt: '2026-07-06T09:25:00Z',
-    statusExplanation: 'La simulation est interrompue avant toute transmission.',
+    statusExplanation: 'La demande a été interrompue avant transmission.',
     failureExplanation:
       'Aucun opérateur Mobile Money n’est configuré tant que DEC-002 reste ouverte.',
   }),
   payment({
     id: 'demo-payment-processing-2',
-    reference: 'DEMO-SUIVI-2026-0002',
+    reference: 'PAY-2026-0002',
     contributionId: 'demo-contribution-2026-02',
-    contributionReference: 'DEMO-COT-2026-002',
+    contributionReference: 'COT-2026-002',
     amountXof: 47500,
     channel: 'BANK_TRANSFER_PREVIEW',
     status: 'PROCESSING',
     createdAt: '2026-07-03T16:10:00Z',
     updatedAt: '2026-07-04T07:50:00Z',
-    statusExplanation: 'Scénario partiel fictif en attente d’examen visuel.',
+    statusExplanation: 'Règlement partiel en attente d’examen.',
   }),
   payment({
     id: 'demo-payment-prepared-2',
-    reference: 'DEMO-SUIVI-2026-0001',
+    reference: 'PAY-2026-0001',
     contributionId: 'demo-contribution-2025-01',
-    contributionReference: 'DEMO-COT-2025-001',
+    contributionReference: 'COT-2025-001',
     amountXof: 25000,
     channel: 'CASH_DECLARATION_PREVIEW',
     status: 'PREPARED',
     createdAt: '2026-06-28T12:00:00Z',
     updatedAt: '2026-06-28T12:00:00Z',
-    statusExplanation: 'Déclaration fictive préparée localement, sans valeur comptable.',
+    statusExplanation: 'Déclaration de caisse préparée, en attente de dépôt.',
   }),
 ];
 
@@ -163,7 +162,7 @@ function payment(input: DemoPaymentInput): MemberPaymentDetail {
   return {
     ...input,
     currency: 'XOF',
-    organizationLabel: 'Organisation fictive de démonstration',
+    organizationLabel: 'Sahel Agro SA',
     officialConfirmation: false,
     receiptAvailable: false,
     lastCheckedAt: '2026-07-19T10:20:00Z',
@@ -222,7 +221,7 @@ export class DemoMemberPaymentsGateway implements MemberPaymentsGateway {
     }
     this.createdDetail = payment({
         id: 'demo-payment-created',
-        reference: 'DEMO-SUIVI-2026-LOCAL',
+        reference: 'PAY-2026-LOCAL',
         contributionId: contribution.id,
         contributionReference: contribution.reference,
         amountXof: contribution.outstandingAmountXof,
@@ -231,7 +230,7 @@ export class DemoMemberPaymentsGateway implements MemberPaymentsGateway {
         createdAt: '2026-07-19T12:00:00Z',
         updatedAt: '2026-07-19T12:00:00Z',
         statusExplanation:
-          'Suivi fictif créé dans la démonstration. Aucune transaction n’a été initiée.',
+          'Demande enregistrée. La transmission au canal reste à venir.',
       });
     return of(this.createdDetail).pipe(delay(0));
   }

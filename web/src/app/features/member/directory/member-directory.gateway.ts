@@ -1,17 +1,17 @@
 import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-export type MemberDirectorySector = 'AGRI_DEMO' | 'SERVICES_DEMO' | 'CRAFT_DEMO';
-export type MemberDirectoryZone = 'ZONE_A_DEMO' | 'ZONE_B_DEMO' | 'ZONE_C_DEMO';
-export type MemberDirectoryTheme = 'SKILLS_DEMO' | 'LOGISTICS_DEMO' | 'TRAINING_DEMO';
+export type MemberDirectorySector = 'AGRI' | 'SERVICES' | 'CRAFT';
+export type MemberDirectoryZone = 'ZONE_A' | 'ZONE_B' | 'ZONE_C';
+export type MemberDirectoryTheme = 'SKILLS' | 'LOGISTICS' | 'TRAINING';
 export type MemberDirectorySort = 'name' | 'sector';
 
 /**
- * Organisation de démonstration volontairement dépourvue de contact, adresse,
+ * Organisation de l’annuaire privé, volontairement dépourvue de contact, adresse,
  * identifiant métier, URL, média et donnée financière.
  */
 export interface PrivateDirectoryOrganization {
-  readonly id: `demo-directory-${string}`;
+  readonly id: `directory-${string}`;
   readonly name: string;
   readonly sector: MemberDirectorySector;
   readonly zone: MemberDirectoryZone;
@@ -30,7 +30,7 @@ export interface MemberDirectoryQuery {
 }
 
 export interface MemberDirectorySnapshot {
-  readonly visibility: 'PRIVATE_MEMBER_DEMO';
+  readonly visibility: 'PRIVATE_MEMBER';
   readonly items: readonly PrivateDirectoryOrganization[];
   readonly total: number;
 }

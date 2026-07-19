@@ -14,29 +14,29 @@ import {
 import { ShowcaseModerationPage } from './showcase-moderation.page';
 
 const item = (suffix: '0001' | '0002'): ShowcaseModerationItem => ({
-  id: `demo-showcase-submission-${suffix}`,
-  demonstrationReference: `DEMO-VITRINE-2026-${suffix}`,
-  organizationLabel: suffix === '0001' ? 'Organisation Démo Alpha' : 'Organisation Démo Bêta',
+  id: `showcase-submission-${suffix}`,
+  demonstrationReference: `VITRINE-2026-${suffix}`,
+  organizationLabel: suffix === '0001' ? 'Organisation Alpha' : 'Organisation Bêta',
   submittedAt: '2026-07-18T09:30:00Z',
   queueLabel: suffix === '0001' ? 'À examiner' : 'Contrôle requis',
-  membershipLabel: 'Adhésion active — scénario fictif',
+  membershipLabel: 'Adhésion active',
   publishedVersion: {
-    versionLabel: 'Version publiée fictive',
-    tagline: 'Accroche publiée fictive',
-    summary: 'Résumé publié fictif.',
-    sectorLabel: 'Secteur fictif',
-    locationDisclosure: 'Localisation masquée dans la démonstration',
-    activities: ['Activité fictive'],
+    versionLabel: 'Version publiée',
+    tagline: 'Accroche publiée',
+    summary: 'Résumé publié.',
+    sectorLabel: 'Secteur',
+    locationDisclosure: 'Localisation masquée',
+    activities: ['Activité'],
     mediaPresentation: 'PLACEHOLDER_ONLY',
     publicContactPresentation: 'MASKED_NO_CONSENT',
   },
   proposedVersion: {
-    versionLabel: 'Proposition fictive',
+    versionLabel: 'Proposition',
     tagline: `Accroche proposée ${suffix}`,
-    summary: 'Résumé proposé fictif.',
-    sectorLabel: 'Secteur fictif',
-    locationDisclosure: 'Localisation masquée dans la démonstration',
-    activities: ['Activité fictive'],
+    summary: 'Résumé proposé.',
+    sectorLabel: 'Secteur',
+    locationDisclosure: 'Localisation masquée',
+    activities: ['Activité'],
     mediaPresentation: 'PLACEHOLDER_ONLY',
     publicContactPresentation: 'MASKED_NO_CONSENT',
   },
@@ -84,8 +84,8 @@ describe('ShowcaseModerationPage', () => {
     const { fixture } = await setup();
     const root = fixture.nativeElement as HTMLElement;
 
-    expect(root.textContent).toContain('Organisation Démo Alpha');
-    expect(root.textContent).toContain('Aperçu public simulé');
+    expect(root.textContent).toContain('Organisation Alpha');
+    expect(root.textContent).toContain('Aperçu public');
     expect(root.textContent).toContain('Décisions bloquées');
     expect(root.querySelectorAll('.showcase-moderation-page__actions button')).toHaveLength(7);
     expect(
@@ -108,23 +108,23 @@ describe('ShowcaseModerationPage', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(router.url).toContain('submission=demo-showcase-submission-0002');
+    expect(router.url).toContain('submission=showcase-submission-0002');
     expect(fixture.nativeElement.textContent).toContain('Accroche proposée 0002');
   });
 
   it('honore une sélection valide déjà présente dans l’URL', async () => {
-    const { fixture } = await setup(undefined, '/?submission=demo-showcase-submission-0002');
+    const { fixture } = await setup(undefined, '/?submission=showcase-submission-0002');
 
     expect(fixture.nativeElement.textContent).toContain('Accroche proposée 0002');
   });
 
   it('rend les états chargement, vide, erreur et HTTP indisponible', async () => {
     const loading = await setup({ loadQueue: () => NEVER });
-    expect(loading.fixture.nativeElement.textContent).toContain('Chargement de la file fictive');
+    expect(loading.fixture.nativeElement.textContent).toContain('Chargement de la file');
     TestBed.resetTestingModule();
 
     const empty = await setup({ loadQueue: () => of({ items: [] }) });
-    expect(empty.fixture.nativeElement.textContent).toContain('Aucune proposition fictive');
+    expect(empty.fixture.nativeElement.textContent).toContain('Aucune proposition');
     TestBed.resetTestingModule();
 
     const error = await setup({ loadQueue: () => throwError(() => new Error('temporaire')) });

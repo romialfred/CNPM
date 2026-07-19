@@ -63,7 +63,7 @@ async function setup(params: Record<string, string> = {}) {
 describe('MemberShowcasePreviewPage — MP-016', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('rend le gabarit fictif privé dans le viewport conservé par l’URL', async () => {
+  it('rend le gabarit privé dans le viewport conservé par l’URL', async () => {
     const { fixture, gateway, host } = await setup({ viewport: 'mobile' });
     gateway.loadResponse.next(DEMO_MEMBER_SHOWCASE_DRAFT);
     await fixture.whenStable();
@@ -71,7 +71,7 @@ describe('MemberShowcasePreviewPage — MP-016', () => {
 
     expect(host.querySelector('.showcase-preview__frame--mobile')).not.toBeNull();
     expect(host.querySelector('.showcase-template-host--mobile')).not.toBeNull();
-    expect(host.textContent).toContain('Atelier Kanu — entreprise fictive');
+    expect(host.textContent).toContain('Atelier Kanu');
     expect(host.textContent).toContain('Badge CNPM non attribué');
     expect(host.textContent).toContain('Section masquée — consentement absent');
     expect(host.querySelector('.showcase-preview h1')).toBe(document.activeElement);

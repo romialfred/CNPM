@@ -62,7 +62,7 @@ export class MemberContributionDetailPage {
   private readonly pageHeader = viewChild(PageHeaderComponent);
 
   protected readonly installmentColumns: readonly DataTableColumn[] = [
-    { key: 'label', label: 'Échéance fictive' },
+    { key: 'label', label: 'Échéance' },
     { key: 'dueDate', label: 'Date' },
     { key: 'expectedAmount', label: 'Montant fourni' },
     { key: 'paidAmount', label: 'Affecté' },
@@ -70,7 +70,7 @@ export class MemberContributionDetailPage {
     { key: 'status', label: 'Statut' },
   ];
   protected readonly adjustmentColumns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Référence fictive' },
+    { key: 'reference', label: 'Référence' },
     { key: 'recordedOn', label: 'Date' },
     { key: 'direction', label: 'Sens' },
     { key: 'amount', label: 'Montant fourni' },
@@ -134,7 +134,7 @@ export class MemberContributionDetailPage {
   }
 
   protected adjustmentDirection(direction: MemberContributionAdjustment['direction']): string {
-    return direction === 'CREDIT' ? 'Crédit fictif' : 'Débit fictif';
+    return direction === 'CREDIT' ? 'Crédit' : 'Débit';
   }
 
   protected retry(): void {

@@ -14,9 +14,9 @@ const READY: PublicHighlights = {
   news: [
     {
       id: 'demo-news',
-      category: 'Atelier fictif',
-      title: 'Actualité de démonstration',
-      summary: 'Cette publication n’annonce aucun événement réel.',
+      category: 'Atelier',
+      title: 'Prendre en main le portail membre',
+      summary: 'Découvrir les cotisations, reçus et requêtes en ligne.',
       fictionalDemo: true,
     },
   ],
@@ -70,26 +70,26 @@ describe('HomePage (PUB-001)', () => {
     expect(host.textContent).toContain('Chargement');
   });
 
-  it('rend les chiffres et signale sans ambiguïté leur provenance fictive', async () => {
+  it('rend les chiffres en signalant qu’ils ne sont pas les statistiques officielles', async () => {
     const { fixture, gateway, host } = await setup();
     gateway.latest.next(READY);
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(host.querySelectorAll('.cnpm-home__metric')).toHaveLength(2);
-    expect(host.textContent).toContain('Données fictives de démonstration');
-    expect(host.textContent).toContain("Aucune date d'arrêté officielle n'est publiée");
+    expect(host.textContent).toContain('Chiffres illustratifs');
+    expect(host.textContent).toContain('ne constituent pas les statistiques officielles du CNPM');
   });
 
-  it('rend les actualités fictives sans leur inventer de destination', async () => {
+  it('rend les actualités illustratives sans leur inventer de destination', async () => {
     const { fixture, gateway, host } = await setup();
     gateway.latest.next(READY);
     await fixture.whenStable();
     fixture.detectChanges();
 
     const news = host.querySelector('#actualites')!;
-    expect(news.textContent).toContain('Contenus fictifs de démonstration');
-    expect(news.textContent).toContain('Publication fictive — aucune destination associée');
+    expect(news.textContent).toContain('Contenus illustratifs');
+    expect(news.textContent).toContain('Exemple de publication — aucune destination associée');
     expect(news.querySelectorAll('a')).toHaveLength(0);
   });
 
@@ -103,7 +103,7 @@ describe('HomePage (PUB-001)', () => {
     gateway.latest.error(new Error('indisponible'));
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(host.textContent).toContain('Les chiffres de démonstration sont indisponibles');
+    expect(host.textContent).toContain('Les chiffres clés sont indisponibles');
     expect(host.textContent).toContain('Réessayer');
   });
 
@@ -124,11 +124,11 @@ describe('HomePage (PUB-001)', () => {
     expect(host.querySelector('.cnpm-skeleton')).not.toBeNull();
   });
 
-  it('expose PUB-012 comme démonstration distincte de la connexion', async () => {
+  it('expose PUB-012 comme parcours distinct de la connexion', async () => {
     const { host } = await setup();
     const links = Array.from(host.querySelectorAll<HTMLAnchorElement>('a[href]'));
     expect(links.some((link) => link.getAttribute('href') === '/adhesion')).toBe(true);
     expect(links.some((link) => link.getAttribute('href') === '/auth/login')).toBe(true);
-    expect(host.textContent).toContain('ne crée aucun dossier officiel');
+    expect(host.textContent).toContain('Préparer une adhésion');
   });
 });

@@ -25,7 +25,7 @@ const AUDIENCE_COUNTS: Readonly<
 };
 
 /**
- * Calculateur local du scénario visuel BO-012.
+ * Calculateur local du scénario BO-012.
  *
  * Les valeurs ne représentent aucun barème CNPM : elles permettent uniquement de
  * valider la composition, les contrôles et la revue des exceptions tant que DEC-008
@@ -43,7 +43,7 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
     // Typage contextuel explicite : sans lui, les unions littérales (sévérité, période)
     // sont élargies en `string` et ne satisfont plus le contrat du port.
     return of<ContributionGenerationSimulation>({
-      scenarioReference: `SIM-DEMO-${suffix}`,
+      scenarioReference: `SIM-GEN-${suffix}`,
       fiscalYear: request.fiscalYear,
       period: request.period,
       audience: request.audience,
@@ -55,15 +55,15 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
       issues: [
         {
           id: 'issue-001',
-          memberCode: 'CNPM-DEMO-0142',
+          memberCode: 'CNPM-2026-0142',
           organizationName: 'Atelier Horizon SARL',
           severity: 'BLOCKING',
           reason: 'Catégorie de cotisation absente',
-          treatment: 'Compléter le dossier avant toute génération réelle.',
+          treatment: 'Compléter le dossier avant toute génération.',
         },
         {
           id: 'issue-002',
-          memberCode: 'CNPM-DEMO-0381',
+          memberCode: 'CNPM-2026-0381',
           organizationName: 'Kora Numérique SA',
           severity: 'BLOCKING',
           reason: 'Période d’adhésion non qualifiée',
@@ -71,7 +71,7 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
         },
         {
           id: 'issue-003',
-          memberCode: 'CNPM-DEMO-0917',
+          memberCode: 'CNPM-2026-0917',
           organizationName: 'Nimba Services SAS',
           severity: 'BLOCKING',
           reason: 'Aucun barème homologué applicable',
@@ -79,7 +79,7 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
         },
         {
           id: 'issue-004',
-          memberCode: 'CNPM-DEMO-0724',
+          memberCode: 'CNPM-2026-0724',
           organizationName: 'Djoliba Emballages SARL',
           severity: 'WARNING',
           reason: 'Changement de catégorie en attente de revue',

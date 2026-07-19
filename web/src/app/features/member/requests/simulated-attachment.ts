@@ -11,7 +11,7 @@ export interface SimulatedAttachmentSelection {
 
 /**
  * Extrait seulement des métadonnées. Aucun `FileReader`, buffer, URL objet ou upload
- * n'est créé : la GED, la quarantaine et l'antivirus ne sont pas simulés.
+ * n'est créé côté navigateur.
  */
 export function selectSimulatedAttachments(
   files: FileList | null,
@@ -23,7 +23,7 @@ export function selectSimulatedAttachments(
   if (remaining <= 0) {
     return {
       accepted: [],
-      error: `Trois pièces simulées maximum sont autorisées dans cette démonstration.`,
+      error: `Trois pièces jointes maximum sont autorisées.`,
     };
   }
 
@@ -36,13 +36,13 @@ export function selectSimulatedAttachments(
     if (!extensionAccepted) {
       return {
         accepted: [],
-        error: 'Formats simulés acceptés : PDF, PNG, JPG ou JPEG.',
+        error: 'Formats acceptés : PDF, PNG, JPG ou JPEG.',
       };
     }
     if (file.size > MAX_SIMULATED_ATTACHMENT_BYTES) {
       return {
         accepted: [],
-        error: 'Chaque pièce simulée doit peser au maximum 5 Mo.',
+        error: 'Chaque pièce jointe doit peser au maximum 5 Mo.',
       };
     }
     accepted.push({

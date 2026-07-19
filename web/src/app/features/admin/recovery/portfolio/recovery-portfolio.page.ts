@@ -227,8 +227,8 @@ export class RecoveryPortfolioPage {
     return chips;
   });
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'case', label: 'Dossier fictif' },
-    { key: 'amount', label: 'Solde fictif' },
+    { key: 'case', label: 'Dossier' },
+    { key: 'amount', label: 'Solde' },
     { key: 'delay', label: 'Retard' },
     { key: 'nextAction', label: 'Prochaine action' },
     { key: 'campaign', label: 'Campagne / segment' },

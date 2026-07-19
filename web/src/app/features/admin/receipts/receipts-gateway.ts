@@ -21,7 +21,7 @@ export interface ReceiptQuery {
 }
 
 /**
- * Projection de démonstration du registre. Elle ne contient volontairement aucun
+ * Projection du registre. Elle ne contient volontairement aucun
  * document, jeton de vérification, QR, signature, cachet ou identité d'émetteur.
  */
 export interface ReceiptRegistryRow {

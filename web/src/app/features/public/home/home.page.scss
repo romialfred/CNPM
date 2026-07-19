@@ -83,14 +83,6 @@
   margin-block-start: var(--cnpm-space-4);
 }
 
-.cnpm-home__action-note {
-  max-width: 34rem;
-  margin: var(--cnpm-space-2) 0 0;
-  color: var(--cnpm-color-text-muted);
-  font-size: var(--cnpm-font-size-xs);
-  line-height: var(--cnpm-font-lineHeight-xs);
-}
-
 .cnpm-home__promises {
   grid-area: promises;
   display: grid;
@@ -176,15 +168,6 @@
   height: var(--cnpm-space-2);
   border-radius: var(--cnpm-radius-pill);
   background: var(--cnpm-color-semantic-success-600);
-}
-
-.cnpm-home__demo-badge {
-  padding: var(--cnpm-space-1) var(--cnpm-space-2);
-  border: 1px solid var(--cnpm-color-brand-blue-200);
-  border-radius: var(--cnpm-radius-pill);
-  background: var(--cnpm-color-brand-blue-50);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .cnpm-home__preview-loading,

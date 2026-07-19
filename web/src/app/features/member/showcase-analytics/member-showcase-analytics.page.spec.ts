@@ -88,7 +88,7 @@ describe('MemberShowcaseAnalyticsPage — MP-017', () => {
   it('lit la période et la présentation depuis l’URL', async () => {
     const { gateway, host } = await setup({ period: '90d', display: 'table' });
     expect(gateway.calls[0].query).toEqual({ period: '90d' });
-    expect(host.textContent).toContain('Chargement des agrégats fictifs');
+    expect(host.textContent).toContain('Chargement des agrégats');
   });
 
   it('rend les agrégats sans suivi individuel et porte noindex', async () => {
@@ -99,7 +99,7 @@ describe('MemberShowcaseAnalyticsPage — MP-017', () => {
 
     expect(host.querySelector('.showcase-analytics h1')).toBe(document.activeElement);
     expect(host.textContent).toContain('45');
-    expect(host.textContent).toContain('Suivi désactivé dans la démonstration');
+    expect(host.textContent).toContain('Suivi des contacts désactivé');
     expect(host.querySelector('table caption')?.textContent).toContain('sans identifiant visiteur');
     expect(TestBed.inject(Meta).getTag('name="robots"')?.content).toBe('noindex,nofollow');
     expect(

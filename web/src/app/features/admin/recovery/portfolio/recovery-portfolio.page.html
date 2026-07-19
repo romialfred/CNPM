@@ -2,7 +2,7 @@
   <div class="recovery-portfolio-page">
     <cnpm-page-header
       title="Portefeuille agent de recouvrement"
-      description="Consultez les dossiers fictifs affectés, leur prochaine échéance et les protections actives."
+      description="Consultez les dossiers affectés, leur prochaine échéance et les protections actives."
     >
       <cnpm-button variant="secondary" routerLink="/admin/recovery/campaigns">
         Campagnes
@@ -12,17 +12,17 @@
       </cnpm-button>
     </cnpm-page-header>
 
-    <cnpm-alert tone="warning" title="Portefeuille fictif en lecture seule">
+    <cnpm-alert tone="warning" title="Portefeuille en lecture seule">
       Le portefeuille n’exécute aucun message, appel, rendez-vous ou visite. Les contacts sont
       masqués, les promesses ne sont pas modifiables et aucun score ne sanctionne ni ne classe un
       membre.
     </cnpm-alert>
 
     @if (overview(); as summary) {
-      <p class="recovery-portfolio-page__count">Vue globale fictive · tous filtres confondus</p>
+      <p class="recovery-portfolio-page__count">Vue globale · tous filtres confondus</p>
       <section
         class="recovery-portfolio-page__kpis"
-        aria-label="Synthèse globale du portefeuille fictif, tous filtres confondus"
+        aria-label="Synthèse globale du portefeuille, tous filtres confondus"
       >
         <article>
           <span>Dossiers affectés au total</span><strong>{{ summary.assignedCases }}</strong>
@@ -37,7 +37,7 @@
           <span>Promesses actives</span><strong>{{ summary.activePromises }}</strong>
         </article>
         <article>
-          <span>Solde fictif suivi</span>
+          <span>Solde suivi</span>
           <strong>{{ summary.outstandingAmount | number: '1.0-0' }} FCFA</strong>
         </article>
       </section>
@@ -47,8 +47,8 @@
         aria-labelledby="portfolio-performance-title"
       >
         <div>
-          <p>Historique agrégé fictif · REL-007</p>
-          <h2 id="portfolio-performance-title">Performance de l’agent Démo</h2>
+          <p>Historique agrégé · REL-007</p>
+          <h2 id="portfolio-performance-title">Performance de l’agent</h2>
           <small
             >Indicateurs descriptifs uniquement ; aucun score individuel ni décision
             automatique.</small
@@ -64,11 +64,11 @@
             <dd>{{ summary.conversionRate | number: '1.0-2' }} %</dd>
           </div>
           <div>
-            <dt>Montant récupéré fictif</dt>
+            <dt>Montant récupéré</dt>
             <dd>{{ summary.recoveredAmount | number: '1.0-0' }} FCFA</dd>
           </div>
           <div>
-            <dt>Coût fictif</dt>
+            <dt>Coût</dt>
             <dd>{{ summary.estimatedCost | number: '1.0-0' }} FCFA</dd>
           </div>
           <div>
@@ -95,7 +95,7 @@
             name="search"
             autocomplete="off"
             maxlength="120"
-            placeholder="Dossier ou organisation Démo"
+            placeholder="Dossier ou organisation"
             [ngModel]="searchDraft()"
             (ngModelChange)="searchDraft.set($event)"
           />
@@ -129,7 +129,7 @@
           </select>
         </div>
         <div class="recovery-portfolio-page__field">
-          <label for="recovery-portfolio-segment">Segment fictif</label>
+          <label for="recovery-portfolio-segment">Segment</label>
           <select
             id="recovery-portfolio-segment"
             name="segment"
@@ -153,7 +153,7 @@
             <option value="nextActionAt:asc">Prochaine action — proche</option>
             <option value="nextActionAt:desc">Prochaine action — lointaine</option>
             <option value="organization:asc">Organisation — A à Z</option>
-            <option value="outstandingAmount:desc">Solde fictif — décroissant</option>
+            <option value="outstandingAmount:desc">Solde — décroissant</option>
             <option value="daysOverdue:desc">Retard — décroissant</option>
           </select>
         </div>
@@ -164,7 +164,7 @@
     <p class="recovery-portfolio-page__count" aria-live="polite">
       @if (state() === 'ready' || state() === 'noResult' || state() === 'empty') {
         <strong>{{ totalItems() }}</strong>
-        {{ totalItems() === 1 ? 'dossier fictif trouvé' : 'dossiers fictifs trouvés' }}
+        {{ totalItems() === 1 ? 'dossier trouvé' : 'dossiers trouvés' }}
       }
     </p>
 
@@ -174,7 +174,7 @@
           variant="table"
           [rows]="pageSize()"
           [columns]="columns.length"
-          label="Chargement du portefeuille fictif…"
+          label="Chargement du portefeuille…"
         />
       }
       @case ('unavailable') {
@@ -199,7 +199,7 @@
       @case ('empty') {
         <cnpm-empty-state
           variant="no-data"
-          title="Aucun dossier fictif affecté"
+          title="Aucun dossier affecté"
           description="L’affectation est une règle serveur absente de ce prototype."
         />
       }
@@ -218,11 +218,11 @@
         <div class="recovery-portfolio-page__layout">
           <section
             class="recovery-portfolio-page__list"
-            aria-label="Dossiers fictifs du portefeuille"
+            aria-label="Dossiers du portefeuille"
           >
             <div class="recovery-portfolio-page__table">
               <cnpm-data-table
-                caption="Portefeuille fictif de l’agent Démo, sans score ni action de contact."
+                caption="Portefeuille de l’agent, sans score ni action de contact."
                 [columns]="columns"
                 [rows]="items()"
                 state="ready"
@@ -285,7 +285,7 @@
                   <p>{{ item.reference }} · {{ item.calendarBucket }}</p>
                   <dl>
                     <div>
-                      <dt>Solde fictif</dt>
+                      <dt>Solde</dt>
                       <dd>{{ item.outstandingAmount | number: '1.0-0' }} FCFA</dd>
                     </div>
                     <div>
@@ -332,7 +332,7 @@
             @if (selected(); as item) {
               <div class="recovery-portfolio-page__detail-head">
                 <div>
-                  <p>Portefeuille Agent Démo</p>
+                  <p>Portefeuille Agent de recouvrement</p>
                   <h2 #detailTitle id="recovery-portfolio-detail-title" tabindex="-1">
                     {{ item.reference }} · détail affiché
                   </h2>
@@ -344,7 +344,7 @@
               <p class="recovery-portfolio-page__detail-name">{{ item.organization }}</p>
               <dl class="recovery-portfolio-page__definitions">
                 <div>
-                  <dt>Solde fictif</dt>
+                  <dt>Solde</dt>
                   <dd>{{ item.outstandingAmount | number: '1.0-0' }} FCFA</dd>
                 </div>
                 <div>
@@ -381,7 +381,7 @@
                   class="recovery-portfolio-page__promise"
                   aria-labelledby="recovery-portfolio-promise-title"
                 >
-                  <h3 id="recovery-portfolio-promise-title">Promesse existante fictive</h3>
+                  <h3 id="recovery-portfolio-promise-title">Promesse existante</h3>
                   <dl>
                     <div>
                       <dt>Montant</dt>

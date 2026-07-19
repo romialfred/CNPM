@@ -60,7 +60,7 @@ const SORTS: readonly MemberPaymentSort[] = ['updatedAt', 'reference', 'amountXo
 
 type PaymentsViewState = 'loading' | 'ready' | 'empty' | 'no-results' | 'unavailable' | 'error';
 
-/** MP-006 — historique paginé des seuls scénarios visibles du membre fictif. */
+/** MP-006 — historique paginé des seuls règlements visibles du membre courant. */
 @Component({
   selector: 'cnpm-member-payments-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -98,11 +98,11 @@ export class MemberPaymentsPage {
   protected readonly channels = CHANNELS;
   protected readonly filtersExpanded = signal(true);
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Référence fictive' },
+    { key: 'reference', label: 'Référence' },
     { key: 'contribution', label: 'Cotisation' },
     { key: 'updatedAt', label: 'Dernière mise à jour' },
-    { key: 'amountXof', label: 'Montant fictif' },
-    { key: 'channel', label: 'Aperçu du canal' },
+    { key: 'amountXof', label: 'Montant' },
+    { key: 'channel', label: 'Canal' },
     { key: 'status', label: 'Statut' },
     { key: 'action', label: 'Suivi' },
   ];

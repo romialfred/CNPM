@@ -22,7 +22,6 @@ import {
 } from '@lucide/angular';
 import { BehaviorSubject, catchError, combineLatest, map, of, switchMap, tap } from 'rxjs';
 import { PageSeoService } from '../../../core/seo/page-seo.service';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
@@ -59,7 +58,6 @@ type DetailOutcome =
   selector: 'cnpm-showcase-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AlertComponent,
     ButtonComponent,
     EmptyStateComponent,
     ErrorStateComponent,

@@ -18,24 +18,24 @@ import {
 import { EditorialPage } from './editorial.page';
 
 const ARTICLE: PublicDemoArticle = {
-  slug: 'publication-fictive',
-  category: 'Repère fictif',
-  title: 'Publication entièrement fictive',
-  summary: 'Résumé de démonstration sans annonce officielle.',
-  body: ['Premier paragraphe fictif.', 'Second paragraphe fictif.'],
+  slug: 'publication-editoriale',
+  category: 'Repère',
+  title: 'Publication éditoriale',
+  summary: 'Résumé de la publication éditoriale.',
+  body: ['Premier paragraphe.', 'Second paragraphe.'],
   publishedOn: '2026-07-08',
   readingMinutes: 2,
   fictionalDemo: true,
 };
 
 const EVENT: PublicDemoEvent = {
-  id: 'event-fictif',
-  kind: 'Atelier fictif',
-  title: 'Rendez-vous de démonstration',
-  summary: 'Aucune inscription réelle.',
+  id: 'evt-2026-09-17',
+  kind: 'Atelier',
+  title: 'Rendez-vous du réseau',
+  summary: 'Inscription non ouverte.',
   startsOn: '2026-09-17T09:00:00Z',
   endsOn: '2026-09-17T11:00:00Z',
-  location: 'Lieu fictif',
+  location: 'Bamako',
   fictionalDemo: true,
 };
 
@@ -93,14 +93,13 @@ async function setup(mode: 'news' | 'article' | 'agenda', slug = '') {
 describe('EditorialPage (PUB-009/PUB-010/PUB-011)', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('rend un chargement identifiable et un avertissement permanent', async () => {
+  it('rend un chargement identifiable et un titre de page unique', async () => {
     const { host } = await setup('news');
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.querySelectorAll('.cnpm-skeleton')).toHaveLength(4);
-    expect(host.textContent).toContain('Contenus 100 % fictifs');
   });
 
-  it('affiche et relie uniquement les actualités fictives', async () => {
+  it('affiche et relie les actualités publiées', async () => {
     const { fixture, gateway, host } = await setup('news');
     gateway.articles.next([ARTICLE]);
     await fixture.whenStable();
@@ -108,7 +107,7 @@ describe('EditorialPage (PUB-009/PUB-010/PUB-011)', () => {
 
     expect(host.textContent).toContain(ARTICLE.title);
     expect(host.querySelector<HTMLAnchorElement>('.news-card h3 a')?.getAttribute('href')).toBe(
-      '/actualites/publication-fictive',
+      '/actualites/publication-editoriale',
     );
     expect(document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content).toBe(
       'noindex,nofollow',

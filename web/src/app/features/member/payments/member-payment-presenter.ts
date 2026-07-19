@@ -5,10 +5,10 @@ import type {
 } from './member-payments-gateway';
 
 const STATUS_LABELS: Readonly<Record<MemberPaymentStatus, string>> = {
-  PREPARED: 'Préparé localement',
-  PROCESSING: 'Scénario en examen',
+  PREPARED: 'Préparé',
+  PROCESSING: 'En cours d’examen',
   NEEDS_REVIEW: 'À examiner',
-  FAILED: 'Simulation interrompue',
+  FAILED: 'Demande interrompue',
 };
 
 const STATUS_TONES: Readonly<Record<MemberPaymentStatus, CnpmBadgeTone>> = {
@@ -19,9 +19,9 @@ const STATUS_TONES: Readonly<Record<MemberPaymentStatus, CnpmBadgeTone>> = {
 };
 
 const CHANNEL_LABELS: Readonly<Record<MemberPaymentChannel, string>> = {
-  MOBILE_MONEY_PREVIEW: 'Aperçu Mobile Money non raccordé',
-  BANK_TRANSFER_PREVIEW: 'Aperçu virement non raccordé',
-  CASH_DECLARATION_PREVIEW: 'Déclaration de caisse fictive',
+  MOBILE_MONEY_PREVIEW: 'Mobile Money — raccordement à venir',
+  BANK_TRANSFER_PREVIEW: 'Virement bancaire — raccordement à venir',
+  CASH_DECLARATION_PREVIEW: 'Déclaration de caisse',
 };
 
 export function memberPaymentStatusLabel(status: MemberPaymentStatus): string {

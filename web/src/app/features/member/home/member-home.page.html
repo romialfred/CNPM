@@ -37,9 +37,6 @@
       @case ('ready') {
         @if (identity(); as member) {
           <section class="member-home__hero" aria-labelledby="member-home-title">
-            <p class="member-home__demo-note">
-              Démonstration — données 100 % fictives, aucune opération financière réelle
-            </p>
             <div class="member-home__welcome">
               <div>
                 <h1 id="member-home-title">
@@ -90,13 +87,13 @@
                 <button
                   class="member-home__button member-home__button--primary member-home__payment"
                   type="button"
-                  aria-describedby="payment-demo-note"
+                  aria-describedby="payment-availability-note"
                   (click)="announceUnavailable('Le paiement en ligne')"
                 >
                   <svg lucideCreditCard aria-hidden="true"></svg>Payer maintenant
                 </button>
-                <span class="member-home__sr-only" id="payment-demo-note"
-                  >Démonstration uniquement, aucune transaction ne sera initiée.</span
+                <span class="member-home__sr-only" id="payment-availability-note"
+                  >Le paiement en ligne n’est pas encore disponible.</span
                 >
               </aside>
             }

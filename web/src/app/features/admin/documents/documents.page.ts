@@ -167,7 +167,7 @@ export class DocumentsPage {
   });
   protected readonly columns: readonly DataTableColumn[] = [
     { key: 'title', label: 'Document', sortable: true },
-    { key: 'businessObject', label: 'Objet métier fictif' },
+    { key: 'businessObject', label: 'Objet métier' },
     { key: 'classification', label: 'Classification' },
     { key: 'lifecycle', label: 'Cycle de vie' },
     { key: 'version', label: 'Version' },

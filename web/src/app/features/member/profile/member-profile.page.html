@@ -1,35 +1,26 @@
 <cnpm-member-portal-shell
-  organization="Entreprise Démo Sahel"
-  userName="Membre de démonstration"
-  memberCode="CNPM-DEMO-0001"
+  organization="Sahel Agro SA"
+  userName="Responsable adhésion"
+  memberCode="CNPM-2026-0001"
   [notificationCount]="0"
 >
   <main class="member-profile" id="contenu-principal">
     <cnpm-page-header
       title="Profil entreprise"
-      description="Consultez l’identité fictive et l’adhésion associées à votre espace membre."
+      description="Consultez l’identité et l’adhésion associées à votre espace membre."
     />
-
-    <cnpm-alert tone="warning" title="Profil local fictif" [live]="false">
-      Aucune identité, coordonnée, photographie ou donnée membre réelle n’est affichée. Cette vue de
-      démonstration ne permet aucune modification.
-    </cnpm-alert>
 
     @switch (result().kind) {
       @case ('loading') {
-        <section class="member-profile__panel" aria-label="Chargement du profil entreprise fictif">
-          <cnpm-skeleton
-            variant="card"
-            [rows]="5"
-            label="Chargement du profil entreprise fictif…"
-          />
+        <section class="member-profile__panel" aria-label="Chargement du profil entreprise">
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement du profil entreprise…" />
         </section>
       }
       @case ('error') {
         <cnpm-error-state
           variant="recoverable"
           title="Le profil n’a pas pu être chargé"
-          description="La source locale est momentanément indisponible. Aucune donnée ni modification n’a été transmise."
+          description="Le service est momentanément indisponible. Vous pouvez relancer le chargement."
         >
           <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
         </cnpm-error-state>
@@ -38,7 +29,7 @@
         <cnpm-error-state
           variant="recoverable"
           title="Profil entreprise indisponible en mode HTTP"
-          description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible. Aucune fixture n’est injectée dans ce mode."
+          description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible."
         />
       }
       @case ('empty') {
@@ -52,7 +43,7 @@
         @if (profile(); as profile) {
           <section class="member-profile__summary" aria-labelledby="member-profile-summary-title">
             <div>
-              <p class="member-profile__eyebrow">Espace auto-scopé — démonstration</p>
+              <p class="member-profile__eyebrow">Espace membre</p>
               <h2 id="member-profile-summary-title">{{ profile.organizationName }}</h2>
               <p>{{ profile.memberReference }}</p>
             </div>
@@ -82,7 +73,7 @@
                   <dd>{{ profile.organizationName }}</dd>
                 </div>
                 <div>
-                  <dt>Référence membre fictive</dt>
+                  <dt>Référence membre</dt>
                   <dd>
                     <code>{{ profile.memberReference }}</code>
                   </dd>
@@ -104,9 +95,8 @@
           </div>
 
           <cnpm-alert tone="info" title="Modification non disponible" [live]="false">
-            {{ profile.disclosure }} Les changements soumis à validation resteront désactivés tant
-            que le contrat serveur, le périmètre d’organisation et la réauthentification ne seront
-            pas définis.
+            {{ profile.disclosure }} La modification en ligne des informations n’est pas ouverte à
+            ce jour.
           </cnpm-alert>
         }
       }

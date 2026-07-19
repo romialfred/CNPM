@@ -3,20 +3,20 @@ import { describe, expect, it } from 'vitest';
 import { DemoMemberDirectoryGateway } from './demo-member-directory.gateway';
 
 describe('DemoMemberDirectoryGateway — MP-018', () => {
-  it('filtre les organisations fictives par secteur, zone et thème', async () => {
+  it('filtre les organisations par secteur, zone et thème', async () => {
     const snapshot = await firstValueFrom(
       new DemoMemberDirectoryGateway().list({
         search: '',
-        sector: 'AGRI_DEMO',
-        zone: 'ZONE_C_DEMO',
-        theme: 'LOGISTICS_DEMO',
+        sector: 'AGRI',
+        zone: 'ZONE_C',
+        theme: 'LOGISTICS',
         sort: 'name',
       }),
     );
 
-    expect(snapshot.visibility).toBe('PRIVATE_MEMBER_DEMO');
+    expect(snapshot.visibility).toBe('PRIVATE_MEMBER');
     expect(snapshot.items).toHaveLength(2);
-    expect(snapshot.items.every((item) => item.name.includes('organisation fictive'))).toBe(true);
+    expect(snapshot.items.every((item) => item.id.startsWith('directory-'))).toBe(true);
   });
 
   it('n’expose aucune coordonnée, URL ou donnée métier sensible', async () => {

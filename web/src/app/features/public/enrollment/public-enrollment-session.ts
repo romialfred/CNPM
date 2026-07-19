@@ -12,9 +12,9 @@ export interface PublicEnrollmentValues {
 }
 
 export interface PublicEnrollmentLocalConfirmation {
-  readonly reference: `DEMO-${string}`;
+  readonly reference: `ADH-${string}`;
   readonly organizationLabel: string;
-  readonly channelLabel: 'Démonstration locale';
+  readonly channelLabel: 'Préparation en ligne';
   readonly officialCaseCreated: false;
 }
 
@@ -33,9 +33,9 @@ export class PublicEnrollmentSession {
 
   create(values: PublicEnrollmentValues): PublicEnrollmentLocalConfirmation {
     const confirmation: PublicEnrollmentLocalConfirmation = {
-      reference: 'DEMO-ADH-2026-001',
+      reference: 'ADH-2026-001',
       organizationLabel: values.legalName.trim(),
-      channelLabel: 'Démonstration locale',
+      channelLabel: 'Préparation en ligne',
       officialCaseCreated: false,
     };
     this.value.set(confirmation);

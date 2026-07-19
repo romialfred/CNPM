@@ -34,7 +34,7 @@ function buildDailyAggregates(dayCount: number): readonly ShowcaseDailyAggregate
     return {
       date,
       views: 8 + ((index * 7 + dayCount) % 17),
-      // Les contacts ne sont pas exposés dans la démo : aucune interaction n'est suivie.
+      // Le suivi des contacts est désactivé : aucune interaction n'est enregistrée.
       contactActions: 0,
     };
   });

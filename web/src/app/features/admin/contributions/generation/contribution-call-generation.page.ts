@@ -169,9 +169,9 @@ export class ContributionCallGenerationPage {
 
   protected audienceLabel(audience: ContributionAudience): string {
     return {
-      ALL_ACTIVE: 'Tous les membres actifs du jeu Démo',
-      NEW_MEMBERS: 'Nouveaux membres fictifs',
-      LARGE_CONTRIBUTORS: 'Segment grands cotisants fictif',
+      ALL_ACTIVE: 'Tous les membres actifs',
+      NEW_MEMBERS: 'Nouveaux membres',
+      LARGE_CONTRIBUTORS: 'Segment grands cotisants',
     }[audience];
   }
 

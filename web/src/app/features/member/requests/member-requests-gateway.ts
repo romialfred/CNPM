@@ -44,7 +44,7 @@ export interface MemberRequestSummary {
   readonly status: MemberRequestStatus;
   readonly createdAt: string;
   readonly updatedAt: string;
-  /** Date cible fournie par le scénario, jamais recalculée dans l'interface. */
+  /** Date cible fournie par la source, jamais recalculée dans l'interface. */
   readonly targetAt: string | null;
   readonly slaState: MemberRequestSlaState;
 }

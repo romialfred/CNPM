@@ -11,7 +11,7 @@ import {
 import { organizationContactsReadGuard } from './organization-contacts-read.guard';
 
 const IDENTITY: SessionIdentity = {
-  displayName: 'Gestionnaire fictif',
+  displayName: 'Gestionnaire',
   roleLabel: 'GESTIONNAIRE',
   exerciseLabel: null,
   notificationCount: null,

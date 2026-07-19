@@ -12,7 +12,7 @@ import {
 import { receiptReadGuard } from './receipt-read.guard';
 
 const IDENTITY: SessionIdentity = {
-  displayName: 'Agent finance fictif',
+  displayName: 'Agent finance',
   roleLabel: 'FINANCE',
   exerciseLabel: null,
   notificationCount: null,

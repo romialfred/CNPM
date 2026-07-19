@@ -23,12 +23,11 @@ import { PaymentsValidationError } from './payments-gateway';
 const LATENCY_MS = 140;
 
 /**
- * Jeu de démonstration — données entièrement fictives.
+ * Jeu de fixtures déterministe.
  *
  * Aucune raison sociale, aucun matricule et aucun montant réel : ni membre du CNPM, ni
  * établissement bancaire, ni opérateur existant. `CLAUDE.md` interdit d'inventer une
- * donnée institutionnelle, et les codes membres portent le préfixe `DEMO` pour qu'une
- * capture d'écran ne puisse jamais être prise pour un extrait de production.
+ * donnée institutionnelle.
  */
 const DEMO_LINES: readonly StatementLine[] = [
   {
@@ -38,13 +37,13 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 12500000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-14T11:23:00Z',
-    transactionReference: 'DEMO-MM-260714-1001',
+    transactionReference: 'TRX-MM-260714-1001',
     status: 'UNMATCHED',
     allocation: null,
     suggestions: [
       {
         id: 'sugg-0001-a',
-        memberCode: 'CNPM-DEMO-0101',
+        memberCode: 'CNPM-2026-0101',
         memberName: 'Sahel Agro SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -58,7 +57,7 @@ const DEMO_LINES: readonly StatementLine[] = [
       },
       {
         id: 'sugg-0001-b',
-        memberCode: 'CNPM-DEMO-0111',
+        memberCode: 'CNPM-2026-0111',
         memberName: 'Wassoulou Agro SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -75,13 +74,13 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 8750000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-14T10:18:00Z',
-    transactionReference: 'DEMO-VIR-260714-1002',
+    transactionReference: 'TRX-VIR-260714-1002',
     status: 'UNMATCHED',
     allocation: null,
     suggestions: [
       {
         id: 'sugg-0002-a',
-        memberCode: 'CNPM-DEMO-0102',
+        memberCode: 'CNPM-2026-0102',
         memberName: 'Niger Textile SARL',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -102,7 +101,7 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 3250000,
     channel: 'CASH',
     valueDate: '2026-07-14T09:52:00Z',
-    transactionReference: 'DEMO-CAI-260714-1003',
+    transactionReference: 'TRX-CAI-260714-1003',
     status: 'UNMATCHED',
     allocation: null,
     // Aucune correspondance : le payeur n'est rattaché à aucun membre connu. L'écran
@@ -116,13 +115,13 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 7250000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-13T17:41:00Z',
-    transactionReference: 'DEMO-MM-260713-1004',
+    transactionReference: 'TRX-MM-260713-1004',
     status: 'UNMATCHED',
     allocation: null,
     suggestions: [
       {
         id: 'sugg-0004-a',
-        memberCode: 'CNPM-DEMO-0106',
+        memberCode: 'CNPM-2026-0106',
         memberName: 'Manding BTP SARL',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -142,13 +141,13 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 5000000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-13T16:05:00Z',
-    transactionReference: 'DEMO-VIR-260713-1005',
+    transactionReference: 'TRX-VIR-260713-1005',
     status: 'UNMATCHED',
     allocation: null,
     suggestions: [
       {
         id: 'sugg-0005-a',
-        memberCode: 'CNPM-DEMO-0105',
+        memberCode: 'CNPM-2026-0105',
         memberName: 'Delta Ciment SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -165,13 +164,13 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 2650000,
     channel: 'CHECK',
     valueDate: '2026-07-13T15:22:00Z',
-    transactionReference: 'DEMO-CHQ-260713-1006',
+    transactionReference: 'TRX-CHQ-260713-1006',
     status: 'UNMATCHED',
     allocation: null,
     suggestions: [
       {
         id: 'sugg-0006-a',
-        memberCode: 'CNPM-DEMO-0104',
+        memberCode: 'CNPM-2026-0104',
         memberName: 'Faso Bureautique SARL',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -181,7 +180,7 @@ const DEMO_LINES: readonly StatementLine[] = [
       },
       {
         id: 'sugg-0006-b',
-        memberCode: 'CNPM-DEMO-0104',
+        memberCode: 'CNPM-2026-0104',
         memberName: 'Faso Bureautique SARL',
         contributionLabel: 'Régularisation 2025',
         period: 'T3 2025 – T4 2025',
@@ -198,13 +197,13 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 1750000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-12T14:03:00Z',
-    transactionReference: 'DEMO-MM-260712-1007',
+    transactionReference: 'TRX-MM-260712-1007',
     status: 'UNMATCHED',
     allocation: null,
     suggestions: [
       {
         id: 'sugg-0007-a',
-        memberCode: 'CNPM-DEMO-0107',
+        memberCode: 'CNPM-2026-0107',
         memberName: 'Bamako Froid SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -224,13 +223,13 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 10000000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-12T11:56:00Z',
-    transactionReference: 'DEMO-VIR-260712-1008',
+    transactionReference: 'TRX-VIR-260712-1008',
     status: 'UNMATCHED',
     allocation: null,
     suggestions: [
       {
         id: 'sugg-0008-a',
-        memberCode: 'CNPM-DEMO-0103',
+        memberCode: 'CNPM-2026-0103',
         memberName: 'Kayes Logistique SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -251,10 +250,10 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 6300000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-11T10:31:00Z',
-    transactionReference: 'DEMO-MM-260711-1009',
+    transactionReference: 'TRX-MM-260711-1009',
     status: 'TO_CONFIRM',
     allocation: {
-      memberCode: 'CNPM-DEMO-0108',
+      memberCode: 'CNPM-2026-0108',
       memberName: 'Sikasso Coton SARL',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 6300000,
@@ -269,10 +268,10 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 9500000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-11T09:12:00Z',
-    transactionReference: 'DEMO-VIR-260711-1010',
+    transactionReference: 'TRX-VIR-260711-1010',
     status: 'TO_CONFIRM',
     allocation: {
-      memberCode: 'CNPM-DEMO-0109',
+      memberCode: 'CNPM-2026-0109',
       memberName: 'Mopti Pêche SA',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 8000000,
@@ -287,10 +286,10 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 4200000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-10T16:48:00Z',
-    transactionReference: 'DEMO-VIR-260710-1011',
+    transactionReference: 'TRX-VIR-260710-1011',
     status: 'MATCHED',
     allocation: {
-      memberCode: 'CNPM-DEMO-0110',
+      memberCode: 'CNPM-2026-0110',
       memberName: 'Gao Énergie SARL',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 4200000,
@@ -305,10 +304,10 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 3100000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-10T13:27:00Z',
-    transactionReference: 'DEMO-MM-260710-1012',
+    transactionReference: 'TRX-MM-260710-1012',
     status: 'MATCHED',
     allocation: {
-      memberCode: 'CNPM-DEMO-0112',
+      memberCode: 'CNPM-2026-0112',
       memberName: 'Koulikoro Transit SARL',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 3100000,
@@ -323,10 +322,10 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 1250000,
     channel: 'CASH',
     valueDate: '2026-07-09T15:04:00Z',
-    transactionReference: 'DEMO-CAI-260709-1013',
+    transactionReference: 'TRX-CAI-260709-1013',
     status: 'MATCHED',
     allocation: {
-      memberCode: 'CNPM-DEMO-0111',
+      memberCode: 'CNPM-2026-0111',
       memberName: 'Wassoulou Agro SA',
       contributionLabel: 'Régularisation 2025',
       allocatedAmount: 1250000,
@@ -341,7 +340,7 @@ const DEMO_LINES: readonly StatementLine[] = [
     amount: 875000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-09T08:36:00Z',
-    transactionReference: 'DEMO-MM-260709-1014',
+    transactionReference: 'TRX-MM-260709-1014',
     status: 'ANOMALY',
     allocation: null,
     suggestions: [],
@@ -352,7 +351,7 @@ const DEMO_LINES: readonly StatementLine[] = [
 const SEED_AUDIT: readonly AuditEntry[] = [
   {
     id: 'audit-003',
-    actor: 'Agent démo 2',
+    actor: 'Agent finance 2',
     action: 'Rapprochement enregistré sur MM-2026-0711-01009, en attente de confirmation',
     outcome: 'pending',
     occurredAt: '2026-07-15T09:41:00Z',
@@ -366,7 +365,7 @@ const SEED_AUDIT: readonly AuditEntry[] = [
   },
   {
     id: 'audit-001',
-    actor: 'Agent démo 1',
+    actor: 'Agent finance 1',
     action: 'Confirmation du rapprochement de VIR-2026-0710-01011',
     outcome: 'success',
     occurredAt: '2026-07-14T17:05:00Z',
@@ -614,7 +613,7 @@ export class DemoPaymentsGateway implements PaymentsGateway {
     this.auditSequence += 1;
     const entry: AuditEntry = {
       id: `audit-${String(this.auditSequence).padStart(3, '0')}`,
-      actor: 'Agent démo 1',
+      actor: 'Agent finance 1',
       action,
       outcome,
       occurredAt: new Date().toISOString(),

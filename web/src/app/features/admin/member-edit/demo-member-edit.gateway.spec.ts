@@ -24,14 +24,14 @@ describe('DemoMemberEditGateway', () => {
     const gateway = new DemoMemberEditGateway();
     const updated = await firstValueFrom(
       gateway.update('MEM-0001', 1, {
-        legalName: '  SOMACOP Démonstration  ',
+        legalName: '  SOMACOP Industries  ',
         tradeName: '',
-        organizationType: 'Entreprise membre — démo',
+        organizationType: 'Entreprise membre',
         sectorCode: '',
       }),
     );
     expect(updated).toMatchObject({
-      legalName: 'SOMACOP Démonstration',
+      legalName: 'SOMACOP Industries',
       tradeName: null,
       version: 2,
     });
@@ -47,7 +47,7 @@ describe('DemoMemberEditGateway', () => {
     ).rejects.toBeInstanceOf(MemberEditConflictError);
   });
 
-  it('distingue les états 403 et 404 de démonstration', async () => {
+  it('distingue les états 403 et 404', async () => {
     const gateway = new DemoMemberEditGateway();
     await expect(firstValueFrom(gateway.load('MEM-INTERDIT'))).rejects.toBeInstanceOf(
       MemberEditAccessError,

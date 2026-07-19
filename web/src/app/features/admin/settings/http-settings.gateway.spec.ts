@@ -23,9 +23,9 @@ const KEY_TWO = '43000000-0000-4000-8000-000000000002';
 function response(version = 4) {
   return {
     id: VALUE_ID,
-    domain: 'DEMO_CLASSE_INTERNE',
-    code: 'DEMO_STANDARD',
-    label: 'Valeur strictement fictive',
+    domain: 'REF_CLASSE_INTERNE',
+    code: 'REF_STANDARD',
+    label: 'Valeur strictement contrôlée',
     sortOrder: 10,
     active: true,
     validFrom: null,
@@ -70,10 +70,10 @@ describe('HttpSettingsGateway', () => {
 
   it('traduit le filtre et la pagination vers GET /reference-values', async () => {
     const resultPromise = firstValueFrom(
-      gateway.list({ domain: ' DEMO_CLASSE_INTERNE ', page: 3, pageSize: 20 }),
+      gateway.list({ domain: ' REF_CLASSE_INTERNE ', page: 3, pageSize: 20 }),
     );
     const request = http.expectOne(
-      '/v1/reference-values?page=2&size=20&domain=DEMO_CLASSE_INTERNE',
+      '/v1/reference-values?page=2&size=20&domain=REF_CLASSE_INTERNE',
     );
     expect(request.request.method).toBe('GET');
     request.flush({
@@ -93,9 +93,9 @@ describe('HttpSettingsGateway', () => {
 
   it('envoie uniquement ReferenceValueInput avec une clé d’idempotence stable sur retry', async () => {
     const input = {
-      domain: 'DEMO_CLASSE_INTERNE',
-      code: 'DEMO_STANDARD',
-      label: 'Valeur strictement fictive',
+      domain: 'REF_CLASSE_INTERNE',
+      code: 'REF_STANDARD',
+      label: 'Valeur strictement contrôlée',
       sortOrder: 10,
       active: true,
     };
@@ -114,10 +114,10 @@ describe('HttpSettingsGateway', () => {
     retryRequest.flush(response(), { status: 201, statusText: 'Created' });
     await expect(retryPromise).resolves.toEqual(response());
 
-    const nextPromise = firstValueFrom(gateway.create({ ...input, label: 'Autre valeur fictive' }));
+    const nextPromise = firstValueFrom(gateway.create({ ...input, label: 'Autre valeur' }));
     const nextRequest = http.expectOne('/v1/reference-values');
     expect(nextRequest.request.headers.get('Idempotency-Key')).toBe(KEY_TWO);
-    nextRequest.flush({ ...response(), label: 'Autre valeur fictive' });
+    nextRequest.flush({ ...response(), label: 'Autre valeur' });
     await nextPromise;
   });
 

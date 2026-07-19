@@ -17,8 +17,8 @@ const READY_PAGE: MemberReceiptPage = {
   items: [
     {
       id: 'demo-receipt-preview-2025-002',
-      reference: 'DEMO-APERCU-2025-002',
-      periodLabel: 'Période fictive 2025',
+      reference: 'RCP-2025-002',
+      periodLabel: 'Exercice 2025',
       amountXof: 180000,
       scenarioDate: '2025-12-20',
       status: 'DEMONSTRATION_CANCELLED',
@@ -110,20 +110,20 @@ describe('MemberReceiptsPage — MP-007', () => {
       page: 2,
       size: 5,
     });
-    expect(host.textContent).toContain('Chargement des aperçus de reçus fictifs');
+    expect(host.textContent).toContain('Chargement des récapitulatifs');
   });
 
-  it('rend table et fiches mobiles comme aperçus sans valeur probante', async () => {
+  it('rend table et fiches mobiles comme récapitulatifs de lecture', async () => {
     const { fixture, gateway, host } = await setup({ page: '2', taille: '5' });
     gateway.latest.next(READY_PAGE);
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
-    expect(host.querySelector('table caption')?.textContent).toContain('Aperçus de reçus fictifs');
-    expect(host.textContent).toContain('DEMO-APERCU-2025-002');
+    expect(host.querySelector('table caption')?.textContent).toContain('Récapitulatifs');
+    expect(host.textContent).toContain('RCP-2025-002');
     expect(host.querySelector('.member-receipts__mobile-list article dl')).not.toBeNull();
-    expect(host.textContent).toContain('aucune preuve officielle');
+    expect(host.textContent).toContain('Reçus officiels à venir');
     expect(host.textContent).not.toContain('REC-2025');
   });
 
@@ -135,7 +135,7 @@ describe('MemberReceiptsPage — MP-007', () => {
 
     const search = host.querySelector<HTMLInputElement>('#member-receipt-search');
     if (!search) throw new Error('Recherche absente');
-    search.value = '  DEMO-APERCU  ';
+    search.value = '  RCP  ';
     search.dispatchEvent(new Event('input'));
     const exercise = host.querySelector<HTMLSelectElement>('#member-receipt-exercise');
     if (!exercise) throw new Error('Exercice absent');
@@ -145,7 +145,7 @@ describe('MemberReceiptsPage — MP-007', () => {
 
     expect(navigate).toHaveBeenCalledWith([], {
       relativeTo: expect.anything(),
-      queryParams: expect.objectContaining({ q: 'DEMO-APERCU', exercice: 2025, page: 1 }),
+      queryParams: expect.objectContaining({ q: 'RCP', exercice: 2025, page: 1 }),
       queryParamsHandling: 'merge',
     });
   });
@@ -161,7 +161,7 @@ describe('MemberReceiptsPage — MP-007', () => {
     });
     await filtered.fixture.whenStable();
     filtered.fixture.detectChanges();
-    expect(filtered.host.textContent).toContain('Aucun aperçu ne correspond');
+    expect(filtered.host.textContent).toContain('Aucun récapitulatif ne correspond');
 
     TestBed.resetTestingModule();
     const empty = await setup();
@@ -174,7 +174,7 @@ describe('MemberReceiptsPage — MP-007', () => {
     });
     await empty.fixture.whenStable();
     empty.fixture.detectChanges();
-    expect(empty.host.textContent).toContain('Aucun aperçu de reçu');
+    expect(empty.host.textContent).toContain('Aucun récapitulatif');
 
     TestBed.resetTestingModule();
     const failed = await setup();

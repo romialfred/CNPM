@@ -86,7 +86,7 @@ export class MemberContributionsPage {
   protected readonly pageSizes = PAGE_SIZES;
   protected readonly statuses = STATUSES;
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Référence fictive' },
+    { key: 'reference', label: 'Référence' },
     { key: 'exercise', label: 'Exercice' },
     { key: 'dueDate', label: 'Échéance' },
     { key: 'calledAmount', label: 'Montant fourni' },

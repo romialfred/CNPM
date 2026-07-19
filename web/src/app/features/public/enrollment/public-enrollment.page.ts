@@ -60,12 +60,12 @@ const STEPS: readonly EnrollmentStep[] = [
     id: 'entreprise',
     label: 'Entreprise',
     heading: 'Identifier l’entreprise',
-    hint: 'Renseignez uniquement des valeurs fictives. Les références RCCM et NIF restent en texte libre.',
+    hint: 'Les références RCCM et NIF sont saisies en texte libre.',
   },
   {
     id: 'contact',
     label: 'Contact',
-    heading: 'Ajouter un contact fictif',
+    heading: 'Ajouter un contact',
     hint: 'Ces coordonnées ne quittent pas cette page et ne sont enregistrées dans aucun stockage.',
   },
   {
@@ -77,8 +77,8 @@ const STEPS: readonly EnrollmentStep[] = [
   {
     id: 'verification',
     label: 'Vérification',
-    heading: 'Vérifier la démonstration',
-    hint: 'La dernière action crée une confirmation locale, pas un dossier d’adhésion.',
+    heading: 'Vérifier les informations',
+    hint: 'La dernière action génère un récapitulatif, pas un dossier d’adhésion.',
   },
 ];
 
@@ -90,14 +90,14 @@ const STEP_FIELDS: Readonly<Record<EnrollmentStepId, readonly FieldKey[]>> = {
 };
 
 const FIELD_LABELS: Readonly<Record<FieldKey, string>> = {
-  legalName: 'Raison sociale fictive',
-  tradeName: 'Nom commercial fictif',
+  legalName: 'Raison sociale',
+  tradeName: 'Nom commercial',
   legalForm: 'Forme juridique déclarée',
-  rccm: 'Référence RCCM de démonstration',
-  nif: 'Référence NIF de démonstration',
-  contactName: 'Nom du contact fictif',
-  contactEmail: 'Adresse e-mail fictive',
-  contactPhone: 'Téléphone fictif',
+  rccm: 'Référence RCCM',
+  nif: 'Référence NIF',
+  contactName: 'Nom du contact',
+  contactEmail: 'Adresse e-mail',
+  contactPhone: 'Téléphone',
 };
 
 const trimmedRequired: ValidatorFn = (
@@ -109,7 +109,7 @@ function isStep(value: string | null): value is EnrollmentStepId {
   return STEPS.some((step) => step.id === value);
 }
 
-/** PUB-012 — parcours public fictif, local et sans persistance. */
+/** PUB-012 — parcours public de préparation, local et sans persistance. */
 @Component({
   selector: 'cnpm-public-enrollment-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -164,7 +164,7 @@ export class PublicEnrollmentPage {
     nif: ['', [trimmedRequired, Validators.maxLength(160)]],
     contactName: ['', [trimmedRequired, Validators.maxLength(351)]],
     contactEmail: ['', [trimmedRequired, Validators.email, Validators.maxLength(320)]],
-    // Aucun pattern téléphonique : seule la présence est contrôlée dans cette démo.
+    // Aucun pattern téléphonique : seule la présence est contrôlée à ce stade.
     contactPhone: ['', [trimmedRequired, Validators.maxLength(30)]],
   });
 
@@ -176,9 +176,9 @@ export class PublicEnrollmentPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Demande d’adhésion — démonstration CNPM',
+      title: 'Demande d’adhésion — CNPM',
       description:
-        'Parcours local fictif illustrant les informations attendues pour une future demande d’adhésion.',
+        'Parcours local présentant les informations attendues pour une future demande d’adhésion.',
       robots: 'noindex,nofollow',
       canonicalPath: '/adhesion',
     });
@@ -228,10 +228,10 @@ export class PublicEnrollmentPage {
       return null;
     }
     if (control.hasError('required')) {
-      return `${FIELD_LABELS[key]} : renseignez une valeur fictive.`;
+      return `${FIELD_LABELS[key]} : renseignez une valeur.`;
     }
     if (control.hasError('email')) {
-      return 'Adresse e-mail fictive : utilisez une adresse au format valide.';
+      return 'Adresse e-mail : utilisez une adresse au format valide.';
     }
     return `${FIELD_LABELS[key]} : la valeur est trop longue.`;
   }
@@ -429,9 +429,9 @@ export class PublicEnrollmentPage {
         return [];
       }
       const message = control.hasError('required')
-        ? `${FIELD_LABELS[key]} : renseignez une valeur fictive.`
+        ? `${FIELD_LABELS[key]} : renseignez une valeur.`
         : control.hasError('email')
-          ? 'Adresse e-mail fictive : utilisez une adresse au format valide.'
+          ? 'Adresse e-mail : utilisez une adresse au format valide.'
           : `${FIELD_LABELS[key]} : la valeur est trop longue.`;
       return [{ fieldId: this.fieldId(key), message }];
     });

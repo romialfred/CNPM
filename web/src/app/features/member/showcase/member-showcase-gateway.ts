@@ -49,7 +49,7 @@ export interface MemberShowcaseDraft {
 
 export interface MemberShowcaseGateway {
   loadDraft(feature: 'MP-015' | 'MP-016'): Observable<MemberShowcaseDraft | null>;
-  /** Stockage navigateur de démonstration uniquement ; ce n’est pas une sauvegarde serveur. */
+  /** Stockage navigateur uniquement ; ce n’est pas une sauvegarde serveur. */
   storeLocalDraft(draft: MemberShowcaseDraft): Observable<MemberShowcaseDraft>;
 }
 

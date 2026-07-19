@@ -38,7 +38,7 @@ interface ReferenceValuePageResponse {
   readonly totalPages?: number;
 }
 
-/** Adaptateur HTTP de BO-033, sans repli silencieux vers les données de démonstration. */
+/** Adaptateur HTTP de BO-033, sans repli silencieux vers les données locales. */
 @Injectable()
 export class HttpSettingsGateway implements ReferenceValuesGateway {
   private readonly http = inject(HttpClient);

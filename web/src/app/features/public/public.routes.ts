@@ -35,7 +35,7 @@ export const publicRoutes: Routes = [
           import('./enrollment/public-enrollment-confirmation.page').then(
             (m) => m.PublicEnrollmentConfirmationPage,
           ),
-        title: 'Confirmation locale d’adhésion — CNPM',
+        title: 'Confirmation d’adhésion — CNPM',
       },
       {
         path: '',
@@ -43,7 +43,7 @@ export const publicRoutes: Routes = [
         canDeactivate: [pendingPublicEnrollmentChangesGuard],
         loadComponent: () =>
           import('./enrollment/public-enrollment.page').then((m) => m.PublicEnrollmentPage),
-        title: 'Demande d’adhésion — démonstration CNPM',
+        title: 'Demande d’adhésion — CNPM',
       },
     ],
   },
@@ -124,7 +124,7 @@ export const publicRoutes: Routes = [
   {
     path: 'contact',
     loadComponent: () => import('./contact/contact.page').then((m) => m.ContactPage),
-    title: 'Contact — démonstration CNPM',
+    title: 'Contact — CNPM',
   },
   {
     path: 'legal/:document',

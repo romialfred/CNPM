@@ -15,7 +15,7 @@ export type MemberDocumentSort = 'metadataRecordedOn' | 'reference' | 'title';
  */
 export interface MemberDocumentMetadata {
   readonly id: string;
-  readonly reference: `DEMO-DOC-${string}`;
+  readonly reference: `CNPM-DOC-${string}`;
   readonly title: string;
   readonly type: MemberDocumentType;
   readonly typeLabel: string;

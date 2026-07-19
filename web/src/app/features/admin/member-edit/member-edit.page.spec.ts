@@ -18,10 +18,10 @@ import { MemberEditPage } from './member-edit.page';
 
 const MEMBER: EditableMemberCore = {
   id: '10000000-0000-4000-8000-000000000001',
-  legalName: 'Ateliers Nimba Démonstration',
+  legalName: 'Ateliers Nimba',
   tradeName: 'Nimba Atelier',
-  organizationType: 'Société de démonstration',
-  sectorCode: 'FABRICATION_DEMO',
+  organizationType: 'Société anonyme',
+  sectorCode: 'FABRICATION_01',
   status: 'ACTIVE',
   riskLevel: 'NORMAL',
   version: 7,
@@ -117,14 +117,14 @@ describe('MemberEditPage BO-004', () => {
     const page = pageApi(fixture);
     const router = TestBed.inject(Router);
     const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
-    page.form.controls.legalName.setValue('Ateliers Nimba Démonstration révisés');
+    page.form.controls.legalName.setValue('Ateliers Nimba révisés');
     page.submit();
     await fixture.whenStable();
 
     expect(gateway.update).toHaveBeenCalledWith(
       MEMBER.id,
       MEMBER.version,
-      expect.objectContaining({ legalName: 'Ateliers Nimba Démonstration révisés' }),
+      expect.objectContaining({ legalName: 'Ateliers Nimba révisés' }),
     );
     expect(navigate).toHaveBeenCalledWith(['/admin/members', MEMBER.id], {
       queryParams: { page: '2', statut: 'ACTIVE', onglet: 'adhesion' },

@@ -162,7 +162,7 @@ const AUTOSAVE_DELAY_MS = 1200;
  * vérification et au back-office.
  *
  * Le port est fourni par la route afin que l'assemblage puisse sélectionner un
- * adaptateur de démonstration ou HTTP sans être masqué par le composant.
+ * adaptateur local ou HTTP sans être masqué par le composant.
  */
 @Component({
   selector: 'cnpm-enrollment-form-page',

@@ -16,19 +16,19 @@ import { RecoveryPortfolioPage } from './recovery-portfolio.page';
 const CASES: readonly RecoveryPortfolioCase[] = [
   {
     id: 'demo-recovery-case-0001',
-    reference: 'DEMO-DOSSIER-0001',
-    memberCode: 'DEMO-MEMBRE-0001',
-    organization: 'Organisation Démo Alpha',
-    agentLabel: 'Agent Démo Recouvrement',
+    reference: 'CNPM-DOSSIER-0001',
+    memberCode: 'CNPM-MEMBRE-0001',
+    organization: 'Organisation Alpha',
+    agentLabel: 'Agent de recouvrement',
     segment: 'Retard 31–60 jours',
-    campaignReference: 'DEMO-CAMP-0001',
-    campaignLabel: 'Campagne Démo Alpha',
+    campaignReference: 'CNPM-CAMP-0001',
+    campaignLabel: 'Campagne Alpha',
     status: 'ACTIVE',
     outstandingAmount: 1_250_000,
     daysOverdue: 45,
     nextActionKind: 'EMAIL',
     nextActionAt: '2026-07-19T08:30:00Z',
-    contactDisclosure: 'Contact masqué — démonstration',
+    contactDisclosure: 'Contact masqué',
     communicationAuthorization: 'AUTHORIZED_DEMO',
     suspension: null,
     promise: null,
@@ -36,19 +36,19 @@ const CASES: readonly RecoveryPortfolioCase[] = [
   },
   {
     id: 'demo-recovery-case-0002',
-    reference: 'DEMO-DOSSIER-0002',
-    memberCode: 'DEMO-MEMBRE-0002',
-    organization: 'Organisation Démo Bêta',
-    agentLabel: 'Agent Démo Recouvrement',
+    reference: 'CNPM-DOSSIER-0002',
+    memberCode: 'CNPM-MEMBRE-0002',
+    organization: 'Organisation Bêta',
+    agentLabel: 'Agent de recouvrement',
     segment: 'Promesse active',
-    campaignReference: 'DEMO-CAMP-0002',
-    campaignLabel: 'Campagne Démo Bêta',
+    campaignReference: 'CNPM-CAMP-0002',
+    campaignLabel: 'Campagne Bêta',
     status: 'SUSPENDED',
     outstandingAmount: 250_000,
     daysOverdue: 15,
     nextActionKind: 'MEETING',
     nextActionAt: '2026-07-20T10:00:00Z',
-    contactDisclosure: 'Contact masqué — démonstration',
+    contactDisclosure: 'Contact masqué',
     communicationAuthorization: 'NOT_APPLICABLE',
     suspension: {
       kind: 'PROMISE',
@@ -58,7 +58,7 @@ const CASES: readonly RecoveryPortfolioCase[] = [
     promise: {
       amount: 250_000,
       dueDate: '2026-07-25',
-      comment: 'Promesse fictive de démonstration.',
+      comment: 'Promesse consignée au dossier.',
       status: 'PENDING',
     },
     calendarBucket: 'Suivi suspendu',
@@ -118,9 +118,9 @@ describe('RecoveryPortfolioPage — BO-020', () => {
     const { fixture } = await setup(gateway(), '/?selection=demo-recovery-case-0002');
     const root = fixture.nativeElement as HTMLElement;
 
-    expect(root.textContent).toContain('Organisation Démo Bêta');
+    expect(root.textContent).toContain('Organisation Bêta');
     expect(root.textContent).toContain('Taux de contact');
-    expect(root.textContent).toContain('Promesse fictive de démonstration.');
+    expect(root.textContent).toContain('Promesse consignée au dossier.');
     expect(root.textContent).toContain('aucun score ne sanctionne ni ne classe un membre');
     expect(root.querySelectorAll('[data-score]')).toHaveLength(0);
     expect(root.querySelectorAll('.recovery-portfolio-page__locked-actions button')).toHaveLength(
@@ -169,7 +169,7 @@ describe('RecoveryPortfolioPage — BO-020', () => {
     const { fixture, router } = await setup(gateway(), '/?page=99');
 
     expect(router.url).not.toContain('page=99');
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Organisation Démo Alpha');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Organisation Alpha');
   });
 
   it('rend chargement, vide, erreur et indisponibilité HTTP', async () => {
@@ -178,7 +178,7 @@ describe('RecoveryPortfolioPage — BO-020', () => {
     TestBed.resetTestingModule();
 
     const empty = await setup(gateway(() => of({ ...DATA, items: [], totalItems: 0 })));
-    expect(empty.fixture.nativeElement.textContent).toContain('Aucun dossier fictif affecté');
+    expect(empty.fixture.nativeElement.textContent).toContain('Aucun dossier affecté');
     TestBed.resetTestingModule();
 
     const error = await setup(gateway(() => throwError(() => new Error('temporaire'))));

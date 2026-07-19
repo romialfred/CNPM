@@ -20,7 +20,7 @@ import { PaymentsReconciliationPage } from './payments-reconciliation.page';
  * Deux niveaux sont éprouvés ici.
  *
  * L'écran est piloté par un port contrôlable, sans passer par la latence de
- * l'adaptateur de démonstration : c'est le seul moyen d'atteindre de façon
+ * l'adaptateur de fixtures : c'est le seul moyen d'atteindre de façon
  * déterministe les états que la fiche exige et que l'adaptateur ne sait pas produire
  * — chargement, panne récupérable, accès refusé.
  *
@@ -35,13 +35,13 @@ const LINE: StatementLine = {
   amount: 1000000,
   channel: 'MOBILE_MONEY',
   valueDate: '2026-07-14T11:23:00Z',
-  transactionReference: 'DEMO-TEST-99001',
+  transactionReference: 'TRX-TEST-99001',
   status: 'UNMATCHED',
   allocation: null,
   suggestions: [
     {
       id: 'sugg-test-1',
-      memberCode: 'CNPM-DEMO-0101',
+      memberCode: 'CNPM-2026-0101',
       memberName: 'Sahel Agro SA',
       contributionLabel: 'Cotisation annuelle 2026',
       period: 'T1 2026 – T4 2026',
@@ -85,7 +85,7 @@ class ControllableGateway implements PaymentsGateway {
 
 async function setup() {
   const gateway = new ControllableGateway();
-  // L'écran fournit lui-même l'adaptateur de démonstration pour fonctionner sans
+  // L'écran fournit lui-même l'adaptateur de fixtures pour fonctionner sans
   // route câblée ; le test substitue le port au même niveau, ce qui vérifie au passage
   // que cette fourniture reste bien remplaçable.
   TestBed.overrideComponent(PaymentsReconciliationPage, {
@@ -150,8 +150,10 @@ describe('PaymentsReconciliationPage — états requis', () => {
     expect(text).toContain('Non rapproché');
     expect(text).toContain('Confiance élevée');
     expect(text).toContain('Mobile Money');
-    expect(text).toContain('REÇU DE DÉMONSTRATION');
-    expect(text).toContain('Aucun cachet, signature ou QR officiel');
+    expect(text).toContain('REÇU DE PAIEMENT');
+    // L'aperçu doit rester explicitement distinct du reçu officiel : DEC-005 (signature
+    // et cachet) n'est pas tranchée, aucun document émis ici ne fait foi.
+    expect(text).toContain('Le reçu officiel sera émis après confirmation CNPM');
   });
 
   it('affiche une erreur récupérable AVEC une action « Réessayer »', async () => {
@@ -266,7 +268,7 @@ describe('DemoPaymentsGateway — règles protégeant l’écriture', () => {
   });
 });
 
-/** Nombre de lignes déjà en attente de confirmation dans le jeu de démonstration. */
+/** Nombre de lignes déjà en attente de confirmation dans le jeu de fixtures. */
 const INITIAL_AWAITING = 2;
 
 async function firstOpenLine(gateway: DemoPaymentsGateway): Promise<StatementLine> {

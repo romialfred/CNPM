@@ -16,7 +16,7 @@ const READY_PAGE: MemberContributionPage = {
   items: [
     {
       id: 'demo-contribution-2026-01',
-      reference: 'DEMO-COT-2026-001',
+      reference: 'CNPM-COT-2026-001',
       exercise: 2026,
       dueDate: '2026-09-30',
       calledAmount: 180000,
@@ -111,20 +111,20 @@ describe('MemberContributionsPage — MP-002', () => {
       page: 2,
       size: 3,
     });
-    expect(host.textContent).toContain('Chargement des cotisations fictives');
+    expect(host.textContent).toContain('Chargement des cotisations');
   });
 
-  it('rend la table et les fiches mobiles avec une seule h1 et des données explicitement fictives', async () => {
+  it('rend la table et les fiches mobiles avec une seule h1 et les données de consultation', async () => {
     const { fixture, gateway, host } = await setup({ page: '2', taille: '3' });
     gateway.latest.next(READY_PAGE);
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
-    expect(host.querySelector('table caption')?.textContent).toContain('Cotisations fictives');
-    expect(host.textContent).toContain('DEMO-COT-2026-001');
+    expect(host.querySelector('table caption')?.textContent).toContain('Cotisations');
+    expect(host.textContent).toContain('CNPM-COT-2026-001');
     expect(host.textContent).toContain('120');
-    expect(host.textContent).toContain('données 100 % fictives');
+    expect(host.textContent).toContain('DEC-008');
     expect(host.querySelector('.member-contributions__mobile-list article dl')).not.toBeNull();
     expect(host.querySelector('a[href*="demo-contribution-2026-01"]')).not.toBeNull();
     expect(host.textContent).not.toMatch(/taux de|tranche de|catégorie tarifaire/i);

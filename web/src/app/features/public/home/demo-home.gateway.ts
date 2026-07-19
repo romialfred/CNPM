@@ -37,26 +37,23 @@ export class DemoHomeGateway implements HomeGateway {
       news: [
         {
           id: 'prise-en-main',
-          category: 'Atelier fictif',
+          category: 'Atelier',
           title: 'Prendre en main le portail membre',
-          summary:
-            'Un scénario de démonstration pour découvrir les cotisations, reçus et requêtes en ligne.',
+          summary: 'Découvrir les cotisations, reçus et requêtes en ligne.',
           fictionalDemo: true,
         },
         {
           id: 'services-numeriques',
-          category: 'Repère fictif',
+          category: 'Repère',
           title: 'Retrouver ses services numériques',
-          summary:
-            'Un aperçu éditorial fictif des démarches réunies dans l’espace sécurisé du membre.',
+          summary: 'Un aperçu des démarches réunies dans l’espace sécurisé du membre.',
           fictionalDemo: true,
         },
         {
           id: 'reseau',
-          category: 'Rencontre fictive',
+          category: 'Rencontre',
           title: 'Faire vivre le réseau des entreprises',
-          summary:
-            'Un contenu de maquette, sans annonce d’événement réel ni engagement institutionnel.',
+          summary: 'Un temps d’échange entre groupements, conseils régionaux et entreprises.',
           fictionalDemo: true,
         },
       ],

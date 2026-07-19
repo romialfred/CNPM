@@ -85,7 +85,7 @@ describe('MemberShowcaseEditorPage — MP-015', () => {
 
     const tagline = host.querySelector<HTMLInputElement>('#showcase-tagline');
     if (!tagline) throw new Error('Champ tagline absent');
-    tagline.value = 'Nouvelle phrase fictive locale';
+    tagline.value = 'Nouvelle phrase locale';
     tagline.dispatchEvent(new Event('input'));
     await vi.waitFor(() => expect(gateway.storeCalls).toHaveLength(1), { timeout: 1000 });
     const stored = {

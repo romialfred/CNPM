@@ -69,7 +69,7 @@ describe('ContactPage (PUB-014)', () => {
     const actions = Array.from(host.querySelectorAll<HTMLButtonElement>('.contact-actions button'));
     expect(actions.map((button) => button.textContent?.trim())).toEqual([
       'Effacer les champs',
-      'Tester le formulaire local',
+      'Vérifier le message',
     ]);
   });
 
@@ -93,11 +93,11 @@ describe('ContactPage (PUB-014)', () => {
   it('efface toutes les valeurs après le contrôle local sans présenter un envoi', async () => {
     const { fixture, host } = await setup();
     const values = {
-      fullName: 'Awa Démo',
+      fullName: 'Awa Traoré',
       organization: 'Entreprise Exemple',
       email: 'awa@cnpm.invalid',
-      subject: 'Question fictive',
-      message: 'Ceci est un message entièrement fictif.',
+      subject: 'Demande de renseignement',
+      message: 'Ceci est un message de test.',
     };
     const fields = host.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input, textarea');
     Object.entries(values).forEach(([name, value]) => {
@@ -115,7 +115,7 @@ describe('ContactPage (PUB-014)', () => {
     fixture.detectChanges();
 
     const success = host.querySelector<HTMLElement>('.contact-success');
-    expect(success?.textContent).toContain('aucun message n’a été transmis');
+    expect(success?.textContent).toContain('Les valeurs saisies ont été effacées');
     expect(document.activeElement).toBe(success);
     expect(Array.from(fields).every((field) => field.value === '')).toBe(true);
     expect(host.textContent).not.toContain('Message envoyé');

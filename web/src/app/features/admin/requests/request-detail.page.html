@@ -49,13 +49,6 @@
       }
       @case ('ready') {
         @if (request(); as request) {
-          @if (demoMode) {
-            <cnpm-alert tone="info" title="Traitement local de démonstration">
-              Les actions ci-dessous préparent seulement un aperçu dans ce navigateur. Aucune donnée
-              n’est enregistrée, aucun message n’est envoyé et aucun statut serveur ne change.
-            </cnpm-alert>
-          }
-
           <section class="cnpm-request-detail__summary" aria-labelledby="request-summary-title">
             <div>
               <p class="cnpm-request-detail__eyebrow" id="request-summary-title">État courant</p>
@@ -69,7 +62,7 @@
               </div>
             </div>
             <div>
-              <span>Échéance fictive de démonstration</span>
+              <span>Échéance</span>
               <strong>{{ formatDate(request.targetAt) }}</strong>
             </div>
           </section>
@@ -111,7 +104,7 @@
               </section>
 
               <section class="cnpm-request-detail__card" aria-labelledby="request-reply-title">
-                <h2 id="request-reply-title">Préparer une réponse de démonstration</h2>
+                <h2 id="request-reply-title">Préparer une réponse</h2>
                 <p>L’aperçu reste local et n’est ajouté ni à la conversation ni à l’historique.</p>
                 <form class="cnpm-request-detail__reply" (ngSubmit)="prepareReply()">
                   <label for="request-reply">Projet de réponse</label>
@@ -219,8 +212,7 @@
                   Clôturer le dossier
                 </cnpm-button>
                 <p id="request-close-unavailable" class="cnpm-request-detail__help">
-                  Action indisponible : aucun contrat de mutation sûr n’est raccordé dans cette
-                  démo.
+                  Action indisponible : aucun contrat de mutation sûr n’est raccordé.
                 </p>
               </section>
 

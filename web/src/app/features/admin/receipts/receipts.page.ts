@@ -3,9 +3,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
-import { CNPM_DATA_MODE } from '../../../core/api/api.config';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -55,7 +53,6 @@ const AMOUNT_FORMATTER = new Intl.NumberFormat('fr-ML', { maximumFractionDigits:
   imports: [
     FormsModule,
     AdminShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
@@ -74,7 +71,6 @@ export class ReceiptsPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  protected readonly demoMode = inject(CNPM_DATA_MODE) === 'demo';
   protected readonly pageSizes = PAGE_SIZES;
   protected readonly statuses = STATUSES;
   protected readonly channels = CHANNELS;
@@ -163,13 +159,13 @@ export class ReceiptsPage {
   });
 
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Identifiant de démonstration' },
-    { key: 'member', label: 'Membre fictif' },
+    { key: 'reference', label: 'Identifiant du reçu' },
+    { key: 'member', label: 'Membre' },
     { key: 'amount', label: 'Montant', note: '(FCFA)', align: 'end', sortable: true },
     { key: 'period', label: 'Période' },
     { key: 'issuedAt', label: 'Date du scénario', sortable: true },
     { key: 'status', label: 'Statut', sortable: true },
-    { key: 'provenance', label: 'Provenance fictive' },
+    { key: 'provenance', label: 'Provenance' },
     { key: 'correction', label: 'Chaîne de correction' },
   ];
   protected readonly rowKey = (row: ReceiptRegistryRow): string => row.id;

@@ -13,13 +13,13 @@ const DEFAULT_QUERY: MemberReceiptQuery = {
 };
 
 describe('DemoMemberReceiptsGateway — MP-007/MP-008', () => {
-  it('filtre, trie et pagine les aperçus déterministes', async () => {
+  it('filtre, trie et pagine les récapitulatifs déterministes', async () => {
     const gateway = new DemoMemberReceiptsGateway();
     const page = await firstValueFrom(gateway.list(DEFAULT_QUERY));
     expect(page.items).toHaveLength(5);
     expect(page.totalElements).toBe(6);
     expect(page.totalPages).toBe(2);
-    expect(page.items[0]?.reference).toBe('DEMO-APERCU-2026-001');
+    expect(page.items[0]?.reference).toBe('RCP-2026-001');
 
     const filtered = await firstValueFrom(
       gateway.list({
@@ -29,15 +29,15 @@ describe('DemoMemberReceiptsGateway — MP-007/MP-008', () => {
         exercise: 2025,
       }),
     );
-    expect(filtered.items.map((item) => item.reference)).toEqual(['DEMO-APERCU-2025-002']);
+    expect(filtered.items.map((item) => item.reference)).toEqual(['RCP-2025-002']);
   });
 
-  it('sert un aperçu consultatif sans contenu ni identifiant de preuve', async () => {
+  it('sert un récapitulatif consultatif sans contenu ni identifiant de preuve', async () => {
     const gateway = new DemoMemberReceiptsGateway();
     const detail = await firstValueFrom(gateway.loadDetail('demo-receipt-preview-2026-001'));
     expect(detail).toMatchObject({
-      reference: 'DEMO-APERCU-2026-001',
-      periodLabel: 'Période fictive 2026',
+      reference: 'RCP-2026-001',
+      periodLabel: 'Exercice 2026',
       amountXof: 150000,
     });
     expect(Object.keys(detail)).not.toEqual(
@@ -50,7 +50,7 @@ describe('DemoMemberReceiptsGateway — MP-007/MP-008', () => {
         'stamp',
       ]),
     );
-    expect(detail.proofDisclosure).toContain('Aucun PDF, QR, cachet ou signature');
+    expect(detail.proofDisclosure).toContain('Le reçu officiel signé n’est pas encore émis');
   });
 
   it('signale une référence absente', async () => {

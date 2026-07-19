@@ -1,7 +1,7 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Membre"
+  memberCode="CNPM-MEMBRE-000"
   [notificationCount]="0"
 >
   <main class="member-request-detail" id="contenu-principal">
@@ -15,18 +15,13 @@
 
     <cnpm-page-header
       title="Détail de la requête"
-      description="Consultez le dossier, le délai cible fictif et les échanges partagés."
+      description="Consultez le dossier, le délai cible et les échanges partagés."
     />
-
-    <cnpm-alert tone="warning" title="Démonstration — dossier non contractuel" [live]="false">
-      Les références, dates et réponses sont fictives. Aucun échange n’est envoyé à la CNPM et
-      aucune pièce n’est stockée.
-    </cnpm-alert>
 
     @switch (state()) {
       @case ('loading') {
-        <section class="member-request-detail__loading" aria-label="Chargement du dossier fictif">
-          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la requête fictive…" />
+        <section class="member-request-detail__loading" aria-label="Chargement du dossier">
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la requête…" />
           <cnpm-skeleton variant="card" [rows]="4" label="" />
         </section>
       }
@@ -53,7 +48,7 @@
           variant="not-found"
           titleAs="h2"
           title="Requête introuvable"
-          description="Ce dossier n’existe pas dans la projection membre fictive."
+          description="Ce dossier n’existe pas ou n’est plus disponible."
         >
           <cnpm-button variant="secondary" routerLink="/member/requests">
             Revenir à la liste
@@ -63,18 +58,17 @@
       @case ('ready') {
         @if (detail(); as request) {
           @if (createdLocally()) {
-            <cnpm-alert tone="success" title="Accusé fictif créé localement">
+            <cnpm-alert tone="success" title="Accusé de dépôt créé">
               Dossier <strong>{{ request.reference }}</strong
-              >, enregistré dans la mémoire de cette démonstration le
-              {{ formatDate(request.createdAt) }}. Délai cible fictif :
-              {{ formatDate(request.targetAt) }}. Aucun accusé officiel n’est émis.
+              >, enregistré le {{ formatDate(request.createdAt) }}. Délai cible :
+              {{ formatDate(request.targetAt) }}.
             </cnpm-alert>
           }
 
           <section class="member-request-detail__summary" aria-labelledby="request-summary-title">
             <header>
               <div>
-                <p class="member-request-detail__eyebrow">Référence fictive</p>
+                <p class="member-request-detail__eyebrow">Référence</p>
                 <h2 id="request-summary-title">{{ request.reference }}</h2>
                 <p>{{ request.subject }}</p>
               </div>
@@ -106,7 +100,7 @@
                 <dd>{{ formatDate(request.updatedAt) }}</dd>
               </div>
               <div>
-                <dt>Délai cible fictif</dt>
+                <dt>Délai cible</dt>
                 <dd>{{ formatDate(request.targetAt) }}</dd>
               </div>
             </dl>
@@ -146,14 +140,11 @@
                       </header>
                       <p>{{ message.body }}</p>
                       @if (message.attachments.length > 0) {
-                        <ul aria-label="Métadonnées de pièces simulées du message">
+                        <ul aria-label="Pièces jointes du message">
                           @for (attachment of message.attachments; track attachment.id) {
                             <li>
                               <strong>{{ attachment.fileName }}</strong>
-                              <span>
-                                {{ formatAttachmentSize(attachment.sizeBytes) }} — métadonnée
-                                locale, non téléchargeable
-                              </span>
+                              <span>{{ formatAttachmentSize(attachment.sizeBytes) }}</span>
                             </li>
                           }
                         </ul>
@@ -170,8 +161,7 @@
                   (ngSubmit)="sendReply()"
                   novalidate
                 >
-                  <h3>Ajouter un message fictif</h3>
-                  <p>Aucun message ni fichier ne quitte ce navigateur.</p>
+                  <h3>Ajouter un message</h3>
 
                   @if (replyError()) {
                     <cnpm-alert tone="error" title="Message non ajouté">{{
@@ -195,7 +185,7 @@
                       aria-describedby="member-request-reply-help member-request-reply-error"
                     ></textarea>
                     <p id="member-request-reply-help" class="member-request-detail__help">
-                      De 5 à 2 000 caractères. Utilisez uniquement des données fictives.
+                      De 5 à 2 000 caractères.
                     </p>
                     @if (replySubmitted() && replyForm.controls.body.invalid) {
                       <p id="member-request-reply-error" class="member-request-detail__error">
@@ -213,7 +203,7 @@
                   </div>
 
                   <div class="member-request-detail__field">
-                    <label for="member-request-reply-files">Pièces simulées facultatives</label>
+                    <label for="member-request-reply-files">Pièces jointes facultatives</label>
                     <input
                       #replyFiles
                       id="member-request-reply-files"
@@ -224,8 +214,8 @@
                       (change)="selectFiles(replyFiles)"
                     />
                     <p id="member-request-reply-files-help" class="member-request-detail__help">
-                      {{ attachments().length }} / {{ maxAttachments }} métadonnées ; aucun upload,
-                      stockage ou scan antivirus.
+                      {{ attachments().length }} / {{ maxAttachments }} pièces jointes au
+                      maximum.
                     </p>
                     @if (attachmentError()) {
                       <p
@@ -243,21 +233,18 @@
                   @if (attachments().length > 0) {
                     <ul
                       class="member-request-detail__reply-attachments"
-                      aria-label="Pièces simulées du nouveau message"
+                      aria-label="Pièces jointes du nouveau message"
                     >
                       @for (attachment of attachments(); track attachment.id) {
                         <li>
                           <span>
                             <strong>{{ attachment.fileName }}</strong>
-                            <small
-                              >{{ formatAttachmentSize(attachment.sizeBytes) }} — non
-                              téléversé</small
-                            >
+                            <small>{{ formatAttachmentSize(attachment.sizeBytes) }}</small>
                           </span>
                           <button
                             type="button"
                             (click)="removeAttachment(attachment.id)"
-                            [attr.aria-label]="'Retirer la pièce simulée ' + attachment.fileName"
+                            [attr.aria-label]="'Retirer la pièce jointe ' + attachment.fileName"
                           >
                             Retirer
                           </button>
@@ -272,7 +259,7 @@
                     [loading]="replying()"
                     [disabled]="replying()"
                   >
-                    Ajouter localement
+                    Ajouter le message
                   </cnpm-button>
                 </form>
               } @else {
@@ -291,12 +278,12 @@
                 <div class="member-request-detail__section-head">
                   <div>
                     <h2 id="requested-documents-title">Pièces demandées</h2>
-                    <p>État fourni par la fixture, sans GED.</p>
+                    <p>État fourni pour chaque pièce demandée.</p>
                   </div>
                 </div>
                 @if (request.requestedDocuments.length === 0) {
                   <p class="member-request-detail__muted">
-                    Aucune pièce fictive n’est demandée pour ce dossier.
+                    Aucune pièce n’est demandée pour ce dossier.
                   </p>
                 } @else {
                   <ul class="member-request-detail__requested-documents">
@@ -310,13 +297,10 @@
                     }
                   </ul>
                 }
-                <p class="member-request-detail__help">
-                  Aucun téléchargement ni dépôt réel n’est disponible dans cette démonstration.
-                </p>
               </section>
 
               <section class="member-request-detail__card" aria-labelledby="sla-detail-title">
-                <h2 id="sla-detail-title">Suivi du délai fictif</h2>
+                <h2 id="sla-detail-title">Suivi du délai</h2>
                 <cnpm-badge [tone]="slaTone(request.slaState)">
                   {{ slaLabel(request.slaState) }}
                 </cnpm-badge>

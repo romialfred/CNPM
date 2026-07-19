@@ -1,7 +1,7 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Membre"
+  memberCode="CNPM-MEMBRE-000"
   [notificationCount]="0"
 >
   <main class="member-contribution-detail" id="contenu-principal">
@@ -15,18 +15,18 @@
 
     <cnpm-page-header
       title="Détail de la cotisation"
-      description="Montants, ajustements et échéancier fournis par la projection de démonstration."
+      description="Montants, ajustements et échéancier fournis par la source de consultation."
     />
 
-    <cnpm-alert tone="warning" title="Démonstration — aucune valeur officielle" [live]="false">
-      Cette page est entièrement fictive et non opposable. Elle ne calcule aucun montant et
-      n’applique aucun taux, tranche ou barème CNPM (DEC-008).
+    <cnpm-alert tone="warning" title="Barème institutionnel non configuré" [live]="false">
+      Cette page ne calcule aucun montant et n’applique aucun taux, tranche ou barème CNPM
+      (DEC-008).
     </cnpm-alert>
 
     @switch (state()) {
       @case ('loading') {
         <section class="member-contribution-detail__loading" aria-label="Chargement du détail">
-          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la cotisation fictive…" />
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la cotisation…" />
           <cnpm-skeleton variant="table" [rows]="3" [columns]="6" label="" />
         </section>
       }
@@ -45,7 +45,7 @@
           variant="recoverable"
           titleAs="h2"
           title="Détail temporairement indisponible"
-          description="Aucun endpoint de détail typé n’est défini dans le contrat OpenAPI. Aucune fixture n’est utilisée hors mode démonstration."
+          description="Aucun endpoint de détail typé n’est défini dans le contrat OpenAPI."
         />
       }
       @case ('not-found') {
@@ -53,7 +53,7 @@
           variant="not-found"
           titleAs="h2"
           title="Cotisation introuvable"
-          description="Cette référence n’existe pas dans la projection fictive ou n’est plus disponible."
+          description="Cette référence n’existe pas ou n’est plus disponible."
         >
           <cnpm-button variant="secondary" routerLink="/member/contributions">
             Revenir à la liste
@@ -65,7 +65,7 @@
           <section class="member-contribution-detail__overview" aria-labelledby="overview-title">
             <header>
               <div>
-                <p class="member-contribution-detail__eyebrow">Référence fictive</p>
+                <p class="member-contribution-detail__eyebrow">Référence</p>
                 <h2 id="overview-title">{{ contribution.reference }}</h2>
               </div>
               <cnpm-badge [tone]="statusTone(contribution.status)">
@@ -79,7 +79,7 @@
                 <dd>{{ contribution.exercise }}</dd>
               </div>
               <div>
-                <dt>Date d’émission fictive</dt>
+                <dt>Date d’émission</dt>
                 <dd>
                   <time [attr.datetime]="contribution.issuedOn">
                     {{ contribution.issuedOn | date: 'dd/MM/yyyy' }}
@@ -87,7 +87,7 @@
                 </dd>
               </div>
               <div>
-                <dt>Date d’échéance fictive</dt>
+                <dt>Date d’échéance</dt>
                 <dd>
                   <time [attr.datetime]="contribution.dueDate">
                     {{ contribution.dueDate | date: 'dd/MM/yyyy' }}
@@ -99,7 +99,7 @@
             <div
               class="member-contribution-detail__amounts"
               role="group"
-              aria-label="Montants fournis par la fixture"
+              aria-label="Montants fournis"
             >
               <article>
                 <span>Montant de l’appel fourni</span>
@@ -124,15 +124,15 @@
           <section class="member-contribution-detail__section" aria-labelledby="schedule-title">
             <div class="member-contribution-detail__section-head">
               <div>
-                <h2 id="schedule-title">Échéancier fictif</h2>
-                <p>Chaque montant et chaque statut sont fournis par la fixture.</p>
+                <h2 id="schedule-title">Échéancier</h2>
+                <p>Chaque montant et chaque statut sont fournis par la source de consultation.</p>
               </div>
               <cnpm-badge tone="neutral">Lecture seule</cnpm-badge>
             </div>
 
             <div class="member-contribution-detail__desktop-table">
               <cnpm-data-table
-                caption="Échéancier fictif fourni : libellé, date, montant, affectation, solde et statut."
+                caption="Échéancier fourni : libellé, date, montant, affectation, solde et statut."
                 [columns]="installmentColumns"
                 [rows]="contribution.schedule"
                 [rowKey]="installmentKey"
@@ -162,7 +162,7 @@
               </cnpm-data-table>
             </div>
 
-            <ol class="member-contribution-detail__cards" aria-label="Échéancier fictif">
+            <ol class="member-contribution-detail__cards" aria-label="Échéancier">
               @for (installment of contribution.schedule; track installment.id) {
                 <li>
                   <article>
@@ -207,13 +207,13 @@
             @if (contribution.adjustments.length === 0) {
               <cnpm-empty-state
                 variant="no-data"
-                title="Aucun ajustement fictif déclaré"
+                title="Aucun ajustement déclaré"
                 description="La projection indique explicitement qu’aucun ajustement n’est associé à cet appel."
               />
             } @else {
               <div class="member-contribution-detail__desktop-table">
                 <cnpm-data-table
-                  caption="Ajustements fictifs fournis : référence, date, sens, montant et explication."
+                  caption="Ajustements fournis : référence, date, sens, montant et explication."
                   [columns]="adjustmentColumns"
                   [rows]="contribution.adjustments"
                   [rowKey]="adjustmentKey"
@@ -238,7 +238,7 @@
                 </cnpm-data-table>
               </div>
 
-              <ol class="member-contribution-detail__cards" aria-label="Ajustements fictifs">
+              <ol class="member-contribution-detail__cards" aria-label="Ajustements">
                 @for (adjustment of contribution.adjustments; track adjustment.reference) {
                   <li>
                     <article>

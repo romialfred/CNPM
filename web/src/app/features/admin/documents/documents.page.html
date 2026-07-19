@@ -5,27 +5,8 @@
       description="Consultez les métadonnées documentaires accessibles dans votre périmètre."
     />
 
-    @if (demoMode) {
-      <cnpm-alert tone="info" title="Bibliothèque 100 % fictive et consultative">
-        Les références DEMO, titres, objets métier, auteurs, versions et dates sont des scénarios.
-        Aucun fichier réel n’est stocké, ouvert, téléversé, analysé, généré ou téléchargé.
-      </cnpm-alert>
-    }
-
-    <section class="documents-page__boundary" aria-labelledby="documents-boundary-title">
-      <div>
-        <h2 id="documents-boundary-title">Périmètre sécurisé de BO-023</h2>
-        <p>La démonstration couvre la recherche de métadonnées sans simuler les contrôles GED.</p>
-      </div>
-      <ul>
-        <li>aucun contenu, aperçu, URL de stockage ou OCR ;</li>
-        <li>aucun dépôt avant quarantaine et antivirus réels ;</li>
-        <li>aucune suppression ou durée de conservation inventée.</li>
-      </ul>
-    </section>
-
     @if (overview(); as summary) {
-      <section class="documents-page__overview" aria-label="Synthèse des métadonnées fictives">
+      <section class="documents-page__overview" aria-label="Synthèse des métadonnées">
         <div>
           <span>Métadonnées</span><strong>{{ summary.total }}</strong>
         </div>
@@ -57,7 +38,7 @@
             name="search"
             autocomplete="off"
             maxlength="120"
-            placeholder="Référence, titre ou objet fictif"
+            placeholder="Référence, titre ou objet"
             [ngModel]="searchDraft()"
             (ngModelChange)="searchDraft.set($event)"
           />
@@ -184,7 +165,7 @@
       @case ('ready') {
         <div class="documents-page__table">
           <cnpm-data-table
-            caption="Bibliothèque fictive de métadonnées documentaires, sans contenu ni téléchargement."
+            caption="Bibliothèque de métadonnées documentaires, sans contenu ni téléchargement."
             [columns]="columns"
             [rows]="rows()"
             state="ready"
@@ -228,7 +209,7 @@
           </cnpm-data-table>
         </div>
 
-        <ul class="documents-page__cards" aria-label="Métadonnées documentaires fictives">
+        <ul class="documents-page__cards" aria-label="Métadonnées documentaires">
           @for (document of rows(); track document.id) {
             <li>
               <div class="documents-page__card-head">
@@ -242,7 +223,7 @@
               </div>
               <dl>
                 <div>
-                  <dt>Objet fictif</dt>
+                  <dt>Objet</dt>
                   <dd>{{ document.businessObjectLabel }}</dd>
                 </div>
                 <div>
@@ -258,7 +239,7 @@
                   <dd>{{ document.versionLabel }}</dd>
                 </div>
                 <div>
-                  <dt>Auteur fictif</dt>
+                  <dt>Auteur</dt>
                   <dd>{{ document.authorLabel }}</dd>
                 </div>
                 <div>

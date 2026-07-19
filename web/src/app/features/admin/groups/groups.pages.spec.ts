@@ -19,8 +19,8 @@ import { GroupsPage } from './groups.page';
 
 const GROUP: ProfessionalGroup = {
   id: '20000000-0000-4000-8000-000000000001',
-  code: 'DEMO-AGRI',
-  name: 'Groupement agricole de démonstration',
+  code: 'GRP-AGRI',
+  name: 'Groupement agricole',
   sectorCode: null,
   status: 'ACTIVE',
   version: 0,

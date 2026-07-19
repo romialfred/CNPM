@@ -514,7 +514,7 @@ export class DemoReportingGateway implements ReportingGateway {
         id: 'ligne-basse',
         kind: 'anomaly',
         message: `${worst.label} reste sous le seuil d’alerte, à ${RATE_FORMAT.format(worst.recoveryRate)} %.`,
-        rationale: `Seuil d’alerte fixé à ${LOW_RECOVERY_THRESHOLD} % pour cette démonstration ; écart constaté de ${AMOUNT_FORMAT.format(Math.abs(worst.gap))} FCFA.`,
+        rationale: `Seuil d’alerte fixé à ${LOW_RECOVERY_THRESHOLD} % ; écart constaté de ${AMOUNT_FORMAT.format(Math.abs(worst.gap))} FCFA.`,
       });
     }
 

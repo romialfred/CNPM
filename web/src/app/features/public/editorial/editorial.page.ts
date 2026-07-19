@@ -52,7 +52,7 @@ type LoadOutcome =
   | { readonly ok: true; readonly events: readonly PublicDemoEvent[] }
   | { readonly ok: false };
 
-/** PUB-009 / PUB-010 / PUB-011 — actualités et agenda publics de démonstration. */
+/** PUB-009 / PUB-010 / PUB-011 — actualités et agenda publics. */
 @Component({
   selector: 'cnpm-editorial-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -192,7 +192,7 @@ export class EditorialPage {
       this.state.set(outcome.article ? 'ready' : 'not-found');
       if (outcome.article) {
         this.seo.apply({
-          title: `${outcome.article.title} — Démonstration CNPM`,
+          title: `${outcome.article.title} — CNPM`,
           description: outcome.article.summary,
           robots: 'noindex,nofollow',
           canonicalPath: `/actualites/${outcome.article.slug}`,
@@ -219,16 +219,16 @@ export class EditorialPage {
   private applySeo(mode: EditorialMode): void {
     if (mode === 'agenda') {
       this.seo.apply({
-        title: 'Agenda de démonstration — CNPM',
-        description: 'Rendez-vous fictifs illustrant le futur agenda public du CNPM.',
+        title: 'Agenda — CNPM',
+        description: 'Les prochains rendez-vous publics du CNPM et de son réseau.',
         robots: 'noindex,nofollow',
         canonicalPath: '/agenda',
       });
       return;
     }
     this.seo.apply({
-      title: mode === 'article' ? 'Actualité de démonstration — CNPM' : 'Actualités — CNPM',
-      description: 'Publications fictives illustrant le futur espace éditorial public du CNPM.',
+      title: mode === 'article' ? 'Actualité — CNPM' : 'Actualités — CNPM',
+      description: 'L’espace éditorial public du CNPM et de son réseau d’entreprises.',
       robots: 'noindex,nofollow',
       canonicalPath: '/actualites',
     });

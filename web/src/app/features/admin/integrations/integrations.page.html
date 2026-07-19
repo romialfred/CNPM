@@ -2,13 +2,8 @@
   <div class="cnpm-integrations">
     <cnpm-page-header
       title="Supervision des intégrations"
-      description="État des échanges de démonstration, versions de contrat et journaux techniques sans données sensibles."
+      description="État des échanges, versions de contrat et journaux techniques sans données sensibles."
     />
-
-    <cnpm-alert tone="info" title="Environnement fictif en lecture seule">
-      Les partenaires, canaux et événements affichés sont entièrement synthétiques. Aucun service
-      externe n’est joint et aucune charge utile, URL, clé, identité ou coordonnée n’est exposée.
-    </cnpm-alert>
 
     @if (state() === 'loading') {
       <section class="cnpm-integrations__metrics" aria-label="Chargement de la synthèse">
@@ -25,9 +20,9 @@
         <article class="cnpm-integrations__metric">
           <span class="cnpm-integrations__metric-mark" aria-hidden="true">P</span>
           <div>
-            <p class="cnpm-integrations__metric-label">Partenaires fictifs</p>
+            <p class="cnpm-integrations__metric-label">Partenaires</p>
             <p class="cnpm-integrations__metric-value">{{ metrics.totalPartners }}</p>
-            <p class="cnpm-integrations__metric-note">Périmètre simulé</p>
+            <p class="cnpm-integrations__metric-note">Périmètre supervisé</p>
           </div>
         </article>
         <article class="cnpm-integrations__metric">
@@ -69,7 +64,7 @@
         <article class="cnpm-integrations__metric">
           <span class="cnpm-integrations__metric-mark" aria-hidden="true">24h</span>
           <div>
-            <p class="cnpm-integrations__metric-label">Événements fictifs</p>
+            <p class="cnpm-integrations__metric-label">Événements</p>
             <p class="cnpm-integrations__metric-value">{{ metrics.events24h }}</p>
             <p class="cnpm-integrations__metric-note">{{ metrics.failedEvents24h }} à contrôler</p>
           </div>
@@ -133,7 +128,7 @@
                 name="recherche"
                 autocomplete="off"
                 maxlength="80"
-                placeholder="Partenaire fictif, version, corrélation…"
+                placeholder="Partenaire, version, corrélation…"
                 [ngModel]="searchDraft()"
                 (ngModelChange)="searchDraft.set($event)"
               />
@@ -182,7 +177,7 @@
               <cnpm-error-state
                 variant="recoverable"
                 title="Projection HTTP indisponible"
-                description="Le contrat actuel ne fournit pas encore les états de santé et journaux typés nécessaires. Aucun jeu fictif n’est affiché en remplacement."
+                description="Le contrat actuel ne fournit pas encore les états de santé et journaux typés nécessaires. Aucun jeu de substitution n’est affiché en remplacement."
               />
             }
             @case ('error') {
@@ -215,7 +210,7 @@
                     [description]="
                       hasFilters()
                         ? 'Élargissez la recherche ou retirez le filtre d’état.'
-                        : 'Aucun partenaire fictif n’est présent dans ce périmètre de démonstration.'
+                        : 'Aucun partenaire n’est présent dans ce périmètre.'
                     "
                   >
                     @if (hasFilters()) {
@@ -227,7 +222,7 @@
                 } @else {
                   <div class="cnpm-integrations__partner-head">
                     <div>
-                      <h2>Partenaires et flux fictifs</h2>
+                      <h2>Partenaires et flux</h2>
                       <p>
                         {{ partners().length }} sur {{ snapshot()?.totalPartners }} partenaires
                         affichés
@@ -330,7 +325,7 @@
               } @else {
                 <div class="cnpm-integrations__partner-head">
                   <div>
-                    <h2>Journal technique fictif</h2>
+                    <h2>Journal technique</h2>
                     <p>
                       {{ logs().length }} événements détaillés sur
                       {{ summary()?.events24h }} événements agrégés sur 24 h
@@ -350,7 +345,7 @@
                     [description]="
                       hasFilters()
                         ? 'Élargissez la recherche ou retirez le filtre de sens.'
-                        : 'Aucun événement fictif n’est disponible pour ce périmètre.'
+                        : 'Aucun événement n’est disponible pour ce périmètre.'
                     "
                   >
                     @if (hasFilters()) {
@@ -362,7 +357,7 @@
                 } @else {
                   <div class="cnpm-integrations__desktop-table">
                     <cnpm-data-table
-                      caption="Journal technique fictif, du plus récent au plus ancien, sans charge utile ni donnée sensible."
+                      caption="Journal technique, du plus récent au plus ancien, sans charge utile ni donnée sensible."
                       [columns]="logColumns"
                       [rows]="logs()"
                       [state]="tableState()"
@@ -395,7 +390,7 @@
                     </cnpm-data-table>
                   </div>
 
-                  <ul class="cnpm-integrations__mobile-log" aria-label="Journal technique fictif">
+                  <ul class="cnpm-integrations__mobile-log" aria-label="Journal technique">
                     @for (entry of logs(); track entry.id) {
                       <li>
                         <article>
@@ -507,7 +502,7 @@
             </li>
             <li>
               <span aria-hidden="true">✓</span>
-              <p><strong>Bac à sable</strong> Jeux et journaux sont strictement fictifs.</p>
+              <p><strong>Bac à sable</strong> Jeux et journaux restent cloisonnés.</p>
             </li>
           </ul>
         </section>

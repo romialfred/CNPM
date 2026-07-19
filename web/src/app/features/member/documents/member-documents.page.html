@@ -1,19 +1,14 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Responsable adhésion"
+  memberCode="CNPM-2026-0001"
   [notificationCount]="0"
 >
   <main class="member-documents" id="contenu-principal">
     <cnpm-page-header
       title="Mes documents"
-      description="Consultez les métadonnées disponibles pour votre scénario membre."
+      description="Consultez les métadonnées documentaires de votre organisation."
     />
-
-    <cnpm-alert tone="warning" title="Catalogue local fictif" [live]="false">
-      Aucun fichier, PDF, lien de téléchargement, QR, signature ou cachet n’est fourni. Les
-      informations affichées sont des métadonnées de démonstration, sans valeur officielle.
-    </cnpm-alert>
 
     <cnpm-filter-bar
       [expanded]="filtersExpanded()"
@@ -29,7 +24,7 @@
             id="member-document-search"
             type="search"
             formControlName="search"
-            placeholder="Référence DEMO ou titre"
+            placeholder="Référence ou titre"
           />
         </div>
         <div class="member-documents__field">
@@ -71,12 +66,12 @@
           <h2 id="member-documents-results-title" #resultsTitle tabindex="-1">
             Catalogue documentaire
           </h2>
-          <p>Lecture seule de métadonnées auto-scopées au scénario membre.</p>
+          <p>Lecture seule des métadonnées documentaires de votre organisation.</p>
         </div>
         @if (data()) {
           <p class="member-documents__count" aria-live="polite">
             {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'métadonnée fictive' : 'métadonnées fictives' }}
+            {{ totalItems() === 1 ? 'métadonnée' : 'métadonnées' }}
           </p>
         }
       </div>
@@ -87,14 +82,14 @@
             variant="table"
             [rows]="pageSize()"
             [columns]="columns.length"
-            label="Chargement du catalogue documentaire fictif…"
+            label="Chargement du catalogue documentaire…"
           />
         }
         @case ('error') {
           <cnpm-error-state
             variant="recoverable"
             title="Le catalogue n’a pas pu être chargé"
-            description="La source locale est momentanément indisponible. Aucun document ni traitement GED n’a été déclenché."
+            description="Le service est momentanément indisponible. Vous pouvez relancer le chargement."
           >
             <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
           </cnpm-error-state>
@@ -103,7 +98,7 @@
           <cnpm-error-state
             variant="recoverable"
             title="Catalogue documentaire indisponible en mode HTTP"
-            description="OpenAPI expose encore une ressource générique sans projection membre typée. Aucune métadonnée fictive n’est injectée dans ce mode."
+            description="OpenAPI expose encore une ressource générique sans projection membre typée."
           />
         }
         @case ('empty') {
@@ -127,7 +122,7 @@
         @case ('ready') {
           <div class="member-documents__desktop-table">
             <cnpm-data-table
-              caption="Métadonnées documentaires fictives : référence, titre, type public, version, date et statut, sans contenu ni action."
+              caption="Métadonnées documentaires : référence, titre, type public, version, date et statut."
               [columns]="columns"
               [rows]="documents()"
               [rowKey]="rowKey"
@@ -156,7 +151,7 @@
             </cnpm-data-table>
           </div>
 
-          <ol class="member-documents__mobile-list" aria-label="Métadonnées documentaires fictives">
+          <ol class="member-documents__mobile-list" aria-label="Métadonnées documentaires">
             @for (document of documents(); track document.id) {
               <li>
                 <article [attr.aria-labelledby]="'member-document-' + document.id">

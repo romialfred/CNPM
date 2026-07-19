@@ -4,7 +4,7 @@ import { DemoGroupsGateway } from './demo-groups.gateway';
 import { GroupNotFoundError } from './groups-gateway';
 
 describe('DemoGroupsGateway', () => {
-  it('sert une pagination stable avec des données explicitement fictives', async () => {
+  it('sert une pagination stable sur un registre fermé', async () => {
     const gateway = new DemoGroupsGateway();
     const first = await firstValueFrom(gateway.list({ page: 1, pageSize: 10 }));
     const second = await firstValueFrom(gateway.list({ page: 2, pageSize: 10 }));
@@ -12,12 +12,12 @@ describe('DemoGroupsGateway', () => {
     expect(first.totalItems).toBe(12);
     expect(first.rows).toHaveLength(10);
     expect(second.rows).toHaveLength(2);
-    expect([...first.rows, ...second.rows].every((group) => group.code.startsWith('DEMO-'))).toBe(
+    expect([...first.rows, ...second.rows].every((group) => group.code.startsWith('GRP-'))).toBe(
       true,
     );
     expect(
       [...first.rows, ...second.rows].every((group) =>
-        /démonstration|fictif|scénario|prototype/i.test(group.name),
+        /^(Groupement|Collectif|Réseau) /.test(group.name),
       ),
     ).toBe(true);
   });

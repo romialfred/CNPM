@@ -12,9 +12,9 @@
       <span aria-current="page">Contacts</span>
     </nav>
 
-    <cnpm-alert tone="info" title="Démonstration sans donnée personnelle réelle">
-      Les identités et coordonnées affichées sont fictives. L’ajout et la modification restent
-      neutralisés tant que le contrat API des contacts n’est pas publié.
+    <cnpm-alert tone="info" title="Consultation seule">
+      L’ajout et la modification restent neutralisés tant que le contrat API des contacts n’est pas
+      publié.
     </cnpm-alert>
 
     @switch (state()) {
@@ -36,7 +36,7 @@
       @case ('ready') {
         <section class="cnpm-contacts__hero" aria-labelledby="organization-contacts-title">
           <div>
-            <p class="cnpm-contacts__eyebrow">Entreprise de démonstration</p>
+            <p class="cnpm-contacts__eyebrow">Entreprise</p>
             <h2 id="organization-contacts-title">{{ view()?.organizationName }}</h2>
             <p>{{ view()?.updatedAt }}</p>
           </div>
@@ -72,7 +72,7 @@
               type="search"
               formControlName="q"
               maxlength="80"
-              placeholder="Nom, fonction ou adresse fictive"
+              placeholder="Nom, fonction ou adresse"
             />
           </div>
           <div>
@@ -123,7 +123,7 @@
           <div class="cnpm-contacts__table-wrap">
             <table>
               <caption>
-                Contacts fictifs de l’entreprise, rôles et validité.
+                Contacts de l’entreprise, rôles et validité.
               </caption>
               <thead>
                 <tr>
@@ -170,7 +170,7 @@
             </table>
           </div>
 
-          <ul class="cnpm-contacts__cards" aria-label="Contacts fictifs de l’entreprise">
+          <ul class="cnpm-contacts__cards" aria-label="Contacts de l’entreprise">
             @for (contact of contacts(); track contact.id) {
               <li>
                 <div class="cnpm-contacts__card-head">
@@ -193,11 +193,11 @@
                 </div>
                 <dl>
                   <div>
-                    <dt>Adresse fictive</dt>
+                    <dt>Adresse</dt>
                     <dd>{{ contact.email }}</dd>
                   </div>
                   <div>
-                    <dt>Téléphone fictif</dt>
+                    <dt>Téléphone</dt>
                     <dd>{{ contact.phone }}</dd>
                   </div>
                   <div>

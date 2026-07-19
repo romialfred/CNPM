@@ -53,7 +53,7 @@ describe('DemoRecoveryGateway — composition BO-017', () => {
     }
   });
 
-  it('conserve des destinations fictives ou masquées dans le journal', async () => {
+  it('conserve des destinations masquées dans le journal', async () => {
     const page = await firstValueFrom(
       new DemoRecoveryGateway().search({ ...ALL_CAMPAIGNS, tab: 'deliveries' }),
     );
@@ -68,14 +68,14 @@ describe('DemoRecoveryGateway — composition BO-017', () => {
     }
   });
 
-  it('livre une file BO-019 strictement fictive, masquée et non exécutable', async () => {
+  it('livre une file BO-019 masquée et non exécutable', async () => {
     const page = await firstValueFrom(new DemoRecoveryGateway().searchActions(ALL_ACTIONS));
 
     expect(page.items).toHaveLength(8);
     expect(page.overview.total).toBe(8);
     for (const action of page.items) {
-      expect(action.organization).toContain('Démo');
-      expect(action.contactDisclosure).toBe('Contact masqué — démonstration');
+      expect(action.organization).toContain('Organisation');
+      expect(action.contactDisclosure).toBe('Contact masqué');
       expect(action.executionAvailable).toBe(false);
       expect(JSON.stringify(action)).not.toMatch(/@|mailto:|tel:|https?:\/\/|\+223/i);
       if (action.suspension) expect(action.suspension.suspendedAt).toBeTruthy();
@@ -110,8 +110,8 @@ describe('DemoRecoveryGateway — composition BO-017', () => {
     expect(page.overview.assignedCases).toBe(8);
     expect(page.overview.contactRate).toBe(42.5);
     for (const item of page.items) {
-      expect(item.organization).toContain('Démo');
-      expect(item.contactDisclosure).toBe('Contact masqué — démonstration');
+      expect(item.organization).toContain('Organisation');
+      expect(item.contactDisclosure).toBe('Contact masqué');
       expect(JSON.stringify(item)).not.toMatch(/score|@|mailto:|tel:|https?:\/\/|\+223/i);
       if (item.status === 'SUSPENDED') expect(item.suspension?.suspendedAt).toBeTruthy();
     }

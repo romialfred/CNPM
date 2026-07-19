@@ -66,32 +66,6 @@
   padding-block: 30px 74px;
 }
 
-.verification-warning {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 28px;
-  padding: 16px 18px;
-  border: 1px solid var(--cnpm-color-semantic-warning-100);
-  border-radius: 10px;
-  background: var(--cnpm-color-semantic-warning-50);
-}
-
-.verification-warning svg {
-  flex: 0 0 auto;
-  color: var(--cnpm-color-semantic-warning-700);
-}
-
-.verification-warning strong {
-  display: block;
-}
-
-.verification-warning p {
-  margin: 4px 0 0;
-  color: var(--cnpm-color-text-secondary);
-  line-height: 1.55;
-}
-
 .verification-layout {
   display: grid;
   grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);

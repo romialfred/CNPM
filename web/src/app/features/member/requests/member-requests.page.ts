@@ -13,7 +13,6 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -70,7 +69,6 @@ type ListState = 'loading' | 'ready' | 'empty' | 'no-result' | 'error' | 'unavai
     ReactiveFormsModule,
     RouterLink,
     MemberPortalShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
@@ -101,11 +99,11 @@ export class MemberRequestsPage {
     sortOption: 'updatedAt:desc',
   });
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Dossier fictif' },
+    { key: 'reference', label: 'Dossier' },
     { key: 'subject', label: 'Objet' },
     { key: 'updatedAt', label: 'Dernière mise à jour' },
     { key: 'status', label: 'Statut' },
-    { key: 'targetAt', label: 'Délai cible fictif' },
+    { key: 'targetAt', label: 'Délai cible' },
     { key: 'action', label: 'Détail' },
   ];
 

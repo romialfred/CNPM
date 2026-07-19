@@ -343,9 +343,11 @@
             <div>
               <h2 id="titre-echeancier">Détail de l’échéancier — {{ call.memberName }}</h2>
               <p>{{ call.reference }} · {{ periodLabel(call) }}</p>
+              <!-- Garde-fou DEC-008 : le barème n'est pas homologué. La mention de
+                   démonstration a été retirée, mais celle-ci porte une information de
+                   gouvernance et doit rester tant que la décision est ouverte. -->
               <p class="cnpm-contributions__demo-note">
-                Simulation fictive en trois tranches pour la démonstration visuelle ; elle ne
-                constitue aucun barème CNPM.
+                Répartition indicative en trois tranches ; elle ne constitue aucun barème CNPM.
               </p>
             </div>
             <div class="cnpm-contributions__detail-actions">

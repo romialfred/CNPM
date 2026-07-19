@@ -21,13 +21,13 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     }
   });
 
-  it('ne fournit que des identités fictives et des corrélations de démonstration', async () => {
+  it('ne fournit que des identités du jeu fermé et des corrélations tracées', async () => {
     const snapshot = await firstValueFrom(
       new DemoAdminSecurityGateway().load({ tab: 'comptes', search: '' }),
     );
 
     expect(snapshot.accounts.length).toBeGreaterThan(0);
     expect(snapshot.accounts.every((account) => account.email.endsWith('.example'))).toBe(true);
-    expect(snapshot.audit.every((entry) => entry.correlationId.startsWith('DEMO-'))).toBe(true);
+    expect(snapshot.audit.every((entry) => entry.correlationId.startsWith('CNPM-AUD-'))).toBe(true);
   });
 });

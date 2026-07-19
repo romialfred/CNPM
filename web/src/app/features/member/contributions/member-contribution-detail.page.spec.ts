@@ -15,7 +15,7 @@ import {
 
 const DETAIL: MemberContributionDetail = {
   id: 'demo-contribution-2026-01',
-  reference: 'DEMO-COT-2026-001',
+  reference: 'CNPM-COT-2026-001',
   exercise: 2026,
   issuedOn: '2026-01-15',
   dueDate: '2026-09-30',
@@ -24,21 +24,21 @@ const DETAIL: MemberContributionDetail = {
   outstandingAmount: 120000,
   currency: 'XOF',
   status: 'PARTIELLE',
-  amountOriginNote: 'Valeur fictive fournie sans aucun calcul réglementaire.',
+  amountOriginNote: 'Aucun calcul réglementaire n’est effectué.',
   adjustments: [
     {
-      reference: 'DEMO-AJ-2026-001',
+      reference: 'CNPM-AJ-2026-001',
       direction: 'CREDIT',
       amount: 15000,
       currency: 'XOF',
-      reason: 'Ajustement fictif expliqué',
+      reason: 'Ajustement expliqué',
       recordedOn: '2026-02-03',
     },
   ],
   schedule: [
     {
       id: 'demo-installment-01',
-      label: 'Échéance fictive 1 sur 1',
+      label: 'Échéance 1 sur 1',
       dueDate: '2026-09-30',
       expectedAmount: 180000,
       paidAmount: 60000,
@@ -95,7 +95,7 @@ describe('MemberContributionDetailPage — MP-003', () => {
   it('charge l’identifiant de route et conserve la requête de retour', async () => {
     const { gateway, host } = await setup();
     expect(gateway.loadedId).toBe(DETAIL.id);
-    expect(host.textContent).toContain('Chargement de la cotisation fictive');
+    expect(host.textContent).toContain('Chargement de la cotisation');
     expect(
       host.querySelector<HTMLAnchorElement>('.member-contribution-detail__back')?.href,
     ).toContain('page=2');
@@ -110,8 +110,8 @@ describe('MemberContributionDetailPage — MP-003', () => {
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.textContent).toContain(DETAIL.reference);
     expect(host.textContent).toContain('Origine du montant');
-    expect(host.textContent).toContain('Ajustement fictif expliqué');
-    expect(host.textContent).toContain('Échéance fictive 1 sur 1');
+    expect(host.textContent).toContain('Ajustement expliqué');
+    expect(host.textContent).toContain('Échéance 1 sur 1');
     expect(host.querySelectorAll('table caption')).toHaveLength(2);
     expect(host.querySelector('.member-contribution-detail__cards article dl')).not.toBeNull();
     expect(host.textContent).toContain('ne sont pas recomposées');

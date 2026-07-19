@@ -23,7 +23,7 @@ import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.comp
 import { MemberPortalShellComponent } from '../../../layout/member-portal-shell/member-portal-shell.component';
 import { MEMBER_PROFILE_GATEWAY } from './member-profile-gateway';
 
-/** MP-013 — profil d’entreprise fictif, strictement consultatif. */
+/** MP-013 — profil d’entreprise, strictement consultatif. */
 @Component({
   selector: 'cnpm-member-profile-page',
   changeDetection: ChangeDetectionStrategy.OnPush,

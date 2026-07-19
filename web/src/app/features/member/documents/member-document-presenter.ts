@@ -4,11 +4,11 @@ import type { MemberDocumentStatus, MemberDocumentType } from './member-document
 export function memberDocumentStatusLabel(status: MemberDocumentStatus): string {
   switch (status) {
     case 'CATALOGUED':
-      return 'Répertorié — démonstration';
+      return 'Répertorié';
     case 'PROCESSING':
-      return 'Traitement fictif';
+      return 'En traitement';
     case 'EXPIRED':
-      return 'Expiré — scénario';
+      return 'Expiré';
   }
 }
 
@@ -26,8 +26,8 @@ export function memberDocumentStatusTone(status: MemberDocumentStatus): CnpmBadg
 export function memberDocumentTypeLabel(type: MemberDocumentType): string {
   switch (type) {
     case 'ATTESTATION':
-      return 'Attestation fictive';
+      return 'Attestation';
     case 'MEMBER_CARD':
-      return 'Carte membre fictive';
+      return 'Carte membre';
   }
 }

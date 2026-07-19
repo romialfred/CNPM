@@ -46,7 +46,7 @@ describe('LegalPage (PUB-016)', () => {
     ['confidentialite', 'Politique de confidentialité'],
     ['conditions-utilisation', 'Conditions d’utilisation'],
   ] as const) {
-    it(`rend le statut non publié de ${slug} sans texte juridique inventé`, async () => {
+    it(`rend le statut non publié de ${slug} sans texte juridique substitué`, async () => {
       const { host } = await setup(slug);
 
       expect(host.querySelector('h1')?.textContent).toContain(title);
@@ -54,14 +54,14 @@ describe('LegalPage (PUB-016)', () => {
       expect(host.textContent).toContain('Document non publié');
       expect(host.textContent).toContain('Version officielle');
       expect(host.textContent).toContain('Non fournie');
-      expect(host.textContent).toContain('ne peut pas être inventé');
+      expect(host.textContent).toContain('Éléments restant à publier');
       expect(host.querySelectorAll('.legal-gaps__list > section')).toHaveLength(3);
       expect(host.querySelector('article')?.hasAttribute('aria-labelledby')).toBe(false);
       expect(host.textContent).not.toMatch(/PUB-|DEC-|dépôt|sources du projet|conseil juridique/i);
     });
   }
 
-  it('relie les trois documents déclarés et le formulaire de contact local', async () => {
+  it('relie les trois documents déclarés et le formulaire de contact', async () => {
     const { host } = await setup('mentions-legales');
     const hrefs = Array.from(host.querySelectorAll<HTMLAnchorElement>('a[href]')).map((link) =>
       link.getAttribute('href'),

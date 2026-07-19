@@ -11,7 +11,7 @@ export interface MemberProfileSnapshot {
   readonly displayLabel: string;
   readonly roleLabel: string;
   readonly organizationName: string;
-  readonly memberReference: `CNPM-DEMO-${string}`;
+  readonly memberReference: `CNPM-${string}`;
   readonly organizationTypeLabel: string;
   readonly membershipLabel: string;
   readonly membershipSince: string;

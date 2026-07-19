@@ -11,7 +11,7 @@ import {
 import { integrationsReadGuard } from './integrations-read.guard';
 
 const IDENTITY: SessionIdentity = {
-  displayName: 'Profil technique fictif',
+  displayName: 'Profil technique',
   roleLabel: 'ADMIN_TECHNIQUE',
   exerciseLabel: null,
   notificationCount: null,

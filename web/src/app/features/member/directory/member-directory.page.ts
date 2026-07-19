@@ -38,9 +38,9 @@ import {
 
 type DirectoryView = 'cards' | 'compact';
 type DirectoryState = 'loading' | 'ready' | 'empty' | 'no-result' | 'error' | 'unavailable';
-const SECTORS: readonly MemberDirectorySector[] = ['AGRI_DEMO', 'SERVICES_DEMO', 'CRAFT_DEMO'];
-const ZONES: readonly MemberDirectoryZone[] = ['ZONE_A_DEMO', 'ZONE_B_DEMO', 'ZONE_C_DEMO'];
-const THEMES: readonly MemberDirectoryTheme[] = ['SKILLS_DEMO', 'LOGISTICS_DEMO', 'TRAINING_DEMO'];
+const SECTORS: readonly MemberDirectorySector[] = ['AGRI', 'SERVICES', 'CRAFT'];
+const ZONES: readonly MemberDirectoryZone[] = ['ZONE_A', 'ZONE_B', 'ZONE_C'];
+const THEMES: readonly MemberDirectoryTheme[] = ['SKILLS', 'LOGISTICS', 'TRAINING'];
 const SORTS: readonly MemberDirectorySort[] = ['name', 'sector'];
 const VIEWS: readonly DirectoryView[] = ['cards', 'compact'];
 const MAX_SEARCH_LENGTH = 80;
@@ -168,8 +168,8 @@ export class MemberDirectoryPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Annuaire privé de démonstration — CNPM',
-      description: 'Annuaire privé composé exclusivement d’organisations fictives.',
+      title: 'Annuaire privé — CNPM',
+      description: 'Annuaire privé des organisations membres du CNPM.',
       robots: 'noindex,nofollow',
       canonicalPath: '/member/directory',
     });
@@ -254,33 +254,33 @@ function truncate(value: string, maxLength: number): string {
 
 function sectorLabel(sector: MemberDirectorySector): string {
   switch (sector) {
-    case 'AGRI_DEMO':
-      return 'Agriculture — scénario';
-    case 'CRAFT_DEMO':
-      return 'Fabrication — scénario';
+    case 'AGRI':
+      return 'Agriculture';
+    case 'CRAFT':
+      return 'Fabrication';
     default:
-      return 'Services — scénario';
+      return 'Services';
   }
 }
 
 function zoneLabel(zone: MemberDirectoryZone): string {
   switch (zone) {
-    case 'ZONE_A_DEMO':
-      return 'Zone A — scénario';
-    case 'ZONE_B_DEMO':
-      return 'Zone B — scénario';
+    case 'ZONE_A':
+      return 'Zone A';
+    case 'ZONE_B':
+      return 'Zone B';
     default:
-      return 'Zone C — scénario';
+      return 'Zone C';
   }
 }
 
 function themeLabel(theme: MemberDirectoryTheme): string {
   switch (theme) {
-    case 'SKILLS_DEMO':
-      return 'Partage de compétences — simulé';
-    case 'LOGISTICS_DEMO':
-      return 'Mutualisation logistique — simulée';
+    case 'SKILLS':
+      return 'Partage de compétences';
+    case 'LOGISTICS':
+      return 'Mutualisation logistique';
     default:
-      return 'Formation — simulée';
+      return 'Formation';
   }
 }

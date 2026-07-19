@@ -37,7 +37,7 @@ describe('DemoMemberContributionsGateway — MP-002/MP-003', () => {
         direction: 'asc',
       }),
     );
-    expect(filtered.items.map((item) => item.reference)).toEqual(['DEMO-COT-2025-002']);
+    expect(filtered.items.map((item) => item.reference)).toEqual(['CNPM-COT-2025-002']);
     expect(filtered.availableExercises).toEqual([2026, 2025, 2024]);
   });
 
@@ -51,7 +51,7 @@ describe('DemoMemberContributionsGateway — MP-002/MP-003', () => {
     expect(detail.adjustments[0]).toMatchObject({ amount: 15000, direction: 'CREDIT' });
     expect(detail.schedule.map((item) => item.outstandingAmount)).toEqual([0, 60000, 60000]);
     expect(Object.keys(detail).join(' ')).not.toMatch(/rate|tier|tranche|barème/i);
-    expect(JSON.stringify(detail)).toContain('fictive');
+    expect(detail.amountOriginNote).toContain('DEC-008');
   });
 
   it('signale explicitement une contribution absente', async () => {

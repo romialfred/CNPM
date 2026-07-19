@@ -18,10 +18,10 @@ import { OrganizationsPage } from './organizations.page';
 
 const ORGANIZATION: Organization = {
   id: '10000000-0000-4000-8000-000000000001',
-  legalName: 'Entreprise Démo Exemple',
-  tradeName: 'Démo Exemple',
-  organizationType: 'Société de démonstration',
-  sectorCode: 'SECTEUR_DEMO',
+  legalName: 'Entreprise Exemple',
+  tradeName: 'Exemple',
+  organizationType: 'Société anonyme',
+  sectorCode: 'SECTEUR_FABRICATION',
   status: 'ACTIVE',
   riskLevel: 'NORMAL',
   version: 7,
@@ -109,14 +109,14 @@ describe('écrans organisations', () => {
     };
     const router = TestBed.inject(Router);
     vi.spyOn(router, 'navigate').mockResolvedValue(true);
-    page.form.controls.legalName.setValue('Entreprise Démo Révisée');
+    page.form.controls.legalName.setValue('Entreprise Révisée');
     page.submit();
     await fixture.whenStable();
 
     expect(gateway.update).toHaveBeenCalledWith(
       ORGANIZATION.id,
       ORGANIZATION.version,
-      expect.objectContaining({ legalName: 'Entreprise Démo Révisée' }),
+      expect.objectContaining({ legalName: 'Entreprise Révisée' }),
     );
     expect(host.textContent).toContain('Champs protégés');
   });

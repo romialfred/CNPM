@@ -5,7 +5,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideEye } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { CNPM_DATA_MODE } from '../../../core/api/api.config';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -65,7 +64,6 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
     RouterLink,
     LucideEye,
     AdminShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
@@ -176,7 +174,7 @@ export class RequestsPage {
     { key: 'requester', label: 'Demandeur' },
     { key: 'priority', label: 'Priorité', sortable: true },
     { key: 'status', label: 'Statut' },
-    { key: 'targetAt', label: 'Échéance fictive', sortable: true },
+    { key: 'targetAt', label: 'Échéance', sortable: true },
     { key: 'assignee', label: 'Responsable' },
     { key: 'actions', label: 'Actions' },
   ];

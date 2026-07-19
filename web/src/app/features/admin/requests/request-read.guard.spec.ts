@@ -12,7 +12,7 @@ import {
 import { requestReadGuard } from './request-read.guard';
 
 const IDENTITY: SessionIdentity = {
-  displayName: 'Agent test fictif',
+  displayName: 'Agent test',
   roleLabel: 'SUPPORT',
   exerciseLabel: null,
   notificationCount: null,

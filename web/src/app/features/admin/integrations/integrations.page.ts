@@ -12,7 +12,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -96,7 +95,7 @@ const OUTCOME_TONES: Readonly<Record<IntegrationLogOutcome, CnpmBadgeTone>> = {
 
 const LOG_COLUMNS: readonly DataTableColumn[] = [
   { key: 'occurredAt', label: 'Horodatage' },
-  { key: 'partner', label: 'Partenaire fictif' },
+  { key: 'partner', label: 'Partenaire' },
   { key: 'exchange', label: 'Échange' },
   { key: 'direction', label: 'Sens' },
   { key: 'outcome', label: 'Résultat' },
@@ -124,7 +123,6 @@ type LoadResult =
   imports: [
     FormsModule,
     AdminShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
@@ -294,9 +292,9 @@ export class IntegrationsPage {
 
   protected mappingLabel(count: number): string {
     if (count === 0) {
-      return 'Aucune correspondance fictive liée';
+      return 'Aucune correspondance liée';
     }
-    return `${count} ${count === 1 ? 'correspondance fictive liée' : 'correspondances fictives liées'}`;
+    return `${count} ${count === 1 ? 'correspondance liée' : 'correspondances liées'}`;
   }
 
   protected selectView(value: string): void {

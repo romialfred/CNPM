@@ -98,7 +98,7 @@ export class MemberShowcasePreviewPage {
   constructor() {
     this.seo.apply({
       title: 'Aperçu privé de la vitrine — CNPM',
-      description: 'Aperçu privé et non indexable d’un brouillon fictif de vitrine membre.',
+      description: 'Aperçu privé et non indexable d’un brouillon de vitrine membre.',
       robots: 'noindex,nofollow',
       canonicalPath: '/member/showcase/preview',
     });

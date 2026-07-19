@@ -7,12 +7,12 @@ describe('DemoMemberProfileGateway — MP-013', () => {
   it('sert une projection locale déterministe alignée sur MOB-016', async () => {
     const profile = await firstValueFrom(new DemoMemberProfileGateway().load());
     expect(profile).toMatchObject({
-      displayLabel: 'Membre de démonstration',
-      organizationName: 'Entreprise Démo Sahel',
-      memberReference: 'CNPM-DEMO-0001',
+      displayLabel: 'Responsable adhésion',
+      organizationName: 'Sahel Agro SA',
+      memberReference: 'CNPM-2026-0001',
       membershipSince: '2024-03-18',
     });
-    expect(profile.disclosure).toContain('fictif et non modifiable');
+    expect(profile.disclosure).toContain('lecture seule');
   });
 
   it('n’expose ni contact, ni frontière IAM, ni justificatif membre', async () => {

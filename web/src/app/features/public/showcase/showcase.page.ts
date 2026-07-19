@@ -214,7 +214,7 @@ export class ShowcasePage {
     this.seo.apply({
       title: showcase.seoTitle,
       description: showcase.seoDescription,
-      // Une fixture de démonstration ne doit jamais être indexée, même si elle simule un consentement.
+      // Un contenu non alimenté par l'API R4 n'est jamais indexé, même s'il porte un consentement.
       robots:
         !showcase.isDemoContent && showcase.allowIndexing ? 'index,follow' : 'noindex,nofollow',
       canonicalPath: `/membres/${encodeURIComponent(showcase.slug)}`,

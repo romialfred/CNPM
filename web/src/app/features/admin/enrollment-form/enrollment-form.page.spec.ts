@@ -16,7 +16,7 @@ import { EnrollmentFormPage } from './enrollment-form.page';
 const CONTEXT: EnrollmentContext = {
   reference: {
     legalForms: [{ id: 'sa', label: 'Société anonyme' }],
-    categories: [{ id: 'demo', label: 'Catégorie de démonstration' }],
+    categories: [{ id: 'grande-entreprise', label: 'Grande entreprise' }],
     groups: [],
     periodicities: [{ id: 'annual', label: 'Annuelle' }],
     documentTypes: [
@@ -24,7 +24,7 @@ const CONTEXT: EnrollmentContext = {
         id: 'rccm',
         label: 'Copie RCCM',
         required: true,
-        hint: 'Document de démonstration.',
+        hint: 'Document officiel lisible.',
         acceptedExtensions: ['.pdf'],
         maxSizeBytes: 5_000_000,
       },
@@ -37,7 +37,7 @@ class StubEnrollmentGateway implements EnrollmentGateway {
   readonly load = vi.fn(() => of(CONTEXT));
 
   saveDraft(values: EnrollmentDraftValues) {
-    return of({ id: 'DRAFT-DEMO', savedAt: '2026-07-18T18:00:00Z', values });
+    return of({ id: 'DRAFT-2026-0001', savedAt: '2026-07-18T18:00:00Z', values });
   }
 
   checkRegistration() {
@@ -53,7 +53,7 @@ class StubEnrollmentGateway implements EnrollmentGateway {
   }
 
   submit() {
-    return of({ reference: 'ENR-DEMO-0001', submittedAt: '2026-07-18T18:00:00Z' });
+    return of({ reference: 'ENR-2026-0001', submittedAt: '2026-07-18T18:00:00Z' });
   }
 }
 
@@ -85,7 +85,7 @@ function editLegalName(page: EnrollmentFormPage): void {
   const exposed = page as unknown as {
     form: { controls: { legalName: { setValue(value: string): void } } };
   };
-  exposed.form.controls.legalName.setValue('Entreprise de démonstration modifiée');
+  exposed.form.controls.legalName.setValue('Entreprise modifiée');
 }
 
 describe('EnrollmentFormPage — protection des modifications', () => {

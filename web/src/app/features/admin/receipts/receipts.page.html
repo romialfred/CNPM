@@ -5,13 +5,6 @@
       description="Consultez les métadonnées et la provenance des enregistrements accessibles."
     />
 
-    @if (demoMode) {
-      <cnpm-alert tone="info" title="Registre strictement fictif">
-        Les identifiants DEMO, membres, paiements, montants, dates et statuts sont des données de
-        scénario. Aucun reçu officiel n’est généré, émis, signé, annulé, vérifié ou téléchargé.
-      </cnpm-alert>
-    }
-
     <section class="cnpm-receipts__scope" aria-labelledby="receipt-scope-title">
       <div>
         <h2 id="receipt-scope-title">Périmètre de consultation</h2>
@@ -25,18 +18,18 @@
     </section>
 
     @if (overview(); as summary) {
-      <section class="cnpm-receipts__overview" aria-label="Synthèse du registre fictif">
+      <section class="cnpm-receipts__overview" aria-label="Synthèse du registre">
         <div>
           <span>Enregistrements</span><strong>{{ summary.totalRecords }}</strong>
         </div>
         <div>
-          <span>Émis — scénario</span><strong>{{ summary.issuedCount }}</strong>
+          <span>Émis</span><strong>{{ summary.issuedCount }}</strong>
         </div>
         <div>
-          <span>Annulés — scénario</span><strong>{{ summary.cancelledCount }}</strong>
+          <span>Annulés</span><strong>{{ summary.cancelledCount }}</strong>
         </div>
         <div>
-          <span>Montant cumulé fictif</span>
+          <span>Montant cumulé</span>
           <strong>{{ formatAmount(summary.totalAmount) }} FCFA</strong>
         </div>
       </section>
@@ -186,7 +179,7 @@
       @case ('ready') {
         <div class="cnpm-receipts__table">
           <cnpm-data-table
-            caption="Registre fictif des reçus avec membre, montant, période, statut, provenance et correction."
+            caption="Registre des reçus avec membre, montant, période, statut, provenance et correction."
             [columns]="columns"
             [rows]="rows()"
             state="ready"
@@ -221,7 +214,7 @@
                 <span class="cnpm-receipts__provenance">
                   <strong>{{ receipt.paymentReference }}</strong>
                   <span>{{ channelLabel(receipt.channel) }}</span>
-                  <span>Confirmation fictive : {{ formatDate(receipt.paymentConfirmedAt) }}</span>
+                  <span>Confirmation : {{ formatDate(receipt.paymentConfirmedAt) }}</span>
                 </span>
               </td>
               <td class="cnpm-table__cell">{{ correctionLabel(receipt) }}</td>
@@ -229,7 +222,7 @@
           </cnpm-data-table>
         </div>
 
-        <ul class="cnpm-receipts__cards" aria-label="Registre fictif des reçus">
+        <ul class="cnpm-receipts__cards" aria-label="Registre des reçus">
           @for (receipt of rows(); track receipt.id) {
             <li>
               <div class="cnpm-receipts__card-head">
@@ -243,7 +236,7 @@
               </div>
               <dl>
                 <div>
-                  <dt>Membre fictif</dt>
+                  <dt>Membre</dt>
                   <dd>{{ receipt.memberLabel }}</dd>
                 </div>
                 <div>
@@ -255,11 +248,11 @@
                   <dd>{{ periodLabel(receipt.period) }}</dd>
                 </div>
                 <div>
-                  <dt>Date du scénario</dt>
+                  <dt>Date d’émission</dt>
                   <dd>{{ formatDate(receipt.issuedAt) }}</dd>
                 </div>
                 <div>
-                  <dt>Paiement fictif</dt>
+                  <dt>Paiement</dt>
                   <dd>{{ receipt.paymentReference }}</dd>
                 </div>
                 <div>

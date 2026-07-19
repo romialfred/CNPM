@@ -19,24 +19,24 @@ import { RequestsPage } from './requests.page';
 
 const DETAIL: ServiceRequestDetail = {
   id: '70000000-0000-4000-8000-000000000001',
-  reference: 'REQ-DEMO-TEST-0001',
-  subject: 'Question fictive de test',
-  requesterLabel: 'Entreprise Test fictive',
-  categoryLabel: 'Information — démonstration',
-  serviceLabel: 'Support — démonstration',
+  reference: 'REQ-2026-TEST-0001',
+  subject: 'Question de test',
+  requesterLabel: 'Entreprise Test',
+  categoryLabel: 'Information',
+  serviceLabel: 'Support',
   priority: 'HIGH',
   status: 'IN_PROGRESS',
   submittedAt: '2026-07-18T09:20:00Z',
   targetAt: '2026-07-20T16:00:00Z',
   slaState: 'DUE_SOON',
-  assigneeLabel: 'Agent support fictif',
-  confidentialityLabel: 'Interne CNPM — démonstration',
-  description: 'Description fictive.',
+  assigneeLabel: 'Agent support',
+  confidentialityLabel: 'Interne CNPM',
+  description: 'Description de test.',
   memberConversation: [
     {
       id: 'message-1',
       direction: 'MEMBER',
-      authorLabel: 'Contact fictif',
+      authorLabel: 'Contact de test',
       body: 'Échange visible par le membre.',
       createdAt: '2026-07-18T09:20:00Z',
     },
@@ -44,7 +44,7 @@ const DETAIL: ServiceRequestDetail = {
   internalNotes: [
     {
       id: 'note-1',
-      authorLabel: 'Agent fictif',
+      authorLabel: 'Agent de test',
       body: 'Note strictement interne de test.',
       createdAt: '2026-07-18T10:00:00Z',
     },
@@ -168,11 +168,11 @@ describe('écrans requêtes et réclamations', () => {
       replyControl: { setValue(value: string): void };
       prepareReply(): void;
     };
-    page.replyControl.setValue('Projet local fictif.');
+    page.replyControl.setValue('Projet local de test.');
     page.prepareReply();
     fixture.detectChanges();
     expect(host.textContent).toContain('Aperçu non envoyé et non enregistré');
-    expect(conversation?.textContent).not.toContain('Projet local fictif');
+    expect(conversation?.textContent).not.toContain('Projet local de test');
   });
 
   it.each([

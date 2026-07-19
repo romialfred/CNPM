@@ -19,12 +19,12 @@ import { IntegrationsPage } from './integrations.page';
 
 const PARTNER: IntegrationPartner = {
   id: 'demo-integration-test',
-  name: 'Partenaire Démo Test',
-  purpose: 'Flux entièrement fictif',
-  channelLabel: 'Canal simulé',
-  environmentLabel: 'Bac à sable fictif',
+  name: 'Partenaire Test',
+  purpose: 'Flux de test',
+  channelLabel: 'Canal de test',
+  environmentLabel: 'Bac à sable',
   health: 'HEALTHY',
-  contractVersion: 'v1-demo',
+  contractVersion: 'v1-2026',
   authorization: 'DOCUMENTED',
   authorizationLabel: 'Autorisation de test documentée',
   externalMappings: 2,
@@ -36,7 +36,7 @@ const PARTNER: IntegrationPartner = {
   lastExchangeLabel: '19 juillet 2026, 10:35',
   successRate24h: 100,
   events24h: 3,
-  statusDetail: 'Scénario fictif opérationnel.',
+  statusDetail: 'Scénario opérationnel.',
 };
 
 const LOG: IntegrationLogEntry = {
@@ -46,10 +46,10 @@ const LOG: IntegrationLogEntry = {
   partnerId: PARTNER.id,
   partnerName: PARTNER.name,
   direction: 'INBOUND',
-  exchangeLabel: 'Import fictif',
+  exchangeLabel: 'Import',
   outcome: 'SUCCESS',
-  correlationLabel: 'DEMO-INT-TEST',
-  contractVersion: 'v1-demo',
+  correlationLabel: 'CNPM-INT-TEST',
+  contractVersion: 'v1-2026',
   provenanceLabel: 'Jeu synthétique Test',
   qualityLabel: 'Conforme',
   detail: 'Aucune charge utile conservée.',
@@ -207,14 +207,14 @@ describe('IntegrationsPage — BO-038', () => {
     });
 
     const input = host.querySelector<HTMLInputElement>('#integration-search')!;
-    input.value = ' partenaire démo ';
+    input.value = ' partenaire alpha ';
     input.dispatchEvent(new Event('input'));
     host
       .querySelector<HTMLFormElement>('.cnpm-integrations__search')!
       .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     expect(navigate).toHaveBeenLastCalledWith([], {
       relativeTo: expect.anything(),
-      queryParams: { q: 'partenaire démo' },
+      queryParams: { q: 'partenaire alpha' },
       queryParamsHandling: 'merge',
     });
 
@@ -257,7 +257,7 @@ describe('IntegrationsPage — BO-038', () => {
     await unavailable.fixture.whenStable();
     unavailable.fixture.detectChanges();
     expect(unavailable.host.textContent).toContain('Projection HTTP indisponible');
-    expect(unavailable.host.textContent).toContain('Aucun jeu fictif n’est affiché');
+    expect(unavailable.host.textContent).toContain('Aucun jeu de substitution n’est affiché');
     expect(buttonByText(unavailable.host, 'Réessayer')).toBeUndefined();
 
     TestBed.resetTestingModule();

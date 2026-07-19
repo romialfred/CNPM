@@ -15,12 +15,12 @@ import { MemberUsersPage } from './member-users.page';
 const READY_PAGE: MemberUserPage = {
   items: [
     {
-      id: 'demo-user-0004',
-      reference: 'DEMO-USR-0004',
-      displayLabel: 'Utilisateur fictif 04',
-      email: 'delegue.04@entreprise-demo.example',
-      roleLabel: 'Utilisateur délégué fictif',
-      status: 'INACTIVE_DEMO',
+      id: 'user-0004',
+      reference: 'CNPM-USR-0004',
+      displayLabel: 'Utilisateur 04',
+      email: 'delegue.04@sahel-agro.example',
+      roleLabel: 'Utilisateur délégué',
+      status: 'INACTIVE',
       lastActivityOn: '2026-05-30',
     },
   ],
@@ -88,22 +88,22 @@ describe('MemberUsersPage — MP-014', () => {
 
   it('lit q, status, sort, order, page et size depuis l’URL', async () => {
     const { gateway, host } = await setup({
-      q: 'fictif 04',
-      status: 'INACTIVE_DEMO',
+      q: 'Utilisateur 04',
+      status: 'INACTIVE',
       sort: 'lastActivityOn',
       order: 'desc',
       page: '2',
       size: '5',
     });
     expect(gateway.calls[0].query).toEqual({
-      search: 'fictif 04',
-      status: 'INACTIVE_DEMO',
+      search: 'Utilisateur 04',
+      status: 'INACTIVE',
       sort: 'lastActivityOn',
       direction: 'desc',
       page: 2,
       size: 5,
     });
-    expect(host.textContent).toContain('Chargement des utilisateurs fictifs');
+    expect(host.textContent).toContain('Chargement des utilisateurs');
   });
 
   it('rend table et fiches mobiles en lecture seule sans frontière IAM', async () => {
@@ -114,8 +114,8 @@ describe('MemberUsersPage — MP-014', () => {
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.querySelector('table caption')?.textContent).toContain('sans action IAM');
-    expect(host.textContent).toContain('DEMO-USR-0004');
-    expect(host.textContent).toContain('delegue.04@entreprise-demo.example');
+    expect(host.textContent).toContain('CNPM-USR-0004');
+    expect(host.textContent).toContain('delegue.04@sahel-agro.example');
     expect(host.querySelector('.member-users__mobile-list article dl')).not.toBeNull();
     expect(host.querySelectorAll('.member-users input[type="checkbox"]')).toHaveLength(0);
     expect(
@@ -134,11 +134,11 @@ describe('MemberUsersPage — MP-014', () => {
 
     const search = host.querySelector<HTMLInputElement>('#member-user-search');
     if (!search) throw new Error('Recherche absente');
-    search.value = '  DEMO-USR  ';
+    search.value = '  CNPM-USR  ';
     search.dispatchEvent(new Event('input'));
     const status = host.querySelector<HTMLSelectElement>('#member-user-status');
     if (!status) throw new Error('État absent');
-    status.value = 'ACTIVE_DEMO';
+    status.value = 'ACTIVE';
     status.dispatchEvent(new Event('change'));
     const sort = host.querySelector<HTMLSelectElement>('#member-user-sort');
     if (!sort) throw new Error('Tri absent');
@@ -149,8 +149,8 @@ describe('MemberUsersPage — MP-014', () => {
     expect(navigate).toHaveBeenCalledWith([], {
       relativeTo: expect.anything(),
       queryParams: expect.objectContaining({
-        q: 'DEMO-USR',
-        status: 'ACTIVE_DEMO',
+        q: 'CNPM-USR',
+        status: 'ACTIVE',
         sort: 'roleLabel',
         order: 'desc',
         page: 1,

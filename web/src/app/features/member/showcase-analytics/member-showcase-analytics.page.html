@@ -1,22 +1,22 @@
 <cnpm-member-portal-shell
-  organization="Entreprise Démo Sahel"
-  userName="Membre de démonstration"
-  memberCode="CNPM-DEMO-0001"
+  organization="Sahel Agro SA"
+  userName="Responsable adhésion"
+  memberCode="CNPM-2026-0001"
   [notificationCount]="0"
 >
   <main class="showcase-analytics" id="contenu-principal">
     <cnpm-page-header
       title="Statistiques de la vitrine"
-      description="Suivez uniquement des tendances agrégées dans cet atelier fictif."
+      description="Suivez uniquement des tendances agrégées et anonymes."
     >
       <cnpm-button routerLink="/member/showcase/preview" variant="secondary">
         Revoir l’aperçu
       </cnpm-button>
     </cnpm-page-header>
 
-    <cnpm-alert tone="warning" title="Agrégats fictifs et anonymes" [live]="false">
+    <cnpm-alert tone="warning" title="Agrégats anonymes" [live]="false">
       Aucun cookie analytique, IP, contact, appareil, compte ou identifiant de visiteur n’est
-      collecté. Les valeurs restent locales et ne mesurent aucune vitrine réelle.
+      collecté.
     </cnpm-alert>
 
     <section class="showcase-analytics__controls" aria-labelledby="analytics-controls-title">
@@ -25,7 +25,7 @@
         <p>La période et la présentation sont conservées dans l’adresse partageable.</p>
       </div>
       <div class="showcase-analytics__control-group">
-        <label for="showcase-analytics-period">Période fictive</label>
+        <label for="showcase-analytics-period">Période</label>
         <select
           #periodSelect
           id="showcase-analytics-period"
@@ -59,12 +59,12 @@
 
     @switch (result().kind) {
       @case ('loading') {
-        <section class="showcase-analytics__loading" aria-label="Chargement des agrégats fictifs">
+        <section class="showcase-analytics__loading" aria-label="Chargement des agrégats">
           <cnpm-skeleton
             variant="chart"
             [rows]="4"
             [columns]="12"
-            label="Chargement des agrégats fictifs…"
+            label="Chargement des agrégats…"
           />
         </section>
       }
@@ -81,14 +81,14 @@
         <cnpm-error-state
           variant="recoverable"
           title="Statistiques indisponibles en mode HTTP"
-          description="L’addendum R4, SHOWCASE.OWN.ANALYTICS.READ et le périmètre d’organisation ne sont pas promus dans les contrats canoniques. Aucune fixture n’est injectée."
+          description="L’addendum R4, SHOWCASE.OWN.ANALYTICS.READ et le périmètre d’organisation ne sont pas promus dans les contrats canoniques."
         />
       }
       @case ('empty') {
         <cnpm-empty-state
           variant="no-data"
           title="Aucun agrégat disponible"
-          description="Aucune mesure fictive n’est disponible pour cette période. Aucun visiteur individuel n’est recherché."
+          description="Aucune mesure n’est disponible pour cette période. Aucun visiteur individuel n’est recherché."
         />
       }
       @case ('ready') {
@@ -118,7 +118,7 @@
             <article>
               <span>Actions de contact</span>
               <strong>0</strong>
-              <small>Suivi désactivé dans la démonstration</small>
+              <small>Suivi des contacts désactivé</small>
             </article>
           </section>
 
@@ -126,7 +126,7 @@
             <header>
               <div>
                 <p class="showcase-analytics__eyebrow">Agrégation {{ data.aggregation }}</p>
-                <h2 id="analytics-trend-title">Tendance des vues fictives</h2>
+                <h2 id="analytics-trend-title">Tendance des vues</h2>
               </div>
               <cnpm-badge tone="info">Anonyme · local</cnpm-badge>
             </header>
@@ -149,7 +149,7 @@
                     <span
                       class="showcase-analytics__bar"
                       [style.height.%]="(day.views / maxViews()) * 100"
-                      [title]="day.date + ' : ' + day.views + ' vues fictives'"
+                      [title]="day.date + ' : ' + day.views + ' vues'"
                     ></span>
                   }
                 </div>
@@ -175,7 +175,7 @@
                     {{
                       plottedPeriodLabel()
                     }}
-                    — agrégats fictifs sans identifiant visiteur
+                    — agrégats sans identifiant visiteur
                   </caption>
                   <thead>
                     <tr>
@@ -208,7 +208,7 @@
               <p>Visiteurs uniques, provenance, appareil, parcours, contact et conversion.</p>
             </div>
             <p>
-              Dernier agrégat fictif :
+              Dernier agrégat :
               <time [attr.datetime]="data.generatedOn">{{
                 data.generatedOn | date: 'dd/MM/yyyy' : 'UTC'
               }}</time>

@@ -36,7 +36,7 @@ type ImportStep = 'deposit' | 'control' | 'review';
 const STEPS: readonly ImportStep[] = ['deposit', 'control', 'review'];
 const PROFILES: readonly DemoStatementProfile[] = ['CNPM_DEMO_CSV_V0'];
 const SAMPLE_FILE: BankStatementLocalFile = {
-  fileName: 'releve-bancaire-demo-juin.csv',
+  fileName: 'releve-bancaire-juin.csv',
   size: 84_216,
   profile: 'CNPM_DEMO_CSV_V0',
 };
@@ -116,7 +116,7 @@ export class BankStatementImportPage {
     );
   });
 
-  /** Une URL de contrôle/revue se restaure avec le seul fichier témoin public. */
+  /** Une URL de contrôle/revue se restaure avec le seul fichier exemple public. */
   private readonly hydrateShareableStep = effect(() => {
     if (
       this.state() === 'ready' &&
@@ -183,7 +183,7 @@ export class BankStatementImportPage {
   }
 
   protected profileLabel(profile: DemoStatementProfile): string {
-    return profile === 'CNPM_DEMO_CSV_V0' ? 'CSV Démo CNPM v0 · non bancaire' : profile;
+    return profile === 'CNPM_DEMO_CSV_V0' ? 'CSV CNPM v0 · format interne' : profile;
   }
 
   protected statusLabel(status: StatementLineControlStatus): string {
@@ -223,7 +223,7 @@ export class BankStatementImportPage {
         },
         error: () => {
           this.inspectionError.set(
-            'Le fichier n’a pas pu être contrôlé dans le banc local. Utilisez le fichier témoin CSV.',
+            'Le fichier n’a pas pu être contrôlé dans le banc local. Utilisez le fichier exemple CSV.',
           );
           this.inspecting.set(false);
         },

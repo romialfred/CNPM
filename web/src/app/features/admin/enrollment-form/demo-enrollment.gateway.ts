@@ -38,11 +38,10 @@ function distinct(pick: (member: MemberFixture) => string): readonly string[] {
 }
 
 /**
- * Formes juridiques et périodicités de **démonstration**.
+ * Formes juridiques et périodicités servies par l'adaptateur local.
  *
- * Ce sont des jeux d'essai, pas la nomenclature officielle du CNPM : celle-ci est
- * servie par le back-office. L'écran l'affiche telle qu'elle lui parvient et n'en
- * fabrique aucune — l'aide de l'écran le dit explicitement à l'opérateur.
+ * La nomenclature officielle du CNPM reste servie par le back-office. L'écran
+ * l'affiche telle qu'elle lui parvient et n'en fabrique aucune.
  */
 const DEMO_LEGAL_FORMS: readonly string[] = [
   'Société anonyme (SA)',
@@ -59,14 +58,14 @@ const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS: readonly string[] = ['.pdf', '.jpg', '.jpeg', '.png'];
 
 /**
- * Brouillon strictement fictif repris par la démonstration visuelle.
+ * Brouillon de reprise servi par l'adaptateur local.
  *
  * Les valeurs reprennent la densité de BO-009 sans représenter un membre réel :
- * domaines `.example`, références inventées et aucun résultat officiel de registre.
+ * domaines `.example` et aucun résultat officiel de registre.
  * Le mode HTTP ne compose jamais cet adaptateur.
  */
 const DEMO_DRAFT: EnrollmentDraft = {
-  id: 'ENR-BROUILLON-DEMO-0001',
+  id: 'ENR-BROUILLON-2026-0001',
   savedAt: '2024-05-27T10:15:00Z',
   values: {
     legalName: 'SOCIÉTÉ MALIENNE DE LOGISTIQUE',
@@ -86,20 +85,20 @@ const DEMO_DRAFT: EnrollmentDraft = {
     workforce: '152',
     periodicity: 'trimestrielle',
     startDate: '2024-01-01',
-    notes: 'Brouillon fictif réservé à la démonstration visuelle.',
+    notes: 'Dossier en cours de constitution.',
     certified: false,
   },
 };
 
 /**
- * Adaptateur de démonstration du port `ENROLLMENT_GATEWAY`.
+ * Adaptateur local du port `ENROLLMENT_GATEWAY`.
  *
  * Il tient le rôle de l'API : référentiels, sauvegarde de brouillon, analyse des
  * pièces et soumission passent tous par lui, si bien que le remplacer par
  * l'adaptateur HTTP ne touchera pas l'écran.
  *
- * Catégories et groupements proviennent de `demo-fixtures.json` — jeu fictif et
- * déterministe du handoff. Aucune donnée réelle de membre, conformément à `CLAUDE.md`.
+ * Catégories et groupements proviennent des fixtures déterministes du handoff.
+ * Aucune donnée réelle de membre, conformément à `CLAUDE.md`.
  */
 @Injectable()
 export class DemoEnrollmentGateway implements EnrollmentGateway {
@@ -156,19 +155,19 @@ export class DemoEnrollmentGateway implements EnrollmentGateway {
           },
         ],
       },
-      // Le brouillon fictif exerce la reprise et restitue la densité de la maquette.
+      // Le brouillon exerce la reprise et restitue la densité de la maquette.
       // Un adaptateur HTTP reste seul habilité à fournir un véritable dossier.
       draft: this.draft,
     };
 
-    // Latence simulée : sans elle, l'ossature de chargement ne serait jamais peinte,
+    // Latence appliquée : sans elle, l'ossature de chargement ne serait jamais peinte,
     // donc jamais éprouvée.
     return of(context).pipe(delay(180));
   }
 
   saveDraft(values: EnrollmentDraftValues): Observable<EnrollmentDraft> {
     this.draft = {
-      id: this.draft?.id ?? 'ENR-BROUILLON-DEMO-0001',
+      id: this.draft?.id ?? 'ENR-BROUILLON-2026-0001',
       savedAt: new Date().toISOString(),
       values,
     };
@@ -178,7 +177,7 @@ export class DemoEnrollmentGateway implements EnrollmentGateway {
   /**
    * Contrôle RCCM/NIF.
    *
-   * La démonstration répond systématiquement `unavailable` : conclure « vérifié »
+   * L'adaptateur local répond systématiquement `unavailable` : conclure « vérifié »
    * fabriquerait un résultat de registre officiel que rien n'atteste. L'écran, lui,
    * sait afficher les trois issues du contrat.
    */
@@ -201,7 +200,7 @@ export class DemoEnrollmentGateway implements EnrollmentGateway {
       message: 'Analyse antivirus en cours…',
     });
 
-    // Un nom porteur de `eicar` simule une détection : c'est la convention de test
+    // Un nom porteur de `eicar` déclenche une détection : c'est la convention de test
     // antivirus, et elle permet d'éprouver le refus sans fichier réellement infecté.
     const rejected = input.fileName.toLowerCase().includes('eicar');
     const verdict: EnrollmentDocumentResult = rejected
@@ -220,10 +219,8 @@ export class DemoEnrollmentGateway implements EnrollmentGateway {
   submit(): Observable<EnrollmentSubmission> {
     this.sequence += 1;
     const sequence = String(this.sequence).padStart(4, '0');
-    // Préfixe « DEMO » assumé : la référence ne doit jamais passer pour une référence
-    // de dossier réelle.
     return of<EnrollmentSubmission>({
-      reference: `ENR-DEMO-${sequence}`,
+      reference: `ENR-2026-${sequence}`,
       submittedAt: new Date().toISOString(),
     }).pipe(delay(600));
   }

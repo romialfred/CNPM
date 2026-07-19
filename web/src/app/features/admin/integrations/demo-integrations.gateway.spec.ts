@@ -24,7 +24,7 @@ describe('DemoIntegrationsGateway — BO-038', () => {
     expect(snapshot.summary.events24h).toBe(
       snapshot.partners.reduce((sum, partner) => sum + partner.events24h, 0),
     );
-    expect(snapshot.partners.every((partner) => partner.contractVersion.endsWith('-demo'))).toBe(
+    expect(snapshot.partners.every((partner) => partner.contractVersion.endsWith('-2026'))).toBe(
       true,
     );
   });
@@ -46,7 +46,7 @@ describe('DemoIntegrationsGateway — BO-038', () => {
     expect(serialized).not.toContain('token');
     expect(serialized).not.toContain('secret');
     expect(serialized).not.toContain('payload');
-    expect(snapshot.logs.every((entry) => entry.correlationLabel.startsWith('DEMO-INT-'))).toBe(
+    expect(snapshot.logs.every((entry) => entry.correlationLabel.startsWith('CNPM-INT-'))).toBe(
       true,
     );
   });

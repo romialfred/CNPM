@@ -4,7 +4,7 @@ import type { Observable } from 'rxjs';
 export interface PublicReceiptVerificationDemo {
   readonly verificationCode: string;
   readonly receiptReference: string;
-  readonly statusLabel: 'Aperçu valide — démonstration';
+  readonly statusLabel: 'Aperçu valide';
   readonly amountXof: number;
   readonly scenarioDate: string;
   readonly fictionalDemo: true;

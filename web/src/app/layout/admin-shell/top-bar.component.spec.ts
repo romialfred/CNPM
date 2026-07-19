@@ -47,14 +47,13 @@ describe('TopBarComponent', () => {
     expect(emit).toHaveBeenCalledWith('SOMACOP');
   });
 
-  it('rend le compteur et le contexte de notification explicitement fictifs', async () => {
+  it('rend le compteur et le contexte de notification', async () => {
     const { host } = await setup();
     const trigger = host.querySelector<HTMLElement>('.cnpm-topbar__notification-trigger');
 
-    expect(trigger?.getAttribute('aria-label')).toBe('8 notifications de démonstration');
+    expect(trigger?.getAttribute('aria-label')).toBe('8 notifications');
     expect(host.querySelector('.cnpm-topbar__notification-count')?.textContent?.trim()).toBe('8');
     expect(host.textContent).toContain('Le centre de notifications n’est pas encore raccordé.');
-    expect(host.querySelector('.cnpm-topbar__demo')?.textContent).toContain('Démo');
   });
 
   it('présente une seule action globale et une identité textuelle', async () => {
@@ -63,9 +62,9 @@ describe('TopBarComponent', () => {
 
     expect(action?.getAttribute('href')).toBe('/admin/enrollments/new');
     expect(action?.getAttribute('aria-label')).toBe('Créer un nouvel enrôlement');
-    expect(host.querySelector('.cnpm-topbar__avatar')?.textContent?.trim()).toBe('AD');
+    expect(host.querySelector('.cnpm-topbar__avatar')?.textContent?.trim()).toBe('AT');
     expect(host.querySelector('.cnpm-topbar__identity')?.getAttribute('aria-label')).toBe(
-      'Agent de démonstration, Administrateur',
+      'Aminata Traoré, Administrateur',
     );
   });
 

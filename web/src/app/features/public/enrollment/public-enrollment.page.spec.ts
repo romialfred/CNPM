@@ -65,13 +65,13 @@ function expose(page: PublicEnrollmentPage): ExposedEnrollmentPage {
 describe('PublicEnrollmentPage (PUB-012)', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('rend une démonstration locale sans champ de fichier ni consentement inventé', async () => {
+  it('rend un parcours local sans champ de fichier ni consentement non validé', async () => {
     const { harness, router } = await setup();
     const host = harness.routeNativeElement!;
 
     expect(router.url).toBe('/adhesion?etape=entreprise');
     expect(host.querySelector('h1')).toBe(document.activeElement);
-    expect(host.textContent).toContain('sans créer de dossier officiel');
+    expect(host.textContent).toContain('ni transmises ni enregistrées');
     expect(host.querySelector('input[type="file"]')).toBeNull();
     expect(host.querySelector('input[type="checkbox"]')).toBeNull();
   });
@@ -93,25 +93,25 @@ describe('PublicEnrollmentPage (PUB-012)', () => {
     ).toContain('adhesion-legalName-erreur');
   });
 
-  it('conserve chaque étape dans l’URL puis crée seulement une confirmation DEMO en mémoire', async () => {
+  it('conserve chaque étape dans l’URL puis crée seulement un récapitulatif en mémoire', async () => {
     const { harness, page, router } = await setup();
     const exposed = expose(page);
 
     exposed.form.patchValue({
-      legalName: 'Entreprise Démo Sahel',
-      tradeName: 'Démo Sahel',
-      legalForm: 'Forme fictive',
-      rccm: 'DEMO-RCCM-001',
-      nif: 'DEMO-NIF-001',
+      legalName: 'Sahel Agro SA',
+      tradeName: 'Sahel Agro',
+      legalForm: 'Société anonyme',
+      rccm: 'RCCM-2026-001',
+      nif: 'NIF-2026-001',
     });
     exposed.onSubmit();
     await harness.fixture.whenStable();
     expect(router.url).toBe('/adhesion?etape=contact');
 
     exposed.form.patchValue({
-      contactName: 'Awa Démo',
-      contactEmail: 'contact@demo.invalid',
-      contactPhone: 'DEMO-TELEPHONE',
+      contactName: 'Contact Sahel Agro',
+      contactEmail: 'contact@sahel-agro.invalid',
+      contactPhone: '+223 00 00 00 00',
     });
     exposed.onSubmit();
     await harness.fixture.whenStable();
@@ -124,16 +124,16 @@ describe('PublicEnrollmentPage (PUB-012)', () => {
     exposed.onSubmit();
     await harness.fixture.whenStable();
     harness.fixture.detectChanges();
-    expect(router.url).toContain('/adhesion/confirmation?reference=DEMO-ADH-2026-001');
+    expect(router.url).toContain('/adhesion/confirmation?reference=ADH-2026-001');
     expect(harness.routeNativeElement?.textContent).toContain('Aucun dossier officiel créé');
-    expect(harness.routeNativeElement?.textContent).toContain('DEMO-ADH-2026-001');
-    expect(harness.routeNativeElement?.textContent).not.toContain('contact@demo.invalid');
+    expect(harness.routeNativeElement?.textContent).toContain('ADH-2026-001');
+    expect(harness.routeNativeElement?.textContent).not.toContain('contact@sahel-agro.invalid');
   });
 
   it('demande un arbitrage avant toute sortie avec une saisie locale', async () => {
     const { harness, page } = await setup();
     const exposed = expose(page);
-    exposed.form.patchValue({ legalName: 'Entreprise Démo modifiée' });
+    exposed.form.patchValue({ legalName: 'Sahel Agro SA modifiée' });
 
     const decision = page.confirmNavigation();
     harness.fixture.detectChanges();
@@ -158,18 +158,16 @@ describe('PublicEnrollmentConfirmationPage (PUB-013)', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
   it('ne fabrique aucune confirmation lors d’un accès direct', async () => {
-    const { harness } = await setup('demo', '/adhesion/confirmation?reference=DEMO-ADH-2026-001');
-    expect(harness.routeNativeElement?.textContent).toContain(
-      'Aucune confirmation locale disponible',
-    );
+    const { harness } = await setup('demo', '/adhesion/confirmation?reference=ADH-2026-001');
+    expect(harness.routeNativeElement?.textContent).toContain('Aucun récapitulatif disponible');
     expect(harness.routeNativeElement?.textContent).not.toContain('Dossier officielNon créé');
   });
 
   it('reste aussi fermée en profil HTTP', async () => {
-    const { harness } = await setup('http', '/adhesion/confirmation?reference=DEMO-ADH-2026-001');
+    const { harness } = await setup('http', '/adhesion/confirmation?reference=ADH-2026-001');
     expect(harness.routeNativeElement?.textContent).toContain(
       'Confirmation d’adhésion non raccordée',
     );
-    expect(harness.routeNativeElement?.textContent).not.toContain('DEMO-ADH-2026-001');
+    expect(harness.routeNativeElement?.textContent).not.toContain('ADH-2026-001');
   });
 });

@@ -12,7 +12,7 @@ import {
 import { contributionGenerateGuard } from './contribution-generate.guard';
 
 const IDENTITY: SessionIdentity = {
-  displayName: 'Persona finance fictive',
+  displayName: 'Agent finance',
   roleLabel: 'Finance',
   exerciseLabel: '2024',
   notificationCount: 0,

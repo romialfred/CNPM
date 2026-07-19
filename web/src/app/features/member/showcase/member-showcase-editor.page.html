@@ -1,35 +1,35 @@
 <cnpm-member-portal-shell
-  organization="Entreprise Démo Sahel"
-  userName="Membre de démonstration"
-  memberCode="CNPM-DEMO-0001"
+  organization="Sahel Agro SA"
+  userName="Responsable adhésion"
+  memberCode="CNPM-2026-0001"
   [notificationCount]="0"
 >
   <main class="showcase-editor" id="contenu-principal">
     <cnpm-page-header
       title="Éditeur de vitrine"
-      description="Préparez un brouillon fictif dans un gabarit éditorial contraint."
+      description="Préparez votre brouillon dans un gabarit éditorial contraint."
     >
       <cnpm-button routerLink="/member/showcase/preview" variant="primary">
         Ouvrir l’aperçu privé
       </cnpm-button>
     </cnpm-page-header>
 
-    <cnpm-alert tone="warning" title="Atelier local de démonstration" [live]="false">
-      Saisissez uniquement du contenu fictif non sensible. Le brouillon reste dans ce navigateur :
-      aucune donnée n’est envoyée, soumise, modérée ou publiée.
+    <cnpm-alert tone="warning" title="Brouillon local" [live]="false">
+      Le brouillon est enregistré dans ce navigateur. La soumission, la modération et la
+      publication ne sont pas encore ouvertes.
     </cnpm-alert>
 
     @switch (state()) {
       @case ('loading') {
-        <section class="showcase-editor__loading" aria-label="Chargement du brouillon fictif">
-          <cnpm-skeleton variant="card" [rows]="8" label="Chargement du brouillon fictif…" />
+        <section class="showcase-editor__loading" aria-label="Chargement du brouillon">
+          <cnpm-skeleton variant="card" [rows]="8" label="Chargement du brouillon…" />
         </section>
       }
       @case ('error') {
         <cnpm-error-state
           variant="recoverable"
           title="Le brouillon local n’a pas pu être chargé"
-          description="Aucune donnée n’a été transmise. Vous pouvez réessayer d’ouvrir l’atelier local."
+          description="Vous pouvez réessayer d’ouvrir l’atelier local."
         >
           <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
         </cnpm-error-state>
@@ -38,14 +38,14 @@
         <cnpm-error-state
           variant="recoverable"
           title="Éditeur de vitrine indisponible en mode HTTP"
-          description="La checklist R4, le contrat canonique, le périmètre d’organisation et les consentements ne sont pas promus. Aucune fixture locale n’est injectée dans ce mode."
+          description="La checklist R4, le contrat canonique, le périmètre d’organisation et les consentements ne sont pas promus."
         />
       }
       @case ('empty') {
         <cnpm-empty-state
           variant="first-use"
           title="Aucun brouillon local"
-          description="Aucun contenu fictif n’est disponible dans cette session de démonstration."
+          description="Aucun contenu n’est encore enregistré dans cet atelier local."
         />
       }
       @case ('ready') {
@@ -127,7 +127,7 @@
               </header>
               <div class="showcase-editor__fields">
                 <div class="showcase-editor__field showcase-editor__field--wide">
-                  <label for="showcase-name">Nom fictif</label>
+                  <label for="showcase-name">Nom</label>
                   <input
                     id="showcase-name"
                     formControlName="name"
@@ -135,17 +135,15 @@
                     aria-describedby="showcase-name-help showcase-name-error"
                     [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
                   />
-                  <small id="showcase-name-help"
-                    >2 à 120 caractères. N’utilisez aucun nom réel.</small
-                  >
+                  <small id="showcase-name-help">2 à 120 caractères.</small>
                   @if (form.controls.name.invalid && form.controls.name.touched) {
                     <strong id="showcase-name-error" class="showcase-editor__error">
-                      Un nom fictif de 2 à 120 caractères est requis.
+                      Un nom de 2 à 120 caractères est requis.
                     </strong>
                   }
                 </div>
                 <div class="showcase-editor__field">
-                  <label for="showcase-slug">Slug de démonstration</label>
+                  <label for="showcase-slug">Slug</label>
                   <input
                     id="showcase-slug"
                     formControlName="slug"
@@ -161,11 +159,11 @@
                   }
                 </div>
                 <div class="showcase-editor__field">
-                  <label for="showcase-sector">Secteur fictif</label>
+                  <label for="showcase-sector">Secteur</label>
                   <input id="showcase-sector" formControlName="sector" maxlength="120" />
                 </div>
                 <div class="showcase-editor__field showcase-editor__field--wide">
-                  <label for="showcase-location">Localisation fictive</label>
+                  <label for="showcase-location">Localisation</label>
                   <input id="showcase-location" formControlName="location" maxlength="160" />
                 </div>
               </div>
@@ -184,7 +182,7 @@
                 <cnpm-badge tone="neutral">Sans média</cnpm-badge>
               </header>
               <div class="showcase-editor__field">
-                <label for="showcase-tagline">Phrase de présentation fictive</label>
+                <label for="showcase-tagline">Phrase de présentation</label>
                 <input
                   id="showcase-tagline"
                   formControlName="tagline"
@@ -213,7 +211,7 @@
                 </div>
               </header>
               <div class="showcase-editor__field">
-                <label for="showcase-summary">Résumé fictif</label>
+                <label for="showcase-summary">Résumé</label>
                 <textarea
                   id="showcase-summary"
                   formControlName="summary"
@@ -227,7 +225,7 @@
               </div>
               <div class="showcase-editor__fields">
                 <div class="showcase-editor__field">
-                  <label for="showcase-employee-range">Effectif fictif</label>
+                  <label for="showcase-employee-range">Effectif</label>
                   <input
                     id="showcase-employee-range"
                     formControlName="employeeRange"
@@ -235,7 +233,7 @@
                   />
                 </div>
                 <div class="showcase-editor__field">
-                  <label for="showcase-founded-year">Année de création fictive</label>
+                  <label for="showcase-founded-year">Année de création</label>
                   <input
                     id="showcase-founded-year"
                     type="number"
@@ -245,7 +243,7 @@
                   />
                 </div>
                 <div class="showcase-editor__field showcase-editor__field--wide">
-                  <label for="showcase-legal-form">Forme fictive</label>
+                  <label for="showcase-legal-form">Forme juridique</label>
                   <input id="showcase-legal-form" formControlName="legalForm" maxlength="80" />
                 </div>
               </div>
@@ -264,15 +262,15 @@
               </header>
               <div class="showcase-editor__fields">
                 <div class="showcase-editor__field">
-                  <label for="showcase-activity-one">Activité fictive 1</label>
+                  <label for="showcase-activity-one">Activité 1</label>
                   <input id="showcase-activity-one" formControlName="activityOne" maxlength="120" />
                 </div>
                 <div class="showcase-editor__field">
-                  <label for="showcase-activity-two">Activité fictive 2</label>
+                  <label for="showcase-activity-two">Activité 2</label>
                   <input id="showcase-activity-two" formControlName="activityTwo" maxlength="120" />
                 </div>
                 <div class="showcase-editor__field showcase-editor__field--wide">
-                  <label for="showcase-activity-three">Activité fictive 3</label>
+                  <label for="showcase-activity-three">Activité 3</label>
                   <input
                     id="showcase-activity-three"
                     formControlName="activityThree"
@@ -295,7 +293,7 @@
               </header>
               @for (index of [1, 2]; track index) {
                 <fieldset>
-                  <legend>Réalisation fictive {{ index }}</legend>
+                  <legend>Réalisation {{ index }}</legend>
                   @if (index === 1) {
                     <div class="showcase-editor__fields">
                       <div class="showcase-editor__field showcase-editor__field--wide">
@@ -370,7 +368,8 @@
                 <cnpm-badge tone="neutral">Bloqué</cnpm-badge>
               </header>
               <cnpm-alert tone="info" title="Téléversement non disponible" [live]="false">
-                Aucun fichier, photographie, logo, point focal ou droit d’usage n’est simulé.
+                Aucun fichier, photographie, logo, point focal ou droit d’usage n’est accepté à ce
+                stade.
               </cnpm-alert>
             </section>
 
@@ -453,7 +452,7 @@
                 <cnpm-badge tone="info">Aperçu local</cnpm-badge>
               </header>
               <div class="showcase-editor__field">
-                <label for="showcase-seo-title">Métatitre fictif</label>
+                <label for="showcase-seo-title">Métatitre</label>
                 <input
                   id="showcase-seo-title"
                   formControlName="seoTitle"
@@ -465,7 +464,7 @@
                 >
               </div>
               <div class="showcase-editor__field">
-                <label for="showcase-seo-description">Métadescription fictive</label>
+                <label for="showcase-seo-description">Métadescription</label>
                 <textarea
                   id="showcase-seo-description"
                   formControlName="seoDescription"
@@ -477,7 +476,7 @@
                   >{{ form.controls.seoDescription.value.length }}/160 caractères</small
                 >
               </div>
-              <p><strong>Indexation :</strong> interdite pour tout contenu de démonstration.</p>
+              <p><strong>Indexation :</strong> interdite tant que la vitrine n’est pas publiée.</p>
             </section>
 
             <section

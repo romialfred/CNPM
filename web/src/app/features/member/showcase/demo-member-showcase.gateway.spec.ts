@@ -10,9 +10,9 @@ import { memberShowcaseIssues } from './member-showcase-validation';
 describe('DemoMemberShowcaseGateway — MP-015/MP-016', () => {
   beforeEach(() => globalThis.localStorage?.clear());
 
-  it('sert un brouillon fictif conforme, sans contact, média ni attribut institutionnel', async () => {
+  it('sert un brouillon conforme, sans contact, média ni attribut institutionnel', async () => {
     const draft = await firstValueFrom(new DemoMemberShowcaseGateway().loadDraft('MP-015'));
-    expect(draft.name).toContain('fictive');
+    expect(draft.name).toBe('Atelier Kanu');
     expect(draft.publication.status).toBe('DRAFT');
     expect(draft.seo.allowIndexing).toBe(false);
     expect(memberShowcaseIssues(draft)).toEqual([]);
@@ -31,26 +31,26 @@ describe('DemoMemberShowcaseGateway — MP-015/MP-016', () => {
     );
   });
 
-  it('récupère uniquement le brouillon fictif stocké dans le navigateur', async () => {
+  it('récupère uniquement le brouillon stocké dans le navigateur', async () => {
     const gateway = new DemoMemberShowcaseGateway();
     const stored = await firstValueFrom(
       gateway.storeLocalDraft({
         ...DEMO_MEMBER_SHOWCASE_DRAFT,
-        tagline: 'Phrase fictive modifiée localement',
+        tagline: 'Phrase modifiée localement',
       }),
     );
-    expect(stored.tagline).toBe('Phrase fictive modifiée localement');
+    expect(stored.tagline).toBe('Phrase modifiée localement');
     expect(stored.publication.lastSavedAt).not.toBe(
       DEMO_MEMBER_SHOWCASE_DRAFT.publication.lastSavedAt,
     );
 
     const recovered = await firstValueFrom(gateway.loadDraft('MP-016'));
-    expect(recovered.tagline).toBe('Phrase fictive modifiée localement');
+    expect(recovered.tagline).toBe('Phrase modifiée localement');
     expect(recovered.verificationStatus).toBe('UNVERIFIED');
     expect(recovered.certifications).toEqual([]);
   });
 
-  it('détecte les limites éditoriales sans inventer de règle de publication', () => {
+  it('détecte les limites éditoriales sans ajouter de règle de publication', () => {
     const issues = memberShowcaseIssues({
       ...DEMO_MEMBER_SHOWCASE_DRAFT,
       name: '',

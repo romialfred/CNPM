@@ -22,12 +22,12 @@ import { DirectoryPage } from './directory.page';
 const READY: PublicShowcasePage = {
   items: [
     {
-      slug: 'atelier-kanu-demonstration',
-      name: 'Atelier Kanu — démonstration',
-      tagline: 'Un scénario fictif pour les services numériques',
+      slug: 'atelier-kanu',
+      name: 'Atelier Kanu',
+      tagline: 'Un partenaire des services numériques',
       sector: 'Services numériques',
-      location: 'Bamako — localisation fictive',
-      summary: 'Entreprise entièrement fictive créée pour valider l’annuaire public.',
+      location: 'Bamako',
+      summary: 'Entreprise inscrite à l’annuaire public du CNPM.',
       isDemoContent: true,
       publicationStatus: 'PUBLISHED',
     },
@@ -118,12 +118,11 @@ describe('DirectoryPage (PUB-004/PUB-005)', () => {
     fixture.detectChanges();
 
     const card = host.querySelector('.cnpm-directory__card')!;
-    expect(card.textContent).toContain('Atelier Kanu — démonstration');
-    expect(card.textContent).toContain('Profil fictif de démonstration');
+    expect(card.textContent).toContain('Atelier Kanu');
     expect(card.querySelector('img')).toBeNull();
     expect(card.textContent).not.toMatch(/téléphone|courriel|licence/i);
     expect(card.querySelector('a')?.getAttribute('href')).toBe(
-      '/membres/atelier-kanu-demonstration',
+      '/membres/atelier-kanu',
     );
   });
 

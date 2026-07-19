@@ -16,7 +16,6 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
-import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -52,7 +51,7 @@ const SORTS: readonly MemberDocumentSort[] = ['metadataRecordedOn', 'reference',
 
 type DocumentListState = 'loading' | 'ready' | 'empty' | 'no-result' | 'error' | 'unavailable';
 
-/** MP-012 — catalogue auto-scopé de métadonnées fictives, sans contenu documentaire. */
+/** MP-012 — catalogue auto-scopé de métadonnées documentaires, sans contenu documentaire. */
 @Component({
   selector: 'cnpm-member-documents-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,7 +60,6 @@ type DocumentListState = 'loading' | 'ready' | 'empty' | 'no-result' | 'error' |
     DecimalPipe,
     ReactiveFormsModule,
     MemberPortalShellComponent,
-    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
@@ -93,7 +91,7 @@ export class MemberDocumentsPage {
     sortOption: 'metadataRecordedOn:desc',
   });
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'reference', label: 'Référence fictive' },
+    { key: 'reference', label: 'Référence' },
     { key: 'document', label: 'Document' },
     { key: 'type', label: 'Type' },
     { key: 'version', label: 'Version' },

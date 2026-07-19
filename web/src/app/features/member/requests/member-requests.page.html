@@ -1,23 +1,18 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Membre"
+  memberCode="CNPM-MEMBRE-000"
   [notificationCount]="0"
 >
   <main class="member-requests" id="contenu-principal">
     <cnpm-page-header
       title="Mes requêtes"
-      description="Suivez vos demandes, réclamations, réponses partagées et délais cibles fictifs."
+      description="Suivez vos demandes, réclamations, réponses partagées et délais cibles."
     >
       <cnpm-button routerLink="/member/requests/new" variant="primary">
         Nouvelle requête
       </cnpm-button>
     </cnpm-page-header>
-
-    <cnpm-alert tone="warning" title="Démonstration — données 100 % fictives" [live]="false">
-      Aucun dossier réel n’est créé. Les références, statuts et dates cibles sont des scénarios non
-      contractuels ; aucune notification n’est envoyée.
-    </cnpm-alert>
 
     <cnpm-filter-bar
       [expanded]="filtersExpanded()"
@@ -33,7 +28,7 @@
             id="member-request-search"
             type="search"
             formControlName="search"
-            placeholder="Référence ou objet fictif"
+            placeholder="Référence ou objet"
           />
         </div>
         <div class="member-requests__field">
@@ -72,12 +67,12 @@
     <section class="member-requests__panel" aria-labelledby="member-requests-results-title">
       <div class="member-requests__toolbar">
         <div>
-          <h2 id="member-requests-results-title" #resultsTitle tabindex="-1">Dossiers fictifs</h2>
+          <h2 id="member-requests-results-title" #resultsTitle tabindex="-1">Dossiers suivis</h2>
           <p>Conversation partagée uniquement — aucune note interne n’est transmise.</p>
         </div>
         @if (data()) {
           <p class="member-requests__count" aria-live="polite">
-            {{ totalItems() }} {{ totalItems() === 1 ? 'dossier fictif' : 'dossiers fictifs' }}
+            {{ totalItems() }} {{ totalItems() === 1 ? 'dossier' : 'dossiers' }}
           </p>
         }
       </div>
@@ -88,7 +83,7 @@
             variant="table"
             [rows]="pageSize()"
             [columns]="columns.length"
-            label="Chargement des requêtes fictives…"
+            label="Chargement des requêtes…"
           />
         }
         @case ('error') {
@@ -104,17 +99,17 @@
           <cnpm-error-state
             variant="recoverable"
             title="Requêtes indisponibles en mode HTTP"
-            description="Le contrat OpenAPI expose seulement des ressources génériques et ne permet pas une projection membre sûre. Aucune fixture n’est injectée dans ce mode."
+            description="Le contrat OpenAPI expose seulement des ressources génériques et ne permet pas une projection membre sûre."
           />
         }
         @case ('empty') {
           <cnpm-empty-state
             variant="first-use"
-            title="Aucune requête fictive"
-            description="Créez un dossier local de démonstration pour parcourir le suivi membre."
+            title="Aucune requête"
+            description="Créez une requête pour démarrer un échange avec le CNPM."
           >
             <cnpm-button routerLink="/member/requests/new" variant="primary">
-              Créer une requête fictive
+              Créer une requête
             </cnpm-button>
           </cnpm-empty-state>
         }
@@ -132,7 +127,7 @@
         @case ('ready') {
           <div class="member-requests__desktop-table">
             <cnpm-data-table
-              caption="Requêtes et réclamations fictives : référence, objet, mise à jour, statut, délai cible et lien vers le détail."
+              caption="Requêtes et réclamations : référence, objet, mise à jour, statut, délai cible et lien vers le détail."
               [columns]="columns"
               [rows]="requests()"
               [rowKey]="rowKey"
@@ -179,7 +174,7 @@
             </cnpm-data-table>
           </div>
 
-          <ol class="member-requests__mobile-list" aria-label="Requêtes et réclamations fictives">
+          <ol class="member-requests__mobile-list" aria-label="Requêtes et réclamations">
             @for (request of requests(); track request.id) {
               <li>
                 <article [attr.aria-labelledby]="'member-request-' + request.id">

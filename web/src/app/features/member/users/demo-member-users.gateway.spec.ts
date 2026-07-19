@@ -19,14 +19,14 @@ describe('DemoMemberUsersGateway — MP-014', () => {
     expect(page.items).toHaveLength(5);
     expect(page.totalElements).toBe(6);
     expect(page.totalPages).toBe(2);
-    expect(page.items[0]?.reference).toBe('DEMO-USR-0001');
+    expect(page.items[0]?.reference).toBe('CNPM-USR-0001');
 
     const inactive = await firstValueFrom(
-      gateway.list({ ...DEFAULT_QUERY, status: 'INACTIVE_DEMO' }),
+      gateway.list({ ...DEFAULT_QUERY, status: 'INACTIVE' }),
     );
     expect(inactive.items.map((item) => item.reference)).toEqual([
-      'DEMO-USR-0004',
-      'DEMO-USR-0006',
+      'CNPM-USR-0004',
+      'CNPM-USR-0006',
     ]);
 
     const secondPage = await firstValueFrom(
@@ -39,8 +39,8 @@ describe('DemoMemberUsersGateway — MP-014', () => {
     const page = await firstValueFrom(new DemoMemberUsersGateway().list(DEFAULT_QUERY));
     const user = page.items[0];
     if (!user) throw new Error('Fixture utilisateur absente');
-    expect(user.email).toMatch(/@entreprise-demo\.example$/);
-    expect(user.displayLabel).toMatch(/^Utilisateur fictif/);
+    expect(user.email).toMatch(/@sahel-agro\.example$/);
+    expect(user.displayLabel).toMatch(/^Utilisateur /);
     expect(Object.keys(user)).not.toEqual(
       expect.arrayContaining([
         'keycloakSubject',

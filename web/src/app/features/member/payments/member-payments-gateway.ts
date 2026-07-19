@@ -10,7 +10,7 @@ export type MemberPaymentSort = 'updatedAt' | 'reference' | 'amountXof' | 'statu
 export type MemberPaymentSortDirection = 'asc' | 'desc';
 
 /**
- * Projection strictement fictive de MP-004 à MP-006.
+ * Projection membre de MP-004 à MP-006.
  *
  * Elle ne représente ni une transaction, ni un callback opérateur, ni une confirmation
  * CNPM. Le contrat canonique ne porte encore aucune commande de paiement auto-scopée
@@ -88,7 +88,7 @@ export interface MemberPaymentPage {
 
 export class MemberPaymentNotFoundError extends Error {
   constructor(readonly paymentId: string) {
-    super(`Le suivi fictif ${paymentId} n'existe pas dans la projection membre.`);
+    super(`Le suivi ${paymentId} n'existe pas dans la projection membre.`);
     this.name = 'MemberPaymentNotFoundError';
   }
 }

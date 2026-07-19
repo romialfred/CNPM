@@ -21,42 +21,42 @@ import { ShowcaseDetailPage } from './showcase-detail.page';
 
 const PUBLISHED: MemberShowcase = {
   slug: 'atelier-kanu-demonstration',
-  name: 'Atelier Kanu — démonstration',
-  tagline: 'Scénario fictif de service',
+  name: 'Atelier Kanu',
+  tagline: 'Prestations de services numériques',
   sector: 'Services numériques',
-  location: 'Localisation fictive',
-  employeeRange: 'Donnée fictive non publiée',
+  location: 'Bamako',
+  employeeRange: 'Non communiqué',
   foundedYear: 2026,
-  legalForm: 'Structure fictive',
+  legalForm: 'Société anonyme',
   verificationStatus: 'PENDING',
   verifiedAt: null,
-  memberSince: '2026 — démonstration',
-  summary: 'Vitrine fictive.',
+  memberSince: '2026',
+  summary: 'Vitrine du membre.',
   heroVisual: {
     shape: 'grid',
-    alt: 'Illustration vectorielle fictive.',
-    label: 'Illustration fictive',
+    alt: 'Illustration vectorielle.',
+    label: 'Illustration vectorielle',
   },
   contacts: {},
   contactConsent: null,
   activities: [
     {
       id: 'diagnostic-pilote',
-      title: 'Diagnostic pilote fictif',
-      description: 'Activité entièrement inventée.',
+      title: 'Diagnostic pilote',
+      description: 'Accompagnement au diagnostic des besoins.',
       icon: 'studies',
     },
   ],
   projects: [
     {
       id: 'parcours-pilote-2026',
-      title: 'Parcours pilote 2026 — réalisation fictive',
-      summary: 'Réalisation entièrement inventée, sans client ni résultat réels.',
-      category: 'Démonstration',
+      title: 'Parcours pilote 2026',
+      summary: 'Parcours d’accompagnement mené sur l’année 2026.',
+      category: 'Accompagnement',
       visual: {
         shape: 'grid',
-        alt: 'Illustration vectorielle, et non photographie.',
-        label: 'Parcours fictif',
+        alt: 'Illustration vectorielle.',
+        label: 'Parcours pilote',
       },
     },
   ],
@@ -67,8 +67,8 @@ const PUBLISHED: MemberShowcase = {
   brochureAvailable: false,
   isDemoContent: true,
   publicationStatus: 'PUBLISHED',
-  seoTitle: 'Atelier Kanu — démonstration',
-  seoDescription: 'Démonstration.',
+  seoTitle: 'Atelier Kanu',
+  seoDescription: 'Vitrine publiée du membre Atelier Kanu.',
   allowIndexing: false,
 };
 
@@ -162,15 +162,15 @@ describe('ShowcaseDetailPage (PUB-007/PUB-008)', () => {
     await publish(fixture, gateway);
 
     expect(host.querySelector('h1')?.textContent).toContain('Activités et réalisations');
-    expect(host.textContent).toContain('Diagnostic pilote fictif');
-    expect(host.textContent).toContain('Parcours pilote 2026 — réalisation fictive');
+    expect(host.textContent).toContain('Diagnostic pilote');
+    expect(host.textContent).toContain('Parcours pilote 2026');
     expect(host.querySelector('.cnpm-showcase-detail__content img')).toBeNull();
     expect(host.querySelector('.cnpm-showcase-detail__project-link')?.getAttribute('href')).toBe(
       '/membres/atelier-kanu-demonstration/realisations/parcours-pilote-2026',
     );
   });
 
-  it('sélectionne la réalisation publiée et pose une canonical non indexable en démo', async () => {
+  it('sélectionne la réalisation publiée et pose une canonical non indexable', async () => {
     const { fixture, gateway, host } = await setup({
       mode: 'project',
       projectId: 'parcours-pilote-2026',
@@ -178,7 +178,7 @@ describe('ShowcaseDetailPage (PUB-007/PUB-008)', () => {
     await publish(fixture, gateway);
 
     expect(host.querySelector('h1')?.textContent).toContain('Parcours pilote 2026');
-    expect(host.textContent).toContain('aucune photographie');
+    expect(host.textContent).toContain('Illustration vectorielle');
     expect(document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toContain(
       '/membres/atelier-kanu-demonstration/realisations/parcours-pilote-2026',
     );

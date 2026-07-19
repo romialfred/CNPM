@@ -51,7 +51,7 @@ const LEGAL_DOCUMENTS: readonly LegalDocument[] = [
       {
         title: 'Coordonnées institutionnelles',
         description:
-          'Aucune coordonnée institutionnelle destinée aux messages du public n’est actuellement publiée. Le formulaire Contact reste une démonstration locale sans transmission.',
+          'Aucune coordonnée institutionnelle destinée aux messages du public n’est actuellement publiée.',
       },
     ],
   },
@@ -75,7 +75,7 @@ const LEGAL_DOCUMENTS: readonly LegalDocument[] = [
       {
         title: 'Consentements et traceurs',
         description:
-          'Les modalités de consentement, de mise à jour et d’utilisation éventuelle de traceurs ne sont pas encore publiées. Aucun traceur marketing n’est simulé par cette page.',
+          'Les modalités de consentement, de mise à jour et d’utilisation éventuelle de traceurs ne sont pas encore publiées. Aucun traceur marketing n’est déposé par cette page.',
       },
     ],
   },
@@ -84,7 +84,7 @@ const LEGAL_DOCUMENTS: readonly LegalDocument[] = [
     shortTitle: 'Conditions d’utilisation',
     title: 'Conditions d’utilisation',
     summary:
-      'Les conditions opposables d’accès et d’utilisation de la plateforme n’ont pas été remises. Aucun engagement contractuel n’est créé par ce contenu de démonstration.',
+      'Les conditions opposables d’accès et d’utilisation de la plateforme n’ont pas été remises. Aucun engagement contractuel n’est créé par cette page.',
     sections: [
       {
         title: 'Périmètre et acceptation',
@@ -105,7 +105,7 @@ const LEGAL_DOCUMENTS: readonly LegalDocument[] = [
   },
 ];
 
-/** PUB-016 — statut de publication des documents juridiques, sans contenu juridique inventé. */
+/** PUB-016 — statut de publication des documents juridiques, sans contenu juridique substitué. */
 @Component({
   selector: 'cnpm-legal-page',
   changeDetection: ChangeDetectionStrategy.OnPush,

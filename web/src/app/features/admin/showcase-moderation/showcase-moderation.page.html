@@ -2,11 +2,11 @@
   <div class="showcase-moderation-page">
     <cnpm-page-header
       title="Modération des vitrines membres"
-      description="Comparer une proposition fictive à sa version publiée, sans prendre de décision."
+      description="Comparer une proposition à sa version publiée, sans prendre de décision."
     />
 
     @if (demoMode) {
-      <cnpm-alert tone="warning" title="Prototype consultatif fictif">
+      <cnpm-alert tone="warning" title="Prototype consultatif">
         La checklist de promotion R4, la politique de modération et le consentement public ne sont
         pas arbitrés. Aucune décision, publication, notification, donnée réelle ou requête API n’est
         exécutée depuis cet écran.
@@ -19,8 +19,7 @@
         <p>Le brouillon vitrine n’est pas intégré au contrat OpenAPI canonique.</p>
       </div>
       <ul>
-        <li>identités, textes, dates et statuts exclusivement fictifs ;</li>
-        <li>aucun média, contact, consentement ou droit d’usage simulé ;</li>
+        <li>aucun média, contact, consentement ou droit d’usage affiché ;</li>
         <li>toutes les commandes restent neutralisées jusqu’aux arbitrages.</li>
       </ul>
     </section>
@@ -28,22 +27,22 @@
     @switch (state()) {
       @case ('loading') {
         <div class="showcase-moderation-page__loading">
-          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la file fictive…" />
-          <cnpm-skeleton variant="card" [rows]="7" label="Chargement de l’aperçu fictif…" />
-          <cnpm-skeleton variant="card" [rows]="6" label="Chargement des contrôles fictifs…" />
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la file…" />
+          <cnpm-skeleton variant="card" [rows]="7" label="Chargement de l’aperçu…" />
+          <cnpm-skeleton variant="card" [rows]="6" label="Chargement des contrôles…" />
         </div>
       }
       @case ('unavailable') {
         <cnpm-error-state
           variant="recoverable"
           title="Modération indisponible en mode HTTP"
-          description="Le contrat OpenAPI canonique ne contient pas encore la projection vitrine. Aucun repli sur les données de démonstration n’est autorisé."
+          description="Le contrat OpenAPI canonique ne contient pas encore la projection vitrine. Aucun repli sur des données locales n’est autorisé."
         />
       }
       @case ('error') {
         <cnpm-error-state
           variant="recoverable"
-          title="La file fictive n’a pas pu être chargée"
+          title="La file n’a pas pu être chargée"
           description="Une erreur temporaire est survenue. La sélection de l’URL est conservée."
         >
           <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
@@ -52,8 +51,8 @@
       @case ('empty') {
         <cnpm-empty-state
           variant="no-data"
-          title="Aucune proposition fictive à examiner"
-          description="La file de démonstration est vide. Aucune action de création n’est proposée."
+          title="Aucune proposition à examiner"
+          description="La file est vide. Aucune action de création n’est proposée."
         />
       }
       @case ('ready') {
@@ -66,7 +65,7 @@
               <div class="showcase-moderation-page__panel-head">
                 <div>
                   <p class="showcase-moderation-page__eyebrow">Étape 1</p>
-                  <h2 id="moderation-queue-title">File fictive</h2>
+                  <h2 id="moderation-queue-title">File</h2>
                 </div>
                 <cnpm-badge tone="neutral">{{ items().length }} scénarios</cnpm-badge>
               </div>

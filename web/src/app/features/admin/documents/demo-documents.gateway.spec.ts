@@ -5,7 +5,7 @@ import { DemoDocumentsGateway } from './demo-documents.gateway';
 describe('DemoDocumentsGateway', () => {
   const gateway = new DemoDocumentsGateway();
 
-  it('retourne uniquement des métadonnées DEMO sans contenu ni téléchargement', async () => {
+  it('retourne uniquement des métadonnées sans contenu ni téléchargement', async () => {
     const page = await firstValueFrom(
       gateway.search({
         search: '',
@@ -19,7 +19,7 @@ describe('DemoDocumentsGateway', () => {
     );
     expect(page.totalItems).toBe(12);
     expect(page.rows).toHaveLength(10);
-    expect(page.rows.every((row) => row.demonstrationReference.startsWith('DEMO-DOC-'))).toBe(true);
+    expect(page.rows.every((row) => row.demonstrationReference.startsWith('DOC-'))).toBe(true);
     expect(page.rows.every((row) => row.contentAvailable === false)).toBe(true);
     expect(JSON.stringify(page)).not.toContain('download');
   });
@@ -37,8 +37,8 @@ describe('DemoDocumentsGateway', () => {
       }),
     );
     expect(page.rows.map((row) => row.demonstrationReference)).toEqual([
-      'DEMO-DOC-2026-0011',
-      'DEMO-DOC-2026-0003',
+      'DOC-2026-0011',
+      'DOC-2026-0003',
     ]);
     expect(page.overview.restricted).toBe(2);
   });

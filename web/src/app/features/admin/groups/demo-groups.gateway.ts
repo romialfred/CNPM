@@ -15,18 +15,18 @@ const DEMO_LATENCY_MS = 90;
  * uniquement aux tests et aux captures de démonstration.
  */
 const DEMO_GROUPS: readonly ProfessionalGroup[] = [
-  demoGroup(1, 'DEMO-AGRI', 'Groupement agricole de démonstration', 'DEMO-AGRI'),
-  demoGroup(2, 'DEMO-ART', 'Collectif artisanal fictif', 'DEMO-ARTISANAT'),
-  demoGroup(3, 'DEMO-BTP', 'Groupement construction scénario', 'DEMO-BTP'),
-  demoGroup(4, 'DEMO-COM', 'Réseau commerce de démonstration', 'DEMO-COMMERCE'),
-  demoGroup(5, 'DEMO-ENE', 'Collectif énergie prototype', 'DEMO-ENERGIE'),
-  demoGroup(6, 'DEMO-HOT', 'Groupement hôtellerie fictif', 'DEMO-HOTELLERIE'),
-  demoGroup(7, 'DEMO-IND', 'Réseau industriel de démonstration', 'DEMO-INDUSTRIE'),
-  demoGroup(8, 'DEMO-LOG', 'Collectif logistique scénario', 'DEMO-LOGISTIQUE'),
-  demoGroup(9, 'DEMO-NUM', 'Groupement numérique prototype', 'DEMO-NUMERIQUE'),
-  demoGroup(10, 'DEMO-SER', 'Réseau services de démonstration', 'DEMO-SERVICES'),
-  demoGroup(11, 'DEMO-TEX', 'Collectif textile fictif', 'DEMO-TEXTILE'),
-  demoGroup(12, 'DEMO-TRA', 'Groupement transport scénario', null),
+  demoGroup(1, 'GRP-AGRI', 'Groupement agricole', 'SEC-AGRI'),
+  demoGroup(2, 'GRP-ART', 'Collectif artisanal', 'SEC-ARTISANAT'),
+  demoGroup(3, 'GRP-BTP', 'Groupement construction', 'SEC-BTP'),
+  demoGroup(4, 'GRP-COM', 'Réseau commerce', 'SEC-COMMERCE'),
+  demoGroup(5, 'GRP-ENE', 'Collectif énergie', 'SEC-ENERGIE'),
+  demoGroup(6, 'GRP-HOT', 'Groupement hôtellerie', 'SEC-HOTELLERIE'),
+  demoGroup(7, 'GRP-IND', 'Réseau industriel', 'SEC-INDUSTRIE'),
+  demoGroup(8, 'GRP-LOG', 'Collectif logistique', 'SEC-LOGISTIQUE'),
+  demoGroup(9, 'GRP-NUM', 'Groupement numérique', 'SEC-NUMERIQUE'),
+  demoGroup(10, 'GRP-SER', 'Réseau services', 'SEC-SERVICES'),
+  demoGroup(11, 'GRP-TEX', 'Collectif textile', 'SEC-TEXTILE'),
+  demoGroup(12, 'GRP-TRA', 'Groupement transport', null),
 ];
 
 @Injectable()

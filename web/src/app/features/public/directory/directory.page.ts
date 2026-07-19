@@ -222,9 +222,9 @@ export class DirectoryPage {
     this.seo.apply({
       title: isSearch ? 'Rechercher un membre — CNPM' : 'Annuaire des membres — CNPM',
       description: isSearch
-        ? 'Rechercher une vitrine membre publiée dans l’annuaire de démonstration du CNPM.'
-        : 'Consulter les vitrines membres publiées dans l’annuaire de démonstration du CNPM.',
-      // Le contenu R4 est fictif et son contrat n'est pas promu : aucune indexation du pilote.
+        ? 'Rechercher une vitrine membre publiée dans l’annuaire du CNPM.'
+        : 'Consulter les vitrines membres publiées dans l’annuaire du CNPM.',
+      // Le contrat R4 n'est pas encore promu dans les contrats canoniques : aucune indexation.
       robots: 'noindex,nofollow',
       canonicalPath: isSearch ? '/membres/recherche' : '/membres',
     });

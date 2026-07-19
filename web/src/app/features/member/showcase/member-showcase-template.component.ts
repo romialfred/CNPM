@@ -16,7 +16,7 @@ export class MemberShowcaseTemplateComponent {
   readonly viewport = input<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   protected readonly displayName = computed(
-    () => this.draft().name.trim() || 'Nom du scénario à compléter',
+    () => this.draft().name.trim() || 'Nom à compléter',
   );
   protected readonly activities = computed(() =>
     this.draft().activities.filter((activity) => activity.trim()),

@@ -16,11 +16,11 @@ import { MemberRequestDetailPage } from './member-request-detail.page';
 
 const DETAIL: MemberRequestDetail = {
   id: 'demo-member-request-1',
-  reference: 'DEMO-REQ-MEMBRE-2026-0006',
+  reference: 'CNPM-REQ-MEMBRE-2026-0006',
   kind: 'REQUEST',
   category: 'DEMO_DOCUMENT',
-  subject: 'Comprendre une pièce demandée dans le scénario',
-  description: 'Demande initiale fictive et partagée.',
+  subject: 'Comprendre une pièce demandée dans le dossier',
+  description: 'Demande initiale partagée.',
   status: 'WAITING_MEMBER',
   createdAt: '2026-07-18T09:20:00Z',
   updatedAt: '2026-07-19T08:45:00Z',
@@ -30,7 +30,7 @@ const DETAIL: MemberRequestDetail = {
     {
       id: 'demo-message-1',
       sender: 'MEMBER',
-      authorLabel: 'Membre fictif',
+      authorLabel: 'Membre',
       body: 'Message partagé du membre.',
       createdAt: '2026-07-18T09:20:00Z',
       attachments: [],
@@ -38,14 +38,14 @@ const DETAIL: MemberRequestDetail = {
     {
       id: 'demo-message-2',
       sender: 'CNPM',
-      authorLabel: 'Équipe CNPM fictive',
-      body: 'Réponse partagée et fictive.',
+      authorLabel: 'Équipe CNPM',
+      body: 'Réponse partagée.',
       createdAt: '2026-07-19T08:45:00Z',
       attachments: [],
     },
   ],
   requestedDocuments: [
-    { id: 'demo-document-1', label: 'Justificatif fictif au format PDF', state: 'REQUESTED' },
+    { id: 'demo-document-1', label: 'Justificatif au format PDF', state: 'REQUESTED' },
   ],
 };
 
@@ -106,7 +106,7 @@ describe('MemberRequestDetailPage — MP-011', () => {
   it('charge la route et conserve les paramètres de retour hors accusé', async () => {
     const { gateway, host } = await setup();
     expect(gateway.loadedId).toBe(DETAIL.id);
-    expect(host.textContent).toContain('Chargement de la requête fictive');
+    expect(host.textContent).toContain('Chargement de la requête');
     const back = host.querySelector<HTMLAnchorElement>('.member-request-detail__back');
     expect(back?.href).toContain('q=pi%C3%A8ce');
     expect(back?.href).not.toContain('created=1');
@@ -119,9 +119,9 @@ describe('MemberRequestDetailPage — MP-011', () => {
     fixture.detectChanges();
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
-    expect(host.textContent).toContain('Accusé fictif créé localement');
+    expect(host.textContent).toContain('Accusé de dépôt créé');
     expect(host.textContent).toContain(DETAIL.reference);
-    expect(host.textContent).toContain('Justificatif fictif au format PDF');
+    expect(host.textContent).toContain('Justificatif au format PDF');
     expect(host.textContent).toContain('Message partagé du membre.');
     expect(host.textContent).toContain('notes réservées aux agents ne sont jamais transmises');
     expect(host.textContent).not.toContain('strictement interne');
@@ -140,12 +140,12 @@ describe('MemberRequestDetailPage — MP-011', () => {
 
     const textarea = host.querySelector<HTMLTextAreaElement>('#member-request-reply');
     if (!textarea) throw new Error('Champ message absent');
-    textarea.value = 'Réponse membre entièrement fictive.';
+    textarea.value = 'Réponse complète du membre.';
     textarea.dispatchEvent(new Event('input'));
     form?.dispatchEvent(new Event('submit'));
     expect(gateway.replyCall).toEqual({
       id: DETAIL.id,
-      input: { body: 'Réponse membre entièrement fictive.', attachments: [] },
+      input: { body: 'Réponse complète du membre.', attachments: [] },
     });
 
     const updated: MemberRequestDetail = {
@@ -155,8 +155,8 @@ describe('MemberRequestDetailPage — MP-011', () => {
         {
           id: 'demo-message-3',
           sender: 'MEMBER',
-          authorLabel: 'Membre fictif',
-          body: 'Réponse membre entièrement fictive.',
+          authorLabel: 'Membre',
+          body: 'Réponse complète du membre.',
           createdAt: '2026-07-19T12:01:00Z',
           attachments: [],
         },
@@ -165,7 +165,7 @@ describe('MemberRequestDetailPage — MP-011', () => {
     gateway.reply.next(updated);
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(host.textContent).toContain('Message ajouté à la conversation fictive locale');
+    expect(host.textContent).toContain('Message ajouté à la conversation');
     expect(document.activeElement?.id).toBe('conversation-title');
   });
 

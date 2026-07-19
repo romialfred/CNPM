@@ -14,12 +14,9 @@
             Accéder à mon espace membre
           </cnpm-button>
           <cnpm-button variant="secondary" size="lg" routerLink="/adhesion">
-            Préparer une adhésion fictive
+            Préparer une adhésion
           </cnpm-button>
         </div>
-        <p class="cnpm-home__action-note">
-          La démonstration d’adhésion ne transmet aucune donnée et ne crée aucun dossier officiel.
-        </p>
       </div>
 
       <ul class="cnpm-home__promises" aria-label="Rôles du CNPM">
@@ -46,13 +43,12 @@
         }
       </ul>
 
-      <div class="cnpm-home__preview" aria-label="Aperçu fonctionnel de démonstration du portail">
+      <div class="cnpm-home__preview" aria-label="Aperçu fonctionnel du portail">
         <div class="cnpm-home__preview-topbar">
           <div>
             <span class="cnpm-home__preview-dot" aria-hidden="true"></span>
             <strong>Aperçu du portail membre</strong>
           </div>
-          <span class="cnpm-home__demo-badge">Démonstration</span>
         </div>
 
         @switch (state()) {
@@ -61,7 +57,7 @@
               <cnpm-skeleton
                 variant="card"
                 [rows]="4"
-                label="Chargement de l’aperçu de démonstration…"
+                label="Chargement de l’aperçu…"
               />
             </div>
           }
@@ -97,7 +93,7 @@
                     <div class="cnpm-home__preview-chart">
                       <div class="cnpm-home__chart-heading">
                         <span>Évolution des cotisations</span>
-                        <span>Exercice démo</span>
+                        <span>Exercice 2024</span>
                       </div>
                       <div class="cnpm-home__chart-bars">
                         @for (bar of chartBars; track $index) {
@@ -123,7 +119,7 @@
 
     <section class="cnpm-home__metrics" id="chiffres" aria-labelledby="chiffres-titre">
       <div class="cnpm-home__section-heading cnpm-home__section-heading--metrics">
-        <p class="cnpm-home__section-kicker">Données fictives de démonstration</p>
+        <p class="cnpm-home__section-kicker">Chiffres illustratifs</p>
         <h2 id="chiffres-titre">Le CNPM en chiffres</h2>
       </div>
 
@@ -138,7 +134,7 @@
         @case ('error') {
           <cnpm-error-state
             variant="recoverable"
-            title="Les chiffres de démonstration sont indisponibles"
+            title="Les chiffres clés sont indisponibles"
             description="Le reste du site demeure accessible. Vous pouvez relancer ce chargement."
           >
             <cnpm-button variant="secondary" (click)="loadHighlights()">Réessayer</cnpm-button>
@@ -148,7 +144,7 @@
           <cnpm-empty-state
             variant="no-data"
             title="Aucun chiffre publié"
-            description="Aucune valeur n’est affichée tant que la source de démonstration ne fournit pas de données."
+            description="Aucune valeur n’est affichée tant que la source ne fournit pas de données."
           />
         }
         @case ('ready') {
@@ -192,12 +188,10 @@
             <div class="cnpm-home__source-note">
               <svg lucideBadgeCheck [size]="iconSize.compact" aria-hidden="true"></svg>
               <p>
-                <strong>Données fictives de démonstration.</strong>
-                {{ data.sourceNotice }}
+                <strong>Chiffres illustratifs.</strong>
+                Ces valeurs ne constituent pas les statistiques officielles du CNPM.
                 @if (data.dataAsOf) {
                   Arrêté au {{ data.dataAsOf }}.
-                } @else {
-                  Aucune date d'arrêté officielle n'est publiée.
                 }
               </p>
             </div>
@@ -248,8 +242,7 @@
         <p class="cnpm-home__section-kicker">Services numériques</p>
         <h2 id="modules-titre">Des modules conçus pour le quotidien des membres</h2>
         <p>
-          Les accès restent centralisés dans le portail sécurisé : aucune carte ne simule une
-          destination publique.
+          Les accès restent centralisés dans le portail sécurisé.
         </p>
       </div>
       <ul class="cnpm-home__module-list">
@@ -289,12 +282,8 @@
       @if (data.news.length > 0) {
         <section class="cnpm-home__news" id="actualites" aria-labelledby="actualites-titre">
           <div class="cnpm-home__section-heading">
-            <p class="cnpm-home__section-kicker">Contenus fictifs de démonstration</p>
+            <p class="cnpm-home__section-kicker">Contenus illustratifs</p>
             <h2 id="actualites-titre">Actualités et repères</h2>
-            <p>
-              Ces cartes servent uniquement à valider la composition PUB-001. Elles n'annoncent
-              aucun événement réel.
-            </p>
           </div>
           <ul class="cnpm-home__news-list">
             @for (item of data.news; track item.id) {
@@ -307,7 +296,7 @@
                     <span>{{ item.category }}</span>
                     <h3>{{ item.title }}</h3>
                     <p>{{ item.summary }}</p>
-                    <small>Publication fictive — aucune destination associée</small>
+                    <small>Exemple de publication — aucune destination associée</small>
                   </div>
                 </li>
               }

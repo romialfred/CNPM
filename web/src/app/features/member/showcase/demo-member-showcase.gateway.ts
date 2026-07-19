@@ -6,37 +6,37 @@ const STORAGE_KEY = 'cnpm.demo.member-showcase-draft.v1';
 
 export const DEMO_MEMBER_SHOWCASE_DRAFT: MemberShowcaseDraft = {
   version: 1,
-  slug: 'atelier-kanu-demonstration',
-  name: 'Atelier Kanu — entreprise fictive',
-  tagline: 'Des services agricoles simulés pour présenter le gabarit',
-  sector: 'Services agricoles — scénario',
-  location: 'Sikasso — localisation fictive',
-  employeeRange: '10–19 collaborateurs — scénario',
+  slug: 'atelier-kanu',
+  name: 'Atelier Kanu',
+  tagline: 'Services agronomiques de proximité pour les exploitations du Sud',
+  sector: 'Services agricoles',
+  location: 'Sikasso',
+  employeeRange: '10–19 collaborateurs',
   foundedYear: 2021,
-  legalForm: 'Entreprise fictive de démonstration',
+  legalForm: 'Société à responsabilité limitée',
   verificationStatus: 'UNVERIFIED',
   summary:
-    'Atelier Kanu est une organisation entièrement inventée pour tester la vitrine membre CNPM. Ses activités, réalisations et caractéristiques ne décrivent aucune entreprise, équipe, exploitation ou clientèle réelle.',
-  activities: ['Conseil agronomique fictif', 'Ateliers de démonstration', 'Suivi qualité simulé'],
+    'Atelier Kanu accompagne les exploitations agricoles de la région de Sikasso : conseil agronomique, formation des équipes techniques et suivi de la qualité des productions.',
+  activities: ['Conseil agronomique', 'Ateliers de formation', 'Suivi qualité'],
   projects: [
     {
-      title: 'Parcours pilote Sahel — réalisation fictive',
+      title: 'Parcours pilote Sahel',
       summary:
-        'Scénario inventé pour éprouver une carte de réalisation, sans client, site ni résultat réel.',
-      category: 'Démonstration',
+        'Accompagnement d’un groupement d’exploitations sur un cycle complet de production.',
+      category: 'Accompagnement',
     },
     {
-      title: 'Atelier témoin 2026 — réalisation fictive',
+      title: 'Atelier de formation 2026',
       summary:
-        'Exemple éditorial local sans bénéficiaire, partenaire, promesse commerciale ou production réelle.',
-      category: 'Scénario local',
+        'Sessions de formation des équipes techniques aux bonnes pratiques agronomiques.',
+      category: 'Formation',
     },
   ],
   certifications: [],
   seo: {
-    title: 'Atelier Kanu — vitrine fictive CNPM',
+    title: 'Atelier Kanu — vitrine CNPM',
     description:
-      'Aperçu privé d’une entreprise fictive utilisé pour valider le gabarit de vitrine membre CNPM.',
+      'Présentation des activités et des réalisations d’Atelier Kanu, membre du CNPM.',
     allowIndexing: false,
   },
   publication: {
@@ -45,7 +45,7 @@ export const DEMO_MEMBER_SHOWCASE_DRAFT: MemberShowcaseDraft = {
     scheduledAt: null,
   },
   disclosure:
-    'Brouillon local de démonstration, sans donnée membre réelle, contact, média, document ou valeur officielle.',
+    'Brouillon local conservé dans ce navigateur, sans contact, média ni document publié.',
 };
 
 @Injectable()

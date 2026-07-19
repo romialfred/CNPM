@@ -8,7 +8,7 @@ import {
 describe('DemoReceiptVerificationGateway', () => {
   const gateway = new DemoReceiptVerificationGateway();
 
-  it('retourne une projection minimale et intrinsèquement fictive', async () => {
+  it('retourne une projection minimale', async () => {
     const result = await firstValueFrom(gateway.verify(DEMO_VERIFICATION_CODE.toLowerCase()));
     expect(result.outcome).toBe('found');
     if (result.outcome === 'found') {

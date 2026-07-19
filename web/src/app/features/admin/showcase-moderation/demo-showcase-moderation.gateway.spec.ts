@@ -3,15 +3,17 @@ import { describe, expect, it } from 'vitest';
 import { DemoShowcaseModerationGateway } from './demo-showcase-moderation.gateway';
 
 describe('DemoShowcaseModerationGateway', () => {
-  it('ne livre que des projections fictives sans contact ni média', async () => {
+  it('ne livre que des projections sans contact ni média', async () => {
     const result = await firstValueFrom(new DemoShowcaseModerationGateway().loadQueue());
     const serialized = JSON.stringify(result);
 
     expect(result.items).toHaveLength(2);
-    expect(result.items.every((item) => item.demonstrationReference.startsWith('DEMO-'))).toBe(
+    expect(result.items.every((item) => item.demonstrationReference.startsWith('VITRINE-'))).toBe(
       true,
     );
-    expect(result.items.every((item) => item.organizationLabel.includes('Démo'))).toBe(true);
+    expect(result.items.every((item) => item.organizationLabel.includes('Organisation'))).toBe(
+      true,
+    );
     expect(
       result.items.every(
         (item) =>

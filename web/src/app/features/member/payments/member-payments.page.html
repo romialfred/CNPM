@@ -1,38 +1,38 @@
 <cnpm-member-portal-shell
-  organization="Organisation fictive de démonstration"
-  userName="Membre fictif"
-  memberCode="DEMO-MEMBRE-000"
+  organization="Sahel Agro SA"
+  userName="Responsable cotisations"
+  memberCode="CNPM-MBR-0142"
   [notificationCount]="0"
 >
   <main class="member-payments" id="contenu-principal">
     <cnpm-page-header
       title="Mes paiements"
-      description="Consultez des scénarios de suivi sans les confondre avec des encaissements CNPM."
+      description="Suivez l’avancement de vos règlements de cotisation."
     >
-      <cnpm-button routerLink="/member/payments/new">Préparer un suivi fictif</cnpm-button>
+      <cnpm-button routerLink="/member/payments/new">Préparer un règlement</cnpm-button>
     </cnpm-page-header>
 
-    <cnpm-alert tone="warning" title="Démonstration — aucun encaissement officiel" [live]="false">
-      Les références, montants et statuts sont fictifs. Aucun scénario affiché n’est confirmé par le
-      CNPM et aucun reçu n’est disponible.
+    <cnpm-alert tone="info" title="Encaissement en ligne à venir" [live]="false">
+      Le raccordement des canaux de paiement n’est pas encore actif : les demandes préparées ici
+      ne sont pas transmises à un opérateur et aucun reçu n’est encore émis.
     </cnpm-alert>
 
     @if (data(); as pageData) {
-      <section class="member-payments__metrics" aria-label="Synthèse des scénarios filtrés" tabindex="0">
+      <section class="member-payments__metrics" aria-label="Synthèse des règlements filtrés" tabindex="0">
         <article>
-          <span>Scénarios trouvés</span>
+          <span>Règlements trouvés</span>
           <strong>{{ pageData.totalElements | number }}</strong>
-          <small>dans la projection fictive</small>
+          <small>sur la période filtrée</small>
         </article>
         <article>
           <span>Montants affichés</span>
           <strong>{{ pageData.summary.displayedAmountXof | number: '1.0-0' }} FCFA</strong>
-          <small>sans valeur comptable</small>
+          <small>hors confirmation CNPM</small>
         </article>
         <article>
           <span>En examen</span>
           <strong>{{ pageData.summary.processingCount | number }}</strong>
-          <small>scénarios visuels</small>
+          <small>en cours de traitement</small>
         </article>
         <article>
           <span>Attention requise</span>
@@ -70,9 +70,9 @@
           </select>
         </div>
         <div class="member-payments__field">
-          <label for="member-payment-channel">Aperçu du canal</label>
+          <label for="member-payment-channel">Canal</label>
           <select id="member-payment-channel" formControlName="channel">
-            <option value="">Tous les aperçus</option>
+            <option value="">Tous les canaux</option>
             @for (item of channels; track item) {
               <option [value]="item">{{ channelLabel(item) }}</option>
             }
@@ -97,13 +97,13 @@
     <section class="member-payments__panel" aria-labelledby="member-payments-results-title">
       <div class="member-payments__toolbar">
         <div>
-          <h2 id="member-payments-results-title" #resultsTitle tabindex="-1">Historique fictif</h2>
-          <p>Chaque statut explicite ce qui n’a pas été transmis ou confirmé.</p>
+          <h2 id="member-payments-results-title" #resultsTitle tabindex="-1">Historique</h2>
+          <p>Chaque statut explicite ce qui a été transmis ou confirmé.</p>
         </div>
         @if (data()) {
           <p class="member-payments__count" aria-live="polite">
             {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'scénario fictif' : 'scénarios fictifs' }}
+            {{ totalItems() === 1 ? 'règlement' : 'règlements' }}
           </p>
         }
       </div>
@@ -114,14 +114,14 @@
             variant="table"
             [rows]="pageSize()"
             [columns]="columns.length"
-            label="Chargement des scénarios de paiement fictifs…"
+            label="Chargement des règlements…"
           />
         }
         @case ('error') {
           <cnpm-error-state
             variant="recoverable"
             title="L’historique n’a pas pu être chargé"
-            description="Aucune transaction n’a été relancée. Réessayez uniquement la lecture."
+            description="Réessayez la lecture de votre historique."
           >
             <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
           </cnpm-error-state>
@@ -136,16 +136,16 @@
         @case ('empty') {
           <cnpm-empty-state
             variant="no-data"
-            title="Aucun scénario fictif"
-            description="La projection de démonstration ne contient aucun suivi pour ce membre fictif."
+            title="Aucun règlement"
+            description="Aucun règlement n’est encore enregistré pour votre organisation."
           >
-            <cnpm-button routerLink="/member/payments/new">Préparer un suivi fictif</cnpm-button>
+            <cnpm-button routerLink="/member/payments/new">Préparer un règlement</cnpm-button>
           </cnpm-empty-state>
         }
         @case ('no-results') {
           <cnpm-empty-state
             variant="no-results"
-            title="Aucun scénario ne correspond"
+            title="Aucun règlement ne correspond"
             description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
           >
             <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
@@ -156,7 +156,7 @@
         @case ('ready') {
           <div class="member-payments__desktop-table">
             <cnpm-data-table
-              caption="Scénarios de paiements fictifs : référence, cotisation, date, montant, canal, statut et lien de suivi."
+              caption="Règlements : référence, cotisation, date, montant, canal, statut et lien de suivi."
               [columns]="columns"
               [rows]="payments()"
               [rowKey]="rowKey"
@@ -183,7 +183,7 @@
                     class="member-payments__detail-link"
                     [routerLink]="['/member/payments', payment.id, 'status']"
                     [queryParams]="detailQueryParams()"
-                    [attr.aria-label]="'Suivre le scénario fictif ' + payment.reference"
+                    [attr.aria-label]="'Suivre le règlement ' + payment.reference"
                   >
                     Suivre
                   </a>
@@ -192,7 +192,7 @@
             </cnpm-data-table>
           </div>
 
-          <ol class="member-payments__mobile-list" aria-label="Scénarios de paiements fictifs">
+          <ol class="member-payments__mobile-list" aria-label="Règlements">
             @for (payment of payments(); track payment.id) {
               <li>
                 <article [attr.aria-labelledby]="'member-payment-' + payment.id">
@@ -207,11 +207,11 @@
                   </header>
                   <dl>
                     <div>
-                      <dt>Montant fictif</dt>
+                      <dt>Montant</dt>
                       <dd>{{ payment.amountXof | number: '1.0-0' }} FCFA</dd>
                     </div>
                     <div>
-                      <dt>Aperçu du canal</dt>
+                      <dt>Canal</dt>
                       <dd>{{ channelLabel(payment.channel) }}</dd>
                     </div>
                     <div>

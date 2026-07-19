@@ -14,11 +14,11 @@ const BASE_QUERY = {
 };
 
 describe('DemoOrganizationsGateway', () => {
-  it('filtre avant de paginer et ne renvoie que des données fictives', async () => {
+  it('filtre avant de paginer', async () => {
     const gateway = new DemoOrganizationsGateway();
     const page = await firstValueFrom(gateway.search({ ...BASE_QUERY, search: 'Nimba' }));
     expect(page.totalItems).toBe(1);
-    expect(page.rows[0]?.legalName).toContain('Démonstration');
+    expect(page.rows[0]?.legalName).toContain('Nimba');
   });
 
   it('incrémente la version après une modification', async () => {

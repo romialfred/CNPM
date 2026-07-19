@@ -19,7 +19,7 @@
           variant="not-found"
           titleAs="h2"
           title="Cotisation introuvable"
-          description="Cette référence fictive n’existe pas ou n’est plus disponible."
+          description="Cette référence n’existe pas ou n’est plus disponible."
         />
       }
       @case ('forbidden') {
@@ -30,7 +30,7 @@
           variant="recoverable"
           titleAs="h2"
           title="Détail indisponible en mode connecté"
-          description="Le contrat HTTP du détail de cotisation n’est pas encore publié. Aucun jeu fictif n’est utilisé en remplacement."
+          description="Le contrat HTTP du détail de cotisation n’est pas encore publié."
         />
       }
       @case ('error') {
@@ -45,11 +45,6 @@
       }
       @case ('ready') {
         @if (call(); as item) {
-          <cnpm-alert tone="warning" title="Données financières fictives" [live]="false">
-            Cette fiche sert uniquement la démonstration visuelle. Elle ne constitue ni un appel
-            officiel, ni une preuve de dette, ni un échéancier CNPM.
-          </cnpm-alert>
-
           <section class="contribution-detail__hero" aria-labelledby="reference-appel">
             <div>
               <p class="contribution-detail__eyebrow">BO-013 · Consultation</p>
@@ -117,7 +112,7 @@
                 <div><dt>Échéance</dt><dd>{{ item.dueDate | date: 'dd/MM/yyyy' }}</dd></div>
                 <div>
                   <dt>État de l’échéance</dt>
-                  <dd>{{ item.pastDue ? 'Échue dans le scénario' : 'À venir dans le scénario' }}</dd>
+                  <dd>{{ item.pastDue ? 'Échue' : 'À venir' }}</dd>
                 </div>
                 <div><dt>Devise</dt><dd>Franc CFA (XOF)</dd></div>
               </dl>
@@ -129,7 +124,7 @@
             <p>
               L’émission, l’annulation, la relance, le paiement et la génération de document
               suivent des workflows séparés avec permissions, idempotence et audit. Cette fiche
-              n’en simule aucun.
+              est en lecture seule.
             </p>
           </section>
         }

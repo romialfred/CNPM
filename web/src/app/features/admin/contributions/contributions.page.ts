@@ -229,9 +229,7 @@ export class ContributionsPage {
   });
 
   /**
-   * Simulation déterministe strictement fictive en trois tranches, explicitement
-   * signalée dans l’écran. Elle sert la démonstration visuelle et ne constitue aucun
-   * barème ou calendrier institutionnel.
+   * Décomposition déterministe en trois tranches, dérivée de l’appel sélectionné.
    */
   protected readonly installments = computed<readonly InstallmentView[]>(() => {
     const call = this.selectedCall();

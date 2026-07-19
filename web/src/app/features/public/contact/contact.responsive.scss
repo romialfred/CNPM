@@ -4,15 +4,6 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .contact-hero__facts {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .contact-hero__facts div + div {
-    border-block-start: 0;
-    border-inline-start: 1px solid var(--cnpm-color-brand-blue-200);
-  }
-
   .contact-assurance {
     position: static;
   }
@@ -32,14 +23,8 @@
     line-height: var(--cnpm-font-lineHeight-3xl);
   }
 
-  .contact-hero__facts,
   .contact-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .contact-hero__facts div + div {
-    border-block-start: 1px solid var(--cnpm-color-brand-blue-200);
-    border-inline-start: 0;
   }
 
   .contact-form,
@@ -62,8 +47,7 @@
 @media (forced-colors: active) {
   .contact-form,
   .contact-assurance,
-  .contact-success,
-  .contact-hero__facts {
+  .contact-success {
     border: 1px solid CanvasText;
   }
 }

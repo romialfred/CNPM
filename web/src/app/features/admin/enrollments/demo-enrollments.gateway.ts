@@ -15,8 +15,8 @@ const REVIEWER_ID = '90000000-0000-4000-8000-000000000001';
 const DEMO_DELAY_MS = 140;
 
 /**
- * Jeu entièrement fictif. Les identifiants, numéros de dossier et entreprises ne
- * représentent aucun membre réel et les canaux sont explicitement marqués démonstration.
+ * Jeu déterministe du handoff. Les identifiants, numéros de dossier et entreprises ne
+ * représentent aucun membre réel.
  */
 const DEMO_APPLICATIONS: readonly EnrollmentApplication[] = [
   application(1, 'SUBMITTED', '2026-07-18T08:15:00Z'),
@@ -107,9 +107,9 @@ function application(
   const suffix = String(sequence).padStart(12, '0');
   return {
     id: `10000000-0000-4000-8000-${suffix}`,
-    caseNumber: `ENR-DEMO-${String(sequence).padStart(4, '0')}`,
+    caseNumber: `ENR-2026-${String(sequence).padStart(4, '0')}`,
     organizationId: `20000000-0000-4000-8000-${suffix}`,
-    channel: sequence % 2 === 0 ? 'DEMO_ASSISTE' : 'DEMO_PORTAIL',
+    channel: sequence % 2 === 0 ? 'GUICHET_ASSISTE' : 'PORTAIL_MEMBRE',
     status,
     submittedAt,
     assignedTo,

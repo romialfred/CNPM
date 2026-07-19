@@ -45,9 +45,8 @@ export class PublicEnrollmentConfirmationPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Confirmation locale d’adhésion — CNPM',
-      description:
-        'Confirmation locale fictive ne créant aucun dossier officiel et ne transmettant aucune donnée.',
+      title: 'Récapitulatif de préparation d’adhésion — CNPM',
+      description: 'Récapitulatif local des informations préparées pour une demande d’adhésion.',
       robots: 'noindex,nofollow',
       canonicalPath: '/adhesion/confirmation',
     });

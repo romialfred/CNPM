@@ -122,7 +122,7 @@ export class InstitutionalPage {
     this.seo.apply({
       title: isServices ? 'Services numériques — CNPM' : 'Le CNPM — Présentation',
       description: isServices
-        ? 'Présentation de démonstration des services numériques destinés aux membres.'
+        ? 'Présentation des services numériques destinés aux membres.'
         : 'Présentation sobre du rôle et de la plateforme digitale du CNPM.',
       robots: 'noindex,nofollow',
       canonicalPath: isServices ? '/services' : '/le-cnpm',

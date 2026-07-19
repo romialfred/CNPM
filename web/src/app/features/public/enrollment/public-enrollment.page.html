@@ -14,11 +14,11 @@
     <header class="enrollment-hero">
       <div class="enrollment-hero__inner">
         <div>
-          <p class="enrollment-eyebrow">PUB-012 · Parcours fictif</p>
-          <h1 #pageTitle tabindex="-1">Préparer une demande d’adhésion de démonstration</h1>
+          <p class="enrollment-eyebrow">PUB-012 · Préparation de dossier</p>
+          <h1 #pageTitle tabindex="-1">Préparer une demande d’adhésion</h1>
           <p class="enrollment-hero__intro">
-            Explorez les informations attendues sans créer de dossier officiel, sans envoyer de
-            données et sans enregistrer de brouillon.
+            Rassemblez les informations attendues avant le dépôt officiel de votre demande. Les
+            saisies ne sont ni transmises ni enregistrées.
           </p>
         </div>
         <dl class="enrollment-hero__facts">
@@ -32,16 +32,15 @@
           </div>
           <div>
             <dt>Référence finale</dt>
-            <dd>DEMO-*</dd>
+            <dd>ADH-*</dd>
           </div>
         </dl>
       </div>
     </header>
 
     <div class="enrollment-page">
-      <cnpm-alert tone="warning" title="Démonstration sans données réelles">
-        Utilisez exclusivement des noms et coordonnées fictifs. Les saisies restent en mémoire le
-        temps de cette page et seront perdues à la fermeture.
+      <cnpm-alert tone="warning" title="Saisie non enregistrée">
+        Les saisies restent en mémoire le temps de cette page et seront perdues à la fermeture.
       </cnpm-alert>
 
       @if (exitPrompt()) {
@@ -65,7 +64,7 @@
         </section>
       }
 
-      <nav class="enrollment-stepper" aria-label="Étapes de la demande fictive">
+      <nav class="enrollment-stepper" aria-label="Étapes de la demande">
         <ol>
           @for (step of steps; track step.id; let index = $index) {
             <li [class]="'enrollment-step enrollment-step--' + stepStatus(step.id)">
@@ -106,20 +105,20 @@
               <div class="enrollment-grid">
                 <div class="enrollment-field enrollment-field--wide">
                   <label for="adhesion-legalName">
-                    Raison sociale fictive <span aria-hidden="true">*</span>
+                    Raison sociale <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="adhesion-legalName"
                     type="text"
                     formControlName="legalName"
                     autocomplete="off"
-                    placeholder="Ex. Entreprise Démo Sahel"
+                    placeholder="Ex. Sahel Agro SA"
                     aria-required="true"
                     [attr.aria-invalid]="invalidAttr('legalName')"
                     [attr.aria-describedby]="describedBy('legalName')"
                   />
                   <p class="enrollment-field__hint" id="adhesion-legalName-aide">
-                    N’utilisez pas la raison sociale d’une entreprise réelle.
+                    Dénomination figurant au registre du commerce.
                   </p>
                   @if (errorFor('legalName'); as error) {
                     <p class="enrollment-field__error" id="adhesion-legalName-erreur">
@@ -129,7 +128,7 @@
                 </div>
 
                 <div class="enrollment-field">
-                  <label for="adhesion-tradeName">Nom commercial fictif</label>
+                  <label for="adhesion-tradeName">Nom commercial</label>
                   <input
                     id="adhesion-tradeName"
                     type="text"
@@ -140,7 +139,7 @@
                     [attr.aria-describedby]="describedBy('tradeName')"
                   />
                   <p class="enrollment-field__hint" id="adhesion-tradeName-aide">
-                    Champ facultatif de la démonstration.
+                    Champ facultatif.
                   </p>
                   @if (errorFor('tradeName'); as error) {
                     <p class="enrollment-field__error" id="adhesion-tradeName-erreur">
@@ -158,7 +157,7 @@
                     type="text"
                     formControlName="legalForm"
                     autocomplete="off"
-                    placeholder="Valeur fictive en texte libre"
+                    placeholder="Ex. Société anonyme"
                     aria-required="true"
                     [attr.aria-invalid]="invalidAttr('legalForm')"
                     [attr.aria-describedby]="describedBy('legalForm')"
@@ -175,14 +174,14 @@
 
                 <div class="enrollment-field">
                   <label for="adhesion-rccm">
-                    Référence RCCM de démonstration <span aria-hidden="true">*</span>
+                    Référence RCCM <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="adhesion-rccm"
                     type="text"
                     formControlName="rccm"
                     autocomplete="off"
-                    placeholder="DEMO-RCCM-001"
+                    placeholder="RCCM-2026-001"
                     aria-required="true"
                     [attr.aria-invalid]="invalidAttr('rccm')"
                     [attr.aria-describedby]="describedBy('rccm')"
@@ -197,14 +196,14 @@
 
                 <div class="enrollment-field">
                   <label for="adhesion-nif">
-                    Référence NIF de démonstration <span aria-hidden="true">*</span>
+                    Référence NIF <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="adhesion-nif"
                     type="text"
                     formControlName="nif"
                     autocomplete="off"
-                    placeholder="DEMO-NIF-001"
+                    placeholder="NIF-2026-001"
                     aria-required="true"
                     [attr.aria-invalid]="invalidAttr('nif')"
                     [attr.aria-describedby]="describedBy('nif')"
@@ -223,20 +222,20 @@
               <div class="enrollment-grid">
                 <div class="enrollment-field enrollment-field--wide">
                   <label for="adhesion-contactName">
-                    Nom du contact fictif <span aria-hidden="true">*</span>
+                    Nom du contact <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="adhesion-contactName"
                     type="text"
                     formControlName="contactName"
                     autocomplete="off"
-                    placeholder="Ex. Awa Démo"
+                    placeholder="Prénom et nom du référent"
                     aria-required="true"
                     [attr.aria-invalid]="invalidAttr('contactName')"
                     [attr.aria-describedby]="describedBy('contactName')"
                   />
                   <p class="enrollment-field__hint" id="adhesion-contactName-aide">
-                    Aucun nom de personne réelle.
+                    Personne habilitée à suivre le dossier.
                   </p>
                   @if (errorFor('contactName'); as error) {
                     <p class="enrollment-field__error" id="adhesion-contactName-erreur">
@@ -247,7 +246,7 @@
 
                 <div class="enrollment-field">
                   <label for="adhesion-contactEmail">
-                    Adresse e-mail fictive <span aria-hidden="true">*</span>
+                    Adresse e-mail <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="adhesion-contactEmail"
@@ -255,13 +254,13 @@
                     formControlName="contactEmail"
                     autocomplete="off"
                     inputmode="email"
-                    placeholder="contact@demo.invalid"
+                    placeholder="contact@entreprise.ml"
                     aria-required="true"
                     [attr.aria-invalid]="invalidAttr('contactEmail')"
                     [attr.aria-describedby]="describedBy('contactEmail')"
                   />
                   <p class="enrollment-field__hint" id="adhesion-contactEmail-aide">
-                    Utilisez le domaine réservé <code>.invalid</code>.
+                    Adresse professionnelle de suivi du dossier.
                   </p>
                   @if (errorFor('contactEmail'); as error) {
                     <p class="enrollment-field__error" id="adhesion-contactEmail-erreur">
@@ -272,20 +271,20 @@
 
                 <div class="enrollment-field">
                   <label for="adhesion-contactPhone">
-                    Téléphone fictif <span aria-hidden="true">*</span>
+                    Téléphone <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="adhesion-contactPhone"
                     type="tel"
                     formControlName="contactPhone"
                     autocomplete="off"
-                    placeholder="DEMO-TELEPHONE"
+                    placeholder="+223 00 00 00 00"
                     aria-required="true"
                     [attr.aria-invalid]="invalidAttr('contactPhone')"
                     [attr.aria-describedby]="describedBy('contactPhone')"
                   />
                   <p class="enrollment-field__hint" id="adhesion-contactPhone-aide">
-                    Aucun format téléphonique officiel n’est simulé.
+                    Texte libre : aucun format téléphonique officiel n’est imposé.
                   </p>
                   @if (errorFor('contactPhone'); as error) {
                     <p class="enrollment-field__error" id="adhesion-contactPhone-erreur">
@@ -297,7 +296,7 @@
             }
 
             @case ('pieces') {
-              <cnpm-alert tone="info" title="Périmètre neutralisé">
+              <cnpm-alert tone="info" title="Téléversement non ouvert">
                 Aucun fichier ne peut être sélectionné, lu ou transmis. La liste opposable des
                 pièces obligatoires, facultatives et conditionnelles doit encore être validée.
               </cnpm-alert>
@@ -312,7 +311,7 @@
                 </li>
                 <li>
                   <span>GED et analyse antivirus</span>
-                  <strong>Sans objet dans cette démo</strong>
+                  <strong>Non raccordé</strong>
                 </li>
                 <li>
                   <span>Blocage pour pièce manquante</span>
@@ -324,7 +323,7 @@
             @case ('verification') {
               <cnpm-alert tone="warning" title="Aucune soumission officielle">
                 La prochaine action ne vaut ni consentement juridique, ni dépôt, ni demande
-                d’adhésion. Elle affiche seulement une confirmation locale de démonstration.
+                d’adhésion. Elle génère uniquement un récapitulatif des informations saisies.
               </cnpm-alert>
               <div class="enrollment-review">
                 <h3>Informations saisies</h3>
@@ -352,7 +351,7 @@
             type="submit"
             [variant]="current() === 'verification' ? 'public-cta' : 'primary'"
           >
-            {{ current() === 'verification' ? 'Créer la confirmation locale' : 'Étape suivante' }}
+            {{ current() === 'verification' ? 'Générer le récapitulatif' : 'Étape suivante' }}
           </cnpm-button>
         </div>
       </form>

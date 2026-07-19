@@ -2,7 +2,7 @@
   <main class="statement-import">
     <cnpm-page-header
       title="Import de relevé bancaire"
-      description="Déposez un fichier témoin, contrôlez ses lignes et préparez une revue sans impact financier."
+      description="Déposez un relevé, contrôlez ses lignes et préparez une revue avant import."
     >
       <cnpm-button variant="secondary" routerLink="/admin/payments/reconciliation">
         Retour aux paiements
@@ -22,7 +22,7 @@
         <cnpm-error-state
           variant="recoverable"
           title="Import indisponible en mode HTTP"
-          description="Aucun format bancaire validé ni contrat typé de résultat n’est disponible. Le profil HTTP échoue fermé sans utiliser les fixtures."
+          description="Aucun format bancaire validé ni contrat typé de résultat n’est disponible. Le profil HTTP échoue fermé."
         />
       }
       @case ('error') {
@@ -38,14 +38,14 @@
           <ol class="statement-import__stepper" aria-label="Étapes du contrôle local">
             <li><button type="button" [class.is-current]="step() === 'deposit'" [class.is-complete]="step() !== 'deposit'" [attr.aria-current]="step() === 'deposit' ? 'step' : null" (click)="goToStep('deposit')"><span>1</span><span><strong>Dépôt</strong><small>Fichier local</small></span></button></li>
             <li><button type="button" [class.is-current]="step() === 'control'" [class.is-complete]="step() === 'review'" [attr.aria-current]="step() === 'control' ? 'step' : null" [attr.aria-disabled]="selectedFile() ? null : 'true'" (click)="goToStep('control')"><span>2</span><span><strong>Contrôles</strong><small>Doublons et anomalies</small></span></button></li>
-            <li><button type="button" [class.is-current]="step() === 'review'" [attr.aria-current]="step() === 'review' ? 'step' : null" [attr.aria-disabled]="inspection() ? null : 'true'" (click)="goToStep('review')"><span>3</span><span><strong>Revue</strong><small>Sans import réel</small></span></button></li>
+            <li><button type="button" [class.is-current]="step() === 'review'" [attr.aria-current]="step() === 'review' ? 'step' : null" [attr.aria-disabled]="inspection() ? null : 'true'" (click)="goToStep('review')"><span>3</span><span><strong>Revue</strong><small>Sans import</small></span></button></li>
           </ol>
         </section>
 
         @if (step() === 'deposit') {
           <div class="statement-import__layout">
             <form class="statement-import__panel" [formGroup]="form" (ngSubmit)="analyze()">
-              <header><span class="statement-import__panel-index" aria-hidden="true">01</span><div><h2>Déposez un fichier témoin</h2><p>Seules les métadonnées du fichier servent à lancer le scénario local.</p></div></header>
+              <header><span class="statement-import__panel-index" aria-hidden="true">01</span><div><h2>Déposez un relevé</h2><p>Seules les métadonnées du fichier servent à lancer le contrôle.</p></div></header>
 
               <div class="statement-import__field">
                 <label for="statement-profile">Profil de contrôle</label>
@@ -57,28 +57,28 @@
 
               <section class="statement-import__dropzone" [class.has-file]="selectedFile()" aria-labelledby="statement-drop-title">
                 <div class="statement-import__drop-icon" aria-hidden="true">CSV</div>
-                <h3 id="statement-drop-title">Fichier CSV de démonstration</h3>
+                <h3 id="statement-drop-title">Fichier CSV du relevé</h3>
                 @if (selectedFile(); as file) {
                   <p><strong>{{ file.fileName }}</strong><span>{{ formatFileSize(file.size) }} · prêt pour le contrôle local</span></p>
                 } @else {
-                  <p>Choisissez un fichier local ou chargez le témoin fourni.</p>
+                  <p>Choisissez un fichier local ou chargez l’exemple fourni.</p>
                 }
                 <input #fileInput id="statement-file" class="statement-import__file" type="file" accept=".csv,text/csv" (change)="selectFile($event)" />
                 <label class="statement-import__file-label" for="statement-file">Choisir un fichier CSV</label>
-                <span>Le contenu ne sera pas lu par cette démonstration.</span>
+                <span>Le contenu du fichier n’est pas transmis.</span>
               </section>
 
               @if (inspectionError(); as error) { <p class="statement-import__validation" role="alert">{{ error }}</p> }
 
               <div class="statement-import__actions">
-                <cnpm-button variant="secondary" (click)="useSample()">Utiliser le fichier témoin</cnpm-button>
+                <cnpm-button variant="secondary" (click)="useSample()">Utiliser le fichier exemple</cnpm-button>
                 <cnpm-button type="submit" variant="primary" [disabled]="!selectedFile()" [loading]="inspecting()" describedBy="local-analysis-note">Analyser localement</cnpm-button>
               </div>
-              <p id="local-analysis-note" class="statement-import__note">L’analyse produit une fixture visuelle déterministe, jamais un import bancaire.</p>
+              <p id="local-analysis-note" class="statement-import__note">L’analyse est réalisée dans le navigateur et ne déclenche aucun import bancaire.</p>
             </form>
 
             <aside class="statement-import__recent" aria-labelledby="recent-controls-title">
-              <span class="statement-import__eyebrow">Historique Démo</span>
+              <span class="statement-import__eyebrow">Historique</span>
               <h2 id="recent-controls-title">Contrôles locaux récents</h2>
               <div class="statement-import__recent-list">
                 @for (run of context()?.recentRuns ?? []; track run.id) {
@@ -90,21 +90,21 @@
           </div>
         } @else if (inspection(); as result) {
           <section class="statement-import__summary" aria-labelledby="statement-summary-title">
-            <header><div><span class="statement-import__eyebrow">{{ result.runId }}</span><h2 id="statement-summary-title">Rapport de contrôle fictif</h2><p>{{ result.fileName }} · aucune donnée transmise</p></div><cnpm-badge tone="warning">Analyse locale</cnpm-badge></header>
-            <div class="statement-import__kpis" tabindex="0" aria-label="Indicateurs fictifs du contrôle">
-              <article><span>Lignes analysées</span><strong>{{ result.totalLines }}</strong><small>Scénario local</small></article>
+            <header><div><span class="statement-import__eyebrow">{{ result.runId }}</span><h2 id="statement-summary-title">Rapport de contrôle</h2><p>{{ result.fileName }} · aucune donnée transmise</p></div><cnpm-badge tone="warning">Analyse locale</cnpm-badge></header>
+            <div class="statement-import__kpis" tabindex="0" aria-label="Indicateurs du contrôle">
+              <article><span>Lignes analysées</span><strong>{{ result.totalLines }}</strong><small>Analyse locale</small></article>
               <article class="is-valid"><span>Contrôlées</span><strong>{{ result.validLines }}</strong><small>Sans import</small></article>
               <article><span>Doublons potentiels</span><strong>{{ result.duplicates }}</strong><small>À exclure</small></article>
               <article><span>Non imputées</span><strong>{{ result.unallocated }}</strong><small>Revue manuelle</small></article>
               <article class="is-critical"><span>Incohérentes</span><strong>{{ result.invalidLines }}</strong><small>Blocage</small></article>
-              <article><span>Total illustratif</span><strong>{{ result.illustrativeAmount | number: '1.0-0' }}</strong><small>XOF fictifs</small></article>
+              <article><span>Total contrôlé</span><strong>{{ result.illustrativeAmount | number: '1.0-0' }}</strong><small>XOF</small></article>
             </div>
           </section>
 
           <section class="statement-import__lines" aria-labelledby="statement-lines-title">
-            <header><div><span class="statement-import__eyebrow">Aperçu contrôlé</span><h2 id="statement-lines-title">Lignes du fichier témoin</h2></div><span>5 lignes affichées sur {{ result.totalLines }}</span></header>
-            <div class="statement-import__table-scroll" tabindex="0" aria-label="Tableau des lignes fictives, défilement horizontal possible">
-              <table><thead><tr><th scope="col">Date de valeur</th><th scope="col">Référence</th><th scope="col">Payeur fictif</th><th scope="col">Montant</th><th scope="col">Contrôle</th><th scope="col">Explication</th></tr></thead><tbody>
+            <header><div><span class="statement-import__eyebrow">Aperçu contrôlé</span><h2 id="statement-lines-title">Lignes du relevé</h2></div><span>5 lignes affichées sur {{ result.totalLines }}</span></header>
+            <div class="statement-import__table-scroll" tabindex="0" aria-label="Tableau des lignes, défilement horizontal possible">
+              <table><thead><tr><th scope="col">Date de valeur</th><th scope="col">Référence</th><th scope="col">Payeur</th><th scope="col">Montant</th><th scope="col">Contrôle</th><th scope="col">Explication</th></tr></thead><tbody>
                 @for (line of result.lines; track line.id) {
                   <tr><td>{{ line.valueDate | date: 'dd/MM/yyyy': 'UTC': 'fr-FR' }}</td><th scope="row">{{ line.reference }}</th><td>{{ line.payer }}</td><td class="statement-import__amount">{{ line.amount | number: '1.0-0' }} XOF</td><td><cnpm-badge [tone]="statusTone(line.status)">{{ statusLabel(line.status) }}</cnpm-badge></td><td>{{ line.explanation }}</td></tr>
                 }
@@ -122,18 +122,18 @@
             </div>
           } @else {
             <section class="statement-import__review" aria-labelledby="statement-review-title">
-              <div><span class="statement-import__eyebrow">Validation locale</span><h2 id="statement-review-title">Clore le rapport sans importer</h2><p>Cette action confirme uniquement la lecture du rapport fictif.</p></div>
+              <div><span class="statement-import__eyebrow">Validation locale</span><h2 id="statement-review-title">Clore le rapport sans importer</h2><p>Cette action confirme uniquement la lecture du rapport.</p></div>
               <label class="statement-import__confirmation"><input type="checkbox" [formControl]="reviewAccepted" /><span>Je confirme que ce rapport contient {{ result.duplicates + result.unallocated + result.invalidLines }} alertes et ne doit produire aucune écriture.</span></label>
-              @if (reviewAccepted.invalid && reviewAccepted.touched) { <p class="statement-import__validation" role="alert">Cochez la confirmation avant de terminer la revue locale.</p> }
+              @if (reviewAccepted.invalid && reviewAccepted.touched) { <p class="statement-import__validation" role="alert">Cochez la confirmation avant de terminer la revue.</p> }
               @if (reviewComplete()) {
                 <cnpm-alert tone="success" title="Rapport local clos">Aucun fichier n’a été importé et aucun paiement n’a été confirmé.</cnpm-alert>
               } @else {
-                <div class="statement-import__actions"><cnpm-button variant="secondary" (click)="goToStep('control')">Retour aux contrôles</cnpm-button><cnpm-button variant="primary" (click)="completeReview()">Terminer la revue locale</cnpm-button></div>
+                <div class="statement-import__actions"><cnpm-button variant="secondary" (click)="goToStep('control')">Retour aux contrôles</cnpm-button><cnpm-button variant="primary" (click)="completeReview()">Terminer la revue</cnpm-button></div>
               }
             </section>
           }
         } @else if (inspecting()) {
-          <cnpm-skeleton variant="table" [rows]="6" [columns]="6" label="Contrôle local du fichier témoin…" />
+          <cnpm-skeleton variant="table" [rows]="6" [columns]="6" label="Contrôle local du relevé…" />
         } @else if (inspectionError(); as error) {
           <cnpm-error-state variant="recoverable" title="Contrôle local impossible" [description]="error" />
         }

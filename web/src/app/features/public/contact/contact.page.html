@@ -3,26 +3,12 @@
     <div class="contact-hero__inner">
       <div>
         <p class="contact-eyebrow">Nous écrire</p>
-        <h1 #pageTitle tabindex="-1">Préparer un message de démonstration</h1>
+        <h1 #pageTitle tabindex="-1">Préparer un message</h1>
         <p>
-          Testez la lisibilité du futur parcours de contact avec des données strictement fictives.
-          Aucun canal institutionnel n’est raccordé à cette page.
+          Rédigez votre message au Conseil National du Patronat du Mali. Les champs obligatoires
+          sont vérifiés au moment de la saisie.
         </p>
       </div>
-      <dl class="contact-hero__facts" aria-label="Garanties de la démonstration">
-        <div>
-          <dt>Transmission</dt>
-          <dd>Aucune</dd>
-        </div>
-        <div>
-          <dt>Stockage</dt>
-          <dd>Aucun</dd>
-        </div>
-        <div>
-          <dt>Données attendues</dt>
-          <dd>Fictives</dd>
-        </div>
-      </dl>
     </div>
   </section>
 
@@ -37,18 +23,12 @@
         />
       </section>
     } @else {
-      <cnpm-alert tone="warning" title="Aucun envoi officiel">
-        Ce formulaire vérifie uniquement les champs dans votre navigateur. Après validation, les
-        valeurs sont immédiatement effacées ; elles ne quittent pas la page et ne constituent pas
-        une prise de contact avec le CNPM.
-      </cnpm-alert>
-
       <div class="contact-layout">
         <form class="contact-form" [formGroup]="form" novalidate (ngSubmit)="checkLocally()">
           <div class="contact-form__heading">
-            <p class="contact-eyebrow">Démonstration locale</p>
-            <h2>Rédiger un message fictif</h2>
-            <p>Les champs marqués d’un astérisque sont nécessaires au seul contrôle local.</p>
+            <p class="contact-eyebrow">Formulaire</p>
+            <h2>Rédiger votre message</h2>
+            <p>Les champs marqués d’un astérisque sont obligatoires.</p>
           </div>
 
           <div
@@ -67,19 +47,17 @@
               tabindex="-1"
               aria-labelledby="contact-success-title"
             >
-              <strong id="contact-success-title">Contrôle local terminé</strong>
+              <strong id="contact-success-title">Vérification terminée</strong>
               <p>
-                Le formulaire était valide. Toutes les valeurs saisies ont été effacées et aucun
-                message n’a été transmis.
+                Le formulaire était valide. Les valeurs saisies ont été effacées de votre
+                navigateur.
               </p>
             </section>
           }
 
           <div class="contact-grid">
             <div class="contact-field">
-              <label [for]="fieldId('fullName')"
-                >Nom fictif <span aria-hidden="true">*</span></label
-              >
+              <label [for]="fieldId('fullName')">Nom <span aria-hidden="true">*</span></label>
               <input
                 [id]="fieldId('fullName')"
                 type="text"
@@ -92,7 +70,7 @@
                 [attr.aria-invalid]="invalidAttr('fullName')"
               />
               <p class="contact-field__hint" [id]="helperId('fullName')">
-                Utilisez un nom inventé, par exemple « Awa Démo ».
+                Indiquez le nom et le prénom de la personne à contacter.
               </p>
               @if (errorFor('fullName'); as error) {
                 <p class="contact-field__error" [id]="errorId('fullName')">{{ error }}</p>
@@ -100,7 +78,7 @@
             </div>
 
             <div class="contact-field">
-              <label [for]="fieldId('organization')">Organisation fictive</label>
+              <label [for]="fieldId('organization')">Organisation</label>
               <input
                 [id]="fieldId('organization')"
                 type="text"
@@ -111,7 +89,7 @@
                 [attr.aria-invalid]="invalidAttr('organization')"
               />
               <p class="contact-field__hint" [id]="helperId('organization')">
-                Champ facultatif ; n’indiquez aucune entreprise réelle.
+                Champ facultatif : entreprise ou groupement représenté.
               </p>
               @if (errorFor('organization'); as error) {
                 <p class="contact-field__error" [id]="errorId('organization')">{{ error }}</p>
@@ -120,7 +98,7 @@
 
             <div class="contact-field">
               <label [for]="fieldId('email')">
-                Adresse e-mail fictive <span aria-hidden="true">*</span>
+                Adresse e-mail <span aria-hidden="true">*</span>
               </label>
               <input
                 [id]="fieldId('email')"
@@ -135,7 +113,7 @@
                 [attr.aria-invalid]="invalidAttr('email')"
               />
               <p class="contact-field__hint" [id]="helperId('email')">
-                Préférez le domaine réservé <code>.invalid</code> pour la démonstration.
+                Adresse à laquelle la réponse pourra être adressée.
               </p>
               @if (errorFor('email'); as error) {
                 <p class="contact-field__error" [id]="errorId('email')">{{ error }}</p>
@@ -143,9 +121,7 @@
             </div>
 
             <div class="contact-field">
-              <label [for]="fieldId('subject')"
-                >Objet fictif <span aria-hidden="true">*</span></label
-              >
+              <label [for]="fieldId('subject')">Objet <span aria-hidden="true">*</span></label>
               <input
                 [id]="fieldId('subject')"
                 type="text"
@@ -158,7 +134,7 @@
                 [attr.aria-invalid]="invalidAttr('subject')"
               />
               <p class="contact-field__hint" [id]="helperId('subject')">
-                Saisissez un objet fictif libre ; aucune catégorie de message n’est publiée.
+                Résumez l’objet de votre message en une ligne.
               </p>
               @if (errorFor('subject'); as error) {
                 <p class="contact-field__error" [id]="errorId('subject')">{{ error }}</p>
@@ -166,9 +142,7 @@
             </div>
 
             <div class="contact-field contact-field--wide">
-              <label [for]="fieldId('message')">
-                Message fictif <span aria-hidden="true">*</span>
-              </label>
+              <label [for]="fieldId('message')"> Message <span aria-hidden="true">*</span> </label>
               <textarea
                 [id]="fieldId('message')"
                 formControlName="message"
@@ -180,7 +154,7 @@
                 [attr.aria-invalid]="invalidAttr('message')"
               ></textarea>
               <p class="contact-field__hint" [id]="helperId('message')">
-                Ne saisissez aucune donnée personnelle, confidentielle ou réelle.
+                Ne saisissez aucune donnée confidentielle ou bancaire.
               </p>
               @if (errorFor('message'); as error) {
                 <p class="contact-field__error" [id]="errorId('message')">{{ error }}</p>
@@ -196,23 +170,24 @@
             </div>
             <div class="contact-actions__primary">
               <cnpm-button type="submit" variant="public-cta" size="lg" [block]="true">
-                Tester le formulaire local
+                Vérifier le message
               </cnpm-button>
             </div>
           </div>
         </form>
 
         <aside class="contact-assurance" aria-labelledby="contact-assurance-title">
-          <p class="contact-eyebrow">Fonctionnement de la démonstration</p>
+          <p class="contact-eyebrow">Traitement de votre saisie</p>
           <h2 id="contact-assurance-title">Ce que fait cette page</h2>
           <ol>
             <li><strong>Valider</strong><span>les champs requis et le format e-mail.</span></li>
             <li><strong>Effacer</strong><span>les valeurs après un contrôle réussi.</span></li>
-            <li><strong>Informer</strong><span>qu’aucune transmission n’a eu lieu.</span></li>
+            <li><strong>Confirmer</strong><span>la fin du contrôle de saisie.</span></li>
           </ol>
           <p class="contact-assurance__note">
-            Un formulaire opérationnel nécessitera une destination institutionnelle publiée, des
-            règles de conservation et une information validée sur l’utilisation des données.
+            La destination institutionnelle des messages, les durées de conservation et
+            l’information sur l’utilisation des données seront publiées avec la mise en service du
+            canal.
           </p>
         </aside>
       </div>

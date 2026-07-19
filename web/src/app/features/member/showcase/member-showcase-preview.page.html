@@ -1,7 +1,7 @@
 <cnpm-member-portal-shell
-  organization="Entreprise Démo Sahel"
-  userName="Membre de démonstration"
-  memberCode="CNPM-DEMO-0001"
+  organization="Sahel Agro SA"
+  userName="Responsable adhésion"
+  memberCode="CNPM-2026-0001"
   [notificationCount]="0"
 >
   <main class="showcase-preview" id="contenu-principal">
@@ -15,21 +15,20 @@
     </cnpm-page-header>
 
     <cnpm-alert tone="warning" title="Aperçu privé et non indexable" [live]="false">
-      Cette page exige le contexte membre, porte <code>noindex,nofollow</code> et ne simule ni
-      soumission, ni modération, ni publication.
+      Cette page exige le contexte membre et porte <code>noindex,nofollow</code>.
     </cnpm-alert>
 
     @switch (result().kind) {
       @case ('loading') {
-        <section class="showcase-preview__loading" aria-label="Chargement de l’aperçu fictif">
-          <cnpm-skeleton variant="card" [rows]="8" label="Chargement de l’aperçu fictif…" />
+        <section class="showcase-preview__loading" aria-label="Chargement de l’aperçu">
+          <cnpm-skeleton variant="card" [rows]="8" label="Chargement de l’aperçu…" />
         </section>
       }
       @case ('error') {
         <cnpm-error-state
           variant="recoverable"
           title="L’aperçu n’a pas pu être chargé"
-          description="Le brouillon local reste inchangé et aucune donnée n’a été transmise."
+          description="Le brouillon local reste inchangé."
         >
           <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
         </cnpm-error-state>
@@ -38,14 +37,14 @@
         <cnpm-error-state
           variant="recoverable"
           title="Aperçu de vitrine indisponible en mode HTTP"
-          description="Le contrat R4, le périmètre d’organisation et les consentements ne sont pas promus. Aucune fixture locale n’est injectée dans ce mode."
+          description="Le contrat R4, le périmètre d’organisation et les consentements ne sont pas promus."
         />
       }
       @case ('empty') {
         <cnpm-empty-state
           variant="no-data"
           title="Aucun brouillon à prévisualiser"
-          description="Créez d’abord un brouillon fictif dans l’atelier local."
+          description="Créez d’abord un brouillon dans l’atelier local."
         >
           <cnpm-button routerLink="/member/showcase/edit" variant="secondary" size="sm">
             Ouvrir l’éditeur
@@ -153,8 +152,8 @@
                 <p>{{ draft.seo.description }}</p>
               </div>
               <p>
-                Cette adresse est illustrative : la stratégie d’URL reste ouverte et aucun lien
-                public n’est créé.
+                La stratégie d’URL publique reste en cours d’arbitrage : aucun lien public n’est
+                encore créé.
               </p>
             </section>
           </div>

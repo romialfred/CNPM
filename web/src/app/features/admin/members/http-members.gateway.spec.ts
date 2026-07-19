@@ -58,13 +58,13 @@ describe('HttpMembersGateway', () => {
           id: '11111111-1111-4111-8111-111111111111',
           membershipNumber: 'CNPM-2026-001',
           organizationId: '22222222-2222-4222-8222-222222222222',
-          organizationLegalName: 'Mali Industrie Démo SA',
+          organizationLegalName: 'Mali Industrie SA',
           categoryCode: 'CAT-A',
           status: 'ACTIVE',
           joinedAt: '2026-01-15',
           version: 3,
           primaryGroupCode: 'GROUPE-1',
-          primaryGroupName: 'Industries de démonstration',
+          primaryGroupName: 'Industries',
           primaryContactName: null,
           primaryContactEmail: null,
           primaryContactPhone: null,
@@ -80,7 +80,7 @@ describe('HttpMembersGateway', () => {
     expect(result.rows[0]).toMatchObject({
       id: '11111111-1111-4111-8111-111111111111',
       organizationId: '22222222-2222-4222-8222-222222222222',
-      organization: 'Mali Industrie Démo SA',
+      organization: 'Mali Industrie SA',
       due: null,
       paid: null,
       lastActivity: null,
@@ -92,7 +92,7 @@ describe('HttpMembersGateway', () => {
     expect(result.supportedSortKeys).toEqual(['code', 'organization', 'status', 'group']);
   });
 
-  it('refuse dans le flux un tri non livré au lieu de le simuler sur la page', async () => {
+  it('refuse dans le flux un tri non livré au lieu de le reproduire sur la page', async () => {
     const result = firstValueFrom(
       gateway.search({ ...QUERY, sort: { key: 'due', direction: 'asc' } }),
     );
@@ -126,7 +126,7 @@ describe('HttpMembersGateway', () => {
           id: '11111111-1111-4111-8111-111111111111',
           membershipNumber: 'CNPM-2026-001',
           organizationId: '22222222-2222-4222-8222-222222222222',
-          organizationLegalName: 'Entreprise Démo',
+          organizationLegalName: 'Entreprise Sahel',
           categoryCode: 'CAT-A',
           status: 'SUSPENDED',
           version: 1,

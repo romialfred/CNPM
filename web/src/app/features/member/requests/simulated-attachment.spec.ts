@@ -7,16 +7,16 @@ function files(...values: File[]): FileList {
   }) as unknown as FileList;
 }
 
-describe('pièces jointes simulées', () => {
+describe('pièces jointes', () => {
   it('ne conserve que les métadonnées autorisées', () => {
-    const file = new File(['contenu non lu par le code'], 'preuve-fictive.pdf', {
+    const file = new File(['contenu non lu par le code'], 'preuve-justificative.pdf', {
       type: 'application/pdf',
     });
     const selection = selectSimulatedAttachments(files(file), 0, 'test');
     expect(selection.error).toBeNull();
     expect(selection.accepted[0]).toEqual({
       id: 'test-1',
-      fileName: 'preuve-fictive.pdf',
+      fileName: 'preuve-justificative.pdf',
       sizeBytes: file.size,
       mimeType: 'application/pdf',
       simulated: true,

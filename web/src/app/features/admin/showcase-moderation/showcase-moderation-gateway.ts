@@ -17,7 +17,7 @@ export interface ShowcasePreviewVersion {
   readonly tagline: string;
   readonly summary: string;
   readonly sectorLabel: string;
-  readonly locationDisclosure: 'Localisation masquée dans la démonstration';
+  readonly locationDisclosure: 'Localisation masquée';
   readonly activities: readonly string[];
   readonly mediaPresentation: 'PLACEHOLDER_ONLY';
   readonly publicContactPresentation: 'MASKED_NO_CONSENT';
@@ -29,7 +29,7 @@ export interface ShowcaseModerationItem {
   readonly organizationLabel: string;
   readonly submittedAt: string;
   readonly queueLabel: 'À examiner' | 'Contrôle requis';
-  readonly membershipLabel: 'Adhésion active — scénario fictif';
+  readonly membershipLabel: 'Adhésion active';
   readonly publishedVersion: ShowcasePreviewVersion;
   readonly proposedVersion: ShowcasePreviewVersion;
   readonly changedFields: readonly string[];

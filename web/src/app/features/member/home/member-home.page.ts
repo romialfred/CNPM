@@ -132,9 +132,7 @@ export class MemberHomePage {
    * donc l'indisponibilité explicite, sans simuler paiement, téléchargement ou envoi.
    */
   protected announceUnavailable(feature: string): void {
-    this.toasts.info(
-      `${feature} est indisponible dans cette démonstration. Aucune opération n’a été initiée.`,
-    );
+    this.toasts.info(`${feature} n’est pas encore disponible. Aucune opération n’a été initiée.`);
   }
 
   protected retry(): void {
@@ -165,7 +163,7 @@ export class MemberHomePage {
       );
       this.draftStatus.set('Brouillon sauvegardé localement — aucun envoi au CNPM');
       if (announce) {
-        this.toasts.info('Brouillon de démonstration sauvegardé localement. Aucun envoi au CNPM.');
+        this.toasts.info('Brouillon sauvegardé localement. Aucun envoi au CNPM.');
       }
     } catch {
       this.draftStatus.set('Le stockage local du brouillon est indisponible');

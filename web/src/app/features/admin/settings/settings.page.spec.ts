@@ -19,9 +19,9 @@ import { SettingsPage } from './settings.page';
 
 const VALUE: ReferenceValue = {
   id: '33000000-0000-4000-8000-000000000001',
-  domain: 'DEMO_CLASSE_INTERNE',
-  code: 'DEMO_STANDARD',
-  label: 'Valeur strictement fictive',
+  domain: 'REF_CLASSE_INTERNE',
+  code: 'REF_STANDARD',
+  label: 'Valeur strictement contrôlée',
   sortOrder: 10,
   active: true,
   validFrom: null,
@@ -47,8 +47,8 @@ class SettingsStub implements ReferenceValuesGateway {
 
 const session: SessionGateway = {
   identity: of({
-    displayName: 'Agent fictif',
-    roleLabel: 'Administrateur fonctionnel fictif',
+    displayName: 'Agent',
+    roleLabel: 'Administrateur fonctionnel',
     exerciseLabel: null,
     notificationCount: null,
     demoMode: true,
@@ -115,12 +115,12 @@ describe('SettingsPage', () => {
 
   it('lit le domaine et la pagination depuis l’URL, puis rend le registre', async () => {
     const { fixture, gateway, host } = await setup({
-      domain: 'DEMO_CLASSE_INTERNE',
+      domain: 'REF_CLASSE_INTERNE',
       page: '2',
       size: '10',
     });
     expect(gateway.queries[0]).toEqual({
-      domain: 'DEMO_CLASSE_INTERNE',
+      domain: 'REF_CLASSE_INTERNE',
       page: 2,
       pageSize: 10,
     });
@@ -158,9 +158,9 @@ describe('SettingsPage', () => {
     buttonByText(host, 'Créer une valeur').click();
     fixture.detectChanges();
 
-    setInput(host.querySelector<HTMLInputElement>('#settings-domain')!, 'DEMO_NOUVEAU');
-    setInput(host.querySelector<HTMLInputElement>('#settings-code')!, 'DEMO_CODE');
-    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Valeur fictive créée');
+    setInput(host.querySelector<HTMLInputElement>('#settings-domain')!, 'REF_NOUVEAU');
+    setInput(host.querySelector<HTMLInputElement>('#settings-code')!, 'REF_CODE');
+    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Valeur créée');
     setInput(host.querySelector<HTMLInputElement>('#settings-sort-order')!, '30');
     host
       .querySelector<HTMLFormElement>('.cnpm-settings__editor-form')!
@@ -168,9 +168,9 @@ describe('SettingsPage', () => {
     await fixture.whenStable();
 
     expect(gateway.create).toHaveBeenCalledWith({
-      domain: 'DEMO_NOUVEAU',
-      code: 'DEMO_CODE',
-      label: 'Valeur fictive créée',
+      domain: 'REF_NOUVEAU',
+      code: 'REF_CODE',
+      label: 'Valeur créée',
       sortOrder: 30,
       active: true,
     });
@@ -184,14 +184,14 @@ describe('SettingsPage', () => {
 
     buttonByText(host, 'Modifier').click();
     fixture.detectChanges();
-    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Libellé fictif révisé');
+    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Libellé révisé');
     host
       .querySelector<HTMLFormElement>('.cnpm-settings__editor-form')!
       .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     await fixture.whenStable();
 
     expect(gateway.update).toHaveBeenCalledWith(VALUE.id, VALUE.version, {
-      label: 'Libellé fictif révisé',
+      label: 'Libellé révisé',
     });
   });
 
@@ -204,7 +204,7 @@ describe('SettingsPage', () => {
 
     buttonByText(host, 'Modifier').click();
     fixture.detectChanges();
-    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Changement local fictif');
+    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Changement local');
     host
       .querySelector<HTMLFormElement>('.cnpm-settings__editor-form')!
       .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -214,7 +214,7 @@ describe('SettingsPage', () => {
     expect(host.textContent).toContain('Conflit détecté');
     expect(host.textContent).toContain('Vos changements n’ont pas été écrasés');
     expect(host.querySelector<HTMLInputElement>('#settings-label')?.value).toBe(
-      'Changement local fictif',
+      'Changement local',
     );
   });
 
@@ -222,7 +222,7 @@ describe('SettingsPage', () => {
     const { fixture, host } = await setup();
     buttonByText(host, 'Créer une valeur').click();
     fixture.detectChanges();
-    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Brouillon fictif');
+    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Brouillon');
     const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(false);
 
     expect(fixture.componentInstance.confirmNavigation()).toBe(false);
@@ -235,7 +235,6 @@ describe('SettingsPage', () => {
     expect(host.querySelector<HTMLInputElement>('#settings-domain')?.required).toBe(true);
     expect(host.querySelector<HTMLInputElement>('#settings-code')?.required).toBe(true);
     expect(host.querySelector<HTMLInputElement>('#settings-label')?.required).toBe(true);
-    expect(host.textContent).toContain('entièrement fictifs');
   });
 
   it('actualise le résumé à mesure que les erreurs locales sont corrigées', async () => {
@@ -249,7 +248,7 @@ describe('SettingsPage', () => {
     fixture.detectChanges();
 
     expect(host.querySelector('a[href="#settings-domain"]')).not.toBeNull();
-    setInput(host.querySelector<HTMLInputElement>('#settings-domain')!, 'DEMO_CORRIGE');
+    setInput(host.querySelector<HTMLInputElement>('#settings-domain')!, 'REF_CORRIGE');
     await fixture.whenStable();
     fixture.detectChanges();
     expect(host.querySelector('a[href="#settings-domain"]')).toBeNull();
@@ -262,9 +261,9 @@ describe('SettingsPage', () => {
     gateway.create.mockReturnValue(pending);
     buttonByText(host, 'Créer une valeur').click();
     fixture.detectChanges();
-    setInput(host.querySelector<HTMLInputElement>('#settings-domain')!, 'DEMO_NOUVEAU');
-    setInput(host.querySelector<HTMLInputElement>('#settings-code')!, 'DEMO_CODE');
-    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Valeur fictive créée');
+    setInput(host.querySelector<HTMLInputElement>('#settings-domain')!, 'REF_NOUVEAU');
+    setInput(host.querySelector<HTMLInputElement>('#settings-code')!, 'REF_CODE');
+    setInput(host.querySelector<HTMLInputElement>('#settings-label')!, 'Valeur créée');
     host
       .querySelector<HTMLFormElement>('.cnpm-settings__editor-form')!
       .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -277,7 +276,7 @@ describe('SettingsPage', () => {
     fixture.detectChanges();
     expect(host.querySelector('.cnpm-settings__editor')).not.toBeNull();
 
-    pending.next({ ...VALUE, domain: 'DEMO_NOUVEAU', code: 'DEMO_CODE', version: 0 });
+    pending.next({ ...VALUE, domain: 'REF_NOUVEAU', code: 'REF_CODE', version: 0 });
     pending.complete();
     await fixture.whenStable();
   });
@@ -285,8 +284,8 @@ describe('SettingsPage', () => {
   it('reste en lecture seule sans ADMIN.REFERENTIAL.WRITE', async () => {
     const readOnlySession: SessionGateway = {
       identity: of({
-        displayName: 'Lecteur fictif',
-        roleLabel: 'Lecture seule fictive',
+        displayName: 'Lecteur',
+        roleLabel: 'Lecture seule',
         exerciseLabel: null,
         notificationCount: null,
         demoMode: false,

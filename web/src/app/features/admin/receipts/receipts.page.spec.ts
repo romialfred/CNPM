@@ -18,15 +18,15 @@ import { ReceiptsPage } from './receipts.page';
 
 const ROW: ReceiptRegistryRow = {
   id: '60000000-0000-4000-8000-000000000001',
-  demonstrationReference: 'DEMO-REC-TEST-0001',
-  memberCode: 'MEM-DEMO-TEST',
-  memberLabel: 'Entreprise Test fictive',
+  demonstrationReference: 'CNPM-REC-TEST-0001',
+  memberCode: 'MEM-2024-TEST',
+  memberLabel: 'Entreprise Test',
   amount: 750_000,
   period: '2024-T1',
   channel: 'BANK_TRANSFER',
   issuedAt: '2024-03-10T10:00:00Z',
   status: 'ISSUED',
-  paymentReference: 'PAY-DEMO-TEST-0001',
+  paymentReference: 'PAY-CNPM-TEST-0001',
   paymentConfirmedAt: '2024-03-10T08:00:00Z',
   sourcePaymentStatus: 'CONFIRMED',
   supersedesReference: null,
@@ -91,7 +91,7 @@ describe('BO-016 — registre des reçus', () => {
 
     expect(host.textContent).toContain(ROW.demonstrationReference);
     expect(host.textContent).toContain('1 enregistrement trouvé');
-    expect(host.querySelector('table caption')?.textContent).toContain('Registre fictif');
+    expect(host.querySelector('table caption')?.textContent).toContain('Registre des reçus');
     expect(host.querySelector('a[download]')).toBeNull();
     expect(host.textContent).not.toContain('Émettre un reçu');
   });

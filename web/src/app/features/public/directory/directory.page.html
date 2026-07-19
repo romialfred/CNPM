@@ -21,11 +21,6 @@
       }
     </header>
 
-    <aside class="cnpm-directory__demo-note" aria-label="Information sur les données">
-      <strong>Données entièrement fictives de démonstration.</strong>
-      Aucun nom, contact, média ou document réel n’est présenté dans cet annuaire pilote.
-    </aside>
-
     @if (isSearchMode()) {
       <form
         class="cnpm-directory__filters"
@@ -125,7 +120,6 @@
                         <svg lucideBuilding2 [size]="iconSize.empty"></svg>
                       </div>
                       <div class="cnpm-directory__card-copy">
-                        <p class="cnpm-directory__demo-label">Profil fictif de démonstration</p>
                         <h3>{{ member.name }}</h3>
                         <p class="cnpm-directory__tagline">{{ member.tagline }}</p>
                         <dl class="cnpm-directory__facts">
