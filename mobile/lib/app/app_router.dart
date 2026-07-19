@@ -14,8 +14,13 @@ import 'package:cnpm_mobile/features/home/domain/member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/presentation/member_home_screen.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/presentation/payment_history_screen.dart';
+import 'package:cnpm_mobile/features/requests/application/add_shared_request_message.dart';
+import 'package:cnpm_mobile/features/requests/application/create_member_request.dart';
+import 'package:cnpm_mobile/features/requests/application/load_member_request.dart';
 import 'package:cnpm_mobile/features/requests/domain/member_request.dart';
+import 'package:cnpm_mobile/features/requests/presentation/member_request_conversation_screen.dart';
 import 'package:cnpm_mobile/features/requests/presentation/member_request_list_screen.dart';
+import 'package:cnpm_mobile/features/requests/presentation/new_member_request_screen.dart';
 import 'package:cnpm_mobile/features/receipts/application/load_member_receipt.dart';
 import 'package:cnpm_mobile/features/receipts/domain/member_receipt.dart';
 import 'package:cnpm_mobile/features/receipts/presentation/receipt_detail_screen.dart';
@@ -31,6 +36,9 @@ GoRouter buildAppRouter({
   required ContentController<MemberReceiptCollection> receiptController,
   required LoadMemberReceipt loadMemberReceipt,
   required ContentController<List<MemberRequest>> requestController,
+  required LoadMemberRequest loadMemberRequest,
+  required CreateMemberRequest createMemberRequest,
+  required AddSharedRequestMessage addSharedRequestMessage,
   required VoidCallback onSignOut,
 }) {
   const authenticatedPaths = {
@@ -57,9 +65,11 @@ GoRouter buildAppRouter({
       }
       final isContributionPath = path.startsWith('/contributions/');
       final isReceiptPath = path.startsWith('/receipts/');
+      final isRequestPath = path.startsWith('/requests/');
       if ((authenticatedPaths.contains(path) ||
               isContributionPath ||
-              isReceiptPath) &&
+              isReceiptPath ||
+              isRequestPath) &&
           !hasSession) {
         return '/login';
       }
@@ -145,6 +155,28 @@ GoRouter buildAppRouter({
         name: 'mobile-requests',
         builder: (context, state) => MemberRequestListScreen(
           controller: requestController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/requests/new',
+        name: 'mobile-request-new',
+        builder: (context, state) => NewMemberRequestScreen(
+          createMemberRequest: createMemberRequest,
+          onCreated: requestController.reload,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/requests/:id',
+        name: 'mobile-request-conversation',
+        builder: (context, state) => MemberRequestConversationScreen(
+          key: ValueKey(state.pathParameters['id']),
+          requestId: state.pathParameters['id']!,
+          loadMemberRequest: loadMemberRequest,
+          addSharedRequestMessage: addSharedRequestMessage,
           isDemo: config.isDemo,
           onSignOut: onSignOut,
         ),

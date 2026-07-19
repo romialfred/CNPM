@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:cnpm_mobile/app/mobile_app_shell.dart';
 import 'package:cnpm_mobile/core/presentation/cnpm_formatters.dart';
@@ -72,6 +73,17 @@ class _MemberRequestListScreenState extends State<MemberRequestListScreen> {
                       'Mode démonstration : références, objets et statuts entièrement fictifs.',
                 ),
               ],
+              const SizedBox(height: CnpmSpacing.x4),
+              ElevatedButton.icon(
+                key: const Key('create-member-request'),
+                onPressed: () => context.go('/requests/new'),
+                icon: const Icon(Icons.add_comment_outlined),
+                label: Text(
+                  widget.isDemo
+                      ? 'Créer une requête fictive'
+                      : 'Créer une requête',
+                ),
+              ),
               const SizedBox(height: CnpmSpacing.x5),
               switch (widget.controller.phase) {
                 ContentPhase.idle ||
@@ -119,7 +131,10 @@ class _RequestList extends StatelessWidget {
         ),
         const SizedBox(height: CnpmSpacing.x3),
         for (var index = 0; index < requests.length; index++) ...[
-          _RequestCard(request: requests[index]),
+          _RequestCard(
+            request: requests[index],
+            onTap: () => context.go('/requests/${requests[index].id}'),
+          ),
           if (index != requests.length - 1)
             const SizedBox(height: CnpmSpacing.x3),
         ],
@@ -133,9 +148,10 @@ class _RequestList extends StatelessWidget {
 }
 
 class _RequestCard extends StatelessWidget {
-  const _RequestCard({required this.request});
+  const _RequestCard({required this.request, required this.onTap});
 
   final MemberRequest request;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -150,63 +166,78 @@ class _RequestCard extends StatelessWidget {
 
     return Semantics(
       container: true,
-      label: '${request.reference}, ${request.subject}, statut $statusLabel',
+      button: true,
+      label:
+          '${request.reference}, ${request.subject}, statut $statusLabel. Voir la conversation partagée.',
       child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(CnpmSpacing.x4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Wrap(
-                alignment: WrapAlignment.spaceBetween,
-                runSpacing: CnpmSpacing.x2,
-                spacing: CnpmSpacing.x3,
-                children: [
-                  Text(
-                    request.reference,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: CnpmColors.brandBlue,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  CnpmStatusBadge(label: statusLabel, tone: tone),
-                ],
-              ),
-              const SizedBox(height: CnpmSpacing.x3),
-              Text(
-                request.subject,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: CnpmSpacing.x2),
-              Text(
-                request.categoryLabel,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: CnpmColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: CnpmSpacing.x3),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.calendar_today_outlined,
-                    size: CnpmSpacing.x5,
-                    color: CnpmColors.textMuted,
-                  ),
-                  const SizedBox(width: CnpmSpacing.x2),
-                  Expanded(
-                    child: Text(
-                      'Créée le ${formatFrenchDate(request.createdOn)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: CnpmColors.textSecondary,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          key: Key('request-${request.id}'),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(CnpmSpacing.x4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  runSpacing: CnpmSpacing.x2,
+                  spacing: CnpmSpacing.x3,
+                  children: [
+                    Text(
+                      request.reference,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: CnpmColors.brandBlue,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
+                    CnpmStatusBadge(label: statusLabel, tone: tone),
+                  ],
+                ),
+                const SizedBox(height: CnpmSpacing.x3),
+                Text(
+                  request.subject,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: CnpmSpacing.x2),
+                Text(
+                  request.categoryLabel,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: CnpmColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: CnpmSpacing.x3),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.calendar_today_outlined,
+                      size: CnpmSpacing.x5,
+                      color: CnpmColors.textMuted,
+                    ),
+                    const SizedBox(width: CnpmSpacing.x2),
+                    Expanded(
+                      child: Text(
+                        'Créée le ${formatFrenchDate(request.createdOn)}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: CnpmColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: CnpmSpacing.x3),
+                Text(
+                  'Voir la conversation',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: CnpmColors.brandBlue,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

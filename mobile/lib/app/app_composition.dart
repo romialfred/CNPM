@@ -22,6 +22,9 @@ import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment_gateway.dart';
 import 'package:cnpm_mobile/features/payments/infrastructure/demo_member_payment_gateway.dart';
 import 'package:cnpm_mobile/features/payments/infrastructure/unavailable_member_payment_gateway.dart';
+import 'package:cnpm_mobile/features/requests/application/add_shared_request_message.dart';
+import 'package:cnpm_mobile/features/requests/application/create_member_request.dart';
+import 'package:cnpm_mobile/features/requests/application/load_member_request.dart';
 import 'package:cnpm_mobile/features/requests/application/load_member_requests.dart';
 import 'package:cnpm_mobile/features/requests/domain/member_request.dart';
 import 'package:cnpm_mobile/features/requests/domain/member_request_gateway.dart';
@@ -44,6 +47,9 @@ final class AppComposition {
     required this.receiptController,
     required this.loadMemberReceipt,
     required this.requestController,
+    required this.loadMemberRequest,
+    required this.createMemberRequest,
+    required this.addSharedRequestMessage,
   });
 
   factory AppComposition.create(AppConfig config) {
@@ -60,7 +66,7 @@ final class AppComposition {
         ? const DemoMemberPaymentGateway()
         : const UnavailableMemberPaymentGateway();
     final MemberRequestGateway requestGateway = config.isDemo
-        ? const DemoMemberRequestGateway()
+        ? DemoMemberRequestGateway()
         : const UnavailableMemberRequestGateway();
     final MemberReceiptGateway receiptGateway = config.isDemo
         ? const DemoMemberReceiptGateway()
@@ -93,6 +99,9 @@ final class AppComposition {
         load: LoadMemberRequests(requestGateway).call,
         isEmpty: (requests) => requests.isEmpty,
       ),
+      loadMemberRequest: LoadMemberRequest(requestGateway),
+      createMemberRequest: CreateMemberRequest(requestGateway),
+      addSharedRequestMessage: AddSharedRequestMessage(requestGateway),
     );
   }
 
@@ -104,6 +113,9 @@ final class AppComposition {
   final ContentController<MemberReceiptCollection> receiptController;
   final LoadMemberReceipt loadMemberReceipt;
   final ContentController<List<MemberRequest>> requestController;
+  final LoadMemberRequest loadMemberRequest;
+  final CreateMemberRequest createMemberRequest;
+  final AddSharedRequestMessage addSharedRequestMessage;
 
   void signOut() {
     dashboardController.reset();

@@ -7,6 +7,8 @@ Socle Flutter 3.44 pour l'expérience membre. Les lots livrés couvrent :
 - `MOB-003` — accueil membre sans KPI administratifs ni barème inventé ;
 - `MOB-008` — historique des paiements en lecture, sans confirmation fictive ;
 - `MOB-011` — liste des requêtes sans notes internes ni SLA inventé ;
+- `MOB-012` — création locale d’une requête fictive avec validation accessible et métadonnée de pièce sans téléversement ;
+- `MOB-013` — détail et conversation fictive limités aux échanges explicitement partagés ;
 - le routeur déclaratif et le shell membre responsive à cinq destinations.
 
 ## Architecture
@@ -45,8 +47,8 @@ flutter test --no-pub
 Les tests couvrent les validations, les erreurs neutres, le profil fermé, les
 états chargement/donnée/vide/erreur, les parcours authentifiés, la sémantique,
 les cibles tactiles, le reflow 360/390/430 et le zoom 200 %. Les goldens de
-`test/golden/goldens/` figent MOB-001, MOB-002, MOB-003, MOB-008 et MOB-011 à ces
-trois largeurs.
+`test/golden/goldens/` figent les écrans livrés, dont MOB-011, MOB-012 et MOB-013,
+à ces trois largeurs.
 
 ## Sources normatives
 

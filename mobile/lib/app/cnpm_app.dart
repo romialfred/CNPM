@@ -33,6 +33,9 @@ class _CnpmAppState extends State<CnpmApp> {
       receiptController: _composition.receiptController,
       loadMemberReceipt: _composition.loadMemberReceipt,
       requestController: _composition.requestController,
+      loadMemberRequest: _composition.loadMemberRequest,
+      createMemberRequest: _composition.createMemberRequest,
+      addSharedRequestMessage: _composition.addSharedRequestMessage,
       onSignOut: _composition.signOut,
     );
   }

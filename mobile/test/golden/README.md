@@ -1,6 +1,6 @@
-# Goldens MOB-001, MOB-002, MOB-003, MOB-004, MOB-005, MOB-008, MOB-009, MOB-010 et MOB-011
+# Goldens MOB-001 à MOB-005 et MOB-008 à MOB-013
 
-Les vingt-sept PNG couvrent les largeurs normatives 360, 390 et 430 px. Ils sont
+Les trente-trois PNG couvrent les largeurs normatives 360, 390 et 430 px. Ils sont
 produits par `flutter_test`, qui utilise la fonte Ahem déterministe : les glyphes
 sont volontairement représentés par des blocs pour stabiliser les différences de
 mise en page entre environnements. Les libellés réels sont contrôlés par les tests
@@ -13,5 +13,6 @@ flutter test --no-pub --update-goldens test/golden/auth_screens_golden_test.dart
 flutter test --no-pub --update-goldens test/golden/member_screens_golden_test.dart
 ```
 
-Ces goldens verrouillent le rendu technique. Leur promotion comme baseline UX
-reste soumise à la revue visuelle prévue par le handoff.
+Les baselines membre couvrent notamment MOB-011, MOB-012 et MOB-013 aux largeurs
+360, 390 et 430 px. Ces goldens verrouillent le rendu technique. Leur promotion
+comme baseline UX reste soumise à la revue visuelle prévue par le handoff.

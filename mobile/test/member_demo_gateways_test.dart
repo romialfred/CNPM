@@ -39,7 +39,7 @@ void main() {
   });
 
   test('MOB-011 utilise uniquement des requêtes fictives', () async {
-    final requests = await const DemoMemberRequestGateway().loadRequests();
+    final requests = await DemoMemberRequestGateway().loadRequests();
 
     expect(requests, isNotEmpty);
     expect(
