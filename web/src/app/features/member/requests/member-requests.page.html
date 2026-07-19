@@ -1,0 +1,238 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-requests" id="contenu-principal">
+    <cnpm-page-header
+      title="Mes requêtes"
+      description="Suivez vos demandes, réclamations, réponses partagées et délais cibles fictifs."
+    >
+      <cnpm-button routerLink="/member/requests/new" variant="primary">
+        Nouvelle requête
+      </cnpm-button>
+    </cnpm-page-header>
+
+    <cnpm-alert tone="warning" title="Démonstration — données 100 % fictives" [live]="false">
+      Aucun dossier réel n’est créé. Les références, statuts et dates cibles sont des scénarios non
+      contractuels ; aucune notification n’est envoyée.
+    </cnpm-alert>
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeFilter($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="member-requests__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <div class="member-requests__field member-requests__field--search">
+          <label for="member-request-search">Recherche</label>
+          <input
+            id="member-request-search"
+            type="search"
+            formControlName="search"
+            placeholder="Référence ou objet fictif"
+          />
+        </div>
+        <div class="member-requests__field">
+          <label for="member-request-status">Statut</label>
+          <select id="member-request-status" formControlName="status">
+            <option value="">Tous les statuts</option>
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ statusLabel(status) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-requests__field">
+          <label for="member-request-kind">Type</label>
+          <select id="member-request-kind" formControlName="kind">
+            <option value="">Tous les types</option>
+            @for (kind of kinds; track kind) {
+              <option [value]="kind">{{ kindLabel(kind) }}</option>
+            }
+          </select>
+        </div>
+        <div class="member-requests__field">
+          <label for="member-request-sort">Tri et ordre</label>
+          <select id="member-request-sort" formControlName="sortOption">
+            <option value="updatedAt:desc">Mise à jour — plus récente</option>
+            <option value="updatedAt:asc">Mise à jour — plus ancienne</option>
+            <option value="createdAt:desc">Création — plus récente</option>
+            <option value="createdAt:asc">Création — plus ancienne</option>
+            <option value="targetAt:asc">Date cible — croissante</option>
+            <option value="targetAt:desc">Date cible — décroissante</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <section class="member-requests__panel" aria-labelledby="member-requests-results-title">
+      <div class="member-requests__toolbar">
+        <div>
+          <h2 id="member-requests-results-title" #resultsTitle tabindex="-1">Dossiers fictifs</h2>
+          <p>Conversation partagée uniquement — aucune note interne n’est transmise.</p>
+        </div>
+        @if (data()) {
+          <p class="member-requests__count" aria-live="polite">
+            {{ totalItems() }} {{ totalItems() === 1 ? 'dossier fictif' : 'dossiers fictifs' }}
+          </p>
+        }
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <cnpm-skeleton
+            variant="table"
+            [rows]="pageSize()"
+            [columns]="columns.length"
+            label="Chargement des requêtes fictives…"
+          />
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Les requêtes n’ont pas pu être chargées"
+            description="La source de consultation est momentanément indisponible."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('unavailable') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Requêtes indisponibles en mode HTTP"
+            description="Le contrat OpenAPI expose seulement des ressources génériques et ne permet pas une projection membre sûre. Aucune fixture n’est injectée dans ce mode."
+          />
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="first-use"
+            title="Aucune requête fictive"
+            description="Créez un dossier local de démonstration pour parcourir le suivi membre."
+          >
+            <cnpm-button routerLink="/member/requests/new" variant="primary">
+              Créer une requête fictive
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('no-result') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucun dossier ne correspond"
+            description="Élargissez ou réinitialisez les filtres conservés dans l’adresse."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+              Réinitialiser les filtres
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('ready') {
+          <div class="member-requests__desktop-table">
+            <cnpm-data-table
+              caption="Requêtes et réclamations fictives : référence, objet, mise à jour, statut, délai cible et lien vers le détail."
+              [columns]="columns"
+              [rows]="requests()"
+              [rowKey]="rowKey"
+            >
+              <ng-template #row let-request>
+                <td class="cnpm-table__cell">
+                  <code>{{ request.reference }}</code>
+                  <span class="member-requests__secondary">{{ kindLabel(request.kind) }}</span>
+                </td>
+                <td class="cnpm-table__cell member-requests__subject">{{ request.subject }}</td>
+                <td class="cnpm-table__cell">
+                  <time [attr.datetime]="request.updatedAt">{{
+                    formatDate(request.updatedAt)
+                  }}</time>
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="statusTone(request.status)">
+                    {{ statusLabel(request.status) }}
+                  </cnpm-badge>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="member-requests__sla">
+                    <cnpm-badge [tone]="slaTone(request.slaState)">
+                      {{ slaLabel(request.slaState) }}
+                    </cnpm-badge>
+                    @if (request.targetAt) {
+                      <time [attr.datetime]="request.targetAt">{{
+                        formatDate(request.targetAt)
+                      }}</time>
+                    }
+                  </span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <a
+                    class="member-requests__detail-link"
+                    [routerLink]="['/member/requests', request.id]"
+                    [queryParams]="detailQueryParams()"
+                    [attr.aria-label]="'Consulter le dossier ' + request.reference"
+                  >
+                    Consulter
+                  </a>
+                </td>
+              </ng-template>
+            </cnpm-data-table>
+          </div>
+
+          <ol class="member-requests__mobile-list" aria-label="Requêtes et réclamations fictives">
+            @for (request of requests(); track request.id) {
+              <li>
+                <article [attr.aria-labelledby]="'member-request-' + request.id">
+                  <header>
+                    <div>
+                      <h3 [id]="'member-request-' + request.id">{{ request.reference }}</h3>
+                      <p>{{ kindLabel(request.kind) }}</p>
+                    </div>
+                    <cnpm-badge [tone]="statusTone(request.status)">
+                      {{ statusLabel(request.status) }}
+                    </cnpm-badge>
+                  </header>
+                  <p class="member-requests__card-subject">{{ request.subject }}</p>
+                  <dl>
+                    <div>
+                      <dt>Mise à jour</dt>
+                      <dd>{{ formatDate(request.updatedAt) }}</dd>
+                    </div>
+                    <div>
+                      <dt>Délai</dt>
+                      <dd>
+                        {{ slaLabel(request.slaState) }}
+                        @if (request.targetAt) {
+                          <span>{{ formatDate(request.targetAt) }}</span>
+                        }
+                      </dd>
+                    </div>
+                  </dl>
+                  <a
+                    class="member-requests__detail-link"
+                    [routerLink]="['/member/requests', request.id]"
+                    [queryParams]="detailQueryParams()"
+                    [attr.aria-label]="'Consulter le dossier ' + request.reference"
+                  >
+                    Consulter le détail
+                  </a>
+                </article>
+              </li>
+            }
+          </ol>
+        }
+      }
+
+      @if (state() === 'ready') {
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    </section>
+  </main>
+</cnpm-member-portal-shell>

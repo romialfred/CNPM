@@ -1,0 +1,343 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-request-detail" id="contenu-principal">
+    <a
+      class="member-request-detail__back"
+      routerLink="/member/requests"
+      [queryParams]="listQueryParams()"
+    >
+      ← Retour à mes requêtes
+    </a>
+
+    <cnpm-page-header
+      title="Détail de la requête"
+      description="Consultez le dossier, le délai cible fictif et les échanges partagés."
+    />
+
+    <cnpm-alert tone="warning" title="Démonstration — dossier non contractuel" [live]="false">
+      Les références, dates et réponses sont fictives. Aucun échange n’est envoyé à la CNPM et
+      aucune pièce n’est stockée.
+    </cnpm-alert>
+
+    @switch (state()) {
+      @case ('loading') {
+        <section class="member-request-detail__loading" aria-label="Chargement du dossier fictif">
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la requête fictive…" />
+          <cnpm-skeleton variant="card" [rows]="4" label="" />
+        </section>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="Le dossier n’a pas pu être chargé"
+          description="La source locale est momentanément indisponible."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="Détail indisponible en mode HTTP"
+          description="Aucune projection typée du dossier, de ses réponses et de ses pièces demandées n’est publiée dans OpenAPI."
+        />
+      }
+      @case ('not-found') {
+        <cnpm-error-state
+          variant="not-found"
+          titleAs="h2"
+          title="Requête introuvable"
+          description="Ce dossier n’existe pas dans la projection membre fictive."
+        >
+          <cnpm-button variant="secondary" routerLink="/member/requests">
+            Revenir à la liste
+          </cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (detail(); as request) {
+          @if (createdLocally()) {
+            <cnpm-alert tone="success" title="Accusé fictif créé localement">
+              Dossier <strong>{{ request.reference }}</strong
+              >, enregistré dans la mémoire de cette démonstration le
+              {{ formatDate(request.createdAt) }}. Délai cible fictif :
+              {{ formatDate(request.targetAt) }}. Aucun accusé officiel n’est émis.
+            </cnpm-alert>
+          }
+
+          <section class="member-request-detail__summary" aria-labelledby="request-summary-title">
+            <header>
+              <div>
+                <p class="member-request-detail__eyebrow">Référence fictive</p>
+                <h2 id="request-summary-title">{{ request.reference }}</h2>
+                <p>{{ request.subject }}</p>
+              </div>
+              <div class="member-request-detail__badges">
+                <cnpm-badge [tone]="statusTone(request.status)">
+                  {{ statusLabel(request.status) }}
+                </cnpm-badge>
+                <cnpm-badge [tone]="slaTone(request.slaState)">
+                  {{ slaLabel(request.slaState) }}
+                </cnpm-badge>
+              </div>
+            </header>
+
+            <dl class="member-request-detail__facts">
+              <div>
+                <dt>Type</dt>
+                <dd>{{ kindLabel(request.kind) }}</dd>
+              </div>
+              <div>
+                <dt>Catégorie</dt>
+                <dd>{{ categoryLabel(request.category) }}</dd>
+              </div>
+              <div>
+                <dt>Créé le</dt>
+                <dd>{{ formatDate(request.createdAt) }}</dd>
+              </div>
+              <div>
+                <dt>Mis à jour le</dt>
+                <dd>{{ formatDate(request.updatedAt) }}</dd>
+              </div>
+              <div>
+                <dt>Délai cible fictif</dt>
+                <dd>{{ formatDate(request.targetAt) }}</dd>
+              </div>
+            </dl>
+
+            <div class="member-request-detail__description">
+              <h3>Demande initiale</h3>
+              <p>{{ request.description }}</p>
+            </div>
+          </section>
+
+          <div class="member-request-detail__layout">
+            <section class="member-request-detail__card" aria-labelledby="conversation-title">
+              <div class="member-request-detail__section-head">
+                <div>
+                  <h2 id="conversation-title" #conversationTitle tabindex="-1">
+                    Conversation partagée
+                  </h2>
+                  <p>Du plus ancien au plus récent.</p>
+                </div>
+                <cnpm-badge tone="neutral">{{ request.conversation.length }} échanges</cnpm-badge>
+              </div>
+
+              <cnpm-alert tone="info" title="Séparation des informations" [live]="false">
+                Cette projection reçoit uniquement les messages partagés. Les notes réservées aux
+                agents ne sont jamais transmises à l’espace membre.
+              </cnpm-alert>
+
+              <ol class="member-request-detail__conversation" aria-label="Échanges partagés">
+                @for (message of request.conversation; track message.id) {
+                  <li [class.member-request-detail__message--member]="message.sender === 'MEMBER'">
+                    <article>
+                      <header>
+                        <strong>{{ message.authorLabel }}</strong>
+                        <time [attr.datetime]="message.createdAt">
+                          {{ formatDate(message.createdAt) }}
+                        </time>
+                      </header>
+                      <p>{{ message.body }}</p>
+                      @if (message.attachments.length > 0) {
+                        <ul aria-label="Métadonnées de pièces simulées du message">
+                          @for (attachment of message.attachments; track attachment.id) {
+                            <li>
+                              <strong>{{ attachment.fileName }}</strong>
+                              <span>
+                                {{ formatAttachmentSize(attachment.sizeBytes) }} — métadonnée
+                                locale, non téléchargeable
+                              </span>
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </article>
+                  </li>
+                }
+              </ol>
+
+              @if (canReply()) {
+                <form
+                  class="member-request-detail__reply"
+                  [formGroup]="replyForm"
+                  (ngSubmit)="sendReply()"
+                  novalidate
+                >
+                  <h3>Ajouter un message fictif</h3>
+                  <p>Aucun message ni fichier ne quitte ce navigateur.</p>
+
+                  @if (replyError()) {
+                    <cnpm-alert tone="error" title="Message non ajouté">{{
+                      replyError()
+                    }}</cnpm-alert>
+                  }
+                  @if (replySuccess()) {
+                    <p class="member-request-detail__success" role="status" aria-live="polite">
+                      {{ replySuccess() }}
+                    </p>
+                  }
+
+                  <div class="member-request-detail__field">
+                    <label for="member-request-reply">Message <span>— obligatoire</span></label>
+                    <textarea
+                      id="member-request-reply"
+                      formControlName="body"
+                      rows="5"
+                      maxlength="2000"
+                      [attr.aria-invalid]="replySubmitted() && replyForm.controls.body.invalid"
+                      aria-describedby="member-request-reply-help member-request-reply-error"
+                    ></textarea>
+                    <p id="member-request-reply-help" class="member-request-detail__help">
+                      De 5 à 2 000 caractères. Utilisez uniquement des données fictives.
+                    </p>
+                    @if (replySubmitted() && replyForm.controls.body.invalid) {
+                      <p id="member-request-reply-error" class="member-request-detail__error">
+                        @if (replyForm.controls.body.hasError('required')) {
+                          Saisissez un message.
+                        } @else if (replyForm.controls.body.hasError('maxlength')) {
+                          Limitez le message à 2 000 caractères.
+                        } @else if (replyForm.controls.body.hasError('minlengthTrimmed')) {
+                          Saisissez au moins 5 caractères.
+                        }
+                      </p>
+                    } @else {
+                      <span id="member-request-reply-error"></span>
+                    }
+                  </div>
+
+                  <div class="member-request-detail__field">
+                    <label for="member-request-reply-files">Pièces simulées facultatives</label>
+                    <input
+                      #replyFiles
+                      id="member-request-reply-files"
+                      type="file"
+                      accept=".pdf,.png,.jpg,.jpeg"
+                      multiple
+                      aria-describedby="member-request-reply-files-help member-request-reply-files-error"
+                      (change)="selectFiles(replyFiles)"
+                    />
+                    <p id="member-request-reply-files-help" class="member-request-detail__help">
+                      {{ attachments().length }} / {{ maxAttachments }} métadonnées ; aucun upload,
+                      stockage ou scan antivirus.
+                    </p>
+                    @if (attachmentError()) {
+                      <p
+                        id="member-request-reply-files-error"
+                        class="member-request-detail__error"
+                        role="alert"
+                      >
+                        {{ attachmentError() }}
+                      </p>
+                    } @else {
+                      <span id="member-request-reply-files-error"></span>
+                    }
+                  </div>
+
+                  @if (attachments().length > 0) {
+                    <ul
+                      class="member-request-detail__reply-attachments"
+                      aria-label="Pièces simulées du nouveau message"
+                    >
+                      @for (attachment of attachments(); track attachment.id) {
+                        <li>
+                          <span>
+                            <strong>{{ attachment.fileName }}</strong>
+                            <small
+                              >{{ formatAttachmentSize(attachment.sizeBytes) }} — non
+                              téléversé</small
+                            >
+                          </span>
+                          <button
+                            type="button"
+                            (click)="removeAttachment(attachment.id)"
+                            [attr.aria-label]="'Retirer la pièce simulée ' + attachment.fileName"
+                          >
+                            Retirer
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+
+                  <cnpm-button
+                    type="submit"
+                    variant="primary"
+                    [loading]="replying()"
+                    [disabled]="replying()"
+                  >
+                    Ajouter localement
+                  </cnpm-button>
+                </form>
+              } @else {
+                <cnpm-alert tone="info" title="Conversation en lecture seule" [live]="false">
+                  Répondre rouvrirait ce dossier. Le délai et le motif de réouverture ne sont pas
+                  définis ; aucune action n’est proposée (REQ-006).
+                </cnpm-alert>
+              }
+            </section>
+
+            <aside class="member-request-detail__side" aria-label="Suivi et pièces demandées">
+              <section
+                class="member-request-detail__card"
+                aria-labelledby="requested-documents-title"
+              >
+                <div class="member-request-detail__section-head">
+                  <div>
+                    <h2 id="requested-documents-title">Pièces demandées</h2>
+                    <p>État fourni par la fixture, sans GED.</p>
+                  </div>
+                </div>
+                @if (request.requestedDocuments.length === 0) {
+                  <p class="member-request-detail__muted">
+                    Aucune pièce fictive n’est demandée pour ce dossier.
+                  </p>
+                } @else {
+                  <ul class="member-request-detail__requested-documents">
+                    @for (document of request.requestedDocuments; track document.id) {
+                      <li>
+                        <strong>{{ document.label }}</strong>
+                        <cnpm-badge [tone]="document.state === 'REQUESTED' ? 'warning' : 'success'">
+                          {{ requestedDocumentLabel(document.state) }}
+                        </cnpm-badge>
+                      </li>
+                    }
+                  </ul>
+                }
+                <p class="member-request-detail__help">
+                  Aucun téléchargement ni dépôt réel n’est disponible dans cette démonstration.
+                </p>
+              </section>
+
+              <section class="member-request-detail__card" aria-labelledby="sla-detail-title">
+                <h2 id="sla-detail-title">Suivi du délai fictif</h2>
+                <cnpm-badge [tone]="slaTone(request.slaState)">
+                  {{ slaLabel(request.slaState) }}
+                </cnpm-badge>
+                <dl class="member-request-detail__side-facts">
+                  <div>
+                    <dt>Date cible fournie</dt>
+                    <dd>{{ formatDate(request.targetAt) }}</dd>
+                  </div>
+                  <div>
+                    <dt>Dernière mise à jour</dt>
+                    <dd>{{ formatDate(request.updatedAt) }}</dd>
+                  </div>
+                </dl>
+                <p class="member-request-detail__help">
+                  Ce délai ne constitue aucun engagement de service CNPM.
+                </p>
+              </section>
+            </aside>
+          </div>
+        }
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

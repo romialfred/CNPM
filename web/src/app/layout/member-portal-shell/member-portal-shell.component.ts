@@ -50,7 +50,12 @@ export class MemberPortalShellComponent {
     },
     { label: 'Paiements', mobileLabel: 'Paiements', route: null, icon: 'payments' },
     { label: 'Reçus', mobileLabel: 'Reçus', route: null, icon: 'receipts' },
-    { label: 'Requêtes', mobileLabel: 'Requêtes', route: null, icon: 'requests' },
+    {
+      label: 'Requêtes',
+      mobileLabel: 'Requêtes',
+      route: '/member/requests',
+      icon: 'requests',
+    },
     { label: 'Documents', mobileLabel: 'Documents', route: null, icon: 'receipts' },
     { label: 'Avantages', mobileLabel: 'Avantages', route: null, icon: 'profile' },
   ];

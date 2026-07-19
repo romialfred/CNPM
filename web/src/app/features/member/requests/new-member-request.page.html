@@ -1,0 +1,218 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="new-member-request" id="contenu-principal">
+    <a class="new-member-request__back" routerLink="/member/requests">← Retour à mes requêtes</a>
+
+    <cnpm-page-header
+      title="Nouvelle requête"
+      description="Préparez un dossier fictif local pour tester le parcours membre."
+    />
+
+    @if (!demoMode) {
+      <cnpm-error-state
+        variant="recoverable"
+        titleAs="h2"
+        title="Création indisponible en mode HTTP"
+        description="Le contrat OpenAPI utilise un ResourceInput générique. Aucun formulaire ne lui est raccordé tant qu’un schéma métier typé n’est pas publié."
+      />
+    } @else {
+      <cnpm-alert
+        tone="warning"
+        title="Simulation locale — aucune soumission réelle"
+        [live]="false"
+      >
+        Le numéro de dossier, l’accusé et le délai cible seront fictifs. Aucun appel réseau,
+        stockage GED, analyse antivirus ou notification n’est effectué.
+      </cnpm-alert>
+
+      <form class="new-member-request__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <cnpm-inline-error-summary [errors]="formErrors()" />
+
+        @if (submitError()) {
+          <cnpm-alert tone="error" title="Création impossible">{{ submitError() }}</cnpm-alert>
+        }
+
+        <section class="new-member-request__card" aria-labelledby="new-request-details-title">
+          <div class="new-member-request__section-head">
+            <div>
+              <h2 id="new-request-details-title">Votre demande fictive</h2>
+              <p>Les champs obligatoires sont signalés par « obligatoire ».</p>
+            </div>
+            <span>Étape unique</span>
+          </div>
+
+          <div class="new-member-request__grid">
+            <div class="new-member-request__field">
+              <label for="new-request-kind">Type <span>— obligatoire</span></label>
+              <select
+                id="new-request-kind"
+                formControlName="kind"
+                [attr.aria-invalid]="submitted() && form.controls.kind.invalid"
+                aria-describedby="new-request-kind-error"
+              >
+                <option value="">Sélectionner un type</option>
+                <option value="REQUEST">Requête fictive</option>
+                <option value="CLAIM">Réclamation fictive</option>
+              </select>
+              @if (submitted() && form.controls.kind.invalid) {
+                <p id="new-request-kind-error" class="new-member-request__error">
+                  Choisissez le type de dossier.
+                </p>
+              } @else {
+                <span id="new-request-kind-error"></span>
+              }
+            </div>
+
+            <div class="new-member-request__field">
+              <label for="new-request-category">Catégorie <span>— obligatoire</span></label>
+              <select
+                id="new-request-category"
+                formControlName="category"
+                [attr.aria-invalid]="submitted() && form.controls.category.invalid"
+                aria-describedby="new-request-category-help new-request-category-error"
+              >
+                <option value="">Sélectionner une catégorie</option>
+                @for (category of categories; track category) {
+                  <option [value]="category">{{ categoryLabel(category) }}</option>
+                }
+              </select>
+              <p id="new-request-category-help" class="new-member-request__help">
+                Taxonomie fictive, sans valeur institutionnelle.
+              </p>
+              @if (submitted() && form.controls.category.invalid) {
+                <p id="new-request-category-error" class="new-member-request__error">
+                  Choisissez une catégorie fictive.
+                </p>
+              } @else {
+                <span id="new-request-category-error"></span>
+              }
+            </div>
+
+            <div class="new-member-request__field new-member-request__field--wide">
+              <label for="new-request-subject">Objet <span>— obligatoire</span></label>
+              <input
+                id="new-request-subject"
+                formControlName="subject"
+                maxlength="160"
+                [attr.aria-invalid]="submitted() && form.controls.subject.invalid"
+                aria-describedby="new-request-subject-help new-request-subject-error"
+              />
+              <p id="new-request-subject-help" class="new-member-request__help">
+                160 caractères maximum.
+              </p>
+              @if (submitted() && form.controls.subject.invalid) {
+                <p id="new-request-subject-error" class="new-member-request__error">
+                  @if (form.controls.subject.hasError('maxlength')) {
+                    Limitez l’objet à 160 caractères.
+                  } @else {
+                    Saisissez un objet.
+                  }
+                </p>
+              } @else {
+                <span id="new-request-subject-error"></span>
+              }
+            </div>
+
+            <div class="new-member-request__field new-member-request__field--wide">
+              <label for="new-request-description">Description <span>— obligatoire</span></label>
+              <textarea
+                id="new-request-description"
+                formControlName="description"
+                rows="7"
+                maxlength="2000"
+                [attr.aria-invalid]="submitted() && form.controls.description.invalid"
+                aria-describedby="new-request-description-help new-request-description-error"
+              ></textarea>
+              <p id="new-request-description-help" class="new-member-request__help">
+                De 20 à 2 000 caractères. N’indiquez aucune donnée réelle dans cette démonstration.
+              </p>
+              @if (submitted() && form.controls.description.invalid) {
+                <p id="new-request-description-error" class="new-member-request__error">
+                  @if (form.controls.description.hasError('maxlength')) {
+                    Limitez la description à 2 000 caractères.
+                  } @else if (form.controls.description.hasError('minlengthTrimmed')) {
+                    Décrivez la demande en au moins 20 caractères.
+                  } @else {
+                    Décrivez votre demande.
+                  }
+                </p>
+              } @else {
+                <span id="new-request-description-error"></span>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="new-member-request__card" aria-labelledby="new-request-attachments-title">
+          <div class="new-member-request__section-head">
+            <div>
+              <h2 id="new-request-attachments-title">Pièces simulées</h2>
+              <p>Seules les métadonnées locales sont affichées ; le contenu n’est jamais lu.</p>
+            </div>
+            <span>{{ attachments().length }} / {{ maxAttachments }}</span>
+          </div>
+
+          <div class="new-member-request__upload">
+            <label for="new-request-attachments">Choisir des fichiers de démonstration</label>
+            <input
+              #fileInput
+              id="new-request-attachments"
+              type="file"
+              accept=".pdf,.png,.jpg,.jpeg"
+              multiple
+              aria-describedby="new-request-attachments-help new-request-attachments-error"
+              (change)="selectFiles(fileInput)"
+            />
+            <p id="new-request-attachments-help" class="new-member-request__help">
+              PDF, PNG, JPG ou JPEG ; 5 Mo maximum par fichier ; trois métadonnées maximum. Aucun
+              upload, stockage, scan antivirus ou téléchargement ultérieur.
+            </p>
+            @if (attachmentError()) {
+              <p id="new-request-attachments-error" class="new-member-request__error" role="alert">
+                {{ attachmentError() }}
+              </p>
+            } @else {
+              <span id="new-request-attachments-error"></span>
+            }
+          </div>
+
+          @if (attachments().length > 0) {
+            <ul class="new-member-request__attachments" aria-label="Métadonnées de pièces simulées">
+              @for (attachment of attachments(); track attachment.id) {
+                <li>
+                  <span>
+                    <strong>{{ attachment.fileName }}</strong>
+                    <small>{{ formatAttachmentSize(attachment.sizeBytes) }} — non téléversé</small>
+                  </span>
+                  <button
+                    type="button"
+                    (click)="removeAttachment(attachment.id)"
+                    [attr.aria-label]="'Retirer la pièce simulée ' + attachment.fileName"
+                  >
+                    Retirer
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <div class="new-member-request__actions">
+          <cnpm-button
+            type="submit"
+            variant="primary"
+            [loading]="submitting()"
+            [disabled]="submitting()"
+          >
+            Créer le dossier fictif
+          </cnpm-button>
+          <cnpm-button routerLink="/member/requests" variant="secondary">Annuler</cnpm-button>
+        </div>
+      </form>
+    }
+  </main>
+</cnpm-member-portal-shell>

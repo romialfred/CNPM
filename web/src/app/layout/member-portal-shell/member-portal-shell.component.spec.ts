@@ -16,6 +16,7 @@ describe('MemberPortalShellComponent', () => {
         provideRouter([
           { path: 'member/home', children: [] },
           { path: 'member/contributions', children: [] },
+          { path: 'member/requests', children: [] },
         ]),
       ],
     }).compileComponents();
@@ -35,8 +36,8 @@ describe('MemberPortalShellComponent', () => {
   });
 
   it('ne transforme pas les destinations absentes en liens morts', () => {
-    expect(host.querySelectorAll('nav a')).toHaveLength(4);
-    expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(8);
+    expect(host.querySelectorAll('nav a')).toHaveLength(6);
+    expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(6);
     expect(host.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
   });
 

@@ -5,9 +5,13 @@ import { DemoMemberContributionsGateway } from './contributions/demo-member-cont
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
 import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
+import { DemoMemberRequestsGateway } from './requests/demo-member-requests.gateway';
+import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
+import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
 import {
   UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
+  UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
 } from './unavailable-member-gateways';
 
 /**
@@ -61,6 +65,45 @@ export const memberRoutes: Routes = [
             (module) => module.MemberContributionDetailPage,
           ),
         title: 'Détail de la cotisation — CNPM',
+      },
+    ],
+  },
+  {
+    path: 'requests',
+    providers: [
+      DemoMemberRequestsGateway,
+      {
+        provide: MEMBER_REQUESTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberRequestsGateway)
+            : UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
+      },
+    ],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./requests/member-requests.page').then((module) => module.MemberRequestsPage),
+        title: 'Mes requêtes — CNPM',
+      },
+      {
+        path: 'new',
+        canDeactivate: [pendingMemberRequestChangesGuard],
+        loadComponent: () =>
+          import('./requests/new-member-request.page').then(
+            (module) => module.NewMemberRequestPage,
+          ),
+        title: 'Nouvelle requête — CNPM',
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./requests/member-request-detail.page').then(
+            (module) => module.MemberRequestDetailPage,
+          ),
+        title: 'Détail de la requête — CNPM',
       },
     ],
   },
