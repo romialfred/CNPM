@@ -437,6 +437,15 @@
     padding: var(--cnpm-space-3);
   }
 
+  .cnpm-member__identity {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cnpm-member__identity-actions {
+    align-self: center;
+  }
+
   .cnpm-member__identity-text {
     gap: var(--cnpm-space-2);
   }

@@ -342,18 +342,16 @@ export class MemberDetailPage {
       { label: 'NIF', value: profile.nif ?? MISSING },
       { label: 'Secteur d’activité', value: identity.sector },
       { label: 'Taille de l’entreprise', value: profile.employeeRange ?? MISSING },
-      { label: 'Forme juridique', value: identity.legalForm },
+      { label: 'Date d’adhésion', value: this.formatDay(profile.joinedOn) },
       { label: 'Région', value: identity.region },
       { label: 'Adresse', value: identity.address },
     ];
     // Les coordonnées sont masquées quand le rôle ne les autorise pas : la fiche
     // l'exige. Le backend reste seul juge — ce masquage n'est qu'un confort.
     if (permissions.canViewContacts) {
-      facts.push(
-        { label: 'Téléphone', value: profile.phone ?? MISSING },
-        { label: 'Courriel', value: profile.email ?? MISSING },
-        { label: 'Site web', value: profile.website ?? MISSING },
-      );
+      const phone = profile.phone ?? MISSING;
+      const email = profile.email ?? MISSING;
+      facts.push({ label: 'Contacts', value: `${phone} · ${email}` });
     }
     return facts;
   });

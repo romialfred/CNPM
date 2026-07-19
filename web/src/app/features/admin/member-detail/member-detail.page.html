@@ -88,6 +88,13 @@
                     @if (member.identity.isLargeContributor) {
                       <cnpm-badge tone="neutral">Grand cotisant</cnpm-badge>
                     }
+                    <cnpm-verification-badge
+                      [status]="member.identity.verification"
+                      [explanation]="verificationExplanation"
+                      [verifiedAt]="
+                        member.identity.verifiedAt ? formatDay(member.identity.verifiedAt) : null
+                      "
+                    />
                   </div>
 
                   <dl class="cnpm-member__meta">
@@ -104,14 +111,6 @@
                       <dd>{{ member.identity.group }}</dd>
                     </div>
                   </dl>
-
-                  <cnpm-verification-badge
-                    [status]="member.identity.verification"
-                    [explanation]="verificationExplanation"
-                    [verifiedAt]="
-                      member.identity.verifiedAt ? formatDay(member.identity.verifiedAt) : null
-                    "
-                  />
                 </div>
 
                 <!-- Les commandes non câblées annoncent leur indisponibilité plutôt que
@@ -270,7 +269,10 @@
                     }
 
                     <div class="cnpm-member__overview-grid">
-                      <section class="cnpm-member__card" aria-labelledby="historique-synthese-titre">
+                      <section
+                        class="cnpm-member__card"
+                        aria-labelledby="historique-synthese-titre"
+                      >
                         <h2 class="cnpm-member__card-title" id="historique-synthese-titre">
                           Historique et timeline
                         </h2>
@@ -307,7 +309,10 @@
                               </tr>
                             </thead>
                             <tbody>
-                              @for (payment of member.payments.slice(0, 5); track payment.reference) {
+                              @for (
+                                payment of member.payments.slice(0, 5);
+                                track payment.reference
+                              ) {
                                 <tr>
                                   <td>{{ payment.paidAt | date: 'dd/MM/yyyy' }}</td>
                                   <td>{{ payment.period }}</td>
@@ -316,7 +321,9 @@
                                   </td>
                                   <td>
                                     @if (payment.receipt) {
-                                      <span class="cnpm-member__reference">{{ payment.receipt }}</span>
+                                      <span class="cnpm-member__reference">{{
+                                        payment.receipt
+                                      }}</span>
                                     } @else {
                                       <span class="cnpm-member__missing">Non émis</span>
                                     }
@@ -339,7 +346,9 @@
                                 <p class="cnpm-member__strong">{{ document.title }}</p>
                                 <p class="cnpm-member__card-note">
                                   {{ document.kind }}
-                                  @if (document.sizeLabel) { — {{ document.sizeLabel }} }
+                                  @if (document.sizeLabel) {
+                                    — {{ document.sizeLabel }}
+                                  }
                                 </p>
                               </div>
                               <cnpm-badge [tone]="documentStatusTone(document.status)">
@@ -351,7 +360,10 @@
                       </section>
                     </div>
 
-                    <section class="cnpm-member__card cnpm-member__agent" aria-labelledby="agent-titre">
+                    <section
+                      class="cnpm-member__card cnpm-member__agent"
+                      aria-labelledby="agent-titre"
+                    >
                       <h2 class="cnpm-member__card-title" id="agent-titre">Agent affecté</h2>
                       @if (member.agent; as agent) {
                         <p class="cnpm-member__strong">{{ agent.name }}</p>
