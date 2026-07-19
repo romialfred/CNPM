@@ -16,7 +16,7 @@
   width: 100%;
   max-width: var(--cnpm-size-publicMax);
   margin: 0 auto;
-  padding-inline: var(--cnpm-layout-pagePaddingDesktop);
+  padding-inline: var(--cnpm-public-gutter);
 }
 
 .cnpm-public__contact-inner {
@@ -95,37 +95,46 @@
   outline-color: var(--cnpm-color-text-inverse);
 }
 
+/* La marque occupe une colonne large, puis les quatre menus de l'en-tete se rangent
+   en colonnes egales : le pied de page se lit comme la navigation, pas comme une
+   liste a plat. */
 .cnpm-public__footer-main {
   display: grid;
-  grid-template-columns: 1.25fr 0.7fr 1fr 1fr;
+  grid-template-columns: minmax(15rem, 1.5fr) repeat(4, minmax(0, 1fr));
   gap: var(--cnpm-space-10);
   padding-block: var(--cnpm-space-12);
 }
 
 .cnpm-public__footer-brand,
-.cnpm-public__footer-nav,
-.cnpm-public__footer-access,
-.cnpm-public__footer-pending {
+.cnpm-public__footer-column {
   min-width: 0;
 }
 
-.cnpm-public__footer-logo-frame {
-  inline-size: 10rem;
-  block-size: 4.5rem;
-}
-
-.cnpm-public__footer-logo {
-  inset-block-start: -1.65rem;
-  inline-size: 10rem;
-}
-
-.cnpm-public__footer-brand p,
-.cnpm-public__footer-access p,
-.cnpm-public__footer-pending p {
+/* Les surcharges de rognage heritees de l'ancien cadre imposaient une largeur de
+   10 rem a un logo haut de 4,5 rem : le lockup y etait etire d'un facteur 1,65.
+   La regle commune de la coquille (hauteur fixe, largeur libre) suffit. */
+.cnpm-public__footer-brand p {
   margin: var(--cnpm-space-3) 0 0;
   color: var(--cnpm-color-text-secondary);
   font-size: var(--cnpm-font-size-sm);
   line-height: var(--cnpm-font-lineHeight-sm);
+}
+
+.cnpm-public__footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  min-height: var(--cnpm-size-control-lg);
+  margin-block-start: var(--cnpm-space-5);
+  padding-inline: var(--cnpm-space-4);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  text-decoration: none;
+}
+
+.cnpm-public__footer-cta:hover {
+  background: var(--cnpm-color-brand-blue-800);
 }
 
 .cnpm-public__footer-title {
@@ -137,7 +146,7 @@
   text-transform: uppercase;
 }
 
-.cnpm-public__footer-nav ul {
+.cnpm-public__footer-column ul {
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-2);
@@ -146,21 +155,11 @@
   list-style: none;
 }
 
-.cnpm-public__footer-main a {
+.cnpm-public__footer-main a:not(.cnpm-public__footer-cta) {
   color: var(--cnpm-color-text-link);
   font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-semibold);
   text-underline-offset: var(--cnpm-space-1);
-}
-
-.cnpm-public__footer-access a {
-  display: inline-block;
-  margin-block-start: var(--cnpm-space-4);
-}
-
-.cnpm-public__footer-pending a {
-  display: block;
-  margin-block-start: var(--cnpm-space-2);
 }
 
 .cnpm-public__legal-bar {

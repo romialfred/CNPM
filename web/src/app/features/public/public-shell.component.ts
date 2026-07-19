@@ -260,54 +260,40 @@ export interface PublicFooterContact {
               Une union de groupements d'employeurs au service des entreprises et du développement
               économique du Mali.
             </p>
+            <a class="cnpm-public__footer-cta" routerLink="/auth/login">
+              <svg lucideLogIn [size]="iconSize.compact" aria-hidden="true"></svg>
+              Accéder au portail membre
+            </a>
           </section>
 
-          <nav class="cnpm-public__footer-nav" aria-label="Navigation du pied de page">
-            <h2 class="cnpm-public__footer-title">Parcourir</h2>
-            <ul>
-              <li><a routerLink="/">Accueil</a></li>
-              @for (group of navigation; track group.id) {
+          <!-- Le pied de page reprend exactement les quatre menus de l'en-tête. Il portait
+               auparavant une liste « Parcourir » à plat de dix liens, doublée par un bloc
+               « Information publique » qui reprenait déjà deux entrées de Services. -->
+          @for (group of navigation; track group.id) {
+            <nav class="cnpm-public__footer-column" [attr.aria-labelledby]="'pied-' + group.id">
+              <h2 class="cnpm-public__footer-title" [id]="'pied-' + group.id">
+                {{ group.label }}
+              </h2>
+              <ul>
                 @for (item of group.items; track item.routerLink) {
                   <li>
                     <a [routerLink]="item.routerLink">{{ item.label }}</a>
                   </li>
                 }
-              }
-            </ul>
-          </nav>
-
-          <section class="cnpm-public__footer-access" aria-labelledby="pied-acces">
-            <h2 class="cnpm-public__footer-title" id="pied-acces">Accès membre</h2>
-            <p>
-              Cotisations, reçus, requêtes et services numériques sont accessibles après connexion.
-            </p>
-            <a routerLink="/auth/login">Se connecter au portail</a>
-          </section>
-
-          <section class="cnpm-public__footer-pending" aria-labelledby="pied-information">
-            <h2 class="cnpm-public__footer-title" id="pied-information">Information publique</h2>
-            <p>
-              Préparez votre demande d’adhésion en ligne et vérifiez l’authenticité d’un reçu de
-              cotisation à partir de son code.
-            </p>
-            <a routerLink="/adhesion">Préparer une demande d’adhésion</a>
-            <a routerLink="/verification/DEMO-VERIF-2026-001">Vérifier un reçu</a>
-          </section>
+              </ul>
+            </nav>
+          }
         </div>
 
         <div class="cnpm-public__legal-bar">
           <p>
-            <abbr title="Conseil National du Patronat du Mali">CNPM</abbr> © 2026 — Tous droits
-            réservés.
+            <abbr title="Conseil National du Patronat du Mali">CNPM</abbr> © {{ currentYear }} —
+            Tous droits réservés.
           </p>
-          <ul aria-label="Statut des documents légaux non publiés">
-            <li><a routerLink="/legal/mentions-legales">Statut des mentions légales</a></li>
-            <li><a routerLink="/legal/confidentialite">Statut de la confidentialité</a></li>
-            <li>
-              <a routerLink="/legal/conditions-utilisation">
-                Statut des conditions d'utilisation
-              </a>
-            </li>
+          <ul aria-label="Informations légales">
+            <li><a routerLink="/legal/mentions-legales">Mentions légales</a></li>
+            <li><a routerLink="/legal/confidentialite">Confidentialité</a></li>
+            <li><a routerLink="/legal/conditions-utilisation">Conditions d’utilisation</a></li>
           </ul>
         </div>
       </footer>
@@ -321,6 +307,13 @@ export class PublicShellComponent {
 
   protected readonly navigation = PUBLIC_NAVIGATION;
   protected readonly iconSize = CNPM_ICON_SIZE;
+  /**
+   * Année du copyright, lue à l'affichage.
+   *
+   * Elle était écrite en dur : le pied de page aurait annoncé 2026 indéfiniment, ce qui
+   * se remarque immédiatement sur un site institutionnel.
+   */
+  protected readonly currentYear = new Date().getFullYear();
   protected readonly menuOpen = signal(false);
 
   private readonly document = inject(DOCUMENT);

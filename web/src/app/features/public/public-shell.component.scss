@@ -1,4 +1,11 @@
 .cnpm-public {
+  /* Gouttière latérale du site public.
+     Le contenu est plafonné à `publicMax` (90 rem). Entre environ 1280 et 1440 px, ce
+     plafond n'a plus rien à contenir : il ne restait alors que les 28 px du token de
+     page, et la barre d'en-tête touchait le bord de l'écran. La gouttière garde ce
+     token comme plancher et s'élargit avec la fenêtre jusqu'à 5 rem. */
+  --cnpm-public-gutter: clamp(var(--cnpm-layout-pagePaddingDesktop), 5vw, var(--cnpm-space-20));
+
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -45,7 +52,7 @@
   max-width: var(--cnpm-size-publicMax);
   min-height: var(--cnpm-space-16);
   margin: 0 auto;
-  padding: 0 var(--cnpm-layout-pagePaddingDesktop);
+  padding: 0 var(--cnpm-public-gutter);
 }
 
 .cnpm-public__brand,

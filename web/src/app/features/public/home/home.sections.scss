@@ -12,7 +12,7 @@
   align-items: center;
   gap: var(--cnpm-space-4);
   max-width: var(--cnpm-size-publicMax);
-  padding: var(--cnpm-space-4) var(--cnpm-layout-pagePaddingDesktop);
+  padding: var(--cnpm-space-4) var(--cnpm-public-gutter);
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-lg);
   background: var(--cnpm-color-surface-primary);
@@ -168,7 +168,7 @@
 
 .cnpm-home__modules {
   max-width: var(--cnpm-size-publicMax);
-  padding-inline: var(--cnpm-layout-pagePaddingDesktop);
+  padding-inline: var(--cnpm-public-gutter);
   background: var(--cnpm-color-surface-secondary);
   border-block: 1px solid var(--cnpm-color-border-subtle);
 }

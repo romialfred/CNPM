@@ -113,10 +113,39 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(hrefs).not.toContain('#services');
     expect(hrefs).not.toContain('#chiffres');
     expect(hrefs).not.toContain('#');
+    // Les libellés « Statut de… » dataient de pages légales non publiées ; ils sont
+    // revenus aux intitulés attendus d'un pied de page institutionnel.
+    expect(host.querySelector('ul[aria-label="Informations légales"]')).not.toBeNull();
+    expect(host.textContent).toContain('Mentions légales');
+  });
+
+  it('reprend au pied de page les quatre menus de l’en-tête', async () => {
+    // Le pied portait une liste « Parcourir » à plat de dix liens, doublée par un bloc
+    // « Information publique » qui reprenait déjà deux entrées de la colonne Services.
+    const { host } = await setup();
+    const colonnes = Array.from(host.querySelectorAll('.cnpm-public__footer-column'));
+
+    expect(colonnes.map((colonne) => colonne.querySelector('h2')?.textContent?.trim())).toEqual([
+      'Le CNPM',
+      'Services',
+      'Membres',
+      'Actualités',
+    ]);
+    // Chaque titre de colonne doit nommer sa propre navigation, sinon un lecteur
+    // d'écran annonce quatre régions « navigation » indiscernables.
     expect(
-      host.querySelector('ul[aria-label="Statut des documents légaux non publiés"]'),
-    ).not.toBeNull();
-    expect(host.textContent).toContain('Statut des mentions légales');
+      colonnes.every(
+        (colonne) => colonne.getAttribute('aria-labelledby') === colonne.querySelector('h2')?.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('date le copyright sur l’année courante plutôt qu’en dur', async () => {
+    const { host } = await setup();
+
+    expect(host.querySelector('.cnpm-public__legal-bar p')?.textContent).toContain(
+      String(new Date().getFullYear()),
+    );
   });
 
   it('ouvre le drawer, pose le focus et rend le contenu arrière inerte', async () => {

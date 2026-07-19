@@ -9,8 +9,8 @@
 .cnpm-home__services,
 .cnpm-home__modules,
 .cnpm-home__news {
-  width: calc(100% - (2 * var(--cnpm-layout-pagePaddingDesktop)));
-  max-width: calc(var(--cnpm-size-publicMax) - (2 * var(--cnpm-layout-pagePaddingDesktop)));
+  width: calc(100% - (2 * var(--cnpm-public-gutter)));
+  max-width: calc(var(--cnpm-size-publicMax) - (2 * var(--cnpm-public-gutter)));
   margin-inline: auto;
   scroll-margin-top: var(--cnpm-space-24);
 }
