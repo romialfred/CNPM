@@ -9,6 +9,9 @@ import { auditReadGuard } from './audit/audit-read.guard';
 import { DemoAuditGateway } from './audit/demo-audit.gateway';
 import { HttpAuditGateway } from './audit/http-audit.gateway';
 import { CONTRIBUTIONS_GATEWAY } from './contributions/contributions-gateway';
+import { CONTRIBUTION_CALL_GENERATION_GATEWAY } from './contributions/generation/contribution-call-generation-gateway';
+import { contributionGenerateGuard } from './contributions/generation/contribution-generate.guard';
+import { DemoContributionCallGenerationGateway } from './contributions/generation/demo-contribution-call-generation.gateway';
 import { DemoContributionsGateway } from './contributions/demo-contributions.gateway';
 import { DASHBOARD_GATEWAY } from './dashboard/dashboard-gateway';
 import { DemoDashboardGateway } from './dashboard/demo-dashboard.gateway';
@@ -43,6 +46,9 @@ import { ORGANIZATIONS_GATEWAY } from './organizations/organizations-gateway';
 import { organizationContactsReadGuard } from './organizations/contacts/organization-contacts-read.guard';
 import { pendingOrganizationChangesGuard } from './organizations/pending-organization-changes.guard';
 import { DemoPaymentsGateway } from './payments/demo-payments.gateway';
+import { BANK_STATEMENT_IMPORT_GATEWAY } from './payments/import/bank-statement-import-gateway';
+import { bankStatementImportGuard } from './payments/import/bank-statement-import.guard';
+import { DemoBankStatementImportGateway } from './payments/import/demo-bank-statement-import.gateway';
 import { PAYMENTS_GATEWAY } from './payments/payments-gateway';
 import { DemoReceiptsGateway } from './receipts/demo-receipts.gateway';
 import { receiptReadGuard } from './receipts/receipt-read.guard';
@@ -69,7 +75,9 @@ import {
 import { adminSessionGuard } from './admin-session.guard';
 import {
   UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
+  UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
   UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
+  UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
   UNAVAILABLE_DASHBOARD_GATEWAY,
   UNAVAILABLE_DOCUMENTS_GATEWAY,
   UNAVAILABLE_ENROLLMENT_GATEWAY,
@@ -151,6 +159,22 @@ export const adminRoutes: Routes = [
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoDashboardGateway)
             : UNAVAILABLE_DASHBOARD_GATEWAY,
+      },
+      DemoContributionCallGenerationGateway,
+      {
+        provide: CONTRIBUTION_CALL_GENERATION_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoContributionCallGenerationGateway)
+            : UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
+      },
+      DemoBankStatementImportGateway,
+      {
+        provide: BANK_STATEMENT_IMPORT_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoBankStatementImportGateway)
+            : UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
       },
       {
         provide: DOCUMENTS_GATEWAY,
@@ -354,6 +378,17 @@ export const adminRoutes: Routes = [
         title: 'Fiche membre — Administration CNPM',
       },
       {
+        // Précède impérativement `contributions/:id` : sinon le segment littéral
+        // « generation » est capté comme identifiant et rend l'écran introuvable.
+        path: 'contributions/generation',
+        canActivate: [contributionGenerateGuard],
+        loadComponent: () =>
+          import('./contributions/generation/contribution-call-generation.page').then(
+            (m) => m.ContributionCallGenerationPage,
+          ),
+        title: 'Générer des appels de cotisation — Administration CNPM',
+      },
+      {
         path: 'contributions/:id',
         loadComponent: () =>
           import('./contributions/contribution-detail.page').then((m) => m.ContributionDetailPage),
@@ -372,6 +407,15 @@ export const adminRoutes: Routes = [
             (m) => m.PaymentsReconciliationPage,
           ),
         title: 'Rapprochement des paiements — Administration CNPM',
+      },
+      {
+        path: 'payments/import',
+        canActivate: [bankStatementImportGuard],
+        loadComponent: () =>
+          import('./payments/import/bank-statement-import.page').then(
+            (m) => m.BankStatementImportPage,
+          ),
+        title: 'Import de relevé bancaire — Administration CNPM',
       },
       {
         path: 'receipts',

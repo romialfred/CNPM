@@ -30,7 +30,11 @@ describe('adminRoutes', () => {
     expect(child('enrollments/new')?.canDeactivate).toHaveLength(1);
     expect(child('enrollments/:id/review')?.loadComponent).toBeTypeOf('function');
     expect(child('contributions')?.loadComponent).toBeTypeOf('function');
+    expect(child('contributions/generation')?.loadComponent).toBeTypeOf('function');
+    expect(child('contributions/generation')?.canActivate).toHaveLength(1);
     expect(child('payments/reconciliation')?.loadComponent).toBeTypeOf('function');
+    expect(child('payments/import')?.loadComponent).toBeTypeOf('function');
+    expect(child('payments/import')?.canActivate).toHaveLength(1);
     expect(child('receipts')?.loadComponent).toBeTypeOf('function');
     expect(child('receipts')?.canActivate).toHaveLength(1);
     expect(child('recovery/campaigns')?.loadComponent).toBeTypeOf('function');
@@ -56,6 +60,25 @@ describe('adminRoutes', () => {
     expect(child('settings')?.loadComponent).toBeTypeOf('function');
     expect(child('settings')?.canActivate).toHaveLength(1);
     expect(child('settings')?.canDeactivate).toHaveLength(1);
+  });
+
+  it('déclare les segments littéraux avant les routes paramétrées qui les captureraient', () => {
+    // Défaut constaté en exécution : « contributions/generation » déclaré après
+    // « contributions/:id » était résolu comme un identifiant, et l'écran de
+    // génération affichait « Cotisation introuvable » au lieu de son contenu.
+    const paths = (adminRoutes[0]?.children ?? []).map((route) => route.path);
+    const literalBeforeParameterized: readonly [string, string][] = [
+      ['contributions/generation', 'contributions/:id'],
+      ['organizations/:id/contacts', 'organizations/:id'],
+      ['organizations/:id/edit', 'organizations/:id'],
+      ['members/:id/edit', 'members/:id'],
+    ];
+
+    for (const [literal, parameterized] of literalBeforeParameterized) {
+      expect(paths).toContain(literal);
+      expect(paths).toContain(parameterized);
+      expect(paths.indexOf(literal)).toBeLessThan(paths.indexOf(parameterized));
+    }
   });
 
   it('redirige les anciens chemins courts vers les routes canoniques', () => {
