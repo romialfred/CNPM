@@ -41,6 +41,9 @@ import { DemoRecoveryGateway } from './recovery/demo-recovery.gateway';
 import { RECOVERY_GATEWAY } from './recovery/recovery-gateway';
 import { DemoReportingGateway } from './reporting/demo-reporting.gateway';
 import { REPORTING_GATEWAY } from './reporting/reporting-gateway';
+import { DemoRequestsGateway } from './requests/demo-requests.gateway';
+import { requestReadGuard } from './requests/request-read.guard';
+import { REQUESTS_GATEWAY } from './requests/requests-gateway';
 import { ADMIN_SECURITY_GATEWAY } from './security/admin-security-gateway';
 import { DemoAdminSecurityGateway } from './security/demo-admin-security.gateway';
 import { DemoSettingsGateway } from './settings/demo-settings.gateway';
@@ -58,6 +61,7 @@ import {
   UNAVAILABLE_PAYMENTS_GATEWAY,
   UNAVAILABLE_RECOVERY_GATEWAY,
   UNAVAILABLE_REPORTING_GATEWAY,
+  UNAVAILABLE_REQUESTS_GATEWAY,
 } from './unavailable-admin-gateways';
 
 /**
@@ -191,6 +195,13 @@ export const adminRoutes: Routes = [
             : UNAVAILABLE_REPORTING_GATEWAY,
       },
       {
+        provide: REQUESTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoRequestsGateway)
+            : UNAVAILABLE_REQUESTS_GATEWAY,
+      },
+      {
         provide: ADMIN_SECURITY_GATEWAY,
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
@@ -204,6 +215,7 @@ export const adminRoutes: Routes = [
       DemoPaymentsGateway,
       DemoRecoveryGateway,
       DemoReportingGateway,
+      DemoRequestsGateway,
       DemoAdminSecurityGateway,
     ],
     canActivate: [adminSessionGuard],
@@ -306,6 +318,19 @@ export const adminRoutes: Routes = [
         path: 'reporting',
         loadComponent: () => import('./reporting/reporting.page').then((m) => m.ReportingPage),
         title: 'Reporting — Administration CNPM',
+      },
+      {
+        path: 'requests',
+        canActivate: [requestReadGuard],
+        loadComponent: () => import('./requests/requests.page').then((m) => m.RequestsPage),
+        title: 'Requêtes et réclamations — Administration CNPM',
+      },
+      {
+        path: 'requests/:id',
+        canActivate: [requestReadGuard],
+        loadComponent: () =>
+          import('./requests/request-detail.page').then((m) => m.RequestDetailPage),
+        title: 'Traitement d’un dossier — Administration CNPM',
       },
       {
         path: 'security/users',

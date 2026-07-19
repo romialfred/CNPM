@@ -1,0 +1,236 @@
+<cnpm-admin-shell>
+  <div class="cnpm-request-detail">
+    <nav aria-label="Fil d’Ariane">
+      <ol class="cnpm-request-detail__crumbs">
+        <li>
+          <a routerLink="/admin/requests" [queryParams]="listQueryParams()">
+            Requêtes et réclamations
+          </a>
+        </li>
+        <li aria-current="page">Traitement</li>
+      </ol>
+    </nav>
+
+    <cnpm-page-header
+      [title]="pageTitle()"
+      description="Qualification, conversation et préparation contrôlée de la réponse."
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="7" label="Chargement du dossier…" />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state
+          variant="forbidden"
+          title="Dossier hors de votre périmètre"
+          description="La permission REQUEST.READ et le périmètre serveur sont requis."
+        />
+      }
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          title="Dossier introuvable"
+          description="Cette requête n’existe pas ou n’est plus accessible."
+        >
+          <cnpm-button variant="secondary" routerLink="/admin/requests">
+            Retour à la file
+          </cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le dossier n’a pas pu être chargé"
+          description="Le service de traitement est momentanément indisponible."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (request(); as request) {
+          @if (demoMode) {
+            <cnpm-alert tone="info" title="Traitement local de démonstration">
+              Les actions ci-dessous préparent seulement un aperçu dans ce navigateur. Aucune donnée
+              n’est enregistrée, aucun message n’est envoyé et aucun statut serveur ne change.
+            </cnpm-alert>
+          }
+
+          <section class="cnpm-request-detail__summary" aria-labelledby="request-summary-title">
+            <div>
+              <p class="cnpm-request-detail__eyebrow" id="request-summary-title">État courant</p>
+              <div class="cnpm-request-detail__badges">
+                <cnpm-badge [tone]="statusTone(request.status)">
+                  {{ statusLabel(request.status) }}
+                </cnpm-badge>
+                <cnpm-badge [tone]="slaTone(request.slaState)">
+                  {{ slaLabel(request.slaState) }}
+                </cnpm-badge>
+              </div>
+            </div>
+            <div>
+              <span>Échéance fictive de démonstration</span>
+              <strong>{{ formatDate(request.targetAt) }}</strong>
+            </div>
+          </section>
+
+          <div class="cnpm-request-detail__layout">
+            <div class="cnpm-request-detail__main-column">
+              <section
+                class="cnpm-request-detail__card"
+                aria-labelledby="request-description-title"
+              >
+                <h2 id="request-description-title">Demande initiale</h2>
+                <p class="cnpm-request-detail__subject">{{ request.subject }}</p>
+                <p>{{ request.description }}</p>
+              </section>
+
+              <section
+                class="cnpm-request-detail__card"
+                aria-labelledby="request-conversation-title"
+              >
+                <div class="cnpm-request-detail__section-heading">
+                  <div>
+                    <h2 id="request-conversation-title">Conversation visible par le membre</h2>
+                    <p>Seuls les échanges externes apparaissent dans cette chronologie.</p>
+                  </div>
+                </div>
+                <ol class="cnpm-request-detail__conversation">
+                  @for (message of request.memberConversation; track message.id) {
+                    <li [class.cnpm-request-detail__message--agent]="message.direction === 'AGENT'">
+                      <div>
+                        <strong>{{ message.authorLabel }}</strong>
+                        <time [attr.datetime]="message.createdAt">{{
+                          formatDate(message.createdAt)
+                        }}</time>
+                      </div>
+                      <p>{{ message.body }}</p>
+                    </li>
+                  }
+                </ol>
+              </section>
+
+              <section class="cnpm-request-detail__card" aria-labelledby="request-reply-title">
+                <h2 id="request-reply-title">Préparer une réponse de démonstration</h2>
+                <p>L’aperçu reste local et n’est ajouté ni à la conversation ni à l’historique.</p>
+                <form class="cnpm-request-detail__reply" (ngSubmit)="prepareReply()">
+                  <label for="request-reply">Projet de réponse</label>
+                  <textarea
+                    #replyDraft
+                    id="request-reply"
+                    rows="5"
+                    maxlength="1000"
+                    [formControl]="replyControl"
+                    aria-describedby="request-reply-help request-reply-error"
+                  ></textarea>
+                  <p id="request-reply-help" class="cnpm-request-detail__help">
+                    1 000 caractères maximum. Aucune notification ne sera envoyée.
+                  </p>
+                  @if (replyControl.touched && replyControl.hasError('required')) {
+                    <p id="request-reply-error" class="cnpm-request-detail__error">
+                      Saisissez un projet de réponse avant de préparer l’aperçu.
+                    </p>
+                  } @else {
+                    <span id="request-reply-error"></span>
+                  }
+                  <div class="cnpm-request-detail__actions">
+                    <cnpm-button (click)="prepareReply(replyDraft.value)">
+                      Préparer l’aperçu local
+                    </cnpm-button>
+                    @if (preparedReply()) {
+                      <cnpm-button variant="tertiary" (click)="clearPreparedReply()">
+                        Effacer l’aperçu
+                      </cnpm-button>
+                    }
+                  </div>
+                </form>
+
+                @if (preparedReply(); as reply) {
+                  <div class="cnpm-request-detail__preview" role="status" aria-live="polite">
+                    <strong>Aperçu non envoyé et non enregistré</strong>
+                    <p>{{ reply }}</p>
+                  </div>
+                }
+              </section>
+            </div>
+
+            <aside class="cnpm-request-detail__side-column" aria-label="Qualification et contrôles">
+              <section
+                class="cnpm-request-detail__card"
+                aria-labelledby="request-qualification-title"
+              >
+                <h2 id="request-qualification-title">Qualification</h2>
+                <cnpm-definition-list [items]="facts()" />
+              </section>
+
+              <section
+                class="cnpm-request-detail__card cnpm-request-detail__internal"
+                aria-labelledby="request-internal-title"
+              >
+                <h2 id="request-internal-title">Notes strictement internes</h2>
+                <p class="cnpm-request-detail__internal-warning">
+                  Ces notes ne sont jamais exposées dans l’espace membre.
+                </p>
+                @if (request.internalNotes.length === 0) {
+                  <p>Aucune note interne dans ce scénario.</p>
+                } @else {
+                  <ol>
+                    @for (note of request.internalNotes; track note.id) {
+                      <li>
+                        <strong>{{ note.authorLabel }}</strong>
+                        <time [attr.datetime]="note.createdAt">{{
+                          formatDate(note.createdAt)
+                        }}</time>
+                        <p>{{ note.body }}</p>
+                      </li>
+                    }
+                  </ol>
+                }
+              </section>
+
+              <section
+                class="cnpm-request-detail__card"
+                aria-labelledby="request-attachments-title"
+              >
+                <h2 id="request-attachments-title">Pièces jointes</h2>
+                <cnpm-alert tone="warning" title="GED indisponible">
+                  {{ request.attachments.reason }}
+                </cnpm-alert>
+              </section>
+
+              <section class="cnpm-request-detail__card" aria-labelledby="request-close-title">
+                <h2 id="request-close-title">Clôture contrôlée</h2>
+                @if (request.resolutionProofLabel) {
+                  <p>
+                    Preuve présente dans le scénario :
+                    <strong>{{ request.resolutionProofLabel }}</strong>
+                  </p>
+                } @else {
+                  <p id="request-close-reason">
+                    Aucune preuve de résolution n’est associée à ce dossier. La clôture est
+                    interdite.
+                  </p>
+                }
+                <cnpm-button
+                  variant="secondary"
+                  [disabled]="true"
+                  describedBy="request-close-unavailable"
+                >
+                  Clôturer le dossier
+                </cnpm-button>
+                <p id="request-close-unavailable" class="cnpm-request-detail__help">
+                  Action indisponible : aucun contrat de mutation sûr n’est raccordé dans cette
+                  démo.
+                </p>
+              </section>
+
+              <cnpm-alert tone="info" title="Notifications non envoyées">
+                {{ request.notificationNotice }}
+              </cnpm-alert>
+            </aside>
+          </div>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>

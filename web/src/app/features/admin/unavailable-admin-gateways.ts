@@ -6,6 +6,7 @@ import type { MemberDetailGateway } from './member-detail/member-detail-gateway'
 import type { PaymentsGateway } from './payments/payments-gateway';
 import type { RecoveryGateway } from './recovery/recovery-gateway';
 import type { ReportingGateway } from './reporting/reporting-gateway';
+import type { RequestsGateway } from './requests/requests-gateway';
 import type { AdminSecurityGateway } from './security/admin-security-gateway';
 
 export const UNAVAILABLE_DASHBOARD_GATEWAY: DashboardGateway = {
@@ -41,6 +42,16 @@ export const UNAVAILABLE_RECOVERY_GATEWAY: RecoveryGateway = {
 
 export const UNAVAILABLE_REPORTING_GATEWAY: ReportingGateway = {
   load: () => unavailableFeature$('BO-028'),
+};
+
+/**
+ * `/service-requests*` n'expose actuellement que `Resource`/`PageResource`, sans
+ * projection métier stable pour BO-021/022. Un mode HTTP explicite vaut mieux qu'un
+ * mapping conjectural de `attributes`.
+ */
+export const UNAVAILABLE_REQUESTS_GATEWAY: RequestsGateway = {
+  search: () => unavailableFeature$('BO-021'),
+  get: () => unavailableFeature$('BO-022'),
 };
 
 export const UNAVAILABLE_ADMIN_SECURITY_GATEWAY: AdminSecurityGateway = {

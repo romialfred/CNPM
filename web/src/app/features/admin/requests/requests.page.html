@@ -1,0 +1,240 @@
+<cnpm-admin-shell>
+  <div class="cnpm-requests">
+    <cnpm-page-header
+      title="Requêtes et réclamations"
+      description="Qualifiez et suivez les dossiers accessibles à votre périmètre."
+    />
+
+    @if (demoMode) {
+      <cnpm-alert tone="info" title="Jeu de démonstration borné">
+        Les dossiers, personnes et échéances affichés sont fictifs. Aucun SLA officiel et aucune
+        notification réelle ne sont engagés.
+      </cnpm-alert>
+    }
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeChip($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="cnpm-requests__filters" role="search" (ngSubmit)="applySearch()">
+        <div class="cnpm-requests__field cnpm-requests__field--search">
+          <label for="request-search">Recherche</label>
+          <input
+            id="request-search"
+            type="search"
+            name="search"
+            autocomplete="off"
+            maxlength="120"
+            placeholder="Référence, objet ou demandeur"
+            [ngModel]="searchDraft()"
+            (ngModelChange)="searchDraft.set($event)"
+          />
+        </div>
+        <div class="cnpm-requests__field">
+          <label for="request-status">Statut</label>
+          <select
+            id="request-status"
+            name="status"
+            [ngModel]="status() ?? ''"
+            (ngModelChange)="setStatus($event)"
+          >
+            <option value="">Tous les statuts</option>
+            @for (value of statuses; track value) {
+              <option [value]="value">{{ statusLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="cnpm-requests__field">
+          <label for="request-priority">Priorité</label>
+          <select
+            id="request-priority"
+            name="priority"
+            [ngModel]="priority() ?? ''"
+            (ngModelChange)="setPriority($event)"
+          >
+            <option value="">Toutes les priorités</option>
+            @for (value of priorities; track value) {
+              <option [value]="value">{{ priorityLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="cnpm-requests__field">
+          <label for="request-sort">Trier par</label>
+          <select
+            id="request-sort"
+            name="sort"
+            [ngModel]="sortOption()"
+            (ngModelChange)="setSortOption($event)"
+          >
+            <option value="submittedAt:desc">Plus récentes</option>
+            <option value="submittedAt:asc">Plus anciennes</option>
+            <option value="targetAt:asc">Échéance fictive</option>
+            <option value="priority:desc">Priorité décroissante</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="secondary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <div class="cnpm-requests__count" aria-live="polite">
+      @if (state() === 'ready' || state() === 'empty' || state() === 'noResult') {
+        <p>
+          <strong>{{ totalItems() }}</strong>
+          {{ totalItems() === 1 ? 'dossier trouvé' : 'dossiers trouvés' }}
+        </p>
+      }
+    </div>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton
+          variant="table"
+          [rows]="pageSize()"
+          [columns]="columns.length"
+          label="Chargement des requêtes et réclamations…"
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Les dossiers n’ont pas pu être chargés"
+          description="Le service est indisponible. Les filtres présents dans l’URL sont conservés."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('forbidden') {
+        <cnpm-error-state
+          variant="forbidden"
+          title="Accès refusé aux requêtes"
+          description="La permission REQUEST.READ est requise pour consulter cette file."
+        />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucun dossier accessible"
+          description="Aucune requête ou réclamation n’est disponible dans votre périmètre."
+        />
+      }
+      @case ('noResult') {
+        <cnpm-empty-state
+          variant="no-results"
+          title="Aucun dossier ne correspond"
+          description="Retirez un filtre ou élargissez la recherche."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+            Réinitialiser les filtres
+          </cnpm-button>
+        </cnpm-empty-state>
+      }
+      @case ('ready') {
+        <div class="cnpm-requests__table">
+          <cnpm-data-table
+            caption="Requêtes et réclamations, demandeurs, priorités, statuts et échéances fictives."
+            [columns]="columns"
+            [rows]="rows()"
+            state="ready"
+            [sort]="sort()"
+            [rowKey]="rowKey"
+            (sortChange)="onSortChange($event)"
+          >
+            <ng-template #row let-request>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-requests__identity">
+                  <strong>{{ request.reference }}</strong>
+                  <span>{{ request.subject }}</span>
+                </span>
+              </td>
+              <td class="cnpm-table__cell">{{ formatDate(request.submittedAt) }}</td>
+              <td class="cnpm-table__cell">{{ request.requesterLabel }}</td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="priorityTone(request.priority)">
+                  {{ priorityLabel(request.priority) }}
+                </cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="statusTone(request.status)">
+                  {{ statusLabel(request.status) }}
+                </cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-requests__deadline">
+                  <span>{{ formatDate(request.targetAt) }}</span>
+                  <cnpm-badge [tone]="slaTone(request.slaState)">
+                    {{ slaLabel(request.slaState) }}
+                  </cnpm-badge>
+                </span>
+              </td>
+              <td class="cnpm-table__cell">{{ request.assigneeLabel ?? 'Non assignée' }}</td>
+              <td class="cnpm-table__cell">
+                <a
+                  class="cnpm-requests__detail-link"
+                  [routerLink]="['/admin/requests', request.id]"
+                  [queryParams]="listQueryParams()"
+                  [attr.aria-label]="'Traiter le dossier ' + request.reference"
+                  title="Ouvrir le traitement"
+                >
+                  <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+              </td>
+            </ng-template>
+          </cnpm-data-table>
+        </div>
+
+        <ul class="cnpm-requests__cards" aria-label="Requêtes et réclamations">
+          @for (request of rows(); track request.id) {
+            <li>
+              <div class="cnpm-requests__card-head">
+                <div>
+                  <strong>{{ request.reference }}</strong>
+                  <span>{{ request.subject }}</span>
+                </div>
+                <cnpm-badge [tone]="statusTone(request.status)">
+                  {{ statusLabel(request.status) }}
+                </cnpm-badge>
+              </div>
+              <dl>
+                <div>
+                  <dt>Demandeur</dt>
+                  <dd>{{ request.requesterLabel }}</dd>
+                </div>
+                <div>
+                  <dt>Priorité</dt>
+                  <dd>{{ priorityLabel(request.priority) }}</dd>
+                </div>
+                <div>
+                  <dt>Soumis le</dt>
+                  <dd>{{ formatDate(request.submittedAt) }}</dd>
+                </div>
+                <div>
+                  <dt>Échéance fictive</dt>
+                  <dd>{{ formatDate(request.targetAt) }}</dd>
+                </div>
+              </dl>
+              <cnpm-button
+                variant="secondary"
+                size="sm"
+                [routerLink]="['/admin/requests', request.id]"
+              >
+                Ouvrir le traitement
+              </cnpm-button>
+            </li>
+          }
+        </ul>
+
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    }
+  </div>
+</cnpm-admin-shell>

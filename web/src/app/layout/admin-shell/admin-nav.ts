@@ -45,7 +45,7 @@ export const ADMIN_NAV: readonly AdminNavEntry[] = [
   { label: 'Paiements', route: '/admin/payments/reconciliation', icon: 'payments' },
   { label: 'Reçus', route: '/admin/receipts', icon: 'receipts', pending: true },
   { label: 'Relances', route: '/admin/recovery/campaigns', icon: 'reminders' },
-  { label: 'Requêtes', route: '/admin/requests', icon: 'requests', pending: true },
+  { label: 'Requêtes', route: '/admin/requests', icon: 'requests' },
   {
     label: 'Groupements',
     route: '/admin/groups',

@@ -31,6 +31,10 @@ describe('adminRoutes', () => {
     expect(child('payments/reconciliation')?.loadComponent).toBeTypeOf('function');
     expect(child('recovery/campaigns')?.loadComponent).toBeTypeOf('function');
     expect(child('reporting')?.loadComponent).toBeTypeOf('function');
+    expect(child('requests')?.loadComponent).toBeTypeOf('function');
+    expect(child('requests')?.canActivate).toHaveLength(1);
+    expect(child('requests/:id')?.loadComponent).toBeTypeOf('function');
+    expect(child('requests/:id')?.canActivate).toHaveLength(1);
     expect(child('security/users')?.loadComponent).toBeTypeOf('function');
     expect(child('security/audit')?.loadComponent).toBeTypeOf('function');
     expect(child('security/audit')?.canActivate).toHaveLength(1);

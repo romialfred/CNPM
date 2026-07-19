@@ -1,0 +1,180 @@
+.cnpm-requests {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+.cnpm-requests__filters {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1.6fr) repeat(3, minmax(10rem, 1fr)) auto;
+  align-items: end;
+  gap: var(--cnpm-space-3);
+  width: 100%;
+}
+
+.cnpm-requests__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+.cnpm-requests__field label {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-requests__field input,
+.cnpm-requests__field select {
+  width: 100%;
+  min-width: 0;
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+}
+
+.cnpm-requests__field input:focus-visible,
+.cnpm-requests__field select:focus-visible,
+.cnpm-requests__detail-link:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
+.cnpm-requests__count {
+  min-height: var(--cnpm-space-5);
+}
+
+.cnpm-requests__count p {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-requests__identity,
+.cnpm-requests__deadline,
+.cnpm-requests__card-head > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-requests__identity {
+  min-width: 14rem;
+}
+
+.cnpm-requests__identity span,
+.cnpm-requests__card-head span {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  overflow-wrap: anywhere;
+}
+
+.cnpm-requests__deadline {
+  align-items: flex-start;
+  min-width: 9rem;
+}
+
+.cnpm-requests__detail-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-control-sm);
+  height: var(--cnpm-size-control-sm);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-requests__detail-link:hover {
+  border-color: var(--cnpm-color-brand-blue-300);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-requests__cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 1199px) {
+  .cnpm-requests__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-requests__filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-requests__field input,
+  .cnpm-requests__field select {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  .cnpm-requests__table {
+    display: none;
+  }
+
+  .cnpm-requests__cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-requests__cards > li {
+    min-width: 0;
+    padding: var(--cnpm-space-4);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-lg);
+    background: var(--cnpm-color-surface-primary);
+  }
+
+  .cnpm-requests__card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-requests__cards dl {
+    display: grid;
+    gap: var(--cnpm-space-2);
+    margin: var(--cnpm-space-4) 0;
+  }
+
+  .cnpm-requests__cards dl > div {
+    display: grid;
+    grid-template-columns: minmax(6.5rem, 0.6fr) minmax(0, 1fr);
+    gap: var(--cnpm-space-2);
+  }
+
+  .cnpm-requests__cards dt {
+    color: var(--cnpm-color-text-muted);
+  }
+
+  .cnpm-requests__cards dd {
+    min-width: 0;
+    margin: 0;
+    color: var(--cnpm-color-text-primary);
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 359px) {
+  .cnpm-requests__card-head {
+    flex-direction: column;
+  }
+
+  .cnpm-requests__cards dl > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
