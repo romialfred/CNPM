@@ -150,6 +150,8 @@ describe('PaymentsReconciliationPage — états requis', () => {
     expect(text).toContain('Non rapproché');
     expect(text).toContain('Confiance élevée');
     expect(text).toContain('Mobile Money');
+    expect(text).toContain('REÇU DE DÉMONSTRATION');
+    expect(text).toContain('Aucun cachet, signature ou QR officiel');
   });
 
   it('affiche une erreur récupérable AVEC une action « Réessayer »', async () => {

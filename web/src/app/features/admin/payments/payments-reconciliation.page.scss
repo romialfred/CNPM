@@ -1,48 +1,11 @@
-@use '../../../../styles/tokens' as tokens;
-
 .cnpm-reconciliation {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-5);
+  gap: var(--cnpm-space-3);
   min-width: 0;
 }
 
-/* Liste et panneau de rapprochement. `minmax(0, 1fr)` empêche la colonne de la table
-   de se dimensionner sur son min-content : sans cela, une table à huit colonnes
-   pousserait la grille au-delà de la page au lieu de défiler dans son conteneur. */
-.cnpm-reconciliation__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 24rem;
-  align-items: start;
-  gap: var(--cnpm-space-6);
-  min-width: 0;
-}
-
-.cnpm-reconciliation__list,
-.cnpm-reconciliation__aside {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-4);
-  min-width: 0;
-}
-
-.cnpm-reconciliation__section-title {
-  margin: 0;
-  font-size: var(--cnpm-font-size-md);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-reconciliation__subtitle {
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
-}
-
-/* Texte réservé aux technologies d'assistance : il décrit un bouton neutralisé, dont
-   le motif doit être annoncé sans encombrer la barre d'actions. */
-.cnpm-reconciliation__sr-hint {
+.cnpm-reconciliation__sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -54,208 +17,269 @@
   border: 0;
 }
 
-.cnpm-reconciliation__hint,
-.cnpm-reconciliation__field-hint,
-.cnpm-reconciliation__panel-note {
-  margin: 0;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
-}
-
-.cnpm-reconciliation__filter {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-2);
-  min-width: 0;
-}
-
-.cnpm-reconciliation__label {
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-reconciliation__select,
-.cnpm-reconciliation__input,
-.cnpm-reconciliation__textarea {
-  width: 100%;
-  min-width: 0;
-  padding: 0 var(--cnpm-space-3);
-  border: 1px solid var(--cnpm-color-border-default);
-  border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-surface-primary);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-reconciliation__select,
-.cnpm-reconciliation__input {
-  height: var(--cnpm-size-control-md);
-}
-
-.cnpm-reconciliation__textarea {
-  padding: var(--cnpm-space-2) var(--cnpm-space-3);
-  resize: vertical;
-}
-
-/* Contour opaque : le halo seul n'atteint pas le rapport 3:1 de WCAG 1.4.11. */
-.cnpm-reconciliation__select:focus-visible,
-.cnpm-reconciliation__input:focus-visible,
-.cnpm-reconciliation__textarea:focus-visible,
-.cnpm-reconciliation__fieldset:focus-visible {
-  border-color: var(--cnpm-color-brand-blue-700);
-  outline: 2px solid var(--cnpm-color-brand-blue-700);
-  outline-offset: 1px;
-}
-
-.cnpm-reconciliation__toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+.cnpm-reconciliation__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 31fr) minmax(0, 29fr) minmax(0, 40fr);
+  align-items: start;
   gap: var(--cnpm-space-3);
   min-width: 0;
 }
 
-.cnpm-reconciliation__total {
+.cnpm-reconciliation__queue,
+.cnpm-reconciliation__panel,
+.cnpm-reconciliation__audit,
+.cnpm-reconciliation__receipt-panel,
+.cnpm-reconciliation__timeline {
+  min-width: 0;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-reconciliation__queue,
+.cnpm-reconciliation__workbench,
+.cnpm-reconciliation__receipt-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__queue {
+  overflow: hidden;
+}
+
+.cnpm-reconciliation__queue-head,
+.cnpm-reconciliation__panel-head,
+.cnpm-reconciliation__receipt-panel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-reconciliation__queue-head {
+  padding: var(--cnpm-space-3);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-reconciliation__queue-head h2,
+.cnpm-reconciliation__panel h2,
+.cnpm-reconciliation__audit h2,
+.cnpm-reconciliation__receipt-panel h2,
+.cnpm-reconciliation__timeline h2 {
   margin: 0;
+  color: var(--cnpm-color-text-primary);
   font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-reconciliation__queue-head p,
+.cnpm-reconciliation__queue-head > span {
+  margin: var(--cnpm-space-1) 0 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-reconciliation__queue-head > span {
+  flex: none;
+  margin: 0;
+}
+
+.cnpm-reconciliation__filter,
+.cnpm-reconciliation__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-reconciliation__label {
   color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-reconciliation__control,
+.cnpm-reconciliation__textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0 var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-reconciliation__control {
+  height: var(--cnpm-size-control-sm);
+}
+
+.cnpm-reconciliation__textarea {
+  padding-top: var(--cnpm-space-2);
+  padding-bottom: var(--cnpm-space-2);
+  resize: vertical;
+}
+
+.cnpm-reconciliation__control:focus-visible,
+.cnpm-reconciliation__textarea:focus-visible,
+.cnpm-reconciliation__fieldset:focus-visible,
+.cnpm-reconciliation__reference:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-reconciliation__filters .cnpm-filters {
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  border: 0;
+  border-radius: 0;
+}
+
+.cnpm-reconciliation__filters .cnpm-filters__head {
+  display: none;
+}
+
+.cnpm-reconciliation__filters .cnpm-filters__body {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-reconciliation__queue .cnpm-table__scroll {
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.cnpm-reconciliation__queue .cnpm-table {
+  font-size: 0.625rem;
+}
+
+.cnpm-reconciliation__queue .cnpm-table__cell {
+  padding: var(--cnpm-space-2) var(--cnpm-space-1);
+}
+
+.cnpm-reconciliation__queue .cnpm-table__sort {
+  gap: var(--cnpm-space-1);
 }
 
 .cnpm-reconciliation__reference {
   display: block;
-  font-weight: var(--cnpm-font-weight-semibold);
+  padding: 0;
+  border: 0;
+  background: none;
   color: var(--cnpm-color-text-brand);
+  font: inherit;
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-align: left;
   white-space: nowrap;
+  cursor: pointer;
 }
 
-/* Marqueur textuel de la ligne ouverte dans le panneau : un liseré coloré seul ne
-   transmettrait pas l'état. */
 .cnpm-reconciliation__examined {
-  display: inline-block;
+  display: block;
   margin-top: var(--cnpm-space-1);
-  padding: 0 var(--cnpm-space-2);
-  border: 1px solid var(--cnpm-color-border-strong);
-  border-radius: var(--cnpm-radius-pill);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-semantic-info-700);
+  font-size: 0.625rem;
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-reconciliation__payer,
+.cnpm-reconciliation__meta,
+.cnpm-reconciliation__channel {
+  display: block;
+  max-width: 7rem;
+  overflow: hidden;
   color: var(--cnpm-color-text-secondary);
-  white-space: nowrap;
+  font-size: 0.625rem;
+  text-overflow: ellipsis;
 }
 
 .cnpm-reconciliation__payer {
-  display: block;
-  font-weight: var(--cnpm-font-weight-medium);
   color: var(--cnpm-color-text-primary);
 }
 
-.cnpm-reconciliation__meta {
-  display: block;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
-}
-
-/* Chasses tabulaires : les montants s'alignent d'une ligne à l'autre, ce qui rend les
-   ordres de grandeur comparables d'un coup d'œil. */
 .cnpm-reconciliation__amount {
-  display: block;
-  font-variant-numeric: tabular-nums;
-  font-weight: var(--cnpm-font-weight-medium);
   color: var(--cnpm-color-text-primary);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.cnpm-reconciliation__match {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--cnpm-space-1);
-  min-width: 10rem;
-}
-
-.cnpm-reconciliation__match-name {
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-primary);
-}
-
-/* Surfaces neutres et bordures plutôt qu'ombres : le panneau regroupe, il n'attire pas. */
 .cnpm-reconciliation__panel,
-.cnpm-reconciliation__audit {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-4);
-  padding: var(--cnpm-layout-cardPadding);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-surface-primary);
-  min-width: 0;
+.cnpm-reconciliation__audit,
+.cnpm-reconciliation__receipt-panel,
+.cnpm-reconciliation__timeline {
+  padding: var(--cnpm-space-3);
 }
 
-.cnpm-reconciliation__panel-amount {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-1);
-  margin: 0;
-}
-
-.cnpm-reconciliation__panel-amount-label {
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-reconciliation__panel-status {
-  margin: 0;
-}
-
+.cnpm-reconciliation__panel,
 .cnpm-reconciliation__form {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-4);
-  min-width: 0;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-reconciliation__payment-detail {
+  padding: var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-secondary);
+}
+
+.cnpm-reconciliation__payment-detail > p {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  margin: var(--cnpm-space-2) 0 0;
+  padding-top: var(--cnpm-space-2);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-reconciliation__payment-detail > p strong {
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-md);
+}
+
+.cnpm-reconciliation__payment-detail > p small,
+.cnpm-reconciliation__field small {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
 }
 
 .cnpm-reconciliation__fieldset {
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-2);
+  min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
-  min-width: 0;
 }
 
 .cnpm-reconciliation__legend {
   padding: 0;
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
   color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
 }
 
-/* Chaque correspondance est une cible complète : le libellé entier coche le choix,
-   ce qui évite une cible de 16 px sur un geste engageant une écriture financière. */
 .cnpm-reconciliation__option {
   display: flex;
   align-items: flex-start;
-  gap: var(--cnpm-space-3);
-  padding: var(--cnpm-space-3);
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-2);
   border: 1px solid var(--cnpm-color-border-default);
   border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-surface-primary);
   cursor: pointer;
-  min-width: 0;
 }
 
-.cnpm-reconciliation__option:has(.cnpm-reconciliation__radio:checked) {
+.cnpm-reconciliation__option:has(input:checked) {
   border-color: var(--cnpm-color-brand-blue-700);
-  background-color: var(--cnpm-color-brand-blue-50);
-}
-
-.cnpm-reconciliation__option:has(.cnpm-reconciliation__radio:focus-visible) {
-  outline: 2px solid var(--cnpm-color-brand-blue-700);
-  outline-offset: 2px;
+  background: var(--cnpm-color-brand-blue-50);
 }
 
 .cnpm-reconciliation__option-body {
@@ -267,37 +291,16 @@
 }
 
 .cnpm-reconciliation__option-title {
-  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-xs);
   font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
 }
 
-.cnpm-reconciliation__code {
-  font-size: var(--cnpm-font-size-xs);
+.cnpm-reconciliation__option-title small {
+  color: var(--cnpm-color-text-muted);
   font-weight: var(--cnpm-font-weight-regular);
-  color: var(--cnpm-color-text-secondary);
-  white-space: nowrap;
 }
 
-.cnpm-reconciliation__reasons {
-  margin: 0;
-  padding-left: var(--cnpm-space-5);
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-reconciliation__choice {
-  display: flex;
-  align-items: center;
-  gap: var(--cnpm-space-2);
-  min-height: var(--cnpm-size-control-md);
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-primary);
-  cursor: pointer;
-}
-
-/* Le contrôle natif conserve sa taille de cible et son focus système ; seul son
-   alignement est ajusté. */
 .cnpm-reconciliation__radio {
   flex: none;
   width: var(--cnpm-size-icon-sm);
@@ -306,110 +309,139 @@
   accent-color: var(--cnpm-color-brand-blue-700);
 }
 
-.cnpm-reconciliation__field {
+.cnpm-reconciliation__reasons {
+  margin: 0;
+  padding-left: var(--cnpm-space-4);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-reconciliation__allocation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.cnpm-reconciliation__allocation .cnpm-reconciliation__legend {
+  grid-column: 1 / -1;
+}
+
+.cnpm-reconciliation__allocation label {
   display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-2);
-  min-width: 0;
+  align-items: center;
+  gap: var(--cnpm-space-1);
+  min-height: var(--cnpm-size-control-sm);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
 }
 
 .cnpm-reconciliation__balance {
   margin: 0;
-  padding: var(--cnpm-space-3);
-  border: 1px solid var(--cnpm-color-border-subtle);
+  padding: var(--cnpm-space-2);
   border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-surface-subtle);
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-reconciliation__balance .cnpm-reconciliation__amount {
-  display: inline;
+  background: var(--cnpm-color-semantic-success-50);
+  color: var(--cnpm-color-semantic-success-700);
+  font-size: var(--cnpm-font-size-xs);
 }
 
 .cnpm-reconciliation__actions {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--cnpm-space-2);
 }
 
-/* L'anomalie est une sortie de parcours : elle est séparée par un filet et vit sous
-   les actions nominales, jamais à côté d'elles. */
 .cnpm-reconciliation__anomaly {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-3);
-  padding-top: var(--cnpm-space-4);
+  padding-top: var(--cnpm-space-2);
   border-top: 1px solid var(--cnpm-color-border-subtle);
-  min-width: 0;
+  color: var(--cnpm-color-text-critical);
+  font-size: var(--cnpm-font-size-xs);
 }
 
-.cnpm-reconciliation__audit-list {
+.cnpm-reconciliation__anomaly[open] {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-3);
-  margin: 0;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-reconciliation__anomaly summary {
+  cursor: pointer;
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-reconciliation__audit ol,
+.cnpm-reconciliation__timeline ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  margin: var(--cnpm-space-3) 0 0;
   padding: 0;
   list-style: none;
 }
 
-.cnpm-reconciliation__audit-item {
+.cnpm-reconciliation__audit li,
+.cnpm-reconciliation__timeline li {
+  display: flex;
+  gap: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-reconciliation__audit li > span {
+  flex: none;
+  width: var(--cnpm-space-2);
+  height: var(--cnpm-space-2);
+  margin-top: var(--cnpm-space-1);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-reconciliation__audit p,
+.cnpm-reconciliation__timeline p {
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-1);
-  padding-left: var(--cnpm-space-3);
-  border-left: 2px solid var(--cnpm-color-border-subtle);
-  min-width: 0;
-}
-
-.cnpm-reconciliation__audit-action {
   margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-primary);
 }
 
-.cnpm-reconciliation__audit-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--cnpm-space-2);
-  margin: 0;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
+.cnpm-reconciliation__audit small,
+.cnpm-reconciliation__timeline small {
+  color: var(--cnpm-color-text-muted);
 }
 
-/* Sous 1440 px, la fiche fait de la troisième zone un tiroir. Faute de spécification
-   de ce tiroir, le panneau passe sous la liste : il reste lisible et complet plutôt
-   que masqué derrière un contrôle non spécifié. */
 @media (max-width: 1439px) {
+  .cnpm-reconciliation__layout {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  }
+
+  .cnpm-reconciliation__receipt-column {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1023px) {
   .cnpm-reconciliation__layout {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .cnpm-reconciliation__aside {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: stretch;
-  }
-
-  .cnpm-reconciliation__aside > * {
-    flex: 1 1 20rem;
+  .cnpm-reconciliation__receipt-column {
+    grid-column: auto;
   }
 }
 
 @media (max-width: 767px) {
-  .cnpm-reconciliation__aside {
-    flex-direction: column;
+  .cnpm-reconciliation__filters .cnpm-filters__head {
+    display: flex;
   }
 
-  /* Densité tactile : la cible passe dans la fourchette 44–48 px du handoff. */
-  .cnpm-reconciliation__select,
-  .cnpm-reconciliation__input {
+  .cnpm-reconciliation__filters .cnpm-filters__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-reconciliation__control {
     height: var(--cnpm-size-control-lg);
   }
 
-  .cnpm-reconciliation__choice {
-    min-height: var(--cnpm-size-control-lg);
+  .cnpm-reconciliation__allocation {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

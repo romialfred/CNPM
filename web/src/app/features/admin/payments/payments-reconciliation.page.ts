@@ -10,7 +10,7 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LucideDownload, LucideRefreshCw } from '@lucide/angular';
+import { LucideDownload, LucideRefreshCw, LucideReceiptText } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent, type CnpmAlertTone } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
@@ -37,10 +37,6 @@ import {
   InlineErrorSummaryComponent,
   type CnpmFieldError,
 } from '../../../design-system/inline-error-summary/inline-error-summary.component';
-import {
-  InsightSummaryComponent,
-  type InsightStat,
-} from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
@@ -62,9 +58,9 @@ import {
 } from './payments-gateway';
 
 const QUEUES: readonly CnpmTab[] = [
-  { id: 'a-rapprocher', label: 'À rapprocher' },
-  { id: 'a-confirmer', label: 'À confirmer' },
-  { id: 'traites', label: 'Traités' },
+  { id: 'a-rapprocher', label: 'Paiements' },
+  { id: 'a-confirmer', label: 'Rapprochement' },
+  { id: 'traites', label: 'Reçus' },
 ];
 
 const QUEUE_IDS: readonly ReconciliationQueue[] = ['a-rapprocher', 'a-confirmer', 'traites'];
@@ -154,16 +150,16 @@ interface PanelFeedback {
     ErrorStateComponent,
     FilterBarComponent,
     InlineErrorSummaryComponent,
-    InsightSummaryComponent,
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
     TabsComponent,
     LucideDownload,
     LucideRefreshCw,
+    LucideReceiptText,
   ],
   templateUrl: './payments-reconciliation.page.html',
-  styleUrl: './payments-reconciliation.page.scss',
+  styleUrls: ['./payments-reconciliation.page.scss', './payments-reconciliation.visual.scss'],
 })
 export class PaymentsReconciliationPage {
   private readonly gateway = inject(PAYMENTS_GATEWAY);
@@ -188,6 +184,7 @@ export class PaymentsReconciliationPage {
   protected readonly filtersExpanded = signal(true);
   /** Sélection bornée à la page affichée : une action de masse ne vise jamais des lignes jamais vues. */
   protected readonly selected = signal<ReadonlySet<string>>(new Set<string>());
+  protected readonly panelDismissed = signal(false);
   protected readonly submitting = signal(false);
   protected readonly feedback = signal<PanelFeedback | null>(null);
   protected readonly formErrors = signal<readonly CnpmFieldError[]>([]);
@@ -321,9 +318,7 @@ export class PaymentsReconciliationPage {
     { key: 'amount', label: 'Montant encaissé', note: '(FCFA)', align: 'end', sortable: true },
     { key: 'channel', label: 'Canal' },
     { key: 'status', label: 'Statut' },
-    { key: 'suggestion', label: 'Correspondance proposée', sortable: true },
     { key: 'valueDate', label: 'Date de valeur', sortable: true },
-    { key: 'actions', label: 'Actions' },
   ];
 
   protected readonly chips = computed<readonly FilterChip[]>(() => {
@@ -343,23 +338,13 @@ export class PaymentsReconciliationPage {
    * Les compteurs sont recopiés tels quels depuis la source ; aucun n'est recalculé ici.
    * Un second calcul côté écran pourrait diverger de celui qui alimente la table.
    */
-  protected readonly queueStats = computed<readonly InsightStat[]>(() => {
-    const summary = this.overview();
-    if (!summary) {
-      return [];
-    }
-    return [
-      { label: 'À rapprocher', value: summary.toReconcile },
-      { label: 'À confirmer', value: summary.toConfirm },
-      { label: 'Anomalies', value: summary.anomalies },
-      { label: 'Montant à affecter (FCFA)', value: summary.amountToReconcile, apart: true },
-    ];
-  });
-
   /** Ligne examinée, résolue sur la page courante. */
   protected readonly examined = computed<StatementLine | null>(() => {
+    if (this.panelDismissed()) {
+      return null;
+    }
     const id = this.examinedId();
-    return id ? (this.lines().find((line) => line.id === id) ?? null) : null;
+    return (id ? this.lines().find((line) => line.id === id) : null) ?? this.lines()[0] ?? null;
   });
 
   protected readonly suggestions = computed<readonly MatchSuggestion[]>(
@@ -564,6 +549,7 @@ export class PaymentsReconciliationPage {
   /** Ouvre une ligne dans le panneau, sans perdre les filtres ni la sélection de masse. */
   protected examine(line: StatementLine): void {
     this.feedback.set(null);
+    this.panelDismissed.set(false);
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { ligne: line.id },
@@ -573,11 +559,16 @@ export class PaymentsReconciliationPage {
 
   protected closePanel(): void {
     this.feedback.set(null);
+    this.panelDismissed.set(true);
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { ligne: null },
       queryParamsHandling: 'merge',
     });
+  }
+
+  protected isExamined(line: StatementLine): boolean {
+    return this.examined()?.id === line.id;
   }
 
   protected toggleRow(key: string): void {

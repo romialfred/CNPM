@@ -1,32 +1,11 @@
 .cnpm-contributions {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-6);
-  min-width: 0;
-}
-
-/* Tableau dominant et panneau de synthèse latéral (fiche BO-011).
-   `minmax(0, 1fr)` empêche la colonne du tableau de se dimensionner sur son
-   min-content : sans cela, une table à neuf colonnes pousserait la grille au-delà de
-   la page au lieu de défiler dans son propre conteneur. */
-.cnpm-contributions__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 18rem;
-  align-items: start;
-  gap: var(--cnpm-space-6);
-  min-width: 0;
-}
-
-.cnpm-contributions__list {
-  display: flex;
-  flex-direction: column;
   gap: var(--cnpm-space-4);
   min-width: 0;
 }
 
-/* Motif de l'indisponibilité de l'export : lu par les technologies d'assistance via
-   `aria-describedby`, masqué visuellement puisque le bouton désactivé le porte déjà. */
-.cnpm-contributions__hint {
+.cnpm-contributions__sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -41,125 +20,191 @@
 .cnpm-contributions__filter {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-2);
+  gap: var(--cnpm-space-1);
   min-width: 0;
 }
 
 .cnpm-contributions__label {
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
   color: var(--cnpm-color-text-secondary);
 }
 
-.cnpm-contributions__select,
-.cnpm-contributions__input {
+.cnpm-contributions__control {
   width: 100%;
   min-width: 0;
-  height: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-sm);
   padding: 0 var(--cnpm-space-3);
   border: 1px solid var(--cnpm-color-border-default);
   border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-surface-primary);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
+  background: var(--cnpm-color-surface-primary);
   color: var(--cnpm-color-text-primary);
+  font: inherit;
+  font-size: var(--cnpm-font-size-sm);
 }
 
-.cnpm-contributions__select:focus-visible,
-.cnpm-contributions__input:focus-visible {
-  border-color: var(--cnpm-color-brand-blue-700);
+.cnpm-contributions__control:focus-visible {
+  border-color: var(--cnpm-color-border-focus);
   outline: 2px solid var(--cnpm-color-brand-blue-700);
   outline-offset: 1px;
 }
 
-.cnpm-contributions__toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
+:host ::ng-deep .cnpm-contributions__filters .cnpm-filters {
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-3);
+}
+
+:host ::ng-deep .cnpm-contributions__filters .cnpm-filters__head {
+  display: none;
+}
+
+:host ::ng-deep .cnpm-contributions__filters .cnpm-filters__body {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-contributions__kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--cnpm-space-3);
+}
+
+.cnpm-contributions__kpi {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+  padding: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-contributions__kpi > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
   min-width: 0;
 }
 
-.cnpm-contributions__total {
+.cnpm-contributions__kpi small {
+  overflow: hidden;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnpm-contributions__kpi strong {
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-lg);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--cnpm-font-letterSpacing-tight);
+  white-space: nowrap;
+}
+
+.cnpm-contributions__kpi-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-control-xl);
+  height: var(--cnpm-size-control-xl);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-contributions__kpi-icon--purple {
+  background: var(--cnpm-color-brand-blue-100);
+  color: var(--cnpm-color-brand-blue-600);
+}
+
+.cnpm-contributions__kpi-icon--green {
+  background: var(--cnpm-color-semantic-success-50);
+  color: var(--cnpm-color-semantic-success-700);
+}
+
+.cnpm-contributions__kpi-icon--orange {
+  background: var(--cnpm-color-semantic-warning-50);
+  color: var(--cnpm-color-semantic-warning-700);
+}
+
+.cnpm-contributions__table-card,
+.cnpm-contributions__detail,
+.cnpm-contributions__chart {
+  min-width: 0;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-contributions__tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-6);
+  min-height: var(--cnpm-size-control-xl);
+  padding: 0 var(--cnpm-space-3);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-contributions__tabs h2,
+.cnpm-contributions__tabs span {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
   margin: 0;
   font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-contributions__tabs h2 {
+  border-bottom: 2px solid var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-contributions__tabs span {
   color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-contributions__tabs p {
+  margin: 0 0 0 auto;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
 }
 
 .cnpm-contributions__asof {
-  margin: 0;
-  font-size: var(--cnpm-font-size-xs);
+  margin: var(--cnpm-space-2) var(--cnpm-space-3);
   color: var(--cnpm-color-text-muted);
-}
-
-.cnpm-contributions__reference {
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-brand);
-  white-space: nowrap;
-}
-
-/* Raison sociale et code sur deux lignes : le code seul est illisible, la raison
-   sociale seule est ambiguë entre deux établissements homonymes. */
-.cnpm-contributions__member {
-  display: flex;
-  flex-direction: column;
-  min-width: 10rem;
-}
-
-.cnpm-contributions__member-name {
-  font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-contributions__member-code {
   font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
-  white-space: nowrap;
+  text-align: right;
 }
 
-/* Les chiffres s'alignent verticalement grâce aux chasses tabulaires : sans elles,
-   comparer deux montants d'une colonne à l'autre demande un effort inutile. */
+:host ::ng-deep .cnpm-contributions__desktop-table .cnpm-table__scroll {
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+
+:host ::ng-deep .cnpm-contributions__desktop-table .cnpm-table {
+  font-size: var(--cnpm-font-size-xs);
+}
+
+:host ::ng-deep .cnpm-contributions__desktop-table .cnpm-table__cell {
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+}
+
+.cnpm-contributions__reference,
 .cnpm-contributions__amount {
-  display: block;
-  font-variant-numeric: tabular-nums;
-  font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-primary);
-  white-space: nowrap;
-}
-
-.cnpm-contributions__note {
-  display: block;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-contributions__due {
-  display: flex;
-  flex-direction: column;
-}
-
-.cnpm-contributions__date {
-  color: var(--cnpm-color-text-primary);
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* La mention porte l'information ; la couleur ne fait que la renforcer. Retirer la
-   teinte laisserait « Échue » parfaitement lisible — c'est la condition posée par
-   `ux-ui.md` sur tout état. */
-.cnpm-contributions__due-flag {
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
-  white-space: nowrap;
-}
-
-.cnpm-contributions__due-flag--past {
-  color: var(--cnpm-color-text-critical);
-  font-weight: var(--cnpm-font-weight-medium);
-}
-
+.cnpm-contributions__member,
+.cnpm-contributions__due,
 .cnpm-contributions__status {
   display: flex;
   flex-direction: column;
@@ -167,48 +212,232 @@
   gap: var(--cnpm-space-1);
 }
 
-/* Les actions restent sur une ligne : un tableau de neuf colonnes se lit en balayant
-   les lignes, et des lignes deux fois plus hautes coûtent plus cher que la barre de
-   défilement qu'elles feraient disparaître. */
-.cnpm-contributions__actions {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--cnpm-space-1);
+.cnpm-contributions__member {
+  min-width: 9rem;
 }
 
-.cnpm-contributions__aside {
+.cnpm-contributions__member small,
+.cnpm-contributions__due small,
+.cnpm-contributions__meta {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-contributions__past {
+  color: var(--cnpm-color-text-critical) !important;
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-contributions__mobile-list {
+  display: none;
+}
+
+.cnpm-contributions__detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-contributions__detail,
+.cnpm-contributions__chart {
+  padding: var(--cnpm-space-3);
+}
+
+.cnpm-contributions__detail header,
+.cnpm-contributions__chart header {
   display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-4);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-contributions__detail h2,
+.cnpm-contributions__chart h2 {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-contributions__detail header p,
+.cnpm-contributions__chart header p {
+  margin: var(--cnpm-space-1) 0 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-contributions__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--cnpm-space-2);
+  margin: var(--cnpm-space-3) 0;
+}
+
+.cnpm-contributions__summary div {
   min-width: 0;
 }
 
-/* Sous 1440 px, la synthèse passe sous la liste plutôt que derrière un tiroir non
-   spécifié : elle reste lisible et complète. */
-@media (max-width: 1439px) {
-  .cnpm-contributions__layout {
+.cnpm-contributions__summary dt {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-contributions__summary dd {
+  margin: var(--cnpm-space-1) 0 0;
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cnpm-contributions__installments {
+  overflow-x: auto;
+}
+
+.cnpm-contributions__installments table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-contributions__installments th,
+.cnpm-contributions__installments td {
+  padding: var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cnpm-contributions__installments th:first-child,
+.cnpm-contributions__installments td:first-child,
+.cnpm-contributions__installments th:last-child,
+.cnpm-contributions__installments td:last-child {
+  text-align: left;
+}
+
+.cnpm-contributions__installments thead th {
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-contributions__bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--cnpm-space-10);
+  min-height: 12rem;
+  padding: var(--cnpm-space-4) var(--cnpm-space-6) 0;
+  border-bottom: 1px solid var(--cnpm-chart-grid);
+}
+
+.cnpm-contributions__bar-item {
+  display: grid;
+  grid-template-rows: auto 8rem auto;
+  align-items: end;
+  justify-items: center;
+  gap: var(--cnpm-space-1);
+  min-width: 5rem;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-contributions__bar-value {
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cnpm-contributions__bar-track {
+  display: flex;
+  align-items: flex-end;
+  width: var(--cnpm-space-8);
+  height: 8rem;
+  background: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-contributions__bar {
+  width: 100%;
+  background: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-contributions__bar--collected {
+  background: var(--cnpm-color-semantic-success-600);
+}
+
+.cnpm-contributions__bar--outstanding {
+  background: var(--cnpm-color-semantic-warning-600);
+}
+
+@media (max-width: 1279px) {
+  .cnpm-contributions__kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cnpm-contributions__detail-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .cnpm-contributions__aside {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  cnpm-insight-summary {
-    flex: 1 1 18rem;
   }
 }
 
-/* Cibles tactiles de 44 à 48 px sous le breakpoint mobile (ux-ui.md). */
 @media (max-width: 767px) {
-  .cnpm-contributions__aside {
+  :host ::ng-deep .cnpm-contributions__filters .cnpm-filters__head {
+    display: flex;
+  }
+
+  :host ::ng-deep .cnpm-contributions__filters .cnpm-filters__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-contributions__control {
+    height: var(--cnpm-size-control-lg);
+  }
+
+  .cnpm-contributions__kpis {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .cnpm-contributions__kpi {
+    flex: 0 0 16rem;
+  }
+
+  .cnpm-contributions__desktop-table {
+    display: none;
+  }
+
+  .cnpm-contributions__mobile-list {
+    display: grid;
+    gap: var(--cnpm-space-3);
+    padding: var(--cnpm-space-3);
+  }
+
+  .cnpm-contributions__mobile-list article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--cnpm-space-3);
+    padding: var(--cnpm-space-3);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-md);
+  }
+
+  .cnpm-contributions__mobile-list article > div {
+    display: flex;
     flex-direction: column;
   }
 
-  .cnpm-contributions__select,
-  .cnpm-contributions__input {
-    height: var(--cnpm-size-control-lg);
+  .cnpm-contributions__mobile-list article small,
+  .cnpm-contributions__mobile-list article span {
+    color: var(--cnpm-color-text-muted);
+    font-size: var(--cnpm-font-size-xs);
+  }
+
+  .cnpm-contributions__mobile-list article p {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cnpm-space-1);
+    margin: 0;
+  }
+
+  .cnpm-contributions__summary {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

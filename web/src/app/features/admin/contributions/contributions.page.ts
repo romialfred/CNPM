@@ -3,7 +3,14 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LucideDownload, LucideFileText } from '@lucide/angular';
+import {
+  LucideChartColumnIncreasing,
+  LucideDownload,
+  LucideFileText,
+  LucideReceiptText,
+  LucideTrendingUp,
+  LucideWalletCards,
+} from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -20,10 +27,6 @@ import {
   type FilterChip,
 } from '../../../design-system/filter-bar/filter-bar.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
-import {
-  InsightSummaryComponent,
-  type InsightStat,
-} from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
@@ -57,8 +60,17 @@ const STATUS_TONES: Readonly<Record<ContributionCallStatus, CnpmBadgeTone>> = {
   OVERDUE: 'error',
 };
 
-const PAGE_SIZES = [10, 25, 50] as const;
-const DEFAULT_PAGE_SIZE = 10;
+const PAGE_SIZES = [5, 10, 25, 50] as const;
+const DEFAULT_PAGE_SIZE = 5;
+
+interface InstallmentView {
+  readonly label: string;
+  readonly dueDate: string;
+  readonly amountDue: number;
+  readonly amountPaid: number;
+  readonly outstanding: number;
+  readonly status: 'SETTLED' | 'PARTIAL' | 'PENDING' | 'OVERDUE';
+}
 
 /**
  * BO-011 — appels de cotisation.
@@ -90,12 +102,15 @@ const DEFAULT_PAGE_SIZE = 10;
     EmptyStateComponent,
     ErrorStateComponent,
     FilterBarComponent,
-    InsightSummaryComponent,
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
     LucideDownload,
     LucideFileText,
+    LucideChartColumnIncreasing,
+    LucideReceiptText,
+    LucideTrendingUp,
+    LucideWalletCards,
   ],
   templateUrl: './contributions.page.html',
   styleUrl: './contributions.page.scss',
@@ -182,8 +197,8 @@ export class ContributionsPage {
           catchError((error: unknown) =>
             of(
               error instanceof ContributionsAccessError
-                ? ({ kind: 'forbidden' as const })
-                : ({ kind: 'error' as const }),
+                ? { kind: 'forbidden' as const }
+                : { kind: 'error' as const },
             ),
           ),
           startWith({ kind: 'loading' as const }),
@@ -204,8 +219,78 @@ export class ContributionsPage {
   protected readonly fiscalYears = computed(() => this.data()?.fiscalYears ?? []);
   protected readonly asOf = computed(() => this.data()?.asOf ?? null);
 
-  protected readonly hasFilters = computed(
-    () => Boolean(this.search() || this.fiscalYear() || this.quarter() || this.status()),
+  /** La sélection locale actualise le détail sans modifier les filtres portés par l'URL. */
+  protected readonly selectedCallId = signal<string | null>(null);
+  protected readonly selectedCall = computed<ContributionCallRow | null>(() => {
+    const rows = this.rows();
+    const id = this.selectedCallId();
+    return (id ? rows.find((call) => call.id === id) : null) ?? rows[0] ?? null;
+  });
+
+  /**
+   * Simulation déterministe strictement fictive en trois tranches, explicitement
+   * signalée dans l’écran. Elle sert la démonstration visuelle et ne constitue aucun
+   * barème ou calendrier institutionnel.
+   */
+  protected readonly installments = computed<readonly InstallmentView[]>(() => {
+    const call = this.selectedCall();
+    if (!call) {
+      return [];
+    }
+    const dates = this.installmentDates(call);
+    const base = Math.floor(call.calledAmount / 3);
+    const dues = [base, base, call.calledAmount - base * 2];
+    let paid = call.paidAmount;
+
+    return dues.map((amountDue, index) => {
+      const amountPaid = Math.min(amountDue, paid);
+      paid -= amountPaid;
+      const outstanding = amountDue - amountPaid;
+      const pastDue = dates[index] < (this.asOf() ?? dates[index]);
+      return {
+        label: `${index + 1}${index === 0 ? 're' : 'e'} tranche`,
+        dueDate: dates[index],
+        amountDue,
+        amountPaid,
+        outstanding,
+        status:
+          outstanding === 0
+            ? 'SETTLED'
+            : amountPaid > 0
+              ? 'PARTIAL'
+              : pastDue
+                ? 'OVERDUE'
+                : 'PENDING',
+      };
+    });
+  });
+
+  /** Même périmètre que le tableau : appelé, encaissé et solde proviennent du port. */
+  protected readonly chart = computed(() => {
+    const summary = this.overview();
+    if (!summary) {
+      return [];
+    }
+    const maximum = Math.max(summary.calledTotal, 1);
+    return [
+      { label: 'Appelé', value: summary.calledTotal, height: 100, tone: 'called' },
+      {
+        label: 'Encaissé',
+        value: summary.collectedTotal,
+        height: Math.max(4, (summary.collectedTotal / maximum) * 100),
+        tone: 'collected',
+      },
+      {
+        label: 'Solde',
+        value: summary.outstandingTotal,
+        height: Math.max(4, (summary.outstandingTotal / maximum) * 100),
+        tone: 'outstanding',
+      },
+    ] as const;
+  });
+
+  protected readonly hasFilters = computed(() =>
+    Boolean(this.search() || this.fiscalYear() || this.quarter() || this.status()),
   );
 
   protected readonly tableState = computed<DataTableState>(() => {
@@ -267,36 +352,6 @@ export class ContributionsPage {
   });
 
   /**
-   * Cinq indicateurs au maximum — plafond posé par la fiche BO-011.
-   *
-   * Aucun n'est recalculé ici : ils sont recopiés tels quels depuis la source, qui les
-   * a établis sur le même jeu que le tableau. Un second calcul côté écran pourrait
-   * diverger et afficher un total que la liste dément.
-   *
-   * L'unité est portée par chaque libellé plutôt que par le panneau : « Appels émis »
-   * est un décompte et ne s'exprime pas en francs.
-   */
-  protected readonly stats = computed<readonly InsightStat[]>(() => {
-    const summary = this.overview();
-    if (!summary) {
-      return [];
-    }
-    return [
-      { label: 'Appels émis', value: summary.callsIssued },
-      { label: 'Montant appelé (FCFA)', value: summary.calledTotal },
-      { label: 'Montant encaissé (FCFA)', value: summary.collectedTotal },
-      { label: 'Solde restant dû (FCFA)', value: summary.outstandingTotal },
-      {
-        label: 'Taux de recouvrement',
-        value: summary.recoveryRate,
-        suffix: ' %',
-        decimals: 1,
-        apart: true,
-      },
-    ];
-  });
-
-  /**
    * Clé de suivi des lignes.
    *
    * Fournie bien que la sélection ne soit pas activée : `DataTable` s'en sert aussi
@@ -339,6 +394,18 @@ export class ContributionsPage {
    */
   protected canRemind(call: ContributionCallRow): boolean {
     return call.status !== 'DRAFT' && call.status !== 'SETTLED';
+  }
+
+  protected selectCall(call: ContributionCallRow): void {
+    this.selectedCallId.set(call.id);
+  }
+
+  protected installmentStatusLabel(status: InstallmentView['status']): string {
+    return STATUS_LABELS[status];
+  }
+
+  protected installmentStatusTone(status: InstallmentView['status']): CnpmBadgeTone {
+    return STATUS_TONES[status];
   }
 
   protected applySearch(): void {
@@ -394,5 +461,22 @@ export class ContributionsPage {
       queryParams: params,
       queryParamsHandling: 'merge',
     });
+  }
+
+  private installmentDates(call: ContributionCallRow): readonly [string, string, string] {
+    const year = Number(call.fiscalYear);
+    const february = year % 4 === 0 ? '02-29' : '02-28';
+    const months: Readonly<Record<Quarter, readonly [string, string, string]>> = {
+      T1: ['01-31', february, '03-31'],
+      T2: ['04-30', '05-31', '06-30'],
+      T3: ['07-31', '08-31', '09-30'],
+      T4: ['10-31', '11-30', '12-31'],
+    };
+    const [first, second, third] = months[call.quarter];
+    return [
+      `${call.fiscalYear}-${first}`,
+      `${call.fiscalYear}-${second}`,
+      `${call.fiscalYear}-${third}`,
+    ];
   }
 }

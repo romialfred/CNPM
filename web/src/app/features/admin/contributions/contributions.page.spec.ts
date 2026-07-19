@@ -174,6 +174,16 @@ describe('ContributionsPage — états requis', () => {
     const text = host.textContent ?? '';
     expect(text).toContain('Encaissé');
     expect(text).not.toContain('Encaisser');
+    expect(text).toContain('Détail de l’échéancier');
+    expect(text).toContain('Situation des encaissements');
+    expect(text).toContain('ne constitue aucun barème CNPM');
+    const unavailableActions = Array.from(host.querySelectorAll('button')).filter((button) =>
+      /Générer des appels|Créer un échéancier/.test(button.textContent ?? ''),
+    );
+    expect(unavailableActions).toHaveLength(2);
+    expect(
+      unavailableActions.every((button) => button.getAttribute('aria-disabled') === 'true'),
+    ).toBe(true);
   });
 
   it('aligne les montants à droite et n’offre « Relancer » que sur un appel non soldé', async () => {
