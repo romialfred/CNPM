@@ -70,15 +70,18 @@ describe('HomePage (PUB-001)', () => {
     expect(host.textContent).toContain('Chargement');
   });
 
-  it('rend les chiffres en signalant qu’ils ne sont pas les statistiques officielles', async () => {
+  it('rend les chiffres avec leur date d’arrêté', async () => {
     const { fixture, gateway, host } = await setup();
     gateway.latest.next(READY);
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(host.querySelectorAll('.cnpm-home__metric')).toHaveLength(2);
-    expect(host.textContent).toContain('Chiffres illustratifs');
-    expect(host.textContent).toContain('ne constituent pas les statistiques officielles du CNPM');
+    // La mise en garde « ces valeurs ne sont pas les statistiques officielles » a été
+    // retirée sur demande explicite du client. L'encart de provenance ne subsiste donc
+    // que lorsqu'une date d'arrêté existe : sans elle, il ne porterait qu'une icône et
+    // un paragraphe vide. La fixture n'en fournit pas.
+    expect(host.querySelector('.cnpm-home__source-note')).toBeNull();
   });
 
   it('rend les actualités illustratives sans leur inventer de destination', async () => {
@@ -88,8 +91,9 @@ describe('HomePage (PUB-001)', () => {
     fixture.detectChanges();
 
     const news = host.querySelector('#actualites')!;
-    expect(news.textContent).toContain('Contenus illustratifs');
     expect(news.textContent).toContain('Exemple de publication — aucune destination associée');
+    // L'invariant qui compte : une actualité sans destination réelle ne doit jamais
+    // devenir un lien. C'est ce qui produirait un clic qui ne mène nulle part.
     expect(news.querySelectorAll('a')).toHaveLength(0);
   });
 

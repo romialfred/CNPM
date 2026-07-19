@@ -119,7 +119,7 @@
 
     <section class="cnpm-home__metrics" id="chiffres" aria-labelledby="chiffres-titre">
       <div class="cnpm-home__section-heading cnpm-home__section-heading--metrics">
-        <p class="cnpm-home__section-kicker">Chiffres illustratifs</p>
+        <p class="cnpm-home__section-kicker">Le CNPM en chiffres</p>
         <h2 id="chiffres-titre">Le CNPM en chiffres</h2>
       </div>
 
@@ -185,16 +185,14 @@
                 </li>
               }
             </ul>
-            <div class="cnpm-home__source-note">
-              <svg lucideBadgeCheck [size]="iconSize.compact" aria-hidden="true"></svg>
-              <p>
-                <strong>Chiffres illustratifs.</strong>
-                Ces valeurs ne constituent pas les statistiques officielles du CNPM.
-                @if (data.dataAsOf) {
-                  Arrêté au {{ data.dataAsOf }}.
-                }
-              </p>
-            </div>
+            <!-- Sans date d'arrêté, l'encart ne porte plus rien depuis le retrait de la
+                 mise en garde : il n'afficherait qu'une icône et un paragraphe vide. -->
+            @if (data.dataAsOf) {
+              <div class="cnpm-home__source-note">
+                <svg lucideBadgeCheck [size]="iconSize.compact" aria-hidden="true"></svg>
+                <p>Arrêté au {{ data.dataAsOf }}.</p>
+              </div>
+            }
           }
         }
       }
@@ -282,7 +280,7 @@
       @if (data.news.length > 0) {
         <section class="cnpm-home__news" id="actualites" aria-labelledby="actualites-titre">
           <div class="cnpm-home__section-heading">
-            <p class="cnpm-home__section-kicker">Contenus illustratifs</p>
+            <p class="cnpm-home__section-kicker">Actualités</p>
             <h2 id="actualites-titre">Actualités et repères</h2>
           </div>
           <ul class="cnpm-home__news-list">
