@@ -1,0 +1,54 @@
+.legal-not-found {
+  min-width: 0;
+  padding-block: var(--cnpm-space-20);
+}
+
+.legal-not-found__panel {
+  display: grid;
+  max-width: 46rem;
+  min-width: 0;
+  justify-items: start;
+  padding: var(--cnpm-space-8);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.legal-not-found__icon {
+  display: grid;
+  width: var(--cnpm-space-16);
+  height: var(--cnpm-space-16);
+  place-items: center;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-semantic-warning-50);
+  color: var(--cnpm-color-semantic-warning-700);
+}
+
+.legal-not-found h1 {
+  max-width: 100%;
+  margin: var(--cnpm-space-5) 0 var(--cnpm-space-2);
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-3xl);
+  line-height: var(--cnpm-font-lineHeight-3xl);
+  overflow-wrap: anywhere;
+}
+
+.legal-not-found p {
+  max-width: 100%;
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: var(--cnpm-font-lineHeight-md);
+  overflow-wrap: anywhere;
+}
+
+.legal-not-found strong {
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.legal-not-found a {
+  margin-block-start: var(--cnpm-space-5);
+  color: var(--cnpm-color-text-link);
+  font-weight: var(--cnpm-font-weight-semibold);
+  overflow-wrap: anywhere;
+}

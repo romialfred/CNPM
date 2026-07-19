@@ -1,0 +1,106 @@
+<cnpm-public-shell>
+  @if (current(); as document) {
+    <section class="legal-hero">
+      <div class="legal-hero__inner">
+        <div>
+          <p class="legal-eyebrow">Information juridique</p>
+          <h1 #pageTitle tabindex="-1">{{ document.title }}</h1>
+          <p>{{ document.summary }}</p>
+        </div>
+        <div class="legal-hero__status" role="note">
+          <svg lucideFileWarning [size]="iconSize.empty" aria-hidden="true"></svg>
+          <strong>Document non publié</strong>
+          <span>Contenu officiel requis avant production</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="legal-page">
+      <nav class="legal-nav" aria-label="Documents légaux">
+        <p class="legal-nav__title">Documents</p>
+        @for (item of documents; track item.slug) {
+          <a
+            [routerLink]="['/legal', item.slug]"
+            [attr.aria-current]="item.slug === document.slug ? 'page' : null"
+          >
+            {{ item.shortTitle }}
+          </a>
+        }
+      </nav>
+
+      <article class="legal-content">
+        <section class="legal-warning" aria-labelledby="legal-status-title">
+          <span aria-hidden="true">
+            <svg lucideShieldAlert [size]="iconSize.control"></svg>
+          </span>
+          <div>
+            <h2 id="legal-status-title">Statut de publication</h2>
+            <p>
+              Cette page signale les informations manquantes ; elle n’est ni une politique, ni une
+              mention légale, ni une condition contractuelle. Une validation juridique et
+              institutionnelle reste obligatoire avant publication.
+            </p>
+          </div>
+        </section>
+
+        <dl class="legal-metadata">
+          <div>
+            <dt>Statut public</dt>
+            <dd>Non publié</dd>
+          </div>
+          <div>
+            <dt>Version officielle</dt>
+            <dd>Non fournie</dd>
+          </div>
+          <div>
+            <dt>Date d’entrée en vigueur</dt>
+            <dd>Non fournie</dd>
+          </div>
+        </dl>
+
+        <section class="legal-gaps" aria-labelledby="legal-gaps-title">
+          <div class="legal-heading">
+            <p class="legal-eyebrow">Éléments à faire valider</p>
+            <h2 id="legal-gaps-title">Ce qui ne peut pas être inventé</h2>
+          </div>
+          <div class="legal-gaps__list">
+            @for (section of document.sections; track section.title; let index = $index) {
+              <section>
+                <span>0{{ index + 1 }}</span>
+                <div>
+                  <h3>{{ section.title }}</h3>
+                  <p>{{ section.description }}</p>
+                </div>
+              </section>
+            }
+          </div>
+        </section>
+
+        <aside class="legal-next" aria-labelledby="legal-next-title">
+          <svg lucideClock3 [size]="iconSize.control" aria-hidden="true"></svg>
+          <div>
+            <h2 id="legal-next-title">Avant la mise en production</h2>
+            <p>
+              L’autorité compétente devra publier le texte validé, son responsable, sa version, sa
+              date d’effet et ses modalités de mise à jour.
+            </p>
+          </div>
+        </aside>
+      </article>
+    </div>
+  } @else {
+    <section class="legal-not-found">
+      <div class="legal-not-found__panel">
+        <span class="legal-not-found__icon" aria-hidden="true">
+          <svg lucideFileWarning [size]="iconSize.empty"></svg>
+        </span>
+        <h1 #pageTitle tabindex="-1">Document légal introuvable</h1>
+        <p>
+          La référence <strong>« {{ requestedSlugLabel() }} »</strong> ne correspond à aucun statut
+          de document publié sur cette plateforme.
+        </p>
+        <a routerLink="/legal/mentions-legales">Consulter le statut des mentions légales</a>
+      </div>
+    </section>
+  }
+</cnpm-public-shell>

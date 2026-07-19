@@ -1,0 +1,55 @@
+.contact-assurance {
+  position: sticky;
+  inset-block-start: calc(var(--cnpm-space-16) + var(--cnpm-space-6));
+  padding: var(--cnpm-space-6);
+}
+
+.contact-assurance ol {
+  display: grid;
+  gap: 0;
+  margin: var(--cnpm-space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: assurance;
+}
+
+.contact-assurance li {
+  display: grid;
+  grid-template-columns: var(--cnpm-space-8) minmax(0, 1fr);
+  gap: var(--cnpm-space-1) var(--cnpm-space-3);
+  padding-block: var(--cnpm-space-4);
+  counter-increment: assurance;
+}
+
+.contact-assurance li + li {
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.contact-assurance li::before {
+  grid-row: 1 / span 2;
+  display: grid;
+  width: var(--cnpm-space-8);
+  height: var(--cnpm-space-8);
+  place-items: center;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+  content: counter(assurance);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-bold);
+}
+
+.contact-assurance li span {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+}
+
+.contact-assurance__note {
+  margin: var(--cnpm-space-5) 0 0;
+  padding-block-start: var(--cnpm-space-5);
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+}

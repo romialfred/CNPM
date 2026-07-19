@@ -17,6 +17,9 @@ async function setup() {
         { path: 'services', children: [] },
         { path: 'actualites', children: [] },
         { path: 'agenda', children: [] },
+        { path: 'contact', children: [] },
+        { path: 'legal/:document', children: [] },
+        { path: 'adhesion', children: [] },
         { path: 'verification/:code', children: [] },
       ]),
     ],
@@ -67,10 +70,19 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(hrefs).toContain('/services');
     expect(hrefs).toContain('/actualites');
     expect(hrefs).toContain('/agenda');
+    expect(hrefs).toContain('/contact');
+    expect(hrefs).toContain('/legal/mentions-legales');
+    expect(hrefs).toContain('/legal/confidentialite');
+    expect(hrefs).toContain('/legal/conditions-utilisation');
     expect(hrefs).toContain('/verification/DEMO-VERIF-2026-001');
     expect(hrefs).toContain('#services');
     expect(hrefs).toContain('#chiffres');
     expect(hrefs).not.toContain('#');
+    expect(host.textContent).toContain('Contact — démonstration');
+    expect(
+      host.querySelector('ul[aria-label="Statut des documents légaux non publiés"]'),
+    ).not.toBeNull();
+    expect(host.textContent).toContain('Statut des mentions légales');
   });
 
   it('ouvre le drawer, pose le focus et rend le contenu arrière inerte', async () => {
@@ -84,9 +96,9 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
     expect(host.querySelector('[role="dialog"]')).not.toBeNull();
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Fermer le menu');
-    expect(fixture.nativeElement.querySelector('.cnpm-public__menu-button')?.getAttribute('aria-label')).toBe(
-      'Fermer la navigation principale',
-    );
+    expect(
+      fixture.nativeElement.querySelector('.cnpm-public__menu-button')?.getAttribute('aria-label'),
+    ).toBe('Fermer la navigation principale');
     expect(host.querySelector('main')?.hasAttribute('inert')).toBe(true);
     expect(document.body.style.overflow).toBe('hidden');
   });

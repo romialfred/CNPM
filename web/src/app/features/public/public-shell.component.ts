@@ -231,6 +231,10 @@ export interface PublicFooterContact {
                   <span>Agenda</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
                 </a>
+                <a class="cnpm-public__drawer-link" routerLink="/contact" (click)="closeMenu()">
+                  <span>Contact (démonstration)</span>
+                  <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
                 <a class="cnpm-public__drawer-link" routerLink="/adhesion" (click)="closeMenu()">
                   <span>Adhésion</span>
                   <svg lucideChevronRight [size]="iconSize.compact" aria-hidden="true"></svg>
@@ -357,6 +361,7 @@ export interface PublicFooterContact {
               <li><a routerLink="/membres">Annuaire des membres</a></li>
               <li><a routerLink="/actualites">Actualités</a></li>
               <li><a routerLink="/agenda">Agenda</a></li>
+              <li><a routerLink="/contact">Contact — démonstration</a></li>
               <li><a routerLink="/adhesion">Demande d’adhésion fictive</a></li>
               @for (section of sections(); track section.id) {
                 <li>
@@ -390,10 +395,14 @@ export interface PublicFooterContact {
             <abbr title="Conseil National du Patronat du Mali">CNPM</abbr> © 2026 — Tous droits
             réservés.
           </p>
-          <ul aria-label="Documents légaux en attente de publication">
-            <li>Mentions légales</li>
-            <li>Politique de confidentialité</li>
-            <li>Conditions d'utilisation</li>
+          <ul aria-label="Statut des documents légaux non publiés">
+            <li><a routerLink="/legal/mentions-legales">Statut des mentions légales</a></li>
+            <li><a routerLink="/legal/confidentialite">Statut de la confidentialité</a></li>
+            <li>
+              <a routerLink="/legal/conditions-utilisation">
+                Statut des conditions d'utilisation
+              </a>
+            </li>
           </ul>
         </div>
       </footer>

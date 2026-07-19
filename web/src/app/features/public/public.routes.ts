@@ -122,6 +122,16 @@ export const publicRoutes: Routes = [
     title: 'Agenda — CNPM',
   },
   {
+    path: 'contact',
+    loadComponent: () => import('./contact/contact.page').then((m) => m.ContactPage),
+    title: 'Contact — démonstration CNPM',
+  },
+  {
+    path: 'legal/:document',
+    loadComponent: () => import('./legal/legal.page').then((m) => m.LegalPage),
+    title: 'Information juridique — CNPM',
+  },
+  {
     path: '',
     pathMatch: 'full',
     providers: [
