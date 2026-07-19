@@ -14,6 +14,7 @@ describe('ADMIN_NAV', () => {
       Enrôlements: '/admin/enrollments',
       Cotisations: '/admin/contributions',
       Paiements: '/admin/payments/reconciliation',
+      Reçus: '/admin/receipts',
       Relances: '/admin/recovery/campaigns',
       Requêtes: '/admin/requests',
       Groupements: '/admin/groups',
@@ -27,8 +28,7 @@ describe('ADMIN_NAV', () => {
   it('conserve les rubriques non livrées comme indisponibles explicites', () => {
     const pending = ADMIN_NAV.filter((entry) => entry.pending);
 
-    expect(pending.map((entry) => entry.label)).toEqual(['Reçus']);
-    expect(pending.map((entry) => entry.route)).toEqual(['/admin/receipts']);
+    expect(pending).toEqual([]);
   });
 
   it('n’expose Groupements qu’avec GROUP.READ', () => {

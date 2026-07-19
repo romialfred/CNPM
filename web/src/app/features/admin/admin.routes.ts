@@ -37,6 +37,9 @@ import { ORGANIZATIONS_GATEWAY } from './organizations/organizations-gateway';
 import { pendingOrganizationChangesGuard } from './organizations/pending-organization-changes.guard';
 import { DemoPaymentsGateway } from './payments/demo-payments.gateway';
 import { PAYMENTS_GATEWAY } from './payments/payments-gateway';
+import { DemoReceiptsGateway } from './receipts/demo-receipts.gateway';
+import { receiptReadGuard } from './receipts/receipt-read.guard';
+import { RECEIPTS_GATEWAY } from './receipts/receipts-gateway';
 import { DemoRecoveryGateway } from './recovery/demo-recovery.gateway';
 import { RECOVERY_GATEWAY } from './recovery/recovery-gateway';
 import { DemoReportingGateway } from './reporting/demo-reporting.gateway';
@@ -59,6 +62,7 @@ import {
   UNAVAILABLE_ENROLLMENT_GATEWAY,
   UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
   UNAVAILABLE_PAYMENTS_GATEWAY,
+  UNAVAILABLE_RECEIPTS_GATEWAY,
   UNAVAILABLE_RECOVERY_GATEWAY,
   UNAVAILABLE_REPORTING_GATEWAY,
   UNAVAILABLE_REQUESTS_GATEWAY,
@@ -188,6 +192,13 @@ export const adminRoutes: Routes = [
             : UNAVAILABLE_RECOVERY_GATEWAY,
       },
       {
+        provide: RECEIPTS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoReceiptsGateway)
+            : UNAVAILABLE_RECEIPTS_GATEWAY,
+      },
+      {
         provide: REPORTING_GATEWAY,
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
@@ -213,6 +224,7 @@ export const adminRoutes: Routes = [
       DemoEnrollmentGateway,
       DemoContributionsGateway,
       DemoPaymentsGateway,
+      DemoReceiptsGateway,
       DemoRecoveryGateway,
       DemoReportingGateway,
       DemoRequestsGateway,
@@ -307,6 +319,12 @@ export const adminRoutes: Routes = [
             (m) => m.PaymentsReconciliationPage,
           ),
         title: 'Rapprochement des paiements — Administration CNPM',
+      },
+      {
+        path: 'receipts',
+        canActivate: [receiptReadGuard],
+        loadComponent: () => import('./receipts/receipts.page').then((m) => m.ReceiptsPage),
+        title: 'Registre des reçus — Administration CNPM',
       },
       {
         path: 'recovery/campaigns',

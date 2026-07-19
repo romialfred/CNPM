@@ -1,0 +1,289 @@
+<cnpm-admin-shell>
+  <div class="cnpm-receipts">
+    <cnpm-page-header
+      title="Registre des reçus"
+      description="Consultez les métadonnées et la provenance des enregistrements accessibles."
+    />
+
+    @if (demoMode) {
+      <cnpm-alert tone="info" title="Registre strictement fictif">
+        Les identifiants DEMO, membres, paiements, montants, dates et statuts sont des données de
+        scénario. Aucun reçu officiel n’est généré, émis, signé, annulé, vérifié ou téléchargé.
+      </cnpm-alert>
+    }
+
+    <section class="cnpm-receipts__scope" aria-labelledby="receipt-scope-title">
+      <div>
+        <h2 id="receipt-scope-title">Périmètre de consultation</h2>
+        <p>REC-001 à REC-006 sont représentées sans déclencher leur workflow sensible.</p>
+      </div>
+      <ul>
+        <li>aucun PDF, cachet, signature ou QR ;</li>
+        <li>aucune émission, annulation ou notification ;</li>
+        <li>aucun lien de téléchargement ou de vérification publique.</li>
+      </ul>
+    </section>
+
+    @if (overview(); as summary) {
+      <section class="cnpm-receipts__overview" aria-label="Synthèse du registre fictif">
+        <div>
+          <span>Enregistrements</span><strong>{{ summary.totalRecords }}</strong>
+        </div>
+        <div>
+          <span>Émis — scénario</span><strong>{{ summary.issuedCount }}</strong>
+        </div>
+        <div>
+          <span>Annulés — scénario</span><strong>{{ summary.cancelledCount }}</strong>
+        </div>
+        <div>
+          <span>Montant cumulé fictif</span>
+          <strong>{{ formatAmount(summary.totalAmount) }} FCFA</strong>
+        </div>
+      </section>
+    }
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeChip($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="cnpm-receipts__filters" role="search" (ngSubmit)="applySearch()">
+        <div class="cnpm-receipts__field cnpm-receipts__field--search">
+          <label for="receipt-search">Recherche</label>
+          <input
+            id="receipt-search"
+            type="search"
+            name="search"
+            autocomplete="off"
+            maxlength="120"
+            placeholder="Identifiant, membre ou paiement"
+            [ngModel]="searchDraft()"
+            (ngModelChange)="searchDraft.set($event)"
+          />
+        </div>
+        <div class="cnpm-receipts__field">
+          <label for="receipt-status">Statut</label>
+          <select
+            id="receipt-status"
+            name="status"
+            [ngModel]="status() ?? ''"
+            (ngModelChange)="setStatus($event)"
+          >
+            <option value="">Tous les statuts</option>
+            @for (value of statuses; track value) {
+              <option [value]="value">{{ statusLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="cnpm-receipts__field">
+          <label for="receipt-channel">Canal de paiement</label>
+          <select
+            id="receipt-channel"
+            name="channel"
+            [ngModel]="channel() ?? ''"
+            (ngModelChange)="setChannel($event)"
+          >
+            <option value="">Tous les canaux</option>
+            @for (value of channels; track value) {
+              <option [value]="value">{{ channelLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="cnpm-receipts__field">
+          <label for="receipt-period">Période</label>
+          <select
+            id="receipt-period"
+            name="period"
+            [ngModel]="period() ?? ''"
+            (ngModelChange)="setPeriod($event)"
+          >
+            <option value="">Toutes les périodes</option>
+            @for (value of periods; track value) {
+              <option [value]="value">{{ periodLabel(value) }}</option>
+            }
+          </select>
+        </div>
+        <div class="cnpm-receipts__field">
+          <label for="receipt-sort">Trier par</label>
+          <select
+            id="receipt-sort"
+            name="sort"
+            [ngModel]="sortOption()"
+            (ngModelChange)="setSortOption($event)"
+          >
+            <option value="issuedAt:desc">Plus récents</option>
+            <option value="issuedAt:asc">Plus anciens</option>
+            <option value="amount:desc">Montant décroissant</option>
+            <option value="amount:asc">Montant croissant</option>
+            <option value="status:asc">Statut</option>
+          </select>
+        </div>
+        <cnpm-button type="submit" variant="secondary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <div class="cnpm-receipts__count" aria-live="polite">
+      @if (state() === 'ready' || state() === 'empty' || state() === 'noResult') {
+        <p>
+          <strong>{{ totalItems() }}</strong>
+          {{ totalItems() === 1 ? 'enregistrement trouvé' : 'enregistrements trouvés' }}
+        </p>
+      }
+    </div>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton
+          variant="table"
+          [rows]="pageSize()"
+          [columns]="columns.length"
+          label="Chargement du registre des reçus…"
+        />
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Registre indisponible en mode HTTP"
+          description="Le contrat actuel ne fournit pas une projection métier assez typée pour afficher les reçus sans conjecture."
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le registre n’a pas pu être chargé"
+          description="Une erreur temporaire est survenue. Les filtres de l’URL sont conservés."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('forbidden') {
+        <cnpm-error-state
+          variant="forbidden"
+          title="Accès refusé au registre"
+          description="La permission RECEIPT.READ et le périmètre serveur sont requis."
+        />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucun enregistrement accessible"
+          description="Le registre ne contient aucune métadonnée consultable dans votre périmètre."
+        />
+      }
+      @case ('noResult') {
+        <cnpm-empty-state
+          variant="no-results"
+          title="Aucun enregistrement ne correspond"
+          description="Retirez un filtre ou élargissez la recherche."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+            Réinitialiser les filtres
+          </cnpm-button>
+        </cnpm-empty-state>
+      }
+      @case ('ready') {
+        <div class="cnpm-receipts__table">
+          <cnpm-data-table
+            caption="Registre fictif des reçus avec membre, montant, période, statut, provenance et correction."
+            [columns]="columns"
+            [rows]="rows()"
+            state="ready"
+            [sort]="sort()"
+            [rowKey]="rowKey"
+            (sortChange)="onSortChange($event)"
+          >
+            <ng-template #row let-receipt>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-receipts__identity">
+                  <strong>{{ receipt.demonstrationReference }}</strong>
+                  <span>Document non disponible</span>
+                </span>
+              </td>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-receipts__identity">
+                  <strong>{{ receipt.memberLabel }}</strong>
+                  <span>{{ receipt.memberCode }}</span>
+                </span>
+              </td>
+              <td class="cnpm-table__cell cnpm-table__cell--end">
+                <strong>{{ formatAmount(receipt.amount) }}</strong>
+              </td>
+              <td class="cnpm-table__cell">{{ periodLabel(receipt.period) }}</td>
+              <td class="cnpm-table__cell">{{ formatDate(receipt.issuedAt) }}</td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="statusTone(receipt.status)">
+                  {{ statusLabel(receipt.status) }}
+                </cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-receipts__provenance">
+                  <strong>{{ receipt.paymentReference }}</strong>
+                  <span>{{ channelLabel(receipt.channel) }}</span>
+                  <span>Confirmation fictive : {{ formatDate(receipt.paymentConfirmedAt) }}</span>
+                </span>
+              </td>
+              <td class="cnpm-table__cell">{{ correctionLabel(receipt) }}</td>
+            </ng-template>
+          </cnpm-data-table>
+        </div>
+
+        <ul class="cnpm-receipts__cards" aria-label="Registre fictif des reçus">
+          @for (receipt of rows(); track receipt.id) {
+            <li>
+              <div class="cnpm-receipts__card-head">
+                <div>
+                  <strong>{{ receipt.demonstrationReference }}</strong>
+                  <span>Document non disponible</span>
+                </div>
+                <cnpm-badge [tone]="statusTone(receipt.status)">
+                  {{ statusLabel(receipt.status) }}
+                </cnpm-badge>
+              </div>
+              <dl>
+                <div>
+                  <dt>Membre fictif</dt>
+                  <dd>{{ receipt.memberLabel }}</dd>
+                </div>
+                <div>
+                  <dt>Montant</dt>
+                  <dd>{{ formatAmount(receipt.amount) }} FCFA</dd>
+                </div>
+                <div>
+                  <dt>Période</dt>
+                  <dd>{{ periodLabel(receipt.period) }}</dd>
+                </div>
+                <div>
+                  <dt>Date du scénario</dt>
+                  <dd>{{ formatDate(receipt.issuedAt) }}</dd>
+                </div>
+                <div>
+                  <dt>Paiement fictif</dt>
+                  <dd>{{ receipt.paymentReference }}</dd>
+                </div>
+                <div>
+                  <dt>Canal</dt>
+                  <dd>{{ channelLabel(receipt.channel) }}</dd>
+                </div>
+                <div>
+                  <dt>Correction</dt>
+                  <dd>{{ correctionLabel(receipt) }}</dd>
+                </div>
+              </dl>
+            </li>
+          }
+        </ul>
+
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    }
+  </div>
+</cnpm-admin-shell>

@@ -5,6 +5,7 @@ import type { EnrollmentGateway } from './enrollment-form/enrollment-gateway';
 import type { MemberDetailGateway } from './member-detail/member-detail-gateway';
 import type { PaymentsGateway } from './payments/payments-gateway';
 import type { RecoveryGateway } from './recovery/recovery-gateway';
+import type { ReceiptsGateway } from './receipts/receipts-gateway';
 import type { ReportingGateway } from './reporting/reporting-gateway';
 import type { RequestsGateway } from './requests/requests-gateway';
 import type { AdminSecurityGateway } from './security/admin-security-gateway';
@@ -38,6 +39,14 @@ export const UNAVAILABLE_PAYMENTS_GATEWAY: PaymentsGateway = {
 
 export const UNAVAILABLE_RECOVERY_GATEWAY: RecoveryGateway = {
   search: () => unavailableFeature$('BO-017'),
+};
+
+/**
+ * `/receipts*` ne fournit que `Resource`/`PageResource`. Sans projection typée des
+ * montants, membres, paiements, statuts et corrections, le profil HTTP échoue fermé.
+ */
+export const UNAVAILABLE_RECEIPTS_GATEWAY: ReceiptsGateway = {
+  search: () => unavailableFeature$('BO-016'),
 };
 
 export const UNAVAILABLE_REPORTING_GATEWAY: ReportingGateway = {

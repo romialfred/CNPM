@@ -43,7 +43,7 @@ export const ADMIN_NAV: readonly AdminNavEntry[] = [
   { label: 'Enrôlements', route: '/admin/enrollments', icon: 'enrolments' },
   { label: 'Cotisations', route: '/admin/contributions', icon: 'contributions' },
   { label: 'Paiements', route: '/admin/payments/reconciliation', icon: 'payments' },
-  { label: 'Reçus', route: '/admin/receipts', icon: 'receipts', pending: true },
+  { label: 'Reçus', route: '/admin/receipts', icon: 'receipts' },
   { label: 'Relances', route: '/admin/recovery/campaigns', icon: 'reminders' },
   { label: 'Requêtes', route: '/admin/requests', icon: 'requests' },
   {

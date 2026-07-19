@@ -29,6 +29,8 @@ describe('adminRoutes', () => {
     expect(child('enrollments/:id/review')?.loadComponent).toBeTypeOf('function');
     expect(child('contributions')?.loadComponent).toBeTypeOf('function');
     expect(child('payments/reconciliation')?.loadComponent).toBeTypeOf('function');
+    expect(child('receipts')?.loadComponent).toBeTypeOf('function');
+    expect(child('receipts')?.canActivate).toHaveLength(1);
     expect(child('recovery/campaigns')?.loadComponent).toBeTypeOf('function');
     expect(child('reporting')?.loadComponent).toBeTypeOf('function');
     expect(child('requests')?.loadComponent).toBeTypeOf('function');
