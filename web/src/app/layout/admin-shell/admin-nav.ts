@@ -10,6 +10,7 @@ export type AdminNavIconName =
   | 'requests'
   | 'documents'
   | 'groups'
+  | 'showcases'
   | 'reporting'
   | 'audit'
   | 'settings'
@@ -58,6 +59,12 @@ export const ADMIN_NAV: readonly AdminNavEntry[] = [
     route: '/admin/groups',
     icon: 'groups',
     requiredPermission: 'GROUP.READ',
+  },
+  {
+    label: 'Vitrines',
+    route: '/admin/showcases/moderation',
+    icon: 'showcases',
+    requiredPermission: 'SHOWCASE.MODERATION.READ',
   },
   { label: 'Reporting', route: '/admin/reporting', icon: 'reporting' },
   {

@@ -163,6 +163,12 @@
                   Audience : {{ campaign.audience | number }} · Promis :
                   {{ campaign.pledgedAmount | number: '1.0-0' }} FCFA
                 </small>
+                <a
+                  class="cnpm-recovery__table-link"
+                  [routerLink]="['/admin/recovery/campaigns', campaign.id]"
+                >
+                  Voir la fiche
+                </a>
               </li>
             }
           </ul>
@@ -618,8 +624,19 @@
                        rendraient la colonne indéchiffrable. -->
                     <td class="cnpm-table__cell">
                       <span class="cnpm-recovery__actions">
-                        <cnpm-button variant="tertiary" size="sm">Voir</cnpm-button>
-                        <cnpm-button variant="tertiary" size="sm">Performance</cnpm-button>
+                        <a
+                          class="cnpm-recovery__table-link"
+                          [routerLink]="['/admin/recovery/campaigns', campaign.id]"
+                        >
+                          Voir la fiche
+                        </a>
+                        <a
+                          class="cnpm-recovery__table-link"
+                          [routerLink]="['/admin/recovery/campaigns', campaign.id]"
+                          fragment="performance-campagne"
+                        >
+                          Performance
+                        </a>
                       </span>
                     </td>
                   </ng-template>

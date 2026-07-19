@@ -19,6 +19,7 @@ describe('ADMIN_NAV', () => {
       Requêtes: '/admin/requests',
       Documents: '/admin/documents',
       Groupements: '/admin/groups',
+      Vitrines: '/admin/showcases/moderation',
       Reporting: '/admin/reporting',
       Audit: '/admin/security/audit',
       Paramétrage: '/admin/settings',
@@ -44,6 +45,13 @@ describe('ADMIN_NAV', () => {
     expect(visibleAdminNav(['DOCUMENT.READ']).some((entry) => entry.label === 'Documents')).toBe(
       true,
     );
+  });
+
+  it('n’expose la modération des vitrines qu’avec la permission du brouillon R4', () => {
+    expect(visibleAdminNav([]).some((entry) => entry.label === 'Vitrines')).toBe(false);
+    expect(
+      visibleAdminNav(['SHOWCASE.MODERATION.READ']).some((entry) => entry.label === 'Vitrines'),
+    ).toBe(true);
   });
 
   it('filtre les rubriques sensibles selon la projection de permissions', () => {

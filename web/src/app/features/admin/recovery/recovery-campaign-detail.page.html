@@ -1,0 +1,201 @@
+<cnpm-admin-shell>
+  <main class="campaign-detail" id="contenu-principal">
+    <a class="campaign-detail__back" routerLink="/admin/recovery/campaigns">
+      <span aria-hidden="true">←</span>
+      Retour aux campagnes
+    </a>
+
+    <cnpm-page-header
+      title="Détail d’une campagne"
+      description="Lecture de l’audience, des contrôles et de la performance du scénario."
+    />
+
+    @switch (state().kind) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="4" label="Chargement de la campagne…" />
+      }
+      @case ('not-found') {
+        <cnpm-error-state
+          variant="not-found"
+          titleAs="h2"
+          title="Campagne introuvable"
+          description="Cette référence fictive n’existe pas ou n’est plus disponible."
+        />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" titleAs="h2" />
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="Détail indisponible en mode connecté"
+          description="Le contrat HTTP de la campagne n’est pas raccordé. Aucun jeu fictif n’est utilisé en remplacement."
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="La campagne n’a pas pu être chargée"
+          description="Une erreur temporaire est survenue. La référence consultée est conservée."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (campaign(); as item) {
+          <cnpm-alert tone="warning" title="Scénario de démonstration" [live]="false">
+            Les campagnes, membres, montants et résultats présentés sont fictifs. Cette page ne
+            déclenche aucun message, aucune relance et aucune décision de recouvrement.
+          </cnpm-alert>
+
+          <section class="campaign-detail__hero" aria-labelledby="reference-campagne">
+            <div>
+              <p class="campaign-detail__eyebrow">BO-018 · Consultation</p>
+              <h2 id="reference-campagne">{{ item.reference }}</h2>
+              <p>{{ item.label }}</p>
+            </div>
+            <cnpm-badge [tone]="statusTone(item.status)">{{ statusLabel(item.status) }}</cnpm-badge>
+          </section>
+
+          <section class="campaign-detail__metrics" aria-label="Indicateurs de campagne">
+            <article>
+              <span>Audience retenue</span><strong>{{ item.audience | number }}</strong>
+            </article>
+            <article>
+              <span>Messages envoyés</span><strong>{{ item.sent | number }}</strong>
+            </article>
+            <article>
+              <span>Messages délivrés</span><strong>{{ item.delivered | number }}</strong>
+            </article>
+            <article class="campaign-detail__metric--accent">
+              <span>Montant promis</span>
+              <strong>{{ item.pledgedAmount | number: '1.0-0' }} FCFA</strong>
+            </article>
+          </section>
+
+          <div class="campaign-detail__grid">
+            <section class="campaign-detail__card" aria-labelledby="configuration-campagne">
+              <p class="campaign-detail__eyebrow">Configuration observée</p>
+              <h2 id="configuration-campagne">Ciblage et diffusion</h2>
+              <dl class="campaign-detail__definitions">
+                <div>
+                  <dt>Segment</dt>
+                  <dd>{{ item.segment }}</dd>
+                </div>
+                <div>
+                  <dt>Scénario</dt>
+                  <dd>{{ item.scenario }}</dd>
+                </div>
+                <div>
+                  <dt>Canaux</dt>
+                  <dd class="campaign-detail__channels">
+                    @for (channel of item.channels; track channel) {
+                      <cnpm-badge tone="neutral">{{ channelLabel(channel) }}</cnpm-badge>
+                    }
+                  </dd>
+                </div>
+                <div>
+                  <dt>Planification</dt>
+                  <dd>
+                    @if (item.scheduledAt) {
+                      {{ item.scheduledAt | date: 'dd MMMM yyyy, HH:mm' : bamakoOffset }} · Bamako
+                    } @else {
+                      Non planifiée
+                    }
+                  </dd>
+                </div>
+              </dl>
+            </section>
+
+            <section class="campaign-detail__card" aria-labelledby="controles-campagne">
+              <p class="campaign-detail__eyebrow">Avant diffusion</p>
+              <h2 id="controles-campagne">Contrôles appliqués</h2>
+              <dl class="campaign-detail__definitions">
+                <div>
+                  <dt>Exclusions</dt>
+                  <dd>{{ item.exclusions | number }}</dd>
+                </div>
+                <div>
+                  <dt>Doublons écartés</dt>
+                  <dd>{{ item.duplicates | number }}</dd>
+                </div>
+                <div>
+                  <dt>Consentements manquants</dt>
+                  <dd>{{ item.missingConsents | number }}</dd>
+                </div>
+                <div>
+                  <dt>Coût estimé fictif</dt>
+                  <dd>{{ item.estimatedCost | number: '1.0-0' }} FCFA</dd>
+                </div>
+              </dl>
+            </section>
+          </div>
+
+          <section
+            class="campaign-detail__performance"
+            id="performance-campagne"
+            aria-labelledby="titre-performance-campagne"
+          >
+            <div class="campaign-detail__section-head">
+              <div>
+                <p class="campaign-detail__eyebrow">Mesure consultative</p>
+                <h2 id="titre-performance-campagne">Performance de la campagne</h2>
+              </div>
+              <span
+                >{{ item.pledgeCount | number }} promesse{{
+                  item.pledgeCount === 1 ? '' : 's'
+                }}</span
+              >
+            </div>
+            <div class="campaign-detail__performance-grid">
+              <article>
+                <span>Taux de délivrance</span>
+                <strong>
+                  @if (deliveryRate(item) !== null) {
+                    {{ deliveryRate(item) | number: '1.0-1' }} %
+                  } @else {
+                    Non mesurable
+                  }
+                </strong>
+                <small>Messages délivrés rapportés aux envois.</small>
+              </article>
+              <article>
+                <span>Taux d’ouverture e-mail</span>
+                <strong>
+                  @if (openRate(item) !== null) {
+                    {{ openRate(item) | number: '1.0-1' }} %
+                  } @else {
+                    Non mesurable
+                  }
+                </strong>
+                <small>Les SMS n’entrent jamais dans ce dénominateur.</small>
+              </article>
+              <article>
+                <span>Conversion en promesse</span>
+                <strong>
+                  @if (conversionRate(item) !== null) {
+                    {{ conversionRate(item) | number: '1.0-1' }} %
+                  } @else {
+                    Non mesurable
+                  }
+                </strong>
+                <small>Promesses rapportées aux membres joints.</small>
+              </article>
+            </div>
+          </section>
+
+          <section class="campaign-detail__notice" aria-labelledby="actions-campagne">
+            <h2 id="actions-campagne">Actions de recouvrement non disponibles</h2>
+            <p>
+              Le lancement, la pause, la reprise, le ciblage et l’envoi exigent des permissions
+              serveur, des consentements vérifiés et un journal d’audit. Cette fiche reste en
+              lecture seule et n’en simule aucun.
+            </p>
+          </section>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

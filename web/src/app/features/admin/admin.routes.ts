@@ -57,6 +57,11 @@ import { HttpSettingsGateway } from './settings/http-settings.gateway';
 import { pendingSettingsChangesGuard } from './settings/pending-settings-changes.guard';
 import { SETTINGS_GATEWAY } from './settings/settings-gateway';
 import { settingsReadGuard } from './settings/settings-read.guard';
+import { DemoShowcaseModerationGateway } from './showcase-moderation/demo-showcase-moderation.gateway';
+import {
+  SHOWCASE_MODERATION_GATEWAY,
+  UNAVAILABLE_SHOWCASE_MODERATION_GATEWAY,
+} from './showcase-moderation/showcase-moderation-gateway';
 import { adminSessionGuard } from './admin-session.guard';
 import {
   UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
@@ -223,6 +228,14 @@ export const adminRoutes: Routes = [
             ? inject(DemoRequestsGateway)
             : UNAVAILABLE_REQUESTS_GATEWAY,
       },
+      DemoShowcaseModerationGateway,
+      {
+        provide: SHOWCASE_MODERATION_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoShowcaseModerationGateway)
+            : UNAVAILABLE_SHOWCASE_MODERATION_GATEWAY,
+      },
       {
         provide: ADMIN_SECURITY_GATEWAY,
         useFactory: () =>
@@ -347,6 +360,14 @@ export const adminRoutes: Routes = [
         title: 'Registre des reçus — Administration CNPM',
       },
       {
+        path: 'recovery/campaigns/:id',
+        loadComponent: () =>
+          import('./recovery/recovery-campaign-detail.page').then(
+            (m) => m.RecoveryCampaignDetailPage,
+          ),
+        title: 'Détail d’une campagne — Administration CNPM',
+      },
+      {
         path: 'recovery/campaigns',
         loadComponent: () =>
           import('./recovery/recovery-campaigns.page').then((m) => m.RecoveryCampaignsPage),
@@ -375,6 +396,14 @@ export const adminRoutes: Routes = [
         canActivate: [documentReadGuard],
         loadComponent: () => import('./documents/documents.page').then((m) => m.DocumentsPage),
         title: 'GED et documents — Administration CNPM',
+      },
+      {
+        path: 'showcases/moderation',
+        loadComponent: () =>
+          import('./showcase-moderation/showcase-moderation.page').then(
+            (m) => m.ShowcaseModerationPage,
+          ),
+        title: 'Modération des vitrines membres — Administration CNPM',
       },
       {
         path: 'security/roles',

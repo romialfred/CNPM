@@ -1,0 +1,63 @@
+<article class="showcase-moderation-preview" aria-label="Aperçu public simulé">
+  <div class="showcase-moderation-preview__identity">
+    <span aria-hidden="true">DÉMO</span>
+    <div>
+      <p>Aperçu public simulé</p>
+      <h3>{{ item().organizationLabel }}</h3>
+      <p>{{ item().membershipLabel }}</p>
+    </div>
+  </div>
+  <div
+    class="showcase-moderation-preview__media"
+    role="img"
+    aria-label="Aucun média : repère graphique fictif"
+  >
+    Aucun média chargé
+  </div>
+  <p class="showcase-moderation-preview__tagline">{{ item().proposedVersion.tagline }}</p>
+  <p>{{ item().proposedVersion.summary }}</p>
+  <dl>
+    <div>
+      <dt>Secteur affiché</dt>
+      <dd>{{ item().proposedVersion.sectorLabel }}</dd>
+    </div>
+    <div>
+      <dt>Localisation</dt>
+      <dd>{{ item().proposedVersion.locationDisclosure }}</dd>
+    </div>
+    <div>
+      <dt>Contact public</dt>
+      <dd>Masqué — consentement non vérifié</dd>
+    </div>
+  </dl>
+  <div>
+    <h4>Activités fictives</h4>
+    <ul class="showcase-moderation-preview__activities">
+      @for (activity of item().proposedVersion.activities; track activity) {
+        <li>{{ activity }}</li>
+      }
+    </ul>
+  </div>
+</article>
+
+<section class="showcase-moderation-preview__diff" aria-labelledby="moderation-diff-title">
+  <div>
+    <h3 id="moderation-diff-title">Champs modifiés</h3>
+    <p>Comparaison textuelle ; le modérateur ne peut pas éditer le contenu.</p>
+  </div>
+  <ul>
+    @for (field of item().changedFields; track field) {
+      <li>{{ field }}</li>
+    }
+  </ul>
+  <div class="showcase-moderation-preview__comparison">
+    <div>
+      <h4>Version publiée fictive</h4>
+      <p>{{ item().publishedVersion.tagline }}</p>
+    </div>
+    <div>
+      <h4>Proposition fictive</h4>
+      <p>{{ item().proposedVersion.tagline }}</p>
+    </div>
+  </div>
+</section>

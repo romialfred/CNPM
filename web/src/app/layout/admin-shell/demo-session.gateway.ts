@@ -28,6 +28,7 @@ export class DemoSessionGateway implements SessionGateway {
       'ENROLLMENT.APPROVE',
       'DOCUMENT.READ',
       'GROUP.READ',
+      'SHOWCASE.MODERATION.READ',
       'AUDIT.READ',
       'ADMIN.REFERENTIAL.READ',
       'ADMIN.REFERENTIAL.WRITE',

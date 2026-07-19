@@ -93,6 +93,9 @@ import type { AdminNavIconName } from './admin-nav';
       @case ('groups') {
         <svg lucideHandshake [size]="size"></svg>
       }
+      @case ('showcases') {
+        <svg lucideMegaphone [size]="size"></svg>
+      }
       @case ('reporting') {
         <svg lucideChartNoAxesCombined [size]="size"></svg>
       }

@@ -2,7 +2,7 @@ import { DatePipe, DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideDownload, LucidePlus } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
@@ -150,6 +150,7 @@ interface StatusOption {
     DatePipe,
     DecimalPipe,
     NgTemplateOutlet,
+    RouterLink,
     FormsModule,
     AdminShellComponent,
     AlertComponent,

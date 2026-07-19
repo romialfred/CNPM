@@ -411,6 +411,21 @@
   gap: var(--cnpm-space-1);
 }
 
+.cnpm-recovery__table-link {
+  color: var(--cnpm-color-brand-blue-700);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.cnpm-recovery__table-link:focus-visible {
+  border-radius: var(--cnpm-radius-sm);
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 3px;
+}
+
 .cnpm-recovery__aside {
   display: flex;
   flex-direction: column;

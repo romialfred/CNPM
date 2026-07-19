@@ -1,0 +1,168 @@
+<cnpm-admin-shell>
+  <div class="showcase-moderation-page">
+    <cnpm-page-header
+      title="Modération des vitrines membres"
+      description="Comparer une proposition fictive à sa version publiée, sans prendre de décision."
+    />
+
+    @if (demoMode) {
+      <cnpm-alert tone="warning" title="Prototype consultatif fictif">
+        La checklist de promotion R4, la politique de modération et le consentement public ne sont
+        pas arbitrés. Aucune décision, publication, notification, donnée réelle ou requête API n’est
+        exécutée depuis cet écran.
+      </cnpm-alert>
+    }
+
+    <section class="showcase-moderation-page__boundary" aria-labelledby="moderation-boundary-title">
+      <div>
+        <h2 id="moderation-boundary-title">Limites institutionnelles de BO-037</h2>
+        <p>Le brouillon vitrine n’est pas intégré au contrat OpenAPI canonique.</p>
+      </div>
+      <ul>
+        <li>identités, textes, dates et statuts exclusivement fictifs ;</li>
+        <li>aucun média, contact, consentement ou droit d’usage simulé ;</li>
+        <li>toutes les commandes restent neutralisées jusqu’aux arbitrages.</li>
+      </ul>
+    </section>
+
+    @switch (state()) {
+      @case ('loading') {
+        <div class="showcase-moderation-page__loading">
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la file fictive…" />
+          <cnpm-skeleton variant="card" [rows]="7" label="Chargement de l’aperçu fictif…" />
+          <cnpm-skeleton variant="card" [rows]="6" label="Chargement des contrôles fictifs…" />
+        </div>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Modération indisponible en mode HTTP"
+          description="Le contrat OpenAPI canonique ne contient pas encore la projection vitrine. Aucun repli sur les données de démonstration n’est autorisé."
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="La file fictive n’a pas pu être chargée"
+          description="Une erreur temporaire est survenue. La sélection de l’URL est conservée."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucune proposition fictive à examiner"
+          description="La file de démonstration est vide. Aucune action de création n’est proposée."
+        />
+      }
+      @case ('ready') {
+        @if (selected(); as item) {
+          <div class="showcase-moderation-page__workspace">
+            <aside
+              class="showcase-moderation-page__panel showcase-moderation-page__queue"
+              aria-labelledby="moderation-queue-title"
+            >
+              <div class="showcase-moderation-page__panel-head">
+                <div>
+                  <p class="showcase-moderation-page__eyebrow">Étape 1</p>
+                  <h2 id="moderation-queue-title">File fictive</h2>
+                </div>
+                <cnpm-badge tone="neutral">{{ items().length }} scénarios</cnpm-badge>
+              </div>
+              <p class="showcase-moderation-page__hint" aria-live="polite">
+                La proposition sélectionnée est conservée dans l’URL.
+              </p>
+              <ul>
+                @for (queueItem of items(); track queueItem.id) {
+                  <li>
+                    <button
+                      type="button"
+                      class="showcase-moderation-page__queue-button"
+                      [class.showcase-moderation-page__queue-button--selected]="
+                        queueItem.id === item.id
+                      "
+                      [attr.aria-current]="queueItem.id === item.id ? 'true' : null"
+                      (click)="select(queueItem.id)"
+                    >
+                      <span>
+                        <strong>{{ queueItem.organizationLabel }}</strong>
+                        <small>{{ queueItem.demonstrationReference }}</small>
+                      </span>
+                      <cnpm-badge [tone]="queueTone(queueItem)">{{
+                        queueItem.queueLabel
+                      }}</cnpm-badge>
+                      <small>Soumis le {{ formatDate(queueItem.submittedAt) }}</small>
+                    </button>
+                  </li>
+                }
+              </ul>
+            </aside>
+
+            <section
+              class="showcase-moderation-page__panel showcase-moderation-page__review"
+              aria-labelledby="moderation-review-title"
+            >
+              <div class="showcase-moderation-page__panel-head">
+                <div>
+                  <p class="showcase-moderation-page__eyebrow">Étape 2</p>
+                  <h2 id="moderation-review-title">Aperçu et différences</h2>
+                </div>
+                <cnpm-badge tone="info">{{ item.proposedVersion.versionLabel }}</cnpm-badge>
+              </div>
+
+              <cnpm-showcase-moderation-preview [item]="item" />
+            </section>
+
+            <aside
+              class="showcase-moderation-page__panel showcase-moderation-page__decision"
+              aria-labelledby="moderation-decision-title"
+            >
+              <div class="showcase-moderation-page__panel-head">
+                <div>
+                  <p class="showcase-moderation-page__eyebrow">Étape 3</p>
+                  <h2 id="moderation-decision-title">Contrôles et décision</h2>
+                </div>
+              </div>
+              <ul class="showcase-moderation-page__checks">
+                @for (check of item.checks; track check.id) {
+                  <li>
+                    <div>
+                      <strong>{{ check.label }}</strong>
+                      <cnpm-badge [tone]="checkTone(check.status)">{{
+                        checkLabel(check.status)
+                      }}</cnpm-badge>
+                    </div>
+                    <p>{{ check.detail }}</p>
+                  </li>
+                }
+              </ul>
+
+              <div
+                class="showcase-moderation-page__actions"
+                aria-labelledby="moderation-actions-title"
+              >
+                <h3 id="moderation-actions-title">Décisions bloquées</h3>
+                <p id="moderation-actions-disabled">
+                  Indisponible : politique, motifs structurés, recours, consentement, notifications
+                  et séparation des tâches non promus.
+                </p>
+                @for (action of lockedActions; track action) {
+                  <cnpm-button
+                    variant="secondary"
+                    size="sm"
+                    [block]="true"
+                    [disabled]="true"
+                    describedBy="moderation-actions-disabled"
+                  >
+                    {{ action }}
+                  </cnpm-button>
+                }
+              </div>
+            </aside>
+          </div>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>
