@@ -9,7 +9,10 @@ Socle Flutter 3.44 pour l'expérience membre. Les lots livrés couvrent :
 - `MOB-011` — liste des requêtes sans notes internes ni SLA inventé ;
 - `MOB-012` — création locale d’une requête fictive avec validation accessible et métadonnée de pièce sans téléversement ;
 - `MOB-013` — détail et conversation fictive limités aux échanges explicitement partagés ;
-- le routeur déclaratif et le shell membre responsive à cinq destinations.
+- `MOB-014` — catalogue consultatif de métadonnées documentaires, sans fichier ni preuve officielle ;
+- `MOB-015` — historique local fictif, sans notification externe ni état de lecture serveur ;
+- le routeur déclaratif et le shell membre responsive à cinq destinations ;
+- la destination `Plus` regroupe Documents, Notifications et le Profil encore indisponible.
 
 ## Architecture
 
@@ -22,9 +25,10 @@ modifier le domaine.
 Les profils normaux sont fermés par défaut. Tant que le client Keycloak et les
 schémas de réponse typés des routes portail ne sont pas livrés, ils affichent une
 source indisponible ; ils ne se replient jamais vers les fixtures. Les contrats
-`/portal/dashboard`, `/portal/payments` et `/service-requests` existent, mais
-retournent encore les enveloppes génériques `Resource`/`PageResource`, ce qui ne
-permet pas de construire un mapping HTTP de production sans invention.
+`/portal/dashboard`, `/portal/payments`, `/portal/documents` et
+`/service-requests` existent, mais retournent encore les enveloppes génériques
+`Resource`/`PageResource`. Aucun endpoint REST ne fournit l’historique membre des
+notifications. Ces limites empêchent un mapping HTTP de production sans invention.
 
 ## Lancer la démonstration
 
@@ -47,8 +51,8 @@ flutter test --no-pub
 Les tests couvrent les validations, les erreurs neutres, le profil fermé, les
 états chargement/donnée/vide/erreur, les parcours authentifiés, la sémantique,
 les cibles tactiles, le reflow 360/390/430 et le zoom 200 %. Les goldens de
-`test/golden/goldens/` figent les écrans livrés, dont MOB-011, MOB-012 et MOB-013,
-à ces trois largeurs.
+`test/golden/goldens/` figent les écrans livrés, dont MOB-011 à MOB-015, à ces
+trois largeurs.
 
 ## Sources normatives
 

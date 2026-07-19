@@ -94,7 +94,7 @@ void main() {
         'Finances',
         'Reçus',
         'Requêtes',
-        'Profil',
+        'Plus',
       ]) {
         expect(find.text(label), findsOneWidget);
       }

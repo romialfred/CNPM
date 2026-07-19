@@ -29,6 +29,8 @@ class _CnpmAppState extends State<CnpmApp> {
       contributionController: _composition.contributionController,
       loadMemberContribution: _composition.loadMemberContribution,
       dashboardController: _composition.dashboardController,
+      documentController: _composition.documentController,
+      notificationController: _composition.notificationController,
       paymentController: _composition.paymentController,
       receiptController: _composition.receiptController,
       loadMemberReceipt: _composition.loadMemberReceipt,

@@ -50,6 +50,10 @@ class MobileAppShell extends StatelessWidget {
         child: NavigationBar(
           selectedIndex: selectedIndex,
           onDestinationSelected: (index) {
+            if (index == 4) {
+              _showMoreDestinations(context);
+              return;
+            }
             if (index == selectedIndex) {
               return;
             }
@@ -62,16 +66,6 @@ class MobileAppShell extends StatelessWidget {
                 context.go('/receipts');
               case 3:
                 context.go('/requests');
-              case 4:
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Cette destination n’est pas encore disponible dans la démonstration.',
-                      ),
-                    ),
-                  );
             }
           },
           destinations: [
@@ -105,13 +99,91 @@ class MobileAppShell extends StatelessWidget {
               label: 'Requêtes',
             ),
             const NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Profil',
+              icon: Icon(Icons.more_horiz),
+              selectedIcon: Icon(Icons.more),
+              label: 'Plus',
+              tooltip: 'Documents, notifications et profil',
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showMoreDestinations(BuildContext context) {
+    return showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              CnpmSpacing.x4,
+              0,
+              CnpmSpacing.x4,
+              CnpmSpacing.x4,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'Plus de services',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: CnpmSpacing.x2),
+                ListTile(
+                  key: const Key('more-documents-action'),
+                  leading: const Icon(Icons.folder_outlined),
+                  title: const Text('Documents'),
+                  subtitle: const Text('Catalogue de métadonnées'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.go('/documents');
+                  },
+                ),
+                ListTile(
+                  key: const Key('more-notifications-action'),
+                  leading: const Icon(Icons.notifications_none_outlined),
+                  title: const Text('Notifications'),
+                  subtitle: const Text('Historique local'),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.go('/notifications');
+                  },
+                ),
+                ListTile(
+                  key: const Key('more-profile-action'),
+                  leading: const Icon(Icons.person_outline),
+                  title: const Text('Profil'),
+                  subtitle: const Text('Indisponible dans cette démonstration'),
+                  onTap: () {
+                    final messenger = ScaffoldMessenger.of(context);
+                    Navigator.of(sheetContext).pop();
+                    messenger
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Cette destination n’est pas encore disponible dans la démonstration.',
+                          ),
+                        ),
+                      );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

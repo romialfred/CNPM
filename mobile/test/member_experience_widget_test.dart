@@ -59,8 +59,10 @@ void main() {
     await pumpCnpmApp(tester);
     await completeDemoSignIn(tester);
 
-    await tester.tap(find.text('Profil'));
-    await tester.pump();
+    await tester.tap(find.text('Plus'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('more-profile-action')));
+    await tester.pumpAndSettle();
     expect(
       find.text(
         'Cette destination n’est pas encore disponible dans la démonstration.',

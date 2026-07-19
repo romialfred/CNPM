@@ -10,8 +10,12 @@ import 'package:cnpm_mobile/features/contributions/application/load_member_contr
 import 'package:cnpm_mobile/features/contributions/domain/member_contribution.dart';
 import 'package:cnpm_mobile/features/contributions/presentation/contribution_detail_screen.dart';
 import 'package:cnpm_mobile/features/contributions/presentation/contribution_list_screen.dart';
+import 'package:cnpm_mobile/features/documents/domain/member_document.dart';
+import 'package:cnpm_mobile/features/documents/presentation/member_document_list_screen.dart';
 import 'package:cnpm_mobile/features/home/domain/member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/presentation/member_home_screen.dart';
+import 'package:cnpm_mobile/features/notifications/domain/member_notification.dart';
+import 'package:cnpm_mobile/features/notifications/presentation/member_notification_list_screen.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/presentation/payment_history_screen.dart';
 import 'package:cnpm_mobile/features/requests/application/add_shared_request_message.dart';
@@ -32,6 +36,9 @@ GoRouter buildAppRouter({
   required ContentController<List<MemberContribution>> contributionController,
   required LoadMemberContribution loadMemberContribution,
   required ContentController<MemberDashboard> dashboardController,
+  required ContentController<MemberDocumentCollection> documentController,
+  required ContentController<MemberNotificationCollection>
+  notificationController,
   required ContentController<List<MemberPayment>> paymentController,
   required ContentController<MemberReceiptCollection> receiptController,
   required LoadMemberReceipt loadMemberReceipt,
@@ -46,6 +53,8 @@ GoRouter buildAppRouter({
     '/payments',
     '/requests',
     '/contributions',
+    '/documents',
+    '/notifications',
     '/receipts',
   };
 
@@ -106,6 +115,24 @@ GoRouter buildAppRouter({
         name: 'mobile-contributions',
         builder: (context, state) => ContributionListScreen(
           controller: contributionController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/documents',
+        name: 'mobile-documents',
+        builder: (context, state) => MemberDocumentListScreen(
+          controller: documentController,
+          isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: 'mobile-notifications',
+        builder: (context, state) => MemberNotificationListScreen(
+          controller: notificationController,
           isDemo: config.isDemo,
           onSignOut: onSignOut,
         ),

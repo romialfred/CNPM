@@ -12,11 +12,21 @@ import 'package:cnpm_mobile/features/contributions/domain/member_contribution.da
 import 'package:cnpm_mobile/features/contributions/domain/member_contribution_gateway.dart';
 import 'package:cnpm_mobile/features/contributions/infrastructure/demo_member_contribution_gateway.dart';
 import 'package:cnpm_mobile/features/contributions/infrastructure/unavailable_member_contribution_gateway.dart';
+import 'package:cnpm_mobile/features/documents/application/load_member_documents.dart';
+import 'package:cnpm_mobile/features/documents/domain/member_document.dart';
+import 'package:cnpm_mobile/features/documents/domain/member_document_gateway.dart';
+import 'package:cnpm_mobile/features/documents/infrastructure/demo_member_document_gateway.dart';
+import 'package:cnpm_mobile/features/documents/infrastructure/unavailable_member_document_gateway.dart';
 import 'package:cnpm_mobile/features/home/application/load_member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/domain/member_dashboard.dart';
 import 'package:cnpm_mobile/features/home/domain/member_dashboard_gateway.dart';
 import 'package:cnpm_mobile/features/home/infrastructure/demo_member_dashboard_gateway.dart';
 import 'package:cnpm_mobile/features/home/infrastructure/unavailable_member_dashboard_gateway.dart';
+import 'package:cnpm_mobile/features/notifications/application/load_member_notifications.dart';
+import 'package:cnpm_mobile/features/notifications/domain/member_notification.dart';
+import 'package:cnpm_mobile/features/notifications/domain/member_notification_gateway.dart';
+import 'package:cnpm_mobile/features/notifications/infrastructure/demo_member_notification_gateway.dart';
+import 'package:cnpm_mobile/features/notifications/infrastructure/unavailable_member_notification_gateway.dart';
 import 'package:cnpm_mobile/features/payments/application/load_member_payments.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment_gateway.dart';
@@ -43,6 +53,8 @@ final class AppComposition {
     required this.contributionController,
     required this.loadMemberContribution,
     required this.dashboardController,
+    required this.documentController,
+    required this.notificationController,
     required this.paymentController,
     required this.receiptController,
     required this.loadMemberReceipt,
@@ -59,6 +71,12 @@ final class AppComposition {
     final MemberDashboardGateway dashboardGateway = config.isDemo
         ? const DemoMemberDashboardGateway()
         : const UnavailableMemberDashboardGateway();
+    final MemberDocumentGateway documentGateway = config.isDemo
+        ? const DemoMemberDocumentGateway()
+        : const UnavailableMemberDocumentGateway();
+    final MemberNotificationGateway notificationGateway = config.isDemo
+        ? const DemoMemberNotificationGateway()
+        : const UnavailableMemberNotificationGateway();
     final MemberContributionGateway contributionGateway = config.isDemo
         ? const DemoMemberContributionGateway()
         : const UnavailableMemberContributionGateway();
@@ -86,6 +104,14 @@ final class AppComposition {
         load: LoadMemberDashboard(dashboardGateway).call,
         isEmpty: (dashboard) => false,
       ),
+      documentController: ContentController<MemberDocumentCollection>(
+        load: LoadMemberDocuments(documentGateway).call,
+        isEmpty: (collection) => false,
+      ),
+      notificationController: ContentController<MemberNotificationCollection>(
+        load: LoadMemberNotifications(notificationGateway).call,
+        isEmpty: (collection) => false,
+      ),
       paymentController: ContentController<List<MemberPayment>>(
         load: LoadMemberPayments(paymentGateway).call,
         isEmpty: (payments) => payments.isEmpty,
@@ -109,6 +135,8 @@ final class AppComposition {
   final ContentController<List<MemberContribution>> contributionController;
   final LoadMemberContribution loadMemberContribution;
   final ContentController<MemberDashboard> dashboardController;
+  final ContentController<MemberDocumentCollection> documentController;
+  final ContentController<MemberNotificationCollection> notificationController;
   final ContentController<List<MemberPayment>> paymentController;
   final ContentController<MemberReceiptCollection> receiptController;
   final LoadMemberReceipt loadMemberReceipt;
@@ -120,6 +148,8 @@ final class AppComposition {
   void signOut() {
     dashboardController.reset();
     contributionController.reset();
+    documentController.reset();
+    notificationController.reset();
     paymentController.reset();
     receiptController.reset();
     requestController.reset();
@@ -130,6 +160,8 @@ final class AppComposition {
     authController.dispose();
     contributionController.dispose();
     dashboardController.dispose();
+    documentController.dispose();
+    notificationController.dispose();
     paymentController.dispose();
     receiptController.dispose();
     requestController.dispose();
