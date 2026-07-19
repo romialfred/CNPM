@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  input,
+  viewChild,
+} from '@angular/core';
 
 /**
  * En-tête de page — `PageHeader` (LAY-005).
@@ -16,7 +22,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   template: `
     <header class="cnpm-page-header">
       <div class="cnpm-page-header__text">
-        <h1 class="cnpm-page-header__title">{{ title() }}</h1>
+        <h1 #titleElement class="cnpm-page-header__title" tabindex="-1">{{ title() }}</h1>
         @if (description()) {
           <p class="cnpm-page-header__description">{{ description() }}</p>
         }
@@ -29,6 +35,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   styleUrl: './page-header.component.scss',
 })
 export class PageHeaderComponent {
+  private readonly titleElement = viewChild.required<ElementRef<HTMLHeadingElement>>('titleElement');
+
   readonly title = input.required<string>();
   readonly description = input<string>();
+
+  /** Replace le focus après une navigation SPA sans ajouter le titre au parcours Tab. */
+  focusTitle(): void {
+    this.titleElement().nativeElement.focus();
+  }
 }

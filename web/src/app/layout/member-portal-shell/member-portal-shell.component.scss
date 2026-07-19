@@ -77,7 +77,7 @@
   white-space: nowrap;
 }
 
-.member-shell__desktop-nav a::after {
+.member-shell__desktop-nav a.member-shell__link--active::after {
   position: absolute;
   inset: auto 0 -1.7rem;
   height: 0.1875rem;
@@ -253,7 +253,7 @@
     text-decoration: none;
   }
 
-  .member-shell__mobile-nav a {
+  .member-shell__mobile-nav a.member-shell__link--active {
     color: var(--cnpm-color-text-brand);
     background: var(--cnpm-color-brand-blue-50);
     font-weight: var(--cnpm-font-weight-semibold);

@@ -1,0 +1,307 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-contribution-detail" id="contenu-principal">
+    <a
+      class="member-contribution-detail__back"
+      routerLink="/member/contributions"
+      [queryParams]="backQueryParams()"
+    >
+      ← Retour à mes cotisations
+    </a>
+
+    <cnpm-page-header
+      title="Détail de la cotisation"
+      description="Montants, ajustements et échéancier fournis par la projection de démonstration."
+    />
+
+    <cnpm-alert tone="warning" title="Démonstration — aucune valeur officielle" [live]="false">
+      Cette page est entièrement fictive et non opposable. Elle ne calcule aucun montant et
+      n’applique aucun taux, tranche ou barème CNPM (DEC-008).
+    </cnpm-alert>
+
+    @switch (state()) {
+      @case ('loading') {
+        <section class="member-contribution-detail__loading" aria-label="Chargement du détail">
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la cotisation fictive…" />
+          <cnpm-skeleton variant="table" [rows]="3" [columns]="6" label="" />
+        </section>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="Le détail n’a pas pu être chargé"
+          description="La source de consultation est momentanément indisponible. Aucun montant n’a été modifié."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          titleAs="h2"
+          title="Détail temporairement indisponible"
+          description="Aucun endpoint de détail typé n’est défini dans le contrat OpenAPI. Aucune fixture n’est utilisée hors mode démonstration."
+        />
+      }
+      @case ('not-found') {
+        <cnpm-error-state
+          variant="not-found"
+          titleAs="h2"
+          title="Cotisation introuvable"
+          description="Cette référence n’existe pas dans la projection fictive ou n’est plus disponible."
+        >
+          <cnpm-button variant="secondary" routerLink="/member/contributions">
+            Revenir à la liste
+          </cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (detail(); as contribution) {
+          <section class="member-contribution-detail__overview" aria-labelledby="overview-title">
+            <header>
+              <div>
+                <p class="member-contribution-detail__eyebrow">Référence fictive</p>
+                <h2 id="overview-title">{{ contribution.reference }}</h2>
+              </div>
+              <cnpm-badge [tone]="statusTone(contribution.status)">
+                {{ statusLabel(contribution.status) }}
+              </cnpm-badge>
+            </header>
+
+            <dl class="member-contribution-detail__facts">
+              <div>
+                <dt>Exercice</dt>
+                <dd>{{ contribution.exercise }}</dd>
+              </div>
+              <div>
+                <dt>Date d’émission fictive</dt>
+                <dd>
+                  <time [attr.datetime]="contribution.issuedOn">
+                    {{ contribution.issuedOn | date: 'dd/MM/yyyy' }}
+                  </time>
+                </dd>
+              </div>
+              <div>
+                <dt>Date d’échéance fictive</dt>
+                <dd>
+                  <time [attr.datetime]="contribution.dueDate">
+                    {{ contribution.dueDate | date: 'dd/MM/yyyy' }}
+                  </time>
+                </dd>
+              </div>
+            </dl>
+
+            <div
+              class="member-contribution-detail__amounts"
+              role="group"
+              aria-label="Montants fournis par la fixture"
+            >
+              <article>
+                <span>Montant de l’appel fourni</span>
+                <strong>{{ contribution.calledAmount | number: '1.0-0' }} FCFA</strong>
+              </article>
+              <article>
+                <span>Montant affecté fourni</span>
+                <strong>{{ contribution.paidAmount | number: '1.0-0' }} FCFA</strong>
+              </article>
+              <article>
+                <span>Solde fourni</span>
+                <strong>{{ contribution.outstandingAmount | number: '1.0-0' }} FCFA</strong>
+              </article>
+            </div>
+
+            <cnpm-alert tone="info" title="Origine du montant" [live]="false">
+              {{ contribution.amountOriginNote }} Les trois valeurs ci-dessus sont affichées telles
+              quelles et ne sont pas recomposées par l’interface.
+            </cnpm-alert>
+          </section>
+
+          <section class="member-contribution-detail__section" aria-labelledby="schedule-title">
+            <div class="member-contribution-detail__section-head">
+              <div>
+                <h2 id="schedule-title">Échéancier fictif</h2>
+                <p>Chaque montant et chaque statut sont fournis par la fixture.</p>
+              </div>
+              <cnpm-badge tone="neutral">Lecture seule</cnpm-badge>
+            </div>
+
+            <div class="member-contribution-detail__desktop-table">
+              <cnpm-data-table
+                caption="Échéancier fictif fourni : libellé, date, montant, affectation, solde et statut."
+                [columns]="installmentColumns"
+                [rows]="contribution.schedule"
+                [rowKey]="installmentKey"
+              >
+                <ng-template #row let-installment>
+                  <td class="cnpm-table__cell">{{ installment.label }}</td>
+                  <td class="cnpm-table__cell">
+                    <time [attr.datetime]="installment.dueDate">
+                      {{ installment.dueDate | date: 'dd/MM/yyyy' }}
+                    </time>
+                  </td>
+                  <td class="cnpm-table__cell member-contribution-detail__number">
+                    {{ installment.expectedAmount | number: '1.0-0' }} FCFA
+                  </td>
+                  <td class="cnpm-table__cell member-contribution-detail__number">
+                    {{ installment.paidAmount | number: '1.0-0' }} FCFA
+                  </td>
+                  <td class="cnpm-table__cell member-contribution-detail__number">
+                    {{ installment.outstandingAmount | number: '1.0-0' }} FCFA
+                  </td>
+                  <td class="cnpm-table__cell">
+                    <cnpm-badge [tone]="statusTone(installment.status)">
+                      {{ statusLabel(installment.status) }}
+                    </cnpm-badge>
+                  </td>
+                </ng-template>
+              </cnpm-data-table>
+            </div>
+
+            <ol class="member-contribution-detail__cards" aria-label="Échéancier fictif">
+              @for (installment of contribution.schedule; track installment.id) {
+                <li>
+                  <article>
+                    <header>
+                      <h3>{{ installment.label }}</h3>
+                      <cnpm-badge [tone]="statusTone(installment.status)">
+                        {{ statusLabel(installment.status) }}
+                      </cnpm-badge>
+                    </header>
+                    <dl>
+                      <div>
+                        <dt>Date</dt>
+                        <dd>{{ installment.dueDate | date: 'dd/MM/yyyy' }}</dd>
+                      </div>
+                      <div>
+                        <dt>Montant fourni</dt>
+                        <dd>{{ installment.expectedAmount | number: '1.0-0' }} FCFA</dd>
+                      </div>
+                      <div>
+                        <dt>Affecté</dt>
+                        <dd>{{ installment.paidAmount | number: '1.0-0' }} FCFA</dd>
+                      </div>
+                      <div>
+                        <dt>Solde fourni</dt>
+                        <dd>{{ installment.outstandingAmount | number: '1.0-0' }} FCFA</dd>
+                      </div>
+                    </dl>
+                  </article>
+                </li>
+              }
+            </ol>
+          </section>
+
+          <section class="member-contribution-detail__section" aria-labelledby="adjustments-title">
+            <div class="member-contribution-detail__section-head">
+              <div>
+                <h2 id="adjustments-title">Ajustements explicités</h2>
+                <p>Aucun impact n’est recalculé dans cette page.</p>
+              </div>
+            </div>
+
+            @if (contribution.adjustments.length === 0) {
+              <cnpm-empty-state
+                variant="no-data"
+                title="Aucun ajustement fictif déclaré"
+                description="La projection indique explicitement qu’aucun ajustement n’est associé à cet appel."
+              />
+            } @else {
+              <div class="member-contribution-detail__desktop-table">
+                <cnpm-data-table
+                  caption="Ajustements fictifs fournis : référence, date, sens, montant et explication."
+                  [columns]="adjustmentColumns"
+                  [rows]="contribution.adjustments"
+                  [rowKey]="adjustmentKey"
+                >
+                  <ng-template #row let-adjustment>
+                    <td class="cnpm-table__cell">
+                      <code>{{ adjustment.reference }}</code>
+                    </td>
+                    <td class="cnpm-table__cell">
+                      <time [attr.datetime]="adjustment.recordedOn">
+                        {{ adjustment.recordedOn | date: 'dd/MM/yyyy' }}
+                      </time>
+                    </td>
+                    <td class="cnpm-table__cell">
+                      {{ adjustmentDirection(adjustment.direction) }}
+                    </td>
+                    <td class="cnpm-table__cell member-contribution-detail__number">
+                      {{ adjustment.amount | number: '1.0-0' }} FCFA
+                    </td>
+                    <td class="cnpm-table__cell">{{ adjustment.reason }}</td>
+                  </ng-template>
+                </cnpm-data-table>
+              </div>
+
+              <ol class="member-contribution-detail__cards" aria-label="Ajustements fictifs">
+                @for (adjustment of contribution.adjustments; track adjustment.reference) {
+                  <li>
+                    <article>
+                      <header>
+                        <h3>{{ adjustment.reference }}</h3>
+                        <cnpm-badge tone="neutral">
+                          {{ adjustmentDirection(adjustment.direction) }}
+                        </cnpm-badge>
+                      </header>
+                      <dl>
+                        <div>
+                          <dt>Date</dt>
+                          <dd>{{ adjustment.recordedOn | date: 'dd/MM/yyyy' }}</dd>
+                        </div>
+                        <div>
+                          <dt>Montant fourni</dt>
+                          <dd>{{ adjustment.amount | number: '1.0-0' }} FCFA</dd>
+                        </div>
+                        <div>
+                          <dt>Explication</dt>
+                          <dd>{{ adjustment.reason }}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  </li>
+                }
+              </ol>
+            }
+          </section>
+
+          <section class="member-contribution-detail__actions" aria-labelledby="actions-title">
+            <div>
+              <h2 id="actions-title">Actions indisponibles</h2>
+              <p id="document-unavailable-reason">
+                Aucun appel officiel ne peut être téléchargé avant validation du barème (DEC-008).
+              </p>
+              <p id="payment-unavailable-reason">
+                Le paiement est une action sensible exclue de cette vue de consultation.
+              </p>
+              <p>
+                Aucun reçu ou document signé n’est émis ; la règle de signature reste ouverte
+                (DEC-005).
+              </p>
+            </div>
+            <div class="member-contribution-detail__action-buttons">
+              <cnpm-button
+                variant="secondary"
+                [disabled]="true"
+                describedBy="document-unavailable-reason"
+              >
+                Télécharger l’appel
+              </cnpm-button>
+              <cnpm-button
+                variant="primary"
+                [disabled]="true"
+                describedBy="payment-unavailable-reason"
+              >
+                Payer en ligne
+              </cnpm-button>
+            </div>
+          </section>
+        }
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

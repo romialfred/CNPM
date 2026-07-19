@@ -1,0 +1,254 @@
+<cnpm-member-portal-shell
+  organization="Organisation fictive de démonstration"
+  userName="Membre fictif"
+  memberCode="DEMO-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-contributions" id="contenu-principal">
+    <cnpm-page-header
+      title="Mes cotisations"
+      description="Consultez les appels et échéanciers fictifs associés à cette démonstration."
+    />
+
+    <cnpm-alert tone="warning" title="Démonstration — données 100 % fictives" [live]="false">
+      Les références, dates, statuts et montants ci-dessous sont non officiels et non opposables.
+      Aucun taux, tranche ou barème CNPM n’est simulé tant que la décision DEC-008 reste ouverte.
+    </cnpm-alert>
+
+    <cnpm-filter-bar
+      [expanded]="filtersExpanded()"
+      [chips]="chips()"
+      (expandedChange)="filtersExpanded.set($event)"
+      (chipRemove)="removeFilter($event)"
+      (resetAll)="resetFilters()"
+    >
+      <form class="member-contributions__filters" (ngSubmit)="applyFilters()">
+        <div class="member-contributions__field">
+          <label for="contribution-status">Statut</label>
+          <select
+            id="contribution-status"
+            name="status"
+            [ngModel]="draftStatus()"
+            (ngModelChange)="draftStatus.set($event)"
+          >
+            <option value="">Tous les statuts</option>
+            @for (status of statuses; track status) {
+              <option [value]="status">{{ statusLabel(status) }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="member-contributions__field">
+          <label for="contribution-exercise">Exercice</label>
+          <select
+            id="contribution-exercise"
+            name="exercise"
+            [ngModel]="draftExercise()"
+            (ngModelChange)="draftExercise.set($event)"
+          >
+            <option value="">Tous les exercices</option>
+            @for (exercise of exercises(); track exercise) {
+              <option [value]="exercise">{{ exercise }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="member-contributions__field">
+          <label for="contribution-sort">Trier par</label>
+          <select
+            id="contribution-sort"
+            name="sort"
+            [ngModel]="draftSort()"
+            (ngModelChange)="draftSort.set($event)"
+          >
+            <option value="dueDate">Date d’échéance</option>
+            <option value="reference">Référence</option>
+            <option value="status">Statut</option>
+          </select>
+        </div>
+
+        <div class="member-contributions__field">
+          <label for="contribution-direction">Ordre</label>
+          <select
+            id="contribution-direction"
+            name="direction"
+            [ngModel]="draftDirection()"
+            (ngModelChange)="draftDirection.set($event)"
+          >
+            <option value="desc">Décroissant</option>
+            <option value="asc">Croissant</option>
+          </select>
+        </div>
+
+        <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
+      </form>
+    </cnpm-filter-bar>
+
+    <section class="member-contributions__panel" aria-labelledby="contributions-results-title">
+      <div class="member-contributions__toolbar">
+        <div>
+          <h2 id="contributions-results-title" #resultsTitle tabindex="-1">Appels fictifs</h2>
+          <p>Projection de consultation en lecture seule</p>
+        </div>
+        @if (data()) {
+          <p class="member-contributions__count" aria-live="polite">
+            {{ totalItems() | number }}
+            {{ totalItems() === 1 ? 'cotisation fictive' : 'cotisations fictives' }}
+          </p>
+        }
+      </div>
+
+      @switch (state()) {
+        @case ('loading') {
+          <cnpm-skeleton
+            variant="table"
+            [rows]="pageSize()"
+            [columns]="columns.length"
+            label="Chargement des cotisations fictives…"
+          />
+        }
+        @case ('error') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Les cotisations n’ont pas pu être chargées"
+            description="La source de consultation est momentanément indisponible. Aucun montant n’a été modifié."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+          </cnpm-error-state>
+        }
+        @case ('unavailable') {
+          <cnpm-error-state
+            variant="recoverable"
+            title="Consultation temporairement indisponible"
+            description="Le contrat GET /portal/contributions ne fournit pas encore de projection typée exploitable. Aucune donnée de démonstration n’est injectée dans ce mode."
+          />
+        }
+        @case ('empty') {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucune cotisation à afficher"
+            description="La projection fictive ne contient aucun appel pour ce membre de démonstration."
+          />
+        }
+        @case ('no-results') {
+          <cnpm-empty-state
+            variant="no-results"
+            title="Aucune cotisation ne correspond"
+            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse de la page."
+          >
+            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+              Réinitialiser les filtres
+            </cnpm-button>
+          </cnpm-empty-state>
+        }
+        @case ('ready') {
+          <div class="member-contributions__desktop-table">
+            <cnpm-data-table
+              caption="Cotisations fictives : référence, exercice, échéance, montants fournis, statut et lien vers le détail."
+              [columns]="columns"
+              [rows]="contributions()"
+              [rowKey]="rowKey"
+            >
+              <ng-template #row let-contribution>
+                <td class="cnpm-table__cell">
+                  <code>{{ contribution.reference }}</code>
+                </td>
+                <td class="cnpm-table__cell">{{ contribution.exercise }}</td>
+                <td class="cnpm-table__cell">
+                  <time [attr.datetime]="contribution.dueDate">
+                    {{ contribution.dueDate | date: 'dd/MM/yyyy' }}
+                  </time>
+                </td>
+                <td class="cnpm-table__cell member-contributions__amount">
+                  {{ contribution.calledAmount | number: '1.0-0' }} FCFA
+                </td>
+                <td class="cnpm-table__cell member-contributions__amount">
+                  {{ contribution.paidAmount | number: '1.0-0' }} FCFA
+                </td>
+                <td class="cnpm-table__cell member-contributions__amount">
+                  {{ contribution.outstandingAmount | number: '1.0-0' }} FCFA
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="statusTone(contribution.status)">
+                    {{ statusLabel(contribution.status) }}
+                  </cnpm-badge>
+                </td>
+                <td class="cnpm-table__cell">
+                  <a
+                    class="member-contributions__detail-link"
+                    [routerLink]="['/member/contributions', contribution.id]"
+                    [queryParams]="detailQueryParams()"
+                    [attr.aria-label]="'Consulter le détail de ' + contribution.reference"
+                  >
+                    Consulter
+                  </a>
+                </td>
+              </ng-template>
+            </cnpm-data-table>
+          </div>
+
+          <ol class="member-contributions__mobile-list" aria-label="Cotisations fictives">
+            @for (contribution of contributions(); track contribution.id) {
+              <li>
+                <article [attr.aria-labelledby]="'contribution-' + contribution.id">
+                  <header>
+                    <div>
+                      <h3 [id]="'contribution-' + contribution.id">
+                        {{ contribution.reference }}
+                      </h3>
+                      <p>Exercice {{ contribution.exercise }}</p>
+                    </div>
+                    <cnpm-badge [tone]="statusTone(contribution.status)">
+                      {{ statusLabel(contribution.status) }}
+                    </cnpm-badge>
+                  </header>
+                  <dl>
+                    <div>
+                      <dt>Échéance</dt>
+                      <dd>
+                        <time [attr.datetime]="contribution.dueDate">
+                          {{ contribution.dueDate | date: 'dd/MM/yyyy' }}
+                        </time>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Montant fourni</dt>
+                      <dd>{{ contribution.calledAmount | number: '1.0-0' }} FCFA</dd>
+                    </div>
+                    <div>
+                      <dt>Montant affecté</dt>
+                      <dd>{{ contribution.paidAmount | number: '1.0-0' }} FCFA</dd>
+                    </div>
+                    <div>
+                      <dt>Solde fourni</dt>
+                      <dd>{{ contribution.outstandingAmount | number: '1.0-0' }} FCFA</dd>
+                    </div>
+                  </dl>
+                  <a
+                    class="member-contributions__detail-link"
+                    [routerLink]="['/member/contributions', contribution.id]"
+                    [queryParams]="detailQueryParams()"
+                    [attr.aria-label]="'Consulter le détail de ' + contribution.reference"
+                  >
+                    Consulter le détail
+                  </a>
+                </article>
+              </li>
+            }
+          </ol>
+        }
+      }
+
+      @if (state() === 'ready') {
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    </section>
+  </main>
+</cnpm-member-portal-shell>

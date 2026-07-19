@@ -14,7 +14,14 @@
       <nav class="member-shell__desktop-nav" aria-label="Navigation du portail membre">
         @for (destination of destinations; track destination.label) {
           @if (destination.route; as route) {
-            <a [routerLink]="route" aria-current="page">{{ destination.label }}</a>
+            <a
+              [routerLink]="route"
+              routerLinkActive="member-shell__link--active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              ariaCurrentWhenActive="page"
+            >
+              {{ destination.label }}
+            </a>
           } @else {
             <span
               class="member-shell__unavailable"
@@ -28,7 +35,7 @@
         }
       </nav>
 
-      <div class="member-shell__account" aria-label="Identité du membre connecté">
+      <div class="member-shell__account" role="group" aria-label="Identité du membre connecté">
         <button
           class="member-shell__notification"
           type="button"
@@ -59,7 +66,12 @@
   <nav class="member-shell__mobile-nav" aria-label="Navigation mobile du portail membre">
     @for (destination of mobileDestinations; track destination.label) {
       @if (destination.route; as route) {
-        <a [routerLink]="route" aria-current="page">
+        <a
+          [routerLink]="route"
+          routerLinkActive="member-shell__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page"
+        >
           @switch (destination.icon) {
             @case ('home') {
               <svg lucideHouse aria-hidden="true"></svg>

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import {
   LucideBell,
   LucideBuilding2,
@@ -22,6 +22,7 @@ interface MemberPortalDestination {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
+    RouterLinkActive,
     LucideBell,
     LucideBuilding2,
     LucideCreditCard,
@@ -41,7 +42,12 @@ export class MemberPortalShellComponent {
 
   protected readonly destinations: readonly MemberPortalDestination[] = [
     { label: 'Accueil', mobileLabel: 'Accueil', route: '/member/home', icon: 'home' },
-    { label: 'Cotisations', mobileLabel: 'Cotisations', route: null, icon: 'payments' },
+    {
+      label: 'Cotisations',
+      mobileLabel: 'Cotisations',
+      route: '/member/contributions',
+      icon: 'payments',
+    },
     { label: 'Paiements', mobileLabel: 'Paiements', route: null, icon: 'payments' },
     { label: 'Reçus', mobileLabel: 'Reçus', route: null, icon: 'receipts' },
     { label: 'Requêtes', mobileLabel: 'Requêtes', route: null, icon: 'requests' },
