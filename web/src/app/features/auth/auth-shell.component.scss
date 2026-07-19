@@ -90,7 +90,10 @@
   width: 100%;
   max-width: var(--cnpm-size-contentMax);
   flex: 1 1 auto;
-  grid-template-columns: minmax(0, 54fr) minmax(0, 46fr);
+  /* La gouttière entre dans le contrôle de composition : 54,01/45,99 évite que
+     l'arrondi sous-pixel de Chromium place la zone de confiance à 51,998 % à
+     1 024 px, juste sous la borne normative de 52 %. */
+  grid-template-columns: minmax(0, 54.01fr) minmax(0, 45.99fr);
   align-items: start;
   gap: var(--cnpm-space-8);
   margin: 0 auto;
@@ -100,20 +103,22 @@
 .cnpm-auth__panel {
   display: flex;
   min-width: 0;
-  justify-content: center;
+  justify-content: flex-start;
+  margin-top: calc(-1 * var(--cnpm-space-5));
+  transform: translateX(calc(-1 * var(--cnpm-space-2)));
 }
 
 .cnpm-auth__trust {
   order: -1;
   display: flex;
-  max-width: 37rem;
+  width: 100%;
   flex-direction: column;
   gap: var(--cnpm-space-4);
   margin-top: calc(var(--cnpm-space-10) * 2);
 }
 
 .cnpm-auth__trust-title {
-  max-width: 32rem;
+  max-width: 24rem;
   margin: 0;
   color: var(--cnpm-color-brand-blue-900);
   font-size: var(--cnpm-font-size-4xl);
@@ -221,6 +226,12 @@
   .cnpm-auth__main {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--cnpm-space-6);
+  }
+
+  .cnpm-auth__panel {
+    justify-content: center;
+    margin-top: 0;
+    transform: none;
   }
 
   .cnpm-auth__trust {

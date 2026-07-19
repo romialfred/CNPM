@@ -767,8 +767,10 @@
                           }
                         }
                       </span>
-                      <h3 class="cnpm-showcase__tile-title">{{ activity.title }}</h3>
-                      <p class="cnpm-showcase__tile-text">{{ activity.description }}</p>
+                      <div class="cnpm-showcase__tile-copy">
+                        <h3 class="cnpm-showcase__tile-title">{{ activity.title }}</h3>
+                        <p class="cnpm-showcase__tile-text">{{ activity.description }}</p>
+                      </div>
                     </li>
                   }
                 </ul>
@@ -843,11 +845,13 @@
                     @for (certification of member.certifications; track certification.name) {
                       <li class="cnpm-showcase__certification">
                         <svg lucideAward [size]="iconSize.control" aria-hidden="true"></svg>
-                        <span class="cnpm-showcase__certification-name">
-                          {{ certification.name }}
-                        </span>
-                        <span class="cnpm-showcase__certification-scope">
-                          {{ certification.scope }}
+                        <span class="cnpm-showcase__certification-copy">
+                          <span class="cnpm-showcase__certification-name">
+                            {{ certification.name }}
+                          </span>
+                          <span class="cnpm-showcase__certification-scope">
+                            {{ certification.scope }}
+                          </span>
                         </span>
                       </li>
                     }

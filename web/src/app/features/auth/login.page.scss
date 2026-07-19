@@ -12,6 +12,7 @@
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-xl);
   box-shadow: var(--cnpm-shadow-sm);
+  min-height: 32.5rem;
 }
 
 .cnpm-login__title,
@@ -63,6 +64,7 @@
 
 @media (max-width: 767px) {
   .cnpm-login {
+    min-height: 0;
     padding: var(--cnpm-space-4);
     gap: var(--cnpm-space-4);
   }

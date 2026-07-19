@@ -20,7 +20,7 @@ export const SUSPENDED_EMAIL = 'demo.suspendu@cnpm.example';
 export async function startChallenge(page: Page): Promise<void> {
   await page.goto('/auth/login');
   await fillCredentials(page, DEMO_EMAIL, DEMO_PASSWORD);
-  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: 'Se connecter' }).click();
   await expect(page).toHaveURL(/\/auth\/verify$/);
 }
 
@@ -31,11 +31,7 @@ export async function startChallenge(page: Page): Promise<void> {
  * porte l'astérisque de champ requis (« Mot de passe * »), et un ciblage non exact sur
  * « Mot de passe » heurterait aussi le bouton « Afficher le mot de passe ».
  */
-export async function fillCredentials(
-  page: Page,
-  email: string,
-  password: string,
-): Promise<void> {
+export async function fillCredentials(page: Page, email: string, password: string): Promise<void> {
   await page.locator('input[type="email"]').fill(email);
   await page.locator('input[type="password"]').fill(password);
 }

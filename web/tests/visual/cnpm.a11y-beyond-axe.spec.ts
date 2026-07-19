@@ -92,7 +92,7 @@ test.describe('Indicateur de focus (WCAG 1.4.11)', () => {
 
   test('le contour de focus du bouton principal atteint 3:1', async ({ page }) => {
     await page.goto('/auth/login');
-    const submit = page.getByRole('button', { name: 'Continuer' });
+    const submit = page.getByRole('button', { name: 'Se connecter' });
     await submit.focus();
 
     const { outlineColor, outlineWidth, pageBackground } = await submit.evaluate((node) => {
@@ -164,7 +164,7 @@ test.describe('Indicateur de focus en état d’erreur (WCAG 1.4.11)', () => {
 
   test('le champ mot de passe invalide garde un contour sur son conteneur', async ({ page }) => {
     await page.goto('/auth/login');
-    await page.getByRole('button', { name: 'Continuer' }).click();
+    await page.getByRole('button', { name: 'Se connecter' }).click();
 
     const style = await page.locator('.cnpm-password').evaluate((node) => {
       (node.querySelector('input') as HTMLInputElement).focus();
@@ -184,7 +184,7 @@ test.describe('Conservation du focus (WCAG 2.4.3)', () => {
     await page.goto('/auth/login');
     await fillCredentials(page, 'inconnu@cnpm.example', 'mauvais');
 
-    const submit = page.getByRole('button', { name: 'Continuer' });
+    const submit = page.getByRole('button', { name: 'Se connecter' });
     await submit.focus();
     await submit.click();
 
@@ -226,7 +226,7 @@ test.describe('Reflow (WCAG 1.4.10)', () => {
       await page.goto('/auth/login');
       // Sans cette attente, la mesure porterait sur une page encore vide : « aucun
       // débordement » serait vrai et parfaitement dénué de sens.
-      await expect(page.getByRole('button', { name: 'Continuer' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Se connecter' })).toBeVisible();
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       );
@@ -282,7 +282,7 @@ test.describe('Cible tactile (règle projet : 44 à 48 px sur mobile et tablette
       await page.goto('/auth/login');
       // Attente web-first avant toute mesure : `evaluate` juste après `goto`
       // s'exécuterait avant le rendu d'Angular et ne trouverait aucun contrôle.
-      await expect(page.getByRole('button', { name: 'Continuer' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Se connecter' })).toBeVisible();
       const controls = await measureControls(page);
 
       expect(controls.length).toBeGreaterThan(0);
@@ -399,9 +399,7 @@ test.describe('État neutralisé', () => {
     expect(Number(opacity)).toBeLessThan(1);
   });
 
-  test('l’atténuation ne délave pas le contour de focus du bouton neutralisé', async ({
-    page,
-  }) => {
+  test('l’atténuation ne délave pas le contour de focus du bouton neutralisé', async ({ page }) => {
     await startChallenge(page);
     // Le bouton neutralisé reste focalisable (aria-disabled) : son indicateur de focus
     // doit garder son contraste, donc l'opacité ne doit pas porter sur l'hôte.

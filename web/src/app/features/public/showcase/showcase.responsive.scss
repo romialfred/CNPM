@@ -1,0 +1,73 @@
+/* Reflow normatif de PUB-006 : deux colonnes sous 1 280 px, puis une colonne sous
+   768 px. Les médias du héros restent après l'identité dans l'ordre du document. */
+@media (max-width: 1279px) {
+  .cnpm-showcase__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--cnpm-space-6);
+  }
+
+  .cnpm-showcase__facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cnpm-showcase__tiles,
+  .cnpm-showcase__projects,
+  .cnpm-showcase__certifications,
+  .cnpm-showcase__gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1023px) {
+  .cnpm-showcase__hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--cnpm-space-6);
+  }
+
+  .cnpm-showcase__name {
+    font-size: var(--cnpm-font-size-4xl);
+    line-height: var(--cnpm-font-lineHeight-4xl);
+  }
+
+  .cnpm-showcase__hero-media {
+    margin-left: 0;
+  }
+
+  .cnpm-showcase__hero-media .cnpm-visual {
+    aspect-ratio: 16 / 9;
+  }
+
+  .cnpm-showcase__verified {
+    position: static;
+    max-width: none;
+    margin-top: var(--cnpm-space-3);
+  }
+}
+
+@media (max-width: 767px) {
+  .cnpm-showcase,
+  .cnpm-showcase__status {
+    gap: var(--cnpm-space-8);
+    padding: var(--cnpm-space-6) var(--cnpm-layout-pagePaddingMobile);
+  }
+
+  .cnpm-showcase__columns,
+  .cnpm-showcase__facts,
+  .cnpm-showcase__tiles,
+  .cnpm-showcase__certifications {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-showcase__name {
+    font-size: var(--cnpm-font-size-3xl);
+    line-height: var(--cnpm-font-lineHeight-3xl);
+  }
+
+  .cnpm-showcase__cta {
+    width: 100%;
+  }
+
+  .cnpm-showcase__identity {
+    padding: var(--cnpm-space-5);
+  }
+}

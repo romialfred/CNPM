@@ -32,7 +32,7 @@ test('axe AUTH-001 — saisie des identifiants', async ({ page }) => {
 test('axe AUTH-001 — identifiants refusés', async ({ page }) => {
   await page.goto('/auth/login');
   await fillCredentials(page, 'inconnu@cnpm.example', 'mauvais');
-  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: 'Se connecter' }).click();
   await expect(page.getByRole('alert')).toBeVisible();
   await expectNoBlockingViolation(page);
 });
@@ -42,7 +42,7 @@ test('axe AUTH-001 — accès non autorisé', async ({ page }) => {
   // est un angle mort, pas une absence de risque.
   await page.goto('/auth/login');
   await fillCredentials(page, SUSPENDED_EMAIL, DEMO_PASSWORD);
-  await page.getByRole('button', { name: 'Continuer' }).click();
+  await page.getByRole('button', { name: 'Se connecter' }).click();
   await expect(page.getByText('Accès non autorisé')).toBeVisible();
   await expectNoBlockingViolation(page);
 });

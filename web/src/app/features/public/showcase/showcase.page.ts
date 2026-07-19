@@ -73,7 +73,7 @@ type PageState = 'loading' | 'published' | 'not-public' | 'not-found';
     LucideWrench,
   ],
   templateUrl: './showcase.page.html',
-  styleUrl: './showcase.page.scss',
+  styleUrls: ['./showcase.page.scss', './showcase.visuals.scss', './showcase.responsive.scss'],
 })
 export class ShowcasePage {
   private readonly gateway = inject(SHOWCASE_GATEWAY);

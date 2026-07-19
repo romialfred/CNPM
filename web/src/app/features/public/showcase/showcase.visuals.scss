@@ -1,0 +1,52 @@
+/* Illustrations vectorielles de PUB-006.
+   Leur feuille est isolée du layout de page : le gabarit reste lisible et les
+   visuels peuvent être remplacés par les futurs médias avec droits sans toucher à
+   la composition responsive. */
+.cnpm-visual {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  margin: 0;
+  border-radius: var(--cnpm-radius-lg);
+  aspect-ratio: 16 / 9;
+  background-color: var(--cnpm-color-brand-blue-800);
+  color: var(--cnpm-color-text-inverse);
+}
+
+.cnpm-visual--thumb {
+  aspect-ratio: 16 / 9;
+}
+
+.cnpm-visual__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cnpm-showcase__mark,
+.cnpm-showcase__partner-mark {
+  flex: none;
+  max-width: 100%;
+  height: auto;
+}
+
+.cnpm-visual__label {
+  position: relative;
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  background-color: var(--cnpm-color-brand-blue-950);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-visual__label--more {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: var(--cnpm-font-size-sm);
+}

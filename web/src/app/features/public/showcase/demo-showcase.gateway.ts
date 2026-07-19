@@ -64,32 +64,32 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
   private static readonly ACTIVITIES: readonly ShowcaseActivity[] = [
     {
       title: 'Travaux publics et infrastructures',
-      description: 'Routes, pistes rurales, réseaux d’assainissement et voiries urbaines.',
+      description: 'Routes, ponts et ouvrages d’art.',
       icon: 'roads',
     },
     {
       title: 'Bâtiment et génie civil',
-      description: 'Bâtiments administratifs, logements collectifs et ouvrages en béton armé.',
+      description: 'Bâtiments et ouvrages industriels.',
       icon: 'building',
     },
     {
       title: 'Aménagement urbain',
-      description: 'Espaces publics, éclairage, mobilier urbain et aménagements paysagers.',
+      description: 'Voirie, réseaux et éclairage public.',
       icon: 'urban',
     },
     {
       title: 'Études et ingénierie',
-      description: 'Études techniques, métrés, suivi de chantier et contrôle qualité.',
+      description: 'Études techniques et contrôle qualité.',
       icon: 'studies',
     },
     {
       title: 'Matériaux et équipements',
-      description: 'Production de granulats, centrale à béton et location d’engins.',
+      description: 'Matériaux et équipements BTP.',
       icon: 'materials',
     },
     {
       title: 'Maintenance et réhabilitation',
-      description: 'Entretien courant, reprise d’ouvrages et mise aux normes.',
+      description: 'Entretien et réhabilitation d’infrastructures.',
       icon: 'maintenance',
     },
   ];

@@ -7,9 +7,9 @@
 .cnpm-showcase,
 .cnpm-showcase__status {
   width: 100%;
-  max-width: var(--cnpm-size-publicMax);
+  max-width: var(--cnpm-size-contentMax);
   margin: 0 auto;
-  padding: var(--cnpm-space-3) var(--cnpm-layout-pagePaddingDesktop) var(--cnpm-space-8);
+  padding: var(--cnpm-space-2) var(--cnpm-space-6) var(--cnpm-space-8);
   min-width: 0;
 }
 
@@ -79,15 +79,20 @@
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   align-items: center;
-  gap: var(--cnpm-space-8);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-brand-blue-50);
 }
 
 .cnpm-showcase__identity {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--cnpm-space-3);
+  gap: var(--cnpm-space-2);
   min-width: 0;
+  padding: var(--cnpm-space-5) calc(var(--cnpm-space-10) + var(--cnpm-space-3));
 }
 
 .cnpm-showcase__eyebrow-row {
@@ -133,7 +138,6 @@
 .cnpm-showcase__actions,
 .cnpm-showcase__meta,
 .cnpm-showcase__partners,
-.cnpm-showcase__localnav-list,
 .cnpm-showcase__carousel {
   display: flex;
   flex-wrap: wrap;
@@ -147,7 +151,6 @@
    tokens. La cible tactile reste à 44 px et le focus visible vient de la feuille
    globale, qui pose déjà un contour de 2 px et son halo. */
 .cnpm-showcase__cta,
-.cnpm-showcase__localnav-link,
 .cnpm-showcase__carousel-button {
   display: inline-flex;
   align-items: center;
@@ -180,7 +183,6 @@
 /* Après la règle pleine : à spécificité égale, le dernier l'emporte, et la variante
    en contour doit garder son fond clair au survol. */
 .cnpm-showcase__cta--ghost:hover,
-.cnpm-showcase__localnav-link:hover,
 .cnpm-showcase__carousel-button:hover {
   background-color: var(--cnpm-color-brand-blue-50);
   color: var(--cnpm-color-text-brand);
@@ -195,10 +197,12 @@
 .cnpm-showcase__hero-media {
   position: relative;
   min-width: 0;
+  margin-left: calc(-1 * var(--cnpm-space-10));
 }
 
 .cnpm-showcase__hero-media .cnpm-visual {
-  aspect-ratio: 2.7 / 1;
+  aspect-ratio: 10 / 3;
+  border-radius: 0;
 }
 
 .cnpm-showcase__verified {
@@ -216,17 +220,6 @@
 .cnpm-showcase__demo {
   background-color: var(--cnpm-color-semantic-warning-50);
   color: var(--cnpm-color-semantic-warning-700);
-}
-
-/* Navigation locale : repères de section, alignés sur les ancres rendues. */
-.cnpm-showcase__localnav {
-  border-block: 1px solid var(--cnpm-color-border-subtle);
-  padding-block: var(--cnpm-space-2);
-}
-
-.cnpm-showcase__localnav-link {
-  padding: 0 var(--cnpm-space-3);
-  color: var(--cnpm-color-text-link);
 }
 
 .cnpm-showcase__section {
@@ -302,6 +295,7 @@
   align-items: center;
   column-gap: var(--cnpm-space-3);
   row-gap: 0;
+  padding-block: var(--cnpm-space-1);
 }
 
 .cnpm-showcase__fact-icon {
@@ -372,6 +366,66 @@
   min-width: 0;
 }
 
+/* À 1 672 px la référence exploite la largeur éditoriale disponible et présente les
+   activités comme de petites fiches horizontales. Ce regroupement préserve les
+   descriptions tout en rapprochant la densité du gabarit validé. */
+.cnpm-showcase__tile {
+  display: grid;
+  grid-template-columns: var(--cnpm-size-control-md) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-1);
+}
+
+.cnpm-showcase__tile-copy {
+  display: grid;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-showcase__tile-title,
+.cnpm-showcase__tile-text {
+  line-height: var(--cnpm-font-lineHeight-xs);
+}
+
+.cnpm-showcase__project {
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-space-1);
+}
+
+.cnpm-showcase__project .cnpm-visual {
+  aspect-ratio: 2 / 1;
+}
+
+.cnpm-showcase__project-title,
+.cnpm-showcase__project-text {
+  line-height: var(--cnpm-font-lineHeight-xs);
+}
+
+.cnpm-showcase__certification {
+  display: grid;
+  grid-template-columns: var(--cnpm-size-icon-md) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-1);
+}
+
+.cnpm-showcase__certification-copy {
+  display: grid;
+}
+
+.cnpm-showcase__certification-name,
+.cnpm-showcase__certification-scope {
+  line-height: var(--cnpm-font-lineHeight-xs);
+}
+
+.cnpm-showcase__columns--even > .cnpm-showcase__section {
+  align-self: stretch;
+  padding: var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
 /* Catégorie : texte sur pastille neutre, jamais une couleur porteuse de sens.
    `align-self` la borne à son contenu : étirée, elle formait un bandeau. */
 .cnpm-showcase__chip {
@@ -415,122 +469,4 @@
   background-color: var(--cnpm-color-surface-primary);
   color: var(--cnpm-color-text-brand);
   cursor: pointer;
-}
-
-/* ILLUSTRATIONS
-   Le cadre ne porte plus qu'un fond de repli : l'illustration couvre toute la surface
-   et apporte ses propres couleurs. Le libellé repose sur un bandeau opaque, seul moyen
-   de garantir son contraste au-dessus d'un dessin clair. */
-.cnpm-visual {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  margin: 0;
-  min-width: 0;
-  overflow: hidden;
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-brand-blue-800);
-  color: var(--cnpm-color-text-inverse);
-  aspect-ratio: 16 / 9;
-}
-
-.cnpm-visual--thumb {
-  aspect-ratio: 1 / 1;
-}
-
-.cnpm-visual__art {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* Illustrations de petit format (couverture de brochure, avatar, monogramme
-   partenaire) : leur taille intrinsèque vient des attributs `width`/`height` du SVG,
-   la feuille se borne à les empêcher de déborder d'une colonne étroite. */
-.cnpm-showcase__mark,
-.cnpm-showcase__partner-mark {
-  flex: none;
-  max-width: 100%;
-  height: auto;
-}
-
-.cnpm-visual__label {
-  position: relative;
-  padding: var(--cnpm-space-2) var(--cnpm-space-3);
-  background-color: var(--cnpm-color-brand-blue-950);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-medium);
-}
-
-/* Dernière vignette : le compteur couvre la vignette au lieu de la légender. Le fond
-   opaque garantit le contraste, qu'aucun voile translucide sur motif ne donnerait. */
-.cnpm-visual__label--more {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: var(--cnpm-font-size-sm);
-}
-
-/* Sous 1280 px la zone à trois colonnes passe à deux, puis à une. */
-@media (max-width: 1279px) {
-  .cnpm-showcase__columns,
-  .cnpm-showcase__columns--even {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--cnpm-space-6);
-  }
-  .cnpm-showcase__facts {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .cnpm-showcase__tiles,
-  .cnpm-showcase__projects,
-  .cnpm-showcase__certifications,
-  .cnpm-showcase__gallery {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1023px) {
-  .cnpm-showcase__hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--cnpm-space-6);
-  }
-  .cnpm-showcase__name {
-    font-size: var(--cnpm-font-size-4xl);
-    line-height: var(--cnpm-font-lineHeight-4xl);
-  }
-  .cnpm-showcase__hero-media .cnpm-visual {
-    aspect-ratio: 16 / 9;
-  }
-  /* La carte flottante repasse dans le flux : superposée à un visuel étroit, elle
-     déborderait et masquerait le motif. */
-  .cnpm-showcase__verified {
-    position: static;
-    max-width: none;
-    margin-top: var(--cnpm-space-3);
-  }
-}
-
-@media (max-width: 767px) {
-  .cnpm-showcase,
-  .cnpm-showcase__status {
-    padding: var(--cnpm-space-6) var(--cnpm-layout-pagePaddingMobile);
-    gap: var(--cnpm-space-8);
-  }
-  .cnpm-showcase__columns,
-  .cnpm-showcase__columns--even,
-  .cnpm-showcase__facts,
-  .cnpm-showcase__tiles,
-  .cnpm-showcase__certifications {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .cnpm-showcase__name {
-    font-size: var(--cnpm-font-size-3xl);
-    line-height: var(--cnpm-font-lineHeight-3xl);
-  }
-  .cnpm-showcase__cta {
-    width: 100%;
-  }
 }
