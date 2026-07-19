@@ -62,6 +62,12 @@ export class MemberPortalShellComponent {
       route: '/member/documents',
       icon: 'receipts',
     },
+    {
+      label: 'Vitrine',
+      mobileLabel: 'Vitrine',
+      route: '/member/showcase/edit',
+      icon: 'profile',
+    },
     { label: 'Profil', mobileLabel: 'Profil', route: '/member/profile', icon: 'profile' },
     {
       label: 'Utilisateurs',

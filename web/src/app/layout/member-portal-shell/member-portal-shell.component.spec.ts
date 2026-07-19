@@ -19,6 +19,7 @@ describe('MemberPortalShellComponent', () => {
           { path: 'member/receipts', children: [] },
           { path: 'member/requests', children: [] },
           { path: 'member/documents', children: [] },
+          { path: 'member/showcase/edit', children: [] },
           { path: 'member/profile', children: [] },
           { path: 'member/users', children: [] },
         ]),
@@ -40,13 +41,13 @@ describe('MemberPortalShellComponent', () => {
   });
 
   it('ne transforme pas les destinations absentes en liens morts', () => {
-    expect(host.querySelectorAll('nav a')).toHaveLength(12);
+    expect(host.querySelectorAll('nav a')).toHaveLength(13);
     expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(2);
     expect(host.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
   });
 
-  it('reprend les neuf destinations desktop et borne le mobile à cinq entrées', () => {
-    expect(host.querySelectorAll('.member-shell__desktop-nav > *')).toHaveLength(9);
+  it('reprend les dix destinations desktop et borne le mobile à cinq entrées', () => {
+    expect(host.querySelectorAll('.member-shell__desktop-nav > *')).toHaveLength(10);
     expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
     expect(host.querySelector('.member-shell__notification-count')?.textContent).toContain('3');
   });
@@ -74,6 +75,7 @@ describe('MemberPortalShellComponent', () => {
   });
 
   it.each([
+    ['/member/showcase/edit', 'Vitrine'],
     ['/member/profile', 'Profil'],
     ['/member/users', 'Utilisateurs'],
   ])('active %s uniquement dans la navigation desktop', async (url, label) => {

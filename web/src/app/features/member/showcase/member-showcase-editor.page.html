@@ -1,0 +1,514 @@
+<cnpm-member-portal-shell
+  organization="Entreprise Démo Sahel"
+  userName="Membre de démonstration"
+  memberCode="CNPM-DEMO-0001"
+  [notificationCount]="0"
+>
+  <main class="showcase-editor" id="contenu-principal">
+    <cnpm-page-header
+      title="Éditeur de vitrine"
+      description="Préparez un brouillon fictif dans un gabarit éditorial contraint."
+    >
+      <cnpm-button routerLink="/member/showcase/preview" variant="primary">
+        Ouvrir l’aperçu privé
+      </cnpm-button>
+    </cnpm-page-header>
+
+    <cnpm-alert tone="warning" title="Atelier local de démonstration" [live]="false">
+      Saisissez uniquement du contenu fictif non sensible. Le brouillon reste dans ce navigateur :
+      aucune donnée n’est envoyée, soumise, modérée ou publiée.
+    </cnpm-alert>
+
+    @switch (state()) {
+      @case ('loading') {
+        <section class="showcase-editor__loading" aria-label="Chargement du brouillon fictif">
+          <cnpm-skeleton variant="card" [rows]="8" label="Chargement du brouillon fictif…" />
+        </section>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le brouillon local n’a pas pu être chargé"
+          description="Aucune donnée n’a été transmise. Vous pouvez réessayer d’ouvrir l’atelier local."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Éditeur de vitrine indisponible en mode HTTP"
+          description="La checklist R4, le contrat canonique, le périmètre d’organisation et les consentements ne sont pas promus. Aucune fixture locale n’est injectée dans ce mode."
+        />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="first-use"
+          title="Aucun brouillon local"
+          description="Aucun contenu fictif n’est disponible dans cette session de démonstration."
+        />
+      }
+      @case ('ready') {
+        <div class="showcase-editor__workspace">
+          <aside class="showcase-editor__sidebar" aria-labelledby="showcase-editor-sections-title">
+            <h2 id="showcase-editor-sections-title">Sections du gabarit</h2>
+            <nav aria-label="Sections de l’éditeur">
+              <ol>
+                @for (section of sections; track section.id) {
+                  <li>
+                    <a [href]="'#showcase-editor-' + section.id">
+                      <span>{{ section.label }}</span>
+                      <cnpm-badge [tone]="section.available ? 'info' : 'neutral'">
+                        {{ section.available ? 'Local' : 'Bloqué' }}
+                      </cnpm-badge>
+                    </a>
+                  </li>
+                }
+              </ol>
+            </nav>
+            <div class="showcase-editor__version">
+              <span>Version locale</span>
+              <strong>v{{ draft()?.version }}</strong>
+              @if (draft()?.publication?.lastSavedAt; as savedAt) {
+                <small>Base chargée le {{ savedAt | date: 'dd/MM/yyyy à HH:mm' : 'UTC' }}</small>
+              }
+            </div>
+          </aside>
+
+          <form class="showcase-editor__form" [formGroup]="form">
+            <div class="showcase-editor__save-status" role="status" aria-live="polite">
+              <span class="showcase-editor__save-dot" aria-hidden="true"></span>
+              <span>{{ saveLabel() }}</span>
+            </div>
+
+            @if (validationChecked()) {
+              <section
+                class="showcase-editor__validation"
+                #validationSummary
+                tabindex="-1"
+                aria-labelledby="showcase-editor-validation-title"
+              >
+                <h2 id="showcase-editor-validation-title">Contrôle du brouillon</h2>
+                @if (issues().length) {
+                  <cnpm-alert tone="error" title="Brouillon incomplet" [live]="false">
+                    {{ issues().length }}
+                    {{ issues().length === 1 ? 'point est à corriger' : 'points sont à corriger' }}
+                    avant un aperçu complet.
+                  </cnpm-alert>
+                  <ul>
+                    @for (issue of issues(); track issue.id) {
+                      <li>
+                        <a [href]="'#showcase-editor-' + issue.section">
+                          {{ issue.label }} — {{ issue.description }}
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <cnpm-alert tone="success" title="Brouillon local conforme" [live]="false">
+                    Les champs éditoriaux respectent les limites locales. Cela n’autorise aucune
+                    soumission ni publication.
+                  </cnpm-alert>
+                }
+              </section>
+            }
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-identity"
+              aria-labelledby="showcase-editor-identity-title"
+            >
+              <header>
+                <div>
+                  <p>01</p>
+                  <h2 id="showcase-editor-identity-title">Identité</h2>
+                </div>
+                <cnpm-badge tone="info">Contenu local</cnpm-badge>
+              </header>
+              <div class="showcase-editor__fields">
+                <div class="showcase-editor__field showcase-editor__field--wide">
+                  <label for="showcase-name">Nom fictif</label>
+                  <input
+                    id="showcase-name"
+                    formControlName="name"
+                    maxlength="120"
+                    aria-describedby="showcase-name-help showcase-name-error"
+                    [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+                  />
+                  <small id="showcase-name-help"
+                    >2 à 120 caractères. N’utilisez aucun nom réel.</small
+                  >
+                  @if (form.controls.name.invalid && form.controls.name.touched) {
+                    <strong id="showcase-name-error" class="showcase-editor__error">
+                      Un nom fictif de 2 à 120 caractères est requis.
+                    </strong>
+                  }
+                </div>
+                <div class="showcase-editor__field">
+                  <label for="showcase-slug">Slug de démonstration</label>
+                  <input
+                    id="showcase-slug"
+                    formControlName="slug"
+                    maxlength="120"
+                    aria-describedby="showcase-slug-help showcase-slug-error"
+                    [attr.aria-invalid]="form.controls.slug.invalid && form.controls.slug.touched"
+                  />
+                  <small id="showcase-slug-help">Minuscules, chiffres et tirets.</small>
+                  @if (form.controls.slug.invalid && form.controls.slug.touched) {
+                    <strong id="showcase-slug-error" class="showcase-editor__error">
+                      Le slug doit utiliser uniquement minuscules, chiffres et tirets simples.
+                    </strong>
+                  }
+                </div>
+                <div class="showcase-editor__field">
+                  <label for="showcase-sector">Secteur fictif</label>
+                  <input id="showcase-sector" formControlName="sector" maxlength="120" />
+                </div>
+                <div class="showcase-editor__field showcase-editor__field--wide">
+                  <label for="showcase-location">Localisation fictive</label>
+                  <input id="showcase-location" formControlName="location" maxlength="160" />
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-hero"
+              aria-labelledby="showcase-editor-hero-title"
+            >
+              <header>
+                <div>
+                  <p>02</p>
+                  <h2 id="showcase-editor-hero-title">Hero</h2>
+                </div>
+                <cnpm-badge tone="neutral">Sans média</cnpm-badge>
+              </header>
+              <div class="showcase-editor__field">
+                <label for="showcase-tagline">Phrase de présentation fictive</label>
+                <input
+                  id="showcase-tagline"
+                  formControlName="tagline"
+                  maxlength="80"
+                  aria-describedby="showcase-tagline-count"
+                />
+                <small id="showcase-tagline-count">
+                  {{ form.controls.tagline.value.length }}/80 caractères
+                </small>
+              </div>
+              <cnpm-alert tone="info" title="Placeholder neutre" [live]="false">
+                Aucun média n’est téléversé. Les droits d’usage, l’analyse et le texte alternatif
+                restent obligatoires avant toute future promotion R4.
+              </cnpm-alert>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-about"
+              aria-labelledby="showcase-editor-about-title"
+            >
+              <header>
+                <div>
+                  <p>03</p>
+                  <h2 id="showcase-editor-about-title">À propos</h2>
+                </div>
+              </header>
+              <div class="showcase-editor__field">
+                <label for="showcase-summary">Résumé fictif</label>
+                <textarea
+                  id="showcase-summary"
+                  formControlName="summary"
+                  rows="5"
+                  maxlength="600"
+                  aria-describedby="showcase-summary-count"
+                ></textarea>
+                <small id="showcase-summary-count">
+                  {{ form.controls.summary.value.length }}/600 caractères
+                </small>
+              </div>
+              <div class="showcase-editor__fields">
+                <div class="showcase-editor__field">
+                  <label for="showcase-employee-range">Effectif fictif</label>
+                  <input
+                    id="showcase-employee-range"
+                    formControlName="employeeRange"
+                    maxlength="40"
+                  />
+                </div>
+                <div class="showcase-editor__field">
+                  <label for="showcase-founded-year">Année de création fictive</label>
+                  <input
+                    id="showcase-founded-year"
+                    type="number"
+                    formControlName="foundedYear"
+                    min="1800"
+                    max="2100"
+                  />
+                </div>
+                <div class="showcase-editor__field showcase-editor__field--wide">
+                  <label for="showcase-legal-form">Forme fictive</label>
+                  <input id="showcase-legal-form" formControlName="legalForm" maxlength="80" />
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-activities"
+              aria-labelledby="showcase-editor-activities-title"
+            >
+              <header>
+                <div>
+                  <p>04</p>
+                  <h2 id="showcase-editor-activities-title">Activités</h2>
+                </div>
+              </header>
+              <div class="showcase-editor__fields">
+                <div class="showcase-editor__field">
+                  <label for="showcase-activity-one">Activité fictive 1</label>
+                  <input id="showcase-activity-one" formControlName="activityOne" maxlength="120" />
+                </div>
+                <div class="showcase-editor__field">
+                  <label for="showcase-activity-two">Activité fictive 2</label>
+                  <input id="showcase-activity-two" formControlName="activityTwo" maxlength="120" />
+                </div>
+                <div class="showcase-editor__field showcase-editor__field--wide">
+                  <label for="showcase-activity-three">Activité fictive 3</label>
+                  <input
+                    id="showcase-activity-three"
+                    formControlName="activityThree"
+                    maxlength="120"
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-projects"
+              aria-labelledby="showcase-editor-projects-title"
+            >
+              <header>
+                <div>
+                  <p>05</p>
+                  <h2 id="showcase-editor-projects-title">Réalisations</h2>
+                </div>
+              </header>
+              @for (index of [1, 2]; track index) {
+                <fieldset>
+                  <legend>Réalisation fictive {{ index }}</legend>
+                  @if (index === 1) {
+                    <div class="showcase-editor__fields">
+                      <div class="showcase-editor__field showcase-editor__field--wide">
+                        <label for="showcase-project-title-one">Titre</label>
+                        <input
+                          id="showcase-project-title-one"
+                          formControlName="projectTitleOne"
+                          maxlength="120"
+                        />
+                      </div>
+                      <div class="showcase-editor__field">
+                        <label for="showcase-project-category-one">Catégorie</label>
+                        <input
+                          id="showcase-project-category-one"
+                          formControlName="projectCategoryOne"
+                          maxlength="80"
+                        />
+                      </div>
+                      <div class="showcase-editor__field showcase-editor__field--full">
+                        <label for="showcase-project-summary-one">Résumé</label>
+                        <textarea
+                          id="showcase-project-summary-one"
+                          formControlName="projectSummaryOne"
+                          rows="3"
+                          maxlength="300"
+                        ></textarea>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="showcase-editor__fields">
+                      <div class="showcase-editor__field showcase-editor__field--wide">
+                        <label for="showcase-project-title-two">Titre</label>
+                        <input
+                          id="showcase-project-title-two"
+                          formControlName="projectTitleTwo"
+                          maxlength="120"
+                        />
+                      </div>
+                      <div class="showcase-editor__field">
+                        <label for="showcase-project-category-two">Catégorie</label>
+                        <input
+                          id="showcase-project-category-two"
+                          formControlName="projectCategoryTwo"
+                          maxlength="80"
+                        />
+                      </div>
+                      <div class="showcase-editor__field showcase-editor__field--full">
+                        <label for="showcase-project-summary-two">Résumé</label>
+                        <textarea
+                          id="showcase-project-summary-two"
+                          formControlName="projectSummaryTwo"
+                          rows="3"
+                          maxlength="300"
+                        ></textarea>
+                      </div>
+                    </div>
+                  }
+                </fieldset>
+              }
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-gallery"
+              aria-labelledby="showcase-editor-gallery-title"
+            >
+              <header>
+                <div>
+                  <p>06</p>
+                  <h2 id="showcase-editor-gallery-title">Galerie</h2>
+                </div>
+                <cnpm-badge tone="neutral">Bloqué</cnpm-badge>
+              </header>
+              <cnpm-alert tone="info" title="Téléversement non disponible" [live]="false">
+                Aucun fichier, photographie, logo, point focal ou droit d’usage n’est simulé.
+              </cnpm-alert>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-certifications"
+              aria-labelledby="showcase-editor-certifications-title"
+            >
+              <header>
+                <div>
+                  <p>07</p>
+                  <h2 id="showcase-editor-certifications-title">Certifications</h2>
+                </div>
+                <cnpm-badge tone="neutral">Bloqué</cnpm-badge>
+              </header>
+              <p>
+                Les certifications, distinctions et badges exigent une vérification
+                institutionnelle.
+              </p>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-documents"
+              aria-labelledby="showcase-editor-documents-title"
+            >
+              <header>
+                <div>
+                  <p>08</p>
+                  <h2 id="showcase-editor-documents-title">Documents</h2>
+                </div>
+                <cnpm-badge tone="neutral">Bloqué</cnpm-badge>
+              </header>
+              <p>Aucun document public ou lien GED n’est disponible dans cet atelier.</p>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-news"
+              aria-labelledby="showcase-editor-news-title"
+            >
+              <header>
+                <div>
+                  <p>09</p>
+                  <h2 id="showcase-editor-news-title">Actualités</h2>
+                </div>
+                <cnpm-badge tone="neutral">Bloqué</cnpm-badge>
+              </header>
+              <p>Le modèle éditorial des actualités n’est pas promu dans le contrat canonique.</p>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-contacts"
+              aria-labelledby="showcase-editor-contacts-title"
+            >
+              <header>
+                <div>
+                  <p>10</p>
+                  <h2 id="showcase-editor-contacts-title">Contacts</h2>
+                </div>
+                <cnpm-badge tone="neutral">Bloqué</cnpm-badge>
+              </header>
+              <cnpm-alert tone="warning" title="Consentement non défini" [live]="false">
+                Aucun nom, téléphone, courriel, adresse, carte ou réseau social n’est collecté ou
+                rendu.
+              </cnpm-alert>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-seo"
+              aria-labelledby="showcase-editor-seo-title"
+            >
+              <header>
+                <div>
+                  <p>11</p>
+                  <h2 id="showcase-editor-seo-title">SEO et partage</h2>
+                </div>
+                <cnpm-badge tone="info">Aperçu local</cnpm-badge>
+              </header>
+              <div class="showcase-editor__field">
+                <label for="showcase-seo-title">Métatitre fictif</label>
+                <input
+                  id="showcase-seo-title"
+                  formControlName="seoTitle"
+                  maxlength="60"
+                  aria-describedby="showcase-seo-title-count"
+                />
+                <small id="showcase-seo-title-count"
+                  >{{ form.controls.seoTitle.value.length }}/60 caractères</small
+                >
+              </div>
+              <div class="showcase-editor__field">
+                <label for="showcase-seo-description">Métadescription fictive</label>
+                <textarea
+                  id="showcase-seo-description"
+                  formControlName="seoDescription"
+                  rows="3"
+                  maxlength="160"
+                  aria-describedby="showcase-seo-description-count"
+                ></textarea>
+                <small id="showcase-seo-description-count"
+                  >{{ form.controls.seoDescription.value.length }}/160 caractères</small
+                >
+              </div>
+              <p><strong>Indexation :</strong> interdite pour tout contenu de démonstration.</p>
+            </section>
+
+            <section
+              class="showcase-editor__section"
+              id="showcase-editor-publication"
+              aria-labelledby="showcase-editor-publication-title"
+            >
+              <header>
+                <div>
+                  <p>12</p>
+                  <h2 id="showcase-editor-publication-title">Publication</h2>
+                </div>
+                <cnpm-badge tone="warning">Brouillon local</cnpm-badge>
+              </header>
+              <cnpm-alert tone="warning" title="Aucune soumission possible" [live]="false">
+                Modération, planification, publication, dépublication et restauration de version
+                restent absentes tant que la promotion R4 n’est pas réalisée.
+              </cnpm-alert>
+            </section>
+
+            <div class="showcase-editor__actions">
+              <cnpm-button type="button" variant="secondary" (click)="verifyDraft()">
+                Vérifier le brouillon
+              </cnpm-button>
+              <cnpm-button routerLink="/member/showcase/preview" variant="primary">
+                Ouvrir l’aperçu privé
+              </cnpm-button>
+            </div>
+          </form>
+        </div>
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

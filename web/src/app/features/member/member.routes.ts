@@ -14,6 +14,8 @@ import { MEMBER_RECEIPTS_GATEWAY } from './receipts/member-receipts-gateway';
 import { DemoMemberRequestsGateway } from './requests/demo-member-requests.gateway';
 import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
 import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
+import { DemoMemberShowcaseGateway } from './showcase/demo-member-showcase.gateway';
+import { MEMBER_SHOWCASE_GATEWAY } from './showcase/member-showcase-gateway';
 import { DemoMemberUsersGateway } from './users/demo-member-users.gateway';
 import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
@@ -23,6 +25,7 @@ import {
   UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
   UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
+  UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
   UNAVAILABLE_MEMBER_USERS_GATEWAY,
 } from './unavailable-member-gateways';
 
@@ -196,6 +199,37 @@ export const memberRoutes: Routes = [
     loadComponent: () =>
       import('./users/member-users.page').then((module) => module.MemberUsersPage),
     title: 'Utilisateurs de l’entreprise — CNPM',
+  },
+  {
+    path: 'showcase',
+    providers: [
+      DemoMemberShowcaseGateway,
+      {
+        provide: MEMBER_SHOWCASE_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberShowcaseGateway)
+            : UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
+      },
+    ],
+    children: [
+      {
+        path: 'edit',
+        loadComponent: () =>
+          import('./showcase/member-showcase-editor.page').then(
+            (module) => module.MemberShowcaseEditorPage,
+          ),
+        title: 'Éditeur de vitrine — CNPM',
+      },
+      {
+        path: 'preview',
+        loadComponent: () =>
+          import('./showcase/member-showcase-preview.page').then(
+            (module) => module.MemberShowcasePreviewPage,
+          ),
+        title: 'Aperçu privé de la vitrine — CNPM',
+      },
+    ],
   },
   // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
 ];

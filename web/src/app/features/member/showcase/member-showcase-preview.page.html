@@ -1,0 +1,170 @@
+<cnpm-member-portal-shell
+  organization="Entreprise Démo Sahel"
+  userName="Membre de démonstration"
+  memberCode="CNPM-DEMO-0001"
+  [notificationCount]="0"
+>
+  <main class="showcase-preview" id="contenu-principal">
+    <cnpm-page-header
+      title="Aperçu de la vitrine"
+      description="Contrôlez le gabarit public sans exposer ni publier le brouillon."
+    >
+      <cnpm-button routerLink="/member/showcase/edit" variant="secondary">
+        Retour à l’éditeur
+      </cnpm-button>
+    </cnpm-page-header>
+
+    <cnpm-alert tone="warning" title="Aperçu privé et non indexable" [live]="false">
+      Cette page exige le contexte membre, porte <code>noindex,nofollow</code> et ne simule ni
+      soumission, ni modération, ni publication.
+    </cnpm-alert>
+
+    @switch (result().kind) {
+      @case ('loading') {
+        <section class="showcase-preview__loading" aria-label="Chargement de l’aperçu fictif">
+          <cnpm-skeleton variant="card" [rows]="8" label="Chargement de l’aperçu fictif…" />
+        </section>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="L’aperçu n’a pas pu être chargé"
+          description="Le brouillon local reste inchangé et aucune donnée n’a été transmise."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('unavailable') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Aperçu de vitrine indisponible en mode HTTP"
+          description="Le contrat R4, le périmètre d’organisation et les consentements ne sont pas promus. Aucune fixture locale n’est injectée dans ce mode."
+        />
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucun brouillon à prévisualiser"
+          description="Créez d’abord un brouillon fictif dans l’atelier local."
+        >
+          <cnpm-button routerLink="/member/showcase/edit" variant="secondary" size="sm">
+            Ouvrir l’éditeur
+          </cnpm-button>
+        </cnpm-empty-state>
+      }
+      @case ('ready') {
+        @if (draft(); as draft) {
+          <section
+            class="showcase-preview__controls"
+            aria-labelledby="showcase-preview-controls-title"
+          >
+            <div>
+              <h2 id="showcase-preview-controls-title">Cadre d’aperçu</h2>
+              <p>Le choix du viewport est conservé dans l’adresse partageable.</p>
+            </div>
+            <div class="showcase-preview__viewports" role="group" aria-label="Viewport de l’aperçu">
+              @for (option of viewports; track option) {
+                <button
+                  type="button"
+                  [class.showcase-preview__viewport--active]="viewport() === option"
+                  [attr.aria-pressed]="viewport() === option"
+                  (click)="selectViewport(option)"
+                >
+                  @switch (option) {
+                    @case ('desktop') {
+                      Desktop
+                    }
+                    @case ('tablet') {
+                      Tablette
+                    }
+                    @case ('mobile') {
+                      Mobile
+                    }
+                  }
+                </button>
+              }
+            </div>
+          </section>
+
+          <section class="showcase-preview__private-bar" aria-label="Version privée prévisualisée">
+            <div>
+              <cnpm-badge tone="warning">Brouillon local</cnpm-badge>
+              <strong>Version {{ draft.version }}</strong>
+            </div>
+            <span>Aucune URL publique, aucun cache et aucune indexation ne sont créés.</span>
+          </section>
+
+          <section
+            class="showcase-preview__frame"
+            [class]="'showcase-preview__frame showcase-preview__frame--' + viewport()"
+            aria-label="Aperçu du gabarit public"
+          >
+            <cnpm-member-showcase-template [draft]="draft" [viewport]="viewport()" />
+          </section>
+
+          <div class="showcase-preview__review-grid">
+            <section
+              class="showcase-preview__panel"
+              aria-labelledby="showcase-preview-checks-title"
+            >
+              <h2 id="showcase-preview-checks-title">Contrôles locaux</h2>
+              <ul>
+                <li>
+                  <strong>Structure éditoriale</strong>
+                  <span>{{ issues().length ? 'À corriger' : 'Conforme aux limites locales' }}</span>
+                </li>
+                <li>
+                  <strong>Contacts</strong>
+                  <span>Section masquée — consentement absent</span>
+                </li>
+                <li>
+                  <strong>Médias</strong>
+                  <span>Placeholder neutre — aucun téléversement</span>
+                </li>
+                <li>
+                  <strong>Indexation</strong>
+                  <span>Bloquée — noindex,nofollow</span>
+                </li>
+              </ul>
+              @if (issues().length) {
+                <div class="showcase-preview__issues">
+                  <h3>Erreurs bloquantes</h3>
+                  <ul>
+                    @for (issue of issues(); track issue.id) {
+                      <li>
+                        <a
+                          routerLink="/member/showcase/edit"
+                          [fragment]="'showcase-editor-' + issue.section"
+                        >
+                          {{ issue.label }} — {{ issue.description }}
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            </section>
+
+            <section class="showcase-preview__panel" aria-labelledby="showcase-preview-seo-title">
+              <h2 id="showcase-preview-seo-title">Aperçu SEO privé</h2>
+              <div class="showcase-preview__search-result">
+                <strong>{{ draft.seo.title }}</strong>
+                <code>/membres/{{ draft.slug }}</code>
+                <p>{{ draft.seo.description }}</p>
+              </div>
+              <p>
+                Cette adresse est illustrative : la stratégie d’URL reste ouverte et aucun lien
+                public n’est créé.
+              </p>
+            </section>
+          </div>
+
+          <cnpm-alert tone="warning" title="Soumission indisponible" [live]="false">
+            Même sans erreur éditoriale, ce brouillon ne peut pas être soumis. La checklist de
+            promotion R4, les permissions, la modération et les consentements restent ouverts.
+          </cnpm-alert>
+        }
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

@@ -1,0 +1,123 @@
+<article class="showcase-template" aria-label="Gabarit public du brouillon fictif">
+  <header class="showcase-template__header">
+    <div>
+      <strong>Vitrine membre</strong>
+      <span>Aperçu privé de démonstration</span>
+    </div>
+    <nav aria-label="Navigation locale de l’aperçu">
+      <a href="#showcase-preview-about">À propos</a>
+      @if (activities().length) {
+        <a href="#showcase-preview-activities">Activités</a>
+      }
+      @if (projects().length) {
+        <a href="#showcase-preview-projects">Réalisations</a>
+      }
+    </nav>
+  </header>
+
+  <section class="showcase-template__hero" aria-labelledby="showcase-preview-name">
+    <div class="showcase-template__identity">
+      <p class="showcase-template__eyebrow">Entreprise fictive — contenu membre</p>
+      <h2 id="showcase-preview-name">{{ displayName() }}</h2>
+      @if (draft().tagline) {
+        <p class="showcase-template__tagline">{{ draft().tagline }}</p>
+      }
+      <p>{{ draft().summary }}</p>
+      @if (activities().length) {
+        <a class="showcase-template__cta" href="#showcase-preview-activities">
+          Voir les activités
+        </a>
+      }
+    </div>
+    <div
+      class="showcase-template__placeholder"
+      role="img"
+      aria-label="Emplacement média neutre : aucune photographie ni illustration membre n’est chargée"
+    >
+      <span aria-hidden="true">◇</span>
+      <strong>Aucun média chargé</strong>
+      <small>Droits et texte alternatif requis avant tout usage.</small>
+    </div>
+  </section>
+
+  <div class="showcase-template__status">
+    <cnpm-badge tone="neutral">Badge CNPM non attribué</cnpm-badge>
+    <span>Le membre ne peut pas modifier ce statut.</span>
+  </div>
+
+  <dl class="showcase-template__facts" aria-label="Faits clés fictifs">
+    <div>
+      <dt>Secteur</dt>
+      <dd>{{ draft().sector }}</dd>
+    </div>
+    <div>
+      <dt>Localisation</dt>
+      <dd>{{ draft().location }}</dd>
+    </div>
+    <div>
+      <dt>Effectif</dt>
+      <dd>{{ draft().employeeRange }}</dd>
+    </div>
+    <div>
+      <dt>Création</dt>
+      <dd>{{ draft().foundedYear }}</dd>
+    </div>
+    <div>
+      <dt>Forme</dt>
+      <dd>{{ draft().legalForm }}</dd>
+    </div>
+  </dl>
+
+  <section
+    class="showcase-template__section"
+    id="showcase-preview-about"
+    aria-labelledby="showcase-preview-about-title"
+  >
+    <h3 id="showcase-preview-about-title">À propos</h3>
+    <p>{{ draft().summary }}</p>
+  </section>
+
+  @if (activities().length) {
+    <section
+      class="showcase-template__section"
+      id="showcase-preview-activities"
+      aria-labelledby="showcase-preview-activities-title"
+    >
+      <h3 id="showcase-preview-activities-title">Activités principales</h3>
+      <ul class="showcase-template__cards">
+        @for (activity of activities(); track activity) {
+          <li>
+            <span aria-hidden="true">◆</span>
+            <strong>{{ activity }}</strong>
+            <small>Présentation fictive sans offre commerciale.</small>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  @if (projects().length) {
+    <section
+      class="showcase-template__section"
+      id="showcase-preview-projects"
+      aria-labelledby="showcase-preview-projects-title"
+    >
+      <h3 id="showcase-preview-projects-title">Réalisations</h3>
+      <ul class="showcase-template__projects">
+        @for (project of projects(); track project.title) {
+          <li>
+            <div class="showcase-template__project-placeholder" aria-hidden="true">◇</div>
+            <span>{{ project.category }}</span>
+            <strong>{{ project.title }}</strong>
+            <p>{{ project.summary }}</p>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <footer class="showcase-template__footer">
+    <strong>Contenu fourni par le membre — scénario fictif</strong>
+    <span>Aucun contact n’est rendu sans consentement vérifié.</span>
+  </footer>
+</article>

@@ -56,4 +56,12 @@ describe('memberRoutes', () => {
     expect(route?.canActivate).toBeUndefined();
     expect(route?.children).toBeUndefined();
   });
+
+  it('expose MP-015 et MP-016 sous une composition locale commune et sans garde factice', () => {
+    const route = memberRoutes.find((candidate) => candidate.path === 'showcase');
+    expect(route?.providers).toHaveLength(2);
+    expect(route?.children?.map((child) => child.path)).toEqual(['edit', 'preview']);
+    expect(route?.children?.every((child) => child.loadComponent)).toBe(true);
+    expect(route?.canActivate).toBeUndefined();
+  });
 });

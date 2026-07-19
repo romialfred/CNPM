@@ -5,6 +5,7 @@ import type { MemberHomeGateway } from './home/member-home-gateway';
 import type { MemberProfileGateway } from './profile/member-profile-gateway';
 import type { MemberReceiptsGateway } from './receipts/member-receipts-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
+import type { MemberShowcaseGateway } from './showcase/member-showcase-gateway';
 import type { MemberUsersGateway } from './users/member-users-gateway';
 
 export const UNAVAILABLE_MEMBER_HOME_GATEWAY: MemberHomeGateway = {
@@ -48,4 +49,10 @@ export const UNAVAILABLE_MEMBER_PROFILE_GATEWAY: MemberProfileGateway = {
 /** Aucun endpoint membre ne garantit encore le périmètre d’organisation IAM. */
 export const UNAVAILABLE_MEMBER_USERS_GATEWAY: MemberUsersGateway = {
   list: () => unavailableFeature$('MP-014'),
+};
+
+/** L’addendum R4 n’est pas promu dans OpenAPI/RBAC/SoD ; tout accès HTTP reste fermé. */
+export const UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY: MemberShowcaseGateway = {
+  loadDraft: (feature) => unavailableFeature$(feature),
+  storeLocalDraft: () => unavailableFeature$('MP-015'),
 };
