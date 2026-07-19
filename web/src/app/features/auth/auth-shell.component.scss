@@ -52,10 +52,11 @@
   padding: var(--cnpm-space-4) calc(var(--cnpm-space-10) * 2);
 }
 
+/* Hauteur imposée, largeur libre : fixer les deux avec `object-fit: fill` étirait le
+   lockup d'un facteur 1,93 (ratio 2,727 forcé sur un actif de ratio 2,015). */
 .cnpm-auth__logo {
-  width: 15rem;
+  width: auto;
   height: 5.5rem;
-  object-fit: fill;
 }
 
 .cnpm-auth__lang {
@@ -257,7 +258,7 @@
   }
 
   .cnpm-auth__logo {
-    width: 9rem;
+    width: auto;
     height: 4rem;
   }
 

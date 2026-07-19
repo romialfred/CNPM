@@ -34,7 +34,7 @@ describe('MemberPortalShellComponent', () => {
 
   it('expose le vrai logo, le lien d’évitement et les deux navigations', () => {
     expect(host.querySelector<HTMLImageElement>('.member-shell__brand img')?.src).toContain(
-      '/assets/brand/logo-CNPM.png',
+      '/assets/brand/logo-CNPM-lockup.png',
     );
     expect(host.querySelector('.member-shell__skip-link')?.getAttribute('href')).toBe(
       '#contenu-principal',

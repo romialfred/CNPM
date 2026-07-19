@@ -77,9 +77,9 @@ export interface PublicFooterContact {
               <span class="cnpm-public__logo-frame" aria-hidden="true">
                 <img
                   class="cnpm-public__logo"
-                  src="/assets/brand/logo-CNPM.png"
-                  width="300"
-                  height="212"
+                  src="/assets/brand/logo-CNPM-lockup.png"
+                  width="276"
+                  height="137"
                   alt=""
                   decoding="async"
                 />
@@ -335,9 +335,9 @@ export interface PublicFooterContact {
             <span class="cnpm-public__footer-logo-frame" aria-hidden="true">
               <img
                 class="cnpm-public__footer-logo"
-                src="/assets/brand/logo-CNPM.png"
-                width="300"
-                height="212"
+                src="/assets/brand/logo-CNPM-lockup.png"
+                width="276"
+                height="137"
                 alt=""
                 loading="lazy"
                 decoding="async"

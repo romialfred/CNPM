@@ -22,7 +22,7 @@ import {
       <header class="cnpm-auth__topbar">
         <img
           class="cnpm-auth__logo"
-          src="/assets/brand/logo-CNPM.png"
+          src="/assets/brand/logo-CNPM-lockup.png"
           alt="CNPM — Conseil National du Patronat du Mali"
         />
         <!-- À décider (UX-DEC-007) : les langues publiques ne sont pas arbitrées.

@@ -47,12 +47,12 @@
   align-items: center;
 }
 
+/* Même défaut que sur l'écran de connexion : largeur et hauteur toutes deux imposées
+   avec `object-fit: fill` étiraient le lockup d'un facteur 1,84. */
 .member-shell__brand img {
   display: block;
-  width: 13rem;
+  width: auto;
   height: 5rem;
-  object-fit: fill;
-  object-position: left center;
 }
 
 .member-shell__desktop-nav {

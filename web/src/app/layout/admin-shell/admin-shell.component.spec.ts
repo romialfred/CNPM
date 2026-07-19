@@ -46,7 +46,7 @@ describe('AdminShellComponent — drawer accessible', () => {
     expect(host.querySelector('a[href="#contenu-principal"]')).not.toBeNull();
     expect(host.querySelector('main#contenu-principal')).not.toBeNull();
     expect(host.querySelector<HTMLImageElement>('.cnpm-sidebar__logo')?.src).toContain(
-      '/assets/brand/logo-CNPM.png',
+      '/assets/brand/logo-CNPM-lockup.png',
     );
   });
 

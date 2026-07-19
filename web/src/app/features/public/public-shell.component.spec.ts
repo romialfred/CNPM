@@ -49,9 +49,12 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     const { host } = await setup();
     const logo = host.querySelector<HTMLImageElement>('.cnpm-public__logo');
 
-    expect(logo?.getAttribute('src')).toBe('/assets/brand/logo-CNPM.png');
-    expect(logo?.getAttribute('width')).toBe('300');
-    expect(logo?.getAttribute('height')).toBe('212');
+    expect(logo?.getAttribute('src')).toBe('/assets/brand/logo-CNPM-lockup.png');
+    // Dimensions intrinsèques de l'actif détouré. Elles doivent rester exactes : c'est
+    // ce ratio que le navigateur réserve avant chargement, et un ratio faux y réintroduit
+    // la déformation que le détourage vient justement de supprimer.
+    expect(logo?.getAttribute('width')).toBe('276');
+    expect(logo?.getAttribute('height')).toBe('137');
     expect(host.querySelector('.cnpm-public__brand-link')?.getAttribute('aria-label')).toContain(
       'Conseil National du Patronat du Mali',
     );

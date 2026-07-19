@@ -40,18 +40,19 @@
   text-decoration: none;
 }
 
+/* Le rognage par fenêtre et translation négative n'a plus lieu d'être : la marge
+   blanche est détourée en amont dans `logo-CNPM-lockup.png`. */
 .cnpm-sidebar__logo-viewport {
-  display: block;
+  display: flex;
   width: 100%;
-  height: calc(var(--cnpm-size-topbar) + var(--cnpm-space-10));
-  overflow: hidden;
+  align-items: center;
 }
 
 .cnpm-sidebar__logo {
   display: block;
-  width: 100%;
-  height: auto;
-  transform: translateY(calc(-1 * var(--cnpm-space-5)));
+  width: auto;
+  max-width: 100%;
+  height: var(--cnpm-space-12);
 }
 
 .cnpm-sidebar__compact-mark {
