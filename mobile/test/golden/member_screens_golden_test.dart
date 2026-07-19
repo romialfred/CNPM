@@ -34,6 +34,36 @@ void main() {
       );
     });
 
+    testWidgets('MOB-006 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/payments/new');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile('goldens/mob_006_payment_new_${viewport.key}.png'),
+      );
+    });
+
+    testWidgets('MOB-007 ${viewport.key}', (tester) async {
+      await pumpCnpmApp(tester, size: viewport.value);
+      await completeDemoSignIn(tester);
+      final homeContext = tester.element(
+        find.byKey(const Key('member-home-list')),
+      );
+      GoRouter.of(homeContext).go('/payments/DEMO-PAY-006');
+      await tester.pumpAndSettle();
+
+      await expectLater(
+        find.byKey(const Key('app-surface')),
+        matchesGoldenFile('goldens/mob_007_payment_status_${viewport.key}.png'),
+      );
+    });
+
     testWidgets('MOB-004 ${viewport.key}', (tester) async {
       await pumpCnpmApp(tester, size: viewport.value);
       await completeDemoSignIn(tester);

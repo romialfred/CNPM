@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:cnpm_mobile/app/mobile_app_shell.dart';
 import 'package:cnpm_mobile/core/presentation/cnpm_formatters.dart';
@@ -71,6 +72,13 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                       'Lecture de démonstration uniquement : aucun paiement affiché n’est confirmé ni encaissé par le CNPM.',
                 ),
               ],
+              const SizedBox(height: CnpmSpacing.x4),
+              OutlinedButton.icon(
+                key: const Key('open-payment-preparation'),
+                onPressed: () => context.go('/payments/new'),
+                icon: const Icon(Icons.add_card_outlined),
+                label: const Text('Préparer un paiement'),
+              ),
               const SizedBox(height: CnpmSpacing.x5),
               switch (widget.controller.phase) {
                 ContentPhase.idle ||

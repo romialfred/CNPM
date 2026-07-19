@@ -19,6 +19,7 @@ import 'package:cnpm_mobile/features/notifications/presentation/member_notificat
 import 'package:cnpm_mobile/features/offline/domain/member_offline_status.dart';
 import 'package:cnpm_mobile/features/offline/presentation/member_offline_status_screen.dart';
 import 'package:cnpm_mobile/features/payments/domain/member_payment.dart';
+import 'package:cnpm_mobile/features/payments/presentation/blocked_payment_screens.dart';
 import 'package:cnpm_mobile/features/payments/presentation/payment_history_screen.dart';
 import 'package:cnpm_mobile/features/profile/domain/member_profile.dart';
 import 'package:cnpm_mobile/features/profile/presentation/member_profile_screen.dart';
@@ -89,10 +90,12 @@ GoRouter buildAppRouter({
         return '/login';
       }
       final isContributionPath = path.startsWith('/contributions/');
+      final isPaymentPath = path.startsWith('/payments/');
       final isReceiptPath = path.startsWith('/receipts/');
       final isRequestPath = path.startsWith('/requests/');
       if ((authenticatedPaths.contains(path) ||
               isContributionPath ||
+              isPaymentPath ||
               isReceiptPath ||
               isRequestPath) &&
           !hasSession) {
@@ -206,6 +209,21 @@ GoRouter buildAppRouter({
         builder: (context, state) => PaymentHistoryScreen(
           controller: paymentController,
           isDemo: config.isDemo,
+          onSignOut: onSignOut,
+        ),
+      ),
+      GoRoute(
+        path: '/payments/new',
+        name: 'mobile-payment-new',
+        builder: (context, state) =>
+            BlockedPaymentPreparationScreen(onSignOut: onSignOut),
+      ),
+      GoRoute(
+        path: '/payments/:id',
+        name: 'mobile-payment-status',
+        builder: (context, state) => BlockedPaymentStatusScreen(
+          key: ValueKey(state.pathParameters['id']),
+          paymentId: state.pathParameters['id']!,
           onSignOut: onSignOut,
         ),
       ),
