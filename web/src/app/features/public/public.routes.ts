@@ -31,8 +31,11 @@ export const publicRoutes: Routes = [
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
     title: 'Conseil National du Patronat du Mali',
   },
+];
+
+export const showcaseRoutes: Routes = [
   {
-    path: 'membres/:slug',
+    path: ':slug',
     providers: [
       DemoShowcaseGateway,
       {

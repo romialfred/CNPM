@@ -32,7 +32,7 @@
 
   <nav class="cnpm-sidebar__nav" aria-label="Navigation d’administration">
     <ul class="cnpm-sidebar__list">
-      @for (entry of navigation; track entry.route) {
+      @for (entry of navigation(); track entry.route) {
         <li>
           @if (entry.pending) {
             <!-- Rubrique déclarée, écran non livré. Rendue en `span` : un lien vers une

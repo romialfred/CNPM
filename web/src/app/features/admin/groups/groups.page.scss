@@ -1,0 +1,110 @@
+.cnpm-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+.cnpm-groups__summary {
+  min-height: var(--cnpm-space-5);
+}
+
+.cnpm-groups__summary p {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-groups__table strong {
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-groups__detail-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-control-lg);
+  height: var(--cnpm-size-control-lg);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  color: var(--cnpm-color-text-brand);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-groups__detail-link:hover {
+  border-color: var(--cnpm-color-brand-blue-300);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-groups__detail-link:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
+.cnpm-groups__cards {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 767px) {
+  .cnpm-groups__table {
+    display: none;
+  }
+
+  .cnpm-groups__cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-groups__cards > li {
+    padding: var(--cnpm-space-4);
+    border: 1px solid var(--cnpm-color-border-subtle);
+    border-radius: var(--cnpm-radius-lg);
+    background: var(--cnpm-color-surface-primary);
+  }
+
+  .cnpm-groups__card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--cnpm-space-3);
+  }
+
+  .cnpm-groups__card-head > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cnpm-space-1);
+    min-width: 0;
+  }
+
+  .cnpm-groups__card-head span {
+    font-size: var(--cnpm-font-size-xs);
+    color: var(--cnpm-color-text-muted);
+  }
+
+  .cnpm-groups__card-head strong {
+    overflow-wrap: anywhere;
+  }
+
+  .cnpm-groups__cards dl {
+    margin: var(--cnpm-space-4) 0;
+  }
+
+  .cnpm-groups__cards dl > div {
+    display: grid;
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: var(--cnpm-space-2);
+  }
+
+  .cnpm-groups__cards dt {
+    color: var(--cnpm-color-text-muted);
+  }
+
+  .cnpm-groups__cards dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}

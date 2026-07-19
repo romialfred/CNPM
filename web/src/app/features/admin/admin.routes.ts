@@ -14,6 +14,10 @@ import { pendingEnrollmentChangesGuard } from './enrollment-form/pending-enrollm
 import { DemoEnrollmentsGateway } from './enrollments/demo-enrollments.gateway';
 import { ENROLLMENTS_GATEWAY } from './enrollments/enrollments-gateway';
 import { HttpEnrollmentsGateway } from './enrollments/http-enrollments.gateway';
+import { DemoGroupsGateway } from './groups/demo-groups.gateway';
+import { groupReadGuard } from './groups/group-read.guard';
+import { GROUPS_GATEWAY } from './groups/groups-gateway';
+import { HttpGroupsGateway } from './groups/http-groups.gateway';
 import { DemoMemberDetailGateway } from './member-detail/demo-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from './member-detail/member-detail-gateway';
 import { DemoMemberEditGateway } from './member-edit/demo-member-edit.gateway';
@@ -58,7 +62,7 @@ import {
  */
 export const adminRoutes: Routes = [
   {
-    path: 'admin',
+    path: '',
     providers: [
       DemoSessionGateway,
       HttpSessionGateway,
@@ -86,6 +90,13 @@ export const adminRoutes: Routes = [
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoOrganizationsGateway)
             : inject(HttpOrganizationsGateway),
+      },
+      DemoGroupsGateway,
+      HttpGroupsGateway,
+      {
+        provide: GROUPS_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo' ? inject(DemoGroupsGateway) : inject(HttpGroupsGateway),
       },
       {
         provide: DASHBOARD_GATEWAY,
@@ -201,6 +212,18 @@ export const adminRoutes: Routes = [
         loadComponent: () =>
           import('./organizations/organization-detail.page').then((m) => m.OrganizationDetailPage),
         title: 'Fiche entreprise — Administration CNPM',
+      },
+      {
+        path: 'groups',
+        canActivate: [groupReadGuard],
+        loadComponent: () => import('./groups/groups.page').then((m) => m.GroupsPage),
+        title: 'Groupements professionnels — Administration CNPM',
+      },
+      {
+        path: 'groups/:id',
+        canActivate: [groupReadGuard],
+        loadComponent: () => import('./groups/group-detail.page').then((m) => m.GroupDetailPage),
+        title: 'Fiche groupement — Administration CNPM',
       },
       {
         path: 'enrollments',

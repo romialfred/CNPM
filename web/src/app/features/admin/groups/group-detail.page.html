@@ -1,0 +1,84 @@
+<cnpm-admin-shell>
+  <div class="cnpm-group-detail">
+    <nav aria-label="Fil d’Ariane">
+      <ol class="cnpm-group-detail__crumbs">
+        <li>
+          <a routerLink="/admin/groups" [queryParams]="listQueryParams()">Groupements</a>
+        </li>
+        <li aria-current="page">Fiche groupement</li>
+      </ol>
+    </nav>
+
+    <cnpm-page-header
+      [title]="pageTitle()"
+      description="Identité descriptive et état courant du groupement professionnel."
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="5" label="Chargement de la fiche groupement…" />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" />
+      }
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          title="Groupement introuvable"
+          description="Ce groupement n’existe pas ou n’est plus accessible."
+        >
+          <cnpm-button variant="secondary" routerLink="/admin/groups"
+            >Retour aux groupements</cnpm-button
+          >
+        </cnpm-error-state>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="La fiche n’a pas pu être chargée"
+          description="Le service des groupements est momentanément indisponible."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (group(); as group) {
+          <cnpm-alert tone="info" title="Périmètre disponible">
+            Cette fiche restitue uniquement les champs exposés par le contrat de lecture. Aucune
+            création ou modification n’est proposée sans contrat dédié.
+          </cnpm-alert>
+
+          <div class="cnpm-group-detail__grid">
+            <section class="cnpm-group-detail__card" aria-labelledby="group-identity-title">
+              <h2 id="group-identity-title">Identité descriptive</h2>
+              <cnpm-definition-list [items]="facts()" />
+            </section>
+
+            <aside class="cnpm-group-detail__card" aria-labelledby="group-state-title">
+              <h2 id="group-state-title">État courant</h2>
+              <div class="cnpm-group-detail__status">
+                <span>Statut</span>
+                <cnpm-badge [tone]="statusTone(group.status)">{{
+                  statusLabel(group.status)
+                }}</cnpm-badge>
+              </div>
+              <p>
+                Version de la fiche&nbsp;: <strong>{{ group.version }}</strong>
+              </p>
+            </aside>
+          </div>
+
+          <section class="cnpm-group-detail__unavailable" aria-labelledby="group-next-title">
+            <h2 id="group-next-title">Incréments non disponibles</h2>
+            <p>Les informations suivantes ne sont pas exposées par les contrats actuels :</p>
+            <ul>
+              <li>responsables, mandats et zones ;</li>
+              <li>composition, rattachements et portefeuille de membres ;</li>
+              <li>objectifs, indicateurs et tableau de bord sectoriel.</li>
+            </ul>
+          </section>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>

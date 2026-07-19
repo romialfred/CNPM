@@ -13,7 +13,7 @@ import { UNAVAILABLE_MEMBER_HOME_GATEWAY } from './unavailable-member-gateways';
  */
 export const memberRoutes: Routes = [
   {
-    path: 'member/home',
+    path: 'home',
     providers: [
       DemoMemberHomeGateway,
       {
@@ -28,5 +28,4 @@ export const memberRoutes: Routes = [
     title: 'Mon espace membre — CNPM',
   },
   // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
-  { path: 'espace-membre', pathMatch: 'full', redirectTo: 'member/home' },
 ];

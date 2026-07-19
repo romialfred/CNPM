@@ -14,7 +14,7 @@ import { UnavailableAuthGateway } from './unavailable-auth.gateway';
  */
 export const authRoutes: Routes = [
   {
-    path: 'auth',
+    path: '',
     providers: [
       DemoAuthGateway,
       UnavailableAuthGateway,

@@ -1,13 +1,30 @@
 import { Routes } from '@angular/router';
-import { adminRoutes } from './features/admin/admin.routes';
-import { authRoutes } from './features/auth/auth.routes';
-import { memberRoutes } from './features/member/member.routes';
-import { publicRoutes } from './features/public/public.routes';
 
 export const routes: Routes = [
-  ...publicRoutes,
-  ...authRoutes,
-  ...memberRoutes,
-  ...adminRoutes,
+  {
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.routes').then((module) => module.authRoutes),
+  },
+  {
+    path: 'member',
+    loadChildren: () =>
+      import('./features/member/member.routes').then((module) => module.memberRoutes),
+  },
+  {
+    path: 'admin',
+    loadChildren: () =>
+      import('./features/admin/admin.routes').then((module) => module.adminRoutes),
+  },
+  { path: 'espace-membre', pathMatch: 'full', redirectTo: 'member/home' },
+  {
+    path: 'membres',
+    loadChildren: () =>
+      import('./features/public/public.routes').then((module) => module.showcaseRoutes),
+  },
+  {
+    path: '',
+    loadChildren: () =>
+      import('./features/public/public.routes').then((module) => module.publicRoutes),
+  },
   { path: '**', redirectTo: '' },
 ];

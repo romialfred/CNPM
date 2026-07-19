@@ -1,0 +1,134 @@
+<cnpm-admin-shell>
+  <div class="cnpm-groups">
+    <cnpm-page-header
+      title="Groupements professionnels"
+      description="Consultez le référentiel des groupements autorisés. L’ordre est stable par code."
+    />
+
+    <div class="cnpm-groups__summary" aria-live="polite">
+      @if (state() === 'ready' || state() === 'empty' || state() === 'pageEmpty') {
+        <p>
+          <strong>{{ totalItems() }}</strong>
+          {{ totalItems() === 1 ? 'groupement disponible' : 'groupements disponibles' }}
+        </p>
+      }
+    </div>
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton
+          variant="table"
+          [rows]="pageSize()"
+          [columns]="columns.length"
+          label="Chargement des groupements professionnels…"
+        />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state variant="forbidden" />
+      }
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          title="Référentiel introuvable"
+          description="Le référentiel des groupements n’est pas disponible à cette adresse."
+        />
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Les groupements n’ont pas pu être chargés"
+          description="Le service est momentanément indisponible. La page demandée est conservée."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('empty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucun groupement disponible"
+          description="Le référentiel ne contient encore aucun groupement consultable."
+        />
+      }
+      @case ('pageEmpty') {
+        <cnpm-empty-state
+          variant="no-data"
+          title="Cette page ne contient aucun groupement"
+          description="Revenez à la première page pour poursuivre la consultation."
+        >
+          <cnpm-button variant="secondary" size="sm" (click)="goToFirstPage()"
+            >Première page</cnpm-button
+          >
+        </cnpm-empty-state>
+      }
+      @case ('ready') {
+        <div class="cnpm-groups__table">
+          <cnpm-data-table
+            caption="Groupements professionnels, secteurs et statuts."
+            [columns]="columns"
+            [rows]="rows()"
+            state="ready"
+            [rowKey]="rowKey"
+          >
+            <ng-template #row let-group>
+              <td class="cnpm-table__cell">
+                <strong>{{ group.code }}</strong>
+              </td>
+              <td class="cnpm-table__cell">{{ group.name }}</td>
+              <td class="cnpm-table__cell">{{ sectorLabel(group.sectorCode) }}</td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="statusTone(group.status)">{{
+                  statusLabel(group.status)
+                }}</cnpm-badge>
+              </td>
+              <td class="cnpm-table__cell">
+                <a
+                  class="cnpm-groups__detail-link"
+                  [routerLink]="['/admin/groups', group.id]"
+                  [queryParams]="listQueryParams()"
+                  [attr.aria-label]="'Voir le groupement ' + group.name"
+                  title="Voir la fiche"
+                >
+                  <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
+                </a>
+              </td>
+            </ng-template>
+          </cnpm-data-table>
+        </div>
+
+        <ul class="cnpm-groups__cards" aria-label="Groupements professionnels">
+          @for (group of rows(); track group.id) {
+            <li>
+              <div class="cnpm-groups__card-head">
+                <div>
+                  <span>{{ group.code }}</span>
+                  <strong>{{ group.name }}</strong>
+                </div>
+                <cnpm-badge [tone]="statusTone(group.status)">{{
+                  statusLabel(group.status)
+                }}</cnpm-badge>
+              </div>
+              <dl>
+                <div>
+                  <dt>Secteur</dt>
+                  <dd>{{ sectorLabel(group.sectorCode) }}</dd>
+                </div>
+              </dl>
+              <cnpm-button variant="secondary" size="sm" (click)="viewGroup(group.id)"
+                >Voir la fiche</cnpm-button
+              >
+            </li>
+          }
+        </ul>
+
+        <cnpm-pagination
+          [page]="page()"
+          [pageSize]="pageSize()"
+          [totalItems]="totalItems()"
+          [pageSizeOptions]="pageSizes"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      }
+    }
+  </div>
+</cnpm-admin-shell>

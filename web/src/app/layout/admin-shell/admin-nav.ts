@@ -16,6 +16,8 @@ export interface AdminNavEntry {
   readonly label: string;
   readonly route: string;
   readonly icon: AdminNavIconName;
+  /** Permission fonctionnelle requise pour exposer la destination dans le shell. */
+  readonly requiredPermission?: string;
   /**
    * Rubrique déclarée mais non encore livrée. L'entrée reste visible — la navigation
    * est la carte du produit — et annonce son indisponibilité au lieu de conduire vers
@@ -42,7 +44,19 @@ export const ADMIN_NAV: readonly AdminNavEntry[] = [
   { label: 'Reçus', route: '/admin/receipts', icon: 'receipts', pending: true },
   { label: 'Relances', route: '/admin/recovery/campaigns', icon: 'reminders' },
   { label: 'Requêtes', route: '/admin/requests', icon: 'requests', pending: true },
-  { label: 'Groupements', route: '/admin/groups', icon: 'groups', pending: true },
+  {
+    label: 'Groupements',
+    route: '/admin/groups',
+    icon: 'groups',
+    requiredPermission: 'GROUP.READ',
+  },
   { label: 'Reporting', route: '/admin/reporting', icon: 'reporting' },
   { label: 'Administration', route: '/admin/security/users', icon: 'administration' },
 ];
+
+/** Filtrage d'affordance uniquement ; le backend garde chaque opération. */
+export function visibleAdminNav(permissions: readonly string[]): readonly AdminNavEntry[] {
+  return ADMIN_NAV.filter(
+    (entry) => !entry.requiredPermission || permissions.includes(entry.requiredPermission),
+  );
+}

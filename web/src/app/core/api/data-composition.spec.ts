@@ -8,6 +8,9 @@ import { DASHBOARD_GATEWAY } from '../../features/admin/dashboard/dashboard-gate
 import { DemoDashboardGateway } from '../../features/admin/dashboard/demo-dashboard.gateway';
 import { ENROLLMENT_GATEWAY } from '../../features/admin/enrollment-form/enrollment-gateway';
 import { MEMBER_DETAIL_GATEWAY } from '../../features/admin/member-detail/member-detail-gateway';
+import { DemoGroupsGateway } from '../../features/admin/groups/demo-groups.gateway';
+import { GROUPS_GATEWAY } from '../../features/admin/groups/groups-gateway';
+import { HttpGroupsGateway } from '../../features/admin/groups/http-groups.gateway';
 import { HttpMembersGateway } from '../../features/admin/members/http-members.gateway';
 import { DemoMembersGateway } from '../../features/admin/members/demo-members.gateway';
 import { MEMBERS_GATEWAY } from '../../features/admin/members/members-gateway';
@@ -35,7 +38,7 @@ import { memberRoutes } from '../../features/member/member.routes';
 import { UNAVAILABLE_MEMBER_HOME_GATEWAY } from '../../features/member/unavailable-member-gateways';
 import { DemoHomeGateway } from '../../features/public/home/demo-home.gateway';
 import { HOME_GATEWAY } from '../../features/public/home/home-gateway';
-import { publicRoutes } from '../../features/public/public.routes';
+import { publicRoutes, showcaseRoutes } from '../../features/public/public.routes';
 import { SHOWCASE_GATEWAY } from '../../features/public/showcase/showcase-gateway';
 import {
   UNAVAILABLE_HOME_GATEWAY,
@@ -55,7 +58,7 @@ function configure(mode: CnpmDataMode): void {
       ...(adminRoutes[0]?.providers ?? []),
       ...(authRoutes[0]?.providers ?? []),
       ...(publicRoutes[0]?.providers ?? []),
-      ...(publicRoutes[1]?.providers ?? []),
+      ...(showcaseRoutes[0]?.providers ?? []),
       ...(memberRoutes[0]?.providers ?? []),
     ],
   });
@@ -69,6 +72,7 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(SESSION_GATEWAY)).toBeInstanceOf(DemoSessionGateway);
     expect(TestBed.inject(AUTH_GATEWAY)).toBeInstanceOf(DemoAuthGateway);
     expect(TestBed.inject(MEMBERS_GATEWAY)).toBeInstanceOf(DemoMembersGateway);
+    expect(TestBed.inject(GROUPS_GATEWAY)).toBeInstanceOf(DemoGroupsGateway);
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBeInstanceOf(DemoDashboardGateway);
     expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(DemoHomeGateway);
     expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(DemoMemberHomeGateway);
@@ -79,6 +83,7 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(SESSION_GATEWAY)).toBeInstanceOf(HttpSessionGateway);
     expect(TestBed.inject(AUTH_GATEWAY)).toBeInstanceOf(UnavailableAuthGateway);
     expect(TestBed.inject(MEMBERS_GATEWAY)).toBeInstanceOf(HttpMembersGateway);
+    expect(TestBed.inject(GROUPS_GATEWAY)).toBeInstanceOf(HttpGroupsGateway);
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBe(UNAVAILABLE_DASHBOARD_GATEWAY);
     expect(TestBed.inject(MEMBER_DETAIL_GATEWAY)).toBe(UNAVAILABLE_MEMBER_DETAIL_GATEWAY);
     expect(TestBed.inject(ENROLLMENT_GATEWAY)).toBe(UNAVAILABLE_ENROLLMENT_GATEWAY);

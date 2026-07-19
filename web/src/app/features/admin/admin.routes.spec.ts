@@ -8,7 +8,7 @@ function child(path: string): Route | undefined {
 
 describe('adminRoutes', () => {
   it('déclare les routes canoniques des écrans livrés', () => {
-    expect(adminRoutes[0]?.path).toBe('admin');
+    expect(adminRoutes[0]?.path).toBe('');
     expect(adminRoutes[0]?.canActivate).toHaveLength(1);
     expect(child('dashboard')?.loadComponent).toBeTypeOf('function');
     expect(child('members')?.loadComponent).toBeTypeOf('function');
@@ -19,6 +19,10 @@ describe('adminRoutes', () => {
     expect(child('organizations/:id')?.loadComponent).toBeTypeOf('function');
     expect(child('organizations/:id/edit')?.loadComponent).toBeTypeOf('function');
     expect(child('organizations/:id/edit')?.canDeactivate).toHaveLength(1);
+    expect(child('groups')?.loadComponent).toBeTypeOf('function');
+    expect(child('groups')?.canActivate).toHaveLength(1);
+    expect(child('groups/:id')?.loadComponent).toBeTypeOf('function');
+    expect(child('groups/:id')?.canActivate).toHaveLength(1);
     expect(child('enrollments')?.loadComponent).toBeTypeOf('function');
     expect(child('enrollments/new')?.loadComponent).toBeTypeOf('function');
     expect(child('enrollments/new')?.canDeactivate).toHaveLength(1);
