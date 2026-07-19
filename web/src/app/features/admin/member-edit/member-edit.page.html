@@ -1,0 +1,257 @@
+<cnpm-admin-shell>
+  <div class="cnpm-member-edit">
+    <nav aria-label="Fil d’Ariane">
+      <ol class="cnpm-member-edit__crumbs">
+        <li>
+          <a routerLink="/admin/members" [queryParams]="detailQueryParams()">Membres</a>
+        </li>
+        @if (member(); as member) {
+          <li>
+            <a [routerLink]="['/admin/members', member.id]" [queryParams]="detailQueryParams()">{{
+              member.legalName
+            }}</a>
+          </li>
+        }
+        <li aria-current="page">Modifier</li>
+      </ol>
+    </nav>
+
+    <cnpm-page-header
+      [title]="pageTitle()"
+      description="Mettez à jour le noyau descriptif autorisé, sans modifier le cycle de vie du membre."
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <cnpm-skeleton variant="card" [rows]="7" label="Chargement du dossier membre…" />
+      }
+      @case ('forbidden') {
+        <cnpm-error-state
+          variant="forbidden"
+          title="Modification non autorisée"
+          description="Votre session ne dispose pas du droit MEMBER.WRITE requis. Le serveur reste seul juge de cette autorisation."
+        />
+      }
+      @case ('notFound') {
+        <cnpm-error-state
+          variant="not-found"
+          title="Dossier membre introuvable"
+          description="Ce dossier n’existe pas ou n’est plus accessible avec cet identifiant."
+        >
+          <cnpm-button variant="secondary" routerLink="/admin/members"
+            >Retour à la liste des membres</cnpm-button
+          >
+        </cnpm-error-state>
+      }
+      @case ('error') {
+        <cnpm-error-state
+          variant="recoverable"
+          title="Le dossier n’a pas pu être chargé"
+          description="Le service des membres est momentanément indisponible."
+        >
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-error-state>
+      }
+      @case ('ready') {
+        @if (member(); as member) {
+          <div class="cnpm-member-edit__identity">
+            <div>
+              <p class="cnpm-member-edit__eyebrow">Dossier membre</p>
+              <h2>{{ member.legalName }}</h2>
+              <p>Identifiant technique&nbsp;: {{ member.id }}</p>
+            </div>
+            <cnpm-badge [tone]="statusTone(member.status)">
+              {{ statusLabel(member.status) }}
+            </cnpm-badge>
+          </div>
+
+          <cnpm-alert tone="info" title="Périmètre contractuel de BO-004" [live]="false">
+            Cet incrément modifie uniquement la raison sociale, le nom commercial, le type
+            d’entreprise et le code secteur. La création reste traitée par le parcours d’enrôlement
+            BO-009. Les autres volets exigent leurs propres contrats et permissions.
+          </cnpm-alert>
+
+          @if (saveFailure()) {
+            <cnpm-alert
+              [tone]="saveFailure() === 'conflict' ? 'warning' : 'error'"
+              [title]="
+                saveFailure() === 'forbidden'
+                  ? 'Droit de modification refusé'
+                  : saveFailure() === 'notFound'
+                    ? 'Dossier devenu introuvable'
+                    : 'Enregistrement impossible'
+              "
+            >
+              <p>{{ saveMessage() }}</p>
+              @if (saveFailure() === 'conflict') {
+                <cnpm-button variant="secondary" size="sm" (click)="reloadCurrent()">
+                  Recharger la version courante
+                </cnpm-button>
+              }
+            </cnpm-alert>
+          }
+
+          <form class="cnpm-member-edit__form" [formGroup]="form" novalidate (ngSubmit)="submit()">
+            <cnpm-inline-error-summary [errors]="formErrors()" />
+
+            <div class="cnpm-member-edit__layout">
+              <section class="cnpm-member-edit__card" aria-labelledby="member-edit-fields-title">
+                <div class="cnpm-member-edit__section-heading">
+                  <div>
+                    <p class="cnpm-member-edit__eyebrow">Informations modifiables</p>
+                    <h2 id="member-edit-fields-title">Identité descriptive</h2>
+                  </div>
+                  <span>MEMBER.WRITE</span>
+                </div>
+                <p class="cnpm-member-edit__intro">
+                  Les champs marqués d’un astérisque sont obligatoires.
+                </p>
+
+                <div class="cnpm-member-edit__fields">
+                  <div class="cnpm-member-edit__field cnpm-member-edit__field--wide">
+                    <label for="member-legal-name">
+                      Raison sociale <span aria-hidden="true">*</span>
+                    </label>
+                    <input
+                      id="member-legal-name"
+                      formControlName="legalName"
+                      maxlength="255"
+                      autocomplete="organization"
+                      [attr.aria-invalid]="fieldError('legalName') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('legalName') ? 'member-legal-name-error' : null
+                      "
+                    />
+                    @if (fieldError('legalName'); as error) {
+                      <p class="cnpm-member-edit__error" id="member-legal-name-error">
+                        <span aria-hidden="true">!</span>{{ error }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="cnpm-member-edit__field cnpm-member-edit__field--wide">
+                    <label for="member-trade-name">Nom commercial</label>
+                    <input
+                      id="member-trade-name"
+                      formControlName="tradeName"
+                      maxlength="255"
+                      [attr.aria-invalid]="fieldError('tradeName') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('tradeName') ? 'member-trade-name-error' : null
+                      "
+                    />
+                    @if (fieldError('tradeName'); as error) {
+                      <p class="cnpm-member-edit__error" id="member-trade-name-error">
+                        <span aria-hidden="true">!</span>{{ error }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="cnpm-member-edit__field">
+                    <label for="member-organization-type">
+                      Type d’entreprise <span aria-hidden="true">*</span>
+                    </label>
+                    <input
+                      id="member-organization-type"
+                      formControlName="organizationType"
+                      maxlength="40"
+                      [attr.aria-invalid]="fieldError('organizationType') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('organizationType')
+                          ? 'member-organization-type-error'
+                          : 'member-organization-type-help'
+                      "
+                    />
+                    <p class="cnpm-member-edit__help" id="member-organization-type-help">
+                      La nomenclature officielle n’étant pas contractuelle, conservez le libellé
+                      déjà attribué.
+                    </p>
+                    @if (fieldError('organizationType'); as error) {
+                      <p class="cnpm-member-edit__error" id="member-organization-type-error">
+                        <span aria-hidden="true">!</span>{{ error }}
+                      </p>
+                    }
+                  </div>
+
+                  <div class="cnpm-member-edit__field">
+                    <label for="member-sector-code">Code secteur</label>
+                    <input
+                      id="member-sector-code"
+                      formControlName="sectorCode"
+                      maxlength="80"
+                      [attr.aria-invalid]="fieldError('sectorCode') ? 'true' : null"
+                      [attr.aria-describedby]="
+                        fieldError('sectorCode')
+                          ? 'member-sector-code-error'
+                          : 'member-sector-code-help'
+                      "
+                    />
+                    <p class="cnpm-member-edit__help" id="member-sector-code-help">
+                      Utilisez uniquement un code du référentiel déjà attribué au dossier.
+                    </p>
+                    @if (fieldError('sectorCode'); as error) {
+                      <p class="cnpm-member-edit__error" id="member-sector-code-error">
+                        <span aria-hidden="true">!</span>{{ error }}
+                      </p>
+                    }
+                  </div>
+                </div>
+              </section>
+
+              <aside class="cnpm-member-edit__side" aria-label="Informations protégées">
+                <section class="cnpm-member-edit__card" aria-labelledby="member-protected-title">
+                  <p class="cnpm-member-edit__eyebrow">Lecture seule</p>
+                  <h2 id="member-protected-title">État protégé</h2>
+                  <dl class="cnpm-member-edit__protected">
+                    <div>
+                      <dt>Statut du membre</dt>
+                      <dd>
+                        <cnpm-badge [tone]="statusTone(member.status)">
+                          {{ statusLabel(member.status) }}
+                        </cnpm-badge>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Niveau de risque</dt>
+                      <dd>{{ riskLabel(member.riskLevel) }}</dd>
+                    </div>
+                    <div>
+                      <dt>Version du dossier</dt>
+                      <dd>{{ member.version }}</dd>
+                    </div>
+                  </dl>
+                  <p class="cnpm-member-edit__note">
+                    La version est contrôlée à l’enregistrement afin de ne pas écraser une
+                    modification concurrente.
+                  </p>
+                </section>
+
+                <section class="cnpm-member-edit__card" aria-labelledby="member-outside-title">
+                  <p class="cnpm-member-edit__eyebrow">Hors de ce flux</p>
+                  <h2 id="member-outside-title">Volets non modifiables ici</h2>
+                  <ul class="cnpm-member-edit__locked-list">
+                    <li>Identifiants RCCM et NIF</li>
+                    <li>Contacts et représentant légal</li>
+                    <li>Catégorie, groupement et statut</li>
+                    <li>Données financières et documents</li>
+                  </ul>
+                  <p class="cnpm-member-edit__note">
+                    Les champs sensibles requièrent notamment MEMBER.SENSITIVE.WRITE et un contrat
+                    dédié ; masquer ou désactiver un champ ne remplacerait pas ce contrôle serveur.
+                  </p>
+                </section>
+              </aside>
+            </div>
+
+            <div class="cnpm-member-edit__actions">
+              <cnpm-button variant="secondary" (click)="cancel()">Annuler</cnpm-button>
+              <cnpm-button type="submit" variant="primary" [loading]="saving()">
+                Enregistrer les modifications
+              </cnpm-button>
+            </div>
+          </form>
+        }
+      }
+    }
+  </div>
+</cnpm-admin-shell>

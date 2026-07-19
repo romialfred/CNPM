@@ -12,6 +12,8 @@ describe('adminRoutes', () => {
     expect(adminRoutes[0]?.canActivate).toHaveLength(1);
     expect(child('dashboard')?.loadComponent).toBeTypeOf('function');
     expect(child('members')?.loadComponent).toBeTypeOf('function');
+    expect(child('members/:id/edit')?.loadComponent).toBeTypeOf('function');
+    expect(child('members/:id/edit')?.canDeactivate).toHaveLength(1);
     expect(child('members/:id')?.loadComponent).toBeTypeOf('function');
     expect(child('organizations')?.loadComponent).toBeTypeOf('function');
     expect(child('organizations/:id')?.loadComponent).toBeTypeOf('function');

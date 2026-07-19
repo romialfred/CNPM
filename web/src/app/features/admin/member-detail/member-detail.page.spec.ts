@@ -1,8 +1,8 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { BehaviorSubject, firstValueFrom, Subject } from 'rxjs';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DemoSessionGateway } from '../../../layout/admin-shell/demo-session.gateway';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
 import { DemoMemberDetailGateway } from './demo-member-detail.gateway';
@@ -97,6 +97,25 @@ describe('MemberDetailPage — états requis', () => {
     expect(headings[0].textContent).toContain(detail.identity.organization);
     expect(host.querySelectorAll('[role="tab"]').length).toBe(6);
     expect(host.querySelector('[role="tabpanel"]')).not.toBeNull();
+  });
+
+  it('ouvre BO-004 avec le contexte partageable de BO-003', async () => {
+    const { fixture, gateway, host } = await setup({ onglet: 'cotisations', q: 'somacop' });
+    const detail = await firstValueFrom(new DemoMemberDetailGateway().load(MEMBER_ID));
+    gateway.latest.next(detail);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const edit = Array.from(host.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Modifier'),
+    );
+    edit?.click();
+
+    expect(navigate).toHaveBeenCalledWith(['/admin/members', MEMBER_ID, 'edit'], {
+      queryParamsHandling: 'preserve',
+    });
   });
 
   it('affiche « membre introuvable » sans proposer de réessayer', async () => {

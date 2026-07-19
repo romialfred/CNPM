@@ -16,6 +16,10 @@ import { ENROLLMENTS_GATEWAY } from './enrollments/enrollments-gateway';
 import { HttpEnrollmentsGateway } from './enrollments/http-enrollments.gateway';
 import { DemoMemberDetailGateway } from './member-detail/demo-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from './member-detail/member-detail-gateway';
+import { DemoMemberEditGateway } from './member-edit/demo-member-edit.gateway';
+import { HttpMemberEditGateway } from './member-edit/http-member-edit.gateway';
+import { MEMBER_EDIT_GATEWAY } from './member-edit/member-edit-gateway';
+import { pendingMemberEditChangesGuard } from './member-edit/pending-member-edit-changes.guard';
 import { DemoMembersGateway } from './members/demo-members.gateway';
 import { HttpMembersGateway } from './members/http-members.gateway';
 import { MEMBERS_GATEWAY } from './members/members-gateway';
@@ -96,6 +100,15 @@ export const adminRoutes: Routes = [
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoMemberDetailGateway)
             : UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
+      },
+      DemoMemberEditGateway,
+      HttpMemberEditGateway,
+      {
+        provide: MEMBER_EDIT_GATEWAY,
+        useFactory: () =>
+          inject(CNPM_DATA_MODE) === 'demo'
+            ? inject(DemoMemberEditGateway)
+            : inject(HttpMemberEditGateway),
       },
       {
         provide: ENROLLMENT_GATEWAY,
@@ -208,6 +221,12 @@ export const adminRoutes: Routes = [
         loadComponent: () =>
           import('./enrollments/enrollment-review.page').then((m) => m.EnrollmentReviewPage),
         title: 'Validation d’un enrôlement — Administration CNPM',
+      },
+      {
+        path: 'members/:id/edit',
+        canDeactivate: [pendingMemberEditChangesGuard],
+        loadComponent: () => import('./member-edit/member-edit.page').then((m) => m.MemberEditPage),
+        title: 'Modifier un dossier membre — Administration CNPM',
       },
       {
         path: 'members/:id',

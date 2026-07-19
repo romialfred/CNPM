@@ -551,6 +551,12 @@ export class MemberDetailPage {
     this.retryTick.update((tick) => tick + 1);
   }
 
+  protected openMemberEdit(id: string): void {
+    void this.router.navigate(['/admin/members', id, 'edit'], {
+      queryParamsHandling: 'preserve',
+    });
+  }
+
   private patch(params: Record<string, string | number | null>): void {
     void this.router.navigate([], {
       relativeTo: this.route,

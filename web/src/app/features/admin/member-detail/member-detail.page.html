@@ -119,10 +119,9 @@
                 <div class="cnpm-member__identity-actions">
                   <cnpm-button
                     variant="primary"
-                    [disabled]="true"
-                    [describedBy]="
-                      member.permissions.canEdit ? 'flux-modification' : 'droit-modifier'
-                    "
+                    [disabled]="!member.permissions.canEdit"
+                    [describedBy]="member.permissions.canEdit ? null : 'droit-modifier'"
+                    (click)="openMemberEdit(member.identity.id)"
                   >
                     <svg lucidePencil [size]="iconSize.compact"></svg>
                     Modifier
@@ -139,9 +138,6 @@
                     Retour à la liste
                   </cnpm-button>
 
-                  <p class="cnpm-member__hint" id="flux-modification">
-                    L’écran de modification d’un membre n’est pas encore disponible.
-                  </p>
                   <p class="cnpm-member__hint" id="droit-modifier">
                     Votre rôle ne permet pas de modifier cette fiche.
                   </p>
