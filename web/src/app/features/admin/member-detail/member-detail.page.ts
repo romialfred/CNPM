@@ -200,7 +200,7 @@ const MISSING = 'Non renseigné';
     LucidePrinter,
   ],
   templateUrl: './member-detail.page.html',
-  styleUrl: './member-detail.page.scss',
+  styleUrls: ['./member-detail.page.scss', './member-detail.chart.scss'],
 })
 export class MemberDetailPage {
   private readonly gateway = inject(MEMBER_DETAIL_GATEWAY);
@@ -210,6 +210,19 @@ export class MemberDetailPage {
   private readonly pageTitle = inject(Title);
 
   protected readonly iconSize = CNPM_ICON_SIZE;
+
+  /**
+   * Hauteur d'une barre, en pourcentage du plus grand montant appelé de la série.
+   *
+   * L'échelle se cale sur le montant APPELÉ et non sur le maximum général : le réglé ne
+   * dépasse jamais l'appelé, et prendre le maximum des deux ferait varier l'échelle d'un
+   * membre à l'autre sans que la lecture y gagne. Un dénominateur nul rend zéro plutôt
+   * qu'une division impossible.
+   */
+  protected chartShare(value: number, lines: readonly { expected: number }[]): number {
+    const plafond = Math.max(...lines.map((line) => line.expected), 0);
+    return plafond > 0 ? Math.round((value / plafond) * 100) : 0;
+  }
   protected readonly tabs = TABS;
   protected readonly missingLabel = MISSING;
   protected readonly historyPageSize = HISTORY_PAGE_SIZE;

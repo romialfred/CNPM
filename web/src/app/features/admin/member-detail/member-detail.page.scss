@@ -179,9 +179,12 @@
   border-radius: var(--cnpm-radius-md);
 }
 
+/* Minimum ramené de 16 à 11 rem : à 1 280 px la colonne principale ne fait que 613 px,
+   et deux cartes par rangée seulement portaient le bloc d'indicateurs à 756 px de haut
+   contre 378 à 1 440. Une carte de chiffre n'a pas besoin de 256 px. */
 .cnpm-member__stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   align-items: start;
   gap: var(--cnpm-space-4);
   min-width: 0;
@@ -419,9 +422,24 @@
   color: var(--cnpm-color-text-muted);
 }
 
-@media (min-width: 1440px) {
+/* Deux colonnes dès 1 280 px et non 1 440 : entre les deux, la colonne latérale
+   passait sous le contenu principal alors que la place existait, et la fiche
+   s'allongeait d'autant. */
+@media (min-width: 1280px) {
   .cnpm-member__layout {
     grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+
+  /* La colonne latérale suit le défilement : elle porte les alertes et les prochaines
+     actions, qui doivent rester lisibles pendant qu'on parcourt les cotisations. */
+  .cnpm-member__aside {
+    position: sticky;
+    top: calc(var(--cnpm-size-topbar) + var(--cnpm-space-16));
+  }
+}
+
+@media (min-width: 1440px) {
+  .cnpm-member__layout {
     gap: var(--cnpm-space-4);
   }
 

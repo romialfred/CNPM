@@ -189,17 +189,6 @@
                           note="Un reçu n’est émis qu’après rapprochement du paiement."
                         />
 
-                        <section class="cnpm-member__card cnpm-member__kpi">
-                          <h2 class="cnpm-member__kpi-title">Dernière activité</h2>
-                          @if (member.history[0]; as latestActivity) {
-                            <p class="cnpm-member__kpi-activity">{{ latestActivity.action }}</p>
-                            <p class="cnpm-member__kpi-note">
-                              {{ latestActivity.at | date: 'dd/MM/yyyy HH:mm' }}
-                            </p>
-                          } @else {
-                            <p class="cnpm-member__missing">Aucune activité enregistrée</p>
-                          }
-                        </section>
 
                         @if (member.risk; as risk) {
                           <!-- Le score n'est jamais affiché seul : la fiche impose ses
@@ -235,6 +224,17 @@
                             </ul>
                           </section>
                         }
+                        <section class="cnpm-member__card cnpm-member__kpi">
+                          <h2 class="cnpm-member__kpi-title">Dernière activité</h2>
+                          @if (member.history[0]; as latestActivity) {
+                            <p class="cnpm-member__kpi-activity">{{ latestActivity.action }}</p>
+                            <p class="cnpm-member__kpi-note">
+                              {{ latestActivity.at | date: 'dd/MM/yyyy HH:mm' }}
+                            </p>
+                          } @else {
+                            <p class="cnpm-member__missing">Aucune activité enregistrée</p>
+                          }
+                        </section>
 
                         <section class="cnpm-member__card cnpm-member__kpi">
                           <h2 class="cnpm-member__kpi-title">
@@ -264,97 +264,67 @@
                       </cnpm-alert>
                     }
 
-                    <div class="cnpm-member__overview-grid">
-                      <section
-                        class="cnpm-member__card"
-                        aria-labelledby="historique-synthese-titre"
-                      >
-                        <h2 class="cnpm-member__card-title" id="historique-synthese-titre">
-                          Historique et timeline
-                        </h2>
-                        <ol class="cnpm-member__timeline">
-                          @for (entry of member.history.slice(0, 5); track entry.id) {
-                            <li>
-                              <span class="cnpm-member__timeline-dot" aria-hidden="true"></span>
-                              <p class="cnpm-member__strong">{{ entry.action }}</p>
-                              <p class="cnpm-member__card-note">
-                                {{ entry.actor }} — {{ entry.at | date: 'dd/MM/yyyy HH:mm' }}
-                              </p>
-                            </li>
-                          }
-                        </ol>
-                      </section>
+                    <!-- Les listes « Historique », « Derniers paiements » et
+                         « Documents recents » ont ete retirees de la synthese : elles
+                         dupliquaient trait pour trait les onglets dedies, et la grille a
+                         trois colonnes les ecrasait a 192, 384 et 224 px — un historique
+                         y etait illisible. La synthese redevient une synthese ; le detail
+                         vit dans son onglet. -->
 
-                      <section class="cnpm-member__card" aria-labelledby="paiements-synthese-titre">
-                        <h2 class="cnpm-member__card-title" id="paiements-synthese-titre">
-                          Derniers paiements
+                    @if (member.contributions.length) {
+                      <section class="cnpm-member__card" aria-labelledby="rythme-titre">
+                        <h2 class="cnpm-member__card-title" id="rythme-titre">
+                          Rythme de règlement par période
                         </h2>
-                        <div
-                          class="cnpm-member__compact-table-region"
-                          role="region"
-                          tabindex="0"
-                          aria-label="Derniers paiements du membre"
-                        >
-                          <table class="cnpm-member__compact-table">
-                            <thead>
-                              <tr>
-                                <th scope="col">Date</th>
-                                <th scope="col">Période</th>
-                                <th scope="col">Montant</th>
-                                <th scope="col">Reçu</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              @for (
-                                payment of member.payments.slice(0, 5);
-                                track payment.reference
-                              ) {
-                                <tr>
-                                  <td>{{ payment.paidAt | date: 'dd/MM/yyyy' }}</td>
-                                  <td>{{ payment.period }}</td>
-                                  <td class="cnpm-member__amount">
-                                    {{ payment.amount | number: '1.0-0' }}
-                                  </td>
-                                  <td>
-                                    @if (payment.receipt) {
-                                      <span class="cnpm-member__reference">{{
-                                        payment.receipt
-                                      }}</span>
-                                    } @else {
-                                      <span class="cnpm-member__missing">Non émis</span>
-                                    }
-                                  </td>
-                                </tr>
-                              }
-                            </tbody>
-                          </table>
-                        </div>
-                      </section>
+                        <p class="cnpm-member__card-note">
+                          Montant appelé et montant réglé, période par période. Les valeurs sont
+                          celles du tableau de l’onglet Cotisations ; rien n’est recalculé ici.
+                        </p>
 
-                      <section class="cnpm-member__card" aria-labelledby="documents-synthese-titre">
-                        <h2 class="cnpm-member__card-title" id="documents-synthese-titre">
-                          Documents récents
-                        </h2>
-                        <ul class="cnpm-member__documents-list">
-                          @for (document of member.documents.slice(0, 5); track document.id) {
-                            <li>
-                              <div>
-                                <p class="cnpm-member__strong">{{ document.title }}</p>
-                                <p class="cnpm-member__card-note">
-                                  {{ document.kind }}
-                                  @if (document.sizeLabel) {
-                                    — {{ document.sizeLabel }}
-                                  }
-                                </p>
-                              </div>
-                              <cnpm-badge [tone]="documentStatusTone(document.status)">
-                                {{ documentStatusLabel(document.status) }}
-                              </cnpm-badge>
+                        <!-- Le graphique est masqué aux technologies d'assistance : sa
+                             lecture passe par la liste de definitions qui suit, laquelle
+                             porte exactement les memes chiffres. Une barre n'a rien a
+                             annoncer qu'un nombre ne dise mieux. -->
+                        <ul class="cnpm-member__chart" aria-hidden="true">
+                          @for (line of member.contributions; track line.period) {
+                            <li class="cnpm-member__chart-column">
+                              <span class="cnpm-member__chart-track">
+                                <span
+                                  class="cnpm-member__chart-bar cnpm-member__chart-bar--expected"
+                                  [style.height.%]="chartShare(line.expected, member.contributions)"
+                                ></span>
+                                <span
+                                  class="cnpm-member__chart-bar cnpm-member__chart-bar--paid"
+                                  [style.height.%]="chartShare(line.paid, member.contributions)"
+                                ></span>
+                              </span>
+                              <span class="cnpm-member__chart-label">{{ line.period }}</span>
                             </li>
                           }
                         </ul>
+
+                        <p class="cnpm-member__chart-legend">
+                          <span class="cnpm-member__chart-key cnpm-member__chart-key--expected"
+                            >Appelé</span
+                          >
+                          <span class="cnpm-member__chart-key cnpm-member__chart-key--paid"
+                            >Réglé</span
+                          >
+                        </p>
+
+                        <dl class="cnpm-member__chart-data">
+                          @for (line of member.contributions; track line.period) {
+                            <div>
+                              <dt>{{ line.label }}</dt>
+                              <dd>
+                                {{ line.paid | number: '1.0-0' }} réglé sur
+                                {{ line.expected | number: '1.0-0' }} appelé
+                              </dd>
+                            </div>
+                          }
+                        </dl>
                       </section>
-                    </div>
+                    }
 
                     <section
                       class="cnpm-member__card cnpm-member__agent"

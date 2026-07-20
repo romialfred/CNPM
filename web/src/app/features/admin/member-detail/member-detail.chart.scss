@@ -1,0 +1,110 @@
+/* Rythme de reglement par periode.
+
+   Extrait de `member-detail.page.scss` : la feuille atteignait la limite de 10 kB que
+   le budget `anyComponentStyle` impose par fichier de style de composant. La page
+   d'accueil et le tableau de bord procedent deja ainsi. Scinder vaut mieux que relever
+   le seuil, qui masquerait la charge reelle. */
+
+/* -------------------------------------------------- Rythme de règlement par période */
+
+.cnpm-member__chart {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: var(--cnpm-space-3);
+  height: 9rem;
+  margin: var(--cnpm-space-3) 0 0;
+  padding: 0;
+  border-block-end: 1px solid var(--cnpm-color-border-subtle);
+  list-style: none;
+}
+
+.cnpm-member__chart-column {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--cnpm-space-2);
+  height: 100%;
+  min-width: 0;
+}
+
+/* Les deux barres se superposent dans la même piste : l'appelé en fond, le réglé
+   par-dessus. Côte à côte, elles doubleraient la largeur sans rien apprendre. */
+.cnpm-member__chart-track {
+  position: relative;
+  display: block;
+  height: 100%;
+}
+
+.cnpm-member__chart-bar {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 0;
+  border-start-start-radius: var(--cnpm-radius-xs);
+  border-start-end-radius: var(--cnpm-radius-xs);
+}
+
+.cnpm-member__chart-bar--expected {
+  background: var(--cnpm-color-brand-blue-200);
+}
+
+.cnpm-member__chart-bar--paid {
+  background: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-member__chart-label {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  text-align: center;
+}
+
+.cnpm-member__chart-legend {
+  display: flex;
+  gap: var(--cnpm-space-4);
+  margin: var(--cnpm-space-3) 0 0;
+  font-size: var(--cnpm-font-size-xs);
+}
+
+/* La légende porte une pastille ET son libellé : la couleur seule ne distingue
+   jamais deux séries. */
+.cnpm-member__chart-key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-member__chart-key::before {
+  width: var(--cnpm-size-icon-xs);
+  height: var(--cnpm-size-icon-xs);
+  border-radius: var(--cnpm-radius-xs);
+  content: '';
+}
+
+.cnpm-member__chart-key--expected::before {
+  background: var(--cnpm-color-brand-blue-200);
+}
+
+.cnpm-member__chart-key--paid::before {
+  background: var(--cnpm-color-brand-blue-700);
+}
+
+/* Alternative textuelle du graphique, exigée par les règles du projet : mêmes
+   chiffres, lisibles sans voir les barres. */
+.cnpm-member__chart-data {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--cnpm-space-2);
+  margin: var(--cnpm-space-4) 0 0;
+}
+
+.cnpm-member__chart-data dt {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-member__chart-data dd {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+}

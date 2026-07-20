@@ -202,3 +202,48 @@ describe('DemoMemberDetailGateway — cohérence du jeu de démonstration', () =
     }
   });
 });
+
+describe('MemberDetailPage — synthèse', () => {
+  beforeEach(() => TestBed.resetTestingModule());
+
+  async function ready() {
+    const contexte = await setup();
+    const detail = await firstValueFrom(new DemoMemberDetailGateway().load(MEMBER_ID));
+    contexte.gateway.latest.next(detail);
+    await contexte.fixture.whenStable();
+    contexte.fixture.detectChanges();
+    return contexte;
+  }
+  it('ne duplique plus les onglets dans la vue d’ensemble', async () => {
+    // Historique, paiements et documents ont chacun leur onglet. Les répéter dans la
+    // synthèse imposait une grille à trois colonnes de 192, 384 et 224 px, où un
+    // historique devenait illisible.
+    const { host } = await ready();
+
+    expect(host.querySelector('.cnpm-member__overview-grid')).toBeNull();
+  });
+
+  it('trace le rythme de règlement et en donne l’équivalent en toutes lettres', async () => {
+    const { host } = await ready();
+    const graphique = host.querySelector('.cnpm-member__chart');
+    const alternative = host.querySelector('.cnpm-member__chart-data');
+
+    expect(graphique).not.toBeNull();
+    // Le graphique est masqué aux lecteurs d'écran parce que la liste qui suit porte
+    // exactement les mêmes chiffres : une barre n'annonce rien qu'un nombre ne dise mieux.
+    expect(graphique?.getAttribute('aria-hidden')).toBe('true');
+    expect(alternative).not.toBeNull();
+    expect(alternative?.querySelectorAll('dt').length).toBe(
+      graphique?.querySelectorAll('.cnpm-member__chart-column').length,
+    );
+    expect(alternative?.textContent).toContain('réglé sur');
+  });
+
+  it('distingue les deux séries autrement que par la couleur', async () => {
+    const { host } = await ready();
+    const legende = host.querySelector('.cnpm-member__chart-legend');
+
+    expect(legende?.textContent).toContain('Appelé');
+    expect(legende?.textContent).toContain('Réglé');
+  });
+});
