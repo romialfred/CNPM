@@ -220,15 +220,9 @@
             <td class="cnpm-table__cell">{{ member.category }}</td>
             <td class="cnpm-table__cell">{{ member.group ?? '—' }}</td>
             <td class="cnpm-table__cell">
-              <span class="cnpm-members__contact">
-                <span class="cnpm-members__contact-name">{{ member.contactName ?? '—' }}</span>
-                @if (member.contactPhone) {
-                  <span class="cnpm-members__contact-detail">{{ member.contactPhone }}</span>
-                }
-                @if (member.contactEmail) {
-                  <span class="cnpm-members__contact-detail">{{ member.contactEmail }}</span>
-                }
-              </span>
+              <!-- Le nom seul. Telephone et courriel occupaient deux lignes de plus par
+                   ligne de tableau ; ils restent sur la fiche du membre. -->
+              <span class="cnpm-members__contact-name">{{ member.contactName ?? '—' }}</span>
             </td>
             <!-- Montants alignés à droite et formatés fr-ML : critère de la fiche.
                  L'unité est portée une fois par l'en-tête, pas répétée à chaque ligne. -->
@@ -257,14 +251,16 @@
                 <cnpm-badge [tone]="statusTone(member.status)">
                   {{ statusLabel(member.status) }}
                 </cnpm-badge>
-                <!-- « Grand cotisant » est un marqueur, pas un statut : il se lit à
-                     côté du statut et ne s'y substitue jamais. Voir DATA-DEC-001. -->
+                <!-- « Grand cotisant » est un marqueur, pas un statut : il se lit sous le
+                     statut et ne s'y substitue jamais. Voir DATA-DEC-001.
+                     Rendu en mention et non en second badge : empiles, deux badges
+                     doublaient la hauteur de chaque ligne. Le texte reste ecrit en
+                     entier, l'information ne depend d'aucune couleur. -->
                 @if (member.isLargeContributor) {
-                  <cnpm-badge tone="neutral">Grand cotisant</cnpm-badge>
+                  <span class="cnpm-members__marker">Grand cotisant</span>
                 }
               </span>
             </td>
-            <td class="cnpm-table__cell">{{ member.lastActivity ?? '—' }}</td>
             <!-- La fiche impose « Voir, Modifier si autorisé, Historique ; pas trois
                  icônes sans tooltip ». Les actions sont donc écrites en toutes
                  lettres : trois pictogrammes muets rendraient la colonne indéchiffrable. -->
@@ -348,58 +344,72 @@
         </cnpm-data-table>
         }
 
-        <!-- Vue en tuiles. Le dos ne contient que du texte : aucun lien, aucun bouton.
-             Un contenu interactif revele au seul survol serait inatteignable au clavier
-             comme au toucher. Il n'est pas non plus masque aux lecteurs d'ecran : il fait
-             partie du texte de la tuile et se lit dans l'ordre du DOM, le retournement
-             n'etant qu'un effet visuel. -->
+        <!-- Vue en tuiles, calquee sur la maquette du client : carte fixe, statut en
+             pastille, code, raison sociale, categorie et groupement, puis les actions en
+             pied.
+
+             Le retournement au survol est retire. Il repondait a une demande anterieure,
+             mais la maquette montre des tuiles fixes portant des ACTIONS — or une action
+             revelee au seul survol est inatteignable au toucher, et un contenu qui pivote
+             sous le curseur ne se lit pas. Les informations qui vivaient au dos (contact,
+             telephone, derniere activite) restent sur la fiche du membre. -->
         @if (view() === 'tiles' && tableState() === 'ready') {
           <ul class="cnpm-members__tiles" aria-label="Membres du CNPM">
             @for (member of rows(); track member.id) {
               <li class="cnpm-members__tile" [class]="statusAccentClass(member.status)">
-                <div class="cnpm-members__tile-inner">
-                  <div class="cnpm-members__tile-face">
-                    <div class="cnpm-members__tile-head">
-                      <cnpm-badge [tone]="statusTone(member.status)">
-                        {{ statusLabel(member.status) }}
-                      </cnpm-badge>
-                      <span class="cnpm-members__tile-code">{{ member.code }}</span>
-                    </div>
-                    <a
-                      class="cnpm-members__tile-name"
-                      [routerLink]="['/admin/members', member.organizationId]"
-                      queryParamsHandling="preserve"
-                    >
-                      {{ member.organization }}
-                    </a>
-                    <p class="cnpm-members__tile-meta">
-                      {{ member.category }}
-                      @if (member.group) {
-                        <span aria-hidden="true"> · </span>{{ member.group }}
-                      }
-                    </p>
-                  </div>
+                <div class="cnpm-members__tile-head">
+                  <cnpm-badge [tone]="statusTone(member.status)">
+                    {{ statusLabel(member.status) }}
+                  </cnpm-badge>
+                  <span class="cnpm-members__tile-code">{{ member.code }}</span>
+                </div>
+                <a
+                  class="cnpm-members__tile-name"
+                  [routerLink]="['/admin/members', member.organizationId]"
+                  queryParamsHandling="preserve"
+                >
+                  {{ member.organization }}
+                </a>
+                <p class="cnpm-members__tile-meta">
+                  {{ member.category }}
+                  @if (member.group) {
+                    <span aria-hidden="true"> · </span>{{ member.group }}
+                  }
+                </p>
+                <!-- « Grand cotisant » est un marqueur, pas un statut. Voir DATA-DEC-001. -->
+                @if (member.isLargeContributor) {
+                  <p class="cnpm-members__marker">Grand cotisant</p>
+                }
 
-                  <dl class="cnpm-members__tile-back">
-                    <div>
-                      <dt>Contact</dt>
-                      <dd>{{ member.contactName ?? 'Non communiqué' }}</dd>
-                    </div>
-                    <div>
-                      <dt>Téléphone</dt>
-                      <dd>{{ member.contactPhone ?? 'Non communiqué' }}</dd>
-                    </div>
-                    <div>
-                      <dt>Dernière activité</dt>
-                      <dd>
-                        @if (member.lastActivity) {
-                          {{ member.lastActivity | date: 'dd/MM/yyyy' }}
-                        } @else {
-                          Aucune
-                        }
-                      </dd>
-                    </div>
-                  </dl>
+                <!-- Les memes deux actions que le tableau, pas davantage : la maquette en
+                     montre trois, mais aucun ecran de modification n'est livre et un
+                     troisieme bouton conduirait a une page absente.
+                     Chaque bouton garde un libelle ecrit, retire de la peinture mais lu
+                     par les technologies d'assistance : trois pictogrammes muets rendent
+                     une rangee d'actions indechiffrable. -->
+                <div class="cnpm-members__tile-actions">
+                  <button
+                    type="button"
+                    class="cnpm-members__tile-action"
+                    (click)="viewMember(member.organizationId)"
+                    [title]="'Voir ' + member.organization"
+                  >
+                    <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
+                    <span class="cnpm-members__row-action-label">
+                      Voir {{ member.organization }}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    class="cnpm-members__tile-action"
+                    (click)="viewHistory(member.organizationId)"
+                    [title]="'Historique de ' + member.organization"
+                  >
+                    <svg lucideHistory [size]="iconSize.compact" aria-hidden="true"></svg>
+                    <span class="cnpm-members__row-action-label">
+                      Historique de {{ member.organization }}
+                    </span>
+                  </button>
                 </div>
               </li>
             }
@@ -427,6 +437,8 @@
           <cnpm-insight-summary
             title="Vue d’ensemble des membres"
             headingId="synthese-membres"
+            [icon]="panelIcons.membres"
+            tone="indigo"
             [stats]="memberStats()"
             note="Actifs et dormants composent la base de membres ; les grands cotisants en sont un sous-ensemble. Les prospects sont comptés à part et n’entrent pas dans la base."
           />
@@ -434,6 +446,8 @@
             title="Cotisations"
             headingId="synthese-cotisations"
             unit="(FCFA)"
+            [icon]="panelIcons.cotisations"
+            tone="sarcelle"
             [stats]="contributionStats()"
             note="Montants portant sur la base de membres, prospects exclus."
           />

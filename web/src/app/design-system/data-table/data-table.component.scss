@@ -60,16 +60,20 @@
   padding-right: var(--cnpm-space-2);
 }
 
-/* Les en-têtes s'enroulent volontairement. En `nowrap`, chacun impose sa longueur
-   comme largeur minimale de colonne : « Dernière activité » réclamait 144 px pour des
-   dates de dix caractères, et la table débordait de 300 px sur le plus grand écran
-   prévu. La table a dix colonnes ; c'est le contenu qui doit décider de leur largeur,
-   pas le libellé de leur en-tête. */
+/* En-tetes sur une seule ligne.
+   Ils s'enroulaient auparavant parce qu'en `nowrap` chacun imposait sa longueur comme
+   largeur minimale de colonne : « Derniere activite » reclamait 144 px pour des dates de
+   dix caracteres, et la table debordait. Cette colonne a ete retiree et les intitules
+   longs raccourcis (« Due », « Payee », « Contact ») : la contrainte est levee, et un
+   en-tete sur deux lignes desalignait tout le haut du tableau.
+   Le debordement eventuel reste absorbe par le conteneur defilant de la table, jamais
+   par la page. */
 .cnpm-table__head .cnpm-table__cell {
   background-color: var(--cnpm-color-surface-subtle);
   color: var(--cnpm-color-text-secondary);
   font-weight: var(--cnpm-font-weight-semibold);
-  vertical-align: bottom;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
 .cnpm-table__label {
@@ -113,6 +117,14 @@
    triable. Sa couleur atteint le contraste non textuel de 3:1 exigé par WCAG 1.4.11. */
 .cnpm-table__sort-idle {
   color: var(--cnpm-color-neutral-500);
+}
+
+/* Zebrure. Elle vient AVANT le survol et la selection dans la feuille : a specificite
+   egale, la derniere regle l'emporte, et une ligne survolee ou selectionnee doit garder
+   sa propre teinte. Purement decorative — elle aide a suivre une ligne du regard et ne
+   porte aucune information. */
+.cnpm-table__body .cnpm-table__row:nth-child(even) {
+  background-color: var(--cnpm-color-surface-page);
 }
 
 .cnpm-table__row:hover {

@@ -1,0 +1,44 @@
+/* Teintes d'en-tête — feuille séparée pour tenir le plafond de taille par fichier.
+ *
+ * Chaque teinte déclare deux variables et rien d'autre : la bande et la couleur du
+ * pictogramme. Le titre reste `text-primary` et l'unité `text-secondary` dans tous les
+ * cas, ce qui rend le contraste du texte indépendant de la teinte choisie.
+ *
+ * Contrastes calculés sur l'aplat réellement peint (les teintes sont opaques, aucun
+ * `color-mix` translucide n'est utilisé ici, donc valeur nominale = valeur composée) :
+ *
+ *   teinte    bande      titre #101828   picto        unité #475467
+ *   neutre    #F2F4F7    16,11:1         6,98:1       6,98:1
+ *   indigo    #E9EDFF    15,23:1         9,51:1       6,60:1
+ *   ciel      #D1E9FF    14,21:1         4,79:1       6,15:1
+ *   sarcelle  #D1FADF    15,59:1         4,76:1       6,75:1
+ *   ambre     #FEF0C7    15,64:1         4,78:1       6,77:1
+ *
+ * Seuils : 4,5:1 pour le texte (le titre est en 16 px semi-gras, donc pas « large »),
+ * 3:1 pour le pictogramme en tant qu'élément non textuel. Tous passent.
+ */
+
+.cnpm-insight__header--neutre {
+  --cnpm-insight-tint: var(--cnpm-color-surface-subtle);
+  --cnpm-insight-emblem: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-insight__header--indigo {
+  --cnpm-insight-tint: var(--cnpm-color-brand-blue-100);
+  --cnpm-insight-emblem: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-insight__header--ciel {
+  --cnpm-insight-tint: var(--cnpm-color-semantic-info-100);
+  --cnpm-insight-emblem: var(--cnpm-color-semantic-info-700);
+}
+
+.cnpm-insight__header--sarcelle {
+  --cnpm-insight-tint: var(--cnpm-color-semantic-success-100);
+  --cnpm-insight-emblem: var(--cnpm-color-semantic-success-700);
+}
+
+.cnpm-insight__header--ambre {
+  --cnpm-insight-tint: var(--cnpm-color-semantic-warning-100);
+  --cnpm-insight-emblem: var(--cnpm-color-semantic-warning-700);
+}

@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import {
   LucideUpload,
   LucideUserCheck,
   LucideUsers,
+  LucideWallet,
 } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
@@ -102,7 +103,6 @@ const DEFAULT_PAGE_SIZE = 10;
   selector: 'cnpm-members-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    DatePipe,
     DecimalPipe,
     RouterLink,
     FormsModule,
@@ -140,6 +140,20 @@ export class MembersPage {
   private readonly session = inject(SESSION_GATEWAY);
 
   protected readonly iconSize = CNPM_ICON_SIZE;
+
+  /**
+   * Pictogrammes des panneaux de synthese.
+   *
+   * On passe la DONNEE d'icone (`.icon`), pas son nom. `LucideDynamicIcon` accepte bien
+   * une chaine, mais elle suppose un registre nom -> icone que ce depot n'installe pas :
+   * `provideCnpmIcons()` ne configure que taille, trait et couleur, l'API par icone etant
+   * retenue pour son tree-shaking. Une chaine leve donc « Unable to resolve icon » a
+   * l'execution, et l'exception vide tout le panneau — c'est arrive.
+   */
+  protected readonly panelIcons = {
+    membres: LucideUsers.icon,
+    cotisations: LucideWallet.icon,
+  } as const;
   protected readonly pageSizes = PAGE_SIZES;
   protected readonly statusLabels = STATUS_LABELS;
   protected readonly statuses = Object.keys(STATUS_LABELS) as readonly MemberStatus[];
@@ -294,27 +308,31 @@ export class MembersPage {
       },
       { key: 'category', label: 'Catégorie' },
       { key: 'group', label: 'Groupement', sortable: supported.has('group') },
-      { key: 'contact', label: 'Contact principal' },
+      // Seul le nom du contact est colonné. Téléphone et courriel restaient sur trois
+      // lignes par ligne de tableau, triplant sa hauteur ; ils demeurent accessibles sur
+      // la fiche du membre, et cette liste peut être exportée — y étaler les coordonnées
+      // personnelles de chaque représentant facilite un export nominatif de masse.
+      { key: 'contact', label: 'Contact' },
       {
+        // « Due » et « Payée » plutôt que « Cotisation due » et « Cotisation payée » :
+        // les intitulés longs se coupaient sur deux lignes et gonflaient l'en-tête.
+        // L'unité reste portée par la note, et la légende du tableau nomme la mesure.
         key: 'due',
-        label: 'Cotisation due',
+        label: 'Due',
         note: '(FCFA)',
         align: 'end',
         sortable: supported.has('due'),
       },
       {
         key: 'paid',
-        label: 'Cotisation payée',
+        label: 'Payée',
         note: '(FCFA)',
         align: 'end',
         sortable: supported.has('paid'),
       },
       { key: 'status', label: 'Statut', sortable: supported.has('status') },
-      {
-        key: 'lastActivity',
-        label: 'Dernière activité',
-        sortable: supported.has('lastActivity'),
-      },
+      // « Dernière activité » est retirée à la demande du client. La donnée reste au
+      // contrat et sur la fiche du membre ; seule la colonne disparaît.
       { key: 'actions', label: 'Actions' },
     ];
   });
@@ -450,10 +468,15 @@ export class MembersPage {
       { label: 'Total dû', value: summary.expected },
       { label: 'Total payé', value: summary.collected },
       {
+        // Rendu en jauge : une part se lit d'un coup d'œil sur une échelle, là où un
+        // nombre seul demande de le rapporter mentalement à 100. Le chiffre reste
+        // affiché à côté de la barre — une barre seule ne se lit pas, et la valeur ne
+        // doit jamais dépendre de la seule longueur d'un trait.
         label: 'Taux de recouvrement',
         value: summary.recoveryRate,
         suffix: ' %',
         decimals: 1,
+        display: 'jauge',
         apart: true,
       },
     ];

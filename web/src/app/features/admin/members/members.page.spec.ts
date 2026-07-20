@@ -267,18 +267,59 @@ describe('MembersPage — vue en tuiles', () => {
     expect(tuiles.host.querySelectorAll('.cnpm-members__tile')).toHaveLength(1);
   });
 
-  it('n’enferme aucun élément interactif au dos de la tuile', async () => {
-    // Un lien ou un bouton révélé au seul survol serait inatteignable au clavier comme
-    // au toucher. Le dos ne porte que du texte ; la fiche du membre reste la
-    // destination complète, atteignable depuis la face avant.
+  it('expose les actions de la tuile en permanence, jamais au seul survol', async () => {
+    // La tuile ne se retourne plus : la maquette montre des cartes fixes portant des
+    // actions, et une action révélée au seul survol est inatteignable au toucher.
     const { host } = await rendu('tuiles');
-    const dos = host.querySelector('.cnpm-members__tile-back');
+    const tuile = host.querySelector('.cnpm-members__tile');
+    const actions = Array.from(
+      tuile?.querySelectorAll<HTMLButtonElement>('.cnpm-members__tile-action') ?? [],
+    );
 
-    expect(dos).not.toBeNull();
-    expect(dos?.querySelectorAll('a, button, input, select, textarea')).toHaveLength(0);
-    // Pas d'aria-hidden : le dos fait partie du texte de la tuile et doit se lire.
-    expect(dos?.getAttribute('aria-hidden')).toBeNull();
-    expect(dos?.textContent).toContain('Contact');
+    // Plus de dos : ni conteneur, ni mécanique de retournement.
+    expect(host.querySelector('.cnpm-members__tile-back')).toBeNull();
+    expect(host.querySelector('.cnpm-members__tile-inner')).toBeNull();
+
+    expect(actions).toHaveLength(2);
+    for (const action of actions) {
+      // Chaque bouton garde un nom accessible : deux pictogrammes muets rendraient la
+      // rangée indéchiffrable pour un lecteur d'écran.
+      expect(action.textContent?.trim()).toBeTruthy();
+      expect(action.getAttribute('title')).toBeTruthy();
+      expect(action.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    }
+  });
+
+  it('rend les panneaux de synthèse en entier, pictogramme compris', async () => {
+    // Régression vécue : le pictogramme était passé par son NOM (`icon="users"`).
+    // `LucideDynamicIcon` accepte une chaîne, mais elle suppose un registre nom → icône
+    // que ce dépôt n'installe pas ; l'exception « Unable to resolve icon » vidait tout le
+    // panneau. Les chiffres disparaissaient sans qu'aucun test n'échoue.
+    const { host } = await rendu();
+    const panneaux = Array.from(host.querySelectorAll('cnpm-insight-summary'));
+
+    expect(panneaux).toHaveLength(2);
+    for (const panneau of panneaux) {
+      expect(panneau.querySelector('.cnpm-insight__emblem svg')).not.toBeNull();
+      // Le panneau porte bien ses mesures, pas seulement son titre.
+      expect(panneau.querySelectorAll('.cnpm-insight__stat').length).toBeGreaterThan(0);
+      expect(panneau.querySelector('.cnpm-insight__stat dt')?.textContent?.trim()).toBeTruthy();
+      expect(panneau.querySelector('.cnpm-insight__stat dd')?.textContent?.trim()).toBeTruthy();
+    }
+  });
+
+  it('rend le taux de recouvrement en jauge accessible', async () => {
+    const { host } = await rendu();
+    const jauge = host.querySelector('[role="progressbar"]');
+
+    expect(jauge).not.toBeNull();
+    expect(jauge?.getAttribute('aria-valuemin')).toBe('0');
+    expect(jauge?.getAttribute('aria-valuemax')).toBe('100');
+    // Le nom accessible est le libellé affiché, et la valeur est lisible en toutes
+    // lettres : une barre dont la valeur ne dépend que d'une longueur ne se lit pas.
+    const libelle = jauge?.getAttribute('aria-labelledby');
+    expect(host.querySelector(`#${libelle}`)?.textContent?.trim()).toBe('Taux de recouvrement');
+    expect(jauge?.getAttribute('aria-valuetext')).toContain('%');
   });
 
   it('annonce la vue active par aria-pressed', async () => {

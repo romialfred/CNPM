@@ -103,15 +103,15 @@
    Les teintes reprennent celles du badge — un meme statut ne doit pas se presenter sous
    deux couleurs sur un meme ecran. Tons 600 : sur blanc, les tons 500 de `success` et
    `warning` ne donnent que 2,62:1 et 2,35:1, sous le seuil de 3:1. */
-.cnpm-members__tile--active .cnpm-members__tile-face {
+.cnpm-members__tile--active {
   border-block-start: var(--cnpm-space-1) solid var(--cnpm-color-semantic-success-600);
 }
 
-.cnpm-members__tile--dormant .cnpm-members__tile-face {
+.cnpm-members__tile--dormant {
   border-block-start: var(--cnpm-space-1) solid var(--cnpm-color-semantic-warning-600);
 }
 
-.cnpm-members__tile--prospect .cnpm-members__tile-face {
+.cnpm-members__tile--prospect {
   border-block-start: var(--cnpm-space-1) solid var(--cnpm-color-semantic-info-600);
 }
 
@@ -127,4 +127,22 @@
   .cnpm-members__kpis {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* -------------------------------------------------------- Mentions et marqueurs */
+
+/* « Grand cotisant » : une mention, pas un second badge. Empiles, deux badges doublaient
+   la hauteur de chaque ligne du tableau. Le texte reste ecrit en entier — l'information
+   ne depend d'aucune couleur (WCAG 2.2, critere 1.4.1). */
+.cnpm-members__marker {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  line-height: var(--cnpm-font-lineHeight-xs);
+}
+
+/* Le contact tient sur une ligne : le nom seul y figure desormais. */
+.cnpm-members__contact-name {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
 }

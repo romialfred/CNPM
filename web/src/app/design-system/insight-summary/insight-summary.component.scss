@@ -3,32 +3,72 @@
 .cnpm-insight {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-3);
-  padding: var(--cnpm-layout-cardPadding);
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-lg);
   background-color: var(--cnpm-color-surface-primary);
   min-width: 0;
+  /* Le fond teinté de l'en-tête doit s'arrêter net sur l'arrondi de la carte. */
+  overflow: hidden;
+}
+
+/* En-tête : bandeau teinté, pictogramme, titre. Le bandeau court sur toute la largeur
+   plutôt que d'être une pastille flottante — c'est la bordure basse continue qui sépare
+   la nature du panneau de ses chiffres. */
+.cnpm-insight__header {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-3) var(--cnpm-layout-cardPadding);
+  /* Filet plus marqué que `border-subtle` : sur une bande claire, un filet à 1,07:1
+     du fond ne délimite rien. `border-default` tient 1,47:1 sur la carte blanche. */
+  border-bottom: 1px solid var(--cnpm-color-border-default);
+  /* Repli sur la teinte neutre : un en-tête sans fond ne serait plus identifié. */
+  background-color: var(--cnpm-insight-tint, var(--cnpm-color-surface-subtle));
+  min-width: 0;
+}
+
+/* Pastille sans fond propre : un aplat blanc sur une teinte claire ne tient que
+   1,04 à 1,10:1, donc ne se voit pas. C'est la bande qui porte la teinte, le
+   pictogramme qui porte la couleur d'accent. */
+.cnpm-insight__emblem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-icon-lg);
+  height: var(--cnpm-size-icon-lg);
+  flex: 0 0 auto;
+  color: var(--cnpm-insight-emblem, var(--cnpm-color-text-secondary));
 }
 
 .cnpm-insight__title {
   margin: 0;
   font-size: var(--cnpm-font-size-md);
   font-weight: var(--cnpm-font-weight-semibold);
+  line-height: var(--cnpm-font-lineHeight-md);
   color: var(--cnpm-color-text-primary);
+  min-width: 0;
 }
 
 .cnpm-insight__unit {
   margin-left: var(--cnpm-space-1);
   font-size: var(--cnpm-font-size-xs);
   font-weight: var(--cnpm-font-weight-regular);
-  color: var(--cnpm-color-text-muted);
+  /* `text-muted` ne tenait que 4,51:1 sur la teinte neutre, sans marge. */
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-insight__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-layout-cardPadding);
+  min-width: 0;
 }
 
 .cnpm-insight__stats {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-2);
+  gap: var(--cnpm-space-3);
   margin: 0;
 }
 
@@ -62,8 +102,80 @@
   white-space: nowrap;
 }
 
+/* Jauge : le libellé passe au-dessus pour laisser à la barre toute la largeur. */
+.cnpm-insight__stat--gauge {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-insight__stat--gauge dd {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+}
+
+/* Le chiffre précède la barre : une barre seule ne se lit pas, et la valeur exacte
+   n'est jamais déductible d'une longueur. */
+.cnpm-insight__figure {
+  flex: 0 0 auto;
+  min-width: var(--cnpm-space-10);
+}
+
+.cnpm-insight__track {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  height: var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-neutral-300);
+  overflow: hidden;
+}
+
+.cnpm-insight__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--cnpm-color-brand-blue-700);
+}
+
+/* Le tiret est décoratif ; le texte d'assistance porte le sens. `aria-label` sur un
+   `span` générique est ignoré par une partie des lecteurs d'écran. */
+.cnpm-insight__assistive {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cnpm-insight__missing {
+  color: var(--cnpm-color-text-muted);
+}
+
 .cnpm-insight__note {
   margin: 0;
+  padding-top: var(--cnpm-space-3);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
   font-size: var(--cnpm-font-size-xs);
+  line-height: var(--cnpm-font-lineHeight-xs);
   color: var(--cnpm-color-text-muted);
+}
+
+/* En couleurs forcées, un aplat de fond disparaît : la piste et le remplissage
+   seraient confondus et la jauge cesserait de rien représenter. */
+@media (forced-colors: active) {
+  .cnpm-insight__header,
+  .cnpm-insight__emblem,
+  .cnpm-insight__track {
+    border: 1px solid CanvasText;
+  }
+
+  .cnpm-insight__fill {
+    background-color: Highlight;
+  }
 }
