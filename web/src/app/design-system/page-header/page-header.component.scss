@@ -19,9 +19,19 @@
   justify-content: space-between;
   gap: var(--cnpm-space-4);
   min-width: 0;
-  margin: calc(-1 * var(--cnpm-layout-pagePaddingDesktop))
-    calc(-1 * var(--cnpm-layout-pagePaddingDesktop)) 0;
-  padding: var(--cnpm-layout-pagePaddingDesktop);
+  /* L'en-tête déborde de la marge de page pour atteindre les bords. Il lit la gouttière
+     RÉELLE du conteneur, publiée par la coquille, et non la valeur desktop en dur.
+
+     Le défaut que cela corrige : la marge négative valait toujours 28 px alors que le
+     conteneur ne réserve que 20 px en tablette et 16 px en mobile. L'en-tête débordait
+     donc de 8 px puis 12 px par côté, et c'est toute la page d'administration qui
+     défilait latéralement — pas seulement l'en-tête.
+
+     Le repli garde le comportement d'origine partout où la variable n'est pas définie :
+     aucune coquille n'est cassée par ce changement. */
+  margin: calc(-1 * var(--cnpm-page-gutter, var(--cnpm-layout-pagePaddingDesktop)))
+    calc(-1 * var(--cnpm-page-gutter, var(--cnpm-layout-pagePaddingDesktop))) 0;
+  padding: var(--cnpm-page-gutter, var(--cnpm-layout-pagePaddingDesktop));
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
   background-color: var(--cnpm-color-surface-page);
 }

@@ -56,7 +56,9 @@
 .cnpm-admin__main {
   flex: 1 1 auto;
   min-width: 0;
-  padding: var(--cnpm-layout-pagePaddingDesktop);
+  --cnpm-page-gutter: var(--cnpm-layout-pagePaddingDesktop);
+
+  padding: var(--cnpm-page-gutter);
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
@@ -109,13 +111,13 @@
   }
 
   .cnpm-admin__main {
-    padding: var(--cnpm-layout-pagePaddingTablet);
+    --cnpm-page-gutter: var(--cnpm-layout-pagePaddingTablet);
   }
 }
 
 @media (max-width: 767px) {
   .cnpm-admin__main {
-    padding: var(--cnpm-layout-pagePaddingMobile);
+    --cnpm-page-gutter: var(--cnpm-layout-pagePaddingMobile);
   }
 }
 
