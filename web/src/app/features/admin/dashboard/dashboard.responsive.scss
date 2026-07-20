@@ -1,0 +1,75 @@
+/* Adaptations responsive du tableau de bord.
+
+   Extraites de `dashboard.page.scss` : la feuille atteignait la limite de 10 kB que
+   le budget `anyComponentStyle` impose par fichier de style de composant. La page
+   d'accueil procede deja ainsi, avec trois feuilles. Scinder vaut mieux que relever
+   le seuil, qui masquerait la charge reelle. */
+
+.cnpm-dashboard {
+  /* ---------------------------------------------------------------------- Adaptations */
+
+  /* Sous 1440 px, le cinquième KPI passe à la rangée suivante — la fiche demande de
+     « réduire à quatre KPI et déplacer le cinquième » à partir de 1280 px. */
+  @media (max-width: 1439px) {
+    &__kpi-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    &__panel--segmentation {
+      display: flex;
+    }
+  }
+
+  /* Tablette : la grille tombe à six colonnes. Les portées doivent suivre, sans quoi
+     un `span 8` déborderait d'une piste de six. */
+  @media (max-width: 1279px) {
+    &__grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    &__cell--wide {
+      --cnpm-cell-span: 6;
+    }
+
+    &__cell--third {
+      --cnpm-cell-span: 3;
+    }
+
+    &__kpi-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Mobile : une seule colonne. Deux panneaux côte à côte sous 768 px ne laisseraient
+     plus assez de place à un montant ou à un libellé de statut. */
+  @media (max-width: 767px) {
+    &__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__grid > * {
+      --cnpm-cell-span: 1;
+    }
+
+    &__kpi-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__select {
+      height: var(--cnpm-size-control-lg);
+    }
+  }
+
+  /* Reflow à 320 px : une seule colonne, et le graphique se resserre plutôt que de
+     forcer un défilement horizontal de la page. */
+  @media (max-width: 479px) {
+    &__kpi-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    &__bars {
+      height: 10rem;
+      gap: var(--cnpm-space-1);
+    }
+  }
+}

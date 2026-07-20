@@ -170,7 +170,7 @@ const SHORTCUTS: readonly DashboardShortcut[] = [
     LucideTrendingUp,
   ],
   templateUrl: './dashboard.page.html',
-  styleUrl: './dashboard.page.scss',
+  styleUrls: ['./dashboard.page.scss', './dashboard.responsive.scss'],
 })
 export class DashboardPage {
   private readonly gateway = inject(DASHBOARD_GATEWAY);

@@ -70,7 +70,7 @@
       </ul>
 
       <div class="cnpm-dashboard__grid">
-        <div class="cnpm-dashboard__column">
+        <div class="cnpm-dashboard__column cnpm-dashboard__cell--wide">
           <section class="cnpm-dashboard__panel">
             <cnpm-skeleton variant="chart" [columns]="6" label="" />
           </section>
@@ -78,7 +78,7 @@
             <cnpm-skeleton variant="table" [rows]="4" [columns]="6" label="" />
           </section>
         </div>
-        <div class="cnpm-dashboard__column">
+        <div class="cnpm-dashboard__column cnpm-dashboard__cell--third">
           <section class="cnpm-dashboard__panel">
             <cnpm-skeleton variant="card" [rows]="4" label="" />
           </section>
@@ -150,8 +150,7 @@
       </section>
 
       <div class="cnpm-dashboard__grid">
-        <div class="cnpm-dashboard__column">
-          <section class="cnpm-dashboard__panel" aria-labelledby="titre-graphique">
+          <section class="cnpm-dashboard__cell cnpm-dashboard__cell--wide cnpm-dashboard__panel" aria-labelledby="titre-graphique">
             <div class="cnpm-dashboard__panel-head">
               <h2 class="cnpm-dashboard__panel-title" id="titre-graphique">
                 Évolution des cotisations encaissées
@@ -257,73 +256,8 @@
               </details>
             }
           </section>
-
-          <section class="cnpm-dashboard__panel" aria-labelledby="titre-paiements">
-            <div class="cnpm-dashboard__panel-head">
-              <h2 class="cnpm-dashboard__panel-title" id="titre-paiements">
-                Derniers paiements enregistrés
-              </h2>
-            </div>
-
-            <cnpm-data-table
-              caption="Derniers paiements enregistrés, avec leur référence, leur payeur, leur montant, leur canal, leur date et leur statut de rapprochement."
-              [columns]="paymentColumns"
-              [rows]="payments()"
-              [state]="paymentsState()"
-              [rowKey]="paymentKey"
-              [rowLabel]="paymentLabel"
-            >
-              <ng-template #row let-payment>
-                <td class="cnpm-table__cell">
-                  <span class="cnpm-dashboard__reference">{{ payment.reference }}</span>
-                </td>
-                <td class="cnpm-table__cell">
-                  <span class="cnpm-dashboard__payer">{{ payment.payer }}</span>
-                </td>
-                <!-- Montants alignés à droite et en chasses tabulaires : les ordres de
-                     grandeur se comparent en lisant les unités les unes sous les autres. -->
-                <td class="cnpm-table__cell cnpm-table__cell--end">
-                  <span class="cnpm-dashboard__amount">{{ payment.amount | number: '1.0-0' }}</span>
-                </td>
-                <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
-                <td class="cnpm-table__cell">
-                  <time [attr.datetime]="payment.paidAt">
-                    {{ payment.paidAt | date: 'dd/MM/yyyy' }}
-                  </time>
-                </td>
-                <td class="cnpm-table__cell">
-                  <cnpm-badge [tone]="paymentStatusTone(payment.status)">
-                    {{ paymentStatusLabel(payment.status) }}
-                  </cnpm-badge>
-                </td>
-              </ng-template>
-
-              <div data-table-status>
-                @switch (paymentsState()) {
-                  @case ('loading') {
-                    <cnpm-skeleton
-                      variant="table"
-                      [rows]="4"
-                      [columns]="paymentColumns.length"
-                      label="Chargement des paiements…"
-                    />
-                  }
-                  @case ('empty') {
-                    <cnpm-empty-state
-                      variant="no-data"
-                      title="Aucun paiement enregistré"
-                      description="Aucun encaissement n’a été enregistré pour l’exercice sélectionné."
-                    />
-                  }
-                }
-              </div>
-            </cnpm-data-table>
-          </section>
-        </div>
-
-        <div class="cnpm-dashboard__column">
           <section
-            class="cnpm-dashboard__panel cnpm-dashboard__panel--segmentation"
+            class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel cnpm-dashboard__panel--segmentation"
             aria-labelledby="titre-segmentation"
           >
             <h2 class="cnpm-dashboard__panel-title" id="titre-segmentation">
@@ -424,9 +358,8 @@
               </p>
             }
           </section>
-
           <section
-            class="cnpm-dashboard__panel cnpm-dashboard__panel--alerts"
+            class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel cnpm-dashboard__panel--alerts"
             aria-labelledby="titre-alertes"
           >
             <h2 class="cnpm-dashboard__panel-title" id="titre-alertes">Alertes</h2>
@@ -466,9 +399,8 @@
               </p>
             }
           </section>
-
           <section
-            class="cnpm-dashboard__panel cnpm-dashboard__panel--activity"
+            class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel cnpm-dashboard__panel--activity"
             aria-labelledby="titre-activite"
           >
             <h2 class="cnpm-dashboard__panel-title" id="titre-activite">Activité récente</h2>
@@ -495,8 +427,7 @@
               </ol>
             }
           </section>
-
-          <cnpm-insight-summary
+          <cnpm-insight-summary class="cnpm-dashboard__cell cnpm-dashboard__cell--third"
             title="Cotisations de l’exercice"
             headingId="synthese-cotisations"
             unit="(FCFA)"
@@ -504,7 +435,7 @@
             note="Le taux de recouvrement rapporte le total encaissé au total attendu. Les prospects n’entrent pas dans ces montants."
           />
 
-          <nav class="cnpm-dashboard__panel" aria-labelledby="titre-raccourcis">
+          <nav class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel" aria-labelledby="titre-raccourcis">
             <h2 class="cnpm-dashboard__panel-title" id="titre-raccourcis">Raccourcis</h2>
             <ul class="cnpm-dashboard__shortcuts">
               @for (shortcut of shortcuts; track shortcut.label) {
@@ -526,7 +457,67 @@
               }
             </ul>
           </nav>
-        </div>
+          <section class="cnpm-dashboard__cell cnpm-dashboard__cell--wide cnpm-dashboard__panel" aria-labelledby="titre-paiements">
+            <div class="cnpm-dashboard__panel-head">
+              <h2 class="cnpm-dashboard__panel-title" id="titre-paiements">
+                Derniers paiements enregistrés
+              </h2>
+            </div>
+
+            <cnpm-data-table
+              caption="Derniers paiements enregistrés, avec leur référence, leur payeur, leur montant, leur canal, leur date et leur statut de rapprochement."
+              [columns]="paymentColumns"
+              [rows]="payments()"
+              [state]="paymentsState()"
+              [rowKey]="paymentKey"
+              [rowLabel]="paymentLabel"
+            >
+              <ng-template #row let-payment>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-dashboard__reference">{{ payment.reference }}</span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-dashboard__payer">{{ payment.payer }}</span>
+                </td>
+                <!-- Montants alignés à droite et en chasses tabulaires : les ordres de
+                     grandeur se comparent en lisant les unités les unes sous les autres. -->
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  <span class="cnpm-dashboard__amount">{{ payment.amount | number: '1.0-0' }}</span>
+                </td>
+                <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
+                <td class="cnpm-table__cell">
+                  <time [attr.datetime]="payment.paidAt">
+                    {{ payment.paidAt | date: 'dd/MM/yyyy' }}
+                  </time>
+                </td>
+                <td class="cnpm-table__cell">
+                  <cnpm-badge [tone]="paymentStatusTone(payment.status)">
+                    {{ paymentStatusLabel(payment.status) }}
+                  </cnpm-badge>
+                </td>
+              </ng-template>
+
+              <div data-table-status>
+                @switch (paymentsState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="4"
+                      [columns]="paymentColumns.length"
+                      label="Chargement des paiements…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="no-data"
+                      title="Aucun paiement enregistré"
+                      description="Aucun encaissement n’a été enregistré pour l’exercice sélectionné."
+                    />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+          </section>
       </div>
     } @else {
       <cnpm-empty-state

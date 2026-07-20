@@ -158,16 +158,37 @@
 
   /* ------------------------------------------------------------------------ Disposition */
 
-  /* Graphique et tableau à gauche (8 colonnes de la fiche), synthèses à droite (4).
-     `minmax(0, …)` empêche la colonne de gauche de se dimensionner sur son min-content :
-     sans cela, une table à six colonnes pousserait la grille au-delà de la page au lieu
-     de défiler dans son propre conteneur. */
+  /* Grille unique de 12 colonnes. Auparavant, deux enveloppes de colonne se partageaient
+     les panneaux : la droite en empilait cinq sur 1 930 px quand la gauche en portait
+     deux sur 575, et la hauteur de la ligne valant le maximum des deux, la page
+     atteignait 2 306 px.
+
+     La portée passe par une variable plutôt que par une règle `grid-column` répétée par
+     classe : les paliers responsive n'ont alors qu'à redéfinir un nombre, et la
+     mécanique de placement reste décrite en un seul endroit.
+
+     `minmax(0, …)` empêche une piste de se dimensionner sur son min-content : sans cela,
+     une table à six colonnes pousserait la grille au-delà de la page au lieu de défiler
+     dans son propre conteneur. */
   &__grid {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: start;
     gap: var(--cnpm-space-4);
     min-width: 0;
+
+    > * {
+      grid-column: span var(--cnpm-cell-span, 12);
+    }
+  }
+
+  &__cell--wide,
+  &__column {
+    --cnpm-cell-span: 8;
+  }
+
+  &__cell--third {
+    --cnpm-cell-span: 4;
   }
 
   /* En-tête de panneau, ligne de légende et raccourci : même répartition aux extrémités. */
@@ -569,51 +590,4 @@
     outline-offset: 1px;
   }
 
-  /* ---------------------------------------------------------------------- Adaptations */
-
-  /* Sous 1440 px, le cinquième KPI passe à la rangée suivante — la fiche demande de
-     « réduire à quatre KPI et déplacer le cinquième » à partir de 1280 px. */
-  @media (max-width: 1439px) {
-    &__kpi-list {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    &__panel--segmentation {
-      display: flex;
-    }
-  }
-
-  /* Tablette : sections empilées, comme l'impose la composition normative. */
-  @media (max-width: 1279px) {
-    &__grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    &__kpi-list {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 767px) {
-    &__kpi-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    &__select {
-      height: var(--cnpm-size-control-lg);
-    }
-  }
-
-  /* Reflow à 320 px : une seule colonne, et le graphique se resserre plutôt que de
-     forcer un défilement horizontal de la page. */
-  @media (max-width: 479px) {
-    &__kpi-list {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    &__bars {
-      height: 10rem;
-      gap: var(--cnpm-space-1);
-    }
-  }
 }
