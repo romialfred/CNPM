@@ -11,18 +11,24 @@
 
    1. « Taux de recouvrement mois par mois » — serie reelle `DashboardMonthPoint.rate`.
       Echelle fixe 0–100 % : un taux EST un pourcentage, aucun maximum n'est deduit de
-      la serie et aucune cible n'est supposee, le depot n'en publiant aucune.
+      la serie et aucune cible n'est supposee, le depot n'en publiant aucune. Le trace
+      est VERT : le taux EST la part encaissee, une mesure de succes.
    2. « Cotisations de l'exercice » — barre de composition batie sur
       `DashboardContributions.expected/.collected/.outstanding`. Elle ne porte que de
       la geometrie ; les montants sont ecrits en toutes lettres juste en dessous.
+      Encaisse en VERT (succes), reste a recouvrer en AMBRE (manque a percevoir).
 
-   Contrastes calcules sur le blanc du panneau (`surface-primary` = #FFFFFF) :
-     blue-700 #273481 / blanc  = 11,08:1
-     blue-400 #7F91CF / blanc  =  3,06:1
-     blue-700 / blue-400       =  3,62:1
-   Les deux series et leur separation depassent donc les 3:1 exiges par WCAG 2.2
-   (1.4.11) pour un element graphique. C'est la raison du passage de blue-200
-   (1,36:1 sur blanc, quasi invisible) a blue-400 pour toute serie secondaire. */
+   Couleurs semantiques introduites ici, contrastes recalcules (luminance relative WCAG) :
+     success-600 #039855 / blanc          = 3,73:1  (courbe, part encaissee)
+     success-600 / surface-subtle #F2F4F7 = 3,39:1  (part sur la piste de la barre)
+     warning-600 #DC6803 / blanc          = 3,49:1  (reste a recouvrer)
+     warning-600 / surface-subtle         = 3,16:1
+   Toutes au-dessus des 3:1 exiges par WCAG 2.2 (1.4.11) pour un element graphique.
+   Vert et ambre poses cote a cote ne donnent que 1,07:1 : un filet blanc de 1px les
+   separe (blanc/vert 3,73:1, blanc/ambre 3,49:1). Le rouge de marque est ecarte : aucune
+   part passive n'est critique, il resterait decoratif et enfreindrait ux-ui.md.
+   Reference neutre conservee en blue-400 #7F91CF (3,06:1 sur blanc), et non blue-200
+   (1,36:1, quasi invisible). */
 
 .cnpm-dashboard {
   /* ------------------------------------------------------- Courbe du taux mensuel */
@@ -84,9 +90,13 @@
 
   /* `non-scaling-stroke` : la boite est etiree horizontalement, sans quoi le trait
      s'epaissirait avec elle et le graphique paraitrait deforme. */
+  /* La courbe du taux de recouvrement passe au vert : le taux EST la part encaissée du
+     mois, une mesure de succès. success-600 (#039855) sur le blanc du panneau = 3,73:1,
+     au-dessus des 3:1 exigés pour un trait graphique. Le titre du panneau et la table
+     accessible portent le même sens : rien ne se lit à la seule couleur. */
   &__rate-line {
     fill: none;
-    stroke: var(--cnpm-color-brand-blue-700);
+    stroke: var(--cnpm-color-semantic-success-600);
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -94,7 +104,7 @@
   }
 
   &__rate-area {
-    fill: color-mix(in srgb, var(--cnpm-color-brand-blue-700) 10%, transparent);
+    fill: color-mix(in srgb, var(--cnpm-color-semantic-success-600) 10%, transparent);
     stroke: none;
   }
 
@@ -105,7 +115,7 @@
     width: var(--cnpm-size-icon-xs);
     height: var(--cnpm-size-icon-xs);
     transform: translate(-50%, 50%);
-    border: 2px solid var(--cnpm-color-brand-blue-700);
+    border: 2px solid var(--cnpm-color-semantic-success-600);
     border-radius: var(--cnpm-radius-pill);
     background: var(--cnpm-color-surface-primary);
   }
@@ -138,12 +148,19 @@
     background: var(--cnpm-color-surface-subtle);
   }
 
+  /* Encaissé au vert sémantique (mesure de succès : part réglée), reste à recouvrer à
+     l'ambre (manque à percevoir) — jamais du rouge, qui resterait décoratif sur une part
+     passive et enfreindrait ux-ui.md. Un filet blanc de 1px les sépare : côte à côte,
+     vert (success-600) et ambre (warning-600) ne se distinguent qu'à 1,07:1 ; contre le
+     filet, chacun dépasse 3:1 (vert 3,73:1, ambre 3,49:1). Chacun tient aussi ≥3:1 sur la
+     piste `surface-subtle` (vert 3,39:1, ambre 3,16:1). */
   &__composition-part--collected {
-    background: var(--cnpm-color-brand-blue-700);
+    background: var(--cnpm-color-semantic-success-600);
   }
 
   &__composition-part--outstanding {
-    background: var(--cnpm-color-brand-blue-400);
+    background: var(--cnpm-color-semantic-warning-600);
+    border-inline-start: 1px solid var(--cnpm-color-surface-primary);
   }
 
   /* Le taux ne s'additionne pas aux trois montants qui le precedent : un filet le

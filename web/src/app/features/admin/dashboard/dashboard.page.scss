@@ -175,14 +175,14 @@
     gap: var(--cnpm-space-2);
   }
 
-  /* La pastille par défaut porte la couleur de la série principale : les modificateurs
-     `--collected` et `--active` n'ont donc rien à redéclarer.
+  /* La pastille par défaut porte le bleu principal ; après les rappels sémantiques
+     ci-dessous, seule la cohorte « dormant » l'emploie encore, accordée à son arc
+     (blue-700). blue-700 sur blanc = 10,6:1.
 
      Les séries secondaires passent de blue-200 à blue-400. Mesuré sur le blanc du
      panneau, blue-200 (#D5DCFA) ne donne que 1,36:1 : la série « attendu » était
-     presque invisible. blue-400 (#7F91CF) donne 3,06:1 sur blanc et 3,62:1 contre
-     blue-700, soit au-dessus des 3:1 exigés par WCAG 2.2 (1.4.11) à la fois contre le
-     fond et contre la série voisine. */
+     presque invisible. blue-400 (#7F91CF) donne 3,06:1 sur blanc, au-dessus des 3:1
+     exigés par WCAG 2.2 (1.4.11) contre le fond. */
   &__swatch {
     display: inline-block;
     width: var(--cnpm-size-icon-xs);
@@ -191,10 +191,27 @@
     background: var(--cnpm-color-brand-blue-700);
   }
 
-  &__swatch--expected,
-  &__swatch--outstanding,
-  &__swatch--dormant {
+  /* Vert sémantique = « encaissé » et « à jour » : la part réglée des cotisations et la
+     cohorte de membres à jour de leur cycle. Il informe une mesure de succès, il ne
+     décore pas ; le libellé voisin porte le même sens et la couleur ne le porte jamais
+     seule. success-600 (#039855) sur le blanc du panneau = 3,73:1, au-dessus des 3:1
+     exigés par WCAG 2.2 (1.4.11) pour une pastille. */
+  &__swatch--collected,
+  &__swatch--active {
+    background: var(--cnpm-color-semantic-success-600);
+  }
+
+  /* Attendu : simple référence, ni succès ni alerte. blue-400 (#7F91CF) = 3,06:1 sur
+     blanc. */
+  &__swatch--expected {
     background: var(--cnpm-color-brand-blue-400);
+  }
+
+  /* Reste à recouvrer = manque à percevoir. Ambre (warning-600 #DC6803, 3,49:1 sur
+     blanc) et NON rouge : ce n'est ni un CTA public, ni un accent de marque, ni une
+     action critique — le rouge `brand-red` y serait décoratif, ce qu'interdit ux-ui.md. */
+  &__swatch--outstanding {
+    background: var(--cnpm-color-semantic-warning-600);
   }
 
   /* Hauteur de tracé fixée localement : aucun token de dimension ne couvre la géométrie
@@ -229,7 +246,8 @@
   }
 
   /* Le rail porte le montant attendu, la part pleine le montant encaissé : le taux de
-     recouvrement du mois se lit directement comme le remplissage du rail. */
+     recouvrement du mois se lit directement comme le remplissage du rail. Le rail reste
+     la référence neutre (blue-400, 3,06:1 sur blanc). */
   &__bar-track {
     display: flex;
     align-items: flex-end;
@@ -239,10 +257,18 @@
     background: var(--cnpm-color-brand-blue-400);
   }
 
+  /* La part pleine passe au vert sémantique : le remplissage dit « encaissé », une mesure
+     de succès, non une simple teinte. success-600 (#039855) = 3,73:1 sur le blanc du
+     panneau. Un filet blanc de 1px coiffe la part pour la séparer du reste attendu
+     (blue-400) : à eux seuls, vert et blue-400 ne se distinguent qu'à 1,22:1, sous le
+     seuil 1.4.11 ; le filet, à 3,73:1 contre le vert et 3,06:1 contre le bleu, délimite la
+     frontière sans reposer sur le contraste des deux aplats. Filet statique, aucune
+     animation (critère de recette BO-001). */
   &__bar-fill {
     width: 100%;
     border-radius: var(--cnpm-radius-xs);
-    background: var(--cnpm-color-brand-blue-700);
+    background: var(--cnpm-color-semantic-success-600);
+    box-shadow: 0 -1px 0 0 var(--cnpm-color-surface-primary);
   }
 
   &__data-summary {
@@ -316,12 +342,17 @@
     stroke-width: 14;
   }
 
+  /* Arc « à jour » (membres actifs) au vert sémantique, arc « dormant » au bleu neutre
+     foncé. Les cohortes sont séparées par un vide de piste (voir `donutArcs`) : chacune
+     se lit alors contre la piste `surface-subtle` — vert 3,39:1, blue-700 10,06:1 — et
+     non l'une contre l'autre, où vert et bleu ne donneraient que ~1,2:1. La légende porte
+     les mêmes libellés : aucune cohorte ne se lit à la seule couleur. */
   &__donut-arc--active {
-    stroke: var(--cnpm-color-brand-blue-700);
+    stroke: var(--cnpm-color-semantic-success-600);
   }
 
   &__donut-arc--dormant {
-    stroke: var(--cnpm-color-brand-blue-400);
+    stroke: var(--cnpm-color-brand-blue-700);
   }
 
   &__donut-center {

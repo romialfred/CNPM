@@ -180,6 +180,29 @@ describe('DashboardPage — graphiques ajoutés', () => {
     expect(host.textContent).toMatch(new RegExp(`${whole}[.,]${fraction}\\s*%`));
   });
 
+  it('sépare les arcs du donut par un vide de piste, teinte vert/bleu insuffisante bord à bord', async () => {
+    const { host, snapshot } = await ready();
+
+    // Circonférence du donut : r = 52 dans le viewBox 120. Le vide (DONUT_GAP = 4) est
+    // retranché à chaque arc pour révéler la piste et distinguer les cohortes, dont le
+    // seul contraste de teinte (vert « à jour » / bleu « dormant ») ne dépasse pas ~1,2:1.
+    const circumference = 2 * Math.PI * 52;
+    const base = snapshot.segments.filter((segment) => segment.scope === 'base');
+    const total = base.reduce((sum, segment) => sum + segment.count, 0);
+
+    const arcs = Array.from(host.querySelectorAll('.cnpm-dashboard__donut-arc'));
+    expect(arcs).toHaveLength(base.length);
+
+    base.forEach((segment, index) => {
+      const full = (segment.count / total) * circumference;
+      const visible = Number(arcs[index].getAttribute('stroke-dasharray')?.split(' ')[0]);
+      // L'arc visible vaut la part pleine moins le vide fixe : les cohortes ne se touchent
+      // plus, chacune se lisant contre la piste et non contre sa voisine.
+      expect(visible).toBeCloseTo(full - 4, 6);
+      expect(visible).toBeLessThan(full);
+    });
+  });
+
   it('n’affiche aucune barre de composition quand l’attendu est indisponible', async () => {
     const { fixture, gateway, host } = await setup();
     const empty = await firstValueFrom(new DemoDashboardGateway().load('2023'));

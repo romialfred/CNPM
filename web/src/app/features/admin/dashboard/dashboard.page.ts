@@ -98,6 +98,18 @@ const ALERT_TONES: Readonly<Record<DashboardAlertSeverity, CnpmAlertTone>> = {
 const DONUT_RADIUS = 52;
 const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
 
+/**
+ * Vide de séparation entre deux arcs, en unités de tracé du cercle (viewBox 120, r = 52,
+ * circonférence ≈ 326,7).
+ *
+ * Depuis que l'arc « à jour » (actifs) est vert et l'arc « dormant » bleu, les deux
+ * cohortes ne peuvent plus se distinguer par le seul contraste de teinte : vert et bleu
+ * posés bord à bord ne donnent que ~1,2:1, sous les 3:1 de WCAG 2.2 (1.4.11). Le vide
+ * révèle la piste entre les arcs, si bien que chacun se lit contre elle (vert 3,39:1,
+ * blue-700 10,06:1) et non contre son voisin. Purement géométrique, comme `DONUT_RADIUS`.
+ */
+const DONUT_GAP = 4;
+
 type DashboardResult =
   | { readonly kind: 'loading' }
   | { readonly kind: 'ready'; readonly data: DashboardSnapshot }
@@ -455,9 +467,13 @@ export class DashboardPage {
     let start = 0;
     return segments.map((segment) => {
       const length = (segment.count / total) * DONUT_CIRCUMFERENCE;
+      // L'arc visible est raccourci du vide de séparation, borné à zéro pour une cohorte
+      // trop petite pour l'accueillir ; l'origine avance de la longueur PLEINE afin que le
+      // vide se place APRÈS l'arc et que le tour complet reste exact.
+      const visible = Math.max(0, length - DONUT_GAP);
       const arc = {
         key: segment.key,
-        dashArray: `${length} ${DONUT_CIRCUMFERENCE - length}`,
+        dashArray: `${visible} ${DONUT_CIRCUMFERENCE - visible}`,
         dashOffset: -start,
       };
       start += length;
