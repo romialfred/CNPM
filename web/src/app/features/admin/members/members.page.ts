@@ -19,7 +19,6 @@ import {
 } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
-import { BulkActionBarComponent } from '../../../design-system/bulk-action-bar/bulk-action-bar.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
 import type {
@@ -108,7 +107,6 @@ const DEFAULT_PAGE_SIZE = 10;
     FormsModule,
     AdminShellComponent,
     BadgeComponent,
-    BulkActionBarComponent,
     ButtonComponent,
     DataTableComponent,
     EmptyStateComponent,
@@ -166,8 +164,6 @@ export class MembersPage {
   protected readonly canStartEnrollment = computed(
     () => this.sessionIdentity()?.permissions.includes('ENROLLMENT.CREATE') ?? false,
   );
-  /** Sélection bornée à la page affichée — la fiche impose une portée explicite. */
-  protected readonly selected = signal<ReadonlySet<string>>(new Set<string>());
 
   /** L'URL est l'unique source de vérité du filtre ; aucun état parallèle. */
   private readonly params = toSignal(this.route.queryParamMap, {
@@ -306,7 +302,6 @@ export class MembersPage {
         label: 'Raison sociale',
         sortable: supported.has('organization'),
       },
-      { key: 'category', label: 'Catégorie' },
       { key: 'group', label: 'Groupement', sortable: supported.has('group') },
       // Seul le nom du contact est colonné. Téléphone et courriel restaient sur trois
       // lignes par ligne de tableau, triplant sa hauteur ; ils demeurent accessibles sur
@@ -493,15 +488,6 @@ export class MembersPage {
     return STATUS_TONES[status];
   }
 
-  /**
-   * Part réglée, en pourcentage. `null` quand rien n'est dû : afficher « 0 % » pour
-   * un membre qui ne doit rien le présenterait comme mauvais payeur.
-   */
-  protected paidShare(row: MemberRow): number | null {
-    return row.due === null || row.paid === null || row.due === 0
-      ? null
-      : (row.paid / row.due) * 100;
-  }
 
   protected applySearch(): void {
     this.patch({ q: this.searchDraft().trim() || null, page: null });
@@ -545,25 +531,8 @@ export class MembersPage {
     this.patch({ q: null, statut: null, categorie: null, groupement: null, page: null });
   }
 
-  protected toggleRow(key: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (!next.delete(key)) {
-        next.add(key);
-      }
-      return next;
-    });
-  }
 
-  protected toggleAll(checked: boolean): void {
-    // La portée est la page affichée, jamais le jeu filtré entier : cocher l'en-tête
-    // ne doit pas silencieusement viser des lignes que personne n'a vues.
-    this.selected.set(checked ? new Set(this.rows().map(this.rowKey)) : new Set());
-  }
 
-  protected clearSelection(): void {
-    this.selected.set(new Set());
-  }
 
   /** BO-009 est le parcours canonique de création actuellement livré. */
   protected startEnrollment(): void {
@@ -597,7 +566,6 @@ export class MembersPage {
   }
 
   private patch(params: Record<string, string | number | null>): void {
-    this.clearSelection();
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,

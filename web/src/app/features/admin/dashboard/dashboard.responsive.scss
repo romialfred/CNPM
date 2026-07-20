@@ -55,13 +55,20 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    &__panel {
+      padding: var(--cnpm-space-4);
+    }
+
     &__select {
       height: var(--cnpm-size-control-lg);
     }
   }
 
-  /* Reflow à 320 px : une seule colonne, et le graphique se resserre plutôt que de
-     forcer un défilement horizontal de la page. */
+  /* Reflow à 320 px : une seule colonne, et les graphiques se resserrent plutôt que
+     de forcer un défilement horizontal de la page. Les graduations intermédiaires de
+     la courbe disparaissent — à cette largeur, cinq étiquettes empilées sur 10 rem se
+     chevaucheraient ; 0 %, 50 % et 100 % suffisent à poser l'échelle, et les valeurs
+     exactes restent dans la table accessible. */
   @media (max-width: 479px) {
     &__kpi-list {
       grid-template-columns: minmax(0, 1fr);
@@ -70,6 +77,20 @@
     &__bars {
       height: 10rem;
       gap: var(--cnpm-space-1);
+    }
+
+    &__rate-axis,
+    &__rate-plot {
+      height: 10rem;
+    }
+
+    &__rate-labels {
+      gap: 0;
+    }
+
+    &__rate-tick:nth-child(2),
+    &__rate-tick:nth-child(4) {
+      display: none;
     }
   }
 }

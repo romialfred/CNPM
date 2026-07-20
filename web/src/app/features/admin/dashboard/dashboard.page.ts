@@ -29,10 +29,6 @@ import type {
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
-import {
-  InsightSummaryComponent,
-  type InsightStat,
-} from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
@@ -122,40 +118,41 @@ interface DashboardView {
 
 const INITIAL_VIEW: DashboardView = { result: { kind: 'loading' }, last: null };
 
-interface DashboardShortcut {
+/**
+ * Tuile KPI prête à peindre : indicateur, habillage décoratif et tracé de sa courbe.
+ *
+ * Assemblée une fois par jeu de données plutôt qu'à chaque cycle de détection : le
+ * gabarit appelait `kpiSkin()` et `kpiSeries()` plusieurs fois par tuile et par rendu,
+ * et recalculait donc le même tracé sans nécessité.
+ */
+interface DashboardKpiCard {
+  readonly kpi: DashboardKpi;
+  readonly accent: string;
+  readonly icon: DashboardKpiIcon;
+  /** Chemin de la courbe ; vide quand aucune série réelle n'existe pour l'indicateur. */
+  readonly linePath: string;
+  /** Même tracé refermé sur la base de la boîte, pour l'aplat sous la courbe. */
+  readonly areaPath: string;
+}
+
+/** Une mesure de la synthèse des cotisations. `value` à `null` vaut « indisponible ». */
+interface DashboardFigure {
   readonly label: string;
-  readonly description: string;
-  readonly route: string;
-  readonly queryParams: Readonly<Record<string, string>>;
+  readonly value: number | null;
+  readonly format: string;
+  readonly suffix?: string;
+  /** Sépare visuellement une mesure qui ne s'additionne pas aux précédentes. */
+  readonly apart?: boolean;
 }
 
 /**
- * Raccourcis de navigation.
+ * Graduations de l'axe du taux de recouvrement, en pourcentage.
  *
- * Tous pointent vers `/admin/members` : c'est la seule rubrique livrée. Ajouter des
- * raccourcis vers Cotisations ou Paiements, annoncés « à venir » dans la navigation,
- * conduirait à des pages mortes.
+ * L'échelle est fixée à 0–100 parce qu'un taux EST un pourcentage : elle ne dépend
+ * d'aucune donnée, donc aucun maximum n'est déduit ni aucune cible supposée. Le dépôt
+ * ne fixe nulle part d'objectif de recouvrement, et le graphique n'en trace aucun.
  */
-const SHORTCUTS: readonly DashboardShortcut[] = [
-  {
-    label: 'Liste des membres',
-    description: 'Base complète, sans filtre.',
-    route: '/admin/members',
-    queryParams: {},
-  },
-  {
-    label: 'Cotisants dormants',
-    description: 'Membres de la base sans activité récente.',
-    route: '/admin/members',
-    queryParams: { statut: 'DORMANT' },
-  },
-  {
-    label: 'Prospects',
-    description: 'Contacts hors base de membres.',
-    route: '/admin/members',
-    queryParams: { statut: 'PROSPECT' },
-  },
-];
+const RATE_TICKS = [0, 25, 50, 75, 100] as const;
 
 /**
  * BO-001 — tableau de bord d'administration.
@@ -172,6 +169,17 @@ const SHORTCUTS: readonly DashboardShortcut[] = [
  * défini nulle part), et les KPI financiers ne sont pas cliquables puisque les
  * rubriques Cotisations et Paiements ne sont pas livrées — un KPI qui ouvre une page
  * morte est pire qu'un KPI inerte.
+ *
+ * ÉCART ASSUMÉ ET NON RÉSOLU — `ActivityFeed` et « activité/alertes 4 colonnes ».
+ * `docs/ui-handoff/docs/04-screens/reference-specs/ref-bo-001-dashboard.md` liste
+ * `ActivityFeed` parmi les composants requis (ligne 27) et impose « Tableau des
+ * paiements 8 colonnes et activité/alertes 4 colonnes » (ligne 16). Le commanditaire a
+ * demandé mot pour mot de « supprimer les raccourcis et la section activité récente ».
+ * La demande client est appliquée : la section « Activité récente » et le panneau de
+ * raccourcis ont été retirés, la colonne de 4 ne porte plus que les alertes. La fiche
+ * n'a PAS été modifiée pour masquer la divergence ; l'arbitrage doit être consigné
+ * dans `docs/00-governance/open-decisions.md` avant recette. Le port continue de
+ * publier `activities` : la donnée reste disponible si l'arbitrage rétablit le fil.
  */
 @Component({
   selector: 'cnpm-dashboard-page',
@@ -188,7 +196,6 @@ const SHORTCUTS: readonly DashboardShortcut[] = [
     DataTableComponent,
     EmptyStateComponent,
     ErrorStateComponent,
-    InsightSummaryComponent,
     PageHeaderComponent,
     SkeletonComponent,
     LucideArrowRight,
@@ -205,7 +212,12 @@ const SHORTCUTS: readonly DashboardShortcut[] = [
     LucideWallet,
   ],
   templateUrl: './dashboard.page.html',
-  styleUrls: ['./dashboard.page.scss', './dashboard.kpi.scss', './dashboard.responsive.scss'],
+  styleUrls: [
+    './dashboard.page.scss',
+    './dashboard.kpi.scss',
+    './dashboard.charts.scss',
+    './dashboard.responsive.scss',
+  ],
 })
 export class DashboardPage {
   private readonly gateway = inject(DASHBOARD_GATEWAY);
@@ -215,7 +227,7 @@ export class DashboardPage {
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly exercises = this.gateway.exercises;
   protected readonly donutRadius = DONUT_RADIUS;
-  protected readonly shortcuts = SHORTCUTS;
+  protected readonly rateTicks = RATE_TICKS;
   /** Emplacements de l'ossature de chargement : autant que de KPI attendus. */
   protected readonly kpiSlots = [1, 2, 3, 4, 5] as const;
 
@@ -301,7 +313,22 @@ export class DashboardPage {
   protected readonly trend = computed(() => this.data()?.trend ?? null);
   protected readonly payments = computed(() => this.data()?.payments ?? []);
   protected readonly alerts = computed(() => this.data()?.alerts ?? []);
-  protected readonly activities = computed(() => this.data()?.activities ?? []);
+
+  /** Tuiles KPI assemblées une fois : habillage décoratif et tracé de la courbe. */
+  protected readonly kpiCards = computed<readonly DashboardKpiCard[]>(() =>
+    this.kpis().map((kpi, index) => {
+      const skin = this.kpiSkin(kpi, index);
+      const linePath = this.sparklinePath(this.kpiSeries(kpi));
+      return {
+        kpi,
+        accent: skin.accent,
+        icon: skin.icon,
+        linePath,
+        // Aplat sous la courbe : même tracé refermé sur la base de la boîte 100 × 32.
+        areaPath: linePath === '' ? '' : `${linePath} L100,32 L0,32 Z`,
+      };
+    }),
+  );
 
   /** Cohortes qui composent la base ; seules celles-là entrent dans le donut. */
   protected readonly baseSegments = computed(() =>
@@ -316,23 +343,100 @@ export class DashboardPage {
     (this.data()?.segments ?? []).filter((segment) => segment.scope !== 'base'),
   );
 
-  protected readonly contributionStats = computed<readonly InsightStat[]>(() => {
+  /**
+   * Mesures de cotisation de l'exercice, telles que la source les publie.
+   *
+   * Aucune n'est recalculée ici : le taux affiché est `recoveryRate`, pas un rapport
+   * refait à l'écran, qui pourrait afficher une décimale de plus ou de moins que le
+   * KPI voisin et faire douter des deux.
+   */
+  protected readonly contributionFigures = computed<readonly DashboardFigure[]>(() => {
     const contributions = this.data()?.contributions;
     if (!contributions) {
       return [];
     }
     return [
-      { label: 'Total attendu', value: contributions.expected },
-      { label: 'Total encaissé', value: contributions.collected },
-      { label: 'Reste à recouvrer', value: contributions.outstanding },
+      { label: 'Total attendu', value: contributions.expected, format: '1.0-0' },
+      { label: 'Total encaissé', value: contributions.collected, format: '1.0-0' },
+      { label: 'Reste à recouvrer', value: contributions.outstanding, format: '1.0-0' },
       {
         label: 'Taux de recouvrement',
         value: contributions.recoveryRate,
+        format: '1.1-1',
         suffix: ' %',
-        decimals: 1,
         apart: true,
       },
     ];
+  });
+
+  /**
+   * Barre de composition du montant attendu de l'exercice.
+   *
+   * Elle ne porte que de la GÉOMÉTRIE : les largeurs sont la part de `collected` et de
+   * `outstanding` dans `expected`, trois montants publiés tels quels par la source.
+   * Aucun de ces pourcentages n'est affiché en chiffres — seul `recoveryRate`, qui vient
+   * lui aussi de la source, l'est. La barre ne peut donc pas contredire la liste de
+   * mesures qu'elle surmonte.
+   *
+   * `null` dès que l'attendu est absent ou nul : une barre sans échelle ne représente
+   * rien, et la remplir de zéros ferait passer une donnée manquante pour une mesure.
+   */
+  protected readonly compositionBar = computed(() => {
+    const contributions = this.data()?.contributions;
+    const expected = contributions?.expected ?? null;
+    if (!contributions || expected === null || expected <= 0) {
+      return null;
+    }
+    const share = (value: number | null): number =>
+      value === null ? 0 : Math.min(100, Math.max(0, (value / expected) * 100));
+    return {
+      collected: share(contributions.collected),
+      outstanding: share(contributions.outstanding),
+    };
+  });
+
+  /**
+   * Points de la courbe du taux de recouvrement mensuel.
+   *
+   * `rate` EST l'ordonnée : l'échelle allant de 0 à 100 %, aucune normalisation n'est
+   * nécessaire et aucun maximum n'est déduit de la série. Les abscisses sont placées au
+   * centre de bandes égales pour que chaque point tombe exactement sous son libellé de
+   * mois ; un placement de bord à bord décalerait tous les intermédiaires.
+   */
+  protected readonly ratePoints = computed(() => {
+    const months = this.months();
+    return months.map((month, index) => ({
+      key: month.key,
+      shortLabel: month.shortLabel,
+      rate: month.rate,
+      x: ((index + 0.5) / months.length) * 100,
+      y: 100 - Math.min(100, Math.max(0, month.rate)),
+    }));
+  });
+
+  /** Tracé de la courbe. Vide sous deux points : une ligne exige deux extrémités. */
+  protected readonly ratePath = computed(() => {
+    const points = this.ratePoints();
+    if (points.length < 2) {
+      return '';
+    }
+    return points
+      .map((point, index) => `${index === 0 ? 'M' : 'L'}${point.x.toFixed(2)},${point.y.toFixed(2)}`)
+      .join(' ');
+  });
+
+  /** Même tracé, refermé sur l'axe des abscisses pour l'aplat sous la courbe. */
+  protected readonly rateArea = computed(() => {
+    const points = this.ratePoints();
+    if (points.length < 2) {
+      return '';
+    }
+    const first = points[0];
+    const last = points[points.length - 1];
+    const segments = points
+      .map((point) => `L${point.x.toFixed(2)},${point.y.toFixed(2)}`)
+      .join(' ');
+    return `M${first.x.toFixed(2)},100 ${segments} L${last.x.toFixed(2)},100 Z`;
   });
 
   /**
@@ -381,6 +485,12 @@ export class DashboardPage {
     { key: 'month', label: 'Mois' },
     { key: 'expected', label: 'Montant attendu', note: '(FCFA)', align: 'end' },
     { key: 'collected', label: 'Montant encaissé', note: '(FCFA)', align: 'end' },
+    { key: 'rate', label: 'Taux de recouvrement', note: '(%)', align: 'end' },
+  ];
+
+  /** Alternative accessible de la courbe : « Les graphiques exposent une table accessible ». */
+  protected readonly rateColumns: readonly DataTableColumn[] = [
+    { key: 'month', label: 'Mois' },
     { key: 'rate', label: 'Taux de recouvrement', note: '(%)', align: 'end' },
   ];
 

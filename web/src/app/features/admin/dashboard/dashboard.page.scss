@@ -1,9 +1,11 @@
 /* Aucune transition ni animation dans cette feuille : « Aucune animation au test
    visuel » est un critère de recette de la fiche BO-001.
 
-   Feuille consolidée pour tenir le budget `anyComponentStyle` d'Angular (8 kB) :
+   Feuille consolidée pour tenir le budget `anyComponentStyle` d'Angular (10 kB) :
    les sélecteurs qui partagent un même bloc de déclarations sont regroupés, et le
-   préfixe de bloc est imbriqué. Les commentaires disparaissent à la minification :
+   préfixe de bloc est imbriqué. Les compléments vivent dans `dashboard.kpi.scss`,
+   `dashboard.charts.scss` et `dashboard.responsive.scss` — le seuil n'est jamais
+   relevé, la feuille est scindée. Les commentaires disparaissent à la minification :
    ils ne pèsent rien dans le budget, la documentation des choix normatifs est donc
    conservée intégralement. Aucune couleur ni aucun espacement en dur : toutes les
    valeurs restent des tokens `var(--cnpm-…)`. */
@@ -17,20 +19,14 @@
   &__period,
   &__kpis,
   &__kpi-card,
-  &__column,
   &__panel,
-  &__legend-list,
-  &__feed-item,
-  &__shortcut-text {
+  &__legend-list {
     display: flex;
     flex-flow: column;
     min-width: 0;
   }
 
-  /* Listes verticales sans puces : alertes, activité récente et raccourcis. */
-  &__alerts,
-  &__feed,
-  &__shortcuts {
+  &__alerts {
     display: flex;
     flex-flow: column;
     gap: var(--cnpm-space-3);
@@ -50,13 +46,12 @@
     background: var(--cnpm-color-surface-primary);
   }
 
+  /* Respiration accrue dans les panneaux : la place libérée par la suppression des
+     raccourcis et du fil d'activité est rendue au contenu qui reste, plutôt que
+     comblée par de nouveaux blocs. */
   &__panel {
-    gap: var(--cnpm-space-3);
-    padding: var(--cnpm-space-4);
-  }
-
-  &__column {
     gap: var(--cnpm-space-4);
+    padding: var(--cnpm-space-5);
   }
 
   &__period {
@@ -70,12 +65,8 @@
   &__kpi-card {
     flex: 1 1 auto;
     gap: var(--cnpm-space-1);
-    min-height: 7.5rem;
+    min-height: 8.5rem;
     padding: var(--cnpm-space-4);
-  }
-
-  &__shortcuts {
-    gap: var(--cnpm-space-2);
   }
 
   /* ------------------------------------------------------------------ Filtre période */
@@ -119,14 +110,10 @@
 
   /* ------------------------------------------------------------------------ Disposition */
 
-  /* Grille unique de 12 colonnes. Auparavant, deux enveloppes de colonne se partageaient
-     les panneaux : la droite en empilait cinq sur 1 930 px quand la gauche en portait
-     deux sur 575, et la hauteur de la ligne valant le maximum des deux, la page
-     atteignait 2 306 px.
-
-     La portée passe par une variable plutôt que par une règle `grid-column` répétée par
-     classe : les paliers responsive n'ont alors qu'à redéfinir un nombre, et la
-     mécanique de placement reste décrite en un seul endroit.
+  /* Grille unique de 12 colonnes, trois rangées de 8 + 4 : graphique principal et
+     segmentation, courbe du taux et composition de l'attendu, table des paiements et
+     alertes. La portée passe par une variable plutôt que par une règle `grid-column`
+     répétée par classe : les paliers responsive n'ont alors qu'à redéfinir un nombre.
 
      `minmax(0, …)` empêche une piste de se dimensionner sur son min-content : sans cela,
      une table à six colonnes pousserait la grille au-delà de la page au lieu de défiler
@@ -143,8 +130,7 @@
     }
   }
 
-  &__cell--wide,
-  &__column {
+  &__cell--wide {
     --cnpm-cell-span: 8;
   }
 
@@ -152,17 +138,12 @@
     --cnpm-cell-span: 4;
   }
 
-  /* En-tête de panneau, ligne de légende et raccourci : même répartition aux extrémités. */
+  /* En-tête de panneau et ligne de légende : même répartition aux extrémités. */
   &__panel-head,
-  &__legend-row,
-  &__shortcut {
+  &__legend-row {
     display: flex;
     justify-content: space-between;
     gap: var(--cnpm-space-3);
-  }
-
-  &__panel-head,
-  &__legend-row {
     align-items: baseline;
     min-width: 0;
   }
@@ -194,8 +175,14 @@
     gap: var(--cnpm-space-2);
   }
 
-  /* La pastille par défaut porte la couleur de la série encaissée : les modificateurs
-     `--collected` et `--active` n'ont donc rien à redéclarer. */
+  /* La pastille par défaut porte la couleur de la série principale : les modificateurs
+     `--collected` et `--active` n'ont donc rien à redéclarer.
+
+     Les séries secondaires passent de blue-200 à blue-400. Mesuré sur le blanc du
+     panneau, blue-200 (#D5DCFA) ne donne que 1,36:1 : la série « attendu » était
+     presque invisible. blue-400 (#7F91CF) donne 3,06:1 sur blanc et 3,62:1 contre
+     blue-700, soit au-dessus des 3:1 exigés par WCAG 2.2 (1.4.11) à la fois contre le
+     fond et contre la série voisine. */
   &__swatch {
     display: inline-block;
     width: var(--cnpm-size-icon-xs);
@@ -204,12 +191,10 @@
     background: var(--cnpm-color-brand-blue-700);
   }
 
-  &__swatch--expected {
-    background: var(--cnpm-color-brand-blue-200);
-  }
-
+  &__swatch--expected,
+  &__swatch--outstanding,
   &__swatch--dormant {
-    background: var(--cnpm-color-brand-blue-300);
+    background: var(--cnpm-color-brand-blue-400);
   }
 
   /* Hauteur de tracé fixée localement : aucun token de dimension ne couvre la géométrie
@@ -224,7 +209,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    border-block-end: 1px solid var(--cnpm-color-border-subtle);
+    border-block-end: 1px solid var(--cnpm-color-border-default);
   }
 
   &__bar {
@@ -251,7 +236,7 @@
     width: 100%;
     max-width: 2.75rem;
     border-radius: var(--cnpm-radius-xs);
-    background: var(--cnpm-color-brand-blue-200);
+    background: var(--cnpm-color-brand-blue-400);
   }
 
   &__bar-fill {
@@ -336,7 +321,7 @@
   }
 
   &__donut-arc--dormant {
-    stroke: var(--cnpm-color-brand-blue-300);
+    stroke: var(--cnpm-color-brand-blue-400);
   }
 
   &__donut-center {
@@ -378,7 +363,7 @@
     white-space: nowrap;
   }
 
-  /* --------------------------------------------------------------- Alertes et activité */
+  /* -------------------------------------------------------------------------- Alertes */
 
   &__alert-detail {
     font-size: var(--cnpm-font-size-sm);
@@ -386,46 +371,6 @@
 
   &__alert-time {
     margin: var(--cnpm-space-1) 0 0;
-  }
-
-  &__feed-item {
-    gap: var(--cnpm-space-1);
-    padding-block-end: var(--cnpm-space-3);
-    border-block-end: 1px solid var(--cnpm-color-border-subtle);
-  }
-
-  &__feed-item:last-child {
-    padding-block-end: 0;
-    border-block-end: 0;
-  }
-
-  &__feed-label {
-    margin: 0;
-    font-size: var(--cnpm-font-size-sm);
-    font-weight: var(--cnpm-font-weight-semibold);
-    color: var(--cnpm-color-text-primary);
-  }
-
-  &__feed-time {
-    margin: 0;
-  }
-
-  /* ------------------------------------------------------------------------ Raccourcis */
-
-  /* Cible tactile de 44 px au minimum : la hauteur de contrôle `lg` du socle. */
-  &__shortcut {
-    align-items: center;
-    min-height: var(--cnpm-size-control-lg);
-    padding: var(--cnpm-space-2) var(--cnpm-space-3);
-    border: 1px solid var(--cnpm-color-border-subtle);
-    border-radius: var(--cnpm-radius-md);
-    color: var(--cnpm-color-text-primary);
-    text-decoration: none;
-  }
-
-  &__shortcut:hover {
-    border-color: var(--cnpm-color-border-default);
-    background: var(--cnpm-color-surface-subtle);
   }
 
   /* ---------------------------------------------------------------------- Typographie */
@@ -440,30 +385,23 @@
   }
 
   &__label,
-  &__kpi-label,
   &__kpi-missing,
   &__kpi-link,
-  &__data-summary,
-  &__shortcut-label {
+  &__data-summary {
     font-size: var(--cnpm-font-size-sm);
     font-weight: var(--cnpm-font-weight-medium);
   }
 
   &__label,
-  &__kpi-label,
   &__refresh,
   &__legend-term {
     color: var(--cnpm-color-text-secondary);
   }
 
   &__kpi-link,
-  &__shortcut-label {
-    color: var(--cnpm-color-text-link);
-    text-decoration: underline;
-  }
-
   &__data-summary {
     color: var(--cnpm-color-text-link);
+    text-decoration: underline;
   }
 
   /* Une valeur absente reste une phrase lisible, pas un tiret énigmatique ni un zéro
@@ -483,11 +421,9 @@
   }
 
   /* Mentions 12 px atténuées. */
-  &__kpi-definition,
   &__note,
   &__alert-time,
-  &__donut-caption,
-  &__feed-time {
+  &__donut-caption {
     font-size: var(--cnpm-font-size-xs);
     color: var(--cnpm-color-text-muted);
   }
@@ -495,9 +431,7 @@
   /* Mentions 12 px courantes. */
   &__legend,
   &__trend-detail,
-  &__bar-label,
-  &__feed-detail,
-  &__shortcut-description {
+  &__bar-label {
     font-size: var(--cnpm-font-size-xs);
     color: var(--cnpm-color-text-secondary);
   }
@@ -506,7 +440,7 @@
      lectures : la note et les détails partagent l'interligne du texte courant. */
   &__note,
   &__alert-detail,
-  &__feed-detail {
+  &__trend-detail {
     margin: 0;
     line-height: var(--cnpm-font-lineHeight-sm);
   }
@@ -535,8 +469,7 @@
 
   &__select:focus-visible,
   &__kpi-link:focus-visible,
-  &__data-summary:focus-visible,
-  &__shortcut:focus-visible {
+  &__data-summary:focus-visible {
     outline: 2px solid var(--cnpm-color-brand-blue-700);
     outline-offset: 2px;
   }
@@ -550,5 +483,4 @@
     border-color: var(--cnpm-color-brand-blue-700);
     outline-offset: 1px;
   }
-
 }

@@ -88,14 +88,15 @@
   color: var(--cnpm-color-text-secondary);
 }
 
+/* Le contenu du tableau reste en graisse normale : mis en gras, chaque cellule
+   reclamait la meme attention et plus rien ne ressortait. La couleur de marque suffit
+   a signaler que le code est un lien. */
 .cnpm-members__code {
-  font-weight: var(--cnpm-font-weight-semibold);
   color: var(--cnpm-color-text-brand);
   white-space: nowrap;
 }
 
 .cnpm-members__organization {
-  font-weight: var(--cnpm-font-weight-medium);
   color: var(--cnpm-color-text-primary);
 }
 
@@ -123,10 +124,11 @@
 
 /* Les chiffres s'alignent verticalement grâce aux chasses tabulaires : sans elles,
    comparer deux montants d'une colonne à l'autre demande un effort inutile. */
+/* `tabular-nums` est conserve : sans chasses fixes, comparer deux montants d'une
+   colonne a l'autre demande un effort inutile. */
 .cnpm-members__amount {
   display: block;
   font-variant-numeric: tabular-nums;
-  font-weight: var(--cnpm-font-weight-medium);
   color: var(--cnpm-color-text-primary);
   white-space: nowrap;
 }

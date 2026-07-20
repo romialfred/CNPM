@@ -1,0 +1,155 @@
+/* Graphiques ajoutes au tableau de bord BO-001.
+   ---------------------------------------------------------------------------
+   Feuille distincte pour la meme raison que `dashboard.kpi.scss` : le plafond de
+   10 ko par feuille de style de composant n'est jamais relache, la feuille est
+   scindee.
+
+   Aucune transition ni animation ici — « Aucune animation au test visuel » est un
+   critere de recette de la fiche.
+
+   Deux graphiques :
+
+   1. « Taux de recouvrement mois par mois » — serie reelle `DashboardMonthPoint.rate`.
+      Echelle fixe 0–100 % : un taux EST un pourcentage, aucun maximum n'est deduit de
+      la serie et aucune cible n'est supposee, le depot n'en publiant aucune.
+   2. « Cotisations de l'exercice » — barre de composition batie sur
+      `DashboardContributions.expected/.collected/.outstanding`. Elle ne porte que de
+      la geometrie ; les montants sont ecrits en toutes lettres juste en dessous.
+
+   Contrastes calcules sur le blanc du panneau (`surface-primary` = #FFFFFF) :
+     blue-700 #273481 / blanc  = 11,08:1
+     blue-400 #7F91CF / blanc  =  3,06:1
+     blue-700 / blue-400       =  3,62:1
+   Les deux series et leur separation depassent donc les 3:1 exiges par WCAG 2.2
+   (1.4.11) pour un element graphique. C'est la raison du passage de blue-200
+   (1,36:1 sur blanc, quasi invisible) a blue-400 pour toute serie secondaire. */
+
+.cnpm-dashboard {
+  /* ------------------------------------------------------- Courbe du taux mensuel */
+
+  /* Axe des ordonnees a gauche, trace a droite, libelles de mois sous le trace. */
+  &__rate {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--cnpm-space-2);
+    min-width: 0;
+  }
+
+  /* Hauteur fixee en `rem` : elle suit le zoom texte jusqu'a 200 %. Aucun token de
+     dimension ne couvre la geometrie d'un graphique. */
+  &__rate-axis,
+  &__rate-plot {
+    position: relative;
+    height: 11.5rem;
+  }
+
+  &__rate-axis {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__rate-tick {
+    position: absolute;
+    right: 0;
+    transform: translateY(50%);
+    color: var(--cnpm-color-text-muted);
+    font-size: var(--cnpm-font-size-xs);
+    line-height: var(--cnpm-font-lineHeight-xs);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__rate-plot {
+    border-inline-start: 1px solid var(--cnpm-color-border-default);
+  }
+
+  /* Filets de graduation. Purement structurants : les valeurs se lisent sur l'axe. */
+  &__rate-grid {
+    position: absolute;
+    right: 0;
+    left: 0;
+    height: 1px;
+    background: var(--cnpm-color-border-subtle);
+  }
+
+  &__rate-svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* `non-scaling-stroke` : la boite est etiree horizontalement, sans quoi le trait
+     s'epaissirait avec elle et le graphique paraitrait deforme. */
+  &__rate-line {
+    fill: none;
+    stroke: var(--cnpm-color-brand-blue-700);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  &__rate-area {
+    fill: color-mix(in srgb, var(--cnpm-color-brand-blue-700) 10%, transparent);
+    stroke: none;
+  }
+
+  /* Les points sont poses en CSS et non en SVG : un cercle place dans une boite
+     etiree deviendrait une ellipse. */
+  &__rate-point {
+    position: absolute;
+    width: var(--cnpm-size-icon-xs);
+    height: var(--cnpm-size-icon-xs);
+    transform: translate(-50%, 50%);
+    border: 2px solid var(--cnpm-color-brand-blue-700);
+    border-radius: var(--cnpm-radius-pill);
+    background: var(--cnpm-color-surface-primary);
+  }
+
+  /* Bandes egales : chaque libelle est centre sous son point, place lui aussi au
+     centre de sa bande. */
+  &__rate-labels {
+    display: grid;
+    grid-column: 2;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--cnpm-space-1);
+    margin: 0;
+    padding-block-start: var(--cnpm-space-2);
+    list-style: none;
+    color: var(--cnpm-color-text-secondary);
+    font-size: var(--cnpm-font-size-xs);
+    text-align: center;
+  }
+
+  /* --------------------------------------------- Composition du montant attendu */
+
+  /* Barre unique, deux parts. Hauteur en `rem` pour suivre le zoom texte. */
+  &__composition {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    height: var(--cnpm-space-3);
+    border-radius: var(--cnpm-radius-pill);
+    background: var(--cnpm-color-surface-subtle);
+  }
+
+  &__composition-part--collected {
+    background: var(--cnpm-color-brand-blue-700);
+  }
+
+  &__composition-part--outstanding {
+    background: var(--cnpm-color-brand-blue-400);
+  }
+
+  /* Le taux ne s'additionne pas aux trois montants qui le precedent : un filet le
+     separe, comme pour les cohortes hors base de la segmentation. */
+  &__legend-row--apart {
+    padding-block-start: var(--cnpm-space-2);
+    border-block-start: 1px solid var(--cnpm-color-border-subtle);
+  }
+}

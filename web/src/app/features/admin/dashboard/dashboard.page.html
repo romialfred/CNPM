@@ -52,9 +52,10 @@
         <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
       </cnpm-error-state>
     } @else if (initialLoading()) {
-      <!-- Ossature fidèle à la structure attendue. Un seul squelette annonce le
-           chargement : cinq régions live simultanées produiraient cinq annonces pour
-           un seul événement. -->
+      <!-- Ossature fidèle à la structure attendue : bandeau de cinq indicateurs, puis
+           trois rangées de 8 + 4 colonnes. Un seul squelette annonce le chargement :
+           cinq régions live simultanées produiraient cinq annonces pour un seul
+           événement. -->
       <ul class="cnpm-dashboard__kpi-list">
         @for (slot of kpiSlots; track slot) {
           <li class="cnpm-dashboard__kpi">
@@ -70,22 +71,24 @@
       </ul>
 
       <div class="cnpm-dashboard__grid">
-        <div class="cnpm-dashboard__column cnpm-dashboard__cell--wide">
-          <section class="cnpm-dashboard__panel">
-            <cnpm-skeleton variant="chart" [columns]="6" label="" />
-          </section>
-          <section class="cnpm-dashboard__panel">
-            <cnpm-skeleton variant="table" [rows]="4" [columns]="6" label="" />
-          </section>
-        </div>
-        <div class="cnpm-dashboard__column cnpm-dashboard__cell--third">
-          <section class="cnpm-dashboard__panel">
-            <cnpm-skeleton variant="card" [rows]="4" label="" />
-          </section>
-          <section class="cnpm-dashboard__panel">
-            <cnpm-skeleton variant="card" [rows]="4" label="" />
-          </section>
-        </div>
+        <section class="cnpm-dashboard__cell--wide cnpm-dashboard__panel">
+          <cnpm-skeleton variant="chart" [columns]="6" label="" />
+        </section>
+        <section class="cnpm-dashboard__cell--third cnpm-dashboard__panel">
+          <cnpm-skeleton variant="card" [rows]="4" label="" />
+        </section>
+        <section class="cnpm-dashboard__cell--wide cnpm-dashboard__panel">
+          <cnpm-skeleton variant="chart" [columns]="6" label="" />
+        </section>
+        <section class="cnpm-dashboard__cell--third cnpm-dashboard__panel">
+          <cnpm-skeleton variant="card" [rows]="4" label="" />
+        </section>
+        <section class="cnpm-dashboard__cell--wide cnpm-dashboard__panel">
+          <cnpm-skeleton variant="table" [rows]="4" [columns]="6" label="" />
+        </section>
+        <section class="cnpm-dashboard__cell--third cnpm-dashboard__panel">
+          <cnpm-skeleton variant="card" [rows]="4" label="" />
+        </section>
       </div>
     } @else if (data(); as snapshot) {
       @if (staleAfterError()) {
@@ -112,64 +115,81 @@
         <!-- Cinq KPI au maximum, sur deux rangées au plus : composition normative de
              la fiche. Le cinquième passe à la ligne sous 1440 px. -->
         <ul class="cnpm-dashboard__kpi-list">
-          @for (kpi of kpis(); track kpi.key; let i = $index) {
+          @for (card of kpiCards(); track card.kpi.key) {
             <li class="cnpm-dashboard__kpi">
               <div
                 class="cnpm-dashboard__kpi-card cnpm-liftable"
-                [class]="'cnpm-tile-accent--' + kpiSkin(kpi, i).accent"
+                [class]="'cnpm-tile-accent--' + card.accent"
               >
-                <!-- Pictogramme purement décoratif : `aria-hidden` est posé par Lucide en
-                     l'absence de `title`, et le libellé du KPI porte seul son sens. La
-                     couleur ne fait que distinguer les tuiles, elle n'informe pas. -->
-                <span class="cnpm-dashboard__kpi-icon" aria-hidden="true">
-                  @switch (kpiSkin(kpi, i).icon) {
-                    @case ('wallet') {
-                      <svg lucideWallet [size]="iconSize.control"></svg>
+                <!-- Pastille et libellé sur une même ligne, comme la référence du
+                     commanditaire. Le pictogramme est purement décoratif : `aria-hidden`
+                     est posé par Lucide en l'absence de `title`, et le libellé du KPI
+                     porte seul son sens. La couleur ne fait que distinguer les tuiles,
+                     elle n'informe pas — retirer toutes les couleurs ne retirerait
+                     aucune information de cet écran. -->
+                <p class="cnpm-dashboard__kpi-head">
+                  <span class="cnpm-dashboard__kpi-icon" aria-hidden="true">
+                    @switch (card.icon) {
+                      @case ('wallet') {
+                        <svg lucideWallet [size]="iconSize.control"></svg>
+                      }
+                      @case ('percent') {
+                        <svg lucidePercent [size]="iconSize.control"></svg>
+                      }
+                      @case ('users') {
+                        <svg lucideUsers [size]="iconSize.control"></svg>
+                      }
+                      @case ('dormant') {
+                        <svg lucideMoon [size]="iconSize.control"></svg>
+                      }
+                      @case ('prospect') {
+                        <svg lucideUserPlus [size]="iconSize.control"></svg>
+                      }
+                      @case ('company') {
+                        <svg lucideBuilding2 [size]="iconSize.control"></svg>
+                      }
+                      @case ('target') {
+                        <svg lucideTarget [size]="iconSize.control"></svg>
+                      }
                     }
-                    @case ('percent') {
-                      <svg lucidePercent [size]="iconSize.control"></svg>
+                  </span>
+                  <span class="cnpm-dashboard__kpi-label">
+                    {{ card.kpi.label }}
+                    @if (card.kpi.unit) {
+                      <span class="cnpm-dashboard__kpi-unit">({{ card.kpi.unit }})</span>
                     }
-                    @case ('users') {
-                      <svg lucideUsers [size]="iconSize.control"></svg>
-                    }
-                    @case ('dormant') {
-                      <svg lucideMoon [size]="iconSize.control"></svg>
-                    }
-                    @case ('prospect') {
-                      <svg lucideUserPlus [size]="iconSize.control"></svg>
-                    }
-                    @case ('company') {
-                      <svg lucideBuilding2 [size]="iconSize.control"></svg>
-                    }
-                    @case ('target') {
-                      <svg lucideTarget [size]="iconSize.control"></svg>
-                    }
-                  }
-                </span>
-                <p class="cnpm-dashboard__kpi-label">
-                  {{ kpi.label }}
-                  @if (kpi.unit) {
-                    <span class="cnpm-dashboard__kpi-unit">({{ kpi.unit }})</span>
-                  }
+                  </span>
                 </p>
                 <p class="cnpm-dashboard__kpi-value">
                   <!-- Une mesure absente n'est pas un zéro : la fiche impose
                        « Donnée indisponible », et un zéro se lirait comme une
                        contre-performance réelle. -->
-                  @if (kpi.value === null) {
+                  @if (card.kpi.value === null) {
                     <span class="cnpm-dashboard__kpi-missing">Donnée indisponible</span>
                   } @else {
-                    {{ kpi.value | number: kpiFormat(kpi) }}{{ kpi.suffix ?? '' }}
+                    {{ card.kpi.value | number: kpiFormat(card.kpi) }}{{ card.kpi.suffix ?? '' }}
                   }
                 </p>
-                <p class="cnpm-dashboard__kpi-definition">{{ kpi.definition }}</p>
+                <p class="cnpm-dashboard__kpi-definition">{{ card.kpi.definition }}</p>
 
-                <!-- Courbe de tendance, uniquement là où une série réelle existe. Les
-                     effectifs n'ont aucun historique au contrat : leur tuile n'en porte
-                     pas plutôt que d'afficher une courbe inventée.
+                @if (card.kpi.route) {
+                  <a
+                    class="cnpm-dashboard__kpi-link"
+                    [routerLink]="card.kpi.route"
+                    [queryParams]="card.kpi.queryParams"
+                    [attr.aria-label]="card.kpi.linkLabel"
+                  >
+                    Voir la liste filtrée
+                    <svg lucideArrowRight [size]="iconSize.compact" aria-hidden="true"></svg>
+                  </a>
+                }
+
+                <!-- Courbe de tendance en pied de tuile, uniquement là où une série
+                     réelle existe. Les effectifs n'ont aucun historique au contrat :
+                     leur tuile n'en porte pas plutôt que d'afficher une courbe inventée.
                      Purement décorative — `aria-hidden` — car elle ne porte aucun chiffre
                      que la table accessible du graphique ne donne déjà. -->
-                @if (kpiSeries(kpi).length > 1) {
+                @if (card.linePath) {
                   <svg
                     class="cnpm-dashboard__kpi-spark"
                     viewBox="0 0 100 32"
@@ -177,19 +197,9 @@
                     aria-hidden="true"
                     focusable="false"
                   >
-                    <path [attr.d]="sparklinePath(kpiSeries(kpi))" fill="none" stroke-width="2" />
+                    <path class="cnpm-dashboard__kpi-spark-area" [attr.d]="card.areaPath"></path>
+                    <path class="cnpm-dashboard__kpi-spark-line" [attr.d]="card.linePath"></path>
                   </svg>
-                }
-                @if (kpi.route) {
-                  <a
-                    class="cnpm-dashboard__kpi-link"
-                    [routerLink]="kpi.route"
-                    [queryParams]="kpi.queryParams"
-                    [attr.aria-label]="kpi.linkLabel"
-                  >
-                    Voir la liste filtrée
-                    <svg lucideArrowRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                  </a>
                 }
               </div>
             </li>
@@ -198,374 +208,474 @@
       </section>
 
       <div class="cnpm-dashboard__grid">
-          <section class="cnpm-dashboard__cell cnpm-dashboard__cell--wide cnpm-dashboard__panel" aria-labelledby="titre-graphique">
-            <div class="cnpm-dashboard__panel-head">
-              <h2 class="cnpm-dashboard__panel-title" id="titre-graphique">
-                Évolution des cotisations encaissées
-              </h2>
-              @if (trend(); as movement) {
-                <p class="cnpm-dashboard__trend">
-                  <cnpm-badge [tone]="trendTone(movement.direction)">
-                    @switch (movement.direction) {
-                      @case ('up') {
-                        <svg lucideTrendingUp [size]="iconSize.dense" aria-hidden="true"></svg>
-                        En hausse de {{ movement.value | number: '1.1-1' }} %
-                      }
-                      @case ('down') {
-                        <svg lucideTrendingDown [size]="iconSize.dense" aria-hidden="true"></svg>
-                        En baisse de {{ movement.value | number: '1.1-1' }} %
-                      }
-                      @default {
-                        <svg lucideMinus [size]="iconSize.dense" aria-hidden="true"></svg>
-                        Stable
-                      }
+        <section
+          class="cnpm-dashboard__cell--wide cnpm-dashboard__panel"
+          aria-labelledby="titre-graphique"
+        >
+          <div class="cnpm-dashboard__panel-head">
+            <h2 class="cnpm-dashboard__panel-title" id="titre-graphique">
+              Évolution des cotisations encaissées
+            </h2>
+            @if (trend(); as movement) {
+              <p class="cnpm-dashboard__trend">
+                <cnpm-badge [tone]="trendTone(movement.direction)">
+                  @switch (movement.direction) {
+                    @case ('up') {
+                      <svg lucideTrendingUp [size]="iconSize.dense" aria-hidden="true"></svg>
+                      En hausse de {{ movement.value | number: '1.1-1' }} %
                     }
-                  </cnpm-badge>
-                  <span class="cnpm-dashboard__trend-detail">
-                    {{ movement.current }} comparé à {{ movement.reference }}
-                  </span>
-                </p>
-              }
-            </div>
-
-            @if (months().length === 0) {
-              <cnpm-empty-state
-                variant="no-data"
-                title="Aucune série mensuelle"
-                description="Aucun encaissement n’est enregistré pour l’exercice sélectionné."
-              />
-            } @else {
-              <p class="cnpm-dashboard__legend">
-                <span class="cnpm-dashboard__legend-item">
-                  <span
-                    class="cnpm-dashboard__swatch cnpm-dashboard__swatch--collected"
-                    aria-hidden="true"
-                  ></span>
-                  Montant encaissé
-                </span>
-                <span class="cnpm-dashboard__legend-item">
-                  <span
-                    class="cnpm-dashboard__swatch cnpm-dashboard__swatch--expected"
-                    aria-hidden="true"
-                  ></span>
-                  Montant attendu
+                    @case ('down') {
+                      <svg lucideTrendingDown [size]="iconSize.dense" aria-hidden="true"></svg>
+                      En baisse de {{ movement.value | number: '1.1-1' }} %
+                    }
+                    @default {
+                      <svg lucideMinus [size]="iconSize.dense" aria-hidden="true"></svg>
+                      Stable
+                    }
+                  }
+                </cnpm-badge>
+                <span class="cnpm-dashboard__trend-detail">
+                  {{ movement.current }} comparé à {{ movement.reference }}
                 </span>
               </p>
-
-              <!-- Le graphique est décoratif : la table ci-dessous porte les mêmes
-                   nombres, comme l'exige « les graphiques exposent une table
-                   accessible ». Aucune animation, conformément au critère de recette. -->
-              <ol class="cnpm-dashboard__bars" aria-hidden="true">
-                @for (month of months(); track month.key) {
-                  <li class="cnpm-dashboard__bar">
-                    <span class="cnpm-dashboard__bar-plot">
-                      <span class="cnpm-dashboard__bar-track" [style.height.%]="trackHeight(month)">
-                        <span
-                          class="cnpm-dashboard__bar-fill"
-                          [style.height.%]="fillHeight(month)"
-                        ></span>
-                      </span>
-                    </span>
-                    <span class="cnpm-dashboard__bar-label">{{ month.shortLabel }}</span>
-                  </li>
-                }
-              </ol>
-
-              <details class="cnpm-dashboard__data">
-                <summary class="cnpm-dashboard__data-summary">
-                  Afficher les données du graphique
-                </summary>
-                <cnpm-data-table
-                  caption="Montant attendu, montant encaissé et taux de recouvrement, mois par mois."
-                  [columns]="monthColumns"
-                  [rows]="months()"
-                  [rowKey]="monthKey"
-                >
-                  <ng-template #row let-month>
-                    <td class="cnpm-table__cell">{{ month.label }}</td>
-                    <td class="cnpm-table__cell cnpm-table__cell--end">
-                      <span class="cnpm-dashboard__amount">
-                        {{ month.expected | number: '1.0-0' }}
-                      </span>
-                    </td>
-                    <td class="cnpm-table__cell cnpm-table__cell--end">
-                      <span class="cnpm-dashboard__amount">
-                        {{ month.collected | number: '1.0-0' }}
-                      </span>
-                    </td>
-                    <td class="cnpm-table__cell cnpm-table__cell--end">
-                      <span class="cnpm-dashboard__amount">
-                        {{ month.rate | number: '1.1-1' }}&nbsp;%
-                      </span>
-                    </td>
-                  </ng-template>
-                  <div data-table-status></div>
-                </cnpm-data-table>
-              </details>
             }
-          </section>
-          <section
-            class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel cnpm-dashboard__panel--segmentation"
-            aria-labelledby="titre-segmentation"
-          >
-            <h2 class="cnpm-dashboard__panel-title" id="titre-segmentation">
-              Segmentation des cotisants
-            </h2>
+          </div>
 
-            @if (baseSegments().length === 0) {
-              <cnpm-empty-state
-                variant="no-data"
-                title="Segmentation indisponible"
-                description="Aucun effectif n’est publié pour l’exercice sélectionné."
-              />
-            } @else {
-              <div class="cnpm-dashboard__donut-wrap">
-                <svg
-                  class="cnpm-dashboard__donut"
-                  viewBox="0 0 120 120"
+          @if (months().length === 0) {
+            <cnpm-empty-state
+              variant="no-data"
+              title="Aucune série mensuelle"
+              description="Aucun encaissement n’est enregistré pour l’exercice sélectionné."
+            />
+          } @else {
+            <p class="cnpm-dashboard__legend">
+              <span class="cnpm-dashboard__legend-item">
+                <span
+                  class="cnpm-dashboard__swatch cnpm-dashboard__swatch--collected"
                   aria-hidden="true"
-                  focusable="false"
-                >
-                  <circle
-                    class="cnpm-dashboard__donut-track"
-                    cx="60"
-                    cy="60"
-                    [attr.r]="donutRadius"
-                  ></circle>
-                  <!-- Rotation d'un quart de tour : sans elle, le premier arc
-                       commencerait à 3 heures et non au sommet. -->
-                  <g transform="rotate(-90 60 60)">
-                    @for (arc of donutArcs(); track arc.key) {
-                      <!-- `attr.class` et non `class` : sur un élément SVG, `className`
-                           n'est pas une chaîne modifiable, et seule l'écriture par
-                           attribut est fiable. -->
-                      <circle
-                        [attr.class]="
-                          'cnpm-dashboard__donut-arc cnpm-dashboard__donut-arc--' + arc.key
-                        "
-                        cx="60"
-                        cy="60"
-                        [attr.r]="donutRadius"
-                        [attr.stroke-dasharray]="arc.dashArray"
-                        [attr.stroke-dashoffset]="arc.dashOffset"
-                      ></circle>
-                    }
-                  </g>
-                </svg>
-                <!-- Le centre répète en gros ce que la légende dit en toutes lettres ;
-                     il est donc masqué aux lecteurs d'écran pour ne pas doubler. -->
-                <p class="cnpm-dashboard__donut-center" aria-hidden="true">
-                  <span class="cnpm-dashboard__donut-total">
-                    {{ snapshot.memberBase | number: '1.0-0' }}
-                  </span>
-                  <span class="cnpm-dashboard__donut-caption">Base</span>
-                </p>
-              </div>
+                ></span>
+                Montant encaissé
+              </span>
+              <span class="cnpm-dashboard__legend-item">
+                <span
+                  class="cnpm-dashboard__swatch cnpm-dashboard__swatch--expected"
+                  aria-hidden="true"
+                ></span>
+                Montant attendu
+              </span>
+            </p>
 
-              <dl class="cnpm-dashboard__legend-list">
-                @for (segment of baseSegments(); track segment.key) {
-                  <div class="cnpm-dashboard__legend-row">
-                    <dt class="cnpm-dashboard__legend-term">
+            <!-- Le graphique est décoratif : la table ci-dessous porte les mêmes
+                 nombres, comme l'exige « les graphiques exposent une table
+                 accessible ». Aucune animation, conformément au critère de recette. -->
+            <ol class="cnpm-dashboard__bars" aria-hidden="true">
+              @for (month of months(); track month.key) {
+                <li class="cnpm-dashboard__bar">
+                  <span class="cnpm-dashboard__bar-plot">
+                    <span class="cnpm-dashboard__bar-track" [style.height.%]="trackHeight(month)">
                       <span
-                        class="cnpm-dashboard__swatch cnpm-dashboard__swatch--{{ segment.key }}"
-                        aria-hidden="true"
+                        class="cnpm-dashboard__bar-fill"
+                        [style.height.%]="fillHeight(month)"
                       ></span>
-                      {{ segment.label }}
-                    </dt>
+                    </span>
+                  </span>
+                  <span class="cnpm-dashboard__bar-label">{{ month.shortLabel }}</span>
+                </li>
+              }
+            </ol>
+
+            <details class="cnpm-dashboard__data">
+              <summary class="cnpm-dashboard__data-summary">Afficher les données du graphique</summary>
+              <cnpm-data-table
+                caption="Montant attendu, montant encaissé et taux de recouvrement, mois par mois."
+                [columns]="monthColumns"
+                [rows]="months()"
+                [rowKey]="monthKey"
+              >
+                <ng-template #row let-month>
+                  <td class="cnpm-table__cell">{{ month.label }}</td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-dashboard__amount">
+                      {{ month.expected | number: '1.0-0' }}
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-dashboard__amount">
+                      {{ month.collected | number: '1.0-0' }}
+                    </span>
+                  </td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-dashboard__amount">
+                      {{ month.rate | number: '1.1-1' }}&nbsp;%
+                    </span>
+                  </td>
+                </ng-template>
+                <div data-table-status></div>
+              </cnpm-data-table>
+            </details>
+          }
+        </section>
+
+        <section
+          class="cnpm-dashboard__cell--third cnpm-dashboard__panel cnpm-dashboard__panel--segmentation"
+          aria-labelledby="titre-segmentation"
+        >
+          <h2 class="cnpm-dashboard__panel-title" id="titre-segmentation">
+            Segmentation des cotisants
+          </h2>
+
+          @if (baseSegments().length === 0) {
+            <cnpm-empty-state
+              variant="no-data"
+              title="Segmentation indisponible"
+              description="Aucun effectif n’est publié pour l’exercice sélectionné."
+            />
+          } @else {
+            <div class="cnpm-dashboard__donut-wrap">
+              <svg
+                class="cnpm-dashboard__donut"
+                viewBox="0 0 120 120"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle
+                  class="cnpm-dashboard__donut-track"
+                  cx="60"
+                  cy="60"
+                  [attr.r]="donutRadius"
+                ></circle>
+                <!-- Rotation d'un quart de tour : sans elle, le premier arc
+                     commencerait à 3 heures et non au sommet. -->
+                <g transform="rotate(-90 60 60)">
+                  @for (arc of donutArcs(); track arc.key) {
+                    <!-- `attr.class` et non `class` : sur un élément SVG, `className`
+                         n'est pas une chaîne modifiable, et seule l'écriture par
+                         attribut est fiable. -->
+                    <circle
+                      [attr.class]="
+                        'cnpm-dashboard__donut-arc cnpm-dashboard__donut-arc--' + arc.key
+                      "
+                      cx="60"
+                      cy="60"
+                      [attr.r]="donutRadius"
+                      [attr.stroke-dasharray]="arc.dashArray"
+                      [attr.stroke-dashoffset]="arc.dashOffset"
+                    ></circle>
+                  }
+                </g>
+              </svg>
+              <!-- Le centre répète en gros ce que la légende dit en toutes lettres ;
+                   il est donc masqué aux lecteurs d'écran pour ne pas doubler. -->
+              <p class="cnpm-dashboard__donut-center" aria-hidden="true">
+                <span class="cnpm-dashboard__donut-total">
+                  {{ snapshot.memberBase | number: '1.0-0' }}
+                </span>
+                <span class="cnpm-dashboard__donut-caption">Base</span>
+              </p>
+            </div>
+
+            <dl class="cnpm-dashboard__legend-list">
+              @for (segment of baseSegments(); track segment.key) {
+                <div class="cnpm-dashboard__legend-row">
+                  <dt class="cnpm-dashboard__legend-term">
+                    <span
+                      class="cnpm-dashboard__swatch cnpm-dashboard__swatch--{{ segment.key }}"
+                      aria-hidden="true"
+                    ></span>
+                    {{ segment.label }}
+                  </dt>
+                  <dd class="cnpm-dashboard__legend-value">
+                    {{ segment.count | number: '1.0-0' }}
+                    @if (segment.share !== null) {
+                      <span class="cnpm-dashboard__legend-share">
+                        ({{ segment.share | number: '1.1-1' }}&nbsp;%)
+                      </span>
+                    }
+                  </dd>
+                </div>
+              }
+            </dl>
+
+            @if (relatedSegments().length > 0) {
+              <dl class="cnpm-dashboard__legend-list cnpm-dashboard__legend-list--related">
+                @for (segment of relatedSegments(); track segment.key) {
+                  <div class="cnpm-dashboard__legend-row">
+                    <dt class="cnpm-dashboard__legend-term">{{ segment.label }}</dt>
                     <dd class="cnpm-dashboard__legend-value">
                       {{ segment.count | number: '1.0-0' }}
-                      @if (segment.share !== null) {
-                        <span class="cnpm-dashboard__legend-share">
-                          ({{ segment.share | number: '1.1-1' }}&nbsp;%)
-                        </span>
-                      }
                     </dd>
                   </div>
                 }
               </dl>
-
-              @if (relatedSegments().length > 0) {
-                <dl class="cnpm-dashboard__legend-list cnpm-dashboard__legend-list--related">
-                  @for (segment of relatedSegments(); track segment.key) {
-                    <div class="cnpm-dashboard__legend-row">
-                      <dt class="cnpm-dashboard__legend-term">{{ segment.label }}</dt>
-                      <dd class="cnpm-dashboard__legend-value">
-                        {{ segment.count | number: '1.0-0' }}
-                      </dd>
-                    </div>
-                  }
-                </dl>
-              }
-
-              <!-- Quatre nombres empilés sans dire lequel contient lequel se prêtent à
-                   toutes les lectures, y compris fausses. -->
-              <p class="cnpm-dashboard__note">
-                Actifs et dormants composent la base de membres. Les grands cotisants en sont un
-                sous-ensemble déjà compté ; les prospects sont comptés à part et n’entrent pas dans
-                la base.
-              </p>
             }
-          </section>
-          <section
-            class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel cnpm-dashboard__panel--alerts"
-            aria-labelledby="titre-alertes"
-          >
-            <h2 class="cnpm-dashboard__panel-title" id="titre-alertes">Alertes</h2>
 
-            @if (alerts().length === 0) {
-              <cnpm-empty-state
-                variant="no-data"
-                title="Aucune alerte"
-                description="Aucun signalement en cours pour l’exercice sélectionné."
-              />
-            } @else {
-              <ul class="cnpm-dashboard__alerts">
-                @for (alert of alerts(); track alert.id) {
-                  <li>
-                    <!-- `live=false` : la liste est peinte d'un bloc au chargement. Cinq
-                         régions live imbriquées provoqueraient cinq annonces pour un
-                         seul événement. La gravité reste écrite par le préfixe du
-                         composant, jamais portée par la seule couleur. -->
-                    <cnpm-alert
-                      [tone]="alertTone(alert.severity)"
-                      [title]="alert.title"
-                      [live]="false"
-                    >
-                      <p class="cnpm-dashboard__alert-detail">{{ alert.detail }}</p>
-                      <p class="cnpm-dashboard__alert-time">
-                        <time [attr.datetime]="alert.raisedAt">
-                          {{ alert.raisedAt | date: 'dd/MM/yyyy' }}
-                        </time>
-                        à {{ alert.raisedAt | date: 'HH:mm' }}
-                      </p>
-                    </cnpm-alert>
+            <!-- Quatre nombres empilés sans dire lequel contient lequel se prêtent à
+                 toutes les lectures, y compris fausses. -->
+            <p class="cnpm-dashboard__note">
+              Actifs et dormants composent la base de membres. Les grands cotisants en sont un
+              sous-ensemble déjà compté ; les prospects sont comptés à part et n’entrent pas dans
+              la base.
+            </p>
+          }
+        </section>
+
+        <!-- Courbe du taux de recouvrement mensuel.
+             Série réelle : `DashboardMonthPoint.rate`, publiée mois par mois par le port
+             et déjà exposée en chiffres par la table du graphique principal. Aucune
+             cible, aucune projection, aucune comparaison inter-exercices : rien de tel
+             n'existe au contrat. -->
+        <section class="cnpm-dashboard__cell--wide cnpm-dashboard__panel" aria-labelledby="titre-taux">
+          <div class="cnpm-dashboard__panel-head">
+            <h2 class="cnpm-dashboard__panel-title" id="titre-taux">
+              Taux de recouvrement mois par mois
+            </h2>
+            <p class="cnpm-dashboard__trend-detail">
+              Part du montant attendu effectivement encaissée, sur une échelle de 0 à 100 %.
+            </p>
+          </div>
+
+          @if (ratePoints().length === 0) {
+            <cnpm-empty-state
+              variant="no-data"
+              title="Aucun taux mensuel"
+              description="Aucun encaissement n’est enregistré pour l’exercice sélectionné."
+            />
+          } @else {
+            <div class="cnpm-dashboard__rate" aria-hidden="true">
+              <ul class="cnpm-dashboard__rate-axis">
+                @for (tick of rateTicks; track tick) {
+                  <li class="cnpm-dashboard__rate-tick" [style.bottom.%]="tick">
+                    {{ tick }}&nbsp;%
                   </li>
                 }
               </ul>
-              <p class="cnpm-dashboard__note">
-                Alertes classées par gravité, puis de la plus récente à la plus ancienne.
-              </p>
-            }
-          </section>
-          <section
-            class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel cnpm-dashboard__panel--activity"
-            aria-labelledby="titre-activite"
-          >
-            <h2 class="cnpm-dashboard__panel-title" id="titre-activite">Activité récente</h2>
 
-            @if (activities().length === 0) {
-              <cnpm-empty-state
-                variant="no-data"
-                title="Aucune activité récente"
-                description="Aucun dossier membre n’a été mouvementé sur l’exercice sélectionné."
-              />
-            } @else {
-              <ol class="cnpm-dashboard__feed">
-                @for (activity of activities(); track activity.id) {
-                  <li class="cnpm-dashboard__feed-item">
-                    <p class="cnpm-dashboard__feed-label">{{ activity.label }}</p>
-                    <p class="cnpm-dashboard__feed-detail">{{ activity.detail }}</p>
-                    <p class="cnpm-dashboard__feed-time">
-                      <time [attr.datetime]="activity.occurredAt">
-                        {{ activity.occurredAt | date: 'dd/MM/yyyy' }}
-                      </time>
-                    </p>
-                  </li>
+              <div class="cnpm-dashboard__rate-plot">
+                @for (tick of rateTicks; track tick) {
+                  <span class="cnpm-dashboard__rate-grid" [style.bottom.%]="tick"></span>
+                }
+                <svg
+                  class="cnpm-dashboard__rate-svg"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  focusable="false"
+                >
+                  <path class="cnpm-dashboard__rate-area" [attr.d]="rateArea()"></path>
+                  <path class="cnpm-dashboard__rate-line" [attr.d]="ratePath()"></path>
+                </svg>
+                @for (point of ratePoints(); track point.key) {
+                  <span
+                    class="cnpm-dashboard__rate-point"
+                    [style.left.%]="point.x"
+                    [style.bottom.%]="point.rate"
+                  ></span>
+                }
+              </div>
+
+              <ol class="cnpm-dashboard__rate-labels">
+                @for (point of ratePoints(); track point.key) {
+                  <li>{{ point.shortLabel }}</li>
                 }
               </ol>
-            }
-          </section>
-          <cnpm-insight-summary class="cnpm-dashboard__cell cnpm-dashboard__cell--third"
-            title="Cotisations de l’exercice"
-            headingId="synthese-cotisations"
-            unit="(FCFA)"
-            [stats]="contributionStats()"
-            note="Le taux de recouvrement rapporte le total encaissé au total attendu. Les prospects n’entrent pas dans ces montants."
-          />
+            </div>
 
-          <nav class="cnpm-dashboard__cell cnpm-dashboard__cell--third cnpm-dashboard__panel" aria-labelledby="titre-raccourcis">
-            <h2 class="cnpm-dashboard__panel-title" id="titre-raccourcis">Raccourcis</h2>
-            <ul class="cnpm-dashboard__shortcuts">
-              @for (shortcut of shortcuts; track shortcut.label) {
-                <li>
-                  <a
-                    class="cnpm-dashboard__shortcut"
-                    [routerLink]="shortcut.route"
-                    [queryParams]="shortcut.queryParams"
-                  >
-                    <span class="cnpm-dashboard__shortcut-text">
-                      <span class="cnpm-dashboard__shortcut-label">{{ shortcut.label }}</span>
-                      <span class="cnpm-dashboard__shortcut-description">
-                        {{ shortcut.description }}
-                      </span>
+            <details class="cnpm-dashboard__data">
+              <summary class="cnpm-dashboard__data-summary">Afficher les données de la courbe</summary>
+              <cnpm-data-table
+                caption="Taux de recouvrement mensuel, exprimé en pourcentage du montant attendu du mois."
+                [columns]="rateColumns"
+                [rows]="months()"
+                [rowKey]="monthKey"
+              >
+                <ng-template #row let-month>
+                  <td class="cnpm-table__cell">{{ month.label }}</td>
+                  <td class="cnpm-table__cell cnpm-table__cell--end">
+                    <span class="cnpm-dashboard__amount">
+                      {{ month.rate | number: '1.1-1' }}&nbsp;%
                     </span>
-                    <svg lucideArrowRight [size]="iconSize.compact" aria-hidden="true"></svg>
-                  </a>
+                  </td>
+                </ng-template>
+                <div data-table-status></div>
+              </cnpm-data-table>
+            </details>
+          }
+        </section>
+
+        <!-- Composition du montant attendu de l'exercice.
+             Série réelle : `DashboardContributions.expected`, `.collected`,
+             `.outstanding` et `.recoveryRate`, publiés par le port pour l'exercice
+             entier. La barre n'affiche aucun pourcentage calculé à l'écran ; seul le
+             taux publié par la source est écrit, juste en dessous. -->
+        <section
+          class="cnpm-dashboard__cell--third cnpm-dashboard__panel"
+          aria-labelledby="titre-composition"
+        >
+          <h2 class="cnpm-dashboard__panel-title" id="titre-composition">
+            Cotisations de l’exercice
+            <span class="cnpm-dashboard__kpi-unit">(FCFA)</span>
+          </h2>
+
+          @if (compositionBar(); as bar) {
+            <!-- Barre décorative : les montants qu'elle représente sont écrits en
+                 toutes lettres dans la liste qui suit. -->
+            <span class="cnpm-dashboard__composition" aria-hidden="true">
+              <span
+                class="cnpm-dashboard__composition-part cnpm-dashboard__composition-part--collected"
+                [style.inline-size.%]="bar.collected"
+              ></span>
+              <span
+                class="cnpm-dashboard__composition-part cnpm-dashboard__composition-part--outstanding"
+                [style.inline-size.%]="bar.outstanding"
+              ></span>
+            </span>
+            <p class="cnpm-dashboard__legend">
+              <span class="cnpm-dashboard__legend-item">
+                <span
+                  class="cnpm-dashboard__swatch cnpm-dashboard__swatch--collected"
+                  aria-hidden="true"
+                ></span>
+                Encaissé
+              </span>
+              <span class="cnpm-dashboard__legend-item">
+                <span
+                  class="cnpm-dashboard__swatch cnpm-dashboard__swatch--outstanding"
+                  aria-hidden="true"
+                ></span>
+                Reste à recouvrer
+              </span>
+            </p>
+          }
+
+          <dl class="cnpm-dashboard__legend-list">
+            @for (figure of contributionFigures(); track figure.label) {
+              <div
+                class="cnpm-dashboard__legend-row"
+                [class.cnpm-dashboard__legend-row--apart]="figure.apart"
+              >
+                <dt class="cnpm-dashboard__legend-term">{{ figure.label }}</dt>
+                <dd class="cnpm-dashboard__legend-value">
+                  @if (figure.value === null) {
+                    <span class="cnpm-dashboard__kpi-missing">Donnée indisponible</span>
+                  } @else {
+                    {{ figure.value | number: figure.format }}{{ figure.suffix ?? '' }}
+                  }
+                </dd>
+              </div>
+            }
+          </dl>
+
+          <p class="cnpm-dashboard__note">
+            Le taux de recouvrement rapporte le total encaissé au total attendu. Les prospects
+            n’entrent pas dans ces montants.
+          </p>
+        </section>
+
+        <section
+          class="cnpm-dashboard__cell--wide cnpm-dashboard__panel"
+          aria-labelledby="titre-paiements"
+        >
+          <div class="cnpm-dashboard__panel-head">
+            <h2 class="cnpm-dashboard__panel-title" id="titre-paiements">
+              Derniers paiements enregistrés
+            </h2>
+          </div>
+
+          <cnpm-data-table
+            caption="Derniers paiements enregistrés, avec leur référence, leur payeur, leur montant, leur canal, leur date et leur statut de rapprochement."
+            [columns]="paymentColumns"
+            [rows]="payments()"
+            [state]="paymentsState()"
+            [rowKey]="paymentKey"
+            [rowLabel]="paymentLabel"
+          >
+            <ng-template #row let-payment>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-dashboard__reference">{{ payment.reference }}</span>
+              </td>
+              <td class="cnpm-table__cell">
+                <span class="cnpm-dashboard__payer">{{ payment.payer }}</span>
+              </td>
+              <!-- Montants alignés à droite et en chasses tabulaires : les ordres de
+                   grandeur se comparent en lisant les unités les unes sous les autres. -->
+              <td class="cnpm-table__cell cnpm-table__cell--end">
+                <span class="cnpm-dashboard__amount">{{ payment.amount | number: '1.0-0' }}</span>
+              </td>
+              <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
+              <td class="cnpm-table__cell">
+                <time [attr.datetime]="payment.paidAt">
+                  {{ payment.paidAt | date: 'dd/MM/yyyy' }}
+                </time>
+              </td>
+              <td class="cnpm-table__cell">
+                <cnpm-badge [tone]="paymentStatusTone(payment.status)">
+                  {{ paymentStatusLabel(payment.status) }}
+                </cnpm-badge>
+              </td>
+            </ng-template>
+
+            <div data-table-status>
+              @switch (paymentsState()) {
+                @case ('loading') {
+                  <cnpm-skeleton
+                    variant="table"
+                    [rows]="4"
+                    [columns]="paymentColumns.length"
+                    label="Chargement des paiements…"
+                  />
+                }
+                @case ('empty') {
+                  <cnpm-empty-state
+                    variant="no-data"
+                    title="Aucun paiement enregistré"
+                    description="Aucun encaissement n’a été enregistré pour l’exercice sélectionné."
+                  />
+                }
+              }
+            </div>
+          </cnpm-data-table>
+        </section>
+
+        <section
+          class="cnpm-dashboard__cell--third cnpm-dashboard__panel"
+          aria-labelledby="titre-alertes"
+        >
+          <h2 class="cnpm-dashboard__panel-title" id="titre-alertes">Alertes</h2>
+
+          @if (alerts().length === 0) {
+            <cnpm-empty-state
+              variant="no-data"
+              title="Aucune alerte"
+              description="Aucun signalement en cours pour l’exercice sélectionné."
+            />
+          } @else {
+            <ul class="cnpm-dashboard__alerts">
+              @for (alert of alerts(); track alert.id) {
+                <li>
+                  <!-- `live=false` : la liste est peinte d'un bloc au chargement. Cinq
+                       régions live imbriquées provoqueraient cinq annonces pour un
+                       seul événement. La gravité reste écrite par le préfixe du
+                       composant, jamais portée par la seule couleur. -->
+                  <cnpm-alert
+                    [tone]="alertTone(alert.severity)"
+                    [title]="alert.title"
+                    [live]="false"
+                  >
+                    <p class="cnpm-dashboard__alert-detail">{{ alert.detail }}</p>
+                    <p class="cnpm-dashboard__alert-time">
+                      <time [attr.datetime]="alert.raisedAt">
+                        {{ alert.raisedAt | date: 'dd/MM/yyyy' }}
+                      </time>
+                      à {{ alert.raisedAt | date: 'HH:mm' }}
+                    </p>
+                  </cnpm-alert>
                 </li>
               }
             </ul>
-          </nav>
-          <section class="cnpm-dashboard__cell cnpm-dashboard__cell--wide cnpm-dashboard__panel" aria-labelledby="titre-paiements">
-            <div class="cnpm-dashboard__panel-head">
-              <h2 class="cnpm-dashboard__panel-title" id="titre-paiements">
-                Derniers paiements enregistrés
-              </h2>
-            </div>
-
-            <cnpm-data-table
-              caption="Derniers paiements enregistrés, avec leur référence, leur payeur, leur montant, leur canal, leur date et leur statut de rapprochement."
-              [columns]="paymentColumns"
-              [rows]="payments()"
-              [state]="paymentsState()"
-              [rowKey]="paymentKey"
-              [rowLabel]="paymentLabel"
-            >
-              <ng-template #row let-payment>
-                <td class="cnpm-table__cell">
-                  <span class="cnpm-dashboard__reference">{{ payment.reference }}</span>
-                </td>
-                <td class="cnpm-table__cell">
-                  <span class="cnpm-dashboard__payer">{{ payment.payer }}</span>
-                </td>
-                <!-- Montants alignés à droite et en chasses tabulaires : les ordres de
-                     grandeur se comparent en lisant les unités les unes sous les autres. -->
-                <td class="cnpm-table__cell cnpm-table__cell--end">
-                  <span class="cnpm-dashboard__amount">{{ payment.amount | number: '1.0-0' }}</span>
-                </td>
-                <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
-                <td class="cnpm-table__cell">
-                  <time [attr.datetime]="payment.paidAt">
-                    {{ payment.paidAt | date: 'dd/MM/yyyy' }}
-                  </time>
-                </td>
-                <td class="cnpm-table__cell">
-                  <cnpm-badge [tone]="paymentStatusTone(payment.status)">
-                    {{ paymentStatusLabel(payment.status) }}
-                  </cnpm-badge>
-                </td>
-              </ng-template>
-
-              <div data-table-status>
-                @switch (paymentsState()) {
-                  @case ('loading') {
-                    <cnpm-skeleton
-                      variant="table"
-                      [rows]="4"
-                      [columns]="paymentColumns.length"
-                      label="Chargement des paiements…"
-                    />
-                  }
-                  @case ('empty') {
-                    <cnpm-empty-state
-                      variant="no-data"
-                      title="Aucun paiement enregistré"
-                      description="Aucun encaissement n’a été enregistré pour l’exercice sélectionné."
-                    />
-                  }
-                }
-              </div>
-            </cnpm-data-table>
-          </section>
+            <p class="cnpm-dashboard__note">
+              Alertes classées par gravité, puis de la plus récente à la plus ancienne.
+            </p>
+          }
+        </section>
       </div>
     } @else {
       <cnpm-empty-state

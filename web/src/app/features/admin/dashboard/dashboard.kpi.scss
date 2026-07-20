@@ -4,12 +4,21 @@
    ---------------------------------------------------------------------------
    Extrait de `dashboard.page.scss`, qui franchissait le plafond de 10 ko par feuille
    de composant. Le plafond n'a pas ete relache : la feuille a ete scindee, comme
-   `dashboard.responsive.scss` l'avait deja ete.
+   `dashboard.charts.scss` et `dashboard.responsive.scss` l'ont ete ensuite.
 
-   Anatomie de la tuile, inspiree de la reference fournie par le client : pastille a
-   pictogramme et libelle en capitales sur une meme ligne, valeur dominante, legende,
-   puis courbe de tendance en pied. La courbe n'est rendue que la ou une serie reelle
-   existe — voir `kpiSeries()`. */
+   Anatomie de la tuile, reprise de la reference fournie par le commanditaire :
+   pastille a pictogramme et libelle en capitales sur une meme ligne, valeur dominante,
+   legende courte, puis courbe de tendance en pied. Le lisere superieur porte un accent
+   different par tuile. La courbe n'est rendue que la ou une serie reelle existe — voir
+   `kpiSeries()`.
+
+   Contrastes verifies sur l'aplat que l'accent colore, jamais sur le blanc de la page.
+   Pastille = 12 % de l'accent aplati sur blanc, icone mesuree CONTRE ELLE :
+     indigo #273481 sur #E5E7F0 = 8,98:1 ; blue #5268B3 sur #EAEDF6 = 4,50:1 ;
+     sky #1570EF sur #E3EEFD = 3,90:1 ; teal #039855 sur #E1F3EB = 3,24:1 ;
+     amber #DC6803 sur #FBEDE1 = 3,04:1. Toutes au-dessus des 3:1 exiges par WCAG 2.2
+     (1.4.11). La proportion de 12 % est un PLANCHER a ne pas augmenter : a 14 %, amber
+     retombe a 2,97:1. */
 
 .cnpm-dashboard {
   /* ---------------------------------------------------------------------- Bandeau KPI */
@@ -32,15 +41,22 @@
     min-width: 0;
   }
 
-  /* Le pictogramme et le libelle partagent une ligne : la valeur gagne ainsi tout
-     l'espace vertical, comme sur la reference. Le libelle passe en capitales, a la
-     taille la plus petite de l'echelle — il nomme la mesure, il ne la concurrence pas. */
-  &__kpi-label {
+  /* Pastille et libelle sur une meme ligne : la valeur gagne ainsi tout l'espace
+     vertical, comme sur la reference. Une vraie ligne flex plutot qu'une pastille
+     positionnee en absolu — a 200 % de zoom, un libelle qui passe sur trois lignes
+     restait auparavant a cote d'une pastille figee en haut de tuile. */
+  &__kpi-head {
     display: flex;
     align-items: center;
-    min-height: var(--cnpm-space-8);
+    gap: var(--cnpm-space-2);
+    min-width: 0;
     margin: 0;
-    padding-inline-start: calc(var(--cnpm-space-8) + var(--cnpm-space-2));
+  }
+
+  /* Le libelle passe en capitales, a la taille la plus petite de l'echelle : il nomme
+     la mesure, il ne la concurrence pas. */
+  &__kpi-label {
+    min-width: 0;
     color: var(--cnpm-color-text-secondary);
     font-size: var(--cnpm-font-size-xs);
     font-weight: var(--cnpm-font-weight-semibold);
@@ -50,13 +66,8 @@
   }
 
   /* Pastille teintee par l'accent de la tuile. Une seule couleur source : le fond en
-     est derive, la tuile reste donc accordee sans valeur repetee.
-     Positionnee, et non posee dans le flux : elle s'aligne alors sur la premiere ligne
-     du libelle meme lorsque celui-ci passe sur deux lignes. */
+     est derive, la tuile reste donc accordee sans valeur repetee. */
   &__kpi-icon {
-    position: absolute;
-    top: var(--cnpm-space-4);
-    left: var(--cnpm-space-4);
     display: inline-flex;
     width: var(--cnpm-space-8);
     height: var(--cnpm-space-8);
@@ -86,17 +97,19 @@
     content: '';
   }
 
+  /* La valeur domine la tuile : c'est le seul element qu'on doit pouvoir lire de loin. */
   &__kpi-value {
     margin: 0;
+    padding-block-start: var(--cnpm-space-1);
     color: var(--cnpm-color-text-primary);
     font-size: var(--cnpm-font-size-3xl);
     font-weight: var(--cnpm-font-weight-bold);
     line-height: var(--cnpm-font-lineHeight-3xl);
   }
 
-  /* La definition redevient visible : elle tient la ligne de legende de la reference,
-     et un indicateur dont la mesure n'est pas dite se prete a l'interpretation. Elle
-     reste au dernier rang typographique pour ne pas alourdir la tuile. */
+  /* La definition tient la ligne de legende de la reference : un indicateur dont la
+     mesure n'est pas dite se prete a l'interpretation. Elle reste au dernier rang
+     typographique pour ne pas alourdir la tuile. */
   &__kpi-definition {
     margin: 0;
     color: var(--cnpm-color-text-muted);
@@ -105,19 +118,31 @@
   }
 
   /* Courbe de tendance. Elle deborde volontairement jusqu'aux bords de la tuile : la
-     hauteur est fixee en `rem` pour suivre le zoom texte jusqu'a 200 %. */
+     hauteur est fixee en `rem` pour suivre le zoom texte jusqu'a 200 %.
+     L'aplat sous la courbe reste tres pale — il ne porte aucune information, la ligne
+     seule dessine la variation et les chiffres exacts vivent dans la table accessible
+     du graphique principal. */
   &__kpi-spark {
     display: block;
     width: calc(100% + var(--cnpm-space-8));
-    height: 2rem;
+    height: 2.5rem;
     margin-block-start: auto;
     margin-inline: calc(var(--cnpm-space-4) * -1);
     margin-block-end: calc(var(--cnpm-space-4) * -1);
+  }
 
-    path {
-      stroke: var(--cnpm-tile-accent);
-      vector-effect: non-scaling-stroke;
-    }
+  &__kpi-spark-area {
+    fill: color-mix(in srgb, var(--cnpm-tile-accent) 12%, transparent);
+    stroke: none;
+  }
+
+  &__kpi-spark-line {
+    fill: none;
+    stroke: var(--cnpm-tile-accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
   }
 
   &__kpi-link {
@@ -125,6 +150,6 @@
     align-items: center;
     gap: var(--cnpm-space-1);
     margin-block-start: auto;
-    padding-block-start: var(--cnpm-space-1);
+    padding-block-start: var(--cnpm-space-2);
   }
 }

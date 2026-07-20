@@ -322,6 +322,31 @@ describe('MembersPage — vue en tuiles', () => {
     expect(jauge?.getAttribute('aria-valuetext')).toContain('%');
   });
 
+  it('allège le tableau des colonnes et mentions retirées', async () => {
+    // Retraits demandés par le client. Le test les verrouille : chacun devra être
+    // rouvert explicitement plutôt que de revenir par inadvertance.
+    // La sélection contredit la fiche BO-002 — écart consigné en UX-DEC-017.
+    const { host } = await rendu();
+    const entetes = Array.from(host.querySelectorAll('.cnpm-table__head th')).map((cellule) =>
+      cellule.textContent?.trim().replace(/\s+/gu, ' '),
+    );
+
+    expect(entetes).toEqual([
+      'Code membre',
+      'Raison sociale',
+      'Groupement',
+      'Contact',
+      'Due (FCFA)',
+      'Payée (FCFA)',
+      'Statut',
+      'Actions',
+    ]);
+    expect(host.querySelectorAll('input[type="checkbox"]')).toHaveLength(0);
+    expect(host.querySelector('cnpm-bulk-action-bar')).toBeNull();
+    expect(host.textContent).not.toContain('Grand cotisant');
+    expect(host.textContent).not.toContain('% réglé');
+  });
+
   it('annonce la vue active par aria-pressed', async () => {
     const { host } = await rendu('tuiles');
     const boutons = Array.from(host.querySelectorAll('.cnpm-members__view'));

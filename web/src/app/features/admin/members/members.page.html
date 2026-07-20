@@ -157,13 +157,13 @@
           </form>
         </cnpm-filter-bar>
 
+        <!-- La selection de lignes est retiree a la demande du client.
+             Elle ne servait a rien : la seule action groupee livree etait « Effacer la
+             selection », qui ne fait que defaire la selection elle-meme. La fiche BO-002
+             exige pourtant `BulkActionBar` et une « selection groupee avec portee
+             explicite » ; l'ecart est consigne en UX-DEC-017 et la selection reviendra
+             avec une action groupee reelle (export, relance). -->
         <div class="cnpm-members__toolbar">
-          <cnpm-bulk-action-bar [selectedCount]="selected().size">
-            <cnpm-button variant="tertiary" size="sm" (click)="clearSelection()">
-              Effacer la sélection
-            </cnpm-button>
-          </cnpm-bulk-action-bar>
-
           <p class="cnpm-members__total">
             @if (data()) {
               Total&nbsp;: {{ totalItems() | number }}
@@ -197,18 +197,14 @@
 
         @if (view() === 'table') {
         <cnpm-data-table
-          caption="Liste des membres du CNPM, avec leur catégorie, groupement, contact, cotisations, statut et dernière activité."
+          caption="Liste des membres du CNPM, avec leur groupement, contact, cotisations et statut."
           [columns]="columns()"
           [rows]="rows()"
           [state]="tableState()"
           [sort]="sort()"
-          [selectable]="true"
-          [selectedKeys]="selected()"
           [rowKey]="rowKey"
           [rowLabel]="rowLabel"
           (sortChange)="onSortChange($event)"
-          (rowToggle)="toggleRow($event)"
-          (allToggle)="toggleAll($event)"
         >
           <ng-template #row let-member>
             <td class="cnpm-table__cell">
@@ -217,7 +213,6 @@
             <td class="cnpm-table__cell">
               <span class="cnpm-members__organization">{{ member.organization }}</span>
             </td>
-            <td class="cnpm-table__cell">{{ member.category }}</td>
             <td class="cnpm-table__cell">{{ member.group ?? '—' }}</td>
             <td class="cnpm-table__cell">
               <!-- Le nom seul. Telephone et courriel occupaient deux lignes de plus par
@@ -239,27 +234,14 @@
               } @else {
                 <span aria-label="Donnée non disponible">—</span>
               }
-              <!-- Test explicite sur `null` : `@if (part; as x)` masquerait le cas 0,
-                   or « 0 % réglé » est justement l'information la plus utile ici. -->
-              @let share = paidShare(member);
-              @if (share !== null) {
-                <span class="cnpm-members__share">{{ share | number: '1.0-0' }}&nbsp;% réglé</span>
-              }
             </td>
             <td class="cnpm-table__cell">
-              <span class="cnpm-members__status">
-                <cnpm-badge [tone]="statusTone(member.status)">
-                  {{ statusLabel(member.status) }}
-                </cnpm-badge>
-                <!-- « Grand cotisant » est un marqueur, pas un statut : il se lit sous le
-                     statut et ne s'y substitue jamais. Voir DATA-DEC-001.
-                     Rendu en mention et non en second badge : empiles, deux badges
-                     doublaient la hauteur de chaque ligne. Le texte reste ecrit en
-                     entier, l'information ne depend d'aucune couleur. -->
-                @if (member.isLargeContributor) {
-                  <span class="cnpm-members__marker">Grand cotisant</span>
-                }
-              </span>
+              <!-- Le seul statut, sans marqueur surajoute. « Grand cotisant » se lit
+                   desormais sur la fiche du membre : dans une liste, il empilait une
+                   seconde ligne sous le statut. Voir DATA-DEC-001. -->
+              <cnpm-badge [tone]="statusTone(member.status)">
+                {{ statusLabel(member.status) }}
+              </cnpm-badge>
             </td>
             <!-- La fiche impose « Voir, Modifier si autorisé, Historique ; pas trois
                  icônes sans tooltip ». Les actions sont donc écrites en toutes

@@ -27,8 +27,10 @@ test.describe('BO-002 — table accessible', () => {
     await expect(page.locator('table caption')).toContainText('Liste des membres');
 
     const headers = page.locator('.cnpm-table__head th[scope="col"]');
-    // Dix colonnes métier plus la colonne de sélection (la fiche en impose 9 à 10).
-    await expect(headers).toHaveCount(11);
+    // Huit colonnes métier. La fiche en impose 9 à 10 : « Dernière activité », la
+    // colonne de sélection et « Catégorie » ont été retirées à la demande du client
+    // (UX-DEC-017 pour la sélection). Le tableau était illisible à onze colonnes.
+    await expect(headers).toHaveCount(8);
   });
 
   test('le tri est annoncé par aria-sort et pas seulement par un pictogramme', async ({ page }) => {
@@ -72,14 +74,19 @@ test.describe('BO-002 — statut', () => {
     }
   });
 
-  test('« Grand cotisant » se lit à côté du statut, jamais à sa place', async ({ page }) => {
-    // DATA-DEC-001 : c'est un marqueur orthogonal, pas une quatrième valeur de statut.
-    // La maquette le rend dans la colonne Statut ; la fiche et le KPI
-    // `largeContributorsSubset` disent l'inverse.
+  test('la colonne Statut ne porte que le statut', async ({ page }) => {
+    // DATA-DEC-001 : « Grand cotisant » est un marqueur orthogonal, pas une quatrième
+    // valeur de statut. Il a quitté la liste à la demande du client et se lit désormais
+    // sur la fiche du membre. Ce test verrouille les DEUX moitiés de la règle : le
+    // statut est présent, le marqueur ne l'accompagne ni ne le remplace.
     await open(page);
     const row = page.locator('.cnpm-table__row', { hasText: 'SOMACOP' });
     await expect(row.locator('.cnpm-badge', { hasText: 'Actif' })).toBeVisible();
-    await expect(row.locator('.cnpm-badge', { hasText: 'Grand cotisant' })).toBeVisible();
+    await expect(row.getByText('Grand cotisant')).toHaveCount(0);
+    // Le compte reste lisible dans le panneau de synthèse, où il a du sens.
+    await expect(
+      page.locator('.cnpm-insight__stat', { hasText: 'Grands cotisants' }),
+    ).toHaveCount(1);
   });
 });
 
@@ -198,25 +205,17 @@ test.describe('BO-002 — états', () => {
   });
 });
 
-test.describe('BO-002 — sélection', () => {
-  test('la portée de la sélection est annoncée et bornée à la page', async ({ page }) => {
-    // La fiche impose une portée explicite : cocher l'en-tête ne doit pas viser
-    // silencieusement des lignes que personne n'a vues.
+test.describe('BO-002 — sélection retirée', () => {
+  test('aucune case à cocher ne subsiste dans la liste', async ({ page }) => {
+    // UX-DEC-017. La fiche exige `BulkActionBar` et une sélection groupée, mais aucune
+    // action groupée réelle n'était livrée : la seule action offerte était « Effacer la
+    // sélection », qui ne fait que défaire la sélection elle-même. On demandait donc de
+    // cocher des lignes pour ne rien pouvoir en faire.
+    // Ce test garde l'écart VISIBLE : il échouera le jour où la sélection reviendra,
+    // obligeant à rouvrir la décision au lieu de la laisser s'effacer.
     await open(page);
-    await expect(page.locator('.cnpm-bulk__count')).toContainText('Aucune ligne sélectionnée');
-
-    await page.getByRole('checkbox', { name: 'Sélectionner toutes les lignes de la page' }).check();
-    await expect(page.locator('.cnpm-bulk__count')).toContainText('10 lignes sélectionnées');
-    await expect(page.locator('.cnpm-bulk__count')).toContainText('sur cette page');
-  });
-
-  test('changer de page ne conserve pas une sélection invisible', async ({ page }) => {
-    await open(page);
-    await page.getByRole('checkbox', { name: 'Sélectionner toutes les lignes de la page' }).check();
-    await page.getByRole('button', { name: 'Page 2', exact: true }).click();
-    // Conserver la sélection après changement de page ferait porter une action groupée
-    // sur des lignes hors de vue.
-    await expect(page.locator('.cnpm-bulk__count')).toContainText('Aucune ligne sélectionnée');
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
+    await expect(page.locator('.cnpm-bulk__count')).toHaveCount(0);
   });
 });
 

@@ -40,6 +40,10 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-015 | Nombre d'entrées de la navigation publique | Arbitrer entre les huit entrées de REF-PUB-001 et le regroupement en quatre menus déroulants demandé par le client | Produit / UX + Communication | Moyen | Ouverte |
 | UX-DEC-016 | Chrome sombre de l'espace d'administration | Écart refermé : le chrome sombre est abandonné au profit d'un fond clair conforme à la règle des surfaces blanches ; reste la teinte de « Supervision », faute de turquoise dans les tokens | Produit / UX | Faible | Refermée |
 | DASH-DEC-001 | Historique des indicateurs du tableau de bord | Décider si `DashboardKpi` porte une valeur précédente et une série, sans quoi trois des cinq tuiles ne peuvent afficher ni variation ni courbe | Produit + API | Moyen | Ouverte |
+| UX-DEC-017 | Retrait de la sélection groupée de BO-002 | Arbitrer la suppression de `BulkActionBar` et de la sélection de lignes, exigées par la fiche, alors qu'aucune action groupée réelle n'est livrée | Produit / UX | Faible | Ouverte |
+| UX-DEC-018 | Retrait du fil d'activité de BO-001 | Arbitrer la suppression de `ActivityFeed` et des raccourcis, `ActivityFeed` étant un composant requis par la fiche | Produit / UX | Moyen | Ouverte |
+| FIN-DEC-001 | Seuils de confiance du rapprochement | **BLOQUÉ — décision humaine requise.** Fixer les seuils qui qualifient une correspondance de « élevée », « moyenne » ou « faible », et celui qui autorise le rapprochement en lot | Direction financière + Métier | Élevé | Ouverte |
+| FIN-DEC-002 | Fonctions absentes du contrat de rapprochement | Arbitrer l'import de relevé, l'enregistrement en brouillon et le filtre par période, présents dans la maquette mais absents du port et de la fiche BO-014 | Produit + API | Moyen | Ouverte |
 | UX-DEC-017 | Taille des pictogrammes de la navigation latérale | Confirmer l'échelon `control` (20 px) là où l'iconographie affecte `navigation` (24 px) aux pictogrammes de navigation, ou revenir à 24 px | Produit / UX | Faible | Ouverte |
 
 ## Décisions API
@@ -289,6 +293,94 @@ trois n'en portent pas. C'est un défaut visuel assumé, préféré à un chiffr
 **Question.** Étend-on le contrat pour que chaque indicateur porte sa valeur précédente et
 sa série — ce qui suppose que le backend sache les produire — ou accepte-t-on des tuiles
 sans tendance pour les effectifs ?
+
+### UX-DEC-017 — Retrait de la sélection groupée de BO-002
+
+**Contexte.** `docs/ui-handoff/docs/04-screens/reference-specs/ref-bo-002-members-list.md`
+exige le composant `BulkActionBar` (ligne 24) et « Sélection groupée avec portée explicite
+page/tous résultats » (ligne 32).
+
+**Constat.** Le client demande le retrait de la case à cocher : « elle n'a pas de sens ».
+Il a raison sur les faits. La sélection était livrée sans aucune action groupée réelle :
+la seule action offerte était « Effacer la sélection », qui ne fait que défaire la
+sélection elle-même. On demandait donc à l'utilisateur de cocher des lignes pour ne rien
+pouvoir en faire.
+
+**État actuel.** La colonne de sélection, la `BulkActionBar` et tout l'état associé sont
+retirés. La fiche BO-002 n'est plus respectée sur ce point.
+
+**Question.** La sélection revient-elle lorsqu'une action groupée réelle est livrée
+(export ciblé, relance de masse) — auquel cas cet écart est temporaire — ou la fiche
+est-elle mise à jour pour ne plus l'exiger ?
+
+### UX-DEC-018 — Retrait du fil d'activité de BO-001
+
+**Contexte.** `docs/ui-handoff/docs/04-screens/reference-specs/ref-bo-001-dashboard.md`
+liste `ActivityFeed` parmi les composants requis (ligne 27) et impose une zone
+« activité/alertes 4 colonnes » (ligne 16).
+
+**Constat.** Le client demande le retrait de la section « Activité récente » et des
+raccourcis, pour faire place à des graphiques.
+
+**État actuel.** Les deux sections sont retirées. `ActivityFeed` n'est plus rendu sur
+BO-001. La zone « alertes » de la fiche, elle, est conservée.
+
+**Question.** Le fil d'activité est-il abandonné sur le tableau de bord — auquel cas
+REF-BO-001 doit être mis à jour — ou déplacé vers un autre écran ?
+
+### FIN-DEC-001 — Seuils de confiance du rapprochement — BLOQUÉ
+
+**Contexte.** `MatchSuggestion.score` (0 à 100) est une donnée réelle du port : la source
+calcule un indice de confiance pour chaque correspondance proposée. L'écran BO-014 le
+traduit en mots — « Confiance élevée », « moyenne », « faible » — et s'en sert pour borner
+le rapprochement en lot.
+
+**Constat.** Les seuils qui opèrent cette traduction sont **codés en dur dans l'écran**
+(`payments-reconciliation.page.ts` : `AUTO_MATCH_THRESHOLD = 90`, et 70 pour la borne
+basse) et **ne proviennent d'aucune source**. Ni la fiche BO-014, ni le contrat OpenAPI, ni
+le TDR, ni les spécifications fonctionnelles ne fixent de valeur. Le commentaire du code
+justifie l'existence d'un seuil, jamais sa valeur.
+
+**Pourquoi c'est bloquant.** Ces nombres décident de ce qu'un agent lit avant de valider
+une écriture financière. Dire « Confiance élevée » à 90 plutôt qu'à 95 déplace la frontière
+entre ce qu'on vérifie et ce qu'on accepte, et le seuil de lot autorise des écritures que
+personne n'aura examinées une à une. C'est une règle métier à part entière, et la mission
+interdit d'en inventer.
+
+**État actuel.** Les seuils en place sont conservés pour ne pas casser l'écran, mais ils ne
+sont validés par personne. La maquette du commanditaire affiche en outre un qualificatif
+plus affirmatif encore (« Correspondance très fiable ») : le rendre plus visible sans
+arbitrage amplifierait une règle inventée.
+
+**Question.** Quelles valeurs la direction financière retient-elle, et le rapprochement en
+lot est-il autorisé — et à partir de quel seuil ?
+
+### FIN-DEC-002 — Fonctions de rapprochement absentes du contrat
+
+**Contexte.** La maquette fournie pour BO-014 comporte quatre éléments qui n'ont aucun
+support dans le port `PaymentsGateway`, ni dans la fiche BO-014.
+
+**Constat.**
+
+1. **Import de relevé** (« Importer un relevé », action primaire de l'en-tête). Aucune
+   méthode du port, aucune mention dans la fiche. Un import de relevé bancaire suppose un
+   format, une validation, un rapport de rejets et une reprise — rien de tout cela n'est
+   spécifié.
+2. **Enregistrement en brouillon** (« Enregistrer brouillon »). `ReconciliationStatus` ne
+   comporte aucun état de brouillon et le port n'expose aucune méthode pour en persister
+   un. Un bouton qui n'enregistre rien est un contrôle mensonger.
+3. **Filtre par période** (« Période : Juillet 2026 »). `PaymentsQuery` porte la file, la
+   recherche, le canal, le tri et la pagination — pas de période.
+4. **Qualificatif « Correspondance très fiable »** — voir FIN-DEC-001.
+
+**État actuel.** Ces quatre éléments ne sont pas rendus, ou sont rendus explicitement
+indisponibles. Le reste de la maquette est implémenté : le contrat couvre le score, les
+motifs de correspondance, les correspondances alternatives, l'affectation complète ou
+partielle, le solde et la séparation des tâches.
+
+**Question.** Ces fonctions entrent-elles au périmètre — auquel cas le contrat et la fiche
+BO-014 doivent être étendus avant implémentation — ou la maquette est-elle ramenée au
+périmètre livrable ?
 
 ### UX-DEC-013 — Modèle de consentement des contacts publics
 
