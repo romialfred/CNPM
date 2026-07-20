@@ -34,8 +34,15 @@
   outline-offset: 2px;
 }
 
+/* La barre latérale suivait la hauteur du contenu : sur le tableau de bord, haut de
+   2 277 px, elle s'étirait d'autant et la navigation disparaissait dès qu'on faisait
+   défiler. Elle occupe désormais la fenêtre et défile pour son propre compte. */
 .cnpm-admin__sidebar {
+  position: sticky;
+  top: 0;
   min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
   border-right: 1px solid var(--cnpm-color-border-subtle);
   background-color: var(--cnpm-color-surface-primary);
 }

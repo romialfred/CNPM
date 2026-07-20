@@ -1,6 +1,16 @@
 @use '../../../styles/tokens' as tokens;
 
 /* Topbar 72 px : valeur imposée par `.claude/rules/ux-ui.md`, lue dans le token. */
+/* C'est l'hôte qui est collant, pas la barre : un élément collant ne peut pas sortir
+   de la boîte de son parent, et l'hôte Angular fait exactement la hauteur de la barre.
+   Posé sur `.cnpm-topbar`, `sticky` n'aurait aucune amplitude et resterait sans effet. */
+:host {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: block;
+}
+
 .cnpm-topbar {
   display: flex;
   align-items: center;

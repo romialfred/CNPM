@@ -1,5 +1,17 @@
 @use '../../../styles/tokens' as tokens;
 
+/* Titre fixe : il reste sous la barre supérieure pendant le défilement, de sorte
+   qu'on sache toujours quel écran on lit — le tableau de bord fait plus de deux
+   hauteurs de fenêtre. Le décalage vaut la hauteur de la barre, qui est elle-même
+   collante ; le fond est opaque et déborde de la marge de page pour que le contenu
+   ne se devine pas dessous. */
+:host {
+  position: sticky;
+  z-index: 9;
+  top: var(--cnpm-size-topbar);
+  display: block;
+}
+
 .cnpm-page-header {
   display: flex;
   flex-wrap: wrap;
@@ -7,6 +19,11 @@
   justify-content: space-between;
   gap: var(--cnpm-space-4);
   min-width: 0;
+  margin: calc(-1 * var(--cnpm-layout-pagePaddingDesktop))
+    calc(-1 * var(--cnpm-layout-pagePaddingDesktop)) 0;
+  padding: var(--cnpm-layout-pagePaddingDesktop);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  background-color: var(--cnpm-color-surface-page);
 }
 
 .cnpm-page-header__text {
@@ -21,10 +38,14 @@
   color: var(--cnpm-color-text-primary);
 }
 
+/* Le sous-titre est mis en italique : il pose le contexte du titre sans entrer en
+   concurrence avec lui. C'est un choix de style, pas de sémantique — la balise reste
+   un paragraphe, et non un <em> qui ferait porter une emphase à toute la phrase. */
 .cnpm-page-header__description {
   margin: var(--cnpm-space-1) 0 0;
-  font-size: var(--cnpm-font-size-sm);
   color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-style: italic;
 }
 
 /* La fiche BO-002 borne l'en-tête à quatre actions ; elles s'enroulent plutôt que
