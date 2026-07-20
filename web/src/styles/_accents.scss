@@ -21,8 +21,14 @@
   --cnpm-tile-accent: var(--cnpm-color-brand-blue-500);
 }
 
+/* Ton 600 et non 500, pour la même raison que `teal` et `amber` ci-dessous — la règle
+   n'avait simplement pas été appliquée ici.
+   Un accent ne se juge pas sur le blanc de la page mais sur l'aplat qu'il colore : la
+   pastille vaut 12 % de l'accent sur blanc, et l'icône se lit CONTRE ELLE. Mesuré ainsi,
+   `info-500` (#2E90FA) ne donne que 2,85:1, sous le seuil de 3:1 ; `info-600` (#1570EF)
+   donne 3,90:1. C'est aussi le ton qu'emploie déjà la navigation. */
 .cnpm-tile-accent--sky {
-  --cnpm-tile-accent: var(--cnpm-color-semantic-info-500);
+  --cnpm-tile-accent: var(--cnpm-color-semantic-info-600);
 }
 
 /* Ton 600 et non 500 : mesuré sur blanc, `success-500` (#12B76A) ne donne que 2,62:1,

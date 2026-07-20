@@ -336,13 +336,16 @@ describe('MembersPage — vue en tuiles', () => {
     const { host } = await rendu('tuiles');
     const boutons = Array.from(host.querySelectorAll('.cnpm-members__view'));
 
-    // Decoratifs : le libelle ecrit porte seul le nom accessible, le pictogramme ne
-    // doit donc rien annoncer.
+    // On n'assere PAS `aria-hidden` sur le pictogramme : `@lucide/angular` le pose de
+    // lui-meme en l'absence de `title`. L'affirmer testerait la bibliotheque, pas ce
+    // code — l'audit independant l'a montre en le mutant sans faire echouer le test.
+    // Ce qui doit etre verifie ici, c'est que le libelle ecrit reste la seule source du
+    // nom accessible : aucun `aria-label` ne doit le supplanter.
     expect(boutons).toHaveLength(2);
+    expect(boutons.map((bouton) => bouton.textContent?.trim())).toEqual(['Tableau', 'Tuiles']);
     for (const bouton of boutons) {
-      const picto = bouton.querySelector('svg');
-      expect(picto).not.toBeNull();
-      expect(picto?.getAttribute('aria-hidden')).toBe('true');
+      expect(bouton.querySelector('svg')).not.toBeNull();
+      expect(bouton.getAttribute('aria-label')).toBeNull();
     }
   });
 
