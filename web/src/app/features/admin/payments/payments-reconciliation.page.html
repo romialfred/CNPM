@@ -143,17 +143,18 @@
               />
             </td>
             <td class="cnpm-table__cell">
+              <!-- Une seule ligne. La reference de transaction empilait une seconde
+                   ligne sur chaque rangee ; elle se lit dans le panneau « Paiement
+                   selectionne », ou elle a un contexte. -->
               <span class="cnpm-recon__ref">{{ line.reference }}</span>
-              <small class="cnpm-recon__meta">{{ line.transactionReference }}</small>
             </td>
             <td class="cnpm-table__cell">
               <span class="cnpm-recon__payer">{{ line.payer }}</span>
             </td>
             <td class="cnpm-table__cell">
               <span class="cnpm-recon__date">{{
-                line.valueDate | date: 'dd/MM/yyyy' : 'UTC'
+                line.valueDate | date: 'dd/MM/yyyy HH:mm' : 'UTC'
               }}</span>
-              <small class="cnpm-recon__meta">{{ line.valueDate | date: 'HH:mm' : 'UTC' }}</small>
             </td>
             <td class="cnpm-table__cell">
               <span class="cnpm-recon__channel">
@@ -176,7 +177,6 @@
             </td>
             <td class="cnpm-table__cell cnpm-table__cell--end">
               <span class="cnpm-recon__amount">{{ line.amount | number: '1.0-0' }}</span>
-              <small class="cnpm-recon__meta">FCFA</small>
             </td>
             <td class="cnpm-table__cell">
               <cnpm-badge [tone]="statusTone(line.status)">{{

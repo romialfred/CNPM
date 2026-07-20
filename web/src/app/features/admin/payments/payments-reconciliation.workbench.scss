@@ -8,12 +8,14 @@
   background: var(--cnpm-color-surface-primary);
 }
 
+/* L'en-tete identifie la section : filet plus marque que le gris tres pale des bordures
+   de carte, faute de quoi deux panneaux voisins se confondent. */
 .cnpm-recon__panel-head {
   display: flex;
   align-items: center;
   gap: var(--cnpm-space-2);
   padding: var(--cnpm-space-3) var(--cnpm-space-4);
-  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  border-bottom: 1px solid var(--cnpm-color-border-default);
   background: var(--cnpm-color-surface-subtle);
   color: var(--cnpm-color-text-brand);
 }
@@ -69,7 +71,6 @@
 .cnpm-recon__hero-unit {
   color: var(--cnpm-color-text-secondary);
   font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .cnpm-recon__facts,
@@ -113,7 +114,6 @@
   margin: 0;
   color: var(--cnpm-color-text-primary);
   font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-semibold);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -173,14 +173,12 @@
 .cnpm-recon__score-value {
   color: var(--cnpm-color-text-secondary);
   font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
 
 .cnpm-recon__option-title {
   color: var(--cnpm-color-text-primary);
   font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .cnpm-recon__option-line {
@@ -219,7 +217,6 @@
   color: var(--cnpm-color-text-link);
   font: inherit;
   font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-semibold);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -269,7 +266,6 @@
 }
 
 .cnpm-recon__anomaly summary {
-  font-weight: var(--cnpm-font-weight-semibold);
   cursor: pointer;
 }
 

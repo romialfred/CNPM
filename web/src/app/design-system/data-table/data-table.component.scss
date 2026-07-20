@@ -76,14 +76,17 @@
   white-space: nowrap;
 }
 
+/* Libelle et note sur une MEME ligne. Empiles, ils donnaient un en-tete de deux lignes
+   — « Montant » au-dessus de « (FCFA) » — qui desalignait tout le haut du tableau alors
+   que la note tient en six caracteres. */
 .cnpm-table__label {
   display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: baseline;
+  gap: var(--cnpm-space-1);
 }
 
 .cnpm-table__cell--end .cnpm-table__label {
-  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .cnpm-table__note {

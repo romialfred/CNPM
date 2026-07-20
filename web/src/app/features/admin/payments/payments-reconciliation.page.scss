@@ -19,16 +19,36 @@
 
 /* ---- Indicateur d'avancement ------------------------------------------------ */
 
+/* Fil d'avancement. Les etapes etaient trois cartes cote a cote, sans lien visible :
+   rien ne disait qu'elles se suivaient. Une fleche les relie desormais.
+
+   La fleche est un pseudo-element purement decoratif, place DANS la gouttiere : elle ne
+   prend aucune largeur a l'etape et ne se lit pas. L'ordre est deja porte par le `<ol>`,
+   la numerotation ecrite et `aria-current` — la fleche ne fait que le montrer. */
 .cnpm-recon__steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--cnpm-space-3);
+  gap: var(--cnpm-space-6);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.cnpm-recon__step + .cnpm-recon__step::before {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--cnpm-space-6) * -1);
+  width: var(--cnpm-space-6);
+  color: var(--cnpm-color-neutral-400);
+  content: '→';
+  font-size: var(--cnpm-font-size-lg);
+  line-height: 1;
+  text-align: center;
+  transform: translateY(-50%);
+}
+
 .cnpm-recon__step {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--cnpm-space-3);
@@ -115,10 +135,13 @@
 }
 
 .cnpm-recon__queue,
+/* Les panneaux du volet se touchaient presque : quatre cartes blanches a 16 px d'ecart,
+   sur un fond lui-meme clair, se lisaient comme un seul bloc. L'ecart est porte a 24 px,
+   assez pour que chaque section se detache sans qu'on ait a la cerner davantage. */
 .cnpm-recon__workbench {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-6);
   min-width: 0;
 }
 

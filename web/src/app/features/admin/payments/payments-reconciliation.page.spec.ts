@@ -430,6 +430,43 @@ describe('DemoPaymentsGateway — règles protégeant l’écriture', () => {
       ),
     ).rejects.toBeInstanceOf(PaymentsValidationError);
   });
+
+  it('allege la file : une ligne par cellule et aucune unite repetee', async () => {
+    // Retraits demandes par le client. La reference de transaction et l'heure empilaient
+    // une seconde ligne sur chaque rangee, et « FCFA » etait repete a chaque montant
+    // alors que l'en-tete de colonne le porte deja.
+    const context = await setup();
+    await emit(context, [LINE]);
+    const corps = context.host.querySelector('.cnpm-table__body');
+    const entetes = Array.from(context.host.querySelectorAll('.cnpm-table__head th')).map(
+      (cellule) => cellule.textContent?.trim().replace(/\s+/gu, ' '),
+    );
+
+    // L'unite reste portee une fois, par l'en-tete, et sur une seule ligne.
+    expect(entetes).toContain('Montant (FCFA)');
+    expect(corps?.textContent).not.toContain('FCFA');
+    // Plus aucune mention secondaire empilee dans les cellules.
+    expect(corps?.querySelectorAll('.cnpm-recon__meta')).toHaveLength(0);
+    // La reference de transaction quitte la file mais reste lisible a droite.
+    expect(corps?.textContent).not.toContain('TRX-TEST-99001');
+  });
+
+  it('relie les trois etapes et ecrit leur avancement', async () => {
+    // Les etapes se lisaient comme trois cartes sans lien. La fleche montre l'ordre ;
+    // elle ne le PORTE pas : la liste ordonnee, la numerotation ecrite et `aria-current`
+    // s'en chargent, et le pseudo-element n'entre pas dans l'arbre d'accessibilite.
+    const context = await setup();
+    await emit(context, [LINE]);
+    const etapes = Array.from(context.host.querySelectorAll('.cnpm-recon__step'));
+
+    expect(etapes).toHaveLength(3);
+    expect(context.host.querySelector('ol.cnpm-recon__steps')).not.toBeNull();
+    etapes.forEach((etape, rang) => {
+      expect(etape.textContent).toContain(`${rang + 1}.`);
+      // L'avancement est ecrit, jamais porte par la seule couleur ni par la fleche.
+      expect(etape.querySelector('.cnpm-recon__step-state')?.textContent?.trim()).toBeTruthy();
+    });
+  });
 });
 
 /** Nombre de lignes déjà en attente de confirmation dans le jeu de fixtures. */
