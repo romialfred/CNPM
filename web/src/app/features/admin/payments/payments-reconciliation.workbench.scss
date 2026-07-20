@@ -1,0 +1,332 @@
+/* Plan de travail du rapprochement : panneaux titrés, correspondances, résumé, audit. */
+
+.cnpm-recon__panel {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-recon__panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-recon__panel-head h2 {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+}
+
+.cnpm-recon__panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
+}
+
+/* ---- Paiement sélectionné --------------------------------------------------- */
+
+.cnpm-recon__payer-name {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-recon__ref-line {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-recon__hero {
+  display: flex;
+  align-items: baseline;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+}
+
+.cnpm-recon__hero-value {
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-3xl);
+  line-height: var(--cnpm-font-lineHeight-3xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cnpm-recon__hero-unit {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-recon__facts,
+.cnpm-recon__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding-top: var(--cnpm-space-3);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-recon__summary {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.cnpm-recon__facts > div,
+.cnpm-recon__summary > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-recon__facts dt,
+.cnpm-recon__summary dt {
+  flex: none;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-recon__facts dd,
+.cnpm-recon__summary dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Correspondances et modes d'affectation --------------------------------- */
+
+.cnpm-recon__fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cnpm-recon__modes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cnpm-recon__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+  padding: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  cursor: pointer;
+}
+
+/* La bordure et l'aplat redoublent l'état natif du bouton radio ; la sélection reste
+   portée par la case cochée, jamais par la seule teinte. */
+.cnpm-recon__option:has(input:checked) {
+  border-color: var(--cnpm-color-brand-blue-700);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-recon__option-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-recon__score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  max-width: 100%;
+}
+
+.cnpm-recon__score-value {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cnpm-recon__option-title {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-recon__option-line {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-recon__reasons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  margin: var(--cnpm-space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-recon__reasons li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-recon__reasons svg {
+  flex: none;
+  margin-top: var(--cnpm-space-1);
+  color: var(--cnpm-color-semantic-success-700);
+}
+
+.cnpm-recon__disclosure {
+  align-self: flex-start;
+  padding: var(--cnpm-space-1) 0;
+  border: 0;
+  background: none;
+  color: var(--cnpm-color-text-link);
+  font: inherit;
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cnpm-recon__alternatives {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+/* ---- Formulaire, actions et anomalie ---------------------------------------- */
+
+.cnpm-recon__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-recon__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-recon__note {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  text-align: right;
+}
+
+.cnpm-recon__anomaly {
+  padding-top: var(--cnpm-space-3);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+  color: var(--cnpm-color-text-critical);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-recon__anomaly[open] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-recon__anomaly summary {
+  font-weight: var(--cnpm-font-weight-semibold);
+  cursor: pointer;
+}
+
+/* ---- Piste d'audit ---------------------------------------------------------- */
+
+.cnpm-recon__audit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-recon__audit li {
+  display: flex;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-recon__audit-dot {
+  flex: none;
+  width: var(--cnpm-space-2);
+  height: var(--cnpm-space-2);
+  margin-top: var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-recon__audit-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-recon__audit-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+@media (max-width: 767px) {
+  .cnpm-recon__modes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-recon__facts > div,
+  .cnpm-recon__summary > div {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cnpm-recon__facts dd,
+  .cnpm-recon__summary dd {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}

@@ -44,6 +44,7 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-018 | Retrait du fil d'activité de BO-001 | Arbitrer la suppression de `ActivityFeed` et des raccourcis, `ActivityFeed` étant un composant requis par la fiche | Produit / UX | Moyen | Ouverte |
 | FIN-DEC-001 | Seuils de confiance du rapprochement | **BLOQUÉ — décision humaine requise.** Fixer les seuils qui qualifient une correspondance de « élevée », « moyenne » ou « faible », et celui qui autorise le rapprochement en lot | Direction financière + Métier | Élevé | Ouverte |
 | FIN-DEC-002 | Fonctions absentes du contrat de rapprochement | Arbitrer l'import de relevé, l'enregistrement en brouillon et le filtre par période, présents dans la maquette mais absents du port et de la fiche BO-014 | Produit + API | Moyen | Ouverte |
+| UX-DEC-019 | Aperçu du reçu retiré de BO-014 | Arbitrer la suppression de `ReceiptPreview`, composant requis par la fiche, absent de la maquette du commanditaire et de toute façon bridé par DEC-005 | Produit / UX + Métier | Moyen | Ouverte |
 | UX-DEC-017 | Taille des pictogrammes de la navigation latérale | Confirmer l'échelon `control` (20 px) là où l'iconographie affecte `navigation` (24 px) aux pictogrammes de navigation, ou revenir à 24 px | Produit / UX | Faible | Ouverte |
 
 ## Décisions API
@@ -350,7 +351,15 @@ interdit d'en inventer.
 **État actuel.** Les seuils en place sont conservés pour ne pas casser l'écran, mais ils ne
 sont validés par personne. La maquette du commanditaire affiche en outre un qualificatif
 plus affirmatif encore (« Correspondance très fiable ») : le rendre plus visible sans
-arbitrage amplifierait une règle inventée.
+arbitrage amplifierait une règle inventée. Il n'a donc pas été repris.
+
+**Le rapprochement en lot a été supprimé de l'écran.** Il écrivait des affectations
+financières sur la seule foi du seuil 90 — c'est-à-dire d'un nombre que personne n'a
+validé — et produisait donc des écritures que personne n'avait examinées une à une.
+La maquette du commanditaire impose par ailleurs une sélection unique. Le seuil ne borne
+plus aucune action de masse ; il ne sert plus qu'à qualifier une correspondance par écrit.
+Cela réduit la portée du blocage sans le lever : la qualification reste affichée à l'agent
+avant qu'il ne valide.
 
 **Question.** Quelles valeurs la direction financière retient-elle, et le rapprochement en
 lot est-il autorisé — et à partir de quel seuil ?
@@ -381,6 +390,29 @@ partielle, le solde et la séparation des tâches.
 **Question.** Ces fonctions entrent-elles au périmètre — auquel cas le contrat et la fiche
 BO-014 doivent être étendus avant implémentation — ou la maquette est-elle ramenée au
 périmètre livrable ?
+
+### UX-DEC-019 — Aperçu du reçu retiré de BO-014
+
+**Contexte.** `docs/ui-handoff/docs/04-screens/reference-specs/ref-bo-014-payments-reconciliation.md`
+liste `ReceiptPreview` et `Timeline` parmi les composants requis, et décrit trois zones
+dont un « aperçu 40 % ».
+
+**Constat.** La maquette fournie par le commanditaire ne comporte pas d'aperçu de reçu :
+la troisième zone y est occupée par quatre panneaux — paiement sélectionné, correspondance
+recommandée, mode d'affectation, résumé — et par un indicateur d'étapes. La refonte suit la
+maquette : l'aperçu et la frise décorative ont été retirés.
+
+**Élément aggravant.** DEC-005 (cachet et signature officiels) interdit de toute façon un
+aperçu d'allure officielle, et la fiche elle-même exige que « le preview fictif n'utilise
+pas un faux cachet/QR en production ». L'aperçu retiré ne pouvait donc rien montrer de
+définitif.
+
+**État actuel.** BO-014 ne rend plus `ReceiptPreview`. La génération du reçu reste soumise
+à la confirmation par un second agent, conformément à la séparation des tâches ; c'est
+l'étape 3 de l'indicateur, mais aucun document n'est prévisualisé.
+
+**Question.** L'aperçu du reçu revient-il sur cet écran une fois DEC-005 tranchée, part-il
+vers un écran dédié aux reçus, ou REF-BO-014 est-elle mise à jour pour ne plus l'exiger ?
 
 ### UX-DEC-013 — Modèle de consentement des contacts publics
 

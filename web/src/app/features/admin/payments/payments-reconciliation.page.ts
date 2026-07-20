@@ -1,20 +1,26 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LucideDownload, LucideRefreshCw, LucideReceiptText } from '@lucide/angular';
+import {
+  LucideBanknote,
+  LucideCheck,
+  LucideDownload,
+  LucideFileText,
+  LucideHistory,
+  LucideLandmark,
+  LucideRefreshCw,
+  LucideScrollText,
+  LucideSmartphone,
+  LucideTarget,
+  LucideUpload,
+  LucideWallet,
+  LucideWorkflow,
+} from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent, type CnpmAlertTone } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
-import { BulkActionBarComponent } from '../../../design-system/bulk-action-bar/bulk-action-bar.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
 import type {
@@ -22,10 +28,6 @@ import type {
   DataTableState,
   SortState,
 } from '../../../design-system/data-table/data-table.model';
-import {
-  DefinitionListComponent,
-  type CnpmDefinition,
-} from '../../../design-system/definition-list/definition-list.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import {
@@ -57,13 +59,25 @@ import {
   type StatementLine,
 } from './payments-gateway';
 
+/**
+ * Files de travail. Les libellés nomment ce que la file contient réellement : le
+ * troisième onglet regroupe les lignes rapprochées et confirmées, pas des reçus —
+ * l'émission d'un reçu relève d'un autre écran et d'une décision non arbitrée (DEC-005).
+ */
 const QUEUES: readonly CnpmTab[] = [
-  { id: 'a-rapprocher', label: 'Paiements' },
-  { id: 'a-confirmer', label: 'Rapprochement' },
-  { id: 'traites', label: 'Reçus' },
+  { id: 'a-rapprocher', label: 'À rapprocher' },
+  { id: 'a-confirmer', label: 'À confirmer' },
+  { id: 'traites', label: 'Traités' },
 ];
 
 const QUEUE_IDS: readonly ReconciliationQueue[] = ['a-rapprocher', 'a-confirmer', 'traites'];
+
+/** Nom du contenu d'une file, au singulier et au pluriel : le compteur les accorde. */
+const QUEUE_NOUNS: Readonly<Record<ReconciliationQueue, string>> = {
+  'a-rapprocher': 'à rapprocher',
+  'a-confirmer': 'à confirmer',
+  traites: 'traités',
+};
 
 const STATUS_LABELS: Readonly<Record<ReconciliationStatus, string>> = {
   UNMATCHED: 'Non rapproché',
@@ -98,10 +112,14 @@ const ANOMALY_LABELS: Readonly<Record<AnomalyType, string>> = {
 };
 
 /**
- * Seuil au-delà duquel une correspondance est jugée sûre.
+ * Seuil de qualification d'une correspondance — **non arbitré, cf. FIN-DEC-001**.
  *
- * Il borne la seule action de masse de l'écran. Un rapprochement en lot sur des scores
- * moyens produirait des écritures financières que personne n'a examinées une à une.
+ * Cette valeur ne provient d'aucune source : ni la fiche BO-014, ni le contrat, ni le
+ * TDR ne la fixent. Elle n'habilite plus aucune écriture : le rapprochement en lot,
+ * que FIN-DEC-001 laisse explicitement en suspens (« le rapprochement en lot est-il
+ * autorisé — et à partir de quel seuil ? »), est retiré de l'écran. Elle ne sert plus
+ * qu'à traduire le score en mots, comportement conservé à l'identique tant que la
+ * décision n'est pas rendue.
  */
 const AUTO_MATCH_THRESHOLD = 90;
 
@@ -110,30 +128,66 @@ const DEFAULT_PAGE_SIZE = 10;
 
 type AllocationMode = 'complete' | 'partial';
 
+/** Avancement réel d'une étape ; jamais une position dans un assistant décoratif. */
+type StepState = 'done' | 'current' | 'todo';
+
+interface ReconciliationStep {
+  readonly index: number;
+  readonly title: string;
+  readonly hint: string;
+  readonly state: StepState;
+  /** Avancement écrit ; l'étape n'est jamais signalée par la seule couleur. */
+  readonly stateLabel: string;
+}
+
 interface PanelFeedback {
   readonly tone: CnpmAlertTone;
   readonly title: string;
   readonly body: string;
 }
 
+const STEP_STATE_LABELS: Readonly<Record<StepState, string>> = {
+  done: 'Étape franchie',
+  current: 'Étape en cours',
+  todo: 'Étape à venir',
+};
+
+const STEP_DEFINITIONS: readonly { readonly title: string; readonly hint: string }[] = [
+  { title: 'Paiement sélectionné', hint: 'Choisir un paiement à rapprocher' },
+  { title: 'Rapprochement', hint: 'Vérifier la correspondance' },
+  { title: 'Confirmation', hint: 'Valider et générer le reçu' },
+];
+
 /**
- * BO-014 — rapprochement des paiements.
+ * Avancement par statut de la ligne examinée. Aucun statut n'est franchi d'avance :
+ * une ligne encore non rapprochée n'a pas « passé » l'étape de rapprochement.
+ */
+const STEP_STATES: Readonly<Record<ReconciliationStatus, readonly StepState[]>> = {
+  UNMATCHED: ['done', 'current', 'todo'],
+  // Une anomalie sort la ligne du parcours d'affectation sans faire avancer la
+  // confirmation : l'étape 2 reste celle où se joue le traitement.
+  ANOMALY: ['done', 'current', 'todo'],
+  TO_CONFIRM: ['done', 'done', 'current'],
+  MATCHED: ['done', 'done', 'done'],
+};
+
+/** Aucun paiement choisi : rien n'est franchi, tout commence à l'étape 1. */
+const STEP_STATES_IDLE: readonly StepState[] = ['current', 'todo', 'todo'];
+
+/**
+ * BO-014 — paiements et rapprochement.
  *
  * File, filtres, tri, page et ligne examinée vivent dans l'URL : la vue reste
  * partageable, et un agent peut transmettre exactement la ligne qu'il examine.
  *
- * Trois zones de la fiche sur ≥1440 px — liste, rapprochement, aperçu du reçu. L'aperçu
- * du reçu n'est pas rendu ici : il relève de l'émission du reçu, dont le gabarit, le
- * cachet et le QR de vérification ne sont pas arbitrés. La fiche interdit explicitement
- * un faux cachet en production ; en dessiner un ici en ferait une maquette trompeuse.
- * L'écran couvre donc la liste, le rapprochement et la piste d'audit.
+ * Trois fonctions de la maquette ne sont pas rendues, faute de support au contrat
+ * (FIN-DEC-002) : l'import de relevé et l'export sont présents mais explicitement
+ * indisponibles ; l'enregistrement en brouillon et le filtre par période sont absents,
+ * un contrôle qui ne produit rien étant un mensonge d'interface.
  */
 @Component({
   selector: 'cnpm-payments-reconciliation-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // Le port est fourni ici pour que l'écran fonctionne sans toucher aux routes. Au
-  // câblage définitif, déplacer cette fourniture dans `admin.routes.ts`, à côté de
-  // `MEMBERS_GATEWAY` : un seul point d'assemblage pour tous les adaptateurs.
   imports: [
     DatePipe,
     DecimalPipe,
@@ -142,10 +196,8 @@ interface PanelFeedback {
     AdminShellComponent,
     AlertComponent,
     BadgeComponent,
-    BulkActionBarComponent,
     ButtonComponent,
     DataTableComponent,
-    DefinitionListComponent,
     EmptyStateComponent,
     ErrorStateComponent,
     FilterBarComponent,
@@ -154,12 +206,25 @@ interface PanelFeedback {
     PaginationComponent,
     SkeletonComponent,
     TabsComponent,
+    LucideBanknote,
+    LucideCheck,
     LucideDownload,
+    LucideFileText,
+    LucideHistory,
+    LucideLandmark,
     LucideRefreshCw,
-    LucideReceiptText,
+    LucideScrollText,
+    LucideSmartphone,
+    LucideTarget,
+    LucideUpload,
+    LucideWallet,
+    LucideWorkflow,
   ],
   templateUrl: './payments-reconciliation.page.html',
-  styleUrls: ['./payments-reconciliation.page.scss', './payments-reconciliation.visual.scss'],
+  styleUrls: [
+    './payments-reconciliation.page.scss',
+    './payments-reconciliation.workbench.scss',
+  ],
 })
 export class PaymentsReconciliationPage {
   private readonly gateway = inject(PAYMENTS_GATEWAY);
@@ -173,18 +238,16 @@ export class PaymentsReconciliationPage {
   protected readonly channelLabels = CHANNEL_LABELS;
   protected readonly anomalyLabels = ANOMALY_LABELS;
   protected readonly anomalyTypes = Object.keys(ANOMALY_LABELS) as readonly AnomalyType[];
-  protected readonly autoMatchThreshold = AUTO_MATCH_THRESHOLD;
 
   /** Ancres des messages d'erreur ; le résumé y renvoie le focus. */
   protected readonly suggestionFieldId = 'rapprochement-correspondance';
   protected readonly amountFieldId = 'rapprochement-montant';
   protected readonly commentFieldId = 'rapprochement-commentaire';
   protected readonly anomalyFieldId = 'anomalie-type';
+  protected readonly alternativesId = 'rapprochement-alternatives';
 
   protected readonly filtersExpanded = signal(true);
-  /** Sélection bornée à la page affichée : une action de masse ne vise jamais des lignes jamais vues. */
-  protected readonly selected = signal<ReadonlySet<string>>(new Set<string>());
-  protected readonly panelDismissed = signal(false);
+  protected readonly alternativesOpen = signal(false);
   protected readonly submitting = signal(false);
   protected readonly feedback = signal<PanelFeedback | null>(null);
   protected readonly formErrors = signal<readonly CnpmFieldError[]>([]);
@@ -293,6 +356,13 @@ export class PaymentsReconciliationPage {
 
   protected readonly hasFilters = computed(() => Boolean(this.search() || this.channel()));
 
+  /** Compteur de tête : il décrit exactement la liste affichée sous lui. */
+  protected readonly queueCountLabel = computed(() => {
+    const total = this.totalItems();
+    const noun = QUEUE_NOUNS[this.queue()];
+    return `${total} ${total === 1 ? 'paiement' : 'paiements'} ${noun}`;
+  });
+
   protected readonly tableState = computed<DataTableState>(() => {
     const result = this.result();
     if (result.kind === 'loading') {
@@ -312,13 +382,20 @@ export class PaymentsReconciliationPage {
     return this.hasFilters() ? 'noResult' : 'empty';
   });
 
+  /**
+   * La première colonne porte la sélection unique de la maquette. Elle est déclarée ici
+   * plutôt que déléguée à `selectable` du tableau : ce dernier rend des cases à cocher,
+   * donc une sélection multiple, qui ouvrirait la porte à des écritures en lot que
+   * FIN-DEC-001 laisse sans arbitrage.
+   */
   protected readonly columns: readonly DataTableColumn[] = [
+    { key: 'select', label: 'Choix' },
     { key: 'reference', label: 'Référence', sortable: true },
     { key: 'payer', label: 'Payeur', sortable: true },
-    { key: 'amount', label: 'Montant encaissé', note: '(FCFA)', align: 'end', sortable: true },
+    { key: 'valueDate', label: 'Date', sortable: true },
     { key: 'channel', label: 'Canal' },
+    { key: 'amount', label: 'Montant', note: '(FCFA)', align: 'end', sortable: true },
     { key: 'status', label: 'Statut' },
-    { key: 'valueDate', label: 'Date de valeur', sortable: true },
   ];
 
   protected readonly chips = computed<readonly FilterChip[]>(() => {
@@ -335,35 +412,43 @@ export class PaymentsReconciliationPage {
   });
 
   /**
-   * Les compteurs sont recopiés tels quels depuis la source ; aucun n'est recalculé ici.
-   * Un second calcul côté écran pourrait diverger de celui qui alimente la table.
+   * Ligne examinée. Rien n'est examiné tant que l'URL ne nomme pas de ligne : présélectionner
+   * la première ferait mentir l'indicateur d'étapes, qui annoncerait un paiement choisi
+   * alors que personne n'a choisi.
    */
-  /** Ligne examinée, résolue sur la page courante. */
   protected readonly examined = computed<StatementLine | null>(() => {
-    if (this.panelDismissed()) {
-      return null;
-    }
     const id = this.examinedId();
-    return (id ? this.lines().find((line) => line.id === id) : null) ?? this.lines()[0] ?? null;
+    return (id ? this.lines().find((line) => line.id === id) : null) ?? null;
   });
 
   protected readonly suggestions = computed<readonly MatchSuggestion[]>(
     () => this.examined()?.suggestions ?? [],
   );
 
-  /**
-   * Lignes sélectionnées éligibles au rapprochement en lot : encore non rapprochées et
-   * portant une correspondance au-dessus du seuil. Les autres exigent un examen.
-   */
-  protected readonly autoMatchable = computed<readonly StatementLine[]>(() =>
-    this.lines().filter((line) => {
-      if (!this.selected().has(line.id) || line.status !== 'UNMATCHED') {
-        return false;
-      }
-      const best = line.suggestions[0];
-      return best !== undefined && best.score >= AUTO_MATCH_THRESHOLD;
-    }),
+  /** Correspondance en tête de la liste rendue par la source ; l'écran ne la reclasse pas. */
+  protected readonly recommended = computed<MatchSuggestion | null>(
+    () => this.suggestions()[0] ?? null,
   );
+
+  protected readonly alternatives = computed<readonly MatchSuggestion[]>(() =>
+    this.suggestions().slice(1),
+  );
+
+  /**
+   * Avancement réel du parcours. Ce n'est pas un assistant : rien n'y est cliquable et
+   * rien n'y empêche de revenir en arrière — l'indicateur décrit l'état, il ne le pilote pas.
+   */
+  protected readonly steps = computed<readonly ReconciliationStep[]>(() => {
+    const line = this.examined();
+    const states = line ? STEP_STATES[line.status] : STEP_STATES_IDLE;
+    return STEP_DEFINITIONS.map((definition, index) => ({
+      index: index + 1,
+      title: definition.title,
+      hint: definition.hint,
+      state: states[index],
+      stateLabel: STEP_STATE_LABELS[states[index]],
+    }));
+  });
 
   protected readonly form = this.fb.group({
     suggestionId: [''],
@@ -379,8 +464,18 @@ export class PaymentsReconciliationPage {
     initialValue: '',
   });
 
+  private readonly suggestionDraft = toSignal(this.form.controls.suggestionId.valueChanges, {
+    initialValue: '',
+  });
+
   protected readonly allocationMode = toSignal(this.form.controls.allocationMode.valueChanges, {
     initialValue: 'complete' as AllocationMode,
+  });
+
+  /** Correspondance réellement cochée : c'est elle que le résumé décrit, pas la recommandée. */
+  protected readonly chosenSuggestion = computed<MatchSuggestion | null>(() => {
+    const id = this.suggestionDraft();
+    return this.suggestions().find((suggestion) => suggestion.id === id) ?? this.recommended();
   });
 
   /**
@@ -397,7 +492,7 @@ export class PaymentsReconciliationPage {
       : this.parseAmount(this.amountDraft());
   });
 
-  /** Reste à affecter après l'opération ; `null` tant que le montant est illisible. */
+  /** Écart restant après l'opération ; `null` tant que le montant est illisible. */
   protected readonly remainder = computed<number | null>(() => {
     const line = this.examined();
     const amount = this.effectiveAmount();
@@ -406,6 +501,19 @@ export class PaymentsReconciliationPage {
     }
     return line.amount - amount;
   });
+
+  /** L'écart est qualifié par un mot ; la couleur ne le porte jamais seule. */
+  protected readonly remainderLabel = computed(() => {
+    const remainder = this.remainder();
+    if (remainder === null) {
+      return 'Montant à affecter illisible';
+    }
+    return remainder === 0 ? 'Affectation complète, aucun reste' : 'Reste à affecter';
+  });
+
+  protected readonly remainderTone = computed<CnpmBadgeTone>(() =>
+    this.remainder() === 0 ? 'success' : 'warning',
+  );
 
   constructor() {
     // Changer de ligne remet le formulaire à son état neutre, avec la meilleure
@@ -422,6 +530,7 @@ export class PaymentsReconciliationPage {
         anomalyType: '',
       });
       this.formErrors.set([]);
+      this.alternativesOpen.set(false);
     });
   }
 
@@ -444,6 +553,10 @@ export class PaymentsReconciliationPage {
   /**
    * Qualificatif de confiance. Le score seul n'est pas un statut lisible : « 74 » ne
    * dit pas s'il faut vérifier. Le mot accompagne le chiffre, jamais une couleur seule.
+   *
+   * Les bornes restent celles d'avant la refonte : FIN-DEC-001 les bloque, et la
+   * maquette propose un qualificatif plus affirmatif encore (« Correspondance très
+   * fiable ») qu'aucune source ne justifie.
    */
   protected confidenceLabel(score: number): string {
     if (score >= AUTO_MATCH_THRESHOLD) {
@@ -480,33 +593,6 @@ export class PaymentsReconciliationPage {
         return 'error';
     }
   }
-
-  /** Détail immuable de la ligne examinée : la fiche impose une sélection non modifiable. */
-  protected readonly paymentDetails = computed<readonly CnpmDefinition[]>(() => {
-    const line = this.examined();
-    if (!line) {
-      return [];
-    }
-    return [
-      { label: 'Référence paiement', value: line.reference },
-      { label: 'Payeur', value: line.payer },
-      { label: 'Canal', value: CHANNEL_LABELS[line.channel] },
-      { label: 'N° de transaction', value: line.transactionReference },
-    ];
-  });
-
-  protected readonly allocationDetails = computed<readonly CnpmDefinition[]>(() => {
-    const allocation = this.examined()?.allocation;
-    if (!allocation) {
-      return [];
-    }
-    return [
-      { label: 'Membre', value: `${allocation.memberName} (${allocation.memberCode})` },
-      { label: 'Cotisation', value: allocation.contributionLabel },
-      { label: 'Montant affecté (FCFA)', value: this.formatAmount(allocation.allocatedAmount) },
-      { label: 'Reste à affecter (FCFA)', value: this.formatAmount(allocation.remainder) },
-    ];
-  });
 
   protected setQueue(queue: string): void {
     this.patch({ file: queue === 'a-rapprocher' ? null : queue, page: null, ligne: null });
@@ -546,10 +632,9 @@ export class PaymentsReconciliationPage {
     this.patch({ q: null, canal: null, page: null, ligne: null });
   }
 
-  /** Ouvre une ligne dans le panneau, sans perdre les filtres ni la sélection de masse. */
+  /** Ouvre une ligne dans le plan de travail, sans perdre les filtres. */
   protected examine(line: StatementLine): void {
     this.feedback.set(null);
-    this.panelDismissed.set(false);
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { ligne: line.id },
@@ -559,7 +644,6 @@ export class PaymentsReconciliationPage {
 
   protected closePanel(): void {
     this.feedback.set(null);
-    this.panelDismissed.set(true);
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { ligne: null },
@@ -571,24 +655,8 @@ export class PaymentsReconciliationPage {
     return this.examined()?.id === line.id;
   }
 
-  protected toggleRow(key: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (!next.delete(key)) {
-        next.add(key);
-      }
-      return next;
-    });
-  }
-
-  protected toggleAll(checked: boolean): void {
-    // La portée est la page affichée, jamais la file entière : cocher l'en-tête ne doit
-    // pas viser silencieusement des lignes que personne n'a vues.
-    this.selected.set(checked ? new Set(this.lines().map(this.rowKey)) : new Set());
-  }
-
-  protected clearSelection(): void {
-    this.selected.set(new Set());
+  protected toggleAlternatives(): void {
+    this.alternativesOpen.update((open) => !open);
   }
 
   protected refresh(): void {
@@ -637,38 +705,7 @@ export class PaymentsReconciliationPage {
           this.onWriteSuccess(
             outcome.replayed,
             'Rapprochement enregistré',
-            `${line.reference} est en attente de confirmation par un second agent.`,
-          ),
-        error: (error: unknown) => this.onWriteFailure(error),
-      });
-  }
-
-  /** Rapproche en lot les correspondances au-dessus du seuil, et elles seules. */
-  protected reconcileSelected(): void {
-    const eligible = this.autoMatchable();
-    if (eligible.length === 0 || this.submitting()) {
-      return;
-    }
-
-    const assignments: readonly ReconciliationAssignment[] = eligible.map((line) => ({
-      lineId: line.id,
-      suggestionId: line.suggestions[0].id,
-      allocatedAmount: line.amount,
-    }));
-
-    this.submitting.set(true);
-    this.gateway
-      .reconcile({
-        idempotencyKey: this.idempotencyKey('bulk', assignments),
-        assignments,
-        comment: null,
-      })
-      .subscribe({
-        next: (outcome) =>
-          this.onWriteSuccess(
-            outcome.replayed,
-            'Rapprochement en lot enregistré',
-            `${outcome.affectedCount} ligne(s) passent en attente de confirmation.`,
+            `${line.reference} est en attente de validation par un second agent.`,
           ),
         error: (error: unknown) => this.onWriteFailure(error),
       });
@@ -769,10 +806,6 @@ export class PaymentsReconciliationPage {
     return Number.isSafeInteger(value) ? value : null;
   }
 
-  private formatAmount(value: number): string {
-    return new Intl.NumberFormat('fr-ML').format(value);
-  }
-
   private idempotencyKey(scope: string, assignments: readonly ReconciliationAssignment[]): string {
     return [
       scope,
@@ -785,7 +818,6 @@ export class PaymentsReconciliationPage {
   private onWriteSuccess(replayed: boolean, title: string, body: string): void {
     this.submitting.set(false);
     this.formErrors.set([]);
-    this.clearSelection();
     this.feedback.set(
       replayed
         ? {
@@ -824,7 +856,6 @@ export class PaymentsReconciliationPage {
   }
 
   private patch(params: Record<string, string | number | null>): void {
-    this.clearSelection();
     this.feedback.set(null);
     void this.router.navigate([], {
       relativeTo: this.route,

@@ -1,26 +1,63 @@
 <cnpm-admin-shell>
-  <main class="cnpm-reconciliation">
+  <main class="cnpm-recon">
     <cnpm-page-header
-      title="Paiement, rapprochement et reçu"
-      description="Suivez, rapprochez et préparez les reçus des paiements enregistrés."
+      title="Paiements et rapprochement"
+      description="Sélectionnez un paiement encaissé, vérifiez sa correspondance et affectez-le à une cotisation."
     >
       <cnpm-button variant="secondary" (click)="refresh()">
         <svg lucideRefreshCw [size]="iconSize.compact"></svg>
         Actualiser
       </cnpm-button>
-      <cnpm-button variant="secondary" [disabled]="true" describedBy="export-a-venir">
+      <cnpm-button variant="secondary" [disabled]="true" describedBy="motif-export">
         <svg lucideDownload [size]="iconSize.compact"></svg>
-        Exporter le relevé
+        Exporter
       </cnpm-button>
-      <p class="cnpm-reconciliation__sr-only" id="export-a-venir">
-        L’export sécurisé du relevé n’est pas encore disponible.
+      <cnpm-button variant="secondary" [disabled]="true" describedBy="motif-import">
+        <svg lucideUpload [size]="iconSize.compact"></svg>
+        Importer un relevé
+      </cnpm-button>
+      <p class="cnpm-recon__sr-only" id="motif-export">
+        L’export du relevé n’est pas disponible : aucun format d’export n’est arbitré et le
+        contrat de rapprochement n’expose aucune opération d’export.
+      </p>
+      <p class="cnpm-recon__sr-only" id="motif-import">
+        L’import de relevé n’est pas disponible : le contrat de rapprochement n’expose aucune
+        opération d’import, et ni le format bancaire ni le traitement des rejets ne sont
+        spécifiés.
       </p>
     </cnpm-page-header>
 
+    <!-- Indicateur d'avancement, non cliquable : il décrit l'état réel du parcours et
+         n'en interdit aucun retour en arrière. -->
+    <ol class="cnpm-recon__steps" aria-label="Avancement du rapprochement">
+      @for (step of steps(); track step.index) {
+        <li
+          class="cnpm-recon__step"
+          [class.cnpm-recon__step--done]="step.state === 'done'"
+          [class.cnpm-recon__step--current]="step.state === 'current'"
+          [attr.aria-current]="step.state === 'current' ? 'step' : null"
+        >
+          <span class="cnpm-recon__step-marker" aria-hidden="true">
+            @if (step.state === 'done') {
+              <svg lucideCheck [size]="iconSize.compact"></svg>
+            } @else {
+              {{ step.index }}
+            }
+          </span>
+          <span class="cnpm-recon__step-body">
+            <span class="cnpm-recon__step-title">{{ step.index }}. {{ step.title }}</span>
+            <span class="cnpm-recon__step-hint">{{ step.hint }}</span>
+            <span class="cnpm-recon__step-state">{{ step.stateLabel }}</span>
+          </span>
+        </li>
+      }
+    </ol>
+
     <cnpm-tabs
       [tabs]="queues"
-      ariaLabel="Paiements, rapprochement et reçus"
+      ariaLabel="Files de rapprochement"
       [selected]="queue()"
+      [panelId]="'panel-' + queue()"
       (selectedChange)="setQueue($event)"
     />
 
@@ -29,37 +66,47 @@
     }
 
     <div
-      class="cnpm-reconciliation__layout"
+      class="cnpm-recon__layout"
       role="tabpanel"
       [id]="'panel-' + queue()"
       [attr.aria-labelledby]="'tab-' + queue()"
     >
-      <section class="cnpm-reconciliation__queue" aria-labelledby="titre-file">
-        <header class="cnpm-reconciliation__queue-head">
-          <div>
-            <h2 id="titre-file">Paiements entrants</h2>
+      <section class="cnpm-recon__queue" aria-labelledby="titre-file">
+        <header class="cnpm-recon__queue-head">
+          <h2 id="titre-file">{{ queueCountLabel() }}</h2>
+          @if (overview(); as summary) {
             <p>
-              @if (overview(); as summary) {
-                {{ summary.toReconcile }} à rapprocher · {{ summary.toConfirm }} à confirmer
-              }
+              {{ summary.toReconcile }} à rapprocher · {{ summary.toConfirm }} à confirmer ·
+              {{ summary.anomalies }} anomalie(s) dans l’ensemble des files
             </p>
-          </div>
-          <span>{{ totalItems() | number }} lignes</span>
+          }
         </header>
 
         <cnpm-filter-bar
-          class="cnpm-reconciliation__filters"
           [expanded]="filtersExpanded()"
           [chips]="chips()"
           (expandedChange)="filtersExpanded.set($event)"
           (chipRemove)="removeChip($event)"
           (resetAll)="resetFilters()"
         >
-          <div class="cnpm-reconciliation__filter">
-            <label class="cnpm-reconciliation__label" for="filtre-canal">Canal</label>
+          <form class="cnpm-recon__field" role="search" (ngSubmit)="applySearch()">
+            <label class="cnpm-recon__label" for="filtre-recherche">Rechercher un paiement</label>
+            <input
+              id="filtre-recherche"
+              class="cnpm-recon__control"
+              type="search"
+              name="recherche"
+              autocomplete="off"
+              placeholder="Référence, payeur, n° de transaction…"
+              [ngModel]="searchDraft()"
+              (ngModelChange)="searchDraft.set($event)"
+            />
+          </form>
+          <div class="cnpm-recon__field">
+            <label class="cnpm-recon__label" for="filtre-canal">Canal</label>
             <select
               id="filtre-canal"
-              class="cnpm-reconciliation__control"
+              class="cnpm-recon__control"
               name="canal"
               [ngModel]="channel() ?? ''"
               (ngModelChange)="setChannel($event)"
@@ -70,87 +117,71 @@
               }
             </select>
           </div>
-          <form class="cnpm-reconciliation__filter" role="search" (ngSubmit)="applySearch()">
-            <label class="cnpm-reconciliation__label" for="filtre-recherche">Recherche</label>
-            <input
-              id="filtre-recherche"
-              class="cnpm-reconciliation__control"
-              type="search"
-              name="recherche"
-              autocomplete="off"
-              placeholder="Référence, payeur…"
-              [ngModel]="searchDraft()"
-              (ngModelChange)="searchDraft.set($event)"
-            />
-          </form>
         </cnpm-filter-bar>
 
-        <cnpm-bulk-action-bar [selectedCount]="selected().size">
-          <cnpm-button
-            variant="secondary"
-            size="sm"
-            describedBy="lot-condition"
-            [disabled]="autoMatchable().length === 0"
-            [loading]="submitting()"
-            (click)="reconcileSelected()"
-          >
-            Rapprocher les lignes sûres ({{ autoMatchable().length }})
-          </cnpm-button>
-          <cnpm-button variant="tertiary" size="sm" (click)="clearSelection()">Effacer</cnpm-button>
-        </cnpm-bulk-action-bar>
-        <p class="cnpm-reconciliation__sr-only" id="lot-condition">
-          Seules les correspondances d’au moins {{ autoMatchThreshold }} % sont traitées en lot.
-        </p>
-
         <cnpm-data-table
-          caption="Paiements entrants avec payeur, montant, canal, statut et date de valeur."
+          caption="Paiements encaissés : choix, référence, payeur, date, canal, montant et statut."
           [columns]="columns"
           [rows]="lines()"
           [state]="tableState()"
           [sort]="sort()"
-          [selectable]="true"
-          [selectedKeys]="selected()"
           [rowKey]="rowKey"
           [rowLabel]="rowLabel"
           (sortChange)="onSortChange($event)"
-          (rowToggle)="toggleRow($event)"
-          (allToggle)="toggleAll($event)"
         >
           <ng-template #row let-line>
-            <td class="cnpm-table__cell">
-              <button
-                type="button"
-                class="cnpm-reconciliation__reference"
-                [attr.aria-label]="'Examiner ' + line.reference"
-                (click)="examine(line)"
-              >
-                {{ line.reference }}
-              </button>
-              @if (isExamined(line)) {
-                <small class="cnpm-reconciliation__examined">Sélectionné</small>
-              }
+            <td class="cnpm-table__cell cnpm-recon__cell-choice">
+              <!-- Sélection unique : un seul paiement se rapproche à la fois, et aucune
+                   écriture financière ne part d'une sélection multiple non arbitrée. -->
+              <input
+                class="cnpm-recon__radio"
+                type="radio"
+                name="paiement-examine"
+                [checked]="isExamined(line)"
+                [attr.aria-label]="'Choisir ' + rowLabel(line)"
+                (change)="examine(line)"
+              />
             </td>
             <td class="cnpm-table__cell">
-              <strong class="cnpm-reconciliation__payer">{{ line.payer }}</strong
-              ><small class="cnpm-reconciliation__meta">{{ line.transactionReference }}</small>
+              <span class="cnpm-recon__ref">{{ line.reference }}</span>
+              <small class="cnpm-recon__meta">{{ line.transactionReference }}</small>
+            </td>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-recon__payer">{{ line.payer }}</span>
+            </td>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-recon__date">{{
+                line.valueDate | date: 'dd/MM/yyyy' : 'UTC'
+              }}</span>
+              <small class="cnpm-recon__meta">{{ line.valueDate | date: 'HH:mm' : 'UTC' }}</small>
+            </td>
+            <td class="cnpm-table__cell">
+              <span class="cnpm-recon__channel">
+                @switch (line.channel) {
+                  @case ('MOBILE_MONEY') {
+                    <svg lucideSmartphone [size]="iconSize.dense" aria-hidden="true"></svg>
+                  }
+                  @case ('BANK_TRANSFER') {
+                    <svg lucideLandmark [size]="iconSize.dense" aria-hidden="true"></svg>
+                  }
+                  @case ('CASH') {
+                    <svg lucideBanknote [size]="iconSize.dense" aria-hidden="true"></svg>
+                  }
+                  @case ('CHECK') {
+                    <svg lucideFileText [size]="iconSize.dense" aria-hidden="true"></svg>
+                  }
+                }
+                {{ channelLabel(line.channel) }}
+              </span>
             </td>
             <td class="cnpm-table__cell cnpm-table__cell--end">
-              <strong class="cnpm-reconciliation__amount">{{
-                line.amount | number: '1.0-0'
-              }}</strong>
-            </td>
-            <td class="cnpm-table__cell">
-              <span class="cnpm-reconciliation__channel">{{ channelLabel(line.channel) }}</span>
+              <span class="cnpm-recon__amount">{{ line.amount | number: '1.0-0' }}</span>
+              <small class="cnpm-recon__meta">FCFA</small>
             </td>
             <td class="cnpm-table__cell">
               <cnpm-badge [tone]="statusTone(line.status)">{{
                 statusLabel(line.status)
               }}</cnpm-badge>
-            </td>
-            <td class="cnpm-table__cell">
-              <small class="cnpm-reconciliation__meta">{{
-                line.valueDate | date: 'dd/MM/yy HH:mm' : 'UTC'
-              }}</small>
             </td>
           </ng-template>
 
@@ -161,20 +192,20 @@
                   variant="table"
                   [rows]="pageSize()"
                   [columns]="columns.length"
-                  label="Chargement des lignes de relevé…"
+                  label="Chargement des paiements…"
                 />
               }
               @case ('empty') {
                 <cnpm-empty-state
                   variant="no-data"
-                  title="Aucune ligne dans cette file"
-                  description="Toutes les lignes de cette file ont été traitées."
+                  title="Aucun paiement dans cette file"
+                  description="Tous les paiements de cette file ont été traités."
                 />
               }
               @case ('noResult') {
                 <cnpm-empty-state
                   variant="no-results"
-                  title="Aucune ligne ne correspond"
+                  title="Aucun paiement ne correspond"
                   description="Élargissez la recherche ou retirez un filtre."
                 >
                   <cnpm-button variant="secondary" size="sm" (click)="resetFilters()"
@@ -212,305 +243,462 @@
         }
       </section>
 
-      <section class="cnpm-reconciliation__workbench" aria-labelledby="titre-rapprochement">
-        <article class="cnpm-reconciliation__panel">
-          <header class="cnpm-reconciliation__panel-head">
-            <h2 id="titre-rapprochement">Rapprochement</h2>
-            @if (examined(); as selected) {
-              <cnpm-badge [tone]="statusTone(selected.status)">{{
-                statusLabel(selected.status)
+      <div class="cnpm-recon__workbench">
+        @if (tableState() === 'loading') {
+          <cnpm-skeleton variant="card" [rows]="5" label="Chargement du plan de rapprochement…" />
+        } @else if (examined(); as line) {
+          <section class="cnpm-recon__panel" aria-labelledby="titre-paiement">
+            <header class="cnpm-recon__panel-head">
+              <svg lucideWallet [size]="iconSize.compact" aria-hidden="true"></svg>
+              <h2 id="titre-paiement">Paiement sélectionné</h2>
+              <cnpm-badge [tone]="statusTone(line.status)">{{
+                statusLabel(line.status)
               }}</cnpm-badge>
-            }
-          </header>
-
-          @if (tableState() === 'loading') {
-            <cnpm-skeleton variant="card" [rows]="4" label="Chargement du rapprochement…" />
-          } @else if (examined(); as line) {
-            <section
-              class="cnpm-reconciliation__payment-detail"
-              aria-label="Détail immuable du paiement"
-            >
-              <cnpm-definition-list [items]="paymentDetails()" />
-              <p>
-                <span>Montant encaissé</span
-                ><strong>{{ line.amount | number: '1.0-0' }} FCFA</strong
-                ><small>{{ line.valueDate | date: 'dd/MM/yyyy HH:mm' : 'UTC' }}</small>
+            </header>
+            <div class="cnpm-recon__panel-body">
+              <p class="cnpm-recon__payer-name">{{ line.payer }}</p>
+              <p class="cnpm-recon__ref-line">{{ line.reference }}</p>
+              <p class="cnpm-recon__hero">
+                <span class="cnpm-recon__hero-value">{{ line.amount | number: '1.0-0' }}</span>
+                <span class="cnpm-recon__hero-unit">FCFA</span>
               </p>
-            </section>
+              <dl class="cnpm-recon__facts">
+                <div>
+                  <dt>Canal</dt>
+                  <dd>
+                    <span class="cnpm-recon__channel">
+                      @switch (line.channel) {
+                        @case ('MOBILE_MONEY') {
+                          <svg lucideSmartphone [size]="iconSize.dense" aria-hidden="true"></svg>
+                        }
+                        @case ('BANK_TRANSFER') {
+                          <svg lucideLandmark [size]="iconSize.dense" aria-hidden="true"></svg>
+                        }
+                        @case ('CASH') {
+                          <svg lucideBanknote [size]="iconSize.dense" aria-hidden="true"></svg>
+                        }
+                        @case ('CHECK') {
+                          <svg lucideFileText [size]="iconSize.dense" aria-hidden="true"></svg>
+                        }
+                      }
+                      {{ channelLabel(line.channel) }}
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt>Horodatage</dt>
+                  <dd>{{ line.valueDate | date: 'dd/MM/yyyy à HH:mm' : 'UTC' }}</dd>
+                </div>
+                <div>
+                  <dt>Référence de transaction</dt>
+                  <dd>{{ line.transactionReference }}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
 
-            @switch (line.status) {
-              @case ('UNMATCHED') {
-                <cnpm-inline-error-summary [errors]="formErrors()" />
-                <form
-                  class="cnpm-reconciliation__form"
-                  [formGroup]="form"
-                  (ngSubmit)="reconcileExamined()"
-                  novalidate
-                >
-                  @if (suggestions().length === 0) {
-                    <cnpm-alert tone="warning" title="Aucune correspondance proposée"
-                      >Signalez une anomalie plutôt que de forcer une affectation.</cnpm-alert
-                    >
-                  } @else {
-                    <fieldset
-                      class="cnpm-reconciliation__fieldset"
-                      [id]="suggestionFieldId"
-                      tabindex="-1"
-                    >
-                      <legend class="cnpm-reconciliation__legend">Correspondances proposées</legend>
-                      @for (suggestion of suggestions(); track suggestion.id) {
-                        <label class="cnpm-reconciliation__option">
+          @switch (line.status) {
+            @case ('UNMATCHED') {
+              <cnpm-inline-error-summary [errors]="formErrors()" />
+              <form class="cnpm-recon__form" [formGroup]="form" (ngSubmit)="reconcileExamined()" novalidate>
+                <section class="cnpm-recon__panel" aria-labelledby="titre-correspondance">
+                  <header class="cnpm-recon__panel-head">
+                    <svg lucideTarget [size]="iconSize.compact" aria-hidden="true"></svg>
+                    <h2 id="titre-correspondance">Correspondance recommandée</h2>
+                  </header>
+                  <div class="cnpm-recon__panel-body">
+                    @if (recommended(); as best) {
+                      <fieldset class="cnpm-recon__fieldset" [id]="suggestionFieldId" tabindex="-1">
+                        <legend class="cnpm-recon__sr-only">Cotisation à rapprocher</legend>
+
+                        <label class="cnpm-recon__option">
                           <input
-                            class="cnpm-reconciliation__radio"
+                            class="cnpm-recon__radio"
                             type="radio"
                             formControlName="suggestionId"
-                            [value]="suggestion.id"
+                            [value]="best.id"
                           />
-                          <span class="cnpm-reconciliation__option-body">
-                            <span class="cnpm-reconciliation__option-title"
-                              >{{ suggestion.memberName }}
-                              <small>{{ suggestion.memberCode }}</small></span
+                          <span class="cnpm-recon__option-body">
+                            <!-- Qualificatif et score sont deux porteurs distincts : le
+                                 badge ne se coupe pas, un libellé unique déborderait à
+                                 320 px. Le score chiffré vient de la source, le mot le
+                                 traduit sans le renforcer. -->
+                            <span class="cnpm-recon__score">
+                              <cnpm-badge [tone]="confidenceTone(best.score)">{{
+                                confidenceLabel(best.score)
+                              }}</cnpm-badge>
+                              <span class="cnpm-recon__score-value"
+                                >Score {{ best.score }} sur 100</span
+                              >
+                            </span>
+                            <span class="cnpm-recon__option-title">{{ best.memberName }}</span>
+                            <span class="cnpm-recon__meta">{{ best.memberCode }}</span>
+                            <span class="cnpm-recon__option-line"
+                              >{{ best.contributionLabel }} · {{ best.period }}</span
                             >
-                            <span class="cnpm-reconciliation__meta"
-                              >{{ suggestion.contributionLabel }} · {{ suggestion.period }}</span
+                            <span class="cnpm-recon__option-line"
+                              >Montant attendu :
+                              {{ best.expectedAmount | number: '1.0-0' }} FCFA</span
                             >
-                            <cnpm-badge [tone]="confidenceTone(suggestion.score)"
-                              >{{ confidenceLabel(suggestion.score) }} —
-                              {{ suggestion.score }} %</cnpm-badge
-                            >
-                            <ul class="cnpm-reconciliation__reasons">
-                              @for (reason of suggestion.reasons; track reason) {
-                                <li>{{ reason }}</li>
+                            <ul class="cnpm-recon__reasons">
+                              @for (reason of best.reasons; track reason) {
+                                <li>
+                                  <svg
+                                    lucideCheck
+                                    [size]="iconSize.dense"
+                                    aria-hidden="true"
+                                  ></svg>
+                                  {{ reason }}
+                                </li>
                               }
                             </ul>
                           </span>
                         </label>
-                      }
-                    </fieldset>
 
-                    <fieldset class="cnpm-reconciliation__fieldset cnpm-reconciliation__allocation">
-                      <legend class="cnpm-reconciliation__legend">Mode d’affectation</legend>
-                      <label
-                        ><input
-                          class="cnpm-reconciliation__radio"
-                          type="radio"
-                          formControlName="allocationMode"
-                          value="complete"
-                        />
-                        Affectation complète</label
-                      >
-                      <label
-                        ><input
-                          class="cnpm-reconciliation__radio"
-                          type="radio"
-                          formControlName="allocationMode"
-                          value="partial"
-                        />
-                        Affectation partielle</label
-                      >
-                    </fieldset>
-
-                    @if (allocationMode() === 'partial') {
-                      <div class="cnpm-reconciliation__field">
-                        <label class="cnpm-reconciliation__label" [for]="amountFieldId"
-                          >Montant à affecter (FCFA)</label
-                        >
-                        <input
-                          class="cnpm-reconciliation__control"
-                          type="text"
-                          inputmode="numeric"
-                          autocomplete="off"
-                          formControlName="allocatedAmount"
-                          [id]="amountFieldId"
-                        />
-                      </div>
-                    }
-                    <p class="cnpm-reconciliation__balance">
-                      Solde après opération :
-                      <strong>{{ remainder() | number: '1.0-0' }} FCFA</strong>
-                    </p>
-                  }
-
-                  <div class="cnpm-reconciliation__field">
-                    <label class="cnpm-reconciliation__label" [for]="commentFieldId"
-                      >Commentaire</label
-                    >
-                    <textarea
-                      class="cnpm-reconciliation__textarea"
-                      rows="2"
-                      formControlName="comment"
-                      [id]="commentFieldId"
-                    ></textarea>
-                    <small>Obligatoire pour toute anomalie.</small>
-                  </div>
-
-                  <div class="cnpm-reconciliation__actions">
-                    @if (suggestions().length > 0) {
-                      <cnpm-button type="submit" variant="primary" [loading]="submitting()"
-                        >Rapprocher</cnpm-button
-                      >
-                    }
-                    <cnpm-button variant="tertiary" (click)="closePanel()">Fermer</cnpm-button>
-                  </div>
-
-                  <details class="cnpm-reconciliation__anomaly">
-                    <summary>Signaler une anomalie</summary>
-                    <div class="cnpm-reconciliation__field">
-                      <label class="cnpm-reconciliation__label" [for]="anomalyFieldId"
-                        >Type d’anomalie</label
-                      >
-                      <select
-                        class="cnpm-reconciliation__control"
-                        formControlName="anomalyType"
-                        [id]="anomalyFieldId"
-                      >
-                        <option value="">Choisir un type</option>
-                        @for (type of anomalyTypes; track type) {
-                          <option [value]="type">{{ anomalyLabels[type] }}</option>
+                        @if (alternatives().length > 0) {
+                          <button
+                            type="button"
+                            class="cnpm-recon__disclosure"
+                            [attr.aria-expanded]="alternativesOpen()"
+                            [attr.aria-controls]="alternativesId"
+                            (click)="toggleAlternatives()"
+                          >
+                            {{ alternativesOpen() ? 'Masquer les' : 'Voir les' }}
+                            {{ alternatives().length }} autre(s) correspondance(s)
+                          </button>
+                          @if (alternativesOpen()) {
+                            <div class="cnpm-recon__alternatives" [id]="alternativesId">
+                              @for (other of alternatives(); track other.id) {
+                                <label class="cnpm-recon__option">
+                                  <input
+                                    class="cnpm-recon__radio"
+                                    type="radio"
+                                    formControlName="suggestionId"
+                                    [value]="other.id"
+                                  />
+                                  <span class="cnpm-recon__option-body">
+                                    <span class="cnpm-recon__score">
+                                      <cnpm-badge [tone]="confidenceTone(other.score)">{{
+                                        confidenceLabel(other.score)
+                                      }}</cnpm-badge>
+                                      <span class="cnpm-recon__score-value"
+                                        >Score {{ other.score }} sur 100</span
+                                      >
+                                    </span>
+                                    <span class="cnpm-recon__option-title">{{
+                                      other.memberName
+                                    }}</span>
+                                    <span class="cnpm-recon__meta">{{ other.memberCode }}</span>
+                                    <span class="cnpm-recon__option-line"
+                                      >{{ other.contributionLabel }} · {{ other.period }}</span
+                                    >
+                                    <ul class="cnpm-recon__reasons">
+                                      @for (reason of other.reasons; track reason) {
+                                        <li>
+                                          <svg
+                                            lucideCheck
+                                            [size]="iconSize.dense"
+                                            aria-hidden="true"
+                                          ></svg>
+                                          {{ reason }}
+                                        </li>
+                                      }
+                                    </ul>
+                                  </span>
+                                </label>
+                              }
+                            </div>
+                          }
                         }
-                      </select>
+                      </fieldset>
+                    } @else {
+                      <cnpm-alert tone="warning" title="Aucune correspondance proposée"
+                        >Signalez une anomalie plutôt que de forcer une affectation.</cnpm-alert
+                      >
+                    }
+                  </div>
+                </section>
+
+                @if (recommended()) {
+                  <section class="cnpm-recon__panel" aria-labelledby="titre-affectation">
+                    <header class="cnpm-recon__panel-head">
+                      <svg lucideWorkflow [size]="iconSize.compact" aria-hidden="true"></svg>
+                      <h2 id="titre-affectation">Mode d’affectation</h2>
+                    </header>
+                    <div class="cnpm-recon__panel-body">
+                      <fieldset class="cnpm-recon__fieldset cnpm-recon__modes">
+                        <legend class="cnpm-recon__sr-only">Mode d’affectation du montant</legend>
+                        <label class="cnpm-recon__option">
+                          <input
+                            class="cnpm-recon__radio"
+                            type="radio"
+                            formControlName="allocationMode"
+                            value="complete"
+                          />
+                          <span class="cnpm-recon__option-body">
+                            <span class="cnpm-recon__option-title">Affectation complète</span>
+                            <span class="cnpm-recon__option-line"
+                              >La totalité du montant reçu est affectée à la cotisation
+                              retenue.</span
+                            >
+                          </span>
+                        </label>
+                        <label class="cnpm-recon__option">
+                          <input
+                            class="cnpm-recon__radio"
+                            type="radio"
+                            formControlName="allocationMode"
+                            value="partial"
+                          />
+                          <span class="cnpm-recon__option-body">
+                            <span class="cnpm-recon__option-title">Affectation partielle</span>
+                            <span class="cnpm-recon__option-line"
+                              >Une part du montant est affectée ; le reste demeure à
+                              affecter.</span
+                            >
+                          </span>
+                        </label>
+                      </fieldset>
+
+                      @if (allocationMode() === 'partial') {
+                        <div class="cnpm-recon__field">
+                          <label class="cnpm-recon__label" [for]="amountFieldId"
+                            >Montant à affecter (FCFA)</label
+                          >
+                          <input
+                            class="cnpm-recon__control"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            formControlName="allocatedAmount"
+                            [id]="amountFieldId"
+                          />
+                        </div>
+                      }
                     </div>
-                    <cnpm-button
-                      type="button"
-                      variant="danger"
-                      [loading]="submitting()"
-                      (click)="reportAnomaly()"
-                      >Signaler l’anomalie</cnpm-button
+                  </section>
+
+                  <section class="cnpm-recon__panel" aria-labelledby="titre-resume">
+                    <header class="cnpm-recon__panel-head">
+                      <svg lucideScrollText [size]="iconSize.compact" aria-hidden="true"></svg>
+                      <h2 id="titre-resume">Résumé</h2>
+                    </header>
+                    <div class="cnpm-recon__panel-body">
+                      <dl class="cnpm-recon__summary">
+                        <div>
+                          <dt>Montant reçu</dt>
+                          <dd>{{ line.amount | number: '1.0-0' }} FCFA</dd>
+                        </div>
+                        <div>
+                          <dt>Montant à affecter</dt>
+                          <dd>
+                            <!-- Test explicite sur `null` : un montant nul est une valeur,
+                                 pas une absence de valeur. -->
+                            @if (effectiveAmount() !== null) {
+                              {{ effectiveAmount() | number: '1.0-0' }} FCFA
+                            } @else {
+                              Montant non lisible
+                            }
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Écart</dt>
+                          <dd>
+                            @if (remainder() !== null) {
+                              {{ remainder() | number: '1.0-0' }} FCFA
+                            } @else {
+                              Écart indéterminé
+                            }
+                            <cnpm-badge [tone]="remainderTone()">{{ remainderLabel() }}</cnpm-badge>
+                          </dd>
+                        </div>
+                        @if (chosenSuggestion(); as chosen) {
+                          <div>
+                            <dt>Cotisation</dt>
+                            <dd>{{ chosen.contributionLabel }}</dd>
+                          </div>
+                          <div>
+                            <dt>Période</dt>
+                            <dd>{{ chosen.period }}</dd>
+                          </div>
+                        }
+                      </dl>
+                    </div>
+                  </section>
+                }
+
+                <div class="cnpm-recon__field">
+                  <label class="cnpm-recon__label" [for]="commentFieldId">Commentaire</label>
+                  <textarea
+                    class="cnpm-recon__textarea"
+                    rows="2"
+                    formControlName="comment"
+                    [id]="commentFieldId"
+                  ></textarea>
+                  <small>Facultatif pour un rapprochement, obligatoire pour une anomalie.</small>
+                </div>
+
+                <div class="cnpm-recon__actions">
+                  <cnpm-button variant="tertiary" (click)="closePanel()">Annuler</cnpm-button>
+                  @if (recommended()) {
+                    <cnpm-button type="submit" variant="primary" [loading]="submitting()"
+                      >Confirmer le rapprochement</cnpm-button
                     >
-                  </details>
-                </form>
-              }
-              @case ('TO_CONFIRM') {
-                <cnpm-alert tone="info" title="En attente de confirmation"
-                  >Un second agent habilité doit confirmer ce rapprochement.</cnpm-alert
-                >
-                <cnpm-definition-list [items]="allocationDetails()" />
-              }
-              @case ('MATCHED') {
-                <cnpm-alert tone="success" title="Paiement rapproché et confirmé"
-                  >L’affectation est enregistrée. Le reçu peut être préparé.</cnpm-alert
-                >
-                <cnpm-definition-list [items]="allocationDetails()" />
-              }
-              @case ('ANOMALY') {
-                <cnpm-alert tone="error" title="Anomalie signalée"
-                  >Cette ligne reste tracée mais ne peut pas être affectée en l’état.</cnpm-alert
-                >
-              }
+                  }
+                </div>
+                <p class="cnpm-recon__note">
+                  La confirmation sera soumise à validation par un second agent habilité.
+                </p>
+
+                <details class="cnpm-recon__anomaly">
+                  <summary>Signaler une anomalie</summary>
+                  <div class="cnpm-recon__field">
+                    <label class="cnpm-recon__label" [for]="anomalyFieldId"
+                      >Type d’anomalie</label
+                    >
+                    <select
+                      class="cnpm-recon__control"
+                      formControlName="anomalyType"
+                      [id]="anomalyFieldId"
+                    >
+                      <option value="">Choisir un type</option>
+                      @for (type of anomalyTypes; track type) {
+                        <option [value]="type">{{ anomalyLabels[type] }}</option>
+                      }
+                    </select>
+                  </div>
+                  <cnpm-button
+                    type="button"
+                    variant="danger"
+                    [loading]="submitting()"
+                    (click)="reportAnomaly()"
+                    >Signaler l’anomalie</cnpm-button
+                  >
+                </details>
+              </form>
             }
-          } @else {
-            <cnpm-empty-state
-              variant="no-data"
-              title="Aucune ligne examinée"
-              description="Choisissez une référence dans la file."
-            />
-          }
-        </article>
-
-        <article class="cnpm-reconciliation__audit" aria-labelledby="titre-audit">
-          <h2 id="titre-audit">Piste d’audit</h2>
-          @if (auditTrail().length === 0) {
-            <p>Aucune action enregistrée.</p>
-          } @else {
-            <ol>
-              @for (entry of auditTrail(); track entry.id) {
-                <li>
-                  <span></span>
-                  <p>
-                    <strong>{{ entry.actor }}</strong> {{ entry.action
-                    }}<small
-                      >{{ entry.occurredAt | date: 'dd/MM/yyyy HH:mm' : 'UTC' }} ·
-                      {{ outcomeLabel(entry.outcome) }}</small
-                    >
-                  </p>
-                </li>
-              }
-            </ol>
-          }
-        </article>
-      </section>
-
-      <aside class="cnpm-reconciliation__receipt-column" aria-labelledby="titre-recu">
-        <article class="cnpm-reconciliation__receipt-panel">
-          <header>
-            <h2 id="titre-recu">Aperçu du reçu</h2>
-            <cnpm-button variant="secondary" size="sm" [disabled]="true"
-              ><svg lucideReceiptText [size]="iconSize.dense"></svg>Télécharger</cnpm-button
-            >
-          </header>
-          @if (examined(); as line) {
-            <div class="cnpm-reconciliation__receipt" aria-label="Aperçu du reçu">
-              <header>
-                <img
-                  src="/assets/brand/logo-CNPM-lockup.png"
-                  alt="CNPM — Conseil National du Patronat du Mali"
-                />
-                <div>
-                  <strong>REÇU DE PAIEMENT</strong><span>N° {{ line.reference }}</span>
-                </div>
-              </header>
-              <div class="cnpm-reconciliation__receipt-rule"></div>
-              <section>
-                <div>
-                  <small>Payeur</small><strong>{{ line.payer }}</strong
-                  ><span>{{ line.transactionReference }}</span>
-                </div>
-                <div>
-                  <small>Référence paiement</small><strong>{{ line.reference }}</strong
-                  ><span>{{ channelLabel(line.channel) }}</span>
-                </div>
-              </section>
-              <div class="cnpm-reconciliation__receipt-amount">
-                <small>Montant reçu</small><strong>{{ line.amount | number: '1.0-0' }} FCFA</strong
-                ><span>{{ line.valueDate | date: 'dd MMMM yyyy à HH:mm' : 'UTC' }}</span>
-              </div>
-              @if (line.suggestions[0]; as match) {
-                <section class="cnpm-reconciliation__receipt-allocation">
-                  <div>
-                    <small>Affectation proposée</small><strong>{{ match.contributionLabel }}</strong
-                    ><span>{{ match.memberName }} · {{ match.period }}</span>
+            @case ('TO_CONFIRM') {
+              <cnpm-alert tone="info" title="En attente de validation"
+                >Un second agent habilité doit valider ce rapprochement avant l’émission d’un
+                reçu.</cnpm-alert
+              >
+              @if (line.allocation; as allocation) {
+                <section class="cnpm-recon__panel" aria-labelledby="titre-affecte">
+                  <header class="cnpm-recon__panel-head">
+                    <svg lucideScrollText [size]="iconSize.compact" aria-hidden="true"></svg>
+                    <h2 id="titre-affecte">Affectation enregistrée</h2>
+                  </header>
+                  <div class="cnpm-recon__panel-body">
+                    <dl class="cnpm-recon__summary">
+                      <div>
+                        <dt>Membre</dt>
+                        <dd>{{ allocation.memberName }} ({{ allocation.memberCode }})</dd>
+                      </div>
+                      <div>
+                        <dt>Cotisation</dt>
+                        <dd>{{ allocation.contributionLabel }}</dd>
+                      </div>
+                      <div>
+                        <dt>Montant affecté</dt>
+                        <dd>{{ allocation.allocatedAmount | number: '1.0-0' }} FCFA</dd>
+                      </div>
+                      <div>
+                        <dt>Reste à affecter</dt>
+                        <dd>{{ allocation.remainder | number: '1.0-0' }} FCFA</dd>
+                      </div>
+                    </dl>
                   </div>
                 </section>
               }
-              <footer>
-                Aperçu avant confirmation. Le reçu officiel sera émis après confirmation CNPM.
-              </footer>
-            </div>
-          } @else {
-            <cnpm-empty-state
-              variant="no-data"
-              title="Aucun aperçu"
-              description="Sélectionnez un paiement pour préparer son reçu."
-            />
+              <div class="cnpm-recon__actions">
+                <cnpm-button variant="tertiary" (click)="closePanel()">Fermer</cnpm-button>
+              </div>
+            }
+            @case ('MATCHED') {
+              <cnpm-alert tone="success" title="Paiement rapproché et validé"
+                >L’affectation est enregistrée et ne peut plus être modifiée.</cnpm-alert
+              >
+              @if (line.allocation; as allocation) {
+                <section class="cnpm-recon__panel" aria-labelledby="titre-affecte">
+                  <header class="cnpm-recon__panel-head">
+                    <svg lucideScrollText [size]="iconSize.compact" aria-hidden="true"></svg>
+                    <h2 id="titre-affecte">Affectation enregistrée</h2>
+                  </header>
+                  <div class="cnpm-recon__panel-body">
+                    <dl class="cnpm-recon__summary">
+                      <div>
+                        <dt>Membre</dt>
+                        <dd>{{ allocation.memberName }} ({{ allocation.memberCode }})</dd>
+                      </div>
+                      <div>
+                        <dt>Cotisation</dt>
+                        <dd>{{ allocation.contributionLabel }}</dd>
+                      </div>
+                      <div>
+                        <dt>Montant affecté</dt>
+                        <dd>{{ allocation.allocatedAmount | number: '1.0-0' }} FCFA</dd>
+                      </div>
+                      <div>
+                        <dt>Reste à affecter</dt>
+                        <dd>{{ allocation.remainder | number: '1.0-0' }} FCFA</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </section>
+              }
+              <div class="cnpm-recon__actions">
+                <cnpm-button variant="tertiary" (click)="closePanel()">Fermer</cnpm-button>
+              </div>
+            }
+            @case ('ANOMALY') {
+              <cnpm-alert tone="error" title="Anomalie signalée"
+                >Ce paiement reste tracé mais ne peut pas être affecté en l’état.</cnpm-alert
+              >
+              <div class="cnpm-recon__actions">
+                <cnpm-button variant="tertiary" (click)="closePanel()">Fermer</cnpm-button>
+              </div>
+            }
           }
-        </article>
+        } @else {
+          <cnpm-empty-state
+            variant="no-data"
+            title="Aucun paiement sélectionné"
+            description="Choisissez un paiement dans la file pour vérifier sa correspondance."
+          />
+        }
 
-        <article class="cnpm-reconciliation__timeline" aria-labelledby="titre-timeline">
-          <h2 id="titre-timeline">Timeline de confirmation</h2>
-          <ol>
-            <li class="is-complete">
-              <span>1</span>
-              <p>
-                <strong>Paiement reçu</strong><small>Transaction enregistrée et immuable</small>
-              </p>
-            </li>
-            <li class="is-current">
-              <span>2</span>
-              <p>
-                <strong>Rapprochement</strong
-                ><small>Contrôle du membre, de la période et du montant</small>
-              </p>
-            </li>
-            <li>
-              <span>3</span>
-              <p>
-                <strong>Confirmation CNPM</strong
-                ><small>Requise avant émission du reçu officiel</small>
-              </p>
-            </li>
-          </ol>
-        </article>
-      </aside>
+        <section class="cnpm-recon__panel" aria-labelledby="titre-audit">
+          <header class="cnpm-recon__panel-head">
+            <svg lucideHistory [size]="iconSize.compact" aria-hidden="true"></svg>
+            <h2 id="titre-audit">Piste d’audit</h2>
+          </header>
+          <div class="cnpm-recon__panel-body">
+            @if (auditTrail().length === 0) {
+              <p class="cnpm-recon__meta">Aucune action enregistrée.</p>
+            } @else {
+              <ol class="cnpm-recon__audit">
+                @for (entry of auditTrail(); track entry.id) {
+                  <li>
+                    <span class="cnpm-recon__audit-dot" aria-hidden="true"></span>
+                    <span class="cnpm-recon__audit-body">
+                      <span class="cnpm-recon__option-title">{{ entry.actor }}</span>
+                      <span class="cnpm-recon__option-line">{{ entry.action }}</span>
+                      <span class="cnpm-recon__audit-foot">
+                        <small class="cnpm-recon__meta">{{
+                          entry.occurredAt | date: 'dd/MM/yyyy à HH:mm' : 'UTC'
+                        }}</small>
+                        <cnpm-badge [tone]="outcomeTone(entry.outcome)">{{
+                          outcomeLabel(entry.outcome)
+                        }}</cnpm-badge>
+                      </span>
+                    </span>
+                  </li>
+                }
+              </ol>
+            }
+          </div>
+        </section>
+      </div>
     </div>
   </main>
 </cnpm-admin-shell>
