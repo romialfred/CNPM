@@ -243,3 +243,51 @@ describe('MembersPage — états requis', () => {
     });
   });
 });
+
+describe('MembersPage — vue en tuiles', () => {
+  async function rendu(vue?: string) {
+    const contexte = await setup();
+    if (vue) {
+      await contexte.router.navigate([], { queryParams: { vue } });
+    }
+    contexte.gateway.latest.next(READY_PAGE);
+    await contexte.fixture.whenStable();
+    contexte.fixture.detectChanges();
+    return contexte;
+  }
+
+  it('rend le tableau par défaut et les tuiles quand l’URL le demande', async () => {
+    const parDefaut = await rendu();
+    expect(parDefaut.host.querySelector('cnpm-data-table')).not.toBeNull();
+    expect(parDefaut.host.querySelectorAll('.cnpm-members__tile')).toHaveLength(0);
+
+    TestBed.resetTestingModule();
+    const tuiles = await rendu('tuiles');
+    expect(tuiles.host.querySelector('cnpm-data-table')).toBeNull();
+    expect(tuiles.host.querySelectorAll('.cnpm-members__tile')).toHaveLength(1);
+  });
+
+  it('n’enferme aucun élément interactif au dos de la tuile', async () => {
+    // Un lien ou un bouton révélé au seul survol serait inatteignable au clavier comme
+    // au toucher. Le dos ne porte que du texte ; la fiche du membre reste la
+    // destination complète, atteignable depuis la face avant.
+    const { host } = await rendu('tuiles');
+    const dos = host.querySelector('.cnpm-members__tile-back');
+
+    expect(dos).not.toBeNull();
+    expect(dos?.querySelectorAll('a, button, input, select, textarea')).toHaveLength(0);
+    // Pas d'aria-hidden : le dos fait partie du texte de la tuile et doit se lire.
+    expect(dos?.getAttribute('aria-hidden')).toBeNull();
+    expect(dos?.textContent).toContain('Contact');
+  });
+
+  it('annonce la vue active par aria-pressed', async () => {
+    const { host } = await rendu('tuiles');
+    const boutons = Array.from(host.querySelectorAll('.cnpm-members__view'));
+
+    expect(boutons.map((bouton) => bouton.getAttribute('aria-pressed'))).toEqual([
+      'false',
+      'true',
+    ]);
+  });
+});

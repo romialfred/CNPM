@@ -1,8 +1,8 @@
-import { DecimalPipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   LucideDownload,
   LucideEye,
@@ -57,6 +57,9 @@ const STATUS_TONES: Readonly<Record<MemberStatus, CnpmBadgeTone>> = {
 };
 
 const PAGE_SIZES = [10, 25, 50] as const;
+
+/** Présentation de la liste. Le tableau reste le défaut : il porte le tri et la sélection. */
+type MembersView = 'table' | 'tiles';
 const DEFAULT_PAGE_SIZE = 10;
 
 /**
@@ -73,7 +76,9 @@ const DEFAULT_PAGE_SIZE = 10;
   selector: 'cnpm-members-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DatePipe,
     DecimalPipe,
+    RouterLink,
     FormsModule,
     AdminShellComponent,
     BadgeComponent,
@@ -122,6 +127,11 @@ export class MembersPage {
   private readonly params = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
   });
+
+  /** Vue courante ; `tuiles` seulement si l'URL le demande, le tableau reste le défaut. */
+  protected readonly view = computed<MembersView>(() =>
+    this.params().get('vue') === 'tuiles' ? 'tiles' : 'table',
+  );
 
   protected readonly search = computed(() => this.params().get('q') ?? '');
   protected readonly status = computed<MemberStatus | null>(() => {
@@ -454,6 +464,21 @@ export class MembersPage {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: params,
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  /**
+   * Bascule tableau / tuiles, conservée dans l'URL puisque la vue est partageable.
+   *
+   * Elle ne passe pas par `patch()` : celui-ci vide la sélection, ce qui serait
+   * justifié pour un filtre — la ligne cochée pourrait disparaître — mais absurde ici,
+   * changer de présentation n'ôte aucun membre de la liste.
+   */
+  protected setView(view: MembersView): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { vue: view === 'tiles' ? 'tuiles' : null },
       queryParamsHandling: 'merge',
     });
   }

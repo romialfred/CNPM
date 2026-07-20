@@ -125,6 +125,28 @@
           </p>
         </div>
 
+        <div class="cnpm-members__views" role="group" aria-label="Présentation de la liste">
+          <button
+            type="button"
+            class="cnpm-members__view"
+            [class.cnpm-members__view--active]="view() === 'table'"
+            [attr.aria-pressed]="view() === 'table'"
+            (click)="setView('table')"
+          >
+            Tableau
+          </button>
+          <button
+            type="button"
+            class="cnpm-members__view"
+            [class.cnpm-members__view--active]="view() === 'tiles'"
+            [attr.aria-pressed]="view() === 'tiles'"
+            (click)="setView('tiles')"
+          >
+            Tuiles
+          </button>
+        </div>
+
+        @if (view() === 'table') {
         <cnpm-data-table
           caption="Liste des membres du CNPM, avec leur catégorie, groupement, contact, cotisations, statut et dernière activité."
           [columns]="columns()"
@@ -275,6 +297,65 @@
             }
           </div>
         </cnpm-data-table>
+        }
+
+        <!-- Vue en tuiles. Le dos ne contient que du texte : aucun lien, aucun bouton.
+             Un contenu interactif revele au seul survol serait inatteignable au clavier
+             comme au toucher. Il n'est pas non plus masque aux lecteurs d'ecran : il fait
+             partie du texte de la tuile et se lit dans l'ordre du DOM, le retournement
+             n'etant qu'un effet visuel. -->
+        @if (view() === 'tiles' && tableState() === 'ready') {
+          <ul class="cnpm-members__tiles" aria-label="Membres du CNPM">
+            @for (member of rows(); track member.id) {
+              <li class="cnpm-members__tile">
+                <div class="cnpm-members__tile-inner">
+                  <div class="cnpm-members__tile-face">
+                    <div class="cnpm-members__tile-head">
+                      <cnpm-badge [tone]="statusTone(member.status)">
+                        {{ statusLabel(member.status) }}
+                      </cnpm-badge>
+                      <span class="cnpm-members__tile-code">{{ member.code }}</span>
+                    </div>
+                    <a
+                      class="cnpm-members__tile-name"
+                      [routerLink]="['/admin/members', member.organizationId]"
+                      queryParamsHandling="preserve"
+                    >
+                      {{ member.organization }}
+                    </a>
+                    <p class="cnpm-members__tile-meta">
+                      {{ member.category }}
+                      @if (member.group) {
+                        <span aria-hidden="true"> · </span>{{ member.group }}
+                      }
+                    </p>
+                  </div>
+
+                  <dl class="cnpm-members__tile-back">
+                    <div>
+                      <dt>Contact</dt>
+                      <dd>{{ member.contactName ?? 'Non communiqué' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Téléphone</dt>
+                      <dd>{{ member.contactPhone ?? 'Non communiqué' }}</dd>
+                    </div>
+                    <div>
+                      <dt>Dernière activité</dt>
+                      <dd>
+                        @if (member.lastActivity) {
+                          {{ member.lastActivity | date: 'dd/MM/yyyy' }}
+                        } @else {
+                          Aucune
+                        }
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </li>
+            }
+          </ul>
+        }
 
         @if (tableState() === 'ready') {
           <cnpm-pagination

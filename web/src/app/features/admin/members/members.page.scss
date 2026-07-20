@@ -260,3 +260,163 @@
     height: var(--cnpm-size-control-lg);
   }
 }
+
+/* ------------------------------------------------------------------ Vue en tuiles */
+
+.cnpm-members__views {
+  display: inline-flex;
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-space-1);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+}
+
+.cnpm-members__view {
+  min-height: var(--cnpm-size-control-md);
+  padding-inline: var(--cnpm-space-4);
+  border: 0;
+  border-radius: var(--cnpm-radius-sm);
+  background: transparent;
+  color: var(--cnpm-color-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-members__view--active {
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+}
+
+.cnpm-members__view:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-members__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--cnpm-space-4);
+  margin: var(--cnpm-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* La perspective vit sur l'élément de liste : posée sur le conteneur, elle donnerait
+   à toutes les tuiles le même point de fuite et celles des bords se déformeraient. */
+.cnpm-members__tile {
+  perspective: 60rem;
+  min-height: 12rem;
+}
+
+.cnpm-members__tile-inner {
+  position: relative;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--cnpm-motion-duration-slow) var(--cnpm-motion-easing-standard);
+}
+
+/* Le retournement répond au survol ET au focus : sans `focus-within`, l'effet
+   n'existerait que pour la souris. */
+.cnpm-members__tile:hover .cnpm-members__tile-inner,
+.cnpm-members__tile:focus-within .cnpm-members__tile-inner {
+  transform: rotateY(180deg);
+}
+
+.cnpm-members__tile-face,
+.cnpm-members__tile-back {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  backface-visibility: hidden;
+}
+
+.cnpm-members__tile-back {
+  margin: 0;
+  transform: rotateY(180deg);
+}
+
+.cnpm-members__tile-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-members__tile-code {
+  color: var(--cnpm-color-text-muted);
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-members__tile-name {
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: none;
+}
+
+.cnpm-members__tile-name:hover {
+  text-decoration: underline;
+}
+
+.cnpm-members__tile-meta {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-members__tile-back div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  padding-block: var(--cnpm-space-1);
+}
+
+.cnpm-members__tile-back dt {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-members__tile-back dd {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  text-align: end;
+}
+
+/* Sous préférence de mouvement réduit, la tuile ne tourne plus : les deux faces sont
+   empilées dans le flux et lues à la suite. La spécificité doit égaler celle des règles
+   de survol ci-dessus, faute de quoi la neutralisation resterait sans effet. */
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-members__tile {
+    perspective: none;
+    min-height: 0;
+  }
+
+  .cnpm-members__tile-inner,
+  .cnpm-members__tile:hover .cnpm-members__tile-inner,
+  .cnpm-members__tile:focus-within .cnpm-members__tile-inner {
+    transform: none;
+    transition: none;
+  }
+
+  .cnpm-members__tile-face,
+  .cnpm-members__tile-back {
+    position: static;
+    backface-visibility: visible;
+  }
+
+  .cnpm-members__tile-back {
+    border-block-start: 0;
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+}
