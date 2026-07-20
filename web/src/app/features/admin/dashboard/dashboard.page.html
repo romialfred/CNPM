@@ -112,9 +112,40 @@
         <!-- Cinq KPI au maximum, sur deux rangées au plus : composition normative de
              la fiche. Le cinquième passe à la ligne sous 1440 px. -->
         <ul class="cnpm-dashboard__kpi-list">
-          @for (kpi of kpis(); track kpi.key) {
+          @for (kpi of kpis(); track kpi.key; let i = $index) {
             <li class="cnpm-dashboard__kpi">
-              <div class="cnpm-dashboard__kpi-card">
+              <div
+                class="cnpm-dashboard__kpi-card cnpm-liftable"
+                [class]="'cnpm-tile-accent--' + kpiSkin(kpi, i).accent"
+              >
+                <!-- Pictogramme purement décoratif : `aria-hidden` est posé par Lucide en
+                     l'absence de `title`, et le libellé du KPI porte seul son sens. La
+                     couleur ne fait que distinguer les tuiles, elle n'informe pas. -->
+                <span class="cnpm-dashboard__kpi-icon" aria-hidden="true">
+                  @switch (kpiSkin(kpi, i).icon) {
+                    @case ('wallet') {
+                      <svg lucideWallet [size]="iconSize.control"></svg>
+                    }
+                    @case ('percent') {
+                      <svg lucidePercent [size]="iconSize.control"></svg>
+                    }
+                    @case ('users') {
+                      <svg lucideUsers [size]="iconSize.control"></svg>
+                    }
+                    @case ('dormant') {
+                      <svg lucideMoon [size]="iconSize.control"></svg>
+                    }
+                    @case ('prospect') {
+                      <svg lucideUserPlus [size]="iconSize.control"></svg>
+                    }
+                    @case ('company') {
+                      <svg lucideBuilding2 [size]="iconSize.control"></svg>
+                    }
+                    @case ('target') {
+                      <svg lucideTarget [size]="iconSize.control"></svg>
+                    }
+                  }
+                </span>
                 <p class="cnpm-dashboard__kpi-label">
                   {{ kpi.label }}
                   @if (kpi.unit) {

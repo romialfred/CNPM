@@ -1,0 +1,80 @@
+@use '../../../../styles/tokens' as tokens;
+
+/* Bandeau KPI de BO-001.
+   ---------------------------------------------------------------------------
+   Extrait de `dashboard.page.scss`, qui franchissait le plafond de 10 ko par feuille
+   de composant. Le plafond n'a pas ete relache : la feuille a ete scindee, comme
+   `dashboard.responsive.scss` l'avait deja ete. */
+
+.cnpm-dashboard {
+  /* ---------------------------------------------------------------------- Bandeau KPI */
+
+  /* Cinq colonnes au-delà de 1440 px ; quatre à partir de 1280 px, où le cinquième KPI
+     passe à la rangée suivante — « À 1280 px, réduire à quatre KPI et déplacer le
+     cinquième ». Deux rangées au maximum, jamais trois. */
+  &__kpi-list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--cnpm-space-3);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__kpi {
+    display: flex;
+    min-width: 0;
+  }
+
+  &__kpi-label {
+    margin: 0;
+  }
+
+  /* Pastille teintee par l'accent de la tuile. Une seule couleur source : le fond en
+     est derive, la tuile reste donc accordee sans valeur repetee. */
+  &__kpi-icon {
+    display: inline-flex;
+    width: var(--cnpm-space-10);
+    height: var(--cnpm-space-10);
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--cnpm-radius-md);
+    background: color-mix(in srgb, var(--cnpm-tile-accent) 12%, transparent);
+    color: var(--cnpm-tile-accent);
+    flex: none;
+  }
+
+  /* Le liseré porte l'accent sur le bord haut de la tuile. Purement décoratif : aucun
+     statut ne s'y lit, et retirer la couleur ne retire aucune information. */
+  &__kpi-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__kpi-card::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: var(--cnpm-space-1);
+    background: var(--cnpm-tile-accent);
+    content: '';
+  }
+
+  &__kpi-value {
+    margin: 0;
+    color: var(--cnpm-color-text-primary);
+    font-size: var(--cnpm-font-size-3xl);
+    font-weight: var(--cnpm-font-weight-bold);
+    line-height: var(--cnpm-font-lineHeight-3xl);
+  }
+
+  &__kpi-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cnpm-space-1);
+    margin-block-start: auto;
+    padding-block-start: var(--cnpm-space-1);
+  }
+}

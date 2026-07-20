@@ -5,10 +5,17 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   LucideArrowRight,
+  LucideBuilding2,
   LucideMinus,
+  LucideMoon,
+  LucidePercent,
   LucideRefreshCw,
+  LucideTarget,
   LucideTrendingDown,
   LucideTrendingUp,
+  LucideUserPlus,
+  LucideUsers,
+  LucideWallet,
 } from '@lucide/angular';
 import { catchError, map, of, scan, startWith, switchMap } from 'rxjs';
 import { AlertComponent, type CnpmAlertTone } from '../../../design-system/alert/alert.component';
@@ -40,6 +47,27 @@ import {
   type DashboardPaymentStatus,
   type DashboardSnapshot,
 } from './dashboard-gateway';
+
+/**
+ * Pictogrammes decoratifs des tuiles KPI.
+ *
+ * Nommes par intention et non par composant Lucide : la correspondance vit dans le
+ * gabarit, seul endroit a reprendre si UX-DEC-009 ecarte la bibliotheque.
+ */
+export type DashboardKpiIcon =
+  | 'wallet'
+  | 'percent'
+  | 'users'
+  | 'dormant'
+  | 'prospect'
+  | 'company'
+  | 'target';
+
+/**
+ * Accents de repli, dans l'ordre de `chart.categorical`. Ils servent aux cles de KPI
+ * que la passerelle peut servir sans qu'elles soient connues ici.
+ */
+const DASHBOARD_KPI_ACCENTS = ['indigo', 'sky', 'teal', 'amber', 'blue'] as const;
 
 const CHANNEL_LABELS: Readonly<Record<DashboardPaymentChannel, string>> = {
   MOBILE_MONEY: 'Mobile money',
@@ -164,13 +192,20 @@ const SHORTCUTS: readonly DashboardShortcut[] = [
     PageHeaderComponent,
     SkeletonComponent,
     LucideArrowRight,
+    LucideBuilding2,
     LucideMinus,
+    LucideMoon,
+    LucidePercent,
     LucideRefreshCw,
+    LucideTarget,
     LucideTrendingDown,
     LucideTrendingUp,
+    LucideUserPlus,
+    LucideUsers,
+    LucideWallet,
   ],
   templateUrl: './dashboard.page.html',
-  styleUrls: ['./dashboard.page.scss', './dashboard.responsive.scss'],
+  styleUrls: ['./dashboard.page.scss', './dashboard.kpi.scss', './dashboard.responsive.scss'],
 })
 export class DashboardPage {
   private readonly gateway = inject(DASHBOARD_GATEWAY);
@@ -369,6 +404,30 @@ export class DashboardPage {
   protected kpiFormat(kpi: DashboardKpi): string {
     const decimals = kpi.decimals ?? 0;
     return `1.${decimals}-${decimals}`;
+  }
+
+  /**
+   * Habillage décoratif d'un KPI : un accent et un pictogramme.
+   *
+   * Strictement décoratif. La clé d'un KPI vient de la passerelle, qui peut en servir
+   * d'autres que celles connues ici — d'où le repli, qui garantit une tuile complète
+   * pour n'importe quelle clé plutôt qu'une tuile amputée.
+   *
+   * Les accents viennent de `chart.categorical`, seule palette du handoff destinée à
+   * différencier SANS porter de sens : la couleur d'une tuile ne signale ni alerte ni
+   * conformité. Le rouge de marque en est exclu, il reste aux actions critiques.
+   */
+  protected kpiSkin(kpi: DashboardKpi, index: number): { accent: string; icon: DashboardKpiIcon } {
+    const connus: Readonly<Record<string, { accent: string; icon: DashboardKpiIcon }>> = {
+      collected: { accent: 'indigo', icon: 'wallet' },
+      recovery: { accent: 'sky', icon: 'percent' },
+      active: { accent: 'teal', icon: 'users' },
+      dormant: { accent: 'amber', icon: 'dormant' },
+      prospects: { accent: 'blue', icon: 'prospect' },
+      large: { accent: 'blue', icon: 'company' },
+    };
+    const repli = DASHBOARD_KPI_ACCENTS[index % DASHBOARD_KPI_ACCENTS.length];
+    return connus[kpi.key] ?? { accent: repli, icon: 'target' };
   }
 
   /** Hauteur du montant attendu, en pourcentage de l'échelle du graphique. */

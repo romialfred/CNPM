@@ -118,44 +118,6 @@
     border: 0;
   }
 
-  /* ---------------------------------------------------------------------- Bandeau KPI */
-
-  /* Cinq colonnes au-delà de 1440 px ; quatre à partir de 1280 px, où le cinquième KPI
-     passe à la rangée suivante — « À 1280 px, réduire à quatre KPI et déplacer le
-     cinquième ». Deux rangées au maximum, jamais trois. */
-  &__kpi-list {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--cnpm-space-3);
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  &__kpi {
-    display: flex;
-    min-width: 0;
-  }
-
-  &__kpi-label {
-    margin: 0;
-  }
-
-  &__kpi-value {
-    margin: 0;
-    font-size: var(--cnpm-font-size-2xl);
-    line-height: var(--cnpm-font-lineHeight-2xl);
-  }
-
-  &__kpi-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--cnpm-space-1);
-    margin-block-start: auto;
-    padding-block-start: var(--cnpm-space-1);
-  }
-
   /* ------------------------------------------------------------------------ Disposition */
 
   /* Grille unique de 12 colonnes. Auparavant, deux enveloppes de colonne se partageaient
