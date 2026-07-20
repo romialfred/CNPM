@@ -136,17 +136,9 @@
     }
   </nav>
 
-  @if (identity | async; as user) {
-    <div
-      class="cnpm-sidebar__exercise"
-      [attr.aria-label]="
-        user.exerciseLabel ? 'Exercice en cours ' + user.exerciseLabel : 'Exercice indisponible'
-      "
-    >
-      <span class="cnpm-sidebar__exercise-label">Exercice en cours</span>
-      <span class="cnpm-sidebar__exercise-value">{{ user.exerciseLabel ?? 'Indisponible' }}</span>
-    </div>
-  }
+  <!-- Le bloc « Exercice en cours » a quitté le pied de la navigation : il y occupait
+       60 px sans jamais servir à naviguer, et l'exercice est déjà sélectionnable sur le
+       tableau de bord, où il pilote réellement les chiffres affichés. -->
 
   <button
     type="button"

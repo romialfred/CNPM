@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -33,7 +32,6 @@ import { SESSION_GATEWAY } from './session-gateway';
   selector: 'cnpm-sidebar-navigation',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     RouterLink,
     RouterLinkActive,
     AdminNavIconComponent,
@@ -71,18 +69,19 @@ export class SidebarNavigationComponent {
   );
 
   protected readonly iconSize = CNPM_ICON_SIZE;
-  protected readonly identity = this.session.identity;
 
   private readonly router = inject(Router);
 
   /**
-   * Groupes que l'utilisateur a refermés.
+   * Groupes que l'utilisateur a ouverts.
    *
-   * L'état est inversé — on retient les fermetures, pas les ouvertures — pour que tout
-   * soit déplié à l'arrivée. Une navigation dont les rubriques sont cachées par défaut
-   * oblige à ouvrir chaque groupe pour savoir ce qu'il contient.
+   * Tout déplier demandait 968 px de hauteur pour 502 disponibles sur un écran de
+   * 760 px : la colonne défilait, ce que le client refuse. Vingt-trois lignes ne tiennent
+   * pas dans cette place, même à 26 px chacune. Les groupes sont donc repliés, et ce sont
+   * leurs cinq intitulés qui restent tous visibles — ce que la demande exige réellement.
+   * Le groupe de l'écran ouvert se déplie de lui-même.
    */
-  private readonly closedGroups = signal<ReadonlySet<string>>(new Set());
+  private readonly openedGroups = signal<ReadonlySet<string>>(new Set());
 
   private readonly currentUrl = toSignal(
     this.router.events.pipe(
@@ -103,12 +102,12 @@ export class SidebarNavigationComponent {
   });
 
   protected isOpen(groupId: string): boolean {
-    return groupId === this.activeGroup() || !this.closedGroups().has(groupId);
+    return groupId === this.activeGroup() || this.openedGroups().has(groupId);
   }
 
   protected toggleGroup(groupId: string): void {
-    this.closedGroups.update((closed) => {
-      const next = new Set(closed);
+    this.openedGroups.update((opened) => {
+      const next = new Set(opened);
       if (next.has(groupId)) {
         next.delete(groupId);
       } else {

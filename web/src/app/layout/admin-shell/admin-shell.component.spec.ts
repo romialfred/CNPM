@@ -51,10 +51,48 @@ describe('AdminShellComponent — drawer accessible', () => {
   });
 
   it('rend BO-037 découvrable pour la persona de démonstration autorisée', async () => {
-    const { host } = await setup();
+    const { fixture, host } = await setup();
+
+    // Les groupes sont repliés : tout déplier demandait 968 px de navigation pour 502
+    // disponibles, et la colonne défilait. La découvrabilité passe donc par l'intitulé
+    // du domaine, toujours visible, puis par son dépliage — c'est le chemin réel de
+    // l'utilisateur, et c'est lui que ce test parcourt.
+    const groupe = Array.from(
+      host.querySelectorAll<HTMLButtonElement>('.cnpm-sidebar__group-trigger'),
+    ).find((bouton) => (bouton.textContent ?? '').includes('Relation membre'));
+
+    expect(groupe).toBeDefined();
+    expect(groupe?.getAttribute('aria-expanded')).toBe('false');
+
+    groupe?.click();
+    fixture.detectChanges();
 
     const link = host.querySelector<HTMLAnchorElement>('a[href="/admin/showcases/moderation"]');
     expect(link?.textContent).toContain('Vitrines');
+  });
+
+  it('garde les cinq intitules de domaine visibles et les groupes replies', async () => {
+    // Contrainte du client : aucune barre de defilement dans la navigation. Vingt-trois
+    // lignes n'y tiennent pas ; ce sont les intitules qui doivent tous rester visibles.
+    const { host } = await setup();
+    const intitules = Array.from(
+      host.querySelectorAll<HTMLButtonElement>('.cnpm-sidebar__group-trigger'),
+    );
+
+    expect(intitules).toHaveLength(5);
+    expect(intitules.every((bouton) => bouton.getAttribute('aria-expanded') === 'false')).toBe(
+      true,
+    );
+    // Aucun panneau de groupe n'est monte tant qu'aucun n'est ouvert.
+    expect(host.querySelectorAll('.cnpm-sidebar__sublist')).toHaveLength(0);
+  });
+
+  it('ne porte plus le bloc « Exercice en cours » en pied de navigation', async () => {
+    // Il occupait 60 px sans servir a naviguer ; l'exercice se choisit sur le tableau de
+    // bord, ou il pilote reellement les chiffres affiches.
+    const { host } = await setup();
+
+    expect(host.querySelector('.cnpm-sidebar__exercise')).toBeNull();
   });
 
   it('ouvre un dialogue modal, neutralise le contenu et place le focus sur Fermer', async () => {
