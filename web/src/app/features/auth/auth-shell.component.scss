@@ -2,61 +2,175 @@
   display: block;
 }
 
+/* Deux zones plein écran. Le formulaire est premier dans le DOM — c'est la tâche
+   principale et son <h1> doit précéder le <h2> du panneau — et le placement explicite
+   en grille rétablit l'ordre visuel attendu : panneau photographique à gauche. */
 .cnpm-auth {
-  position: relative;
-  display: flex;
+  display: grid;
   min-height: 100vh;
-  flex-direction: column;
-  overflow: hidden;
+  grid-template-columns: minmax(0, 56fr) minmax(0, 44fr);
   background: var(--cnpm-color-surface-primary);
 }
 
-.cnpm-auth::before,
-.cnpm-auth::after {
+.cnpm-auth__visual {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  grid-column: 1;
+  grid-row: 1;
+  justify-content: space-between;
+  background: var(--cnpm-color-brand-blue-900);
+}
+
+.cnpm-auth__side {
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+/* `cover` sans déformation : la photographie est panoramique et la colonne quasi
+   carrée, le recadrage est donc assumé et centré sur l'entrée du bâtiment. */
+.cnpm-auth__photo {
   position: absolute;
-  z-index: 0;
-  border: 1px solid var(--cnpm-color-brand-blue-100);
-  border-radius: 50%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Voile dégradé : la photographie est claire en haut à gauche, là où se posent le
+   logo et le titre. Sans lui, le texte blanc y perdrait tout contraste. */
+.cnpm-auth__visual::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--cnpm-color-brand-blue-950) 88%, transparent) 0%,
+    color-mix(in srgb, var(--cnpm-color-brand-blue-950) 55%, transparent) 52%,
+    color-mix(in srgb, var(--cnpm-color-brand-blue-950) 15%, transparent) 100%
+  );
   content: '';
   pointer-events: none;
 }
 
-.cnpm-auth::before {
-  width: 60rem;
-  height: 32rem;
-  inset: -18rem auto auto -9rem;
-  rotate: 18deg;
-  opacity: 0.55;
-}
-
-.cnpm-auth::after {
-  width: 48rem;
-  height: 18rem;
-  inset: auto auto 3rem -11rem;
-  rotate: -13deg;
-  opacity: 0.45;
-}
-
-.cnpm-auth__topbar,
-.cnpm-auth__main,
-.cnpm-auth__footer {
+.cnpm-auth__visual-inner {
   position: relative;
   z-index: 1;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: var(--cnpm-space-8);
+  padding: var(--cnpm-space-10);
+}
+
+.cnpm-auth__logo {
+  width: auto;
+  height: 4.5rem;
+  /* Le lockup officiel est bleu sur fond clair : posé sur la photographie, il reçoit
+     une pastille blanche plutôt qu'une variante recolorée, interdite par la charte. */
+  align-self: flex-start;
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-auth__trust {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  justify-content: center;
+  max-width: 32rem;
+}
+
+.cnpm-auth__trust-title {
+  margin: 0;
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-4xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  line-height: 1.15;
+}
+
+.cnpm-auth__accent {
+  width: 3.75rem;
+  height: 0.1875rem;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-red-600);
+}
+
+.cnpm-auth__trust-text {
+  max-width: 30rem;
+  margin: 0;
+  color: color-mix(in srgb, var(--cnpm-color-text-inverse) 88%, transparent);
+  font-size: var(--cnpm-font-size-md);
+  line-height: var(--cnpm-font-lineHeight-lg);
+}
+
+/* Bande translucide en pied de panneau : c'est elle qui garantit le contraste des
+   quatre bénéfices, la photographie étant plus claire vers le bas. */
+.cnpm-auth__benefits {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cnpm-space-5);
+  margin: 0;
+  padding: var(--cnpm-space-6);
+  border: 1px solid color-mix(in srgb, var(--cnpm-color-text-inverse) 14%, transparent);
+  border-radius: var(--cnpm-radius-lg);
+  background: color-mix(in srgb, var(--cnpm-color-brand-blue-950) 82%, transparent);
+  backdrop-filter: blur(6px);
+  list-style: none;
+}
+
+.cnpm-auth__benefits li {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+  text-align: center;
+}
+
+.cnpm-auth__benefits li > span {
+  display: grid;
+  width: var(--cnpm-space-12);
+  height: var(--cnpm-space-12);
+  place-items: center;
+  border-radius: var(--cnpm-radius-pill);
+  background: color-mix(in srgb, var(--cnpm-color-text-inverse) 12%, transparent);
+  color: var(--cnpm-color-text-inverse);
+}
+
+.cnpm-auth__benefits svg {
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+}
+
+.cnpm-auth__benefits div {
+  display: grid;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-auth__benefits strong {
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-auth__benefits small {
+  color: color-mix(in srgb, var(--cnpm-color-text-inverse) 78%, transparent);
+  font-size: var(--cnpm-font-size-xs);
+  line-height: var(--cnpm-font-lineHeight-sm);
 }
 
 .cnpm-auth__topbar {
   display: flex;
-  min-height: 6.25rem;
+  min-height: 5rem;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--cnpm-space-4) calc(var(--cnpm-space-10) * 2);
-}
-
-/* Hauteur imposée, largeur libre : fixer les deux avec `object-fit: fill` étirait le
-   lockup d'un facteur 1,93 (ratio 2,727 forcé sur un actif de ratio 2,015). */
-.cnpm-auth__logo {
-  width: auto;
-  height: 5.5rem;
+  justify-content: flex-end;
+  padding: var(--cnpm-space-5) var(--cnpm-space-10) 0;
 }
 
 .cnpm-auth__lang {
@@ -86,124 +200,28 @@
   color: var(--cnpm-color-text-muted);
 }
 
-.cnpm-auth__main {
-  display: grid;
-  width: 100%;
-  max-width: var(--cnpm-size-contentMax);
-  flex: 1 1 auto;
-  /* La gouttière entre dans le contrôle de composition : 54,01/45,99 évite que
-     l'arrondi sous-pixel de Chromium place la zone de confiance à 51,998 % à
-     1 024 px, juste sous la borne normative de 52 %. */
-  grid-template-columns: minmax(0, 54.01fr) minmax(0, 45.99fr);
-  align-items: start;
-  gap: var(--cnpm-space-8);
-  margin: 0 auto;
-  padding: 0 calc(var(--cnpm-space-10) * 2) var(--cnpm-space-10);
-}
-
 .cnpm-auth__panel {
   display: flex;
-  min-width: 0;
-  justify-content: flex-start;
-  margin-top: calc(-1 * var(--cnpm-space-5));
-  transform: translateX(calc(-1 * var(--cnpm-space-2)));
-}
-
-.cnpm-auth__trust {
-  order: -1;
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-  gap: var(--cnpm-space-4);
-  margin-top: calc(var(--cnpm-space-10) * 2);
-}
-
-.cnpm-auth__trust-title {
-  max-width: 24rem;
-  margin: 0;
-  color: var(--cnpm-color-brand-blue-900);
-  font-size: var(--cnpm-font-size-4xl);
-  font-weight: var(--cnpm-font-weight-bold);
-  line-height: 1.2;
-}
-
-.cnpm-auth__accent {
-  width: 3.75rem;
-  height: 0.1875rem;
-  border-radius: var(--cnpm-radius-pill);
-  background: var(--cnpm-color-brand-red-600);
-}
-
-.cnpm-auth__trust-text {
-  max-width: 34rem;
-  margin: 0;
-  color: var(--cnpm-color-text-secondary);
-  font-size: var(--cnpm-font-size-md);
-  line-height: var(--cnpm-font-lineHeight-lg);
-}
-
-.cnpm-auth__benefits {
-  display: grid;
-  gap: var(--cnpm-space-4);
-  margin: var(--cnpm-space-2) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.cnpm-auth__benefits li {
-  display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr);
+  flex: 1 1 auto;
   align-items: center;
-  gap: var(--cnpm-space-4);
-}
-
-.cnpm-auth__benefits li > span {
-  display: grid;
-  width: 3.5rem;
-  height: 3.5rem;
-  place-items: center;
-  border-radius: var(--cnpm-radius-pill);
-  background: var(--cnpm-color-brand-blue-50);
-  color: var(--cnpm-color-brand-blue-700);
-}
-
-.cnpm-auth__benefits svg {
-  width: var(--cnpm-size-icon-lg);
-  height: var(--cnpm-size-icon-lg);
-}
-
-.cnpm-auth__benefits div {
-  display: grid;
-  gap: var(--cnpm-space-1);
-}
-
-.cnpm-auth__benefits strong {
-  color: var(--cnpm-color-brand-blue-900);
-  font-size: var(--cnpm-font-size-sm);
-}
-
-.cnpm-auth__benefits small {
-  max-width: 27rem;
-  color: var(--cnpm-color-text-secondary);
-  font-size: var(--cnpm-font-size-xs);
-  line-height: var(--cnpm-font-lineHeight-sm);
+  justify-content: center;
+  min-width: 0;
+  padding: var(--cnpm-space-6) var(--cnpm-space-10);
 }
 
 .cnpm-auth__footer {
   display: flex;
-  min-height: 4.25rem;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--cnpm-color-border-subtle);
-  padding: var(--cnpm-space-4) calc(var(--cnpm-space-10) * 2);
-  background: var(--cnpm-color-surface-primary);
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-5) var(--cnpm-space-10);
 }
 
 .cnpm-auth__legal,
 .cnpm-auth__secure {
   margin: 0;
   color: var(--cnpm-color-text-muted);
-  font-size: var(--cnpm-font-size-sm);
+  font-size: var(--cnpm-font-size-xs);
 }
 
 .cnpm-auth__secure {
@@ -217,90 +235,84 @@
   color: var(--cnpm-color-brand-blue-700);
 }
 
-@media (max-width: 63.9375rem) {
-  .cnpm-auth__topbar,
-  .cnpm-auth__main,
-  .cnpm-auth__footer {
-    padding-inline: var(--cnpm-layout-pagePaddingTablet);
+/* Tablette : le panneau perd du terrain mais reste présent, et les bénéfices passent
+   sur deux rangées plutôt que d'être comprimés à quatre colonnes étroites. */
+@media (max-width: 79.9375rem) {
+  .cnpm-auth {
+    grid-template-columns: minmax(0, 48fr) minmax(0, 52fr);
   }
 
-  .cnpm-auth__main {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--cnpm-space-6);
-  }
-
-  .cnpm-auth__panel {
-    justify-content: center;
-    margin-top: 0;
-    transform: none;
-  }
-
-  .cnpm-auth__trust {
-    order: 0;
-    max-width: 40rem;
-    margin: 0 auto;
+  .cnpm-auth__visual-inner {
+    padding: var(--cnpm-space-8);
   }
 
   .cnpm-auth__benefits {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
 
-@media (max-width: 47.9375rem) {
-  .cnpm-auth__topbar {
-    min-height: 4.5rem;
+  .cnpm-auth__panel,
+  .cnpm-auth__topbar,
+  .cnpm-auth__footer {
+    padding-inline: var(--cnpm-space-6);
   }
 
+  .cnpm-auth__trust-title {
+    font-size: var(--cnpm-font-size-3xl);
+  }
+}
+
+/* Mobile : une seule colonne, formulaire prioritaire. Le panneau devient un bandeau
+   supérieur borné en hauteur — l'ordre du DOM plaçant le formulaire en premier, le
+   placement explicite en lignes est nécessaire pour remettre l'image au-dessus. */
+@media (max-width: 47.9375rem) {
+  .cnpm-auth {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-auth__visual {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 15rem;
+    max-height: 18rem;
+  }
+
+  .cnpm-auth__side {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .cnpm-auth__visual-inner {
+    gap: var(--cnpm-space-4);
+    padding: var(--cnpm-space-5);
+  }
+
+  .cnpm-auth__logo {
+    height: 3rem;
+    padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  }
+
+  .cnpm-auth__trust-title {
+    font-size: var(--cnpm-font-size-xl);
+    line-height: var(--cnpm-font-lineHeight-xl);
+  }
+
+  /* Les bénéfices et le sous-titre sont retirés du bandeau mobile : ils y seraient
+     illisibles et repousseraient le formulaire hors de l'écran. */
+  .cnpm-auth__trust-text,
+  .cnpm-auth__benefits,
+  .cnpm-auth__lang-unavailable {
+    display: none;
+  }
+
+  .cnpm-auth__panel,
   .cnpm-auth__topbar,
-  .cnpm-auth__main,
   .cnpm-auth__footer {
     padding-inline: var(--cnpm-layout-pagePaddingMobile);
   }
 
-  .cnpm-auth__logo {
-    width: auto;
-    height: 4rem;
-  }
-
-  .cnpm-auth__lang-unavailable,
-  .cnpm-auth__benefits li:nth-child(n + 3) {
-    display: none;
-  }
-
-  .cnpm-auth__main {
-    padding-block: var(--cnpm-space-4);
-  }
-
-  .cnpm-auth__trust-title {
-    font-size: var(--cnpm-font-size-md);
-    line-height: var(--cnpm-font-lineHeight-md);
-  }
-
-  .cnpm-auth__trust-text,
-  .cnpm-auth__benefits small {
-    font-size: var(--cnpm-font-size-xs);
-  }
-
-  .cnpm-auth__benefits {
-    grid-template-columns: 1fr;
-    gap: var(--cnpm-space-2);
-  }
-
-  .cnpm-auth__benefits li {
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-  }
-
-  .cnpm-auth__benefits li > span {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-
   .cnpm-auth__footer {
-    min-height: auto;
-    justify-content: center;
-  }
-
-  .cnpm-auth__secure {
-    display: none;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--cnpm-space-2);
   }
 }
