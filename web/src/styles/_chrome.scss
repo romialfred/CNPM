@@ -10,9 +10,9 @@
    la navigation sombre est validée.
 
    Contrastes mesurés sur le fond `--cnpm-chrome-surface` (#0B123B) :
-     texte principal   #FFFFFF   18,0:1
-     texte secondaire  #D5DCFA   14,3:1
-     texte atténué     #AEBBE8   11,2:1
+     texte principal   #FFFFFF   18,04:1
+     texte secondaire  #D5DCFA   13,27:1
+     texte atténué     #AEBBE8    9,51:1
    Tous dépassent largement le 4,5:1 exigé du texte. */
 
 :root {
@@ -25,7 +25,25 @@
   --cnpm-chrome-text: var(--cnpm-color-neutral-0);
   --cnpm-chrome-text-secondary: var(--cnpm-color-brand-blue-200);
   --cnpm-chrome-text-muted: var(--cnpm-color-brand-blue-300);
+
+  /* SÉPARATEUR DÉCORATIF UNIQUEMENT — ne jamais s'en servir pour délimiter un contrôle.
+     Un `color-mix` translucide ne se juge pas à sa valeur nominale mais à son aplat réel :
+     à 22 % sur ce fond, la couleur peinte est #2F3761, soit 1,58:1. C'est assez pour un
+     filet de séparation, que WCAG 2.2 n'assujettit à aucun seuil (1.4.11 ne vise que ce
+     qui identifie un composant ou son état), et très insuffisant pour une limite de
+     contrôle. D'où le jeton distinct ci-dessous. */
   --cnpm-chrome-border: color-mix(in srgb, var(--cnpm-color-brand-blue-300) 22%, transparent);
+
+  /* LIMITE DE CONTRÔLE — soumise au 3:1 de WCAG 2.2 (1.4.11).
+     Champ de recherche, bouton de repli, fermeture du tiroir, bouton hamburger : leur
+     bordure est le SEUL élément qui les délimite, aucun remplissage ne les porte. Le
+     seuil de 3:1 est atteint à partir de 48 % ; 50 % donne 3,26:1, avec une marge qui
+     survit à l'arrondi 8 bits du compositeur. */
+  --cnpm-chrome-control-border: color-mix(
+    in srgb,
+    var(--cnpm-color-brand-blue-300) 50%,
+    transparent
+  );
 
   /* L'anneau de focus du dépôt vaut `--cnpm-color-brand-blue-700` partout. Mesuré sur
      ce fond sombre, il tombe à 1,63:1 : invisible. Tout le chrome échouerait alors aux

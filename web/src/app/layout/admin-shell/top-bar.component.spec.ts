@@ -113,6 +113,115 @@ describe('TopBarComponent', () => {
     expect(document.activeElement).toBe(toggle);
   });
 
+  it('referme le panneau de notifications par Échap en rendant le focus au déclencheur', async () => {
+    // Le tiroir de recherche du même composant offre déjà ce comportement : sans lui ici,
+    // la personne au clavier repartirait du haut du document (WCAG 2.2, critère 2.4.3).
+    const { fixture, host } = await setup();
+    const panel = host.querySelector<HTMLDetailsElement>('.cnpm-topbar__notifications');
+    const trigger = host.querySelector<HTMLElement>('.cnpm-topbar__notification-trigger');
+    if (!panel || !trigger) throw new Error('Panneau de notifications introuvable');
+
+    // L'état vient du DOM natif, pas d'un signal parallèle.
+    panel.open = true;
+    fixture.detectChanges();
+    // Le focus doit être DANS le panneau : c'est la seule situation où le rapatrier
+    // est correct. Ailleurs, ce serait un vol de focus.
+    trigger.focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(panel.open).toBe(false);
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('referme le panneau sur Échap frappé ailleurs, sans déplacer le focus', async () => {
+    // Défaut trouvé par vérification adversariale : le gestionnaire rapatriait le focus
+    // sans regarder d'où venait la touche. Un Échap frappé n'importe où dans la page
+    // sautait donc sur la cloche, et `preventDefault` privait tout autre consommateur
+    // de la touche. Ce test échoue sur la version fautive.
+    const { fixture, host } = await setup();
+    const panel = host.querySelector<HTMLDetailsElement>('.cnpm-topbar__notifications');
+    const ailleurs = host.querySelector<HTMLButtonElement>('.cnpm-topbar__search-toggle');
+    if (!panel || !ailleurs) throw new Error('Panneau de notifications introuvable');
+
+    panel.open = true;
+    fixture.detectChanges();
+    ailleurs.focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(panel.open).toBe(false);
+    expect(document.activeElement).toBe(ailleurs);
+  });
+
+  it('n intercepte pas l Échap du champ de recherche quand le panneau est ouvert', async () => {
+    // Les deux dépliants coexistent. Sans garde, l'Échap du champ était consommé deux
+    // fois : `closeSearch()` posait le focus sur son déclencheur, puis le gestionnaire
+    // du panneau l'écrasait vers la cloche.
+    const { fixture, host } = await setup();
+    const panel = host.querySelector<HTMLDetailsElement>('.cnpm-topbar__notifications');
+    const toggle = host.querySelector<HTMLButtonElement>('.cnpm-topbar__search-toggle');
+    if (!panel || !toggle) throw new Error('Barre incomplète');
+
+    panel.open = true;
+    toggle.click();
+    fixture.detectChanges();
+    const input = host.querySelector<HTMLInputElement>('#recherche-globale');
+    input?.focus();
+    input?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it('referme le panneau quand le focus en sort au clavier', async () => {
+    // Le panneau ne contient aucun élément focalisable : une tabulation depuis le
+    // `<summary>` le laissait ouvert indéfiniment. Sous 479 px il est en `position:
+    // fixed` pleine largeur et recouvrirait l'élément qui vient de prendre le focus.
+    const { fixture, host } = await setup();
+    const panel = host.querySelector<HTMLDetailsElement>('.cnpm-topbar__notifications');
+    const ailleurs = host.querySelector<HTMLButtonElement>('.cnpm-topbar__search-toggle');
+    if (!panel || !ailleurs) throw new Error('Panneau de notifications introuvable');
+
+    panel.open = true;
+    fixture.detectChanges();
+    panel.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: ailleurs }));
+    fixture.detectChanges();
+
+    expect(panel.open).toBe(false);
+  });
+
+  it('referme le panneau de notifications au clic extérieur sans voler le focus', async () => {
+    const { fixture, host } = await setup();
+    const panel = host.querySelector<HTMLDetailsElement>('.cnpm-topbar__notifications');
+    const ailleurs = host.querySelector<HTMLButtonElement>('.cnpm-topbar__search-toggle');
+    if (!panel || !ailleurs) throw new Error('Panneau de notifications introuvable');
+
+    panel.open = true;
+    fixture.detectChanges();
+    ailleurs.focus();
+    ailleurs.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(panel.open).toBe(false);
+    // Le focus appartient à la cible du clic : le ramener au déclencheur le lui volerait.
+    expect(document.activeElement).toBe(ailleurs);
+  });
+
+  it('laisse le panneau de notifications ouvert lors d un clic à l intérieur', async () => {
+    const { fixture, host } = await setup();
+    const panel = host.querySelector<HTMLDetailsElement>('.cnpm-topbar__notifications');
+    const contenu = host.querySelector<HTMLElement>('.cnpm-topbar__notification-panel');
+    if (!panel || !contenu) throw new Error('Panneau de notifications introuvable');
+
+    panel.open = true;
+    fixture.detectChanges();
+    contenu.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    fixture.detectChanges();
+
+    expect(panel.open).toBe(true);
+  });
+
   it('affiche une accroche nominative sans dupliquer le h1 de la page', async () => {
     const { host } = await setup();
     const title = host.querySelector<HTMLElement>('.cnpm-topbar__title');

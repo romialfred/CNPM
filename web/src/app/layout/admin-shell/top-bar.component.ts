@@ -4,6 +4,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  HostListener,
   inject,
   Injector,
   input,
@@ -56,6 +57,81 @@ export class TopBarComponent {
 
   private readonly searchToggle = viewChild<ElementRef<HTMLButtonElement>>('searchToggle');
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+
+  /**
+   * Panneau de notifications — `<details>` natif, sans état parallèle.
+   *
+   * L'ouverture reste gérée par le navigateur ; on lit et on écrit `open` sur l'élément
+   * lui-même. Dupliquer cet état dans un signal le ferait diverger du DOM dès que
+   * l'utilisateur replie le panneau par un clic sur le `<summary>`.
+   */
+  private readonly notifications = viewChild<ElementRef<HTMLDetailsElement>>('notifications');
+  private readonly notificationTrigger = viewChild<ElementRef<HTMLElement>>('notificationTrigger');
+
+  /**
+   * Échap referme le panneau.
+   *
+   * L'écoute est posée sur le document, pas sur l'hôte : un panneau ouvert alors que le
+   * focus se trouve ailleurs dans la page ne recevrait jamais l'événement et resterait
+   * ouvert.
+   *
+   * Le focus n'est rendu au `<summary>` QUE s'il se trouvait dans le panneau. Rapatrier
+   * inconditionnellement en ferait un voleur de focus : un Échap frappé n'importe où —
+   * typiquement dans le champ de recherche, qui a son propre Échap — déplacerait la
+   * personne sur la cloche, et `preventDefault` priverait au passage tout autre
+   * consommateur de la touche. Fermer sans toucher au focus est le comportement correct
+   * hors du panneau (WCAG 2.2, critère 2.4.3), comme le fait déjà le clic extérieur.
+   *
+   * `@HostListener` est retiré par Angular à la destruction du composant : aucun
+   * écouteur ne survit à la vue.
+   */
+  @HostListener('document:keydown', ['$event'])
+  protected onDocumentKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Escape') return;
+    const panneau = this.notifications()?.nativeElement;
+    if (!panneau?.open) return;
+    const dedans = panneau.contains(document.activeElement);
+    panneau.open = false;
+    if (dedans) {
+      event.preventDefault();
+      this.notificationTrigger()?.nativeElement.focus();
+    }
+  }
+
+  /**
+   * Sortir du panneau au clavier le referme.
+   *
+   * Sans cela, une tabulation depuis le `<summary>` laisserait `open` à `true`
+   * indéfiniment — le panneau ne contient aujourd'hui aucun élément focalisable. Sous
+   * 479 px il passe en `position: fixed` pleine largeur et recouvrirait alors l'élément
+   * qui vient de recevoir le focus (WCAG 2.2, critère 2.4.11).
+   *
+   * Le focus n'est pas déplacé : il appartient déjà à sa nouvelle destination.
+   */
+  @HostListener('focusout', ['$event'])
+  protected onFocusOut(event: FocusEvent): void {
+    const panneau = this.notifications()?.nativeElement;
+    if (!panneau?.open) return;
+    const destination = event.relatedTarget as Node | null;
+    // `relatedTarget` nul signifie que le focus quitte le document : le panneau n'a plus
+    // de raison de rester ouvert non plus.
+    if (destination && panneau.contains(destination)) return;
+    panneau.open = false;
+  }
+
+  /**
+   * Un clic hors du panneau le referme sans lui voler le focus.
+   *
+   * Le focus appartient déjà à la cible du clic : le déplacer sur le `<summary>` ferait
+   * sauter le point d'insertion de la personne.
+   */
+  @HostListener('document:pointerdown', ['$event'])
+  protected onDocumentPointerDown(event: Event): void {
+    const panneau = this.notifications()?.nativeElement;
+    if (!panneau?.open) return;
+    if (panneau.contains(event.target as Node)) return;
+    panneau.open = false;
+  }
 
   protected toggleSearch(): void {
     const ouvert = !this.searchOpen();

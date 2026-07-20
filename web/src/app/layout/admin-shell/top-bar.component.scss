@@ -111,7 +111,7 @@
   gap: var(--cnpm-space-2);
   padding: 0 var(--cnpm-space-3);
   height: var(--cnpm-size-control-md);
-  border: 1px solid var(--cnpm-chrome-border);
+  border: 1px solid var(--cnpm-chrome-control-border);
   border-radius: var(--cnpm-radius-md);
   background-color: var(--cnpm-chrome-surface-raised);
 }
@@ -122,11 +122,6 @@
   border-color: var(--cnpm-chrome-focus);
   outline: 2px solid var(--cnpm-chrome-focus);
   outline-offset: 1px;
-}
-
-.cnpm-topbar__search-icon {
-  flex: none;
-  color: var(--cnpm-color-neutral-500);
 }
 
 .cnpm-topbar__input {
@@ -183,16 +178,6 @@
   gap: var(--cnpm-space-1);
   font-size: var(--cnpm-font-size-xs);
   color: var(--cnpm-chrome-text-secondary);
-}
-
-.cnpm-topbar__demo {
-  padding: 0 var(--cnpm-space-1);
-  border-radius: var(--cnpm-radius-xs);
-  background-color: var(--cnpm-chrome-surface-raised);
-  color: var(--cnpm-chrome-text-secondary);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-semibold);
-  line-height: var(--cnpm-font-lineHeight-xs);
 }
 
 .cnpm-topbar__notifications {
@@ -326,7 +311,7 @@
     /* Cible tactile de 44 px. */
     width: var(--cnpm-size-control-lg);
     height: var(--cnpm-size-control-lg);
-    border: 1px solid var(--cnpm-chrome-border);
+    border: 1px solid var(--cnpm-chrome-control-border);
     border-radius: var(--cnpm-radius-md);
     background-color: transparent;
     color: var(--cnpm-chrome-text-secondary);

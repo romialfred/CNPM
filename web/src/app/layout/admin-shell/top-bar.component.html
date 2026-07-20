@@ -65,9 +65,13 @@
   </form>
 
   @if (identity | async; as user) {
-    <details class="cnpm-topbar__notifications">
+    <!-- L'ouverture reste native : `<details>` porte l'état, le composant n'ajoute que la
+         fermeture par Échap (avec retour du focus) et au clic extérieur, absentes du
+         comportement natif. -->
+    <details class="cnpm-topbar__notifications" #notifications>
       <summary
         class="cnpm-topbar__notification-trigger"
+        #notificationTrigger
         [attr.aria-label]="
           user.notificationCount === null
             ? 'Notifications indisponibles'

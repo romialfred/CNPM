@@ -87,6 +87,39 @@ describe('AdminShellComponent — drawer accessible', () => {
     expect(host.querySelectorAll('.cnpm-sidebar__sublist')).toHaveLength(0);
   });
 
+  it('conserve l’accent de domaine quand la navigation est réduite', async () => {
+    // En mode réduit les libellés sont masqués : le pictogramme reste seul à identifier
+    // la rubrique, et son accent devient la seule distinction entre domaines. Il ne peut
+    // donc pas disparaître précisément là où il porte le plus d'information.
+    const { fixture, host } = await setup();
+
+    host.querySelector<HTMLButtonElement>('.cnpm-sidebar__collapse')?.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // La navigation est bien rendue à plat : plus aucun intitulé de domaine.
+    expect(host.querySelectorAll('.cnpm-sidebar__group-trigger')).toHaveLength(0);
+
+    const accents = (selecteur: string) =>
+      host.querySelector<HTMLAnchorElement>(selecteur)?.className ?? '';
+
+    // Chaque entrée porte l'accent de SON groupe, pas une valeur unique recopiée.
+    expect(accents('a.cnpm-sidebar__item[href="/admin/members"]')).toContain(
+      'cnpm-nav-accent--repertoire',
+    );
+    expect(accents('a.cnpm-sidebar__item[href="/admin/payments/reconciliation"]')).toContain(
+      'cnpm-nav-accent--recouvrement',
+    );
+    expect(accents('a.cnpm-sidebar__item[href="/admin/requests"]')).toContain(
+      'cnpm-nav-accent--relation',
+    );
+    // Le tableau de bord est hors groupe : son accent vient de la donnée de navigation,
+    // plus d'une chaîne écrite dans le gabarit.
+    expect(accents('a.cnpm-sidebar__item[href="/admin/dashboard"]')).toContain(
+      'cnpm-nav-accent--dashboard',
+    );
+  });
+
   it('ne porte plus le bloc « Exercice en cours » en pied de navigation', async () => {
     // Il occupait 60 px sans servir a naviguer ; l'exercice se choisit sur le tableau de
     // bord, ou il pilote reellement les chiffres affiches.

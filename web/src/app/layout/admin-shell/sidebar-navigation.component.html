@@ -33,15 +33,18 @@
   <nav class="cnpm-sidebar__nav" aria-label="Navigation d’administration">
     <!-- En mode réduit, les libellés sont masqués : un intitulé de groupe n'y aurait rien
          à annoncer et un dépliant ne pourrait pas se lire. Les destinations sont alors
-         rendues à plat, comme autant de pictogrammes. -->
+         rendues à plat, comme autant de pictogrammes. Chacune garde l'accent de son
+         domaine : c'est ici que le pictogramme porte le plus, puisqu'il est seul. -->
     @if (collapsed()) {
       <ul class="cnpm-sidebar__list">
         @for (entry of navigation(); track entry.route) {
           <li>
             <a
               class="cnpm-sidebar__item"
+              [class]="accentClassOfRoute(entry.route)"
               [routerLink]="entry.route"
               routerLinkActive="cnpm-sidebar__item--active"
+              ariaCurrentWhenActive="page"
               (click)="drawerClose.emit()"
             >
               <cnpm-admin-nav-icon [name]="entry.icon" [size]="iconSize.control" />
@@ -56,9 +59,11 @@
           @if (node.kind === 'link') {
             <li>
               <a
-                class="cnpm-sidebar__item cnpm-nav-accent--dashboard"
+                class="cnpm-sidebar__item"
+                [class]="accentClassOfRoute(node.entry.route)"
                 [routerLink]="node.entry.route"
                 routerLinkActive="cnpm-sidebar__item--active"
+                ariaCurrentWhenActive="page"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="drawerClose.emit()"
               >
@@ -70,7 +75,7 @@
             <li class="cnpm-sidebar__group">
               <button
                 class="cnpm-sidebar__group-trigger"
-                [class]="'cnpm-nav-accent--' + node.group.id"
+                [class]="accentClassOfGroup(node.group.id)"
                 type="button"
                 [id]="node.group.id + '-trigger'"
                 [attr.aria-expanded]="isOpen(node.group.id)"
@@ -113,6 +118,7 @@
                           class="cnpm-sidebar__item cnpm-sidebar__item--sub"
                           [routerLink]="entry.route"
                           routerLinkActive="cnpm-sidebar__item--active"
+                          ariaCurrentWhenActive="page"
                           (click)="drawerClose.emit()"
                         >
                           <span class="cnpm-sidebar__label">{{ entry.label }}</span>

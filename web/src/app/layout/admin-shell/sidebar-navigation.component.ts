@@ -18,7 +18,11 @@ import {
 import { catchError, filter, map, of, startWith } from 'rxjs';
 import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
 import { AdminNavIconComponent } from './admin-nav-icon.component';
-import { adminNavGroupOfRoute, visibleAdminNav, visibleAdminNavTree } from './admin-nav';
+import {
+  adminNavAccentOfRoute,
+  visibleAdminNav,
+  visibleAdminNavTree,
+} from './admin-nav';
 import { SESSION_GATEWAY } from './session-gateway';
 
 /**
@@ -117,9 +121,29 @@ export class SidebarNavigationComponent {
     });
   }
 
-  protected readonly hasPending = computed(() =>
-    this.navigation().some((entry) => entry.pending),
-  );
+  protected readonly hasPending = computed(() => this.navigation().some((entry) => entry.pending));
 
-  protected groupOfRoute = adminNavGroupOfRoute;
+
+  /**
+   * Classe d'accent d'un domaine.
+   *
+   * Le préfixe vit ici, à un seul endroit : le gabarit ne compose plus de nom de classe
+   * et n'écrit surtout aucun identifiant de domaine en dur.
+   */
+  protected accentClassOfGroup(groupId: string): string {
+    return `cnpm-nav-accent--${groupId}`;
+  }
+
+  /**
+   * Classe d'accent d'une destination, dérivée des données de navigation.
+   *
+   * Indispensable en mode réduit : les libellés y sont masqués, le pictogramme reste
+   * seul à identifier la rubrique, et sa couleur est alors la seule distinction entre
+   * domaines. Sans accent déclaré, aucune classe n'est posée — le repli de
+   * `sidebar-navigation.component.scss` (`--cnpm-chrome-text-muted`) prend le relais.
+   */
+  protected accentClassOfRoute(route: string): string {
+    const accent = adminNavAccentOfRoute(route);
+    return accent ? this.accentClassOfGroup(accent) : '';
+  }
 }

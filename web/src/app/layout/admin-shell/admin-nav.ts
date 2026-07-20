@@ -40,7 +40,17 @@ export interface AdminNavGroup {
 }
 
 export type AdminNavNode =
-  | { readonly kind: 'link'; readonly entry: AdminNavEntry }
+  | {
+      readonly kind: 'link';
+      readonly entry: AdminNavEntry;
+      /**
+       * Accent de domaine d'un lien hors groupe. Un lien n'ayant pas de groupe dont
+       * hériter, il porte le sien. La valeur désigne une classe `.cnpm-nav-accent--*`
+       * de `web/src/styles/_chrome.scss` ; laisser le champ vide est licite, le repli
+       * CSS s'applique alors.
+       */
+      readonly accent?: string;
+    }
   | { readonly kind: 'group'; readonly group: AdminNavGroup };
 
 /**
@@ -63,6 +73,7 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
   {
     kind: 'link',
     entry: { label: 'Tableau de bord', route: '/admin/dashboard', icon: 'dashboard' },
+    accent: 'dashboard',
   },
   {
     kind: 'group',
@@ -203,6 +214,27 @@ export function visibleAdminNavTree(permissions: readonly string[]): readonly Ad
 export function adminNavGroupOfRoute(route: string): string | undefined {
   for (const node of ADMIN_NAV_TREE) {
     if (node.kind === 'group' && node.group.entries.some((entry) => entry.route === route)) {
+      return node.group.id;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Accent de domaine d'une destination : celui de son GROUPE, ou celui que déclare le
+ * lien hors groupe.
+ *
+ * L'identifiant de groupe sert directement d'identifiant d'accent — c'est la convention
+ * des classes `.cnpm-nav-accent--*` de `web/src/styles/_chrome.scss`, pas une couleur
+ * décidée ici. Une destination sans accent déclaré renvoie `undefined` : aucune classe
+ * n'est posée et le repli CSS s'applique, plutôt qu'une classe inventée qui n'existerait
+ * dans aucune feuille.
+ */
+export function adminNavAccentOfRoute(route: string): string | undefined {
+  for (const node of ADMIN_NAV_TREE) {
+    if (node.kind === 'link') {
+      if (node.entry.route === route) return node.accent;
+    } else if (node.group.entries.some((entry) => entry.route === route)) {
       return node.group.id;
     }
   }

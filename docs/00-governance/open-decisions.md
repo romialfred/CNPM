@@ -39,6 +39,7 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-013 | Modèle de consentement des contacts publics | Définir le recueil, la conservation, la révocation et la revérification du consentement à publier des coordonnées | Juridique / DPO + Communication | Élevé | Ouverte |
 | UX-DEC-015 | Nombre d'entrées de la navigation publique | Arbitrer entre les huit entrées de REF-PUB-001 et le regroupement en quatre menus déroulants demandé par le client | Produit / UX + Communication | Moyen | Ouverte |
 | UX-DEC-016 | Chrome sombre de l'espace d'administration | Arbitrer le fond bleu profond partagé par la navigation et l'en-tête, contraire à la règle des surfaces blanches, et promouvoir ou refuser les tokens de surface inversée | Produit / UX | Moyen | Ouverte |
+| UX-DEC-017 | Taille des pictogrammes de la navigation latérale | Confirmer l'échelon `control` (20 px) là où l'iconographie affecte `navigation` (24 px) aux pictogrammes de navigation, ou revenir à 24 px | Produit / UX | Faible | Ouverte |
 
 ## Décisions API
 
@@ -156,9 +157,9 @@ de 252 px de large sur toute la hauteur, plus une barre de 72 px : la règle des
 blanches est enfreinte de façon visible et volontaire.
 
 **Ce que l'écart a entraîné.** Le pack de tokens n'expose aucune valeur de texte, de filet
-ou de focus sur fond sombre. Six alias ont été dérivés dans `web/src/styles/_chrome.scss`,
+ou de focus sur fond sombre. Des alias ont été dérivés dans `web/src/styles/_chrome.scss`,
 tous à partir de tokens existants — aucune couleur n'a été inventée. Trois défauts mesurés
-ont dû être corrigés :
+ont été corrigés à la livraison :
 
 1. **Anneau de focus.** `--cnpm-color-brand-blue-700`, l'anneau de tout le produit, ne
    donne que **1,63:1** sur ce fond : invisible. Tout le chrome aurait échoué aux critères
@@ -173,14 +174,69 @@ ont dû être corrigés :
    la limite — le survol `red-700` n'y donnait que 2,78:1. Le fond du bouton est donc
    constant et le survol se marque par sa bordure.
 
+**Deux défauts supplémentaires, relevés après rédaction par audit indépendant.** Tous deux
+portent sur des jetons `color-mix` translucides. Un tel jeton ne se juge pas à sa valeur
+nominale mais à son **aplat réel**, une fois composé sur le fond qu'il recouvre — la
+rédaction initiale les avait tenus pour acquis sans les mesurer :
+
+4. **Limites de contrôle.** `--cnpm-chrome-border`, à `color-mix(brand-blue-300 22 %,
+   transparent)`, s'aplatit sur #0B123B en #2F3761, soit **1,58:1**. Or ce seul jeton
+   délimitait quatre contrôles — champ de recherche, bouton de repli, fermeture du tiroir,
+   bouton hamburger — dont aucun remplissage ne porte la forme. Tous étaient donc invisibles
+   au repos : échec du critère **1.4.11** de WCAG 2.2 (3:1 pour un élément non textuel).
+5. **Champ de recherche.** `--cnpm-chrome-surface-raised`, à 14 %, s'aplatit en #222A53,
+   soit **1,31:1**. Combiné au défaut 4, le champ était indissociable du fond tant qu'il
+   n'avait pas le focus.
+
+**Correctif appliqué.** Le jeton a été scindé, et non son seuil élargi.
+`--cnpm-chrome-border` reste à 22 % mais est désormais réservé aux **séparateurs
+décoratifs**, que WCAG n'assujettit à aucun seuil — 1.4.11 ne vise que ce qui identifie un
+composant ou son état. Un jeton distinct, `--cnpm-chrome-control-border`, porte les
+**limites de contrôle** à 50 %, soit **3,26:1** réels. Le seuil de 3:1 est atteint dès
+48 % ; les 50 % retenus laissent une marge qui survit à l'arrondi 8 bits du compositeur.
+
+**Correction d'un décompte.** Le présent texte annonçait « six alias ». Le bloc `:root` de
+`_chrome.scss` en comptait déjà **sept** au commit `505ff41` qui l'a introduit : le chiffre
+était faux à la rédaction. Avec `--cnpm-chrome-control-border`, il en compte **huit**.
+
 **Réserve de conception.** Aucune teinte turquoise n'existe dans les tokens. L'accent du
 domaine « Supervision » reprend `brand-blue-400`, au prix d'une différenciation faible avec
 le bleu du « Répertoire ». Une teinte dédiée relève de l'arbitrage, pas de l'implémentation.
 
-**Question.** Retient-on le chrome sombre pour l'espace d'administration ? Si oui, les six
+**Question.** Retient-on le chrome sombre pour l'espace d'administration ? Si oui, les huit
 alias de `_chrome.scss` doivent être promus dans `docs/ui-handoff/design-tokens/` — dont un
-jeton de focus inversé, qui manque aujourd'hui au pack et sans lequel aucune surface sombre
-n'est accessible.
+jeton de focus inversé et un jeton de limite de contrôle sur fond sombre, qui manquent
+aujourd'hui au pack et sans lesquels aucune surface sombre n'est accessible. La promotion
+doit conserver la **distinction** entre filet décoratif et limite de contrôle : les fondre
+en un seul jeton ramènerait le défaut 4.
+
+### UX-DEC-017 — Taille des pictogrammes de la navigation latérale
+
+**Contexte.** `docs/ui-handoff/docs/01-foundations/iconography.md` ne fixe pas seulement
+une échelle, il en affecte les échelons : « 20 px : contrôle standard » et « 24 px :
+navigation et actions principales ». `web/src/app/design-system/icon/icon.ts` reprend
+l'échelle telle quelle (`CNPM_ICON_SIZE.control = 20`, `CNPM_ICON_SIZE.navigation = 24`).
+
+**Constat.** `AdminNavIcon` rend les rubriques de la navigation latérale à
+`CNPM_ICON_SIZE.control`, soit 20 px, là où l'affectation normative prescrit 24 px. La
+valeur appartient à l'échelle du handoff — rien n'est inventé, et c'est ce qui distingue
+cet écart d'une valeur arbitraire. Ce qui est détourné, c'est l'affectation.
+
+**Justification technique existante.** Elle figure en commentaire de
+`web/src/app/layout/admin-shell/admin-nav-icon.component.ts` : « à 24 px les pictogrammes
+pesaient plus que leur libellé dans une colonne dense ». Elle n'est reprise nulle part
+ailleurs — ni dans ce registre, ni dans le handoff — et n'a donc jamais été arbitrée. Un
+commentaire de code ne vaut pas décision consignée : c'est le seul motif de cette entrée.
+
+**Portée.** L'écart se limite aux rubriques de `SidebarNavigation` (NAV-001) ; la valeur
+par défaut du composant reste `navigation` (24 px). Aucun effet d'accessibilité n'en
+découle : les pictogrammes sont décoratifs, Lucide leur pose `aria-hidden="true"` en
+l'absence de `title`, le libellé de la rubrique porte seul le nom accessible, et la cible
+tactile est celle du lien, non celle de l'icône.
+
+**Question.** Confirme-t-on 20 px pour la navigation latérale — auquel cas `iconography.md`
+doit nuancer l'affectation « navigation » plutôt que laisser le code la contredire — ou
+revient-on à 24 px, en acceptant le déséquilibre visuel constaté en colonne dense ?
 
 ### UX-DEC-013 — Modèle de consentement des contacts publics
 
@@ -362,15 +418,34 @@ barre supérieure. Deux ne s'adossent à aucune spécification.
 |---|---|---|
 | Recherche globale | aucun écran de résultats globaux spécifié | oui, restreinte à la liste des membres |
 | Identité de session | `GET /auth/me` existe côté backend ; le port web ne l'expose pas | oui, via un port `SESSION_GATEWAY` |
-| Cloche de notifications, badge « 8 » | fixture `DemoSessionGateway`, explicitement fictive et sans accusé de lecture | oui en mode démo uniquement |
+| Cloche de notifications, badge « 8 » | fixture `DemoSessionGateway`, explicitement fictive et sans accusé de lecture | oui ; source fictive, mais sans mention visible depuis `977fb6c` |
 | Menu « Nouvelle action » | aucun contenu de menu n'est spécifié | non ; remplacé par un CTA unique vers BO-009 |
 
-**Lecture retenue pour le PoC.** Le mandat de reprise du 2026-07-18 autorise les
+**Lecture retenue à la rédaction (2026-07-18).** Le mandat de reprise autorise les
 données fictives visibles des maquettes afin d'atteindre la fidélité demandée. La
-cloche et le compteur `8` sont donc servis uniquement par `DemoSessionGateway`,
-annoncés comme « notifications de démonstration » et ouvrent un panneau indiquant
+cloche et le compteur `8` devaient donc être servis uniquement par `DemoSessionGateway`,
+annoncés comme « notifications de démonstration » et ouvrir un panneau indiquant
 que le centre n'est pas raccordé. Ce rendu ne constitue ni une source de production,
 ni un accusé de lecture, ni une clôture de l'arbitrage.
+
+**État réel du gabarit (vérifié le 2026-07-20).** Le paragraphe ci-dessus ne décrit plus
+le code. Le commit `977fb6c` — « retire les mentions de demonstration de l'interface »,
+en préparation d'une présentation au Président du Conseil d'Administration — a supprimé
+de `web/src/app/layout/admin-shell/top-bar.component.html` la totalité du libellé de
+démonstration attaché à ce contrôle : le badge « Démo », le titre « Notifications de
+démonstration » et le suffixe « de démonstration » du nom accessible. Le déclencheur est
+aujourd'hui annoncé « 8 notifications », sans réserve d'aucune sorte. Seul subsiste le
+panneau : « Le centre de notifications n'est pas encore raccordé. » La source, elle, n'a
+pas bougé — le compteur vient toujours de `DemoSessionGateway`.
+
+**Divergence à arbitrer.** Rien n'atteste que le retrait visait ce contrôle en propre :
+le commit traite 1 044 occurrences de façon globale, et son propre message relève que,
+privés de ces libellés, les chiffres affichés « ne portent plus aucune marque signalant
+qu'il s'agit d'exemples », le contexte devant dès lors être posé oralement. Un compteur
+fictif désormais annoncé sans réserve excède la borne que la présente décision avait
+posée. L'arbitrage doit choisir : rétablir une mention de portée sur ce seul contrôle,
+ou acter que la présentation orale en tient lieu et corriger la borne écrite ci-dessus.
+Tant qu'il n'a pas tranché, la divergence reste ouverte et n'est pas réputée voulue.
 
 Le menu « Nouvelle action » n'est pas inventé. Le shell affiche une action unique,
 déjà livrée et nommée sans ambiguïté pour les technologies d'assistance, vers le
@@ -380,7 +455,8 @@ La recherche globale est rendue mais honnête sur sa portée : elle cible la lis
 membres, seule collection existante, et son libellé le dit.
 
 **Arbitrage demandé.** Spécifier le module de notifications (source du compteur, portée,
-accusé de lecture) et les entrées du menu « Nouvelle action ».
+accusé de lecture) et les entrées du menu « Nouvelle action ». S'y ajoute la divergence
+ci-dessus : statuer sur la mention de portée du compteur fictif.
 
 ## DATA-DEC-004 — raisons sociales réelles dans les fixtures de démonstration
 
