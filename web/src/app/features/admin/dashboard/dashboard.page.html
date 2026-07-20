@@ -163,6 +163,23 @@
                   }
                 </p>
                 <p class="cnpm-dashboard__kpi-definition">{{ kpi.definition }}</p>
+
+                <!-- Courbe de tendance, uniquement là où une série réelle existe. Les
+                     effectifs n'ont aucun historique au contrat : leur tuile n'en porte
+                     pas plutôt que d'afficher une courbe inventée.
+                     Purement décorative — `aria-hidden` — car elle ne porte aucun chiffre
+                     que la table accessible du graphique ne donne déjà. -->
+                @if (kpiSeries(kpi).length > 1) {
+                  <svg
+                    class="cnpm-dashboard__kpi-spark"
+                    viewBox="0 0 100 32"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path [attr.d]="sparklinePath(kpiSeries(kpi))" fill="none" stroke-width="2" />
+                  </svg>
+                }
                 @if (kpi.route) {
                   <a
                     class="cnpm-dashboard__kpi-link"

@@ -4,7 +4,12 @@
    ---------------------------------------------------------------------------
    Extrait de `dashboard.page.scss`, qui franchissait le plafond de 10 ko par feuille
    de composant. Le plafond n'a pas ete relache : la feuille a ete scindee, comme
-   `dashboard.responsive.scss` l'avait deja ete. */
+   `dashboard.responsive.scss` l'avait deja ete.
+
+   Anatomie de la tuile, inspiree de la reference fournie par le client : pastille a
+   pictogramme et libelle en capitales sur une meme ligne, valeur dominante, legende,
+   puis courbe de tendance en pied. La courbe n'est rendue que la ou une serie reelle
+   existe — voir `kpiSeries()`. */
 
 .cnpm-dashboard {
   /* ---------------------------------------------------------------------- Bandeau KPI */
@@ -27,16 +32,34 @@
     min-width: 0;
   }
 
+  /* Le pictogramme et le libelle partagent une ligne : la valeur gagne ainsi tout
+     l'espace vertical, comme sur la reference. Le libelle passe en capitales, a la
+     taille la plus petite de l'echelle — il nomme la mesure, il ne la concurrence pas. */
   &__kpi-label {
+    display: flex;
+    align-items: center;
+    min-height: var(--cnpm-space-8);
     margin: 0;
+    padding-inline-start: calc(var(--cnpm-space-8) + var(--cnpm-space-2));
+    color: var(--cnpm-color-text-secondary);
+    font-size: var(--cnpm-font-size-xs);
+    font-weight: var(--cnpm-font-weight-semibold);
+    letter-spacing: var(--cnpm-font-letterSpacing-wide);
+    line-height: var(--cnpm-font-lineHeight-xs);
+    text-transform: uppercase;
   }
 
   /* Pastille teintee par l'accent de la tuile. Une seule couleur source : le fond en
-     est derive, la tuile reste donc accordee sans valeur repetee. */
+     est derive, la tuile reste donc accordee sans valeur repetee.
+     Positionnee, et non posee dans le flux : elle s'aligne alors sur la premiere ligne
+     du libelle meme lorsque celui-ci passe sur deux lignes. */
   &__kpi-icon {
+    position: absolute;
+    top: var(--cnpm-space-4);
+    left: var(--cnpm-space-4);
     display: inline-flex;
-    width: var(--cnpm-space-10);
-    height: var(--cnpm-space-10);
+    width: var(--cnpm-space-8);
+    height: var(--cnpm-space-8);
     align-items: center;
     justify-content: center;
     border-radius: var(--cnpm-radius-md);
@@ -50,6 +73,7 @@
   &__kpi-card {
     position: relative;
     overflow: hidden;
+    padding-block-start: var(--cnpm-space-4);
   }
 
   &__kpi-card::before {
@@ -68,6 +92,32 @@
     font-size: var(--cnpm-font-size-3xl);
     font-weight: var(--cnpm-font-weight-bold);
     line-height: var(--cnpm-font-lineHeight-3xl);
+  }
+
+  /* La definition redevient visible : elle tient la ligne de legende de la reference,
+     et un indicateur dont la mesure n'est pas dite se prete a l'interpretation. Elle
+     reste au dernier rang typographique pour ne pas alourdir la tuile. */
+  &__kpi-definition {
+    margin: 0;
+    color: var(--cnpm-color-text-muted);
+    font-size: var(--cnpm-font-size-xs);
+    line-height: var(--cnpm-font-lineHeight-xs);
+  }
+
+  /* Courbe de tendance. Elle deborde volontairement jusqu'aux bords de la tuile : la
+     hauteur est fixee en `rem` pour suivre le zoom texte jusqu'a 200 %. */
+  &__kpi-spark {
+    display: block;
+    width: calc(100% + var(--cnpm-space-8));
+    height: 2rem;
+    margin-block-start: auto;
+    margin-inline: calc(var(--cnpm-space-4) * -1);
+    margin-block-end: calc(var(--cnpm-space-4) * -1);
+
+    path {
+      stroke: var(--cnpm-tile-accent);
+      vector-effect: non-scaling-stroke;
+    }
   }
 
   &__kpi-link {

@@ -38,7 +38,8 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-012 | Sémantique du sélecteur d'espace (AUTH-001) | Trancher entre patron ARIA `tablist` et `radiogroup` pour le choix administration/membre | Produit / UX + Accessibilité | Moyen | Ouverte |
 | UX-DEC-013 | Modèle de consentement des contacts publics | Définir le recueil, la conservation, la révocation et la revérification du consentement à publier des coordonnées | Juridique / DPO + Communication | Élevé | Ouverte |
 | UX-DEC-015 | Nombre d'entrées de la navigation publique | Arbitrer entre les huit entrées de REF-PUB-001 et le regroupement en quatre menus déroulants demandé par le client | Produit / UX + Communication | Moyen | Ouverte |
-| UX-DEC-016 | Chrome sombre de l'espace d'administration | Arbitrer le fond bleu profond partagé par la navigation et l'en-tête, contraire à la règle des surfaces blanches, et promouvoir ou refuser les tokens de surface inversée | Produit / UX | Moyen | Ouverte |
+| UX-DEC-016 | Chrome sombre de l'espace d'administration | Écart refermé : le chrome sombre est abandonné au profit d'un fond clair conforme à la règle des surfaces blanches ; reste la teinte de « Supervision », faute de turquoise dans les tokens | Produit / UX | Faible | Refermée |
+| DASH-DEC-001 | Historique des indicateurs du tableau de bord | Décider si `DashboardKpi` porte une valeur précédente et une série, sans quoi trois des cinq tuiles ne peuvent afficher ni variation ni courbe | Produit + API | Moyen | Ouverte |
 | UX-DEC-017 | Taille des pictogrammes de la navigation latérale | Confirmer l'échelon `control` (20 px) là où l'iconographie affecte `navigation` (24 px) aux pictogrammes de navigation, ou revenir à 24 px | Produit / UX | Faible | Ouverte |
 
 ## Décisions API
@@ -144,6 +145,30 @@ REF-PUB-001 en conséquence ?
 
 ### UX-DEC-016 — Chrome sombre de l'espace d'administration
 
+> **ÉCART REFERMÉ — le chrome sombre est abandonné.** Après revue visuelle, le client a
+> écarté le fond bleu profond. La navigation et la barre supérieure partagent désormais un
+> fond CLAIR (`--cnpm-color-surface-page`), ce qui remet le chrome en conformité avec la
+> règle des « surfaces principalement blanches ou neutres » : il n'y a plus d'écart à
+> arbitrer sur ce point.
+>
+> Les sept alias de `web/src/styles/_chrome.scss` subsistent mais renvoient tous à des
+> tokens standard du handoff ; aucune valeur ne leur est propre et **aucun nouveau jeton
+> n'est à promouvoir**. L'indirection est conservée parce que cette bascule a montré son
+> utilité : le chrome se redéfinit en un seul endroit.
+>
+> Le retour au clair a supprimé d'un coup les cinq défauts décrits ci-dessous — l'anneau
+> de focus du produit redevient lisible (11,08:1), le lockup retrouve un fond clair et sa
+> plaque blanche est retirée, et les limites de contrôle reprennent les tokens de bordure
+> éprouvés du reste du produit. Les accents de domaine ont en revanche dû être redérivés :
+> sur fond clair, les tons 500 de `success` et `warning` ne donnent que 2,62:1 et 2,35:1,
+> sous le seuil de 3:1. Les tons 600 sont retenus.
+>
+> **Ce qui reste à arbitrer** : la réserve sur « Supervision », qui reprend un bleu proche
+> de celui du « Répertoire » faute de teinte turquoise dans les tokens.
+>
+> L'historique ci-dessous est conservé : il documente ce que la surface sombre imposait, et
+> servira de référence si une surface sombre est un jour reconsidérée.
+
 **Contexte.** `.claude/rules/ux-ui.md` et `CLAUDE.md` imposent des « surfaces
 principalement blanches ou neutres » et proscrivent explicitement tout « grand cadre
 coloré » ou « panneau saturé ». Le catalogue `docs/ui-handoff/docs/02-components/navigation.md`
@@ -237,6 +262,33 @@ tactile est celle du lien, non celle de l'icône.
 **Question.** Confirme-t-on 20 px pour la navigation latérale — auquel cas `iconography.md`
 doit nuancer l'affectation « navigation » plutôt que laisser le code la contredire — ou
 revient-on à 24 px, en acceptant le déséquilibre visuel constaté en colonne dense ?
+
+### DASH-DEC-001 — Historique des indicateurs du tableau de bord
+
+**Contexte.** Le client demande des tuiles d'indicateurs sur le modèle d'une référence
+qui affiche, pour chaque mesure, une variation chiffrée (« +50 % vs période précédente »)
+et une courbe de tendance.
+
+**Constat.** Le contrat ne le permet pas. `DashboardKpi`
+(`web/src/app/features/admin/dashboard/dashboard-gateway.ts`) porte une valeur courante et
+rien d'autre : ni valeur précédente, ni série, ni cible. Seuls deux indicateurs disposent
+d'un historique réel, et par un autre chemin — `DashboardMonthPoint` expose `collected` et
+`rate` mois par mois, ce qui couvre « Cotisations encaissées » et « Taux de recouvrement ».
+Les trois indicateurs d'effectif — membres actifs, cotisants dormants, prospects — n'ont
+aucun antécédent nulle part.
+
+**État actuel.** La courbe n'est rendue que sur les deux indicateurs qui possèdent une
+série. Les trois autres n'en portent aucune. Aucune variation chiffrée n'est affichée sur
+aucune tuile. Fabriquer ces chiffres aurait produit des tendances fausses sur un tableau
+de bord financier, présentées comme des mesures — c'est précisément ce que la mission
+interdit d'inventer.
+
+**Conséquence de l'écart.** Les tuiles ne sont pas homogènes : deux portent une courbe,
+trois n'en portent pas. C'est un défaut visuel assumé, préféré à un chiffre inventé.
+
+**Question.** Étend-on le contrat pour que chaque indicateur porte sa valeur précédente et
+sa série — ce qui suppose que le backend sache les produire — ou accepte-t-on des tuiles
+sans tendance pour les effectifs ?
 
 ### UX-DEC-013 — Modèle de consentement des contacts publics
 

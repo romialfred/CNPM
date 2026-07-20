@@ -226,7 +226,7 @@ describe('TopBarComponent', () => {
     const { host } = await setup();
     const title = host.querySelector<HTMLElement>('.cnpm-topbar__title');
 
-    expect(title?.textContent).toContain('Plateforme des cotisations');
+    expect(title?.textContent).toContain('Plateforme Nationale de Gestion des Membres du CNPM');
     expect(title?.textContent).toContain('Bonjour Aminata');
     // La barre est présente sur toutes les pages : un `h1` ici en ferait deux par écran.
     expect(host.querySelector('h1')).toBeNull();

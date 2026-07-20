@@ -417,6 +417,47 @@ export class DashboardPage {
    * différencier SANS porter de sens : la couleur d'une tuile ne signale ni alerte ni
    * conformité. Le rouge de marque en est exclu, il reste aux actions critiques.
    */
+  /**
+   * Série mensuelle réelle d'un KPI, pour sa courbe de tendance.
+   *
+   * Seuls deux indicateurs en possèdent une : le montant encaissé et le taux de
+   * recouvrement, tous deux portés par `DashboardMonthPoint`. Les effectifs (membres
+   * actifs, dormants, prospects) n'ont AUCUN historique dans le contrat — ni valeur
+   * précédente, ni série. Leur inventer une courbe produirait un graphique faux sur un
+   * tableau de bord financier ; ces tuiles n'en portent donc pas, et le vide est ici la
+   * seule réponse honnête. Voir DASH-DEC-001.
+   */
+  protected kpiSeries(kpi: DashboardKpi): readonly number[] {
+    const mois = this.months();
+    if (kpi.key === 'collected') return mois.map((point) => point.collected);
+    if (kpi.key === 'recovery') return mois.map((point) => point.rate);
+    return [];
+  }
+
+  /**
+   * Tracé de la courbe, normalisé dans une boîte de 100 × 32.
+   *
+   * L'échelle part du minimum de la série et non de zéro : sur des montants qui varient
+   * peu autour d'une valeur élevée, une échelle absolue écraserait la courbe en ligne
+   * droite et masquerait précisément ce qu'elle doit montrer. La courbe illustre une
+   * variation, elle ne sert pas à comparer des grandeurs — les chiffres exacts restent
+   * dans la table accessible du graphique principal.
+   */
+  protected sparklinePath(series: readonly number[]): string {
+    if (series.length < 2) return '';
+    const min = Math.min(...series);
+    const max = Math.max(...series);
+    const amplitude = max - min;
+    return series
+      .map((valeur, index) => {
+        const x = (index / (series.length - 1)) * 100;
+        // Amplitude nulle : la série est plate, on la trace au milieu de la boîte.
+        const y = amplitude === 0 ? 16 : 30 - ((valeur - min) / amplitude) * 28;
+        return `${index === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
+      })
+      .join(' ');
+  }
+
   protected kpiSkin(kpi: DashboardKpi, index: number): { accent: string; icon: DashboardKpiIcon } {
     const connus: Readonly<Record<string, { accent: string; icon: DashboardKpiIcon }>> = {
       collected: { accent: 'indigo', icon: 'wallet' },

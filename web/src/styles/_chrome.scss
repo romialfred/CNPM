@@ -1,83 +1,77 @@
-/* Chrome sombre — navigation latérale et barre supérieure.
+/* Chrome de l'espace d'administration — navigation latérale et barre supérieure.
    ---------------------------------------------------------------------------
-   La navigation et l'en-tête partagent un même fond bleu profond, à la demande du
-   client. Cet écart aux règles maison — qui veulent des surfaces majoritairement
-   blanches et proscrivent les grands panneaux saturés — est consigné en UX-DEC-016.
+   Les deux surfaces partagent un même fond, à la demande du client. Ce fond est CLAIR :
+   la version bleu profond a été écartée après revue visuelle. Le retour au clair aligne
+   le chrome sur la règle maison des « surfaces principalement blanches ou neutres » et
+   referme l'écart qu'UX-DEC-016 consignait.
 
-   Le handoff n'expose AUCUN jeu de tokens pour du texte, des filets ou un focus sur
-   fond sombre. Les alias ci-dessous les tiennent lieu ; ils dérivent tous de tokens
-   existants, aucune couleur n'est inventée. Ils sont à promouvoir dans le handoff si
-   la navigation sombre est validée.
+   Chaque alias renvoie désormais à un token standard du handoff. Aucune valeur n'est
+   propre à ce fichier : l'indirection ne subsiste que pour garder UN seul endroit où le
+   chrome se redéfinit, comme l'a montré la bascule précédente.
 
-   Contrastes mesurés sur le fond `--cnpm-chrome-surface` (#0B123B) :
-     texte principal   #FFFFFF   18,04:1
-     texte secondaire  #D5DCFA   13,27:1
-     texte atténué     #AEBBE8    9,51:1
-   Tous dépassent largement le 4,5:1 exigé du texte. */
+   Ce retour au clair supprime d'un coup les trois défauts que la surface sombre imposait :
+   plus besoin d'un anneau de focus inversé (l'anneau du produit reprend ses droits), plus
+   besoin d'une plaque sous le logo (le lockup retrouve son fond clair), et les limites de
+   contrôle reprennent les tokens de bordure éprouvés du reste du produit. */
 
 :root {
-  --cnpm-chrome-surface: var(--cnpm-color-brand-blue-950);
-  --cnpm-chrome-surface-raised: color-mix(
-    in srgb,
-    var(--cnpm-color-brand-blue-300) 14%,
-    transparent
-  );
-  --cnpm-chrome-text: var(--cnpm-color-neutral-0);
-  --cnpm-chrome-text-secondary: var(--cnpm-color-brand-blue-200);
-  --cnpm-chrome-text-muted: var(--cnpm-color-brand-blue-300);
+  /* Gris très clair plutôt que blanc pur : le contenu des pages, lui, est blanc, et le
+     chrome doit s'en distinguer sans qu'un filet ait à porter seul la séparation. */
+  --cnpm-chrome-surface: var(--cnpm-color-surface-page);
+  --cnpm-chrome-surface-raised: var(--cnpm-color-brand-blue-50);
+  --cnpm-chrome-text: var(--cnpm-color-text-primary);
+  --cnpm-chrome-text-secondary: var(--cnpm-color-text-secondary);
+  --cnpm-chrome-text-muted: var(--cnpm-color-text-muted);
 
-  /* SÉPARATEUR DÉCORATIF UNIQUEMENT — ne jamais s'en servir pour délimiter un contrôle.
-     Un `color-mix` translucide ne se juge pas à sa valeur nominale mais à son aplat réel :
-     à 22 % sur ce fond, la couleur peinte est #2F3761, soit 1,58:1. C'est assez pour un
-     filet de séparation, que WCAG 2.2 n'assujettit à aucun seuil (1.4.11 ne vise que ce
-     qui identifie un composant ou son état), et très insuffisant pour une limite de
-     contrôle. D'où le jeton distinct ci-dessous. */
-  --cnpm-chrome-border: color-mix(in srgb, var(--cnpm-color-brand-blue-300) 22%, transparent);
+  /* Séparateur décoratif — aucun seuil de contraste ne s'y applique (WCAG 1.4.11 ne vise
+     que ce qui identifie un composant ou son état). */
+  --cnpm-chrome-border: var(--cnpm-color-border-subtle);
 
-  /* LIMITE DE CONTRÔLE — soumise au 3:1 de WCAG 2.2 (1.4.11).
-     Champ de recherche, bouton de repli, fermeture du tiroir, bouton hamburger : leur
-     bordure est le SEUL élément qui les délimite, aucun remplissage ne les porte. Le
-     seuil de 3:1 est atteint à partir de 48 % ; 50 % donne 3,26:1, avec une marge qui
-     survit à l'arrondi 8 bits du compositeur. */
-  --cnpm-chrome-control-border: color-mix(
-    in srgb,
-    var(--cnpm-color-brand-blue-300) 50%,
-    transparent
-  );
+  /* Limite de contrôle — soumise au 3:1 de WCAG 2.2 (1.4.11). Sur le fond sombre, ce
+     jeton devait être dérivé à la main ; sur fond clair, le token de bordure standard du
+     produit convient et a déjà été validé partout ailleurs. */
+  --cnpm-chrome-control-border: var(--cnpm-color-border-default);
 
-  /* L'anneau de focus du dépôt vaut `--cnpm-color-brand-blue-700` partout. Mesuré sur
-     ce fond sombre, il tombe à 1,63:1 : invisible. Tout le chrome échouerait alors aux
-     critères 2.4.7 et 2.4.11 de WCAG 2.2. Le blanc y donne 18,0:1. */
-  --cnpm-chrome-focus: var(--cnpm-color-neutral-0);
+  /* L'anneau de focus du produit redevient utilisable : 11,08:1 sur ce fond, contre
+     1,63:1 sur l'ancien fond sombre. */
+  --cnpm-chrome-focus: var(--cnpm-color-brand-blue-700);
 }
 
 /* Accents de domaine de la navigation.
-   Une couleur par famille, comme dans la référence. Contrastes mesurés sur #0B123B :
-   tous dépassent le 3:1 exigé des éléments d'interface non textuels.
+   Une couleur par famille. Contrastes mesurés sur le fond clair, seuil de 3:1 des
+   éléments d'interface non textuels :
+     dashboard      brand-blue-700        11,08:1
+     répertoire     semantic-info-600      4,57:1
+     recouvrement   semantic-success-600   3,73:1
+     relation       semantic-warning-600   3,49:1
+     supervision    brand-blue-500         5,26:1
+     administration neutral-500            4,97:1
 
-   Réserve : aucune teinte turquoise n'existe dans les tokens. « Supervision » reprend
-   donc `brand-blue-400`, au prix d'une différenciation faible avec le bleu du
-   répertoire. Une teinte dédiée reste à arbitrer plutôt qu'à inventer ici. */
+   Les tons 500 de `success` et `warning` ont été écartés : 2,62:1 et 2,35:1 sur clair,
+   sous le seuil. C'est le même défaut que celui déjà corrigé sur les tuiles.
+
+   Réserve inchangée : aucune teinte turquoise n'existe dans les tokens, « Supervision »
+   reprend donc un bleu proche de celui du « Répertoire ». À arbitrer, pas à inventer. */
 .cnpm-nav-accent--dashboard {
-  --cnpm-nav-accent: var(--cnpm-color-brand-blue-300);
+  --cnpm-nav-accent: var(--cnpm-color-brand-blue-700);
 }
 
 .cnpm-nav-accent--repertoire {
-  --cnpm-nav-accent: var(--cnpm-color-semantic-info-500);
+  --cnpm-nav-accent: var(--cnpm-color-semantic-info-600);
 }
 
 .cnpm-nav-accent--recouvrement {
-  --cnpm-nav-accent: var(--cnpm-color-semantic-success-500);
+  --cnpm-nav-accent: var(--cnpm-color-semantic-success-600);
 }
 
 .cnpm-nav-accent--relation {
-  --cnpm-nav-accent: var(--cnpm-color-semantic-warning-500);
+  --cnpm-nav-accent: var(--cnpm-color-semantic-warning-600);
 }
 
 .cnpm-nav-accent--supervision {
-  --cnpm-nav-accent: var(--cnpm-color-brand-blue-400);
+  --cnpm-nav-accent: var(--cnpm-color-brand-blue-500);
 }
 
 .cnpm-nav-accent--administration {
-  --cnpm-nav-accent: var(--cnpm-color-neutral-300);
+  --cnpm-nav-accent: var(--cnpm-color-neutral-500);
 }

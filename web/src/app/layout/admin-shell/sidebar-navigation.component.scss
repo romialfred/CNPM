@@ -44,18 +44,12 @@
 
 /* Le rognage par fenêtre et translation négative n'a plus lieu d'être : la marge
    blanche est détourée en amont dans `logo-CNPM-lockup.png`. */
-/* Plaque claire sous le lockup.
-   Mesure sur `logo-CNPM-lockup.png` : sa couleur dominante (#202080, 66 % des pixels
-   opaques) ne donne que 1,36:1 sur `--cnpm-chrome-surface` — le logo y disparaitrait.
-   Une variante inversee serait un nouvel actif de marque, qui ne s'invente pas. La
-   plaque preserve l'actif officiel intact et sa lisibilite. */
+/* Le chrome est redevenu clair : le lockup retrouve son fond d'origine et la plaque
+   blanche qu'imposait le fond sombre n'a plus lieu d'etre. */
 .cnpm-sidebar__logo-viewport {
   display: flex;
   width: 100%;
   align-items: center;
-  padding: var(--cnpm-space-2) var(--cnpm-space-3);
-  border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-neutral-0);
 }
 
 .cnpm-sidebar__logo {
