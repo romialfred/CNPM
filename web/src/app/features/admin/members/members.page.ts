@@ -7,8 +7,14 @@ import {
   LucideDownload,
   LucideEye,
   LucideHistory,
+  LucideLayoutGrid,
+  LucideMoon,
+  LucidePercent,
   LucidePlus,
+  LucideTable,
   LucideUpload,
+  LucideUserCheck,
+  LucideUsers,
 } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
@@ -41,8 +47,28 @@ import {
   MembersAccessError,
   type MemberQuery,
   type MemberRow,
+  type MembersOverview,
   type MemberStatus,
 } from './members-gateway';
+
+/**
+ * Une tuile du bandeau d'indicateurs de la base de membres.
+ *
+ * `value` accepte `null` : `recoveryRate` l'est lorsqu'aucun montant n'est attendu, et
+ * un taux absent n'est pas un taux nul.
+ */
+interface MembersOverviewKpi {
+  readonly key: string;
+  readonly icon: 'total' | 'active' | 'dormant' | 'recovery';
+  /** Classe d'accent de `_accents.scss`, issue de `chart.categorical`. */
+  readonly accent: string;
+  readonly label: string;
+  readonly value: number | null;
+  /** Format `DecimalPipe`. */
+  readonly format: string;
+  readonly suffix: string;
+  readonly caption: string;
+}
 
 const STATUS_LABELS: Readonly<Record<MemberStatus, string>> = {
   ACTIVE: 'Actif',
@@ -96,10 +122,16 @@ const DEFAULT_PAGE_SIZE = 10;
     LucideEye,
     LucideHistory,
     LucidePlus,
+    LucideLayoutGrid,
+    LucideMoon,
+    LucidePercent,
+    LucideTable,
     LucideUpload,
+    LucideUserCheck,
+    LucideUsers,
   ],
   templateUrl: './members.page.html',
-  styleUrl: './members.page.scss',
+  styleUrls: ['./members.page.scss', './members.kpi.scss'],
 })
 export class MembersPage {
   private readonly gateway = inject(MEMBERS_GATEWAY);
@@ -307,6 +339,88 @@ export class MembersPage {
     }
     return chips;
   });
+
+  /**
+   * Bandeau d'indicateurs de la base de membres.
+   *
+   * Les quatre valeurs sont recopiées de `MembersOverview`, jamais recalculées : c'est
+   * la source qui alimente déjà le tableau, et deux calculs concurrents sur un même
+   * écran finissent par diverger.
+   *
+   * Les libellés ne reprennent PAS ceux de la maquette de référence, qui décrivent une
+   * autre base : elle annonce « tous statuts confondus » pour un total qui, ici,
+   * n'inclut pas les prospects. `ux-ui.md` interdit de recopier les incohérences de
+   * libellés d'une image de conception ; les légendes ci-dessous disent donc ce que les
+   * chiffres mesurent réellement.
+   *
+   * Aucune cible de recouvrement n'est affichée : le contrat n'en porte aucune, et un
+   * objectif inventé sur un indicateur financier serait lu comme un engagement.
+   */
+  /**
+   * Classe d'accent d'une tuile membre, portant la couleur de son liseré supérieur.
+   *
+   * Le liseré DOUBLE le badge de statut, il ne le remplace pas : le statut reste écrit
+   * en toutes lettres sur la tuile, et retirer la couleur n'enlève aucune information
+   * (`ux-ui.md`, WCAG 2.2 critère 1.4.1). Les teintes reprennent celles du badge, pour
+   * qu'un même statut ne se présente pas sous deux couleurs sur le même écran.
+   */
+  protected statusAccentClass(status: MemberStatus): string {
+    const accents: Readonly<Record<MemberStatus, string>> = {
+      ACTIVE: 'cnpm-members__tile--active',
+      DORMANT: 'cnpm-members__tile--dormant',
+      PROSPECT: 'cnpm-members__tile--prospect',
+    };
+    return accents[status];
+  }
+
+  protected overviewKpis(summary: MembersOverview): readonly MembersOverviewKpi[] {
+    const part = (valeur: number) =>
+      summary.membersTotal > 0
+        ? `${Math.round((valeur / summary.membersTotal) * 100)} % de la base`
+        : 'Base vide';
+    return [
+      {
+        key: 'total',
+        icon: 'total',
+        accent: 'indigo',
+        label: 'Base de membres',
+        value: summary.membersTotal,
+        format: '1.0-0',
+        suffix: '',
+        caption: 'Actifs et dormants ; prospects exclus.',
+      },
+      {
+        key: 'active',
+        icon: 'active',
+        accent: 'teal',
+        label: 'Membres actifs',
+        value: summary.active,
+        format: '1.0-0',
+        suffix: '',
+        caption: part(summary.active),
+      },
+      {
+        key: 'dormant',
+        icon: 'dormant',
+        accent: 'amber',
+        label: 'Cotisants dormants',
+        value: summary.dormant,
+        format: '1.0-0',
+        suffix: '',
+        caption: part(summary.dormant),
+      },
+      {
+        key: 'recovery',
+        icon: 'recovery',
+        accent: 'sky',
+        label: 'Taux de recouvrement',
+        value: summary.recoveryRate,
+        format: '1.1-1',
+        suffix: ' %',
+        caption: 'Part du montant attendu encaissée.',
+      },
+    ];
+  }
 
   /**
    * Les statistiques sont recopiées telles quelles depuis la source ; aucune n'est

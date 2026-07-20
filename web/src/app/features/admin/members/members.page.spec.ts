@@ -290,4 +290,55 @@ describe('MembersPage — vue en tuiles', () => {
       'true',
     ]);
   });
+
+  it('accompagne chaque presentation d un pictogramme decoratif', async () => {
+    const { host } = await rendu('tuiles');
+    const boutons = Array.from(host.querySelectorAll('.cnpm-members__view'));
+
+    // Decoratifs : le libelle ecrit porte seul le nom accessible, le pictogramme ne
+    // doit donc rien annoncer.
+    expect(boutons).toHaveLength(2);
+    for (const bouton of boutons) {
+      const picto = bouton.querySelector('svg');
+      expect(picto).not.toBeNull();
+      expect(picto?.getAttribute('aria-hidden')).toBe('true');
+    }
+  });
+
+  it('derive le bandeau d indicateurs de la meme source que le tableau', async () => {
+    // Un bandeau qui contredirait le total affiche plus bas serait le « total
+    // incoherent » que la fiche BO-002 interdit : les deux viennent d'`overview`.
+    const { host } = await rendu();
+    const libelles = Array.from(host.querySelectorAll('.cnpm-members__kpi-label')).map(
+      (element) => element.textContent?.trim(),
+    );
+
+    expect(libelles).toEqual([
+      'Base de membres',
+      'Membres actifs',
+      'Cotisants dormants',
+      'Taux de recouvrement',
+    ]);
+    // La base exclut les prospects : la legende doit le dire, faute de quoi le chiffre
+    // se lirait comme un total tous statuts confondus.
+    expect(host.querySelector('.cnpm-members__kpi-caption')?.textContent).toContain(
+      'prospects exclus',
+    );
+  });
+
+  it('double le badge de statut par un lisere, sans jamais le remplacer', async () => {
+    // Le lisere est une redondance visuelle. Le statut reste ecrit en toutes lettres :
+    // retirer la couleur ne doit retirer aucune information (WCAG 2.2, critere 1.4.1).
+    const { host } = await rendu('tuiles');
+    const tuiles = Array.from(host.querySelectorAll('.cnpm-members__tile'));
+
+    expect(tuiles.length).toBeGreaterThan(0);
+    for (const tuile of tuiles) {
+      const accent = Array.from(tuile.classList).find((classe) =>
+        classe.startsWith('cnpm-members__tile--'),
+      );
+      expect(accent).toBeDefined();
+      expect(tuile.querySelector('cnpm-badge')?.textContent?.trim()).toBeTruthy();
+    }
+  });
 });

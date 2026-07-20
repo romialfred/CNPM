@@ -272,6 +272,9 @@
 }
 
 .cnpm-members__view {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
   min-height: var(--cnpm-size-control-md);
   padding-inline: var(--cnpm-space-4);
   border: 0;

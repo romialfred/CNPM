@@ -1,0 +1,130 @@
+@use '../../../../styles/tokens' as tokens;
+
+/* Bandeau d'indicateurs et accents de tuile de BO-002.
+   ---------------------------------------------------------------------------
+   Feuille distincte de `members.page.scss`, qui approchait deja le plafond de 10 ko par
+   feuille de composant. Le plafond n'est pas relache : la feuille est scindee, comme
+   `dashboard.kpi.scss` et `dashboard.responsive.scss` avant elle. */
+
+/* ------------------------------------------------------------- Bandeau d'indicateurs */
+
+.cnpm-members__kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-members__kpi {
+  display: flex;
+  min-width: 0;
+}
+
+/* Bordure plutot qu'ombre, comme partout ailleurs : `ux-ui.md` demande la bordure
+   d'abord. Le liseré superieur porte l'accent de la tuile. */
+.cnpm-members__kpi-card {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--cnpm-space-4);
+  padding-block-start: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-members__kpi-card::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: var(--cnpm-space-1);
+  background: var(--cnpm-tile-accent);
+  content: '';
+}
+
+/* Pastille teintee par l'accent : une seule couleur source, la tuile reste accordee. */
+.cnpm-members__kpi-icon {
+  display: inline-flex;
+  width: var(--cnpm-space-10);
+  height: var(--cnpm-space-10);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--cnpm-radius-md);
+  background: color-mix(in srgb, var(--cnpm-tile-accent) 12%, transparent);
+  color: var(--cnpm-tile-accent);
+  flex: none;
+}
+
+.cnpm-members__kpi-label {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  line-height: var(--cnpm-font-lineHeight-xs);
+  text-transform: uppercase;
+}
+
+.cnpm-members__kpi-value {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-3xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  line-height: var(--cnpm-font-lineHeight-3xl);
+}
+
+/* Une mesure absente ne doit pas emprunter la typographie d'un chiffre : elle se lirait
+   comme une valeur. */
+.cnpm-members__kpi-missing {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+.cnpm-members__kpi-caption {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  line-height: var(--cnpm-font-lineHeight-xs);
+}
+
+/* --------------------------------------------------- Liseré de statut des tuiles */
+
+/* Le liseré DOUBLE le badge de statut, il ne le remplace pas : le statut reste ecrit en
+   toutes lettres sur la tuile. Retirer la couleur n'enleve aucune information.
+   Les teintes reprennent celles du badge — un meme statut ne doit pas se presenter sous
+   deux couleurs sur un meme ecran. Tons 600 : sur blanc, les tons 500 de `success` et
+   `warning` ne donnent que 2,62:1 et 2,35:1, sous le seuil de 3:1. */
+.cnpm-members__tile--active .cnpm-members__tile-face {
+  border-block-start: var(--cnpm-space-1) solid var(--cnpm-color-semantic-success-600);
+}
+
+.cnpm-members__tile--dormant .cnpm-members__tile-face {
+  border-block-start: var(--cnpm-space-1) solid var(--cnpm-color-semantic-warning-600);
+}
+
+.cnpm-members__tile--prospect .cnpm-members__tile-face {
+  border-block-start: var(--cnpm-space-1) solid var(--cnpm-color-semantic-info-600);
+}
+
+/* ------------------------------------------------------------------------ Responsive */
+
+@media (max-width: 79.9375rem) {
+  .cnpm-members__kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .cnpm-members__kpis {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
