@@ -7,21 +7,66 @@
   min-width: 0;
 }
 
-/* Tableau principal et panneau de synthèse 280–300 px (fiche BO-002).
-   `minmax(0, 1fr)` empêche la colonne du tableau de se dimensionner sur son
-   min-content : sans cela, une table à dix colonnes pousserait la grille au-delà de
-   la page au lieu de défiler dans son propre conteneur. */
+/* Disposition en quatre zones.
+   Le bandeau d'indicateurs et le panneau de synthèse partagent la rangée du haut : le
+   panneau « monte » ainsi au niveau des tuiles au lieu de commencer sous elles. Les
+   tuiles n'occupent plus toute la largeur — seulement la colonne de gauche —, ce qui
+   les resserre comme demandé. Le TABLEAU, lui, s'étend sur toute la largeur (`table
+   table`) : c'est ce qui lui donne la place d'afficher chaque cellule sur une ligne,
+   sans retour à la ligne.
+
+   `minmax(0, 1fr)` empêche la colonne du tableau de se dimensionner sur son min-content :
+   sans cela, une table pousserait la grille au-delà de la page au lieu de défiler dans
+   son propre conteneur. */
 .cnpm-members__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 18rem;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  grid-template-areas:
+    'kpis    rail'
+    'filters rail'
+    'table   table';
   align-items: start;
   gap: var(--cnpm-space-4);
   min-width: 0;
 }
 
+.cnpm-members__kpis {
+  grid-area: kpis;
+}
+
+.cnpm-members__filters {
+  grid-area: filters;
+  min-width: 0;
+}
+
 .cnpm-members__list {
+  grid-area: table;
   display: flex;
   flex-direction: column;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+/* Filtres sur une seule ligne : chacun s'étire à parts égales. Ils s'enroulent sous
+   1024 px, où la colonne de gauche devient trop étroite pour quatre contrôles. */
+.cnpm-members__filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-members__filter-row .cnpm-members__filter {
+  flex: 1 1 8rem;
+}
+
+/* Total et bascule de présentation sur une même ligne, aux deux extrémités. */
+.cnpm-members__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--cnpm-space-3);
   min-width: 0;
 }
@@ -195,6 +240,7 @@
 }
 
 .cnpm-members__aside {
+  grid-area: rail;
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-4);
@@ -232,9 +278,19 @@
 /* Sous 1440 px, la fiche fait du panneau un tiroir. Faute de spécification de ce
    tiroir, la synthèse passe sous la liste : elle reste lisible et complète, plutôt
    que d'être masquée derrière un contrôle non spécifié. */
-@media (max-width: 1439px) {
+/* Sous 1280 px, tout s'empile en une colonne : bandeau, filtres, tableau, puis la
+   synthèse. Le tableau garde ainsi la pleine largeur et la synthèse reste lisible sous
+   lui. Le seuil est descendu de 1440 à 1280 pour que le panneau « monte » au niveau des
+   tuiles sur les écrans d'ordinateur portable courants, et pas seulement sur les très
+   grands écrans. */
+@media (max-width: 1279px) {
   .cnpm-members__layout {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'kpis'
+      'filters'
+      'table'
+      'rail';
   }
 
   .cnpm-members__aside {
@@ -244,6 +300,13 @@
 
   cnpm-insight-summary {
     flex: 1 1 18rem;
+  }
+}
+
+/* La colonne de gauche devient trop étroite pour quatre filtres alignés : ils s'empilent. */
+@media (max-width: 1023px) {
+  .cnpm-members__filter-row .cnpm-members__filter {
+    flex-basis: 100%;
   }
 }
 

@@ -43,11 +43,13 @@ export type CnpmInsightTone = 'neutre' | 'indigo' | 'ciel' | 'sarcelle' | 'ambre
  *
  * `nombre` : valeur alignée à droite du libellé, forme par défaut.
  * `jauge` : barre de progression bornée à 0–100, réservée aux parts et aux taux.
+ * `barre` : barre horizontale dont la longueur situe un effectif face à `barMax`. La
+ *   valeur reste affichée en clair ; la barre n'est que sa lecture visuelle relative.
  *
- * Une jauge n'a de sens que pour une grandeur dont 100 est le maximum connu. L'appliquer
- * à un effectif ou à un montant produirait une barre sans échelle, donc illisible.
+ * Une jauge n'a de sens que pour une grandeur dont 100 est le maximum connu. Une barre,
+ * elle, compare des effectifs entre eux sur une échelle commune (`barMax`).
  */
-export type CnpmInsightDisplay = 'nombre' | 'jauge';
+export type CnpmInsightDisplay = 'nombre' | 'jauge' | 'barre';
 
 export interface InsightStat {
   readonly label: string;
@@ -61,6 +63,12 @@ export interface InsightStat {
   readonly apart?: boolean;
   /** Forme de rendu ; `nombre` par défaut. */
   readonly display?: CnpmInsightDisplay;
+  /**
+   * Échelle de la barre horizontale (`display: 'barre'`). La longueur vaut
+   * `value / barMax`, bornée à 100 %. Sans échelle, une barre ne se lit pas ; elle est
+   * donc ignorée si `barMax` est absent ou nul.
+   */
+  readonly barMax?: number;
 }
 
 /** Borne d'une jauge : une part ne se lit que sur une échelle connue. */
@@ -114,6 +122,7 @@ const JAUGE_MAX = 100;
               class="cnpm-insight__stat"
               [class.cnpm-insight__stat--apart]="stat.apart"
               [class.cnpm-insight__stat--gauge]="isGauge(stat)"
+              [class.cnpm-insight__stat--barre]="isBar(stat)"
             >
               <dt [id]="statId(rang)">{{ stat.label }}</dt>
               <dd>
@@ -137,6 +146,14 @@ const JAUGE_MAX = 100;
                   >
                     <span class="cnpm-insight__fill" [style.inline-size.%]="bounded(stat.value)">
                     </span>
+                  </span>
+                } @else if (isBar(stat)) {
+                  <span class="cnpm-insight__figure">{{ text(stat) }}</span>
+                  <!-- La barre est décorative : le libellé et la valeur, tous deux en
+                       clair, portent l'information. Elle situe l'effectif d'un coup d'œil,
+                       sans jamais en être l'unique lecture. -->
+                  <span class="cnpm-insight__track" aria-hidden="true">
+                    <span class="cnpm-insight__fill" [style.inline-size.%]="barWidth(stat)"></span>
                   </span>
                 } @else {
                   {{ text(stat) }}
@@ -187,6 +204,19 @@ export class InsightSummaryComponent {
 
   protected isGauge(stat: InsightStat): boolean {
     return stat.display === 'jauge';
+  }
+
+  /** Barre horizontale : seulement si le mode ET une échelle exploitable sont fournis. */
+  protected isBar(stat: InsightStat): boolean {
+    return stat.display === 'barre' && stat.value !== null && (stat.barMax ?? 0) > 0;
+  }
+
+  /** Longueur de la barre, en pourcentage de `barMax`, bornée à 100. */
+  protected barWidth(stat: InsightStat): number {
+    if (stat.value === null || !stat.barMax) {
+      return 0;
+    }
+    return Math.min(100, Math.max(0, (stat.value / stat.barMax) * 100));
   }
 
   /**

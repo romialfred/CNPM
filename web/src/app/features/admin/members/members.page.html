@@ -27,6 +27,8 @@
       </p>
     </cnpm-page-header>
 
+
+    <div class="cnpm-members__layout">
     <!-- Bandeau d'indicateurs.
          Les quatre chiffres viennent tous de `MembersOverview`, donc du même jeu que le
          tableau : un bandeau qui contredirait le total affiché plus bas serait exactement
@@ -74,8 +76,7 @@
       </ul>
     }
 
-    <div class="cnpm-members__layout">
-      <div class="cnpm-members__list">
+      <div class="cnpm-members__filters">
         <cnpm-filter-bar
           [expanded]="filtersExpanded()"
           [chips]="chips()"
@@ -83,6 +84,7 @@
           (chipRemove)="removeChip($event)"
           (resetAll)="resetFilters()"
         >
+          <div class="cnpm-members__filter-row">
           <div class="cnpm-members__filter">
             <label class="cnpm-members__label" for="filtre-statut">Statut</label>
             <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique
@@ -155,7 +157,11 @@
               (ngModelChange)="searchDraft.set($event)"
             />
           </form>
+          </div>
         </cnpm-filter-bar>
+      </div>
+
+      <div class="cnpm-members__list">
 
         <!-- La selection de lignes est retiree a la demande du client.
              Elle ne servait a rien : la seule action groupee livree etait « Effacer la
@@ -163,16 +169,15 @@
              exige pourtant `BulkActionBar` et une « selection groupee avec portee
              explicite » ; l'ecart est consigne en UX-DEC-017 et la selection reviendra
              avec une action groupee reelle (export, relance). -->
-        <div class="cnpm-members__toolbar">
+        <div class="cnpm-members__controls">
           <p class="cnpm-members__total">
             @if (data()) {
               Total&nbsp;: {{ totalItems() | number }}
               {{ totalItems() === 1 ? 'membre' : 'membres' }}
             }
           </p>
-        </div>
 
-        <div class="cnpm-members__views" role="group" aria-label="Présentation de la liste">
+          <div class="cnpm-members__views" role="group" aria-label="Présentation de la liste">
           <button
             type="button"
             class="cnpm-members__view"
@@ -193,6 +198,7 @@
             <svg lucideLayoutGrid [size]="iconSize.compact" aria-hidden="true"></svg>
             Tuiles
           </button>
+          </div>
         </div>
 
         @if (view() === 'table') {
@@ -416,13 +422,16 @@
            interdit. -->
       @if (overview()) {
         <aside class="cnpm-members__aside">
+          <!-- La note explicative a ete retiree a la demande du client : les barres
+               situent chaque effectif face a la base, la lecture est desormais visuelle.
+               « Grands cotisants » et « Prospects » restent distingues par leur libelle
+               et, pour les prospects, par le filet de separation. -->
           <cnpm-insight-summary
             title="Vue d’ensemble des membres"
             headingId="synthese-membres"
             [icon]="panelIcons.membres"
             tone="indigo"
             [stats]="memberStats()"
-            note="Actifs et dormants composent la base de membres ; les grands cotisants en sont un sous-ensemble. Les prospects sont comptés à part et n’entrent pas dans la base."
           />
           <cnpm-insight-summary
             title="Cotisations"

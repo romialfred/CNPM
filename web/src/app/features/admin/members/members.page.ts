@@ -445,12 +445,22 @@ export class MembersPage {
     if (!summary) {
       return [];
     }
+    // Barres horizontales situees sur une meme echelle : la base de membres. Chaque
+    // effectif se lit d'un coup d'oeil face au total, la valeur restant affichee en
+    // clair. « Base de membres » est la reference — sa barre est donc pleine. Les
+    // prospects, comptes hors base, gardent la meme echelle pour rester comparables.
+    const base = summary.membersTotal;
     return [
-      { label: 'Base de membres', value: summary.membersTotal },
-      { label: 'Actifs', value: summary.active },
-      { label: 'Dormants', value: summary.dormant },
-      { label: 'Grands cotisants', value: summary.largeContributors },
-      { label: 'Prospects', value: summary.prospects, apart: true },
+      { label: 'Base de membres', value: base, display: 'barre', barMax: base },
+      { label: 'Actifs', value: summary.active, display: 'barre', barMax: base },
+      { label: 'Dormants', value: summary.dormant, display: 'barre', barMax: base },
+      {
+        label: 'Grands cotisants',
+        value: summary.largeContributors,
+        display: 'barre',
+        barMax: base,
+      },
+      { label: 'Prospects', value: summary.prospects, display: 'barre', barMax: base, apart: true },
     ];
   });
 

@@ -115,6 +115,22 @@
   gap: var(--cnpm-space-3);
 }
 
+/* Barre horizontale d'effectif. Même disposition que la jauge : le libellé au-dessus,
+   la valeur puis la barre en dessous. La barre partage `__track`/`__fill`, mais la
+   valeur affichee est un effectif — le libellé reste a gauche du chiffre. */
+.cnpm-insight__stat--barre {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-insight__stat--barre dd {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+}
+
 /* Le chiffre précède la barre : une barre seule ne se lit pas, et la valeur exacte
    n'est jamais déductible d'une longueur. */
 .cnpm-insight__figure {
