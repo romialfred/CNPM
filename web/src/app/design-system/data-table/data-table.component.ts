@@ -46,6 +46,17 @@ export class DataTableComponent<T> {
   readonly state = input<DataTableState>('ready');
   readonly sort = input<SortState | null>(null);
 
+  /**
+   * Table dense : espacement horizontal reduit dans les cellules ET les en-tetes.
+   *
+   * Sert aux tables nombreuses en colonnes logees dans une demi-largeur, ou l'espacement
+   * standard suffit a provoquer un defilement lateral. Le defilement d'une table de
+   * montants fait perdre de vue la colonne qu'on compare — mieux vaut resserrer.
+   * La taille du texte et la hauteur de frappe ne changent pas : seule la respiration
+   * horizontale diminue.
+   */
+  readonly dense = input(false);
+
   readonly selectable = input(false);
   readonly selectedKeys = input<ReadonlySet<string>>(new Set<string>());
   /** Extrait la clé de sélection d'une ligne ; sans elle, la sélection est impossible. */

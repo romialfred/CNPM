@@ -154,3 +154,16 @@
   padding: var(--cnpm-space-10) var(--cnpm-space-4);
   border-bottom: none;
 }
+
+/* Densite horizontale reduite. Le texte et la hauteur des lignes ne changent pas : seule
+   la respiration laterale diminue, ce qui evite le defilement horizontal sur les tables
+   nombreuses en colonnes. La colonne de choix ne porte qu'un controle et se contente de
+   sa largeur minimale. */
+.cnpm-table--dense .cnpm-table__cell {
+  padding-inline: var(--cnpm-space-2);
+}
+
+.cnpm-table--dense .cnpm-table__cell:first-child {
+  width: 1%;
+  white-space: nowrap;
+}

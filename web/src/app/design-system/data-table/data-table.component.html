@@ -2,7 +2,7 @@
      exigence de reflow à 320 px. `tabindex` le rend atteignable au clavier — une
      zone défilante inatteignable au clavier est un échec de WCAG 2.2 (2.1.1). -->
 <div class="cnpm-table__scroll" tabindex="0" role="region" [attr.aria-label]="caption()">
-  <table class="cnpm-table">
+  <table class="cnpm-table" [class.cnpm-table--dense]="dense()">
     <caption class="cnpm-table__caption">
       {{ caption() }}
     </caption>

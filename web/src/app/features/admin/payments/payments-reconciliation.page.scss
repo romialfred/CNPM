@@ -126,9 +126,15 @@
 
 /* ---- Disposition ------------------------------------------------------------ */
 
+/* La file reprend la largeur. A 1,1fr contre 1fr, elle n'avait que 52 % de la place et
+   sa table debordait de 98 px : le tableau defilait lateralement alors que le volet, lui,
+   avait de la marge. L'apercu du recu ayant ete retire (UX-DEC-019), la troisieme zone
+   de la fiche est libre — c'est a la file qu'elle revient.
+
+   Le volet garde un plancher : sous 22 rem, les montants en tres grand s'y coupent. */
 .cnpm-recon__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.75fr) minmax(22rem, 1fr);
   align-items: start;
   gap: var(--cnpm-space-4);
   min-width: 0;
@@ -276,7 +282,12 @@
   text-align: inherit;
 }
 
-@media (max-width: 1279px) {
+/* Deux zones cote a cote seulement au-dela de 1440 px — c'est ce que dit la fiche
+   BO-014 (« Trois zones sur >= 1440 px ; a 1024-1439 px, l'apercu devient drawer »).
+   Le palier etait fixe a 1279 px : entre 1280 et 1439, la file gardait une demi-largeur
+   ou sa table debordait de 58 px. Sous 1440, la file prend donc toute la largeur et le
+   volet passe dessous ; plus aucun defilement lateral, a aucune largeur. */
+@media (max-width: 1439px) {
   .cnpm-recon__layout {
     grid-template-columns: minmax(0, 1fr);
   }
