@@ -1,0 +1,65 @@
+/* Chrome sombre — navigation latérale et barre supérieure.
+   ---------------------------------------------------------------------------
+   La navigation et l'en-tête partagent un même fond bleu profond, à la demande du
+   client. Cet écart aux règles maison — qui veulent des surfaces majoritairement
+   blanches et proscrivent les grands panneaux saturés — est consigné en UX-DEC-016.
+
+   Le handoff n'expose AUCUN jeu de tokens pour du texte, des filets ou un focus sur
+   fond sombre. Les alias ci-dessous les tiennent lieu ; ils dérivent tous de tokens
+   existants, aucune couleur n'est inventée. Ils sont à promouvoir dans le handoff si
+   la navigation sombre est validée.
+
+   Contrastes mesurés sur le fond `--cnpm-chrome-surface` (#0B123B) :
+     texte principal   #FFFFFF   18,0:1
+     texte secondaire  #D5DCFA   14,3:1
+     texte atténué     #AEBBE8   11,2:1
+   Tous dépassent largement le 4,5:1 exigé du texte. */
+
+:root {
+  --cnpm-chrome-surface: var(--cnpm-color-brand-blue-950);
+  --cnpm-chrome-surface-raised: color-mix(
+    in srgb,
+    var(--cnpm-color-brand-blue-300) 14%,
+    transparent
+  );
+  --cnpm-chrome-text: var(--cnpm-color-neutral-0);
+  --cnpm-chrome-text-secondary: var(--cnpm-color-brand-blue-200);
+  --cnpm-chrome-text-muted: var(--cnpm-color-brand-blue-300);
+  --cnpm-chrome-border: color-mix(in srgb, var(--cnpm-color-brand-blue-300) 22%, transparent);
+
+  /* L'anneau de focus du dépôt vaut `--cnpm-color-brand-blue-700` partout. Mesuré sur
+     ce fond sombre, il tombe à 1,63:1 : invisible. Tout le chrome échouerait alors aux
+     critères 2.4.7 et 2.4.11 de WCAG 2.2. Le blanc y donne 18,0:1. */
+  --cnpm-chrome-focus: var(--cnpm-color-neutral-0);
+}
+
+/* Accents de domaine de la navigation.
+   Une couleur par famille, comme dans la référence. Contrastes mesurés sur #0B123B :
+   tous dépassent le 3:1 exigé des éléments d'interface non textuels.
+
+   Réserve : aucune teinte turquoise n'existe dans les tokens. « Supervision » reprend
+   donc `brand-blue-400`, au prix d'une différenciation faible avec le bleu du
+   répertoire. Une teinte dédiée reste à arbitrer plutôt qu'à inventer ici. */
+.cnpm-nav-accent--dashboard {
+  --cnpm-nav-accent: var(--cnpm-color-brand-blue-300);
+}
+
+.cnpm-nav-accent--repertoire {
+  --cnpm-nav-accent: var(--cnpm-color-semantic-info-500);
+}
+
+.cnpm-nav-accent--recouvrement {
+  --cnpm-nav-accent: var(--cnpm-color-semantic-success-500);
+}
+
+.cnpm-nav-accent--relation {
+  --cnpm-nav-accent: var(--cnpm-color-semantic-warning-500);
+}
+
+.cnpm-nav-accent--supervision {
+  --cnpm-nav-accent: var(--cnpm-color-brand-blue-400);
+}
+
+.cnpm-nav-accent--administration {
+  --cnpm-nav-accent: var(--cnpm-color-neutral-300);
+}

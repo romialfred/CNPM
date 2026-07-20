@@ -63,55 +63,55 @@ import type { AdminNavIconName } from './admin-nav';
   template: `
     @switch (name()) {
       @case ('dashboard') {
-        <svg lucideLayoutDashboard [size]="size"></svg>
+        <svg lucideLayoutDashboard [size]="size()"></svg>
       }
       @case ('members') {
-        <svg lucideUsers [size]="size"></svg>
+        <svg lucideUsers [size]="size()"></svg>
       }
       @case ('companies') {
-        <svg lucideBuilding2 [size]="size"></svg>
+        <svg lucideBuilding2 [size]="size()"></svg>
       }
       @case ('enrolments') {
-        <svg lucideClipboardCheck [size]="size"></svg>
+        <svg lucideClipboardCheck [size]="size()"></svg>
       }
       @case ('contributions') {
-        <svg lucideFileBadge [size]="size"></svg>
+        <svg lucideFileBadge [size]="size()"></svg>
       }
       @case ('payments') {
-        <svg lucideWalletCards [size]="size"></svg>
+        <svg lucideWalletCards [size]="size()"></svg>
       }
       @case ('receipts') {
-        <svg lucideReceiptText [size]="size"></svg>
+        <svg lucideReceiptText [size]="size()"></svg>
       }
       @case ('reminders') {
-        <svg lucideMegaphone [size]="size"></svg>
+        <svg lucideMegaphone [size]="size()"></svg>
       }
       @case ('requests') {
-        <svg lucideMessagesSquare [size]="size"></svg>
+        <svg lucideMessagesSquare [size]="size()"></svg>
       }
       @case ('documents') {
-        <svg lucideFolderArchive [size]="size"></svg>
+        <svg lucideFolderArchive [size]="size()"></svg>
       }
       @case ('groups') {
-        <svg lucideHandshake [size]="size"></svg>
+        <svg lucideHandshake [size]="size()"></svg>
       }
       @case ('showcases') {
-        <svg lucideMegaphone [size]="size"></svg>
+        <svg lucideMegaphone [size]="size()"></svg>
       }
       @case ('integrations') {
-        <svg lucideCable [size]="size"></svg>
+        <svg lucideCable [size]="size()"></svg>
       }
       @case ('reporting') {
-        <svg lucideChartNoAxesCombined [size]="size"></svg>
+        <svg lucideChartNoAxesCombined [size]="size()"></svg>
       }
       @case ('audit') {
-        <svg lucideScrollText [size]="size"></svg>
+        <svg lucideScrollText [size]="size()"></svg>
       }
       @case ('settings') {
-        <svg lucideSlidersHorizontal [size]="size"></svg>
+        <svg lucideSlidersHorizontal [size]="size()"></svg>
       }
       @case ('administration') {
-        <svg lucideSettings [size]="size"></svg>
+        <svg lucideSettings [size]="size()"></svg>
       }
     }
   `,
@@ -124,5 +124,16 @@ import type { AdminNavIconName } from './admin-nav';
 })
 export class AdminNavIconComponent {
   readonly name = input.required<AdminNavIconName>();
-  protected readonly size = CNPM_ICON_SIZE.navigation;
+
+  /**
+   * Taille du pictogramme, restreinte à l'échelle de `iconography.md` — le type
+   * interdit toute autre valeur, y compris depuis un appelant.
+   *
+   * La navigation latérale demande `control` (20 px) et non `navigation` (24 px) :
+   * à 24 px les pictogrammes pesaient plus que leur libellé dans une colonne dense.
+   * La valeur par défaut reste `navigation`, les autres porteurs étant inchangés.
+   */
+  readonly size = input<(typeof CNPM_ICON_SIZE)[keyof typeof CNPM_ICON_SIZE]>(
+    CNPM_ICON_SIZE.navigation,
+  );
 }

@@ -11,22 +11,55 @@
     <svg lucideMenu [size]="iconSize.control"></svg>
   </button>
 
-  <!-- `role="search"` fournit le repère attendu par le catalogue (FRM-012).
-       La portée est restreinte aux membres et le libellé le dit : promettre une
-       recherche transverse qui n'existe pas serait un contrôle mensonger. -->
+  <!-- Titre de l'espace.
+       Aucune accroche institutionnelle n'existe dans les sources — le seul slogan du
+       dépôt appartient à une entreprise de démonstration. Rien n'est donc inventé ici :
+       la surtitre nomme l'objet réel de la plateforme, et l'accroche est une donnée,
+       le prénom de la personne connectée.
+       Ce n'est pas un `h1` : chaque page porte le sien dans `PageHeader`. -->
+  <p class="cnpm-topbar__title">
+    <span class="cnpm-topbar__eyebrow">Plateforme des cotisations</span>
+    <span class="cnpm-topbar__headline">
+      @if (identity | async; as user) {
+        Bonjour {{ firstName(user.displayName) }}
+      } @else {
+        Espace d’administration
+      }
+    </span>
+  </p>
+
+  <!-- `role="search"` fournit le repère attendu par le catalogue (FRM-012) ; le
+       formulaire reste donc monté en permanence, même champ replié. La portée est
+       restreinte aux membres et le libellé le dit : promettre une recherche transverse
+       qui n'existe pas serait un contrôle mensonger. -->
   <form class="cnpm-topbar__search" role="search" (ngSubmit)="submit()">
-    <label class="cnpm-topbar__search-label" for="recherche-globale"> Rechercher un membre </label>
-    <span class="cnpm-topbar__field">
-      <svg lucideSearch class="cnpm-topbar__search-icon" [size]="iconSize.control"></svg>
+    <button
+      type="button"
+      class="cnpm-topbar__search-toggle"
+      #searchToggle
+      [attr.aria-expanded]="searchOpen()"
+      aria-controls="recherche-globale-champ"
+      aria-label="Rechercher un membre"
+      (click)="toggleSearch()"
+    >
+      <svg lucideSearch [size]="iconSize.control"></svg>
+    </button>
+
+    <span class="cnpm-topbar__field" id="recherche-globale-champ" [hidden]="!searchOpen()">
+      <label class="cnpm-topbar__search-label" for="recherche-globale">
+        Rechercher un membre
+      </label>
       <input
         id="recherche-globale"
         class="cnpm-topbar__input"
+        #searchInput
         type="search"
         name="q"
         autocomplete="off"
         placeholder="Code membre, raison sociale, contact…"
         [ngModel]="query()"
         (ngModelChange)="query.set($event)"
+        (keydown.escape)="closeSearch()"
       />
     </span>
   </form>

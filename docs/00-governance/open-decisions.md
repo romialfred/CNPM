@@ -38,6 +38,7 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-012 | Sémantique du sélecteur d'espace (AUTH-001) | Trancher entre patron ARIA `tablist` et `radiogroup` pour le choix administration/membre | Produit / UX + Accessibilité | Moyen | Ouverte |
 | UX-DEC-013 | Modèle de consentement des contacts publics | Définir le recueil, la conservation, la révocation et la revérification du consentement à publier des coordonnées | Juridique / DPO + Communication | Élevé | Ouverte |
 | UX-DEC-015 | Nombre d'entrées de la navigation publique | Arbitrer entre les huit entrées de REF-PUB-001 et le regroupement en quatre menus déroulants demandé par le client | Produit / UX + Communication | Moyen | Ouverte |
+| UX-DEC-016 | Chrome sombre de l'espace d'administration | Arbitrer le fond bleu profond partagé par la navigation et l'en-tête, contraire à la règle des surfaces blanches, et promouvoir ou refuser les tokens de surface inversée | Produit / UX | Moyen | Ouverte |
 
 ## Décisions API
 
@@ -139,6 +140,47 @@ ou si la navigation revient à huit entrées.
 
 **Question.** Retient-on le regroupement en quatre menus déroulants, et met-on à jour
 REF-PUB-001 en conséquence ?
+
+### UX-DEC-016 — Chrome sombre de l'espace d'administration
+
+**Contexte.** `.claude/rules/ux-ui.md` et `CLAUDE.md` imposent des « surfaces
+principalement blanches ou neutres » et proscrivent explicitement tout « grand cadre
+coloré » ou « panneau saturé ». Le catalogue `docs/ui-handoff/docs/02-components/navigation.md`
+ne décrit ni fond ni thème pour `SidebarNavigation` (NAV-001) et `TopBar` (NAV-002) : il
+reste muet sur ce point.
+
+**État actuel.** Le client a demandé explicitement « une couleur d'arrière-plan identique
+sur le sidebar et le header », références visuelles à l'appui. La navigation et la barre
+supérieure partagent donc `--cnpm-color-brand-blue-950` (#0B123B). C'est un panneau saturé
+de 252 px de large sur toute la hauteur, plus une barre de 72 px : la règle des surfaces
+blanches est enfreinte de façon visible et volontaire.
+
+**Ce que l'écart a entraîné.** Le pack de tokens n'expose aucune valeur de texte, de filet
+ou de focus sur fond sombre. Six alias ont été dérivés dans `web/src/styles/_chrome.scss`,
+tous à partir de tokens existants — aucune couleur n'a été inventée. Trois défauts mesurés
+ont dû être corrigés :
+
+1. **Anneau de focus.** `--cnpm-color-brand-blue-700`, l'anneau de tout le produit, ne
+   donne que **1,63:1** sur ce fond : invisible. Tout le chrome aurait échoué aux critères
+   2.4.7 et 2.4.11 de WCAG 2.2. `--cnpm-chrome-focus` (blanc) y donne 18,0:1.
+2. **Logo.** La couleur dominante de `logo-CNPM-lockup.png` (#202080, 66 % des pixels
+   opaques) ne donne que **1,36:1** sur ce fond. Le lockup y disparaîtrait. Une variante
+   inversée serait un nouvel actif de marque, qui ne s'invente pas : le logo est donc posé
+   sur une plaque blanche, l'actif officiel restant intact.
+3. **Appel à l'action.** `--cnpm-color-brand-red-600` est la **seule** nuance de l'échelle
+   rouge à tenir simultanément la limite du bouton (3,76:1 sur le fond) et son libellé
+   blanc (4,8:1). Toute nuance plus claire casse le libellé, toute nuance plus sombre casse
+   la limite — le survol `red-700` n'y donnait que 2,78:1. Le fond du bouton est donc
+   constant et le survol se marque par sa bordure.
+
+**Réserve de conception.** Aucune teinte turquoise n'existe dans les tokens. L'accent du
+domaine « Supervision » reprend `brand-blue-400`, au prix d'une différenciation faible avec
+le bleu du « Répertoire ». Une teinte dédiée relève de l'arbitrage, pas de l'implémentation.
+
+**Question.** Retient-on le chrome sombre pour l'espace d'administration ? Si oui, les six
+alias de `_chrome.scss` doivent être promus dans `docs/ui-handoff/design-tokens/` — dont un
+jeton de focus inversé, qui manque aujourd'hui au pack et sans lequel aucune surface sombre
+n'est accessible.
 
 ### UX-DEC-013 — Modèle de consentement des contacts publics
 

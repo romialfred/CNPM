@@ -44,7 +44,7 @@
               routerLinkActive="cnpm-sidebar__item--active"
               (click)="drawerClose.emit()"
             >
-              <cnpm-admin-nav-icon [name]="entry.icon" />
+              <cnpm-admin-nav-icon [name]="entry.icon" [size]="iconSize.control" />
               <span class="cnpm-sidebar__label">{{ entry.label }}</span>
             </a>
           </li>
@@ -56,13 +56,13 @@
           @if (node.kind === 'link') {
             <li>
               <a
-                class="cnpm-sidebar__item"
+                class="cnpm-sidebar__item cnpm-nav-accent--dashboard"
                 [routerLink]="node.entry.route"
                 routerLinkActive="cnpm-sidebar__item--active"
                 [routerLinkActiveOptions]="{ exact: true }"
                 (click)="drawerClose.emit()"
               >
-                <cnpm-admin-nav-icon [name]="node.entry.icon" />
+                <cnpm-admin-nav-icon [name]="node.entry.icon" [size]="iconSize.control" />
                 <span class="cnpm-sidebar__label">{{ node.entry.label }}</span>
               </a>
             </li>
@@ -70,13 +70,14 @@
             <li class="cnpm-sidebar__group">
               <button
                 class="cnpm-sidebar__group-trigger"
+                [class]="'cnpm-nav-accent--' + node.group.id"
                 type="button"
                 [id]="node.group.id + '-trigger'"
                 [attr.aria-expanded]="isOpen(node.group.id)"
                 [attr.aria-controls]="node.group.id + '-panel'"
                 (click)="toggleGroup(node.group.id)"
               >
-                <cnpm-admin-nav-icon [name]="node.group.icon" />
+                <cnpm-admin-nav-icon [name]="node.group.icon" [size]="iconSize.control" />
                 <span class="cnpm-sidebar__label">{{ node.group.label }}</span>
                 <svg
                   class="cnpm-sidebar__chevron"

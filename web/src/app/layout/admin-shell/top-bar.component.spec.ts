@@ -68,6 +68,69 @@ describe('TopBarComponent', () => {
     );
   });
 
+  it('garde le repère de recherche monté alors que le champ est replié', async () => {
+    // Le champ a cédé sa place au titre. Le formulaire, lui, reste dans le document :
+    // le retirer supprimerait le repère `role="search"` exigé par FRM-012 (P0).
+    const { host } = await setup();
+    const field = host.querySelector<HTMLElement>('.cnpm-topbar__field');
+    const toggle = host.querySelector<HTMLButtonElement>('.cnpm-topbar__search-toggle');
+
+    expect(host.querySelector('form[role="search"]')).not.toBeNull();
+    expect(field?.hasAttribute('hidden')).toBe(true);
+    expect(toggle?.getAttribute('aria-expanded')).toBe('false');
+    expect(toggle?.getAttribute('aria-controls')).toBe('recherche-globale-champ');
+    expect(field?.id).toBe('recherche-globale-champ');
+  });
+
+  it('déplie puis replie le champ de recherche', async () => {
+    const { fixture, host } = await setup();
+    const toggle = host.querySelector<HTMLButtonElement>('.cnpm-topbar__search-toggle');
+
+    toggle?.click();
+    fixture.detectChanges();
+    expect(host.querySelector('.cnpm-topbar__field')?.hasAttribute('hidden')).toBe(false);
+    expect(toggle?.getAttribute('aria-expanded')).toBe('true');
+
+    toggle?.click();
+    fixture.detectChanges();
+    expect(host.querySelector('.cnpm-topbar__field')?.hasAttribute('hidden')).toBe(true);
+  });
+
+  it('ramène le focus sur le déclencheur quand Échap referme le champ', async () => {
+    // Sans ce retour, le focus resterait sur un champ devenu `hidden` : le navigateur le
+    // renverrait au document et la personne au clavier repartirait du haut de la page.
+    const { fixture, host } = await setup();
+    const toggle = host.querySelector<HTMLButtonElement>('.cnpm-topbar__search-toggle');
+
+    toggle?.click();
+    fixture.detectChanges();
+    const input = host.querySelector<HTMLInputElement>('#recherche-globale');
+    input?.focus();
+    input?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+
+    expect(host.querySelector('.cnpm-topbar__field')?.hasAttribute('hidden')).toBe(true);
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it('affiche une accroche nominative sans dupliquer le h1 de la page', async () => {
+    const { host } = await setup();
+    const title = host.querySelector<HTMLElement>('.cnpm-topbar__title');
+
+    expect(title?.textContent).toContain('Plateforme des cotisations');
+    expect(title?.textContent).toContain('Bonjour Aminata');
+    // La barre est présente sur toutes les pages : un `h1` ici en ferait deux par écran.
+    expect(host.querySelector('h1')).toBeNull();
+  });
+
+  it('retombe sur un titre neutre tant que l identité est inconnue', async () => {
+    const { host } = await setup({ identity: of(null) });
+
+    expect(host.querySelector('.cnpm-topbar__headline')?.textContent?.trim()).toBe(
+      'Espace d’administration',
+    );
+  });
+
   it('masque l action d enrôlement sans la permission backend', async () => {
     const { host } = await setup({
       identity: of({

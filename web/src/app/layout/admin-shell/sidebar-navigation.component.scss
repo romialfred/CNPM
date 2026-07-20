@@ -19,6 +19,8 @@
   flex-direction: column;
   height: 100%;
   min-width: 0;
+  background-color: var(--cnpm-chrome-surface);
+  color: var(--cnpm-chrome-text-secondary);
 }
 
 .cnpm-sidebar__brand {
@@ -29,7 +31,7 @@
   min-height: calc(var(--cnpm-size-topbar) + var(--cnpm-space-12));
   flex: none;
   padding: var(--cnpm-space-1) var(--cnpm-space-4);
-  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  border-bottom: 1px solid var(--cnpm-chrome-border);
 }
 
 .cnpm-sidebar__wordmark {
@@ -42,10 +44,18 @@
 
 /* Le rognage par fenêtre et translation négative n'a plus lieu d'être : la marge
    blanche est détourée en amont dans `logo-CNPM-lockup.png`. */
+/* Plaque claire sous le lockup.
+   Mesure sur `logo-CNPM-lockup.png` : sa couleur dominante (#202080, 66 % des pixels
+   opaques) ne donne que 1,36:1 sur `--cnpm-chrome-surface` — le logo y disparaitrait.
+   Une variante inversee serait un nouvel actif de marque, qui ne s'invente pas. La
+   plaque preserve l'actif officiel intact et sa lisibilite. */
 .cnpm-sidebar__logo-viewport {
   display: flex;
   width: 100%;
   align-items: center;
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-neutral-0);
 }
 
 .cnpm-sidebar__logo {
@@ -60,22 +70,25 @@
   font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-bold);
   letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  color: var(--cnpm-color-text-brand);
+  color: var(--cnpm-chrome-text);
   text-decoration: none;
 }
 
+/* `--cnpm-color-brand-blue-700`, l'anneau du reste du produit, ne donne que 1,63:1 sur
+   ce fond : il serait invisible et toute la barre echouerait aux criteres 2.4.7 et
+   2.4.11 de WCAG 2.2. `--cnpm-chrome-focus` y donne 18,0:1. */
 .cnpm-sidebar__wordmark:focus-visible,
 .cnpm-sidebar__item:focus-visible,
 .cnpm-sidebar__collapse:focus-visible,
 .cnpm-sidebar__drawer-close:focus-visible {
-  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-chrome-focus);
   outline-offset: 2px;
 }
 
 .cnpm-sidebar__nav {
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: var(--cnpm-space-3);
+  padding: var(--cnpm-space-2);
   min-height: 0;
 }
 
@@ -92,13 +105,20 @@
   display: flex;
   align-items: center;
   gap: var(--cnpm-space-3);
-  padding: var(--cnpm-space-3);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
   border-radius: var(--cnpm-radius-md);
-  color: var(--cnpm-color-text-secondary);
+  color: var(--cnpm-chrome-text-secondary);
   font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-medium);
   text-decoration: none;
   min-height: var(--cnpm-size-control-md);
+}
+
+/* Le pictogramme porte l'accent du domaine, le libelle reste neutre : la couleur
+   distingue les familles sans jamais porter seule une information. */
+.cnpm-sidebar__item cnpm-admin-nav-icon,
+.cnpm-sidebar__group-trigger cnpm-admin-nav-icon {
+  color: var(--cnpm-nav-accent, var(--cnpm-chrome-text-muted));
 }
 
 /* Intitulé de domaine. C'est un bouton natif et non un div cliquable : l'activation au
@@ -109,11 +129,11 @@
   align-items: center;
   gap: var(--cnpm-space-3);
   min-height: var(--cnpm-size-control-md);
-  padding: var(--cnpm-space-3);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
   border: 0;
   border-radius: var(--cnpm-radius-md);
   background: transparent;
-  color: var(--cnpm-color-text-secondary);
+  color: var(--cnpm-chrome-text-muted);
   cursor: pointer;
   font: inherit;
   font-size: var(--cnpm-font-size-xs);
@@ -124,12 +144,12 @@
 }
 
 .cnpm-sidebar__group-trigger:hover {
-  background-color: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-brand);
+  background-color: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-chrome-text);
 }
 
 .cnpm-sidebar__group-trigger:focus-visible {
-  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-chrome-focus);
   outline-offset: 2px;
 }
 
@@ -150,13 +170,13 @@
   flex-direction: column;
   gap: var(--cnpm-space-1);
   margin: 0;
-  padding: 0 0 var(--cnpm-space-2) var(--cnpm-space-8);
+  padding: 0 0 var(--cnpm-space-2) var(--cnpm-space-7);
   list-style: none;
 }
 
 .cnpm-sidebar__item--sub {
   min-height: var(--cnpm-size-control-sm);
-  padding-block: var(--cnpm-space-2);
+  padding-block: var(--cnpm-space-1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -166,19 +186,20 @@
 }
 
 a.cnpm-sidebar__item:hover {
-  background-color: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-primary);
+  background-color: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-chrome-text);
 }
 
 .cnpm-sidebar__item--active {
-  background-color: var(--cnpm-color-brand-blue-50);
-  color: var(--cnpm-color-text-brand);
+  background-color: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-chrome-text);
   font-weight: var(--cnpm-font-weight-semibold);
-  box-shadow: inset var(--cnpm-space-1) 0 0 var(--cnpm-color-brand-blue-700);
+  box-shadow: inset var(--cnpm-space-1) 0 0
+    var(--cnpm-nav-accent, var(--cnpm-color-brand-blue-300));
 }
 
 .cnpm-sidebar__item--pending {
-  color: var(--cnpm-color-text-muted);
+  color: var(--cnpm-chrome-text-muted);
   cursor: not-allowed;
 }
 
@@ -193,7 +214,7 @@ a.cnpm-sidebar__item:hover {
 .cnpm-sidebar__hint {
   flex: none;
   font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
+  color: var(--cnpm-chrome-text-muted);
 }
 
 .cnpm-sidebar__legend {
@@ -208,51 +229,18 @@ a.cnpm-sidebar__item:hover {
   margin: var(--cnpm-space-3);
   padding: var(--cnpm-space-3);
   min-height: var(--cnpm-size-control-md);
-  border: 1px solid var(--cnpm-color-border-subtle);
+  border: 1px solid var(--cnpm-chrome-border);
   border-radius: var(--cnpm-radius-md);
   background-color: transparent;
-  color: var(--cnpm-color-text-secondary);
+  color: var(--cnpm-chrome-text-secondary);
   font-family: var(--cnpm-font-family-sans);
   font-size: var(--cnpm-font-size-sm);
   cursor: pointer;
 }
 
 .cnpm-sidebar__collapse:hover {
-  background-color: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-sidebar__exercise {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-2);
-  flex: none;
-  margin: 0 var(--cnpm-space-4) var(--cnpm-space-2);
-}
-
-.cnpm-sidebar__exercise-label {
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
-}
-
-.cnpm-sidebar__exercise-value {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--cnpm-space-2);
-  min-height: var(--cnpm-size-control-sm);
-  padding: 0 var(--cnpm-space-3);
-  border: 1px solid var(--cnpm-color-border-default);
-  border-radius: var(--cnpm-radius-md);
-  color: var(--cnpm-color-text-primary);
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
-}
-
-.cnpm-sidebar__demo {
-  color: var(--cnpm-color-text-muted);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-medium);
+  background-color: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-chrome-text);
 }
 
 .cnpm-sidebar__drawer-close {
@@ -264,8 +252,7 @@ a.cnpm-sidebar__item:hover {
    navigation d'un lecteur d'écran. */
 .cnpm-sidebar--collapsed {
   .cnpm-sidebar__label,
-  .cnpm-sidebar__hint,
-  .cnpm-sidebar__exercise {
+  .cnpm-sidebar__hint {
     @include visually-hidden;
   }
 
@@ -287,7 +274,6 @@ a.cnpm-sidebar__item:hover {
 @media (min-width: 1024px) and (max-width: 1279px) {
   .cnpm-sidebar__label,
   .cnpm-sidebar__hint,
-  .cnpm-sidebar__exercise,
   .cnpm-sidebar__logo-viewport {
     @include visually-hidden;
   }
@@ -311,8 +297,7 @@ a.cnpm-sidebar__item:hover {
 @media (max-width: 1023px) {
   .cnpm-sidebar--collapsed {
     .cnpm-sidebar__label,
-    .cnpm-sidebar__hint,
-    .cnpm-sidebar__exercise {
+    .cnpm-sidebar__hint {
       position: static;
       width: auto;
       height: auto;
@@ -347,10 +332,10 @@ a.cnpm-sidebar__item:hover {
     flex: none;
     width: var(--cnpm-size-control-lg);
     height: var(--cnpm-size-control-lg);
-    border: 1px solid var(--cnpm-color-border-subtle);
+    border: 1px solid var(--cnpm-chrome-border);
     border-radius: var(--cnpm-radius-md);
     background-color: transparent;
-    color: var(--cnpm-color-text-secondary);
+    color: var(--cnpm-chrome-text-secondary);
     cursor: pointer;
   }
 }

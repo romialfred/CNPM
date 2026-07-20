@@ -58,8 +58,10 @@
   --cnpm-tile-accent: var(--cnpm-color-semantic-info-500);
 }
 
+/* Même correction que dans `_accents.scss` : `success-500` ne donne que 2,62:1 sur
+   blanc, sous le seuil de 3:1 des éléments d'interface non textuels. */
 .cnpm-tile--teal {
-  --cnpm-tile-accent: var(--cnpm-color-semantic-success-500);
+  --cnpm-tile-accent: var(--cnpm-color-semantic-success-600);
 }
 
 .cnpm-tile--amber {

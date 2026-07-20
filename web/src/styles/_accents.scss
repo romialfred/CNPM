@@ -25,8 +25,11 @@
   --cnpm-tile-accent: var(--cnpm-color-semantic-info-500);
 }
 
+/* Ton 600 et non 500 : mesuré sur blanc, `success-500` (#12B76A) ne donne que 2,62:1,
+   sous le seuil de 3:1 qu'impose WCAG 2.2 aux éléments d'interface non textuels — et
+   ces accents colorent des pictogrammes. `success-600` (#039855) donne 3,73:1. */
 .cnpm-tile-accent--teal {
-  --cnpm-tile-accent: var(--cnpm-color-semantic-success-500);
+  --cnpm-tile-accent: var(--cnpm-color-semantic-success-600);
 }
 
 .cnpm-tile-accent--amber {
