@@ -1,6 +1,12 @@
 import { firstValueFrom } from 'rxjs';
 import { describe, expect, it } from 'vitest';
-import { ADMIN_NAV, visibleAdminNav } from './admin-nav';
+import {
+  ADMIN_NAV,
+  ADMIN_NAV_TREE,
+  adminNavGroupOfRoute,
+  visibleAdminNav,
+  visibleAdminNavTree,
+} from './admin-nav';
 import { DemoSessionGateway } from './demo-session.gateway';
 
 describe('ADMIN_NAV', () => {
@@ -86,5 +92,65 @@ describe('ADMIN_NAV', () => {
     );
     expect(routes).toContain('/admin/security/audit');
     expect(routes).toContain('/admin/settings');
+  });
+});
+
+describe('ADMIN_NAV_TREE', () => {
+  it('ne perd ni ne duplique aucune destination au regroupement', () => {
+    const dansArbre = ADMIN_NAV_TREE.flatMap((node) =>
+      node.kind === 'link' ? [node.entry.route] : node.group.entries.map((entry) => entry.route),
+    );
+
+    // La liste plate est DERIVEE de l'arbre : les deux representations ne peuvent pas
+    // diverger, et ce test le constate plutot que de le supposer.
+    expect(dansArbre).toEqual(ADMIN_NAV.map((entry) => entry.route));
+    expect(new Set(dansArbre).size).toBe(dansArbre.length);
+    expect(dansArbre).toHaveLength(17);
+  });
+
+  it('garde le tableau de bord hors groupe, donc a un seul clic', () => {
+    const premier = ADMIN_NAV_TREE[0];
+
+    expect(premier.kind).toBe('link');
+    expect(premier.kind === 'link' && premier.entry.route).toBe('/admin/dashboard');
+  });
+
+  it('retire un groupe vide plutot que d afficher un titre sans destination', () => {
+    // Sans aucune permission, « Relation membre » ne conserve que Requetes ; les deux
+    // autres entrees tombent. Le groupe subsiste donc, mais allege.
+    const sansPermission = visibleAdminNavTree([]);
+    const relation = sansPermission.find(
+      (node) => node.kind === 'group' && node.group.id === 'relation',
+    );
+
+    expect(relation?.kind).toBe('group');
+    expect(relation?.kind === 'group' && relation.group.entries.map((e) => e.label)).toEqual([
+      'Requêtes',
+    ]);
+
+    // Chaque groupe rendu porte au moins une destination.
+    for (const node of sansPermission) {
+      if (node.kind === 'group') {
+        expect(node.group.entries.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('applique les permissions a l entree, jamais au groupe', () => {
+    const avec = visibleAdminNavTree(['SHOWCASE.MODERATION.READ', 'DOCUMENT.READ']);
+    const relation = avec.find((node) => node.kind === 'group' && node.group.id === 'relation');
+
+    expect(relation?.kind === 'group' && relation.group.entries.map((e) => e.label)).toEqual([
+      'Requêtes',
+      'Documents',
+      'Vitrines',
+    ]);
+  });
+
+  it('retrouve le groupe d une route, pour deplier celui de l ecran ouvert', () => {
+    expect(adminNavGroupOfRoute('/admin/reporting')).toBe('supervision');
+    expect(adminNavGroupOfRoute('/admin/members')).toBe('repertoire');
+    // Le tableau de bord n'appartient a aucun groupe.
+    expect(adminNavGroupOfRoute('/admin/dashboard')).toBeUndefined();
   });
 });

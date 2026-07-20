@@ -1,12 +1,25 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { LucidePanelLeftClose, LucidePanelLeftOpen, LucideX } from '@lucide/angular';
-import { catchError, map, of } from 'rxjs';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  LucideChevronDown,
+  LucidePanelLeftClose,
+  LucidePanelLeftOpen,
+  LucideX,
+} from '@lucide/angular';
+import { catchError, filter, map, of, startWith } from 'rxjs';
 import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
 import { AdminNavIconComponent } from './admin-nav-icon.component';
-import { visibleAdminNav } from './admin-nav';
+import { adminNavGroupOfRoute, visibleAdminNav, visibleAdminNavTree } from './admin-nav';
 import { SESSION_GATEWAY } from './session-gateway';
 
 /**
@@ -24,6 +37,7 @@ import { SESSION_GATEWAY } from './session-gateway';
     RouterLink,
     RouterLinkActive,
     AdminNavIconComponent,
+    LucideChevronDown,
     LucidePanelLeftClose,
     LucidePanelLeftOpen,
     LucideX,
@@ -46,6 +60,67 @@ export class SidebarNavigationComponent {
     ),
     { initialValue: visibleAdminNav([]) },
   );
+
+  /** Même filtrage que `navigation`, en conservant les groupes. */
+  protected readonly tree = toSignal(
+    this.session.identity.pipe(
+      map((identity) => visibleAdminNavTree(identity?.permissions ?? [])),
+      catchError(() => of(visibleAdminNavTree([]))),
+    ),
+    { initialValue: visibleAdminNavTree([]) },
+  );
+
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly identity = this.session.identity;
+
+  private readonly router = inject(Router);
+
+  /**
+   * Groupes que l'utilisateur a refermés.
+   *
+   * L'état est inversé — on retient les fermetures, pas les ouvertures — pour que tout
+   * soit déplié à l'arrivée. Une navigation dont les rubriques sont cachées par défaut
+   * oblige à ouvrir chaque groupe pour savoir ce qu'il contient.
+   */
+  private readonly closedGroups = signal<ReadonlySet<string>>(new Set());
+
+  private readonly currentUrl = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event) => event.urlAfterRedirects),
+      startWith(this.router.url),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  /** Groupe de l'écran ouvert : il reste déplié, même si l'utilisateur l'avait fermé. */
+  protected readonly activeGroup = computed(() => {
+    const url = this.currentUrl().split('?')[0];
+    return this.tree()
+      .filter((node) => node.kind === 'group')
+      .map((node) => (node.kind === 'group' ? node.group : null))
+      .find((group) => group?.entries.some((entry) => url.startsWith(entry.route)))?.id;
+  });
+
+  protected isOpen(groupId: string): boolean {
+    return groupId === this.activeGroup() || !this.closedGroups().has(groupId);
+  }
+
+  protected toggleGroup(groupId: string): void {
+    this.closedGroups.update((closed) => {
+      const next = new Set(closed);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }
+
+  protected readonly hasPending = computed(() =>
+    this.navigation().some((entry) => entry.pending),
+  );
+
+  protected groupOfRoute = adminNavGroupOfRoute;
 }

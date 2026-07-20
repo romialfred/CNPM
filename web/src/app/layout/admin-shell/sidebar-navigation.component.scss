@@ -101,6 +101,70 @@
   min-height: var(--cnpm-size-control-md);
 }
 
+/* Intitulé de domaine. C'est un bouton natif et non un div cliquable : l'activation au
+   clavier, le rôle et l'état plié/déplié viennent alors gratuitement. */
+.cnpm-sidebar__group-trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-height: var(--cnpm-size-control-md);
+  padding: var(--cnpm-space-3);
+  border: 0;
+  border-radius: var(--cnpm-radius-md);
+  background: transparent;
+  color: var(--cnpm-color-text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.cnpm-sidebar__group-trigger:hover {
+  background-color: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-sidebar__group-trigger:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+/* Le chevron suit l'état, mais ne le porte pas seul : `aria-expanded` l'annonce. */
+.cnpm-sidebar__chevron {
+  margin-inline-start: auto;
+  transition: transform var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+}
+
+.cnpm-sidebar__group-trigger[aria-expanded='false'] .cnpm-sidebar__chevron {
+  transform: rotate(-90deg);
+}
+
+/* Les sous-entrées s'alignent sous le libellé du groupe, pas sous son pictogramme :
+   le décalage rend la hiérarchie lisible sans ajouter de trait. */
+.cnpm-sidebar__sublist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  margin: 0;
+  padding: 0 0 var(--cnpm-space-2) var(--cnpm-space-8);
+  list-style: none;
+}
+
+.cnpm-sidebar__item--sub {
+  min-height: var(--cnpm-size-control-sm);
+  padding-block: var(--cnpm-space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnpm-sidebar__chevron {
+    transition: none;
+  }
+}
+
 a.cnpm-sidebar__item:hover {
   background-color: var(--cnpm-color-surface-subtle);
   color: var(--cnpm-color-text-primary);

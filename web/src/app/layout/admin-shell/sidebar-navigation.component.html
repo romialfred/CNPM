@@ -31,23 +31,13 @@
   </div>
 
   <nav class="cnpm-sidebar__nav" aria-label="Navigation d’administration">
-    <ul class="cnpm-sidebar__list">
-      @for (entry of navigation(); track entry.route) {
-        <li>
-          @if (entry.pending) {
-            <!-- Rubrique déclarée, écran non livré. Rendue en `span` : un lien vers une
-                 page inexistante est un défaut, pas un espace réservé. Le motif est
-                 écrit — « à venir » — et non porté par la seule atténuation. -->
-            <span
-              class="cnpm-sidebar__item cnpm-sidebar__item--pending"
-              aria-disabled="true"
-              aria-describedby="nav-pending"
-            >
-              <cnpm-admin-nav-icon [name]="entry.icon" />
-              <span class="cnpm-sidebar__label">{{ entry.label }}</span>
-              <span class="cnpm-sidebar__hint">à venir</span>
-            </span>
-          } @else {
+    <!-- En mode réduit, les libellés sont masqués : un intitulé de groupe n'y aurait rien
+         à annoncer et un dépliant ne pourrait pas se lire. Les destinations sont alors
+         rendues à plat, comme autant de pictogrammes. -->
+    @if (collapsed()) {
+      <ul class="cnpm-sidebar__list">
+        @for (entry of navigation(); track entry.route) {
+          <li>
             <a
               class="cnpm-sidebar__item"
               [routerLink]="entry.route"
@@ -57,13 +47,93 @@
               <cnpm-admin-nav-icon [name]="entry.icon" />
               <span class="cnpm-sidebar__label">{{ entry.label }}</span>
             </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <ul class="cnpm-sidebar__list">
+        @for (node of tree(); track node.kind === 'group' ? node.group.id : node.entry.route) {
+          @if (node.kind === 'link') {
+            <li>
+              <a
+                class="cnpm-sidebar__item"
+                [routerLink]="node.entry.route"
+                routerLinkActive="cnpm-sidebar__item--active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                (click)="drawerClose.emit()"
+              >
+                <cnpm-admin-nav-icon [name]="node.entry.icon" />
+                <span class="cnpm-sidebar__label">{{ node.entry.label }}</span>
+              </a>
+            </li>
+          } @else {
+            <li class="cnpm-sidebar__group">
+              <button
+                class="cnpm-sidebar__group-trigger"
+                type="button"
+                [id]="node.group.id + '-trigger'"
+                [attr.aria-expanded]="isOpen(node.group.id)"
+                [attr.aria-controls]="node.group.id + '-panel'"
+                (click)="toggleGroup(node.group.id)"
+              >
+                <cnpm-admin-nav-icon [name]="node.group.icon" />
+                <span class="cnpm-sidebar__label">{{ node.group.label }}</span>
+                <svg
+                  class="cnpm-sidebar__chevron"
+                  lucideChevronDown
+                  [size]="iconSize.compact"
+                  aria-hidden="true"
+                ></svg>
+              </button>
+
+              @if (isOpen(node.group.id)) {
+                <ul
+                  class="cnpm-sidebar__sublist"
+                  [id]="node.group.id + '-panel'"
+                  [attr.aria-labelledby]="node.group.id + '-trigger'"
+                >
+                  @for (entry of node.group.entries; track entry.route) {
+                    <li>
+                      @if (entry.pending) {
+                        <!-- Rubrique déclarée, écran non livré. Rendue en `span` : un lien
+                             vers une page inexistante est un défaut, pas un espace
+                             réservé. Le motif est écrit, non porté par la seule
+                             atténuation. -->
+                        <span
+                          class="cnpm-sidebar__item cnpm-sidebar__item--sub cnpm-sidebar__item--pending"
+                          aria-disabled="true"
+                          aria-describedby="nav-pending"
+                        >
+                          <span class="cnpm-sidebar__label">{{ entry.label }}</span>
+                          <span class="cnpm-sidebar__hint">à venir</span>
+                        </span>
+                      } @else {
+                        <a
+                          class="cnpm-sidebar__item cnpm-sidebar__item--sub"
+                          [routerLink]="entry.route"
+                          routerLinkActive="cnpm-sidebar__item--active"
+                          (click)="drawerClose.emit()"
+                        >
+                          <span class="cnpm-sidebar__label">{{ entry.label }}</span>
+                        </a>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </li>
           }
-        </li>
-      }
-    </ul>
-    <p class="cnpm-sidebar__legend" id="nav-pending">
-      Les rubriques marquées « à venir » ne sont pas encore disponibles.
-    </p>
+        }
+      </ul>
+    }
+
+    <!-- La légende n'apparaît que si une rubrique la référence : sans entrée « à venir »,
+         elle annoncerait une convention qui ne s'applique à rien. -->
+    @if (hasPending()) {
+      <p class="cnpm-sidebar__legend" id="nav-pending">
+        Les rubriques marquées « à venir » ne sont pas encore disponibles.
+      </p>
+    }
   </nav>
 
   @if (identity | async; as user) {
