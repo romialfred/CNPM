@@ -11,7 +11,7 @@ import {
   type EnrollmentPageQuery,
   type EnrollmentsGateway,
 } from './enrollments-gateway';
-import { EnrollmentsPage } from './enrollments.page';
+import { channelLabel, EnrollmentsPage } from './enrollments.page';
 
 class ControllableGateway implements Pick<EnrollmentsGateway, 'list'> {
   readonly calls: { query: EnrollmentPageQuery; result: Subject<EnrollmentPage> }[] = [];
@@ -131,7 +131,13 @@ describe('EnrollmentsPage', () => {
     const mobileCards = host.querySelector('.cnpm-enrollments__cards');
     expect(mobileCards).not.toBeNull();
     expect(mobileCards?.textContent).toContain('ENR-DEMO-0001');
-    expect(mobileCards?.textContent).toContain('20000000-0000-4000-8000-000000000001');
+    // L'UUID d'organisation ne doit plus apparaître : le contrat ne portant aucune
+    // raison sociale (API-DEC-001), il tenait lieu de nom d'entreprise dans la liste.
+    // C'est la référence du dossier qui fait l'identité de la carte.
+    expect(mobileCards?.textContent).not.toContain('20000000-0000-4000-8000-000000000001');
+    // Le canal de la fixture n'est pas un des deux codes connus : il est remis en forme
+    // mécaniquement plutôt que masqué — mieux vaut un libellé brut qu'une donnée perdue.
+    expect(mobileCards?.textContent).toContain('Demo');
 
     const button = mobileCards?.querySelector('button');
     button?.click();
@@ -140,5 +146,22 @@ describe('EnrollmentsPage', () => {
       ['/admin/enrollments', '10000000-0000-4000-8000-000000000001', 'review'],
       { queryParamsHandling: 'preserve' },
     );
+  });
+});
+
+describe('channelLabel', () => {
+  it('traduit les deux canaux connus de la source', () => {
+    expect(channelLabel('PORTAIL_MEMBRE')).toBe('Portail membre');
+    expect(channelLabel('GUICHET_ASSISTE')).toBe('Guichet assisté');
+  });
+
+  it('remet en forme un canal inconnu plutôt que de le masquer', () => {
+    // Aucune nomenclature n'est inventée : un code non répertorié reste lisible.
+    expect(channelLabel('COURRIER')).toBe('Courrier');
+    expect(channelLabel('AGENCE_REGIONALE')).toBe('Agence regionale');
+  });
+
+  it('rend le code tel quel plutôt que rien s’il est vide', () => {
+    expect(channelLabel('')).toBe('');
   });
 });

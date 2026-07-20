@@ -48,15 +48,44 @@ const STATUS_TONES: Readonly<Record<EnrollmentStatus, CnpmBadgeTone>> = {
   REJECTED: 'error',
 };
 
+/**
+ * La colonne « Entreprise » a disparu de la lecture courante.
+ *
+ * Le contrat ne porte aucune raison sociale : `EnrollmentApplicationView`
+ * (docs/04-api/openapi.yaml) n'expose que `organizationId`, un UUID. La colonne
+ * affichait donc un identifiant technique de 36 caractères là où un dirigeant attend
+ * un nom d'entreprise. Tant que le contrat ne transporte pas le libellé, la référence
+ * du dossier fait l'identité et l'UUID reste consultable dans la fiche.
+ * Consigné en API-DEC-001 dans `docs/00-governance/open-decisions.md`.
+ */
 const COLUMNS: readonly DataTableColumn[] = [
   { key: 'caseNumber', label: 'Dossier' },
-  { key: 'organizationId', label: 'Entreprise' },
-  { key: 'channel', label: 'Canal' },
+  { key: 'channel', label: 'Origine' },
   { key: 'submittedAt', label: 'Soumis le' },
   { key: 'assignedTo', label: 'Contrôleur' },
   { key: 'status', label: 'Statut' },
   { key: 'actions', label: 'Actions' },
 ];
+
+/**
+ * Rend un code de canal lisible.
+ *
+ * Aucune nomenclature n'est inventée : les deux codes connus de la source sont
+ * traduits mot pour mot, et tout code inconnu est simplement remis en forme
+ * mécaniquement plutôt que masqué — mieux vaut un libellé brut qu'une information
+ * perdue.
+ */
+export function channelLabel(channel: string): string {
+  const connus: Readonly<Record<string, string>> = {
+    PORTAIL_MEMBRE: 'Portail membre',
+    GUICHET_ASSISTE: 'Guichet assisté',
+  };
+  if (connus[channel]) {
+    return connus[channel];
+  }
+  const mots = channel.toLocaleLowerCase('fr').replaceAll('_', ' ').trim();
+  return mots ? mots.charAt(0).toLocaleUpperCase('fr') + mots.slice(1) : channel;
+}
 
 /** BO-008 — liste paginée des dossiers d'enrôlement. */
 @Component({
@@ -88,6 +117,7 @@ export class EnrollmentsPage {
 
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly columns = COLUMNS;
+  protected readonly channelLabel = channelLabel;
   protected readonly pageSizes = PAGE_SIZES;
 
   private readonly params = toSignal(this.route.queryParamMap, {

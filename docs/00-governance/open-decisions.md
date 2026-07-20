@@ -39,6 +39,35 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-013 | Modèle de consentement des contacts publics | Définir le recueil, la conservation, la révocation et la revérification du consentement à publier des coordonnées | Juridique / DPO + Communication | Élevé | Ouverte |
 | UX-DEC-015 | Nombre d'entrées de la navigation publique | Arbitrer entre les huit entrées de REF-PUB-001 et le regroupement en quatre menus déroulants demandé par le client | Produit / UX + Communication | Moyen | Ouverte |
 
+## Décisions API
+
+| ID | Sujet | Décision attendue | Responsable | Impact | Statut |
+|---|---|---|---|---|---|
+| API-DEC-001 | Libellé d'organisation sur les dossiers d'enrôlement | Décider si `EnrollmentApplicationView` transporte la raison sociale, ou si l'écran doit joindre une seconde ressource | Produit + Architecture | Moyen | Ouverte |
+
+### API-DEC-001 — Libellé d'organisation sur les dossiers d'enrôlement
+
+**Contexte.** `docs/04-api/openapi.yaml`, schéma `EnrollmentApplicationView`, expose
+`organizationId` sous forme d'UUID et ne porte aucune raison sociale. Le port web
+`EnrollmentApplication` reflète fidèlement ce contrat.
+
+**Constat.** La liste BO-008 affichait donc `20000000-0000-4000-8000-000000000001` dans
+une colonne intitulée « Entreprise ». Un identifiant technique de 36 caractères y tenait
+lieu de nom d'entreprise, sur l'écran qu'un dirigeant lit en premier. Le défaut n'est pas
+de présentation : la donnée lisible n'existe pas dans la source.
+
+**État actuel.** La colonne est retirée de la lecture courante. La référence du dossier
+(`caseNumber`, format ENR-2026-0001) fait l'identité de la ligne ; l'UUID reste
+disponible dans la fiche de revue, où il a une valeur de traçabilité. Aucun nom n'est
+inventé et aucune jointure côté client n'est introduite — N+1 appels sur une liste
+paginée seraient un défaut de performance et de charge.
+
+**Options.** (1) Ajouter un libellé dénormalisé à la vue d'enrôlement : une lecture, mais
+une donnée dupliquée à maintenir cohérente. (2) Exposer une ressource de résolution par
+lots d'identifiants d'organisation : normalisé, mais un aller-retour supplémentaire.
+
+**Question.** Retient-on le libellé dénormalisé sur `EnrollmentApplicationView` ?
+
 ## Décisions ouvertes — détail
 
 ### UX-DEC-011 — Récupération, support et méthodes 2FA alternatives

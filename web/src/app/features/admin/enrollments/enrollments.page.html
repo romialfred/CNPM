@@ -30,7 +30,7 @@
         [class.cnpm-enrollments__table--ready]="tableState() === 'ready'"
       >
         <cnpm-data-table
-          caption="Dossiers d’enrôlement avec leur entreprise, canal, date de soumission, affectation et statut."
+          caption="Dossiers d’enrôlement avec leur origine, date de soumission, affectation et statut."
           [columns]="columns"
           [rows]="rows()"
           [state]="tableState()"
@@ -40,10 +40,7 @@
             <td class="cnpm-table__cell">
               <span class="cnpm-enrollments__case">{{ enrollment.caseNumber }}</span>
             </td>
-            <td class="cnpm-table__cell">
-              <span class="cnpm-enrollments__technical-id">{{ enrollment.organizationId }}</span>
-            </td>
-            <td class="cnpm-table__cell">{{ enrollment.channel }}</td>
+            <td class="cnpm-table__cell">{{ channelLabel(enrollment.channel) }}</td>
             <td class="cnpm-table__cell">
               @if (enrollment.submittedAt) {
                 {{ enrollment.submittedAt | date: 'dd/MM/yyyy HH:mm' }}
@@ -53,7 +50,7 @@
             </td>
             <td class="cnpm-table__cell">
               @if (enrollment.assignedTo) {
-                <span class="cnpm-enrollments__technical-id">{{ enrollment.assignedTo }}</span>
+                <span>Affecté</span>
               } @else {
                 <span class="cnpm-enrollments__missing">Non affecté</span>
               }
@@ -145,12 +142,8 @@
               </div>
               <dl>
                 <div>
-                  <dt>Entreprise</dt>
-                  <dd class="cnpm-enrollments__technical-id">{{ enrollment.organizationId }}</dd>
-                </div>
-                <div>
-                  <dt>Canal</dt>
-                  <dd>{{ enrollment.channel }}</dd>
+                  <dt>Origine</dt>
+                  <dd>{{ channelLabel(enrollment.channel) }}</dd>
                 </div>
                 <div>
                   <dt>Soumis le</dt>
@@ -166,9 +159,7 @@
                   <dt>Contrôleur</dt>
                   <dd>
                     @if (enrollment.assignedTo) {
-                      <span class="cnpm-enrollments__technical-id">{{
-                        enrollment.assignedTo
-                      }}</span>
+                      <span>Affecté</span>
                     } @else {
                       <span class="cnpm-enrollments__missing">Non affecté</span>
                     }
