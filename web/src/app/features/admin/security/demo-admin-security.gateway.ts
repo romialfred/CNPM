@@ -407,7 +407,8 @@ function fold(value: string): string {
 @Injectable()
 export class DemoAdminSecurityGateway implements AdminSecurityGateway {
   private readonly roles = buildRoles();
-  private readonly permissions = buildPermissions();
+  /** Mutable — l'édition de la matrice met à jour les cellules, comme le fera le backend. */
+  private permissions: PermissionRow[] = [...buildPermissions()];
   private readonly sessions = SESSIONS;
   /**
    * Mutable — une réinitialisation de second facteur y consigne sa trace, motif compris,
@@ -444,6 +445,10 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
       policy: POLICY,
       posture: this.posture(),
       counts: this.counts(),
+      // En démo, le compte courant est super-administrateur : il peut éditer la matrice.
+      // Un backend renverrait `false` pour un profil sans le droit, et l'UI resterait en
+      // lecture seule.
+      canManagePermissions: true,
     };
 
     // Latence simulée : sans elle, l'état de chargement ne serait jamais peint, donc
@@ -505,6 +510,28 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
       this.audit = [entry, ...this.audit];
       return { ...account, twoFactor: 'PENDING' };
     });
+  }
+
+  setPermissionGrant(
+    permissionId: string,
+    roleId: string,
+    granted: boolean,
+  ): Observable<PermissionRow> {
+    const index = this.permissions.findIndex((row) => row.id === permissionId);
+    if (index === -1) {
+      return throwError(() => new Error('Permission introuvable')).pipe(delay(180));
+    }
+    const row = this.permissions[index];
+    const grants = row.grants.map((grant) =>
+      grant.roleId === roleId ? { ...grant, granted } : grant,
+    );
+    const updated: PermissionRow = { ...row, grants };
+    this.permissions = [
+      ...this.permissions.slice(0, index),
+      updated,
+      ...this.permissions.slice(index + 1),
+    ];
+    return of(updated).pipe(delay(180));
   }
 
   /** Applique une transformation à un compte et le renvoie ; erreur si l'identifiant est inconnu. */

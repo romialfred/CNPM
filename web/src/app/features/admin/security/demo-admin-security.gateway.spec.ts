@@ -117,4 +117,43 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
       firstValueFrom(gateway.resetTwoFactor('compte-inexistant', 'motif quelconque')),
     ).rejects.toThrow();
   });
+
+  it('déclare la matrice éditable et persiste l’accord puis le retrait d’un droit', async () => {
+    const gateway = new DemoAdminSecurityGateway();
+    const before = await firstValueFrom(gateway.load({ tab: 'roles', search: '' }));
+    expect(before.canManagePermissions).toBe(true);
+
+    // Une permission financière refusée au rôle technique (séparation des tâches).
+    const permission = before.permissions.find(
+      (row) =>
+        row.domain === 'Finance' &&
+        row.grants.some((grant) => grant.roleId === 'admin-technique' && !grant.granted),
+    );
+    if (!permission) throw new Error('permission financière refusée attendue');
+
+    const updated = await firstValueFrom(
+      gateway.setPermissionGrant(permission.id, 'admin-technique', true),
+    );
+    expect(updated.grants.find((grant) => grant.roleId === 'admin-technique')?.granted).toBe(true);
+
+    const after = await firstValueFrom(gateway.load({ tab: 'roles', search: '' }));
+    const granted = after.permissions
+      .find((row) => row.id === permission.id)
+      ?.grants.find((grant) => grant.roleId === 'admin-technique')?.granted;
+    expect(granted).toBe(true);
+
+    // Retour arrière possible : le droit se retire aussi.
+    await firstValueFrom(gateway.setPermissionGrant(permission.id, 'admin-technique', false));
+    const reverted = await firstValueFrom(gateway.load({ tab: 'roles', search: '' }));
+    const revertedGrant = reverted.permissions
+      .find((row) => row.id === permission.id)
+      ?.grants.find((grant) => grant.roleId === 'admin-technique')?.granted;
+    expect(revertedGrant).toBe(false);
+  });
+
+  it('rejette l’édition d’une permission inconnue', async () => {
+    await expect(
+      firstValueFrom(new DemoAdminSecurityGateway().setPermissionGrant('inconnue', 'auditeur', true)),
+    ).rejects.toThrow();
+  });
 });

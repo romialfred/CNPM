@@ -41,6 +41,7 @@ import {
   type AdminSecuritySnapshot,
   type AuditEntry,
   type AuditOutcome,
+  type PermissionGrant,
   type PermissionRow,
   type SecurityAccount,
   type SecuritySession,
@@ -298,6 +299,50 @@ export class AdminSecurityPage {
     this.permissions().slice(0, 6),
   );
   protected readonly roles = computed(() => this.data()?.roles ?? []);
+  /** L'édition de la matrice n'est ouverte que si la source y autorise le compte courant. */
+  protected readonly canManagePermissions = computed(
+    () => this.data()?.canManagePermissions ?? false,
+  );
+  /** Cellules en cours d'enregistrement, clef « permissionId:roleId » : évite le double clic. */
+  private readonly savingGrants = signal<ReadonlySet<string>>(new Set());
+
+  protected isGrantSaving(permissionId: string, roleId: string): boolean {
+    return this.savingGrants().has(`${permissionId}:${roleId}`);
+  }
+
+  /** Bascule un droit d'un rôle dans la matrice, si le compte courant en a le droit. */
+  protected togglePermission(permission: PermissionRow, grant: PermissionGrant): void {
+    const key = `${permission.id}:${grant.roleId}`;
+    if (!this.canManagePermissions() || this.savingGrants().has(key)) {
+      return;
+    }
+    this.savingGrants.update((current) => new Set(current).add(key));
+    this.gateway
+      .setPermissionGrant(permission.id, grant.roleId, !grant.granted)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (row) => {
+          this.releaseGrant(key);
+          const cell = row.grants.find((entry) => entry.roleId === grant.roleId);
+          this.toast.success(
+            `${cell?.granted ? 'Accordé' : 'Retiré'} : ${permission.label} · ${grant.roleLabel}.`,
+          );
+          this.retryTick.update((tick) => tick + 1);
+        },
+        error: () => {
+          this.releaseGrant(key);
+          this.toast.error('La modification du droit a échoué. Réessayez.');
+        },
+      });
+  }
+
+  private releaseGrant(key: string): void {
+    this.savingGrants.update((current) => {
+      const next = new Set(current);
+      next.delete(key);
+      return next;
+    });
+  }
   protected readonly sessions = computed<readonly SecuritySession[]>(
     () => this.data()?.sessions ?? [],
   );

@@ -201,6 +201,40 @@
   vertical-align: middle;
 }
 
+/* Cellule éditable : bouton bascule. L'état « accordé » est porté par le pictogramme,
+   `aria-pressed` ET la couleur — jamais la couleur seule. */
+.cnpm-security__grant-toggle {
+  display: inline-grid;
+  width: var(--cnpm-size-control-sm);
+  height: var(--cnpm-size-control-sm);
+  place-items: center;
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-sm);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-disabled);
+  cursor: pointer;
+}
+
+.cnpm-security__grant-toggle:hover:not(:disabled) {
+  border-color: var(--cnpm-color-brand-blue-300);
+}
+
+.cnpm-security__grant-toggle:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-security__grant-toggle:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.cnpm-security__grant-toggle--on {
+  border-color: var(--cnpm-color-semantic-success-600);
+  background: var(--cnpm-color-semantic-success-50);
+  color: var(--cnpm-color-semantic-success-700);
+}
+
 .cnpm-security__legend {
   display: flex;
   flex-wrap: wrap;
@@ -398,74 +432,6 @@
   /* Reflow à 320 px : les cartes de rôle passent sur une colonne unique plutôt que
      d'imposer une largeur minimale que la page ne peut pas offrir. */
   .cnpm-security__roles {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* ----------------------------------------------------- Formulaire de création */
-
-.cnpm-security__create-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-4);
-}
-
-/* Prénom et nom côte à côte au-delà du mobile ; empilés en dessous. */
-.cnpm-security__create-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--cnpm-space-4);
-}
-
-.cnpm-security__field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-2);
-  min-width: 0;
-}
-
-.cnpm-security__label {
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-security__select {
-  width: 100%;
-  min-width: 0;
-  height: var(--cnpm-size-control-md);
-  padding: 0 var(--cnpm-space-3);
-  border: 1px solid var(--cnpm-color-border-default);
-  border-radius: var(--cnpm-radius-md);
-  background-color: var(--cnpm-color-surface-primary);
-  font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-security__select:focus-visible {
-  border-color: var(--cnpm-color-brand-blue-700);
-  outline: 2px solid var(--cnpm-color-brand-blue-700);
-  outline-offset: 1px;
-}
-
-/* L'erreur de champ ne dépend pas de la seule couleur : le texte l'énonce. */
-.cnpm-security__field-error {
-  margin: 0;
-  color: var(--cnpm-color-semantic-error-600);
-  font-size: var(--cnpm-font-size-xs);
-  line-height: var(--cnpm-font-lineHeight-xs);
-}
-
-.cnpm-security__create-note {
-  margin: 0;
-  color: var(--cnpm-color-text-muted);
-  font-size: var(--cnpm-font-size-sm);
-  line-height: var(--cnpm-font-lineHeight-sm);
-}
-
-@media (max-width: 40rem) {
-  .cnpm-security__create-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }

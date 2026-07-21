@@ -163,6 +163,12 @@ export interface AdminSecuritySnapshot {
   readonly policy: readonly SecurityPolicyItem[];
   readonly posture: SecurityPosture;
   readonly counts: SecurityCounts;
+  /**
+   * Le compte courant peut-il MODIFIER la matrice des droits ? Décidé par la source (le
+   * serveur reste l'autorité) : l'UI n'ouvre l'édition que si ce drapeau est vrai, sinon
+   * la matrice reste en lecture seule.
+   */
+  readonly canManagePermissions: boolean;
 }
 
 /**
@@ -221,6 +227,17 @@ export interface AdminSecurityGateway {
    * le motif est transmis à la source pour être consigné dans l'événement d'audit corrélé.
    */
   resetTwoFactor(accountId: string, reason: string): Observable<SecurityAccount>;
+
+  /**
+   * Accorde ou retire une permission à un rôle dans la matrice. Le serveur applique la
+   * règle (séparation des tâches, droit de gérer les permissions) et trace l'action ;
+   * l'écran ne fait que demander et rafraîchir. Renvoie la ligne de permission à jour.
+   */
+  setPermissionGrant(
+    permissionId: string,
+    roleId: string,
+    granted: boolean,
+  ): Observable<PermissionRow>;
 }
 
 export const ADMIN_SECURITY_GATEWAY = new InjectionToken<AdminSecurityGateway>(

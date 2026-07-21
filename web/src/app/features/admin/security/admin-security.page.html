@@ -279,11 +279,17 @@
 
           <!-- ================ Rôles et permissions ================ -->
           @case ('roles') {
-            <cnpm-alert tone="info" title="Matrice en lecture seule" [live]="false">
-              Les droits sont chargés depuis le backend et se lisent ici sans être modifiables :
-              l’édition des permissions n’est pas encore disponible dans cette version. Le rôle
-              technique ne reçoit aucun droit financier.
-            </cnpm-alert>
+            @if (canManagePermissions()) {
+              <cnpm-alert tone="info" title="Matrice éditable" [live]="false">
+                Cliquez une cellule pour accorder ou retirer un droit à un rôle. Chaque
+                modification est tracée. Le rôle technique ne reçoit aucun droit financier.
+              </cnpm-alert>
+            } @else {
+              <cnpm-alert tone="info" title="Matrice en lecture seule" [live]="false">
+                Vous n’avez pas le droit de modifier les permissions : elles s’affichent en
+                lecture seule. Le rôle technique ne reçoit aucun droit financier.
+              </cnpm-alert>
+            }
 
             <cnpm-data-table
               caption="Matrice des permissions par rôle. Chaque ligne est une permission, chaque colonne un rôle, et chaque cellule indique si le rôle est autorisé."
@@ -305,24 +311,50 @@
                      libellé serait indéchiffrable hors du contexte visuel. -->
                 @for (grant of permission.grants; track grant.roleId) {
                   <td class="cnpm-table__cell cnpm-security__grant">
-                    @if (grant.granted) {
-                      <svg
-                        lucideCheck
-                        class="cnpm-security__grant-yes"
-                        [size]="iconSize.compact"
-                        aria-hidden="true"
-                      ></svg>
+                    @if (canManagePermissions()) {
+                      <!-- Cellule éditable : un clic bascule le droit. L'état est porté par
+                           `aria-pressed` et le pictogramme, jamais par la seule couleur. -->
+                      <button
+                        type="button"
+                        class="cnpm-security__grant-toggle"
+                        [class.cnpm-security__grant-toggle--on]="grant.granted"
+                        [attr.aria-pressed]="grant.granted"
+                        [disabled]="isGrantSaving(permission.id, grant.roleId)"
+                        [attr.aria-label]="
+                          (grant.granted ? 'Retirer' : 'Accorder') +
+                          ' : ' +
+                          permission.label +
+                          ' pour ' +
+                          grant.roleLabel
+                        "
+                        (click)="togglePermission(permission, grant)"
+                      >
+                        @if (grant.granted) {
+                          <svg lucideCheck [size]="iconSize.compact" aria-hidden="true"></svg>
+                        } @else {
+                          <svg lucideMinus [size]="iconSize.compact" aria-hidden="true"></svg>
+                        }
+                      </button>
                     } @else {
-                      <svg
-                        lucideMinus
-                        class="cnpm-security__grant-no"
-                        [size]="iconSize.compact"
-                        aria-hidden="true"
-                      ></svg>
+                      @if (grant.granted) {
+                        <svg
+                          lucideCheck
+                          class="cnpm-security__grant-yes"
+                          [size]="iconSize.compact"
+                          aria-hidden="true"
+                        ></svg>
+                      } @else {
+                        <svg
+                          lucideMinus
+                          class="cnpm-security__grant-no"
+                          [size]="iconSize.compact"
+                          aria-hidden="true"
+                        ></svg>
+                      }
+                      <span class="cnpm-security__sr">
+                        {{ grant.roleLabel }} : {{ grant.granted ? 'autorisé' : 'non autorisé' }}
+                      </span>
                     }
-                    <span class="cnpm-security__sr">
-                      {{ grant.roleLabel }} : {{ grant.granted ? 'autorisé' : 'non autorisé' }}
-                    </span>
                   </td>
                 }
               </ng-template>
