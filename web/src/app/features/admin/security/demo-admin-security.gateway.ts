@@ -66,6 +66,12 @@ const ROLE_SEED: readonly Omit<SecurityRole, 'accounts'>[] = [
     label: 'Lecteur',
     description: 'Consultation restreinte des membres et du tableau de bord.',
   },
+  {
+    id: 'membre-cnpm',
+    label: 'Membre CNPM',
+    description:
+      'Adhérent : accès à l’espace membre (cotisations, requêtes, informations). Aucun droit d’administration.',
+  },
 ];
 
 /**
@@ -448,12 +454,21 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
   createAccount(input: NewAccountInput): Observable<SecurityAccount> {
     this.createdCount += 1;
     const fullName = `${input.firstName} ${input.lastName}`.replace(/\s+/gu, ' ').trim();
+    const trimmed = (value: string | undefined): string | undefined => {
+      const cleaned = value?.trim();
+      return cleaned ? cleaned : undefined;
+    };
     const account: SecurityAccount = {
       id: `acc-demo-${this.createdCount}`,
       fullName,
       email: input.email.trim(),
       roleId: input.roleId,
       roleLabel: this.roles.find((role) => role.id === input.roleId)?.label ?? 'Rôle inconnu',
+      accountType: input.accountType,
+      phone: trimmed(input.phone),
+      jobTitle: trimmed(input.jobTitle),
+      organization: trimmed(input.organization),
+      department: trimmed(input.department),
       // Un compte créé n'est pas encore actif : il est invité, son second facteur reste à
       // enrôler et il ne s'est jamais connecté. C'est exactement l'état qui déclenchera
       // la popup d'enrôlement à la première connexion.

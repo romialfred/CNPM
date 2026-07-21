@@ -42,9 +42,12 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
 
     const cree = await firstValueFrom(
       gateway.createAccount({
+        accountType: 'PROFESSIONAL',
         firstName: 'Awa',
         lastName: 'Touré',
         email: 'a.toure@cnpm-demo.example',
+        phone: '+223 00 00 00 02',
+        jobTitle: 'Auditrice interne',
         roleId: 'auditeur',
       }),
     );
@@ -57,6 +60,10 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     expect(cree.lastLoginAt).toBeNull();
     expect(cree.roleLabel).toBe('Auditeur');
     expect(cree.email.endsWith('.example')).toBe(true);
+    // Le type de compte et les champs de profil renseignés sont portés par le compte créé.
+    expect(cree.accountType).toBe('PROFESSIONAL');
+    expect(cree.phone).toBe('+223 00 00 00 02');
+    expect(cree.jobTitle).toBe('Auditrice interne');
 
     // Le rechargement suivant le voit, en tête de liste.
     const apres = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));

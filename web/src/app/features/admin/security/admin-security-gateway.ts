@@ -32,6 +32,13 @@ export interface SecurityAccount {
   readonly email: string;
   readonly roleId: string;
   readonly roleLabel: string;
+  /** Nature du compte ; défaut PROFESSIONAL pour les comptes historiques. */
+  readonly accountType?: AccountType;
+  /** Champs de profil facultatifs, renseignés à la création. */
+  readonly phone?: string;
+  readonly jobTitle?: string;
+  readonly organization?: string;
+  readonly department?: string;
   readonly status: AccountStatus;
   readonly twoFactor: TwoFactorStatus;
   /**
@@ -168,11 +175,25 @@ export interface AdminSecuritySnapshot {
  * fournisseur d'identité (Keycloak, ADR-003), le compte naît « invité », second facteur
  * « en attente », jamais connecté.
  */
+/**
+ * Nature du compte créé. Un compte PROFESSIONNEL est un agent/administrateur de la
+ * plateforme ; un compte MEMBRE est un adhérent (accès à l'espace membre).
+ */
+export type AccountType = 'PROFESSIONAL' | 'MEMBER';
+
 export interface NewAccountInput {
+  readonly accountType: AccountType;
   readonly firstName: string;
   readonly lastName: string;
   readonly email: string;
+  /** Champs de profil optionnels. La source persiste ce qu'elle sait porter. */
+  readonly phone?: string;
+  readonly jobTitle?: string;
+  readonly organization?: string;
+  readonly department?: string;
   readonly roleId: string;
+  /** Permissions accordées EN PLUS de celles du rôle ; le serveur reste l'autorité. */
+  readonly extraPermissionIds?: readonly string[];
 }
 
 export interface AdminSecurityGateway {

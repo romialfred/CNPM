@@ -1,0 +1,178 @@
+<cnpm-admin-shell>
+  <main class="cnpm-new-account" id="contenu-principal">
+    <cnpm-page-header
+      title="Nouveau compte"
+      description="Créez un compte professionnel ou un compte membre, avec son rôle et ses permissions."
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="cnpm-new-account__status" role="status">Chargement des rôles et permissions…</p>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les rôles n’ont pas pu être chargés. Réessayez dans un instant.</p>
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        <form class="cnpm-new-account__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          @if (submitError()) {
+            <cnpm-alert tone="error" title="Création impossible">
+              <p>{{ submitError() }}</p>
+            </cnpm-alert>
+          }
+
+          <!-- Type de compte -->
+          <fieldset class="cnpm-new-account__section">
+            <legend class="cnpm-new-account__legend">Type de compte</legend>
+            <div class="cnpm-new-account__choices">
+              <label class="cnpm-new-account__choice">
+                <input type="radio" formControlName="accountType" value="PROFESSIONAL" />
+                <span>
+                  <strong>Compte professionnel</strong>
+                  <small>Agent ou administrateur de la plateforme.</small>
+                </span>
+              </label>
+              <label class="cnpm-new-account__choice">
+                <input type="radio" formControlName="accountType" value="MEMBER" />
+                <span>
+                  <strong>Compte membre</strong>
+                  <small>Adhérent : accès à l’espace membre.</small>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Identité -->
+          <fieldset class="cnpm-new-account__section">
+            <legend class="cnpm-new-account__legend">Informations</legend>
+            <div class="cnpm-new-account__grid">
+              <cnpm-text-input
+                formControlName="firstName"
+                label="Prénom"
+                name="firstName"
+                autocomplete="given-name"
+                [required]="true"
+                [error]="fieldError('firstName') ?? undefined"
+              />
+              <cnpm-text-input
+                formControlName="lastName"
+                label="Nom"
+                name="lastName"
+                autocomplete="family-name"
+                [required]="true"
+                [error]="fieldError('lastName') ?? undefined"
+              />
+              <cnpm-text-input
+                formControlName="email"
+                label="Adresse électronique"
+                type="email"
+                name="email"
+                autocomplete="email"
+                [required]="true"
+                [error]="fieldError('email') ?? undefined"
+              />
+              <cnpm-text-input
+                formControlName="phone"
+                label="Téléphone"
+                name="phone"
+                autocomplete="tel"
+                [error]="fieldError('phone') ?? undefined"
+              />
+              <cnpm-text-input
+                formControlName="jobTitle"
+                label="Fonction"
+                name="jobTitle"
+                autocomplete="organization-title"
+                [error]="fieldError('jobTitle') ?? undefined"
+              />
+              <cnpm-text-input
+                formControlName="organization"
+                label="Organisation"
+                name="organization"
+                autocomplete="organization"
+                [error]="fieldError('organization') ?? undefined"
+              />
+              <cnpm-text-input
+                formControlName="department"
+                label="Département"
+                name="department"
+                [error]="fieldError('department') ?? undefined"
+              />
+            </div>
+          </fieldset>
+
+          <!-- Rôle + permissions -->
+          <fieldset class="cnpm-new-account__section">
+            <legend class="cnpm-new-account__legend">Rôle et permissions</legend>
+
+            <div class="cnpm-new-account__field">
+              <label class="cnpm-new-account__label" for="new-account-role">Rôle</label>
+              <select
+                id="new-account-role"
+                class="cnpm-new-account__select"
+                formControlName="roleId"
+                [attr.aria-invalid]="fieldError('roleId') ? 'true' : null"
+              >
+                <option value="" disabled>Choisir un rôle…</option>
+                @for (role of roleOptions(); track role.id) {
+                  <option [value]="role.id">{{ role.label }}</option>
+                }
+              </select>
+              @if (fieldError('roleId')) {
+                <p class="cnpm-new-account__field-error">{{ fieldError('roleId') }}</p>
+              }
+            </div>
+
+            @if (rolePermissions().length) {
+              <div class="cnpm-new-account__preview">
+                <p class="cnpm-new-account__preview-title">Permissions accordées par ce rôle</p>
+                <ul class="cnpm-new-account__tags">
+                  @for (permission of rolePermissions(); track permission.id) {
+                    <li class="cnpm-new-account__tag">{{ permission.label }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (!isMember() && extraPermissionOptions().length) {
+              <div class="cnpm-new-account__extra">
+                <p class="cnpm-new-account__preview-title">Permissions supplémentaires (optionnel)</p>
+                <div class="cnpm-new-account__checks">
+                  @for (permission of extraPermissionOptions(); track permission.id) {
+                    <label class="cnpm-new-account__check">
+                      <input
+                        type="checkbox"
+                        [checked]="isExtraSelected(permission.id)"
+                        (change)="toggleExtra(permission.id, $any($event.target).checked)"
+                      />
+                      <span>
+                        {{ permission.label }}
+                        <small>{{ permission.domain }}</small>
+                      </span>
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+          </fieldset>
+
+          <p class="cnpm-new-account__note">
+            Aucun mot de passe n’est saisi ici : le compte est créé « invité ». La personne
+            définira son mot de passe et enrôlera son second facteur à la première connexion.
+          </p>
+
+          <div class="cnpm-new-account__actions">
+            <cnpm-button variant="secondary" (click)="cancel()" [disabled]="submitting()">
+              Annuler
+            </cnpm-button>
+            <cnpm-button variant="primary" (click)="submit()" [loading]="submitting()">
+              Créer le compte
+            </cnpm-button>
+          </div>
+        </form>
+      }
+    }
+  </main>
+</cnpm-admin-shell>

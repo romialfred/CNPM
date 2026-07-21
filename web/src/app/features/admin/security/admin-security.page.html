@@ -4,13 +4,12 @@
       title="Administration et sécurité"
       description="Comptes, rôles et permissions, sessions ouvertes et journal d’audit de la plateforme."
     >
-      <!-- « Nouveau compte » est livré : il ouvre le dialogue de création. Aucun mot de
-           passe n'y est saisi — l'accès passe par le fournisseur d'identité, le compte
-           naît « invité », second facteur à enrôler.
+      <!-- « Nouveau compte » ouvre une PAGE dédiée (plus de modale) : type de compte,
+           profil, rôle et permissions y sont choisis. Aucun mot de passe n'y est saisi,
+           le compte naît « invité » et enrôlera son second facteur à la première connexion.
            Les opérations sensibles (réinitialisation d'un second facteur, révocation de
-           session) ne sont pas des actions globales : elles s'effectuent compte par compte
-           depuis les tableaux, avec motif obligatoire et trace d'audit. -->
-      <cnpm-button variant="primary" (click)="openCreate()">
+           session) s'effectuent compte par compte depuis les tableaux, avec motif et audit. -->
+      <cnpm-button variant="primary" routerLink="/admin/security/accounts/new">
         <svg lucideUserPlus [size]="iconSize.compact"></svg>
         Nouveau compte
       </cnpm-button>
@@ -661,94 +660,6 @@
       }
     </div>
   </div>
-
-  <!-- Dialogue de création d'un compte. Fondé sur le composant `cnpm-dialog` partagé,
-       qui servira aussi la popup d'enrôlement 2FA. Aucun mot de passe : l'identité passe
-       par le fournisseur d'identité (Keycloak). -->
-  <cnpm-dialog
-    [open]="createOpen()"
-    title="Nouveau compte"
-    eyebrow="Gestion des utilisateurs"
-    [dismissible]="!creating()"
-    (dismiss)="closeCreate()"
-  >
-    <form
-      class="cnpm-security__create-form"
-      id="cnpm-security-create-form"
-      [formGroup]="createForm"
-      (ngSubmit)="submitCreate()"
-    >
-      @if (createError()) {
-        <cnpm-alert tone="error" title="Création impossible">
-          <p>{{ createError() }}</p>
-        </cnpm-alert>
-      }
-
-      <div class="cnpm-security__create-grid">
-        <cnpm-text-input
-          formControlName="firstName"
-          label="Prénom"
-          name="firstName"
-          autocomplete="given-name"
-          [required]="true"
-          [error]="fieldError('firstName') ?? undefined"
-        />
-        <cnpm-text-input
-          formControlName="lastName"
-          label="Nom"
-          name="lastName"
-          autocomplete="family-name"
-          [required]="true"
-          [error]="fieldError('lastName') ?? undefined"
-        />
-      </div>
-
-      <cnpm-text-input
-        formControlName="email"
-        label="Adresse électronique"
-        type="email"
-        name="email"
-        autocomplete="email"
-        [required]="true"
-        [error]="fieldError('email') ?? undefined"
-      />
-
-      <div class="cnpm-security__field">
-        <label class="cnpm-security__label" for="cnpm-security-create-role">Rôle</label>
-        <select
-          id="cnpm-security-create-role"
-          class="cnpm-security__select"
-          formControlName="roleId"
-          [attr.aria-invalid]="fieldError('roleId') ? 'true' : null"
-        >
-          <option value="" disabled>Choisir un rôle…</option>
-          @for (role of roleOptions(); track role.id) {
-            <option [value]="role.id">{{ role.label }}</option>
-          }
-        </select>
-        @if (fieldError('roleId')) {
-          <p class="cnpm-security__field-error">{{ fieldError('roleId') }}</p>
-        }
-      </div>
-
-      <p class="cnpm-security__create-note">
-        Le compte est créé « invité » : la personne définira son mot de passe et activera son
-        second facteur à la première connexion.
-      </p>
-    </form>
-
-    <ng-container cnpm-dialog-footer>
-      <cnpm-button variant="secondary" (click)="closeCreate()" [disabled]="creating()">
-        Annuler
-      </cnpm-button>
-      <!-- Le pied est hors du `<form>` dans le DOM ; `cnpm-button` ne relaie pas
-           l'attribut `form`. On soumet donc au clic. La touche Entrée dans un champ
-           déclenche `ngSubmit` du formulaire, qui appelle la même méthode. -->
-      <cnpm-button variant="primary" (click)="submitCreate()" [loading]="creating()">
-        Créer le compte
-      </cnpm-button>
-    </ng-container>
-  </cnpm-dialog>
 
   <!-- Confirmation d'une action de compte : suspendre, réactiver, réinitialiser le 2FA.
        On ne modifie jamais un compte sans une confirmation explicite. -->

@@ -504,6 +504,13 @@ export const adminRoutes: Routes = [
         title: 'Sécurité — Administration CNPM',
       },
       {
+        // Création d'un compte : écran plein, hors modale (BO-030).
+        path: 'security/accounts/new',
+        loadComponent: () =>
+          import('./security/new-account.page').then((m) => m.NewAccountPage),
+        title: 'Nouveau compte — Administration CNPM',
+      },
+      {
         path: 'security/audit',
         canActivate: [auditReadGuard],
         loadComponent: () => import('./audit/audit.page').then((m) => m.AuditPage),

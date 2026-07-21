@@ -1,0 +1,190 @@
+:host {
+  display: block;
+}
+
+.cnpm-new-account {
+  display: grid;
+  gap: var(--cnpm-space-5);
+  width: min(100%, var(--cnpm-size-contentMax));
+  margin-inline: auto;
+  padding: var(--cnpm-layout-pagePaddingDesktop);
+}
+
+.cnpm-new-account__status {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-new-account__form {
+  display: grid;
+  gap: var(--cnpm-space-5);
+  width: min(100%, 52rem);
+}
+
+.cnpm-new-account__section {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  padding: var(--cnpm-space-5);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-new-account__legend {
+  padding-inline: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-new-account__choices {
+  display: grid;
+  gap: var(--cnpm-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.cnpm-new-account__choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  cursor: pointer;
+}
+
+.cnpm-new-account__choice:has(input:checked) {
+  border-color: var(--cnpm-color-brand-blue-500);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-new-account__choice:has(input:focus-visible) {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-new-account__choice span {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.cnpm-new-account__choice strong {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-new-account__choice small {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__grid {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+
+.cnpm-new-account__field {
+  display: grid;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-new-account__label {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-new-account__select {
+  width: 100%;
+  min-height: var(--cnpm-size-control-lg);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  padding-inline: var(--cnpm-space-3);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-new-account__field-error {
+  margin: 0;
+  color: var(--cnpm-color-text-critical);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__preview,
+.cnpm-new-account__extra {
+  display: grid;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-new-account__preview-title {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-new-account__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-new-account__tag {
+  border: 1px solid var(--cnpm-color-brand-blue-100);
+  border-radius: var(--cnpm-radius-pill);
+  padding: 0.125rem var(--cnpm-space-3);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__checks {
+  display: grid;
+  gap: var(--cnpm-space-2);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.cnpm-new-account__check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-new-account__check span {
+  display: grid;
+}
+
+.cnpm-new-account__check small {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__note {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-new-account__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-3);
+}
+
+@media (max-width: 47.9375rem) {
+  .cnpm-new-account {
+    padding: var(--cnpm-layout-pagePaddingMobile);
+  }
+
+  .cnpm-new-account__actions {
+    flex-direction: column-reverse;
+  }
+}
