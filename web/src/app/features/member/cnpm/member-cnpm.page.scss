@@ -1,0 +1,100 @@
+:host {
+  display: block;
+}
+
+.member-cnpm {
+  display: grid;
+  gap: var(--cnpm-space-5);
+  width: min(100%, var(--cnpm-size-contentMax));
+  margin-inline: auto;
+  padding: var(--cnpm-space-5) calc(var(--cnpm-layout-pagePaddingDesktop) + var(--cnpm-space-4))
+    var(--cnpm-space-8);
+}
+
+.member-cnpm__section {
+  display: grid;
+  gap: var(--cnpm-space-3);
+}
+
+.member-cnpm__section-title {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.member-cnpm__panel {
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  padding: var(--cnpm-space-4);
+}
+
+.member-cnpm__grid {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member-cnpm__card {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  padding: var(--cnpm-space-4);
+  color: inherit;
+  text-decoration: none;
+}
+
+.member-cnpm__card-icon {
+  display: inline-grid;
+  width: var(--cnpm-size-control-xl);
+  height: var(--cnpm-size-control-xl);
+  flex: none;
+  place-items: center;
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+}
+
+.member-cnpm__card-icon svg {
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+}
+
+.member-cnpm__card-body {
+  display: grid;
+  min-width: 0;
+  gap: var(--cnpm-space-1);
+}
+
+.member-cnpm__card-title {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.member-cnpm__card-text {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.member-cnpm__card-arrow {
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--cnpm-color-text-muted);
+}
+
+@media (max-width: 47.9375rem) {
+  .member-cnpm {
+    padding-inline: var(--cnpm-layout-pagePaddingMobile);
+  }
+}

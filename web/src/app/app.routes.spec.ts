@@ -29,6 +29,7 @@ describe('routes racine', () => {
         'profile',
         'users',
         'showcase',
+        'cnpm',
         'directory',
         // Repli du catalogue, en dernier : /member rendait un corps vide sans lui.
         '',

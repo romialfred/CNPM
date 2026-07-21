@@ -89,6 +89,15 @@ describe('memberRoutes', () => {
     expect(route?.children).toBeUndefined();
   });
 
+  it('expose « Le CNPM » comme écran présentationnel, sans passerelle ni fixture', () => {
+    const route = memberRoutes.find((candidate) => candidate.path === 'cnpm');
+    expect(route?.loadComponent).toBeTypeOf('function');
+    // Page institutionnelle sans données membre : aucune passerelle composée, aucun enfant.
+    expect(route?.providers).toBeUndefined();
+    expect(route?.children).toBeUndefined();
+    expect(route?.canActivate).toBeUndefined();
+  });
+
   it('rend /member sur un écran plutôt que sur un corps vide', () => {
     // Défaut constaté en exécution : sans route de repli, /member ne correspondait à
     // aucune route et rendait un document entièrement vide — ni coquille, ni message.

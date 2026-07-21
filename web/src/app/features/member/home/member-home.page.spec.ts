@@ -88,6 +88,7 @@ describe('MemberHomePage', () => {
         '/member/receipts',
         '/member/requests',
         '/member/documents',
+        '/member/cnpm',
         '/member/profile',
         '/member/users',
         '/member/showcase/edit',

@@ -298,6 +298,14 @@ export const memberRoutes: Routes = [
     ],
   },
   {
+    // Point d'entrée institutionnel « Le CNPM » : page présentationnelle, sans passerelle
+    // de données ni fixture membre. Elle n'expose que des actualités en état vide honnête
+    // et des accès vers des écrans existants.
+    path: 'cnpm',
+    loadComponent: () => import('./cnpm/member-cnpm.page').then((module) => module.MemberCnpmPage),
+    title: 'Le CNPM — actualités et informations',
+  },
+  {
     path: 'directory',
     providers: [
       DemoMemberDirectoryGateway,

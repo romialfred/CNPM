@@ -1,39 +1,133 @@
 <a class="member-shell__skip-link" href="#contenu-principal">Aller au contenu principal</a>
 
-<div class="member-shell">
-  <header class="member-shell__header">
-    <div class="member-shell__header-inner">
+<div class="member-shell" [class.member-shell--drawer-open]="drawerOpen()">
+  <!-- Voile du tiroir mobile. Décoratif : la fermeture au clavier passe par Échap et par
+       le bouton dédié, jamais par ce bloc. -->
+  @if (drawerOpen()) {
+    <div class="member-shell__scrim" aria-hidden="true" (click)="closeDrawer()"></div>
+  }
+
+  <aside
+    class="member-shell__sidebar"
+    id="member-navigation"
+    [attr.role]="drawerOpen() ? 'dialog' : null"
+    [attr.aria-modal]="drawerOpen() ? 'true' : null"
+    [attr.aria-label]="drawerOpen() ? 'Navigation de l’espace membre' : null"
+  >
+    <div class="member-shell__sidebar-head">
       <a
         class="member-shell__brand"
         routerLink="/member/home"
-        aria-label="CNPM — Accueil du portail membre"
+        aria-label="CNPM — Accueil de l’espace membre"
+        (click)="closeDrawer()"
       >
-        <img src="/assets/brand/logo-CNPM-lockup.png" alt="CNPM — Conseil National du Patronat du Mali" />
+        <img
+          src="/assets/brand/logo-CNPM-lockup.png"
+          alt="CNPM — Conseil National du Patronat du Mali"
+        />
+      </a>
+      <button
+        type="button"
+        class="member-shell__drawer-close"
+        data-drawer-initial-focus
+        aria-label="Fermer la navigation"
+        (click)="closeDrawer()"
+      >
+        <svg lucideX aria-hidden="true"></svg>
+      </button>
+    </div>
+
+    <nav class="member-shell__nav" aria-label="Navigation de l’espace membre">
+      @for (group of navGroups; track group.title) {
+        <div class="member-shell__group">
+          <p class="member-shell__group-title">{{ group.title }}</p>
+          <ul class="member-shell__list">
+            @for (link of group.links; track link.route) {
+              <li>
+                <a
+                  class="member-shell__item"
+                  [routerLink]="link.route"
+                  routerLinkActive="member-shell__item--active"
+                  [routerLinkActiveOptions]="{ exact: !!link.exact }"
+                  ariaCurrentWhenActive="page"
+                  (click)="closeDrawer()"
+                >
+                  <span class="member-shell__item-icon" aria-hidden="true">
+                    @switch (link.icon) {
+                      @case ('dashboard') {
+                        <svg lucideLayoutDashboard></svg>
+                      }
+                      @case ('contributions') {
+                        <svg lucideWallet></svg>
+                      }
+                      @case ('payments') {
+                        <svg lucideCreditCard></svg>
+                      }
+                      @case ('receipts') {
+                        <svg lucideReceiptText></svg>
+                      }
+                      @case ('documents') {
+                        <svg lucideFolderArchive></svg>
+                      }
+                      @case ('requests') {
+                        <svg lucideMessageSquareText></svg>
+                      }
+                      @case ('cnpm') {
+                        <svg lucideNewspaper></svg>
+                      }
+                      @case ('directory') {
+                        <svg lucideBookUser></svg>
+                      }
+                      @case ('showcase') {
+                        <svg lucideStore></svg>
+                      }
+                      @case ('analytics') {
+                        <svg lucideChartNoAxesCombined></svg>
+                      }
+                      @case ('profile') {
+                        <svg lucideIdCard></svg>
+                      }
+                      @default {
+                        <svg lucideUsersRound></svg>
+                      }
+                    }
+                  </span>
+                  <span class="member-shell__item-label">{{ link.label }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </nav>
+  </aside>
+
+  <div
+    class="member-shell__frame"
+    [attr.inert]="drawerOpen() ? '' : null"
+    [attr.aria-hidden]="drawerOpen() ? 'true' : null"
+  >
+    <header class="member-shell__topbar">
+      <button
+        type="button"
+        class="member-shell__menu-button"
+        [attr.aria-expanded]="drawerOpen()"
+        aria-controls="member-navigation"
+        aria-label="Ouvrir la navigation"
+        (click)="toggleDrawer()"
+      >
+        <svg lucideMenu aria-hidden="true"></svg>
+      </button>
+
+      <a
+        class="member-shell__topbar-brand"
+        routerLink="/member/home"
+        aria-label="CNPM — Accueil de l’espace membre"
+      >
+        <img src="/assets/brand/logo-CNPM-lockup.png" alt="CNPM" />
       </a>
 
-      <nav class="member-shell__desktop-nav" aria-label="Navigation du portail membre">
-        @for (destination of destinations; track destination.label) {
-          @if (destination.route; as route) {
-            <a
-              [routerLink]="route"
-              routerLinkActive="member-shell__link--active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              ariaCurrentWhenActive="page"
-            >
-              {{ destination.label }}
-            </a>
-          } @else {
-            <span
-              class="member-shell__unavailable"
-              aria-disabled="true"
-              [attr.aria-label]="destination.label + ', bientôt disponible'"
-              title="Bientôt disponible"
-            >
-              {{ destination.label }}
-            </span>
-          }
-        }
-      </nav>
+      <p class="member-shell__topbar-eyebrow">Espace membre</p>
 
       <div class="member-shell__account" role="group" aria-label="Identité du membre connecté">
         <button
@@ -58,122 +152,8 @@
           <small>{{ organization() }}</small>
         </span>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <ng-content />
-
-  @if (moreOpen()) {
-    <div class="member-shell__more-backdrop" aria-hidden="true" (click)="closeMore()"></div>
-    <aside
-      #morePanel
-      class="member-shell__more-panel"
-      id="member-shell-more-panel"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="member-shell-more-title"
-      (keydown.escape)="closeMore()"
-      (keydown)="trapMorePanelFocus($event)"
-    >
-      <header>
-        <div>
-          <p>Navigation membre</p>
-          <h2 id="member-shell-more-title">Plus de services</h2>
-        </div>
-        <button
-          type="button"
-          class="member-shell__more-close"
-          aria-label="Fermer le menu Plus"
-          (click)="closeMore()"
-        >
-          <svg lucideX aria-hidden="true"></svg>
-        </button>
-      </header>
-      <nav aria-label="Autres services du portail membre">
-        @for (destination of moreDestinations; track destination.label) {
-          @if (destination.route; as route) {
-            <a
-              [routerLink]="route"
-              routerLinkActive="member-shell__more-link--active"
-              [routerLinkActiveOptions]="{ exact: true }"
-              ariaCurrentWhenActive="page"
-              (click)="closeMore(false)"
-            >
-              {{ destination.label }}
-            </a>
-          }
-        }
-      </nav>
-    </aside>
-  }
-
-  <nav class="member-shell__mobile-nav" aria-label="Navigation mobile du portail membre">
-    @for (destination of mobileDestinations; track destination.label) {
-      @if (destination.route; as route) {
-        <a
-          [routerLink]="route"
-          routerLinkActive="member-shell__link--active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          ariaCurrentWhenActive="page"
-        >
-          @switch (destination.icon) {
-            @case ('home') {
-              <svg lucideHouse aria-hidden="true"></svg>
-            }
-            @case ('payments') {
-              <svg lucideCreditCard aria-hidden="true"></svg>
-            }
-            @case ('receipts') {
-              <svg lucideReceiptText aria-hidden="true"></svg>
-            }
-            @case ('requests') {
-              <svg lucideMessageSquareText aria-hidden="true"></svg>
-            }
-            @default {
-              <svg lucideUserRound aria-hidden="true"></svg>
-            }
-          }
-          <span>{{ destination.mobileLabel }}</span>
-        </a>
-      } @else {
-        <span
-          class="member-shell__mobile-unavailable"
-          aria-disabled="true"
-          [attr.aria-label]="destination.label + ', bientôt disponible'"
-        >
-          @switch (destination.icon) {
-            @case ('home') {
-              <svg lucideHouse aria-hidden="true"></svg>
-            }
-            @case ('payments') {
-              <svg lucideCreditCard aria-hidden="true"></svg>
-            }
-            @case ('receipts') {
-              <svg lucideReceiptText aria-hidden="true"></svg>
-            }
-            @case ('requests') {
-              <svg lucideMessageSquareText aria-hidden="true"></svg>
-            }
-            @default {
-              <svg lucideUserRound aria-hidden="true"></svg>
-            }
-          }
-          <span>{{ destination.mobileLabel }}</span>
-          <span class="member-shell__sr-only"> — indisponible</span>
-        </span>
-      }
-    }
-    <button
-      #moreButton
-      type="button"
-      class="member-shell__more-button"
-      [class.member-shell__link--active]="moreOpen()"
-      [attr.aria-expanded]="moreOpen()"
-      aria-controls="member-shell-more-panel"
-      (click)="toggleMore()"
-    >
-      <svg lucideMenu aria-hidden="true"></svg>
-      <span>Plus</span>
-    </button>
-  </nav>
+    <ng-content />
+  </div>
 </div>

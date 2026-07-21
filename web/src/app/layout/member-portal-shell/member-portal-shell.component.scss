@@ -2,7 +2,12 @@
   display: block;
 }
 
+/* Barre latérale permanente à gauche, cadre à droite. La largeur de barre (252 px) et la
+   hauteur de topbar (72 px) sont imposées par `.claude/rules/ux-ui.md`, lues dans les
+   tokens et jamais réécrites en dur. */
 .member-shell {
+  display: grid;
+  grid-template-columns: var(--cnpm-size-sidebar-expanded) minmax(0, 1fr);
   min-height: 100dvh;
   background: var(--cnpm-color-surface-page);
 }
@@ -24,78 +29,184 @@
   translate: 0;
 }
 
-.member-shell__header {
-  border-block-end: 1px solid var(--cnpm-color-border-subtle);
-  background: var(--cnpm-color-surface-primary);
+/* ---------------------------------------------------------------- Barre latérale */
+
+.member-shell__sidebar {
+  position: sticky;
+  inset-block-start: 0;
+  display: flex;
+  min-width: 0;
+  height: 100vh;
+  flex-direction: column;
+  overflow-y: auto;
+  border-inline-end: 1px solid var(--cnpm-chrome-border);
+  background: var(--cnpm-chrome-surface);
 }
 
-.member-shell__header-inner {
-  display: grid;
-  grid-template-columns: 18rem minmax(0, 1fr) 17rem;
+.member-shell__sidebar-head {
+  display: flex;
   align-items: center;
-  width: min(100%, var(--cnpm-size-contentMax));
-  min-height: 5.875rem;
-  margin-inline: auto;
-  padding-inline: calc(var(--cnpm-layout-pagePaddingDesktop) + var(--cnpm-space-4));
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-4) var(--cnpm-space-4) var(--cnpm-space-3);
+  border-block-end: 1px solid var(--cnpm-chrome-border);
 }
 
 .member-shell__brand {
   display: inline-flex;
-  width: fit-content;
-  min-width: 13rem;
-  min-height: 5rem;
+  min-width: 0;
   align-items: center;
 }
 
-/* Même défaut que sur l'écran de connexion : largeur et hauteur toutes deux imposées
-   avec `object-fit: fill` étiraient le lockup d'un facteur 1,84. */
 .member-shell__brand img {
   display: block;
   width: auto;
-  height: 5rem;
+  height: 2.75rem;
+  max-width: 100%;
 }
 
-.member-shell__desktop-nav {
-  display: flex;
-  min-width: 0;
-  align-self: stretch;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(var(--cnpm-space-4), 1.8vw, var(--cnpm-space-8));
+.member-shell__drawer-close {
+  display: none;
+  width: var(--cnpm-size-control-lg);
+  height: var(--cnpm-size-control-lg);
+  flex: none;
+  place-items: center;
+  border: 0;
+  border-radius: var(--cnpm-radius-md);
+  background: transparent;
+  color: var(--cnpm-chrome-text-muted);
+  cursor: pointer;
 }
 
-.member-shell__desktop-nav a,
-.member-shell__desktop-nav span {
+.member-shell__drawer-close svg {
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+}
+
+.member-shell__nav {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-4) var(--cnpm-space-3) var(--cnpm-space-6);
+}
+
+.member-shell__group {
+  display: grid;
+  gap: var(--cnpm-space-1);
+}
+
+.member-shell__group-title {
+  margin: 0;
+  padding-inline: var(--cnpm-space-3);
+  padding-block: var(--cnpm-space-1);
+  color: var(--cnpm-chrome-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.member-shell__list {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member-shell__item {
   position: relative;
-  display: inline-flex;
+  display: flex;
   min-height: var(--cnpm-size-control-lg);
   align-items: center;
-  color: var(--cnpm-color-text-primary);
+  gap: var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-md);
+  padding-inline: var(--cnpm-space-3);
+  padding-block: var(--cnpm-space-2);
+  color: var(--cnpm-chrome-text);
   font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
+  font-weight: var(--cnpm-font-weight-medium);
   text-decoration: none;
+}
+
+.member-shell__item-icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  color: var(--cnpm-chrome-text-muted);
+}
+
+.member-shell__item-icon svg {
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+}
+
+.member-shell__item-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.member-shell__desktop-nav a.member-shell__link--active::after {
+.member-shell__item:hover {
+  background: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* L'état actif n'est jamais porté par la seule couleur : liseré à gauche, fond teinté,
+   graisse renforcée et `aria-current="page"` le signalent conjointement. Le fond est un
+   cran plus soutenu que le survol (blue-100 vs blue-50), pour rester distinct. */
+.member-shell__item--active {
+  background: var(--cnpm-color-brand-blue-100);
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.member-shell__item--active .member-shell__item-icon {
+  color: var(--cnpm-color-text-brand);
+}
+
+.member-shell__item--active::before {
   position: absolute;
-  inset: auto 0 -1.7rem;
-  height: 0.1875rem;
+  inset-block: 0.375rem;
+  inset-inline-start: 0;
+  width: 0.1875rem;
   border-radius: var(--cnpm-radius-pill);
   background: var(--cnpm-color-brand-blue-700);
   content: '';
 }
 
-.member-shell__unavailable {
-  color: var(--cnpm-color-text-muted) !important;
-  cursor: not-allowed;
+/* ------------------------------------------------------------------------ Cadre */
+
+.member-shell__frame {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
 }
 
-.member-shell__unavailable::after {
-  content: '•';
-  margin-inline-start: var(--cnpm-space-1);
-  color: var(--cnpm-color-text-disabled);
-  font-size: var(--cnpm-font-size-xs);
+.member-shell__topbar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--cnpm-zIndex-sticky);
+  display: flex;
+  min-height: var(--cnpm-size-topbar);
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  border-block-end: 1px solid var(--cnpm-color-border-subtle);
+  background: var(--cnpm-color-surface-primary);
+  padding-inline: calc(var(--cnpm-layout-pagePaddingDesktop) + var(--cnpm-space-4));
+  padding-block: var(--cnpm-space-3);
+}
+
+.member-shell__menu-button,
+.member-shell__topbar-brand {
+  display: none;
+}
+
+.member-shell__topbar-eyebrow {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .member-shell__account {
@@ -104,6 +215,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: var(--cnpm-space-3);
+  margin-inline-start: auto;
 }
 
 .member-shell__notification {
@@ -172,41 +284,89 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
-.member-shell__mobile-nav {
+.member-shell__scrim {
   display: none;
 }
 
-.member-shell__sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-}
+/* ----------------------------------------------------- Tiroir sous 1024 px */
 
-@media (max-width: 89.9375rem) {
-  .member-shell__header-inner {
-    grid-template-columns: 13rem minmax(0, 1fr) 3.5rem;
-    min-height: 4.5rem;
+@media (max-width: 63.9375rem) {
+  .member-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Hors tiroir ouvert, la barre sort de l'écran. `visibility: hidden` la retire du
+     parcours de tabulation ; un simple `translate` la laisserait focalisable hors champ. */
+  .member-shell__sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: var(--cnpm-zIndex-modal);
+    width: var(--cnpm-size-sidebar-expanded);
+    max-width: 85vw;
+    height: 100dvh;
+    translate: -100% 0;
+    visibility: hidden;
+  }
+
+  .member-shell--drawer-open .member-shell__sidebar {
+    translate: 0 0;
+    visibility: visible;
+    box-shadow: var(--cnpm-shadow-lg);
+  }
+
+  .member-shell__drawer-close {
+    display: inline-grid;
+  }
+
+  .member-shell__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: var(--cnpm-zIndex-drawer);
+    background: color-mix(in srgb, var(--cnpm-color-neutral-950) 50%, transparent);
+  }
+
+  .member-shell__topbar {
     padding-inline: var(--cnpm-layout-pagePaddingTablet);
   }
 
-  .member-shell__brand {
-    min-height: 3.5rem;
+  .member-shell__menu-button {
+    display: inline-grid;
+    width: var(--cnpm-size-control-lg);
+    height: var(--cnpm-size-control-lg);
+    flex: none;
+    place-items: center;
+    border: 1px solid var(--cnpm-chrome-control-border);
+    border-radius: var(--cnpm-radius-md);
+    background: var(--cnpm-color-surface-primary);
+    color: var(--cnpm-color-text-primary);
+    cursor: pointer;
   }
 
-  .member-shell__brand img {
-    width: 11rem;
-    height: 3.5rem;
+  .member-shell__menu-button svg {
+    width: var(--cnpm-size-icon-md);
+    height: var(--cnpm-size-icon-md);
   }
 
-  .member-shell__desktop-nav {
-    gap: var(--cnpm-space-4);
+  .member-shell__topbar-brand {
+    display: inline-flex;
+    align-items: center;
   }
 
-  .member-shell__desktop-nav a::after {
-    inset-block-end: -0.875rem;
+  .member-shell__topbar-brand img {
+    display: block;
+    width: auto;
+    height: 2.25rem;
+  }
+
+  .member-shell__topbar-eyebrow {
+    display: none;
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .member-shell__topbar {
+    padding-inline: var(--cnpm-layout-pagePaddingMobile);
   }
 
   .member-shell__notification,
@@ -215,87 +375,14 @@
   }
 }
 
-@media (max-width: 63.9375rem) {
-  .member-shell__header-inner {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .member-shell__desktop-nav {
-    display: none;
-  }
-
-  .member-shell__mobile-nav {
-    position: fixed;
-    z-index: var(--cnpm-zIndex-sticky);
-    inset: auto 0 0;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    border-block-start: 1px solid var(--cnpm-color-border-subtle);
-    background: var(--cnpm-color-surface-primary);
-    padding: var(--cnpm-space-1) var(--cnpm-space-1)
-      max(var(--cnpm-space-1), env(safe-area-inset-bottom));
-    box-shadow: 0 -2px 8px rgba(16, 24, 40, 0.05);
-  }
-
-  .member-shell__mobile-nav a,
-  .member-shell__mobile-nav > span,
-  .member-shell__mobile-nav > button {
-    position: relative;
-    display: grid;
-    min-width: 0;
-    min-height: 3.75rem;
-    place-content: center;
-    justify-items: center;
-    gap: var(--cnpm-space-1);
-    border-radius: var(--cnpm-radius-md);
-    color: var(--cnpm-color-text-muted);
-    font-size: 0.6875rem;
-    font-weight: var(--cnpm-font-weight-medium);
-    text-decoration: none;
-  }
-
-  .member-shell__mobile-nav > button {
-    border: 0;
-    background: transparent;
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .member-shell__mobile-nav :is(a, button).member-shell__link--active {
-    color: var(--cnpm-color-text-brand);
-    background: var(--cnpm-color-brand-blue-50);
-    font-weight: var(--cnpm-font-weight-semibold);
-  }
-
-  .member-shell__mobile-nav svg {
-    width: var(--cnpm-size-icon-md);
-    height: var(--cnpm-size-icon-md);
-  }
-
-  .member-shell__mobile-unavailable {
-    opacity: 0.55;
-  }
-}
-
-@media (max-width: 29.9375rem) {
-  .member-shell__header-inner {
-    min-height: 4rem;
-    padding-inline: var(--cnpm-layout-pagePaddingMobile);
-  }
-
-  .member-shell__brand img {
-    width: 9.5rem;
-    height: 3.125rem;
-  }
-
-  .member-shell__avatar {
-    width: var(--cnpm-size-control-lg);
-    height: var(--cnpm-size-control-lg);
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .member-shell__skip-link {
     transition: translate var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-enter);
+  }
+
+  .member-shell__sidebar {
+    transition:
+      translate var(--cnpm-motion-duration-normal) var(--cnpm-motion-easing-standard),
+      visibility var(--cnpm-motion-duration-normal) var(--cnpm-motion-easing-standard);
   }
 }

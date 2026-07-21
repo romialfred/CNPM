@@ -1,0 +1,57 @@
+<cnpm-member-portal-shell
+  organization="Sahel Agro SA"
+  userName="Membre"
+  memberCode="CNPM-MEMBRE-000"
+  [notificationCount]="0"
+>
+  <main class="member-cnpm" id="contenu-principal">
+    <cnpm-page-header
+      title="Le CNPM"
+      description="Les actualités du Conseil National du Patronat du Mali et vos accès à la vie du réseau."
+    />
+
+    <section class="member-cnpm__section" aria-labelledby="member-cnpm-news">
+      <h2 id="member-cnpm-news" class="member-cnpm__section-title">Actualités</h2>
+      <div class="member-cnpm__panel">
+        <cnpm-empty-state
+          variant="no-data"
+          title="Aucune actualité publiée"
+          description="Les communications officielles du CNPM s’afficheront ici dès leur publication par l’équipe communication."
+        />
+      </div>
+    </section>
+
+    <section class="member-cnpm__section" aria-labelledby="member-cnpm-shortcuts">
+      <h2 id="member-cnpm-shortcuts" class="member-cnpm__section-title">Accès rapides</h2>
+      <ul class="member-cnpm__grid">
+        @for (shortcut of shortcuts; track shortcut.route) {
+          <li>
+            <a class="member-cnpm__card cnpm-liftable" [routerLink]="shortcut.route">
+              <span class="member-cnpm__card-icon" aria-hidden="true">
+                @switch (shortcut.icon) {
+                  @case ('directory') {
+                    <svg lucideBookUser></svg>
+                  }
+                  @case ('showcase') {
+                    <svg lucideStore></svg>
+                  }
+                  @case ('requests') {
+                    <svg lucideMessageSquareText></svg>
+                  }
+                  @default {
+                    <svg lucideFolderArchive></svg>
+                  }
+                }
+              </span>
+              <span class="member-cnpm__card-body">
+                <strong class="member-cnpm__card-title">{{ shortcut.label }}</strong>
+                <small class="member-cnpm__card-text">{{ shortcut.description }}</small>
+              </span>
+              <svg class="member-cnpm__card-arrow" lucideArrowRight aria-hidden="true"></svg>
+            </a>
+          </li>
+        }
+      </ul>
+    </section>
+  </main>
+</cnpm-member-portal-shell>

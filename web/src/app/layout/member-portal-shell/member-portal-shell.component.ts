@@ -2,172 +2,241 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  Injector,
-  afterNextRender,
+  OnDestroy,
   inject,
   input,
   signal,
-  viewChild,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import {
   LucideBell,
+  LucideBookUser,
   LucideBuilding2,
+  LucideChartNoAxesCombined,
   LucideCreditCard,
-  LucideHouse,
+  LucideFolderArchive,
+  LucideIdCard,
+  LucideLayoutDashboard,
   LucideMenu,
   LucideMessageSquareText,
+  LucideNewspaper,
   LucideReceiptText,
-  LucideUserRound,
+  LucideStore,
+  LucideUsersRound,
+  LucideWallet,
   LucideX,
 } from '@lucide/angular';
 
+/** Pictogramme d'une entrée de navigation membre. */
+type MemberNavIcon =
+  | 'dashboard'
+  | 'contributions'
+  | 'payments'
+  | 'receipts'
+  | 'documents'
+  | 'requests'
+  | 'cnpm'
+  | 'directory'
+  | 'showcase'
+  | 'analytics'
+  | 'profile'
+  | 'users';
+
 interface MemberPortalDestination {
   readonly label: string;
-  readonly mobileLabel: string;
-  readonly route: string | null;
-  readonly icon: 'home' | 'payments' | 'receipts' | 'requests' | 'profile';
+  readonly route: string;
+  readonly icon: MemberNavIcon;
+  /** Un lien de sous-section reste actif sur ses écrans enfants ; un lien exact ne l'est
+   *  que sur son URL propre (utile quand deux liens partagent un préfixe, ex. la vitrine). */
+  readonly exact?: boolean;
 }
 
+interface MemberNavGroup {
+  readonly title: string;
+  readonly links: readonly MemberPortalDestination[];
+}
+
+/**
+ * Cadre de l'espace membre — sa navigation lui est DÉDIÉE, à la première personne.
+ *
+ * Contrairement au back-office, le membre est chez lui : la barre latérale gauche regroupe
+ * ses données personnelles (« Mon espace »), ses accès à la vie du CNPM (« Le CNPM ») et
+ * son compte (« Mon compte »). Sous 1024 px, cette même barre devient un tiroir modal
+ * (focus piégé, Échap, défilement verrouillé, focus restauré), comme l'exige WCAG 2.2 AA.
+ */
 @Component({
   selector: 'cnpm-member-portal-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:keydown.escape)': 'handleEscape($event)',
+    // `keydown` générique plutôt que `keydown.tab` : la liaison `.tab` d'Angular ne
+    // correspond qu'à Tab SANS modificateur (Maj+Tab devient « shift.tab »). Piéger le
+    // focus dans les deux sens impose donc d'écouter toute frappe et de filtrer sur Tab.
+    '(document:keydown)': 'trapDrawerFocus($event)',
+    '(window:resize)': 'synchroniseViewport()',
+  },
   imports: [
     RouterLink,
     RouterLinkActive,
     LucideBell,
+    LucideBookUser,
     LucideBuilding2,
+    LucideChartNoAxesCombined,
     LucideCreditCard,
-    LucideHouse,
+    LucideFolderArchive,
+    LucideIdCard,
+    LucideLayoutDashboard,
     LucideMenu,
     LucideMessageSquareText,
+    LucideNewspaper,
     LucideReceiptText,
-    LucideUserRound,
+    LucideStore,
+    LucideUsersRound,
+    LucideWallet,
     LucideX,
   ],
   templateUrl: './member-portal-shell.component.html',
-  styleUrls: ['./member-portal-shell.component.scss', './member-portal-shell.more-panel.scss'],
+  styleUrl: './member-portal-shell.component.scss',
 })
-export class MemberPortalShellComponent {
-  private readonly injector = inject(Injector);
-  private readonly moreButton = viewChild<ElementRef<HTMLButtonElement>>('moreButton');
-  private readonly morePanel = viewChild<ElementRef<HTMLElement>>('morePanel');
+export class MemberPortalShellComponent implements OnDestroy {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private previouslyFocused: HTMLElement | null = null;
+  private previousBodyOverflow = '';
+  private bodyScrollLocked = false;
 
   readonly organization = input('Espace membre');
   readonly userName = input('Membre CNPM');
   readonly memberCode = input('');
   readonly notificationCount = input(3);
 
-  protected readonly destinations: readonly MemberPortalDestination[] = [
-    { label: 'Accueil', mobileLabel: 'Accueil', route: '/member/home', icon: 'home' },
+  /** Tiroir de navigation sous 1024 px. Sur desktop, la barre latérale est permanente. */
+  protected readonly drawerOpen = signal(false);
+
+  /**
+   * Navigation à la voix du membre. « Le CNPM » réunit les accès institutionnels : ses
+   * actualités, l'annuaire, la vitrine publique et ses statistiques de visibilité.
+   */
+  protected readonly navGroups: readonly MemberNavGroup[] = [
     {
-      label: 'Cotisations',
-      mobileLabel: 'Cotisations',
-      route: '/member/contributions',
-      icon: 'payments',
+      title: 'Mon espace',
+      links: [
+        { label: 'Tableau de bord', route: '/member/home', icon: 'dashboard', exact: true },
+        { label: 'Mes cotisations', route: '/member/contributions', icon: 'contributions' },
+        { label: 'Mes paiements', route: '/member/payments', icon: 'payments' },
+        { label: 'Mes reçus', route: '/member/receipts', icon: 'receipts' },
+        { label: 'Mes documents', route: '/member/documents', icon: 'documents' },
+        { label: 'Mes requêtes', route: '/member/requests', icon: 'requests' },
+      ],
     },
     {
-      label: 'Paiements',
-      mobileLabel: 'Paiements',
-      route: '/member/payments',
-      icon: 'payments',
-    },
-    { label: 'Reçus', mobileLabel: 'Reçus', route: '/member/receipts', icon: 'receipts' },
-    {
-      label: 'Requêtes',
-      mobileLabel: 'Requêtes',
-      route: '/member/requests',
-      icon: 'requests',
+      title: 'Le CNPM',
+      links: [
+        { label: 'Actualités & informations', route: '/member/cnpm', icon: 'cnpm' },
+        { label: 'Annuaire des membres', route: '/member/directory', icon: 'directory' },
+        { label: 'Ma vitrine', route: '/member/showcase/edit', icon: 'showcase' },
+        { label: 'Statistiques', route: '/member/showcase/analytics', icon: 'analytics' },
+      ],
     },
     {
-      label: 'Annuaire',
-      mobileLabel: 'Annuaire',
-      route: '/member/directory',
-      icon: 'profile',
-    },
-    {
-      label: 'Documents',
-      mobileLabel: 'Documents',
-      route: '/member/documents',
-      icon: 'receipts',
-    },
-    {
-      label: 'Vitrine',
-      mobileLabel: 'Vitrine',
-      route: '/member/showcase/edit',
-      icon: 'profile',
-    },
-    {
-      label: 'Statistiques',
-      mobileLabel: 'Stats',
-      route: '/member/showcase/analytics',
-      icon: 'payments',
-    },
-    { label: 'Profil', mobileLabel: 'Profil', route: '/member/profile', icon: 'profile' },
-    {
-      label: 'Utilisateurs',
-      mobileLabel: 'Utilisateurs',
-      route: '/member/users',
-      icon: 'profile',
+      title: 'Mon compte',
+      links: [
+        { label: 'Profil', route: '/member/profile', icon: 'profile' },
+        { label: 'Utilisateurs', route: '/member/users', icon: 'users' },
+      ],
     },
   ];
 
-  /**
-   * Quatre accès fréquents restent fixes ; le cinquième emplacement ouvre « Plus ».
-   * Tous les autres écrans livrés restent ainsi découvrables sans dépasser cinq
-   * destinations dans la barre mobile normative.
-   */
-  protected readonly mobileDestinations = this.destinations
-    .filter((destination) => destination.route !== null)
-    .slice(0, 4);
-  protected readonly moreDestinations = this.destinations
-    .filter((destination) => destination.route !== null)
-    .slice(4);
-  protected readonly moreOpen = signal(false);
-
-  protected toggleMore(): void {
-    if (this.moreOpen()) {
-      this.closeMore();
+  protected toggleDrawer(): void {
+    if (this.drawerOpen()) {
+      this.closeDrawer();
       return;
     }
-    this.moreOpen.set(true);
-    afterNextRender(
-      () => {
-        const panel = this.morePanel()?.nativeElement;
-        panel?.querySelector<HTMLButtonElement>('.member-shell__more-close')?.focus();
-      },
-      { injector: this.injector },
-    );
+
+    const document = this.host.nativeElement.ownerDocument;
+    this.previouslyFocused = document.activeElement as HTMLElement | null;
+    this.previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    this.bodyScrollLocked = true;
+    this.drawerOpen.set(true);
+
+    queueMicrotask(() => {
+      if (!this.drawerOpen()) return;
+      const initialFocus = this.host.nativeElement.querySelector<HTMLElement>(
+        '[data-drawer-initial-focus]',
+      );
+      (initialFocus ?? this.drawerFocusableElements()[0])?.focus();
+    });
   }
 
-  protected closeMore(restoreFocus = true): void {
-    if (!this.moreOpen()) return;
-    this.moreOpen.set(false);
-    if (restoreFocus) {
-      afterNextRender(() => this.moreButton()?.nativeElement.focus(), {
-        injector: this.injector,
-      });
-    }
+  protected closeDrawer(): void {
+    if (!this.drawerOpen()) return;
+
+    this.drawerOpen.set(false);
+    this.restoreBodyScroll();
+
+    const target = this.previouslyFocused;
+    this.previouslyFocused = null;
+    queueMicrotask(() => target?.focus());
   }
 
-  protected trapMorePanelFocus(event: Event): void {
+  protected handleEscape(event: Event): void {
+    if (!this.drawerOpen()) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.closeDrawer();
+  }
+
+  protected trapDrawerFocus(event: Event): void {
+    if (!this.drawerOpen()) return;
     const keyboardEvent = event as KeyboardEvent;
     if (keyboardEvent.key !== 'Tab') return;
-    const panel = this.morePanel()?.nativeElement;
-    if (!panel) return;
-    const focusable = Array.from(
-      panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'),
-    );
-    const first = focusable[0];
-    const last = focusable.at(-1);
-    if (!first || !last) return;
 
-    if (keyboardEvent.shiftKey && document.activeElement === first) {
-      keyboardEvent.preventDefault();
-      last.focus();
-    } else if (!keyboardEvent.shiftKey && document.activeElement === last) {
-      keyboardEvent.preventDefault();
-      first.focus();
+    const focusable = this.drawerFocusableElements();
+    if (focusable.length === 0) {
+      event.preventDefault();
+      return;
     }
+
+    const document = this.host.nativeElement.ownerDocument;
+    const activeIndex = focusable.indexOf(document.activeElement as HTMLElement);
+    const movingBeforeStart = keyboardEvent.shiftKey && activeIndex <= 0;
+    const movingAfterEnd = !keyboardEvent.shiftKey && activeIndex === focusable.length - 1;
+    const focusIsOutside = activeIndex === -1;
+
+    if (movingBeforeStart) {
+      event.preventDefault();
+      focusable.at(-1)?.focus();
+    } else if (movingAfterEnd || focusIsOutside) {
+      event.preventDefault();
+      focusable[0].focus();
+    }
+  }
+
+  protected synchroniseViewport(): void {
+    if (globalThis.innerWidth >= 1024) this.closeDrawer();
+  }
+
+  ngOnDestroy(): void {
+    this.restoreBodyScroll();
+  }
+
+  private drawerFocusableElements(): HTMLElement[] {
+    const sidebar = this.host.nativeElement.querySelector<HTMLElement>('.member-shell__sidebar');
+    if (!sidebar) return [];
+
+    const selector = ['a[href]', 'button:not([disabled])', '[tabindex]:not([tabindex="-1"])'].join(
+      ',',
+    );
+
+    return [...sidebar.querySelectorAll<HTMLElement>(selector)].filter((element) => {
+      const style = globalThis.getComputedStyle(element);
+      return !element.hidden && style.display !== 'none' && style.visibility !== 'hidden';
+    });
+  }
+
+  private restoreBodyScroll(): void {
+    if (!this.bodyScrollLocked) return;
+    this.host.nativeElement.ownerDocument.body.style.overflow = this.previousBodyOverflow;
+    this.bodyScrollLocked = false;
   }
 }

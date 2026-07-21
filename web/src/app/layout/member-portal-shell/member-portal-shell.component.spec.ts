@@ -1,10 +1,10 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { MemberPortalShellComponent } from './member-portal-shell.component';
 
-describe('MemberPortalShellComponent', () => {
+describe('MemberPortalShellComponent — barre latérale dédiée au membre', () => {
   let fixture: ComponentFixture<MemberPortalShellComponent>;
   let host: HTMLElement;
 
@@ -15,11 +15,14 @@ describe('MemberPortalShellComponent', () => {
         provideZonelessChangeDetection(),
         provideRouter([
           { path: 'member/home', children: [] },
+          { path: 'member/contributions/:id', children: [] },
           { path: 'member/contributions', children: [] },
+          { path: 'member/payments', children: [] },
           { path: 'member/receipts', children: [] },
-          { path: 'member/requests', children: [] },
-          { path: 'member/directory', children: [] },
           { path: 'member/documents', children: [] },
+          { path: 'member/requests', children: [] },
+          { path: 'member/cnpm', children: [] },
+          { path: 'member/directory', children: [] },
           { path: 'member/showcase/edit', children: [] },
           { path: 'member/showcase/analytics', children: [] },
           { path: 'member/profile', children: [] },
@@ -32,30 +35,42 @@ describe('MemberPortalShellComponent', () => {
     host = fixture.nativeElement as HTMLElement;
   });
 
-  it('expose le vrai logo, le lien d’évitement et les deux navigations', () => {
+  it('expose le logo, le lien d’évitement et une navigation groupée à la voix du membre', () => {
     expect(host.querySelector<HTMLImageElement>('.member-shell__brand img')?.src).toContain(
       '/assets/brand/logo-CNPM-lockup.png',
     );
     expect(host.querySelector('.member-shell__skip-link')?.getAttribute('href')).toBe(
       '#contenu-principal',
     );
-    expect(host.querySelectorAll('nav')).toHaveLength(2);
+
+    const titles = Array.from(host.querySelectorAll('.member-shell__group-title')).map((element) =>
+      element.textContent?.trim(),
+    );
+    expect(titles).toEqual(['Mon espace', 'Le CNPM', 'Mon compte']);
   });
 
-  it('ne transforme pas les destinations absentes en liens morts', () => {
-    // 11 destinations desktop + les 4 premières reprises en mobile (la 5e entrée
-    // mobile est le déclencheur « Plus », pas un lien).
-    expect(host.querySelectorAll('nav a')).toHaveLength(15);
-    expect(host.querySelectorAll('[aria-disabled="true"]')).toHaveLength(0);
-    expect(host.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
-  });
-
-  it('reprend les onze destinations desktop et borne le mobile à cinq entrées', () => {
-    // L'ajout du parcours Paiements porte le desktop à 11 ; le bornage mobile à 5,
-    // lui, ne bouge pas — c'est l'invariant que ce test protège.
-    expect(host.querySelectorAll('.member-shell__desktop-nav > *')).toHaveLength(11);
-    expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
+  it('rend les douze destinations comme de vrais liens, sans lien mort', () => {
+    const items = Array.from(
+      host.querySelectorAll<HTMLAnchorElement>('.member-shell__nav a.member-shell__item'),
+    );
+    expect(items).toHaveLength(12);
+    expect(items.every((link) => (link.getAttribute('href')?.length ?? 0) > 0)).toBe(true);
+    expect(host.querySelectorAll('.member-shell__nav [aria-disabled="true"]')).toHaveLength(0);
     expect(host.querySelector('.member-shell__notification-count')?.textContent).toContain('3');
+  });
+
+  it('surface bien l’entrée « Le CNPM » attendue par le membre', () => {
+    const labels = Array.from(host.querySelectorAll('.member-shell__item-label')).map((element) =>
+      element.textContent?.trim(),
+    );
+    expect(labels).toContain('Mes cotisations');
+    expect(labels).toContain('Mes documents');
+    expect(labels).toContain('Mes requêtes');
+    expect(labels).toContain('Actualités & informations');
+    const cnpm = host.querySelector<HTMLAnchorElement>(
+      '.member-shell__nav a[href="/member/cnpm"]',
+    );
+    expect(cnpm?.textContent).toContain('Actualités & informations');
   });
 
   it('annonce uniquement la destination réellement active', async () => {
@@ -64,102 +79,98 @@ describe('MemberPortalShellComponent', () => {
     await fixture.whenStable();
 
     const current = Array.from(host.querySelectorAll<HTMLAnchorElement>('[aria-current="page"]'));
-    expect(current).toHaveLength(2);
-    expect(current.every((link) => link.textContent?.trim() === 'Cotisations')).toBe(true);
-    expect(host.querySelectorAll('.member-shell__link--active')).toHaveLength(2);
+    expect(current).toHaveLength(1);
+    expect(current[0]?.textContent?.trim()).toBe('Mes cotisations');
+    expect(host.querySelectorAll('.member-shell__item--active')).toHaveLength(1);
   });
 
-  it('active Documents uniquement sur desktop sans ajouter une sixième destination', async () => {
-    await TestBed.inject(Router).navigateByUrl('/member/documents');
+  it('garde la rubrique parente active sur un écran enfant', async () => {
+    await TestBed.inject(Router).navigateByUrl('/member/contributions/CNPM-2024');
     fixture.detectChanges();
     await fixture.whenStable();
 
     const current = Array.from(host.querySelectorAll<HTMLAnchorElement>('[aria-current="page"]'));
     expect(current).toHaveLength(1);
-    expect(current[0]?.textContent?.trim()).toBe('Documents');
-    expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
+    expect(current[0]?.textContent?.trim()).toBe('Mes cotisations');
   });
 
-  it('rend Annuaire découvrable dans Plus sans dépasser cinq destinations fixes', async () => {
-    await TestBed.inject(Router).navigateByUrl('/member/directory');
+  it('distingue Vitrine et Statistiques malgré leur préfixe commun', async () => {
+    await TestBed.inject(Router).navigateByUrl('/member/showcase/analytics');
     fixture.detectChanges();
     await fixture.whenStable();
-
-    expect(host.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
-    const plus = Array.from(host.querySelectorAll<HTMLButtonElement>('button')).find(
-      (item) => item.textContent?.trim() === 'Plus',
-    );
-    plus?.click();
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
 
     const current = Array.from(host.querySelectorAll<HTMLAnchorElement>('[aria-current="page"]'));
-    expect(current).toHaveLength(2);
-    expect(current.every((link) => link.textContent?.trim() === 'Annuaire')).toBe(true);
-    expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
+    expect(current).toHaveLength(1);
+    expect(current[0]?.textContent?.trim()).toBe('Statistiques');
   });
 
-  it('ouvre Plus au clavier, piège le focus et restaure le déclencheur à la fermeture', async () => {
-    const plus = Array.from(host.querySelectorAll<HTMLButtonElement>('button')).find(
-      (item) => item.textContent?.trim() === 'Plus',
-    );
-    if (!plus) throw new Error('Bouton Plus absent');
+  it('ouvre le tiroir mobile en dialogue modal, neutralise le cadre et focalise Fermer', async () => {
+    const trigger = await openDrawer();
 
-    plus.focus();
-    plus.click();
-    fixture.detectChanges();
-    await fixture.whenStable();
-    fixture.detectChanges();
+    const sidebar = host.querySelector<HTMLElement>('.member-shell__sidebar');
+    const frame = host.querySelector<HTMLElement>('.member-shell__frame');
+    const close = host.querySelector<HTMLButtonElement>('[data-drawer-initial-focus]');
 
-    const panel = host.querySelector<HTMLElement>('.member-shell__more-panel');
-    const close = host.querySelector<HTMLButtonElement>('.member-shell__more-close');
-    expect(panel?.getAttribute('role')).toBe('dialog');
-    expect(panel?.getAttribute('aria-modal')).toBe('true');
-    expect(close).toBe(document.activeElement);
-    expect(
-      Array.from(panel?.querySelectorAll<HTMLAnchorElement>('nav a') ?? []).map((link) =>
-        link.textContent?.trim(),
+    expect(sidebar?.getAttribute('role')).toBe('dialog');
+    expect(sidebar?.getAttribute('aria-modal')).toBe('true');
+    expect(frame?.hasAttribute('inert')).toBe(true);
+    expect(frame?.getAttribute('aria-hidden')).toBe('true');
+    expect(document.activeElement).toBe(close);
+    expect(document.body.style.overflow).toBe('hidden');
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('boucle le focus avec Tab et Maj+Tab dans le tiroir', async () => {
+    await openDrawer();
+
+    const focusable = Array.from(
+      host.querySelectorAll<HTMLElement>(
+        '.member-shell__sidebar a[href], .member-shell__sidebar button:not([disabled])',
       ),
-    // Paiements prend la 3e place fixe en mobile : Requêtes bascule donc dans « Plus ».
-    ).toEqual([
-      'Requêtes',
-      'Annuaire',
-      'Documents',
-      'Vitrine',
-      'Statistiques',
-      'Profil',
-      'Utilisateurs',
-    ]);
-
-    close?.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }),
     );
-    const lastLink = panel?.querySelector<HTMLAnchorElement>('nav a:last-child');
-    expect(lastLink).toBe(document.activeElement);
-    lastLink?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    const first = focusable[0];
+
+    focusable.at(-1)?.focus();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    expect(document.activeElement).toBe(first);
+
+    first?.focus();
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }),
+    );
+    const sidebar = host.querySelector<HTMLElement>('.member-shell__sidebar');
+    expect(sidebar?.contains(document.activeElement)).toBe(true);
+    expect(document.activeElement).not.toBe(first);
+  });
+
+  it('ferme avec Échap, restitue le focus au déclencheur et réactive le cadre', async () => {
+    const trigger = await openDrawer();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await Promise.resolve();
+
+    const frame = host.querySelector<HTMLElement>('.member-shell__frame');
+    const sidebar = host.querySelector<HTMLElement>('.member-shell__sidebar');
+    expect(frame?.hasAttribute('inert')).toBe(false);
+    expect(sidebar?.hasAttribute('role')).toBe(false);
+    expect(document.activeElement).toBe(trigger);
+    expect(document.body.style.overflow).toBe('');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  /** Ouvre le tiroir via le déclencheur et laisse la micro-tâche de focus initial s'exécuter. */
+  async function openDrawer(): Promise<HTMLButtonElement> {
+    const trigger = host.querySelector<HTMLButtonElement>('.member-shell__menu-button');
+    if (!trigger) throw new Error('Déclencheur du tiroir introuvable');
+    trigger.focus();
+    trigger.click();
     fixture.detectChanges();
     await fixture.whenStable();
     fixture.detectChanges();
-
-    expect(host.querySelector('.member-shell__more-panel')).toBeNull();
-    expect(plus).toBe(document.activeElement);
-    expect(plus.getAttribute('aria-expanded')).toBe('false');
-  });
-
-  it.each([
-    ['/member/showcase/edit', 'Vitrine'],
-    ['/member/showcase/analytics', 'Statistiques'],
-    ['/member/profile', 'Profil'],
-    ['/member/users', 'Utilisateurs'],
-  ])('active %s uniquement dans la navigation desktop', async (url, label) => {
-    await TestBed.inject(Router).navigateByUrl(url);
-    fixture.detectChanges();
-    await fixture.whenStable();
-
-    const current = Array.from(host.querySelectorAll<HTMLAnchorElement>('[aria-current="page"]'));
-    expect(current).toHaveLength(1);
-    expect(current[0]?.textContent?.trim()).toBe(label);
-    expect(host.querySelectorAll('.member-shell__mobile-nav > *')).toHaveLength(5);
-  });
+    // La mise au focus de Fermer passe par queueMicrotask : l'await la laisse s'exécuter.
+    await Promise.resolve();
+    return trigger;
+  }
 });
