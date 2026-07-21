@@ -29,6 +29,10 @@
 
 
     <div class="cnpm-members__layout">
+      <!-- Colonne principale continue : indicateurs, filtres et tableau s'enchaînent sans
+           vide. Le rail de synthèse est une colonne à part, alignée en haut — plus de
+           rangée étirée par un rail plus haut que la colonne de gauche. -->
+      <div class="cnpm-members__main">
     <!-- Bandeau d'indicateurs.
          Les quatre chiffres viennent tous de `MembersOverview`, donc du même jeu que le
          tableau : un bandeau qui contredirait le total affiché plus bas serait exactement
@@ -415,6 +419,8 @@
           />
         }
       </div>
+      </div>
+      <!-- fin de la colonne principale -->
 
       <!-- Panneau de synthèse de la fiche : 280–300 px sur grand desktop. Ses chiffres
            sont dérivés du même jeu que le tableau — un panneau qui contredirait le

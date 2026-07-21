@@ -21,26 +21,25 @@
 .cnpm-members__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 20rem;
-  grid-template-areas:
-    'kpis    rail'
-    'filters rail'
-    'table   table';
   align-items: start;
   gap: var(--cnpm-space-4);
   min-width: 0;
 }
 
-.cnpm-members__kpis {
-  grid-area: kpis;
+/* Colonne principale : les indicateurs, les filtres et le tableau s'enchaînent en flux
+   continu, sans rangée étirée par le rail — d'où la disparition du grand vide. */
+.cnpm-members__main {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
 }
 
 .cnpm-members__filters {
-  grid-area: filters;
   min-width: 0;
 }
 
 .cnpm-members__list {
-  grid-area: table;
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-3);
@@ -240,7 +239,6 @@
 }
 
 .cnpm-members__aside {
-  grid-area: rail;
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-4);
@@ -286,11 +284,6 @@
 @media (max-width: 1279px) {
   .cnpm-members__layout {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'kpis'
-      'filters'
-      'table'
-      'rail';
   }
 
   .cnpm-members__aside {
