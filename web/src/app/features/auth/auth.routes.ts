@@ -116,6 +116,12 @@ export const authRoutes: Routes = [
         title: 'Connexion — CNPM',
       },
       {
+        // Déconnexion volontaire : termine la session et retourne à la connexion.
+        path: 'logout',
+        loadComponent: () => import('./logout.page').then((m) => m.LogoutPage),
+        title: 'Déconnexion — CNPM',
+      },
+      {
         // AUTH-008 : atteint après expiration de session. Aucun garde de gateway —
         // c'est un écran d'information, pas une étape d'authentification.
         path: 'session-ended',

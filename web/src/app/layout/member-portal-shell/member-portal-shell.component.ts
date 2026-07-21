@@ -8,10 +8,10 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AccountMenuComponent } from '../account-menu/account-menu.component';
 import {
   LucideBell,
   LucideBookUser,
-  LucideBuilding2,
   LucideChartNoAxesCombined,
   LucideCreditCard,
   LucideFolderArchive,
@@ -82,9 +82,9 @@ interface MemberNavGroup {
   imports: [
     RouterLink,
     RouterLinkActive,
+    AccountMenuComponent,
     LucideBell,
     LucideBookUser,
-    LucideBuilding2,
     LucideChartNoAxesCombined,
     LucideCreditCard,
     LucideFolderArchive,

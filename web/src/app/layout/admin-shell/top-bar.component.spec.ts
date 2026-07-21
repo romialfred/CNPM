@@ -56,15 +56,16 @@ describe('TopBarComponent', () => {
     expect(host.textContent).toContain('Le centre de notifications n’est pas encore raccordé.');
   });
 
-  it('présente une seule action globale et une identité textuelle', async () => {
+  it('présente une seule action globale et le menu du compte connecté', async () => {
     const { host } = await setup();
     const action = host.querySelector<HTMLAnchorElement>('.cnpm-topbar__primary-action');
 
     expect(action?.getAttribute('href')).toBe('/admin/enrollments/new');
     expect(action?.getAttribute('aria-label')).toBe('Créer un nouvel enrôlement');
-    expect(host.querySelector('.cnpm-topbar__avatar')?.textContent?.trim()).toBe('AT');
-    expect(host.querySelector('.cnpm-topbar__identity')?.getAttribute('aria-label')).toBe(
-      'Aminata Traoré, Administrateur',
+    // L'identité devient un menu de compte : initiales, nom + rôle, et la déconnexion.
+    expect(host.querySelector('.cnpm-account-menu__avatar')?.textContent?.trim()).toBe('AT');
+    expect(host.querySelector('.cnpm-account-menu__trigger')?.getAttribute('aria-label')).toBe(
+      'Compte de Aminata Traoré, Administrateur',
     );
   });
 

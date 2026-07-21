@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LucideBell, LucideMenu, LucidePlus, LucideSearch } from '@lucide/angular';
 import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
+import { AccountMenuComponent } from '../account-menu/account-menu.component';
 import { SESSION_GATEWAY } from './session-gateway';
 
 /**
@@ -27,7 +28,16 @@ import { SESSION_GATEWAY } from './session-gateway';
 @Component({
   selector: 'cnpm-top-bar',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [AsyncPipe, FormsModule, RouterLink, LucideBell, LucideMenu, LucidePlus, LucideSearch],
+  imports: [
+    AsyncPipe,
+    FormsModule,
+    RouterLink,
+    AccountMenuComponent,
+    LucideBell,
+    LucideMenu,
+    LucidePlus,
+    LucideSearch,
+  ],
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.scss',
 })

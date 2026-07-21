@@ -152,13 +152,12 @@
             }}</span>
           }
         </button>
-        <span class="member-shell__avatar" aria-hidden="true">
-          <svg lucideBuilding2></svg>
-        </span>
-        <span class="member-shell__account-copy">
-          <strong>{{ userName() }}</strong>
-          <small>{{ organization() }}</small>
-        </span>
+        <cnpm-account-menu
+          menuId="member-account"
+          [name]="userName()"
+          [secondary]="organization()"
+          profileLink="/member/profile"
+        />
       </div>
     </header>
 

@@ -1,0 +1,46 @@
+<div class="cnpm-account-menu" [class.cnpm-account-menu--open]="open()">
+  <button
+    #trigger
+    class="cnpm-account-menu__trigger"
+    type="button"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId()"
+    [attr.aria-label]="'Compte de ' + name() + (secondary() ? ', ' + secondary() : '')"
+    (click)="toggle()"
+  >
+    <span class="cnpm-account-menu__avatar" aria-hidden="true">{{ initials() }}</span>
+    <span class="cnpm-account-menu__copy">
+      <span class="cnpm-account-menu__name">{{ name() }}</span>
+      @if (secondary()) {
+        <span class="cnpm-account-menu__secondary">{{ secondary() }}</span>
+      }
+    </span>
+    <svg class="cnpm-account-menu__chevron" lucideChevronDown aria-hidden="true"></svg>
+  </button>
+
+  @if (open()) {
+    <div class="cnpm-account-menu__panel" [id]="panelId()" role="menu">
+      @if (profileLink(); as link) {
+        <a
+          class="cnpm-account-menu__item"
+          role="menuitem"
+          [routerLink]="link"
+          (click)="close()"
+        >
+          <svg lucideUserRound aria-hidden="true"></svg>
+          Mon profil
+        </a>
+      }
+      <a
+        class="cnpm-account-menu__item cnpm-account-menu__item--danger"
+        role="menuitem"
+        routerLink="/auth/logout"
+        (click)="close()"
+      >
+        <svg lucideLogOut aria-hidden="true"></svg>
+        Se déconnecter
+      </a>
+    </div>
+  }
+</div>
