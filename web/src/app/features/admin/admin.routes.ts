@@ -15,6 +15,7 @@ import { DemoContributionCallGenerationGateway } from './contributions/generatio
 import { DemoContributionsGateway } from './contributions/demo-contributions.gateway';
 import { DASHBOARD_GATEWAY } from './dashboard/dashboard-gateway';
 import { DemoDashboardGateway } from './dashboard/demo-dashboard.gateway';
+import { HttpDashboardGateway } from './dashboard/http-dashboard.gateway';
 import { DemoDocumentsGateway } from './documents/demo-documents.gateway';
 import { documentReadGuard } from './documents/document-read.guard';
 import { DOCUMENTS_GATEWAY } from './documents/documents-gateway';
@@ -78,7 +79,6 @@ import {
   UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
   UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
-  UNAVAILABLE_DASHBOARD_GATEWAY,
   UNAVAILABLE_DOCUMENTS_GATEWAY,
   UNAVAILABLE_ENROLLMENT_GATEWAY,
   UNAVAILABLE_INTEGRATIONS_GATEWAY,
@@ -158,7 +158,7 @@ export const adminRoutes: Routes = [
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoDashboardGateway)
-            : UNAVAILABLE_DASHBOARD_GATEWAY,
+            : inject(HttpDashboardGateway),
       },
       DemoContributionCallGenerationGateway,
       {
@@ -280,6 +280,7 @@ export const adminRoutes: Routes = [
             : UNAVAILABLE_INTEGRATIONS_GATEWAY,
       },
       DemoDashboardGateway,
+      HttpDashboardGateway,
       DemoDocumentsGateway,
       DemoMemberDetailGateway,
       DemoEnrollmentGateway,
