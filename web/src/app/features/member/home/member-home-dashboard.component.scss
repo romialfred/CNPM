@@ -1,11 +1,12 @@
 :host {
   display: block;
 }
+/* Grille 2 colonnes équilibrée (2×2) : à gauche la colonne large (reçus, puis activités),
+   à droite la colonne étroite (formulaire de requête, puis profil + assistance). Les
+   quatre colonnes inégales d'avant donnaient une mise en page désordonnée. */
 .member-home__dashboard-grid {
   display: grid;
-  grid-template-columns:
-    minmax(0, 3.85fr) minmax(0, 2.85fr) minmax(0, 2.85fr)
-    minmax(0, 2.4fr);
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
   gap: var(--cnpm-space-4);
   align-items: start;
 }
@@ -353,25 +354,9 @@ td strong {
   white-space: nowrap;
 }
 
-@media (max-width: 79.9375rem) {
-  .member-home__dashboard-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-  .member-home__receipts,
-  .member-home__request {
-    grid-column: span 6;
-  }
-  .member-home__activities {
-    grid-column: span 7;
-  }
-  .member-home__side-stack {
-    grid-column: span 5;
-  }
-}
 @media (max-width: 63.9375rem) {
-  .member-home__dashboard-grid > *,
-  .member-home__side-stack {
-    grid-column: span 12;
+  .member-home__dashboard-grid {
+    grid-template-columns: 1fr;
   }
   .member-home__side-stack {
     grid-template-columns: repeat(2, 1fr);
