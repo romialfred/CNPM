@@ -1,14 +1,22 @@
 import { registerLocaleData } from '@angular/common';
 import localeFrMl from '@angular/common/locales/fr-ML';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  inject,
+  LOCALE_ID,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { CNPM_ACCESS_TOKEN } from './core/api/access-token';
 import { provideCnpmApi, readCnpmRuntimeConfig } from './core/api/api.config';
 import { apiProblemInterceptor } from './core/api/api-problem.interceptor';
 import { bearerAuthInterceptor } from './core/api/bearer.interceptor';
 import { correlationIdInterceptor } from './core/api/correlation-id.interceptor';
+import { CNPM_OIDC_CONFIG, readOidcConfig } from './core/auth/oidc.config';
+import { OidcSessionService } from './core/auth/oidc-session.service';
 import { provideCnpmIcons } from './design-system/icon/icon';
 
 // `.claude/rules/ux-ui.md` impose le formatage `fr-ML`. Sans enregistrement explicite,
@@ -29,6 +37,25 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([correlationIdInterceptor, bearerAuthInterceptor, apiProblemInterceptor]),
     ),
+    // Configuration OIDC lue du même bloc runtime, remplaçable au déploiement. L'URI de
+    // redirection dérive de l'origine et doit correspondre à celle enregistrée côté Keycloak.
+    {
+      provide: CNPM_OIDC_CONFIG,
+      useFactory: () =>
+        readOidcConfig(
+          (globalThis as Record<string, unknown>)['__CNPM_RUNTIME_CONFIG__'],
+          globalThis.location?.origin ?? '',
+        ),
+    },
+    // Le jeton d'accès vient désormais de la session OIDC. En démo, aucune session n'est
+    // ouverte : le fournisseur renvoie `null` et l'intercepteur n'ajoute rien.
+    {
+      provide: CNPM_ACCESS_TOKEN,
+      useFactory: () => {
+        const session = inject(OidcSessionService);
+        return () => session.currentAccessToken();
+      },
+    },
     provideCnpmIcons(),
     { provide: LOCALE_ID, useValue: 'fr-ML' },
   ],

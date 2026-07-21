@@ -109,6 +109,13 @@ export const authRoutes: Routes = [
         title: 'Enrôlement 2FA — CNPM',
       },
       {
+        // Retour de la redirection OIDC Keycloak : échange le code contre un jeton.
+        path: 'callback',
+        loadComponent: () =>
+          import('./oidc-callback.page').then((m) => m.OidcCallbackPage),
+        title: 'Connexion — CNPM',
+      },
+      {
         // AUTH-008 : atteint après expiration de session. Aucun garde de gateway —
         // c'est un écran d'information, pas une étape d'authentification.
         path: 'session-ended',
