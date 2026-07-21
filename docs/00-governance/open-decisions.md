@@ -44,6 +44,7 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-018 | Retrait du fil d'activité de BO-001 | Arbitrer la suppression de `ActivityFeed` et des raccourcis, `ActivityFeed` étant un composant requis par la fiche | Produit / UX | Moyen | Ouverte |
 | FIN-DEC-001 | Seuils de confiance du rapprochement | **BLOQUÉ — décision humaine requise.** Fixer les seuils qui qualifient une correspondance de « élevée », « moyenne » ou « faible », et celui qui autorise le rapprochement en lot | Direction financière + Métier | Élevé | Ouverte |
 | FIN-DEC-002 | Fonctions absentes du contrat de rapprochement | Arbitrer l'import de relevé, l'enregistrement en brouillon et le filtre par période, présents dans la maquette mais absents du port et de la fiche BO-014 | Produit + API | Moyen | Ouverte |
+| RBAC-DEC-001 | Regroupement des 5 rôles-façade | Valider la projection des 20 rôles canoniques sur les 5 rôles de présentation de la mission ; c'est un groupement d'affichage, pas un modèle d'autorisation | Sécurité + Produit | Faible | Ouverte |
 | UX-DEC-019 | Aperçu du reçu retiré de BO-014 | Arbitrer la suppression de `ReceiptPreview`, composant requis par la fiche, absent de la maquette du commanditaire et de toute façon bridé par DEC-005 | Produit / UX + Métier | Moyen | Ouverte |
 | UX-DEC-017 | Taille des pictogrammes de la navigation latérale | Confirmer l'échelon `control` (20 px) là où l'iconographie affecte `navigation` (24 px) aux pictogrammes de navigation, ou revenir à 24 px | Produit / UX | Faible | Ouverte |
 
@@ -413,6 +414,23 @@ l'étape 3 de l'indicateur, mais aucun document n'est prévisualisé.
 
 **Question.** L'aperçu du reçu revient-il sur cet écran une fois DEC-005 tranchée, part-il
 vers un écran dédié aux reçus, ou REF-BO-014 est-elle mise à jour pour ne plus l'exiger ?
+
+### RBAC-DEC-001 — Regroupement des 5 rôles-façade
+
+**Contexte.** La mission demande 5 rôles (SUPER ADMIN, ADMIN CNPM, RESPONSABLE ORGANISATION,
+MEMBRE CNPM, AUDITEUR). Le dépôt en compte 20 canoniques (`docs/05-security/rbac-grants.csv`),
+source de vérité de la matrice RBAC et de la séparation des tâches.
+
+**Décision retenue (validée en séance).** On NE réduit PAS le modèle à 5 rôles — cela
+régresserait la matrice et la SOD. On projette les 20 rôles sur 5 **façades d'affichage**
+(`web/src/app/core/auth/role-facade.ts`). La façade est une lecture simplifiée pour l'écran ;
+les droits restent portés par les rôles canoniques et vérifiés côté serveur. Changer le
+regroupement ne touche que l'affichage, jamais l'autorisation.
+
+**À valider.** Le rattachement exact de chaque rôle canonique à sa façade est un choix de
+conception (ex. : `MEMBRE_ADMIN` rangé sous « Responsable d'organisation », `DIRECTION_GENERALE`
+sous « Administrateur CNPM »). Sécurité et Produit doivent confirmer ou ajuster ces
+rattachements — sans effet sur les droits réels.
 
 ### UX-DEC-013 — Modèle de consentement des contacts publics
 
