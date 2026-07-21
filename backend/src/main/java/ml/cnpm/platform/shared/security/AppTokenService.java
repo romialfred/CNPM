@@ -77,6 +77,11 @@ public class AppTokenService {
         }
     }
 
+    /** Clé HMAC-SHA256 du jeton applicatif, pour que le resource-server puisse le vérifier. */
+    public javax.crypto.SecretKey macKey() {
+        return new javax.crypto.spec.SecretKeySpec(key, "HmacSHA256");
+    }
+
     private static byte[] sha256(String material) {
         try {
             return MessageDigest.getInstance("SHA-256").digest(material.getBytes(StandardCharsets.UTF_8));

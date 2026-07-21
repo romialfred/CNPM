@@ -27,7 +27,8 @@ public class MfaService {
 
     public record Enrollment(String manualKey, String otpAuthUri) { }
 
-    public record EnrollmentResult(List<String> recoveryCodes) { }
+    /** Résultat de l'activation : codes de secours + compte activé (pour émettre le jeton). */
+    public record EnrollmentResult(List<String> recoveryCodes, MfaAccount account) { }
 
     private static final int RECOVERY_CODE_COUNT = 8;
     private static final String ISSUER = "CNPM";
@@ -89,7 +90,7 @@ public class MfaService {
         accounts.save(account);
         pendingSecrets.remove(challengeToken);
         challenges.consume(challengeToken);
-        return new EnrollmentResult(List.copyOf(recoveryCodes));
+        return new EnrollmentResult(List.copyOf(recoveryCodes), account);
     }
 
     public synchronized MfaAccount verify(String challengeToken, String code, String recoveryCode) {

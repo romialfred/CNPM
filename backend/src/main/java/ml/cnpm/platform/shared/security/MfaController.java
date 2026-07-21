@@ -54,7 +54,14 @@ public class MfaController {
     public ResponseEntity<Map<String, Object>> confirm(@RequestBody CodeRequest request) {
         try {
             EnrollmentResult result = mfa.confirmEnrollment(request.challenge(), request.code());
-            return ResponseEntity.ok(Map.of("recoveryCodes", result.recoveryCodes()));
+            // Le premier code a prouvé la possession : on ouvre la session dans la foulée, en
+            // remettant les codes de secours. Pas de reconnexion imposée (UX première connexion).
+            MfaAccount account = result.account();
+            String token = tokens.issue(account.id(), account.login(), List.copyOf(account.roles()));
+            return ResponseEntity.ok(Map.of(
+                    "status", "AUTHENTICATED",
+                    "recoveryCodes", result.recoveryCodes(),
+                    "accessToken", token));
         } catch (MfaException | MfaChallengeException ex) {
             return failure(ex.getMessage());
         }
