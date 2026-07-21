@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { delay, type Observable, of } from 'rxjs';
+import { delay, type Observable, of, throwError } from 'rxjs';
 import type {
+  AccountStatus,
   AdminSecurityGateway,
   AdminSecurityQuery,
   AdminSecuritySnapshot,
@@ -509,6 +510,29 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
     // En tête de liste : l'opérateur voit immédiatement le compte qu'il vient de créer.
     this.accounts = [account, ...this.accounts];
     return of(account).pipe(delay(180));
+  }
+
+  changeAccountStatus(accountId: string, status: AccountStatus): Observable<SecurityAccount> {
+    return this.mutate(accountId, (account) => ({ ...account, status }));
+  }
+
+  resetTwoFactor(accountId: string): Observable<SecurityAccount> {
+    // On relance l'enrôlement (PENDING), on ne désactive pas la protection.
+    return this.mutate(accountId, (account) => ({ ...account, twoFactor: 'PENDING' }));
+  }
+
+  /** Applique une transformation à un compte et le renvoie ; erreur si l'identifiant est inconnu. */
+  private mutate(
+    accountId: string,
+    change: (account: SecurityAccount) => SecurityAccount,
+  ): Observable<SecurityAccount> {
+    const index = this.accounts.findIndex((account) => account.id === accountId);
+    if (index === -1) {
+      return throwError(() => new Error('Compte introuvable')).pipe(delay(180));
+    }
+    const updated = change(this.accounts[index]);
+    this.accounts = [...this.accounts.slice(0, index), updated, ...this.accounts.slice(index + 1)];
+    return of(updated).pipe(delay(180));
   }
 
   /** Effectifs de référence, toujours calculés sur les collections complètes. */

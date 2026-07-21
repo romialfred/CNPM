@@ -61,4 +61,37 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     const recherche = await firstValueFrom(gateway.load({ tab: 'comptes', search: 'touré' }));
     expect(recherche.accounts.some((account) => account.fullName === 'Awa Touré')).toBe(true);
   });
+
+  it('suspend puis réactive un compte, et le rechargement reflète le nouveau statut', async () => {
+    const gateway = new DemoAdminSecurityGateway();
+    const initial = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));
+    const actif = initial.accounts.find((account) => account.status === 'ACTIVE');
+    if (!actif) throw new Error('compte actif attendu dans la démo');
+
+    const suspendu = await firstValueFrom(gateway.changeAccountStatus(actif.id, 'SUSPENDED'));
+    expect(suspendu.status).toBe('SUSPENDED');
+    const apresSuspension = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));
+    expect(apresSuspension.accounts.find((a) => a.id === actif.id)?.status).toBe('SUSPENDED');
+
+    await firstValueFrom(gateway.changeAccountStatus(actif.id, 'ACTIVE'));
+    const apresReactivation = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));
+    expect(apresReactivation.accounts.find((a) => a.id === actif.id)?.status).toBe('ACTIVE');
+  });
+
+  it('réinitialise le second facteur en le repassant « en attente », sans le désactiver', async () => {
+    const gateway = new DemoAdminSecurityGateway();
+    const initial = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));
+    const enrole = initial.accounts.find((account) => account.twoFactor === 'ENABLED');
+    if (!enrole) throw new Error('compte à 2FA active attendu');
+
+    const reinit = await firstValueFrom(gateway.resetTwoFactor(enrole.id));
+    // On relance l'enrôlement (PENDING), on ne DÉSACTIVE jamais la protection.
+    expect(reinit.twoFactor).toBe('PENDING');
+    expect(reinit.twoFactor).not.toBe('DISABLED');
+  });
+
+  it('rejette une action sur un compte inconnu', async () => {
+    const gateway = new DemoAdminSecurityGateway();
+    await expect(firstValueFrom(gateway.resetTwoFactor('compte-inexistant'))).rejects.toThrow();
+  });
 });

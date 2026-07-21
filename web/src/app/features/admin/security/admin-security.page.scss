@@ -469,3 +469,17 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Actions de ligne : boutons compacts alignés, s'enroulant si la colonne est étroite. */
+.cnpm-security__row-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-security__confirm-text {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+}

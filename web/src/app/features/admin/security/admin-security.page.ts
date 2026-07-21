@@ -580,6 +580,115 @@ export class AdminSecurityPage {
       });
   }
 
+  // ------------------------------------------------------------ Actions de compte
+
+  /**
+   * Action en attente de confirmation. On demande toujours confirmation avant d'agir sur
+   * un compte : suspendre ou relancer un enrôlement ne doit pas partir d'un clic seul.
+   */
+  protected readonly pendingAction = signal<AccountAction | null>(null);
+  protected readonly actioning = signal(false);
+
+  protected askSuspend(account: SecurityAccount): void {
+    this.pendingAction.set({ kind: 'suspend', account });
+  }
+
+  protected askReactivate(account: SecurityAccount): void {
+    this.pendingAction.set({ kind: 'reactivate', account });
+  }
+
+  protected askResetTwoFactor(account: SecurityAccount): void {
+    this.pendingAction.set({ kind: 'reset2fa', account });
+  }
+
+  protected cancelAction(): void {
+    if (!this.actioning()) {
+      this.pendingAction.set(null);
+    }
+  }
+
+  protected readonly actionTitle = computed(() => {
+    switch (this.pendingAction()?.kind) {
+      case 'suspend':
+        return 'Suspendre le compte';
+      case 'reactivate':
+        return 'Réactiver le compte';
+      case 'reset2fa':
+        return 'Réinitialiser le second facteur';
+      default:
+        return '';
+    }
+  });
+
+  protected readonly actionMessage = computed(() => {
+    const action = this.pendingAction();
+    if (!action) {
+      return '';
+    }
+    const name = action.account.fullName;
+    switch (action.kind) {
+      case 'suspend':
+        return `${name} ne pourra plus se connecter tant que le compte reste suspendu.`;
+      case 'reactivate':
+        return `${name} pourra de nouveau se connecter.`;
+      case 'reset2fa':
+        return `${name} devra réenrôler son second facteur à la prochaine connexion. La protection n’est pas désactivée, elle est relancée.`;
+      default:
+        return '';
+    }
+  });
+
+  protected readonly actionConfirmLabel = computed(() => {
+    switch (this.pendingAction()?.kind) {
+      case 'suspend':
+        return 'Suspendre';
+      case 'reactivate':
+        return 'Réactiver';
+      case 'reset2fa':
+        return 'Réinitialiser';
+      default:
+        return 'Confirmer';
+    }
+  });
+
+  protected confirmAction(): void {
+    const action = this.pendingAction();
+    if (!action || this.actioning()) {
+      return;
+    }
+    const request$ =
+      action.kind === 'reset2fa'
+        ? this.gateway.resetTwoFactor(action.account.id)
+        : this.gateway.changeAccountStatus(
+            action.account.id,
+            action.kind === 'suspend' ? 'SUSPENDED' : 'ACTIVE',
+          );
+    this.actioning.set(true);
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (account) => {
+        this.actioning.set(false);
+        this.pendingAction.set(null);
+        this.toast.success(this.successMessage(action.kind, account.fullName));
+        this.retryTick.update((tick) => tick + 1);
+      },
+      error: () => {
+        this.actioning.set(false);
+        this.toast.error('L’action a échoué. Réessayez ou contactez le support.');
+      },
+    });
+  }
+
+  private successMessage(kind: AccountActionKind, name: string): string {
+    switch (kind) {
+      case 'suspend':
+        return `Compte de ${name} suspendu.`;
+      case 'reactivate':
+        return `Compte de ${name} réactivé.`;
+      case 'reset2fa':
+        return `Second facteur de ${name} réinitialisé.`;
+    }
+  }
+
   private patch(params: Record<string, string | null>): void {
     void this.router.navigate([], {
       relativeTo: this.route,
@@ -587,4 +696,10 @@ export class AdminSecurityPage {
       queryParamsHandling: 'merge',
     });
   }
+}
+
+type AccountActionKind = 'suspend' | 'reactivate' | 'reset2fa';
+interface AccountAction {
+  readonly kind: AccountActionKind;
+  readonly account: SecurityAccount;
 }

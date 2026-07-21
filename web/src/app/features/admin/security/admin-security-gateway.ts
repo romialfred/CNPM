@@ -184,6 +184,19 @@ export interface AdminSecurityGateway {
    * d'interface ne protège rien côté serveur.
    */
   createAccount(input: NewAccountInput): Observable<SecurityAccount>;
+
+  /**
+   * Change le statut d'un compte (suspendre, réactiver). Le serveur applique la règle et
+   * trace l'action ; l'écran ne fait que demander et rafraîchir. Renvoie le compte à jour.
+   */
+  changeAccountStatus(accountId: string, status: AccountStatus): Observable<SecurityAccount>;
+
+  /**
+   * Réinitialise le second facteur : le compte repasse « en attente » et devra réenrôler
+   * à la prochaine connexion. Aucune 2FA n'est désactivée ici — on relance l'enrôlement,
+   * on ne baisse pas la garde.
+   */
+  resetTwoFactor(accountId: string): Observable<SecurityAccount>;
 }
 
 export const ADMIN_SECURITY_GATEWAY = new InjectionToken<AdminSecurityGateway>(

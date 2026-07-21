@@ -87,6 +87,8 @@ export const UNAVAILABLE_REQUESTS_GATEWAY: RequestsGateway = {
 export const UNAVAILABLE_ADMIN_SECURITY_GATEWAY: AdminSecurityGateway = {
   load: () => unavailableFeature$('BO-030'),
   createAccount: () => unavailableFeature$('BO-030'),
+  changeAccountStatus: () => unavailableFeature$('BO-030'),
+  resetTwoFactor: () => unavailableFeature$('BO-030'),
 };
 
 /**

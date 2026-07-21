@@ -132,15 +132,35 @@
                   <span class="cnpm-security__count">{{ account.activeSessions | number }}</span>
                 </td>
                 <td class="cnpm-table__cell">
-                  <cnpm-button
-                    variant="tertiary"
-                    size="sm"
-                    [disabled]="true"
-                    [describedBy]="sensitiveHintId"
-                    [accessibleLabel]="'Actions de sécurité pour ' + account.fullName"
-                  >
-                    ⋮
-                  </cnpm-button>
+                  <span class="cnpm-security__row-actions">
+                    @if (account.status === 'SUSPENDED') {
+                      <cnpm-button
+                        variant="tertiary"
+                        size="sm"
+                        (click)="askReactivate(account)"
+                        [accessibleLabel]="'Réactiver le compte de ' + account.fullName"
+                      >
+                        Réactiver
+                      </cnpm-button>
+                    } @else {
+                      <cnpm-button
+                        variant="tertiary"
+                        size="sm"
+                        (click)="askSuspend(account)"
+                        [accessibleLabel]="'Suspendre le compte de ' + account.fullName"
+                      >
+                        Suspendre
+                      </cnpm-button>
+                    }
+                    <cnpm-button
+                      variant="tertiary"
+                      size="sm"
+                      (click)="askResetTwoFactor(account)"
+                      [accessibleLabel]="'Réinitialiser le second facteur de ' + account.fullName"
+                    >
+                      Réinit. 2FA
+                    </cnpm-button>
+                  </span>
                 </td>
               </ng-template>
 
@@ -730,6 +750,27 @@
            déclenche `ngSubmit` du formulaire, qui appelle la même méthode. -->
       <cnpm-button variant="primary" (click)="submitCreate()" [loading]="creating()">
         Créer le compte
+      </cnpm-button>
+    </ng-container>
+  </cnpm-dialog>
+
+  <!-- Confirmation d'une action de compte : suspendre, réactiver, réinitialiser le 2FA.
+       On ne modifie jamais un compte sans une confirmation explicite. -->
+  <cnpm-dialog
+    [open]="pendingAction() !== null"
+    [title]="actionTitle()"
+    eyebrow="Gestion des utilisateurs"
+    [dismissible]="!actioning()"
+    (dismiss)="cancelAction()"
+  >
+    <p class="cnpm-security__confirm-text">{{ actionMessage() }}</p>
+
+    <ng-container cnpm-dialog-footer>
+      <cnpm-button variant="secondary" (click)="cancelAction()" [disabled]="actioning()">
+        Annuler
+      </cnpm-button>
+      <cnpm-button variant="primary" (click)="confirmAction()" [loading]="actioning()">
+        {{ actionConfirmLabel() }}
       </cnpm-button>
     </ng-container>
   </cnpm-dialog>
