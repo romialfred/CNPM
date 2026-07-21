@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,9 @@ public class MfaService {
     private final SecureRandom random = new SecureRandom();
     private final Map<String, String> pendingSecrets = new ConcurrentHashMap<>();
 
+    // Deux constructeurs coexistent (le second injecte une Clock pour les tests) : Spring
+    // ne peut pas deviner lequel utiliser, d'où l'annotation explicite du constructeur de prod.
+    @Autowired
     public MfaService(MfaAccountStore accounts, MfaChallengeService challenges,
             CnpmMfaRolePolicy rolePolicy, TotpService totp, MfaCryptoService crypto) {
         this(accounts, challenges, rolePolicy, totp, crypto, Clock.systemUTC());

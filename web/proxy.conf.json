@@ -1,0 +1,10 @@
+{
+  "//": "Proxy de développement : le front (ng serve, :4200) appelle /v1/** en même origine ;",
+  "//2": "le préfixe /v1 (passerelle en prod) est retiré et relayé vers le backend natif sur :8080.",
+  "/v1": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": { "^/v1": "" }
+  }
+}
