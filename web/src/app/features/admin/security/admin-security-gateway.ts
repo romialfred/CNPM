@@ -158,8 +158,32 @@ export interface AdminSecuritySnapshot {
   readonly counts: SecurityCounts;
 }
 
+/**
+ * Création d'un compte.
+ *
+ * On ne collecte ici que l'identité que le modèle de compte porte réellement — prénom,
+ * nom, adresse, rôle. Le profil étendu (téléphone, fonction, département, photo) relèvera
+ * de l'API Utilisateurs dédiée : afficher des champs qu'aucun stockage ne reçoit serait
+ * un formulaire mensonger. Aucun mot de passe n'est saisi : l'accès passe par le
+ * fournisseur d'identité (Keycloak, ADR-003), le compte naît « invité », second facteur
+ * « en attente », jamais connecté.
+ */
+export interface NewAccountInput {
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly email: string;
+  readonly roleId: string;
+}
+
 export interface AdminSecurityGateway {
   load(query: AdminSecurityQuery): Observable<AdminSecuritySnapshot>;
+
+  /**
+   * Crée un compte et le renvoie tel qu'il sera listé. La validation réelle (unicité de
+   * l'adresse, rôle autorisé, séparation des tâches) appartient à la source : une garde
+   * d'interface ne protège rien côté serveur.
+   */
+  createAccount(input: NewAccountInput): Observable<SecurityAccount>;
 }
 
 export const ADMIN_SECURITY_GATEWAY = new InjectionToken<AdminSecurityGateway>(

@@ -4,21 +4,23 @@
       title="Administration et sécurité"
       description="Comptes, rôles et permissions, sessions ouvertes et journal d’audit de la plateforme."
     >
-      <!-- Invitation, suspension, réinitialisation du second facteur et révocation de
-           session sont des flux distincts, soumis à réauthentification (fiche BO-030).
-           Aucun n'est spécifié à ce jour : les commandes annoncent leur indisponibilité
+      <!-- « Nouveau compte » est livré : il ouvre le dialogue de création. Aucun mot de
+           passe n'y est saisi — l'accès passe par le fournisseur d'identité, le compte
+           naît « invité », second facteur à enrôler.
+           La réinitialisation du second facteur reste un flux distinct soumis à
+           réauthentification, non encore livré : la commande annonce son indisponibilité
            plutôt que d'ouvrir sur un écran absent. -->
-      <cnpm-button variant="primary" [disabled]="true" [describedBy]="sensitiveHintId">
+      <cnpm-button variant="primary" (click)="openCreate()">
         <svg lucideUserPlus [size]="iconSize.compact"></svg>
-        Inviter un utilisateur
+        Nouveau compte
       </cnpm-button>
       <cnpm-button variant="secondary" [disabled]="true" [describedBy]="sensitiveHintId">
         <svg lucideKeyRound [size]="iconSize.compact"></svg>
         Réinitialiser un second facteur
       </cnpm-button>
       <p class="cnpm-security__sr" [id]="sensitiveHintId">
-        Les opérations sensibles suivent un flux dédié avec réauthentification, motif obligatoire et
-        trace d’audit. Ce flux n’est pas encore disponible.
+        La réinitialisation du second facteur suit un flux dédié avec réauthentification, motif
+        obligatoire et trace d’audit. Ce flux n’est pas encore disponible.
       </p>
     </cnpm-page-header>
 
@@ -643,4 +645,92 @@
       }
     </div>
   </div>
+
+  <!-- Dialogue de création d'un compte. Fondé sur le composant `cnpm-dialog` partagé,
+       qui servira aussi la popup d'enrôlement 2FA. Aucun mot de passe : l'identité passe
+       par le fournisseur d'identité (Keycloak). -->
+  <cnpm-dialog
+    [open]="createOpen()"
+    title="Nouveau compte"
+    eyebrow="Gestion des utilisateurs"
+    [dismissible]="!creating()"
+    (dismiss)="closeCreate()"
+  >
+    <form
+      class="cnpm-security__create-form"
+      id="cnpm-security-create-form"
+      [formGroup]="createForm"
+      (ngSubmit)="submitCreate()"
+    >
+      @if (createError()) {
+        <cnpm-alert tone="error" title="Création impossible">
+          <p>{{ createError() }}</p>
+        </cnpm-alert>
+      }
+
+      <div class="cnpm-security__create-grid">
+        <cnpm-text-input
+          formControlName="firstName"
+          label="Prénom"
+          name="firstName"
+          autocomplete="given-name"
+          [required]="true"
+          [error]="fieldError('firstName') ?? undefined"
+        />
+        <cnpm-text-input
+          formControlName="lastName"
+          label="Nom"
+          name="lastName"
+          autocomplete="family-name"
+          [required]="true"
+          [error]="fieldError('lastName') ?? undefined"
+        />
+      </div>
+
+      <cnpm-text-input
+        formControlName="email"
+        label="Adresse électronique"
+        type="email"
+        name="email"
+        autocomplete="email"
+        [required]="true"
+        [error]="fieldError('email') ?? undefined"
+      />
+
+      <div class="cnpm-security__field">
+        <label class="cnpm-security__label" for="cnpm-security-create-role">Rôle</label>
+        <select
+          id="cnpm-security-create-role"
+          class="cnpm-security__select"
+          formControlName="roleId"
+          [attr.aria-invalid]="fieldError('roleId') ? 'true' : null"
+        >
+          <option value="" disabled>Choisir un rôle…</option>
+          @for (role of roleOptions(); track role.id) {
+            <option [value]="role.id">{{ role.label }}</option>
+          }
+        </select>
+        @if (fieldError('roleId')) {
+          <p class="cnpm-security__field-error">{{ fieldError('roleId') }}</p>
+        }
+      </div>
+
+      <p class="cnpm-security__create-note">
+        Le compte est créé « invité » : la personne définira son mot de passe et activera son
+        second facteur à la première connexion.
+      </p>
+    </form>
+
+    <ng-container cnpm-dialog-footer>
+      <cnpm-button variant="secondary" (click)="closeCreate()" [disabled]="creating()">
+        Annuler
+      </cnpm-button>
+      <!-- Le pied est hors du `<form>` dans le DOM ; `cnpm-button` ne relaie pas
+           l'attribut `form`. On soumet donc au clic. La touche Entrée dans un champ
+           déclenche `ngSubmit` du formulaire, qui appelle la même méthode. -->
+      <cnpm-button variant="primary" (click)="submitCreate()" [loading]="creating()">
+        Créer le compte
+      </cnpm-button>
+    </ng-container>
+  </cnpm-dialog>
 </cnpm-admin-shell>

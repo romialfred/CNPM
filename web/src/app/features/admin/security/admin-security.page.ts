@@ -7,12 +7,20 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LucideCheck, LucideKeyRound, LucideMinus, LucideUserPlus } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
+import { DialogComponent } from '../../../design-system/dialog/dialog.component';
+import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
+import { ToastService } from '../../../design-system/toast/toast.service';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -39,6 +47,7 @@ import {
   type AdminSecuritySnapshot,
   type AuditEntry,
   type AuditOutcome,
+  type NewAccountInput,
   type PermissionRow,
   type SecurityAccount,
   type SecuritySession,
@@ -168,18 +177,21 @@ const AUDIT_COLUMNS: readonly DataTableColumn[] = [
   imports: [
     DecimalPipe,
     FormsModule,
+    ReactiveFormsModule,
     AdminShellComponent,
     AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
     DefinitionListComponent,
+    DialogComponent,
     EmptyStateComponent,
     ErrorStateComponent,
     InsightSummaryComponent,
     PageHeaderComponent,
     SkeletonComponent,
     TabsComponent,
+    TextInputComponent,
     LucideCheck,
     LucideKeyRound,
     LucideMinus,
@@ -472,6 +484,100 @@ export class AdminSecurityPage {
   /** Relance le chargement après une erreur récupérable, sans recharger la page. */
   protected retry(): void {
     this.retryTick.update((tick) => tick + 1);
+  }
+
+  // ------------------------------------------------------------ Création de compte
+
+  private readonly fb = inject(NonNullableFormBuilder);
+  private readonly toast = inject(ToastService);
+
+  protected readonly createOpen = signal(false);
+  protected readonly creating = signal(false);
+  /** Erreur globale du formulaire (refus de la source), distincte des erreurs de champ. */
+  protected readonly createError = signal<string | null>(null);
+
+  /**
+   * Rôles proposés à la création : ceux réellement présents dans l'instantané. Aucun
+   * rôle n'est inventé côté écran ; si la liste n'est pas encore chargée, elle est vide
+   * et le formulaire ne peut pas être soumis.
+   */
+  protected readonly roleOptions = computed(() => this.roles());
+
+  protected readonly createForm = this.fb.group({
+    firstName: this.fb.control('', [Validators.required, Validators.maxLength(80)]),
+    lastName: this.fb.control('', [Validators.required, Validators.maxLength(80)]),
+    email: this.fb.control('', [Validators.required, Validators.email, Validators.maxLength(160)]),
+    roleId: this.fb.control('', [Validators.required]),
+  });
+
+  protected openCreate(): void {
+    this.createForm.reset({ firstName: '', lastName: '', email: '', roleId: '' });
+    this.createError.set(null);
+    this.createOpen.set(true);
+  }
+
+  protected closeCreate(): void {
+    // Ne pas fermer pendant l'envoi : l'opérateur perdrait le retour de l'opération.
+    if (!this.creating()) {
+      this.createOpen.set(false);
+    }
+  }
+
+  /** Message d'erreur d'un champ, seulement une fois qu'il a été touché. */
+  protected fieldError(control: keyof typeof this.createForm.controls): string | null {
+    const field = this.createForm.controls[control];
+    if (field.valid || !(field.touched || field.dirty)) {
+      return null;
+    }
+    if (field.hasError('required')) {
+      return 'Ce champ est obligatoire.';
+    }
+    if (field.hasError('email')) {
+      return 'Adresse électronique invalide.';
+    }
+    if (field.hasError('maxlength')) {
+      return 'Ce champ est trop long.';
+    }
+    return null;
+  }
+
+  protected submitCreate(): void {
+    if (this.creating()) {
+      return;
+    }
+    if (this.createForm.invalid) {
+      this.createForm.markAllAsTouched();
+      return;
+    }
+    const raw = this.createForm.getRawValue();
+    const input: NewAccountInput = {
+      firstName: raw.firstName.trim(),
+      lastName: raw.lastName.trim(),
+      email: raw.email.trim(),
+      roleId: raw.roleId,
+    };
+    this.creating.set(true);
+    this.createError.set(null);
+    this.gateway
+      .createAccount(input)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (account) => {
+          this.creating.set(false);
+          this.createOpen.set(false);
+          // Le compte apparaîtra au rechargement ; le message le nomme pour lever le doute.
+          this.toast.success(`Compte créé pour ${account.fullName}.`);
+          this.retryTick.update((tick) => tick + 1);
+        },
+        error: (cause: unknown) => {
+          this.creating.set(false);
+          this.createError.set(
+            cause instanceof AdminSecurityAccessError
+              ? 'Vous n’avez pas le droit de créer un compte.'
+              : 'La création a échoué. Réessayez ou contactez le support.',
+          );
+        },
+      });
   }
 
   private patch(params: Record<string, string | null>): void {

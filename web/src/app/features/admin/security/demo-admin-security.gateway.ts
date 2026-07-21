@@ -5,6 +5,7 @@ import type {
   AdminSecurityQuery,
   AdminSecuritySnapshot,
   AuditEntry,
+  NewAccountInput,
   PermissionGrant,
   PermissionRow,
   SecurityAccount,
@@ -451,7 +452,13 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
   private readonly permissions = buildPermissions();
   private readonly sessions = SESSIONS;
   private readonly audit = AUDIT;
-  private readonly accounts = buildAccounts();
+  /**
+   * Mutable — les comptes créés en session s'y ajoutent, de sorte qu'un rechargement les
+   * fasse apparaître. La démo simule ainsi la persistance de la source réelle sans
+   * jamais toucher à un stockage.
+   */
+  private accounts: SecurityAccount[] = [...buildAccounts()];
+  private createdCount = 0;
 
   load(query: AdminSecurityQuery): Observable<AdminSecuritySnapshot> {
     const term = fold(query.search.trim());
@@ -479,6 +486,29 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
     // Latence simulée : sans elle, l'état de chargement ne serait jamais peint, donc
     // jamais éprouvé.
     return of(snapshot).pipe(delay(140));
+  }
+
+  createAccount(input: NewAccountInput): Observable<SecurityAccount> {
+    this.createdCount += 1;
+    const fullName = `${input.firstName} ${input.lastName}`.replace(/\s+/gu, ' ').trim();
+    const account: SecurityAccount = {
+      id: `acc-demo-${this.createdCount}`,
+      fullName,
+      email: input.email.trim(),
+      roleId: input.roleId,
+      roleLabel: this.roles.find((role) => role.id === input.roleId)?.label ?? 'Rôle inconnu',
+      // Un compte créé n'est pas encore actif : il est invité, son second facteur reste à
+      // enrôler et il ne s'est jamais connecté. C'est exactement l'état qui déclenchera
+      // la popup d'enrôlement à la première connexion.
+      status: 'INVITED',
+      twoFactor: 'PENDING',
+      lastLoginAt: null,
+      lastLoginLabel: null,
+      activeSessions: 0,
+    };
+    // En tête de liste : l'opérateur voit immédiatement le compte qu'il vient de créer.
+    this.accounts = [account, ...this.accounts];
+    return of(account).pipe(delay(180));
   }
 
   /** Effectifs de référence, toujours calculés sur les collections complètes. */
