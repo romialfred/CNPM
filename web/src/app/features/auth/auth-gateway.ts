@@ -22,7 +22,7 @@ export type CredentialsResult =
    * En production, ce forçage est porté par Keycloak (ADR-003) ; ici l'issue pilote le
    * parcours applicatif/démo.
    */
-  | { readonly outcome: 'enrollment-required' }
+  | { readonly outcome: 'enrollment-required'; readonly challengeId: string }
   | { readonly outcome: 'invalid' }
   /** Identité connue mais accès refusé (compte suspendu, espace non autorisé). */
   | { readonly outcome: 'forbidden' };

@@ -16,7 +16,7 @@ import { apiProblemInterceptor } from './core/api/api-problem.interceptor';
 import { bearerAuthInterceptor } from './core/api/bearer.interceptor';
 import { correlationIdInterceptor } from './core/api/correlation-id.interceptor';
 import { CNPM_OIDC_CONFIG, readOidcConfig } from './core/auth/oidc.config';
-import { OidcSessionService } from './core/auth/oidc-session.service';
+import { NativeSessionStore } from './core/auth/native-session.store';
 import { provideCnpmIcons } from './design-system/icon/icon';
 
 // `.claude/rules/ux-ui.md` impose le formatage `fr-ML`. Sans enregistrement explicite,
@@ -47,13 +47,14 @@ export const appConfig: ApplicationConfig = {
           globalThis.location?.origin ?? '',
         ),
     },
-    // Le jeton d'accès vient désormais de la session OIDC. En démo, aucune session n'est
-    // ouverte : le fournisseur renvoie `null` et l'intercepteur n'ajoute rien.
+    // Le jeton d'accès vient de la session NATIVE (AUTH-DEC-020), alimentée après un second
+    // facteur validé. En démo, aucune session n'est ouverte : le fournisseur renvoie `null`
+    // et l'intercepteur Bearer n'ajoute rien.
     {
       provide: CNPM_ACCESS_TOKEN,
       useFactory: () => {
-        const session = inject(OidcSessionService);
-        return () => session.currentAccessToken();
+        const session = inject(NativeSessionStore);
+        return () => session.current();
       },
     },
     provideCnpmIcons(),

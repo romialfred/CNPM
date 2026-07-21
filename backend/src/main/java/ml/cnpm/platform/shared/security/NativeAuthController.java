@@ -1,6 +1,5 @@
 package ml.cnpm.platform.shared.security;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -61,9 +60,12 @@ public class NativeAuthController {
 
         AuthAccount account = found.get();
         if (!rolePolicy.requiresMfa(account.roles())) {
-            // Cas résiduel (aucun rôle) : accès direct, sans second facteur.
-            String token = tokens.issue(account.id(), account.email(), List.copyOf(account.roles()));
-            return ResponseEntity.ok(Map.of("status", "AUTHENTICATED", "accessToken", token));
+            // Aucun rôle attribué : pas de second facteur possible, donc pas d'accès. On ne
+            // délivre jamais de session sans 2FA — la connexion passe toujours par l'enrôlement
+            // ou la vérification.
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "errorCode", "NO_ROLE_ASSIGNED",
+                    "errorMessage", "Aucun rôle n'est attribué à ce compte."));
         }
 
         boolean enrolled = account.mfaEnabled() && account.mfaSecretEncrypted() != null

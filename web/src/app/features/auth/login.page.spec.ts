@@ -19,6 +19,9 @@ class StubGateway implements AuthGateway {
     if (this.outcome === 'mfa-required') {
       return of({ outcome: 'mfa-required', challengeId: 'challenge-1' } as const);
     }
+    if (this.outcome === 'enrollment-required') {
+      return of({ outcome: 'enrollment-required', challengeId: 'enroll-challenge-1' } as const);
+    }
     return of({ outcome: this.outcome } as const);
   }
 
@@ -184,7 +187,7 @@ describe('LoginPage (AUTH-001)', () => {
     // L'espace choisi (admin par défaut) est porté par le flow pour la redirection finale.
     const challenge = TestBed.inject(AuthFlowStore).activeChallenge();
     expect(challenge?.space).toBe('admin');
-    expect(challenge?.id).toBe('enrollment-pending');
+    expect(challenge?.id).toBe('enroll-challenge-1');
   });
 
   it('n’appelle pas la passerelle si le formulaire est invalide', async () => {

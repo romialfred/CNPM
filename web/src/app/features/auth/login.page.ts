@@ -133,10 +133,10 @@ export class LoginPage {
           return;
         }
         if (result.outcome === 'enrollment-required') {
-          // Première connexion : on conduit à l'enrôlement forcé (popup non fermable).
-          // Le flow porte l'espace, seule information dont la page d'enrôlement a besoin
-          // pour rediriger après activation. Aucun accès au tableau de bord d'ici là.
-          this.flow.startChallenge('enrollment-pending', space);
+          // Première connexion : on conduit à l'enrôlement forcé (popup non fermable). Le
+          // flow porte le challenge (jeton d'enrôlement de la source) et l'espace, dont la
+          // page d'enrôlement a besoin. Aucun accès au tableau de bord d'ici là.
+          this.flow.startChallenge(result.challengeId, space);
           void this.router.navigate(['/auth/2fa-enrollment']);
           return;
         }

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { NativeSessionStore } from '../../core/auth/native-session.store';
 import { AuthFlowStore } from './auth-flow.store';
 
 /**
@@ -27,8 +28,11 @@ import { AuthFlowStore } from './auth-flow.store';
 export class LogoutPage {
   private readonly router = inject(Router);
   private readonly flow = inject(AuthFlowStore);
+  private readonly session = inject(NativeSessionStore);
 
   constructor() {
+    // Purge le jeton applicatif en mémoire et l'état d'authentification transitoire.
+    this.session.clear();
     this.flow.clear();
     void this.router.navigate(['/auth/login'], { replaceUrl: true });
   }

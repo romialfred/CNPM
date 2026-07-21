@@ -37,7 +37,7 @@ import {
 import { authRoutes } from '../../features/auth/auth.routes';
 import { AUTH_GATEWAY } from '../../features/auth/auth-gateway';
 import { DemoAuthGateway } from '../../features/auth/demo-auth.gateway';
-import { UnavailableAuthGateway } from '../../features/auth/unavailable-auth.gateway';
+import { HttpAuthGateway } from '../../features/auth/http-auth.gateway';
 import { DemoMemberHomeGateway } from '../../features/member/home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from '../../features/member/home/member-home-gateway';
 import { memberRoutes } from '../../features/member/member.routes';
@@ -91,7 +91,7 @@ describe('composition des sources applicatives', () => {
   it('ne laisse aucune feature non raccordée retomber sur une fixture en profil http', () => {
     configure('http');
     expect(TestBed.inject(SESSION_GATEWAY)).toBeInstanceOf(HttpSessionGateway);
-    expect(TestBed.inject(AUTH_GATEWAY)).toBeInstanceOf(UnavailableAuthGateway);
+    expect(TestBed.inject(AUTH_GATEWAY)).toBeInstanceOf(HttpAuthGateway);
     expect(TestBed.inject(MEMBERS_GATEWAY)).toBeInstanceOf(HttpMembersGateway);
     expect(TestBed.inject(GROUPS_GATEWAY)).toBeInstanceOf(HttpGroupsGateway);
     expect(TestBed.inject(AUDIT_GATEWAY)).toBeInstanceOf(HttpAuditGateway);

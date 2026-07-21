@@ -3,7 +3,7 @@ import type { Routes } from '@angular/router';
 import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { AUTH_GATEWAY } from './auth-gateway';
 import { DemoAuthGateway } from './demo-auth.gateway';
-import { UnavailableAuthGateway } from './unavailable-auth.gateway';
+import { HttpAuthGateway } from './http-auth.gateway';
 import type { BlockedAuthContent } from './blocked-auth.page';
 
 const BLOCKED_AUTH_SCREENS = {
@@ -55,13 +55,15 @@ export const authRoutes: Routes = [
     path: '',
     providers: [
       DemoAuthGateway,
-      UnavailableAuthGateway,
+      HttpAuthGateway,
       {
+        // En mode démo, l'adaptateur déterministe ; en mode http, l'authentification
+        // NATIVE réelle (AUTH-DEC-020) qui parle au backend — Keycloak est abandonné.
         provide: AUTH_GATEWAY,
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoAuthGateway)
-            : inject(UnavailableAuthGateway),
+            : inject(HttpAuthGateway),
       },
     ],
     children: [

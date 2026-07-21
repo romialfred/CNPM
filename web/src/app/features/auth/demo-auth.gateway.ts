@@ -60,7 +60,7 @@ export class DemoAuthGateway implements AuthGateway {
       result = { outcome: 'forbidden' };
     } else if (email === DemoAuthGateway.DEMO_ENROLL_EMAIL && passwordMatches) {
       // Première connexion : identifiants bons, mais aucun second facteur encore actif.
-      result = { outcome: 'enrollment-required' };
+      result = { outcome: 'enrollment-required', challengeId: DemoAuthGateway.CHALLENGE_ID };
     } else if (email === DemoAuthGateway.DEMO_EMAIL && passwordMatches) {
       result = { outcome: 'mfa-required', challengeId: DemoAuthGateway.CHALLENGE_ID };
     } else {

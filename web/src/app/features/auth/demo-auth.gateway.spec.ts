@@ -39,7 +39,7 @@ describe('DemoAuthGateway', () => {
   it('exige l’enrôlement à la première connexion (2FA jamais activé)', async () => {
     // Identifiants valides mais aucun second facteur : on ne délivre PAS de défi 2FA,
     // on conduit à l'enrôlement forcé.
-    await expect(credentials(ENROLL_EMAIL, PASSWORD)).resolves.toEqual({
+    await expect(credentials(ENROLL_EMAIL, PASSWORD)).resolves.toMatchObject({
       outcome: 'enrollment-required',
     });
     // Un mot de passe erroné reste indifférencié, pour ne pas trahir l'existence du compte.
