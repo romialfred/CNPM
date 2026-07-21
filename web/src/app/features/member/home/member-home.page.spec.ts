@@ -68,6 +68,13 @@ describe('MemberHomePage', () => {
     expect(normalizedText).toContain('1 350 000');
     expect(normalizedText).toContain('dont 450 000 FCFA échus');
     expect(text).toContain('30/09/2026');
+
+    // Indicateurs de la mission : total cotisé (somme des exercices soldés) et dernière
+    // cotisation, fournis par la source, jamais recalculés côté vue.
+    expect(text).toContain('Total cotisé');
+    expect(normalizedText).toContain('6 000 000');
+    expect(text).toContain('Dernière cotisation');
+    expect(text).toContain('27/06/2026');
   });
 
   it('n’expose aucun KPI global CNPM ni lien vers une route membre absente', async () => {

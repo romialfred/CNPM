@@ -48,10 +48,17 @@ export interface ExerciseSummary {
 export interface ContributionSituation {
   /** Reste dû tous exercices confondus : ce que le membre doit réellement aujourd'hui. */
   readonly outstandingTotal: number;
+  /**
+   * Total cotisé tous exercices confondus (somme des `settled`). Porté par la source pour
+   * rester cohérent avec les lignes par exercice — l'écran ne le recalcule pas.
+   */
+  readonly settledTotal: number;
   /** Part du reste dû dont l'échéance est dépassée ; `0` si le membre est dans les temps. */
   readonly overdueAmount: number;
   /** Prochaine échéance à honorer ; `null` quand plus rien n'est attendu. */
   readonly nextDueDate: string | null;
+  /** Dernière cotisation réglée (montant + date ISO) ; `null` si aucune. Fournie par la source. */
+  readonly lastContribution: { readonly amount: number; readonly paidOn: string } | null;
   /** Du plus récent au plus ancien : l'exercice courant est la vue par défaut. */
   readonly exercises: readonly ExerciseSummary[];
 }

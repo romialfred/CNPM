@@ -309,8 +309,12 @@ const SNAPSHOT: MemberHomeSnapshot = {
     // 450 000 (T2, échu). Le total est porté par la source pour rester cohérent avec
     // les lignes affichées.
     outstandingTotal: 1_350_000,
+    // Somme des `settled` par exercice : 1 350 000 + 3 200 000 + 1 450 000.
+    settledTotal: 6_000_000,
     overdueAmount: 450_000,
     nextDueDate: '2026-09-30',
+    // Reçu le plus récent (cf. RECEIPTS) : acompte T2 2026 réglé le 27/06/2026.
+    lastContribution: { amount: 450_000, paidOn: '2026-06-27' },
     exercises: [
       { year: 2026, called: 2_700_000, settled: 1_350_000, outstanding: 1_350_000 },
       { year: 2025, called: 3_200_000, settled: 3_200_000, outstanding: 0 },

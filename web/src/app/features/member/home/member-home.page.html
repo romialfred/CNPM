@@ -84,6 +84,21 @@
                     {{ due.overdueAmount | number: '1.0-0' }} FCFA échus
                   </p>
                 }
+                <dl class="member-home__due-stats">
+                  <div>
+                    <dt>Total cotisé</dt>
+                    <dd>{{ due.settledTotal | number: '1.0-0' }} FCFA</dd>
+                  </div>
+                  @if (due.lastContribution; as last) {
+                    <div>
+                      <dt>Dernière cotisation</dt>
+                      <dd>
+                        {{ last.amount | number: '1.0-0' }} FCFA
+                        <span>le {{ last.paidOn | date: 'dd/MM/yyyy' }}</span>
+                      </dd>
+                    </div>
+                  }
+                </dl>
                 <button
                   class="member-home__button member-home__button--primary member-home__payment"
                   type="button"
