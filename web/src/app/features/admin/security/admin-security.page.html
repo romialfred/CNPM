@@ -7,20 +7,16 @@
       <!-- « Nouveau compte » est livré : il ouvre le dialogue de création. Aucun mot de
            passe n'y est saisi — l'accès passe par le fournisseur d'identité, le compte
            naît « invité », second facteur à enrôler.
-           La réinitialisation du second facteur reste un flux distinct soumis à
-           réauthentification, non encore livré : la commande annonce son indisponibilité
-           plutôt que d'ouvrir sur un écran absent. -->
+           Les opérations sensibles (réinitialisation d'un second facteur, révocation de
+           session) ne sont pas des actions globales : elles s'effectuent compte par compte
+           depuis les tableaux, avec motif obligatoire et trace d'audit. -->
       <cnpm-button variant="primary" (click)="openCreate()">
         <svg lucideUserPlus [size]="iconSize.compact"></svg>
         Nouveau compte
       </cnpm-button>
-      <cnpm-button variant="secondary" [disabled]="true" [describedBy]="sensitiveHintId">
-        <svg lucideKeyRound [size]="iconSize.compact"></svg>
-        Réinitialiser un second facteur
-      </cnpm-button>
       <p class="cnpm-security__sr" [id]="sensitiveHintId">
-        La réinitialisation du second facteur suit un flux dédié avec réauthentification, motif
-        obligatoire et trace d’audit. Ce flux n’est pas encore disponible.
+        Les opérations sensibles s’effectuent compte par compte depuis les tableaux ci-dessous :
+        la réinitialisation d’un second facteur exige un motif et produit une trace d’audit.
       </p>
     </cnpm-page-header>
 
@@ -285,9 +281,9 @@
           <!-- ================ Rôles et permissions ================ -->
           @case ('roles') {
             <cnpm-alert tone="info" title="Matrice en lecture seule" [live]="false">
-              Les droits sont chargés depuis le backend et ne se modifient pas ici : un changement
-              de rôle passe par un flux dédié, qui montre les permissions ajoutées et retirées avant
-              confirmation. Le rôle technique ne reçoit aucun droit financier.
+              Les droits sont chargés depuis le backend et se lisent ici sans être modifiables :
+              l’édition des permissions n’est pas encore disponible dans cette version. Le rôle
+              technique ne reçoit aucun droit financier.
             </cnpm-alert>
 
             <cnpm-data-table
@@ -765,11 +761,39 @@
   >
     <p class="cnpm-security__confirm-text">{{ actionMessage() }}</p>
 
+    @if (pendingAction()?.kind === 'reset2fa') {
+      <!-- Motif OBLIGATOIRE : consigné dans la trace d'audit (BO-030). Le bouton de
+           confirmation reste bloqué tant qu'il n'est pas renseigné. -->
+      <div class="cnpm-security__reason">
+        <label for="reset-2fa-reason">Motif de la réinitialisation (obligatoire)</label>
+        <textarea
+          #reasonField
+          id="reset-2fa-reason"
+          rows="3"
+          maxlength="240"
+          [value]="resetReason()"
+          (input)="updateResetReason(reasonField.value)"
+          aria-required="true"
+          [attr.aria-invalid]="resetReasonValid() ? null : 'true'"
+          aria-describedby="reset-2fa-reason-hint"
+          placeholder="Ex. demande du membre après perte de son téléphone"
+        ></textarea>
+        <p id="reset-2fa-reason-hint" class="cnpm-security__reason-hint">
+          Le motif est consigné dans le journal d’audit, corrélé à cette action.
+        </p>
+      </div>
+    }
+
     <ng-container cnpm-dialog-footer>
       <cnpm-button variant="secondary" (click)="cancelAction()" [disabled]="actioning()">
         Annuler
       </cnpm-button>
-      <cnpm-button variant="primary" (click)="confirmAction()" [loading]="actioning()">
+      <cnpm-button
+        variant="primary"
+        (click)="confirmAction()"
+        [loading]="actioning()"
+        [disabled]="pendingAction()?.kind === 'reset2fa' && !resetReasonValid()"
+      >
         {{ actionConfirmLabel() }}
       </cnpm-button>
     </ng-container>

@@ -15,7 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LucideCheck, LucideKeyRound, LucideMinus, LucideUserPlus } from '@lucide/angular';
+import { LucideCheck, LucideMinus, LucideUserPlus } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { DialogComponent } from '../../../design-system/dialog/dialog.component';
@@ -193,7 +193,6 @@ const AUDIT_COLUMNS: readonly DataTableColumn[] = [
     TabsComponent,
     TextInputComponent,
     LucideCheck,
-    LucideKeyRound,
     LucideMinus,
     LucideUserPlus,
   ],
@@ -589,6 +588,14 @@ export class AdminSecurityPage {
   protected readonly pendingAction = signal<AccountAction | null>(null);
   protected readonly actioning = signal(false);
 
+  /**
+   * Motif de la réinitialisation du second facteur. OBLIGATOIRE (BO-030) : il est saisi
+   * dans la confirmation, transmis au port et consigné dans la trace d'audit. On exige
+   * un minimum de substance — quelques caractères — pour qu'un simple espace ne passe pas.
+   */
+  protected readonly resetReason = signal('');
+  protected readonly resetReasonValid = computed(() => this.resetReason().trim().length >= 5);
+
   protected askSuspend(account: SecurityAccount): void {
     this.pendingAction.set({ kind: 'suspend', account });
   }
@@ -598,12 +605,18 @@ export class AdminSecurityPage {
   }
 
   protected askResetTwoFactor(account: SecurityAccount): void {
+    this.resetReason.set('');
     this.pendingAction.set({ kind: 'reset2fa', account });
+  }
+
+  protected updateResetReason(value: string): void {
+    this.resetReason.set(value);
   }
 
   protected cancelAction(): void {
     if (!this.actioning()) {
       this.pendingAction.set(null);
+      this.resetReason.set('');
     }
   }
 
@@ -656,9 +669,13 @@ export class AdminSecurityPage {
     if (!action || this.actioning()) {
       return;
     }
+    // Le reset 2FA ne part jamais sans motif : garde-fou en plus du bouton désactivé.
+    if (action.kind === 'reset2fa' && !this.resetReasonValid()) {
+      return;
+    }
     const request$ =
       action.kind === 'reset2fa'
-        ? this.gateway.resetTwoFactor(action.account.id)
+        ? this.gateway.resetTwoFactor(action.account.id, this.resetReason().trim())
         : this.gateway.changeAccountStatus(
             action.account.id,
             action.kind === 'suspend' ? 'SUSPENDED' : 'ACTIVE',
@@ -668,6 +685,7 @@ export class AdminSecurityPage {
       next: (account) => {
         this.actioning.set(false);
         this.pendingAction.set(null);
+        this.resetReason.set('');
         this.toast.success(this.successMessage(action.kind, account.fullName));
         this.retryTick.update((tick) => tick + 1);
       },

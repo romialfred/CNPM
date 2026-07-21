@@ -315,6 +315,13 @@ const SESSIONS: readonly SecuritySession[] = [
 ];
 
 /** Journal fictif, du plus récent au plus ancien. Immuable : aucune écriture ici. */
+/**
+ * Horodatage fixe des traces de réinitialisation produites en session. La démo reste
+ * déterministe (aucun `Date.now`) ; l'étiquette lisible « À l'instant » indique la
+ * fraîcheur sans introduire de valeur non reproductible dans les tests.
+ */
+const RESET_AUDIT_TIMESTAMP = '2026-07-21T00:00:00+00:00';
+
 const AUDIT: readonly AuditEntry[] = [
   {
     id: 'aud-01',
@@ -452,7 +459,11 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
   private readonly roles = buildRoles();
   private readonly permissions = buildPermissions();
   private readonly sessions = SESSIONS;
-  private readonly audit = AUDIT;
+  /**
+   * Mutable — une réinitialisation de second facteur y consigne sa trace, motif compris,
+   * de sorte qu'un rechargement du journal la fasse apparaître (BO-030 : motif + audit).
+   */
+  private audit: AuditEntry[] = [...AUDIT];
   /**
    * Mutable — les comptes créés en session s'y ajoutent, de sorte qu'un rechargement les
    * fasse apparaître. La démo simule ainsi la persistance de la source réelle sans
@@ -460,6 +471,7 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
    */
   private accounts: SecurityAccount[] = [...buildAccounts()];
   private createdCount = 0;
+  private resetCount = 0;
 
   load(query: AdminSecurityQuery): Observable<AdminSecuritySnapshot> {
     const term = fold(query.search.trim());
@@ -516,9 +528,24 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
     return this.mutate(accountId, (account) => ({ ...account, status }));
   }
 
-  resetTwoFactor(accountId: string): Observable<SecurityAccount> {
+  resetTwoFactor(accountId: string, reason: string): Observable<SecurityAccount> {
     // On relance l'enrôlement (PENDING), on ne désactive pas la protection.
-    return this.mutate(accountId, (account) => ({ ...account, twoFactor: 'PENDING' }));
+    return this.mutate(accountId, (account) => {
+      // BO-030 : la réinitialisation produit un événement d'audit corrélé PORTANT le motif.
+      this.resetCount += 1;
+      const entry: AuditEntry = {
+        id: `aud-reset-${this.resetCount}`,
+        occurredAt: RESET_AUDIT_TIMESTAMP,
+        occurredAtLabel: 'À l’instant',
+        actor: 'Administrateur sécurité',
+        action: `Réinitialisation du second facteur — motif : ${reason.trim()}`,
+        target: account.fullName,
+        outcome: 'SUCCESS',
+        correlationId: `CNPM-AUD-2FA-${String(this.resetCount).padStart(4, '0')}`,
+      };
+      this.audit = [entry, ...this.audit];
+      return { ...account, twoFactor: 'PENDING' };
+    });
   }
 
   /** Applique une transformation à un compte et le renvoie ; erreur si l'identifiant est inconnu. */

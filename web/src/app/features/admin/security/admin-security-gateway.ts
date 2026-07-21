@@ -195,8 +195,11 @@ export interface AdminSecurityGateway {
    * Réinitialise le second facteur : le compte repasse « en attente » et devra réenrôler
    * à la prochaine connexion. Aucune 2FA n'est désactivée ici — on relance l'enrôlement,
    * on ne baisse pas la garde.
+   *
+   * `reason` est OBLIGATOIRE (critère BO-030 « le reset 2FA nécessite motif et audit ») :
+   * le motif est transmis à la source pour être consigné dans l'événement d'audit corrélé.
    */
-  resetTwoFactor(accountId: string): Observable<SecurityAccount>;
+  resetTwoFactor(accountId: string, reason: string): Observable<SecurityAccount>;
 }
 
 export const ADMIN_SECURITY_GATEWAY = new InjectionToken<AdminSecurityGateway>(

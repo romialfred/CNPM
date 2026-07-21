@@ -84,14 +84,25 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     const enrole = initial.accounts.find((account) => account.twoFactor === 'ENABLED');
     if (!enrole) throw new Error('compte à 2FA active attendu');
 
-    const reinit = await firstValueFrom(gateway.resetTwoFactor(enrole.id));
+    const reinit = await firstValueFrom(
+      gateway.resetTwoFactor(enrole.id, 'Perte du téléphone du membre'),
+    );
     // On relance l'enrôlement (PENDING), on ne DÉSACTIVE jamais la protection.
     expect(reinit.twoFactor).toBe('PENDING');
     expect(reinit.twoFactor).not.toBe('DISABLED');
+
+    // BO-030 : la réinitialisation produit une trace d'audit PORTANT le motif.
+    const apres = await firstValueFrom(gateway.load({ tab: 'audit', search: '' }));
+    const trace = apres.audit.find((entry) => entry.action.includes('Réinitialisation du second'));
+    expect(trace).toBeDefined();
+    expect(trace?.action).toContain('Perte du téléphone du membre');
+    expect(trace?.correlationId.startsWith('CNPM-AUD-')).toBe(true);
   });
 
   it('rejette une action sur un compte inconnu', async () => {
     const gateway = new DemoAdminSecurityGateway();
-    await expect(firstValueFrom(gateway.resetTwoFactor('compte-inexistant'))).rejects.toThrow();
+    await expect(
+      firstValueFrom(gateway.resetTwoFactor('compte-inexistant', 'motif quelconque')),
+    ).rejects.toThrow();
   });
 });

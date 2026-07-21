@@ -483,3 +483,42 @@
   font-size: var(--cnpm-font-size-sm);
   line-height: var(--cnpm-font-lineHeight-sm);
 }
+
+.cnpm-security__reason {
+  display: grid;
+  gap: var(--cnpm-space-2);
+  margin-block-start: var(--cnpm-space-4);
+}
+
+.cnpm-security__reason label {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-security__reason textarea {
+  width: 100%;
+  min-height: var(--cnpm-size-control-xl);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+  font-size: var(--cnpm-font-size-sm);
+  resize: vertical;
+}
+
+.cnpm-security__reason textarea[aria-invalid='true'] {
+  border-color: var(--cnpm-color-border-strong);
+}
+
+.cnpm-security__reason textarea:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-security__reason-hint {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
