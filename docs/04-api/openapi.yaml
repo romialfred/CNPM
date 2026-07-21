@@ -3654,8 +3654,12 @@ components:
       type: object
       description: >-
         Projection du jeton authentifié et des autorités dérivées par le serveur.
-        Les permissions proviennent exclusivement du mapping RBAC serveur ; cette
-        réponse ne déclare ni périmètre ABAC, ni niveau MFA.
+        Les permissions proviennent exclusivement du mapping RBAC serveur. L'état du
+        second facteur (`mfaEnrolled`, `mfaRequired`) reflète le fournisseur d'identité
+        (Keycloak, ADR-003) ; il n'exprime aucune politique CNPM inventée. Les méthodes
+        2FA autorisées, les codes de secours et la récupération restent portés par
+        UX-DEC-011 et ne figurent volontairement pas ici tant que la décision est ouverte.
+        Le périmètre ABAC n'est pas encore déclaré (ADR-008).
       required:
       - subject
       - username
@@ -3690,6 +3694,22 @@ components:
             PERM_, triées par code.
           items:
             type: string
+        mfaEnrolled:
+          type: boolean
+          nullable: true
+          description: >-
+            Vrai si un second facteur est enrôlé pour ce compte selon le fournisseur
+            d'identité. `null` lorsque le jeton ne porte pas l'information : le serveur
+            ne l'invente pas. Sert à décider, côté client, si l'enrôlement doit être
+            proposé — jamais à contourner le contrôle du fournisseur d'identité.
+        mfaRequired:
+          type: boolean
+          nullable: true
+          description: >-
+            Vrai si le fournisseur d'identité impose l'enrôlement d'un second facteur
+            avant d'accorder l'accès complet (required action Keycloak). C'est un fait
+            porté par Keycloak, pas une politique CNPM définie ici. `null` si absent
+            du jeton.
       additionalProperties: false
     Uuid:
       type: string

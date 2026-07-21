@@ -66,5 +66,60 @@ class CurrentUserControllerTest {
         assertNull(response.email());
         assertEquals(List.of(), response.roles());
         assertEquals(List.of(), response.permissions());
+        // Sans revendication 2FA, le serveur ne conclut rien : null, jamais false.
+        assertNull(response.mfaEnrolled());
+        assertNull(response.mfaRequired());
+    }
+
+    @Test
+    void reflectsExplicitMfaClaimsFromTheIdentityProvider() {
+        Jwt jwt =
+                Jwt.withTokenValue("token")
+                        .header("alg", "none")
+                        .subject("user-enrolled")
+                        .claim("mfa_enrolled", Boolean.TRUE)
+                        .claim("mfa_required", Boolean.FALSE)
+                        .build();
+
+        CurrentUserResponse response =
+                controller.currentUser(new JwtAuthenticationToken(jwt, List.of()));
+
+        assertEquals(Boolean.TRUE, response.mfaEnrolled());
+        assertEquals(Boolean.FALSE, response.mfaRequired());
+    }
+
+    @Test
+    void derivesEnrolmentFromAmrWhenNoExplicitClaimIsPresent() {
+        // La session courante a présenté un OTP : le second facteur est donc enrôlé,
+        // même sans mappeur `mfa_enrolled` dédié.
+        Jwt jwt =
+                Jwt.withTokenValue("token")
+                        .header("alg", "none")
+                        .subject("user-with-otp-session")
+                        .claim("amr", List.of("pwd", "otp"))
+                        .build();
+
+        CurrentUserResponse response =
+                controller.currentUser(new JwtAuthenticationToken(jwt, List.of()));
+
+        assertEquals(Boolean.TRUE, response.mfaEnrolled());
+        // `amr` ne dit rien de l'obligation : elle reste indéterminée.
+        assertNull(response.mfaRequired());
+    }
+
+    @Test
+    void doesNotInferEnrolmentFromASingleFactorSession() {
+        Jwt jwt =
+                Jwt.withTokenValue("token")
+                        .header("alg", "none")
+                        .subject("user-password-only")
+                        .claim("amr", List.of("pwd"))
+                        .build();
+
+        CurrentUserResponse response =
+                controller.currentUser(new JwtAuthenticationToken(jwt, List.of()));
+
+        // Une session à un seul facteur ne prouve PAS l'absence d'enrôlement : null.
+        assertNull(response.mfaEnrolled());
     }
 }
