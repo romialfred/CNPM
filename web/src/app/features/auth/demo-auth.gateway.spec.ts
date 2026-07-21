@@ -68,4 +68,31 @@ describe('DemoAuthGateway', () => {
       firstValueFrom(gateway.verifyCode('defi-inexistant', CODE, 'admin')),
     ).resolves.toEqual({ outcome: 'invalid-code' });
   });
+
+  it('ouvre un enrôlement TOTP avec un QR image et une clé, sans exposer de secret brut', async () => {
+    const enrollment = await firstValueFrom(gateway.beginTotpEnrollment());
+
+    expect(enrollment.enrollmentId).toBeTruthy();
+    expect(enrollment.issuer).toBe('CNPM');
+    // Le QR est une image data URI prête à peindre, jamais un secret exploitable en clair.
+    expect(enrollment.qrImage.startsWith('data:image/svg+xml')).toBe(true);
+    expect(enrollment.manualKey.length).toBeGreaterThan(0);
+  });
+
+  it('active le second facteur avec le premier code, et conduit vers l’espace choisi', async () => {
+    const enrollment = await firstValueFrom(gateway.beginTotpEnrollment());
+    await expect(
+      firstValueFrom(gateway.activateTotp(enrollment.enrollmentId, CODE, 'member')),
+    ).resolves.toEqual({ outcome: 'activated', redirectTo: '/member' });
+    await expect(
+      firstValueFrom(gateway.activateTotp(enrollment.enrollmentId, CODE, 'admin')),
+    ).resolves.toEqual({ outcome: 'activated', redirectTo: '/admin' });
+  });
+
+  it('refuse un code d’activation erroné, sans activer', async () => {
+    const enrollment = await firstValueFrom(gateway.beginTotpEnrollment());
+    await expect(
+      firstValueFrom(gateway.activateTotp(enrollment.enrollmentId, '000000', 'admin')),
+    ).resolves.toEqual({ outcome: 'invalid-code' });
+  });
 });

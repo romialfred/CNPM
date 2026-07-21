@@ -41,14 +41,6 @@ const BLOCKED_AUTH_SCREENS = {
       "L'activation en libre-service reste fermée jusqu'au raccordement du fournisseur d'identité et des invitations CNPM.",
     decision: "Canal d'invitation, preuve d'identité et durée du lien à valider.",
   },
-  enrollment: {
-    screenId: 'AUTH-007',
-    eyebrow: 'Sécurité du compte',
-    title: 'Enrôlement 2FA',
-    description:
-      "L'enrôlement TOTP ou passkey sera ouvert après validation de la politique applicable à chaque rôle sensible.",
-    decision: 'Priorité WebAuthn/passkey, TOTP, secours et récupération à confirmer.',
-  },
 } as const satisfies Record<string, BlockedAuthContent>;
 
 /**
@@ -108,10 +100,13 @@ export const authRoutes: Routes = [
         data: { blockedAuth: BLOCKED_AUTH_SCREENS.activate },
       },
       {
+        // AUTH-007 : enrôlement du second facteur à la première connexion. En mode démo,
+        // le port fournit un défi jouable ; en mode HTTP, il reste indisponible tant que
+        // le client OIDC/PKCE Keycloak n'est pas livré, et la popup l'annonce proprement.
         path: '2fa-enrollment',
-        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        loadComponent: () =>
+          import('./two-factor-enrollment.page').then((m) => m.TwoFactorEnrollmentPage),
         title: 'Enrôlement 2FA — CNPM',
-        data: { blockedAuth: BLOCKED_AUTH_SCREENS.enrollment },
       },
       {
         // AUTH-008 : atteint après expiration de session. Aucun garde de gateway —

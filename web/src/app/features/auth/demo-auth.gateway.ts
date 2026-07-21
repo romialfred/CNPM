@@ -5,8 +5,46 @@ import type {
   AuthSpace,
   CredentialsRequest,
   CredentialsResult,
+  TotpActivationResult,
+  TotpEnrollment,
   VerificationResult,
 } from './auth-gateway';
+
+/**
+ * QR de DÉMONSTRATION, en SVG.
+ *
+ * Ce n'est pas un vrai QR encodant un secret : en production, l'image provient de
+ * Keycloak. Le motif est purement décoratif et déterministe (aucune génération de QR
+ * côté client), et l'écran l'annonce explicitement comme un aperçu de démonstration.
+ * On évite `btoa` (unicode fragile) : le SVG est encodé par `encodeURIComponent`.
+ */
+function demoQrImage(): string {
+  const modules = 21;
+  const rects: string[] = [];
+  const finder = (ox: number, oy: number): void => {
+    rects.push(`<rect x="${ox}" y="${oy}" width="7" height="7" fill="#0B123B"/>`);
+    rects.push(`<rect x="${ox + 1}" y="${oy + 1}" width="5" height="5" fill="#fff"/>`);
+    rects.push(`<rect x="${ox + 2}" y="${oy + 2}" width="3" height="3" fill="#0B123B"/>`);
+  };
+  const inFinder = (x: number, y: number): boolean =>
+    (x < 8 && y < 8) || (x > 12 && y < 8) || (x < 8 && y > 12);
+  finder(0, 0);
+  finder(14, 0);
+  finder(0, 14);
+  for (let y = 0; y < modules; y += 1) {
+    for (let x = 0; x < modules; x += 1) {
+      if (!inFinder(x, y) && (x * 7 + y * 13 + 3) % 5 === 0) {
+        rects.push(`<rect x="${x}" y="${y}" width="1" height="1" fill="#0B123B"/>`);
+      }
+    }
+  }
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${modules} ${modules}" ` +
+    `shape-rendering="crispEdges"><rect width="${modules}" height="${modules}" fill="#fff"/>` +
+    rects.join('') +
+    '</svg>';
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
 
 /**
  * Adaptateur de démonstration déterministe pour l'écran pilote AUTH-001.
@@ -55,5 +93,31 @@ export class DemoAuthGateway implements AuthGateway {
 
   resendCode(): Observable<void> {
     return of(undefined).pipe(delay(DemoAuthGateway.LATENCY_MS));
+  }
+
+  beginTotpEnrollment(): Observable<TotpEnrollment> {
+    // Clé de démonstration, manifestement fictive. En production, secret et QR viennent
+    // de Keycloak ; ici, ils ne protègent rien et ne sont jamais persistés.
+    const enrollment: TotpEnrollment = {
+      enrollmentId: 'demo-enrollment',
+      qrImage: demoQrImage(),
+      manualKey: 'JBSW Y3DP EHPK 3PXP DEMO',
+      issuer: 'CNPM',
+      account: DemoAuthGateway.DEMO_EMAIL,
+    };
+    return of(enrollment).pipe(delay(DemoAuthGateway.LATENCY_MS));
+  }
+
+  activateTotp(
+    enrollmentId: string,
+    code: string,
+    space: AuthSpace,
+  ): Observable<TotpActivationResult> {
+    // Même code fictif que la vérification : un seul secret de démonstration à retenir.
+    const valid = enrollmentId === 'demo-enrollment' && code === DemoAuthGateway.DEMO_CODE;
+    const result: TotpActivationResult = valid
+      ? { outcome: 'activated', redirectTo: space === 'admin' ? '/admin' : '/member' }
+      : { outcome: 'invalid-code' };
+    return of(result).pipe(delay(DemoAuthGateway.LATENCY_MS));
   }
 }

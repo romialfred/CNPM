@@ -4,6 +4,8 @@ import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type {
   AuthGateway,
   CredentialsResult,
+  TotpActivationResult,
+  TotpEnrollment,
   VerificationResult,
 } from './auth-gateway';
 
@@ -20,5 +22,13 @@ export class UnavailableAuthGateway implements AuthGateway {
 
   resendCode(): Observable<void> {
     return unavailableFeature$('AUTH-001');
+  }
+
+  beginTotpEnrollment(): Observable<TotpEnrollment> {
+    return unavailableFeature$('AUTH-007');
+  }
+
+  activateTotp(): Observable<TotpActivationResult> {
+    return unavailableFeature$('AUTH-007');
   }
 }

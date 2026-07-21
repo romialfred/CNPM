@@ -1,0 +1,114 @@
+<!-- Popup forcée : non fermable au clic ni à Échap. La seule issue est la déconnexion,
+     offerte discrètement en pied. -->
+<cnpm-dialog
+  [open]="true"
+  [dismissible]="false"
+  eyebrow="Sécurité du compte"
+  title="Activation de votre authentification sécurisée"
+  describedBy="cnpm-2fa-intro"
+>
+  <div class="cnpm-2fa">
+    <div class="cnpm-2fa__brand">
+      <img
+        class="cnpm-2fa__logo"
+        src="/assets/brand/logo-CNPM.png"
+        alt="Conseil National du Patronat du Mali"
+        width="96"
+        height="96"
+      />
+    </div>
+
+    <p class="cnpm-2fa__intro" id="cnpm-2fa-intro">
+      Pour protéger votre compte, activez une authentification à deux facteurs. Elle demande,
+      à chaque connexion, un code temporaire généré par une application sur votre téléphone.
+    </p>
+
+    @switch (state().kind) {
+      @case ('loading') {
+        <p class="cnpm-2fa__status" role="status">Préparation de votre enrôlement…</p>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Enrôlement momentanément indisponible">
+          <p>Le service d’authentification n’a pas répondu. Réessayez dans un instant.</p>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        <ol class="cnpm-2fa__steps">
+          <li class="cnpm-2fa__step">
+            <span class="cnpm-2fa__step-index" aria-hidden="true">1</span>
+            <span class="cnpm-2fa__step-body">
+              <span class="cnpm-2fa__step-title">Installez une application d’authentification</span>
+              <span class="cnpm-2fa__step-text">
+                Microsoft Authenticator, ou toute application compatible TOTP, sur votre
+                téléphone.
+              </span>
+            </span>
+          </li>
+          <li class="cnpm-2fa__step">
+            <span class="cnpm-2fa__step-index" aria-hidden="true">2</span>
+            <span class="cnpm-2fa__step-body">
+              <span class="cnpm-2fa__step-title">Scannez le code, ou saisissez la clé</span>
+              <span class="cnpm-2fa__step-text">
+                Ajoutez un compte dans l’application, puis scannez l’image ci-dessous.
+              </span>
+
+              <div class="cnpm-2fa__qr-zone">
+                <figure class="cnpm-2fa__qr">
+                  <img
+                    class="cnpm-2fa__qr-image"
+                    [src]="enrollment()!.qrImage"
+                    alt="Code QR d’enrôlement pour {{ enrollment()!.issuer }} — {{ enrollment()!.account }}"
+                    width="160"
+                    height="160"
+                  />
+                  <figcaption class="cnpm-2fa__qr-note">Aperçu de démonstration</figcaption>
+                </figure>
+
+                <div class="cnpm-2fa__manual">
+                  <p class="cnpm-2fa__manual-label">Ou saisissez cette clé manuellement :</p>
+                  <p class="cnpm-2fa__manual-key">{{ enrollment()!.manualKey }}</p>
+                  <button type="button" class="cnpm-2fa__copy" (click)="copyManualKey()">
+                    {{ copied() ? 'Clé copiée' : 'Copier la clé' }}
+                  </button>
+                </div>
+              </div>
+            </span>
+          </li>
+          <li class="cnpm-2fa__step">
+            <span class="cnpm-2fa__step-index" aria-hidden="true">3</span>
+            <span class="cnpm-2fa__step-body">
+              <span class="cnpm-2fa__step-title">Saisissez le code affiché</span>
+              <span class="cnpm-2fa__step-text">
+                Entrez le code à six chiffres que l’application vient de générer.
+              </span>
+
+              <form class="cnpm-2fa__form" [formGroup]="form" (ngSubmit)="activate()" novalidate>
+                <cnpm-otp-input
+                  #otpField
+                  formControlName="code"
+                  label="Code de vérification à six chiffres"
+                  [length]="6"
+                  [error]="codeError()"
+                />
+              </form>
+            </span>
+          </li>
+        </ol>
+      }
+    }
+  </div>
+
+  <ng-container cnpm-dialog-footer>
+    <button type="button" class="cnpm-2fa__signout" (click)="signOut()">
+      Ce n’est pas vous ? Se déconnecter
+    </button>
+    <cnpm-button
+      variant="primary"
+      (click)="activate()"
+      [loading]="submitting()"
+      [disabled]="state().kind !== 'ready'"
+    >
+      Activer et continuer
+    </cnpm-button>
+  </ng-container>
+</cnpm-dialog>

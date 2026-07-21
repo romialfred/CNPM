@@ -24,6 +24,37 @@ export type VerificationResult =
   | { readonly outcome: 'invalid-code' };
 
 /**
+ * Défi d'enrôlement TOTP présenté à la première connexion.
+ *
+ * Le secret et le QR proviennent du fournisseur d'identité (Keycloak, ADR-003) :
+ * l'application ne les FABRIQUE ni ne les STOCKE, elle ne fait qu'afficher ce que la
+ * source lui remet. `qrImage` est une image prête à peindre (data URI), jamais le secret
+ * brut ; `manualKey` est la même clé sous forme saisissable, pour les lecteurs qui ne
+ * peuvent pas scanner. C'est pourquoi aucune bibliothèque de génération de QR ne vit
+ * côté client : la génération appartient à Keycloak.
+ */
+export interface TotpEnrollment {
+  readonly enrollmentId: string;
+  /** Image du QR, data URI. Fournie par Keycloak ; l'app ne l'encode pas. */
+  readonly qrImage: string;
+  /** Clé à saisir manuellement dans l'application d'authentification. */
+  readonly manualKey: string;
+  /** Émetteur affiché dans l'application d'authentification, par ex. « CNPM ». */
+  readonly issuer: string;
+  /** Compte auquel le facteur est rattaché (adresse ou identifiant). */
+  readonly account: string;
+}
+
+/**
+ * Résultat de l'activation. `invalid-code` n'est pas une erreur technique : c'est un
+ * code qui ne correspond pas, et l'écran le distingue d'une panne pour proposer la
+ * bonne suite (ressaisir vs réessayer plus tard).
+ */
+export type TotpActivationResult =
+  | { readonly outcome: 'activated'; readonly redirectTo: string }
+  | { readonly outcome: 'invalid-code' };
+
+/**
  * Port d'authentification consommé par les pages AUTH-001.
  *
  * L'implémentation réelle (Keycloak OIDC/PKCE ou endpoint dédié) reste à câbler ;
@@ -40,6 +71,19 @@ export interface AuthGateway {
    */
   verifyCode(challengeId: string, code: string, space: AuthSpace): Observable<VerificationResult>;
   resendCode(challengeId: string): Observable<void>;
+
+  /**
+   * Ouvre un enrôlement TOTP. La destination après activation ne dépend pas de cette
+   * étape mais de `activateTotp`, à qui `space` est passé.
+   */
+  beginTotpEnrollment(): Observable<TotpEnrollment>;
+
+  /** Confirme l'activation avec le premier code produit par l'application d'authentification. */
+  activateTotp(
+    enrollmentId: string,
+    code: string,
+    space: AuthSpace,
+  ): Observable<TotpActivationResult>;
 }
 
 export const AUTH_GATEWAY = new InjectionToken<AuthGateway>('AUTH_GATEWAY');

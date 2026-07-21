@@ -1,0 +1,178 @@
+@use '../../../styles/tokens' as tokens;
+
+.cnpm-2fa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-2fa__brand {
+  display: flex;
+  justify-content: center;
+}
+
+.cnpm-2fa__logo {
+  width: auto;
+  height: var(--cnpm-space-12);
+}
+
+.cnpm-2fa__intro {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+}
+
+.cnpm-2fa__status {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-2fa__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.cnpm-2fa__step {
+  display: flex;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+/* Pastille numérotée : l'ordre est déjà porté par le `<ol>`, la pastille le montre. */
+.cnpm-2fa__step-index {
+  display: inline-flex;
+  width: var(--cnpm-space-8);
+  height: var(--cnpm-space-8);
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: var(--cnpm-radius-pill);
+  background-color: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-bold);
+}
+
+.cnpm-2fa__step-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-2fa__step-title {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+.cnpm-2fa__step-text {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+}
+
+/* QR et clé côte à côte au-delà du mobile ; empilés en dessous. */
+.cnpm-2fa__qr-zone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-4);
+  margin-block-start: var(--cnpm-space-3);
+}
+
+.cnpm-2fa__qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cnpm-space-1);
+  margin: 0;
+  padding: var(--cnpm-space-2);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-2fa__qr-image {
+  display: block;
+  width: 10rem;
+  height: 10rem;
+}
+
+.cnpm-2fa__qr-note {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-2fa__manual {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+
+.cnpm-2fa__manual-label {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+/* Chasses fixes : une clé se relit caractère par caractère sans qu'ils dansent. */
+.cnpm-2fa__manual-key {
+  margin: 0;
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-sm);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  word-break: break-all;
+}
+
+.cnpm-2fa__copy {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cnpm-color-text-brand);
+  cursor: pointer;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: underline;
+}
+
+.cnpm-2fa__copy:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-2fa__form {
+  margin-block-start: var(--cnpm-space-3);
+}
+
+/* La déconnexion est discrète mais présente : l'utilisateur ne doit jamais être piégé. */
+.cnpm-2fa__signout {
+  margin-inline-end: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--cnpm-color-text-secondary);
+  cursor: pointer;
+  font-size: var(--cnpm-font-size-sm);
+  text-decoration: underline;
+}
+
+.cnpm-2fa__signout:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}

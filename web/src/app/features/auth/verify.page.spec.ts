@@ -26,6 +26,20 @@ class StubGateway implements AuthGateway {
     this.resendCalls++;
     return of(undefined);
   }
+
+  beginTotpEnrollment() {
+    return of({
+      enrollmentId: 'stub',
+      qrImage: 'data:image/svg+xml,stub',
+      manualKey: 'STUB',
+      issuer: 'CNPM',
+      account: 'stub@cnpm.example',
+    } as const);
+  }
+
+  activateTotp() {
+    return of({ outcome: 'activated', redirectTo: '/' } as const);
+  }
 }
 
 describe('VerifyPage (AUTH-001 — 2FA)', () => {
