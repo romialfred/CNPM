@@ -7,6 +7,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideCnpmApi, readCnpmRuntimeConfig } from './core/api/api.config';
 import { apiProblemInterceptor } from './core/api/api-problem.interceptor';
+import { bearerAuthInterceptor } from './core/api/bearer.interceptor';
 import { correlationIdInterceptor } from './core/api/correlation-id.interceptor';
 import { provideCnpmIcons } from './design-system/icon/icon';
 
@@ -23,7 +24,11 @@ export const appConfig: ApplicationConfig = {
     // S'il manque, `provideCnpmApi` ferme en mode HTTP ; aucun échec réseau ne
     // déclenche un repli vers les fixtures.
     provideCnpmApi(readCnpmRuntimeConfig()),
-    provideHttpClient(withInterceptors([correlationIdInterceptor, apiProblemInterceptor])),
+    // Ordre voulu : corrélation puis jeton (préparation de la requête sortante), enfin
+    // la normalisation d'erreur, qui doit voir la réponse de toutes les requêtes émises.
+    provideHttpClient(
+      withInterceptors([correlationIdInterceptor, bearerAuthInterceptor, apiProblemInterceptor]),
+    ),
     provideCnpmIcons(),
     { provide: LOCALE_ID, useValue: 'fr-ML' },
   ],
