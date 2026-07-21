@@ -56,7 +56,16 @@ describe('MemberPortalShellComponent — barre latérale dédiée au membre', ()
     expect(items).toHaveLength(12);
     expect(items.every((link) => (link.getAttribute('href')?.length ?? 0) > 0)).toBe(true);
     expect(host.querySelectorAll('.member-shell__nav [aria-disabled="true"]')).toHaveLength(0);
-    expect(host.querySelector('.member-shell__notification-count')?.textContent).toContain('3');
+  });
+
+  it('n’invente aucun compteur de notification par défaut, mais rend un compte fourni', () => {
+    // Aucun flux n'est raccordé : afficher un nombre par défaut serait une donnée inventée,
+    // en rouge de marque de surcroît. La pastille ne paraît que sur un compte réel (> 0).
+    expect(host.querySelector('.member-shell__notification-count')).toBeNull();
+
+    fixture.componentRef.setInput('notificationCount', 4);
+    fixture.detectChanges();
+    expect(host.querySelector('.member-shell__notification-count')?.textContent).toContain('4');
   });
 
   it('surface bien l’entrée « Le CNPM » attendue par le membre', () => {
@@ -158,6 +167,29 @@ describe('MemberPortalShellComponent — barre latérale dédiée au membre', ()
     expect(document.activeElement).toBe(trigger);
     expect(document.body.style.overflow).toBe('');
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('au passage en desktop, referme le tiroir et ne perd pas le focus sur le déclencheur masqué', async () => {
+    await openDrawer();
+
+    // Le franchissement de 1024px masque le bouton menu (display:none). On simule le
+    // redimensionnement : le focus doit se replier sur la barre latérale permanente,
+    // jamais retomber sur <body>.
+    const initialWidth = globalThis.innerWidth;
+    try {
+      Object.defineProperty(globalThis, 'innerWidth', { value: 1280, configurable: true });
+      globalThis.dispatchEvent(new Event('resize'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      await Promise.resolve();
+
+      expect(host.querySelector('.member-shell__sidebar')?.hasAttribute('role')).toBe(false);
+      const active = document.activeElement as HTMLElement | null;
+      expect(active).not.toBe(document.body);
+      expect(host.querySelector('.member-shell__sidebar')?.contains(active)).toBe(true);
+    } finally {
+      Object.defineProperty(globalThis, 'innerWidth', { value: initialWidth, configurable: true });
+    }
   });
 
   /** Ouvre le tiroir via le déclencheur et laisse la micro-tâche de focus initial s'exécuter. */

@@ -46,8 +46,12 @@ interface MemberPortalDestination {
   readonly label: string;
   readonly route: string;
   readonly icon: MemberNavIcon;
-  /** Un lien de sous-section reste actif sur ses écrans enfants ; un lien exact ne l'est
-   *  que sur son URL propre (utile quand deux liens partagent un préfixe, ex. la vitrine). */
+  /** `exact: true` n'active le lien que sur son URL propre ; par défaut (non-exact) un lien
+   *  reste actif sur ses écrans enfants. Seul le tableau de bord l'exige ici : `/member/home`
+   *  n'est le préfixe d'aucune autre route. Vitrine et Statistiques, elles, restent
+   *  mutuellement exclusives SANS `exact` — ne partageant que le préfixe `/member/showcase`,
+   *  elles diffèrent sur le dernier segment, que `routerLinkActive` compare segment par
+   *  segment. */
   readonly exact?: boolean;
 }
 
@@ -107,7 +111,13 @@ export class MemberPortalShellComponent implements OnDestroy {
   readonly organization = input('Espace membre');
   readonly userName = input('Membre CNPM');
   readonly memberCode = input('');
-  readonly notificationCount = input(3);
+  /**
+   * Compteur de notifications. Défaut à 0 : aucun flux de notifications n'est encore
+   * raccordé, afficher un nombre serait une donnée inventée — et la pastille dépense du
+   * rouge de marque, réservé aux signaux réellement critiques. La pastille n'apparaît donc
+   * que si un appelant fournit un compte réel (> 0).
+   */
+  readonly notificationCount = input(0);
 
   /** Tiroir de navigation sous 1024 px. Sur desktop, la barre latérale est permanente. */
   protected readonly drawerOpen = signal(false);
@@ -168,15 +178,25 @@ export class MemberPortalShellComponent implements OnDestroy {
     });
   }
 
-  protected closeDrawer(): void {
+  protected closeDrawer(options?: { focusFallback?: boolean }): void {
     if (!this.drawerOpen()) return;
 
     this.drawerOpen.set(false);
     this.restoreBodyScroll();
 
+    const focusFallback = options?.focusFallback ?? false;
     const target = this.previouslyFocused;
     this.previouslyFocused = null;
-    queueMicrotask(() => target?.focus());
+    queueMicrotask(() => {
+      if (focusFallback) {
+        // Fermeture provoquée par un passage en desktop : le déclencheur (bouton menu)
+        // devient `display:none`, lui rendre le focus le perdrait sur `<body>`. On le
+        // pose donc sur la barre latérale, désormais permanente et visible.
+        this.firstSidebarTarget()?.focus();
+        return;
+      }
+      target?.focus();
+    });
   }
 
   protected handleEscape(event: Event): void {
@@ -213,11 +233,20 @@ export class MemberPortalShellComponent implements OnDestroy {
   }
 
   protected synchroniseViewport(): void {
-    if (globalThis.innerWidth >= 1024) this.closeDrawer();
+    if (globalThis.innerWidth >= 1024 && this.drawerOpen()) {
+      this.closeDrawer({ focusFallback: true });
+    }
   }
 
   ngOnDestroy(): void {
     this.restoreBodyScroll();
+  }
+
+  /** Premier élément focalisable de la barre latérale, cible de repli du focus. */
+  private firstSidebarTarget(): HTMLElement | null {
+    return this.host.nativeElement.querySelector<HTMLElement>(
+      '.member-shell__sidebar a[href], .member-shell__sidebar button:not([disabled])',
+    );
   }
 
   private drawerFocusableElements(): HTMLElement[] {

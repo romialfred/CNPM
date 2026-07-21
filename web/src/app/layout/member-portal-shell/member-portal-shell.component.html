@@ -1,4 +1,12 @@
-<a class="member-shell__skip-link" href="#contenu-principal">Aller au contenu principal</a>
+<!-- Neutralisé pendant que le tiroir est ouvert : frère du dialogue, il échapperait
+     sinon à `aria-modal` et resterait focalisable en dehors du tiroir. -->
+<a
+  class="member-shell__skip-link"
+  href="#contenu-principal"
+  [attr.inert]="drawerOpen() ? '' : null"
+  [attr.aria-hidden]="drawerOpen() ? 'true' : null"
+  >Aller au contenu principal</a
+>
 
 <div class="member-shell" [class.member-shell--drawer-open]="drawerOpen()">
   <!-- Voile du tiroir mobile. Décoratif : la fermeture au clavier passe par Échap et par
