@@ -50,14 +50,17 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
-.member-home__section-heading button {
+.member-home__section-heading :is(a, button) {
+  display: inline-flex;
   min-height: var(--cnpm-size-control-sm);
+  align-items: center;
   border: 0;
   background: transparent;
   color: var(--cnpm-color-text-link);
   font: inherit;
   font-size: var(--cnpm-font-size-xs);
   font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -193,6 +196,7 @@ td strong {
   font: inherit;
   font-size: var(--cnpm-font-size-sm);
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
 .member-home__request .member-home__button,

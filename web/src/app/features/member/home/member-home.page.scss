@@ -171,6 +171,7 @@
   font: inherit;
   font-size: var(--cnpm-font-size-sm);
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
 .member-home__button svg,
@@ -204,7 +205,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--cnpm-space-4);
 }
-.member-home__metrics > button {
+.member-home__metrics > :is(a, button) {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -216,17 +217,18 @@
   padding: var(--cnpm-space-4);
   color: var(--cnpm-color-text-primary);
   text-align: start;
+  text-decoration: none;
   cursor: pointer;
 }
-.member-home__metrics > button:hover {
+.member-home__metrics > :is(a, button):hover {
   border-color: var(--cnpm-color-brand-blue-300);
   background: var(--cnpm-color-brand-blue-50);
 }
-.member-home__metrics > button > svg {
+.member-home__metrics > :is(a, button) > svg {
   width: var(--cnpm-size-icon-sm);
   color: var(--cnpm-color-text-muted);
 }
-.member-home__metrics button > span:nth-child(2) {
+.member-home__metrics :is(a, button) > span:nth-child(2) {
   display: grid;
   gap: var(--cnpm-space-1);
   min-width: 0;
@@ -395,7 +397,7 @@
     font-size: var(--cnpm-font-size-xl);
     line-height: var(--cnpm-font-lineHeight-xl);
   }
-  .member-home__metrics > button {
+  .member-home__metrics > :is(a, button) {
     min-height: 5.5rem;
   }
   .member-home__benefits ul {

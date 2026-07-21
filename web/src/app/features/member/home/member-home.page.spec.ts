@@ -49,7 +49,8 @@ describe('MemberHomePage', () => {
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.querySelector('h1')?.textContent).toContain('Bienvenue');
     expect(host.querySelector('.member-shell__brand img')).not.toBeNull();
-    expect(host.querySelectorAll('.member-home__metrics > button')).toHaveLength(4);
+    // Les tuiles-raccourcis sont des liens de navigation (a), pas des boutons morts.
+    expect(host.querySelectorAll('.member-home__metrics > a')).toHaveLength(4);
     expect(
       host.querySelectorAll(
         '.member-home__dashboard-grid > section, .member-home__side-stack > section',

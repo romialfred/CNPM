@@ -1,6 +1,7 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   LucideCircleAlert,
   LucideCircleCheck,
@@ -42,6 +43,7 @@ const ACTIVITY_LABELS: Readonly<Record<MemberActivityTone, string>> = {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
+    RouterLink,
     LucideCircleAlert,
     LucideCircleCheck,
     LucideClock3,

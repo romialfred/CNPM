@@ -100,7 +100,7 @@
           </section>
 
           <section class="member-home__metrics" aria-label="Raccourcis du portail membre">
-            <button type="button" (click)="announceUnavailable('Le détail des cotisations')">
+            <a routerLink="/member/contributions">
               <span
                 class="member-home__metric-icon member-home__metric-icon--blue"
                 aria-hidden="true"
@@ -111,8 +111,8 @@
                 ><strong>{{ situation()?.outstandingTotal ?? 0 | number: '1.0-0' }} FCFA</strong
                 ><em>Voir le détail</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
-            </button>
-            <button type="button" (click)="announceUnavailable('L’historique des paiements')">
+            </a>
+            <a routerLink="/member/payments">
               <span
                 class="member-home__metric-icon member-home__metric-icon--green"
                 aria-hidden="true"
@@ -122,8 +122,8 @@
                 ><small>Mes paiements</small><strong>{{ paymentCount() }}</strong
                 ><em>Voir l'historique</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
-            </button>
-            <button type="button" (click)="announceUnavailable('La liste des reçus')">
+            </a>
+            <a routerLink="/member/receipts">
               <span
                 class="member-home__metric-icon member-home__metric-icon--purple"
                 aria-hidden="true"
@@ -133,8 +133,8 @@
                 ><small>Mes reçus</small><strong>{{ receiptCount() }}</strong
                 ><em>Voir tous les reçus</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
-            </button>
-            <button type="button" (click)="announceUnavailable('Le suivi des requêtes')">
+            </a>
+            <a routerLink="/member/requests">
               <span
                 class="member-home__metric-icon member-home__metric-icon--orange"
                 aria-hidden="true"
@@ -144,7 +144,7 @@
                 ><small>Mes requêtes</small><strong>{{ requestCount() }}</strong
                 ><em>Voir mes requêtes</em></span
               ><svg lucideArrowRight aria-hidden="true"></svg>
-            </button>
+            </a>
           </section>
 
           @if (profile(); as completion) {

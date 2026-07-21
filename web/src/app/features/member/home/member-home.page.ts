@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
+import { RouterLink } from '@angular/router';
 import {
   LucideArrowRight,
   LucideBuilding2,
@@ -63,6 +64,7 @@ const MEMBERSHIP_LABELS: Readonly<Record<MembershipStatus, string>> = {
     DatePipe,
     DecimalPipe,
     ReactiveFormsModule,
+    RouterLink,
     ErrorStateComponent,
     SkeletonComponent,
     MemberPortalShellComponent,
@@ -128,8 +130,10 @@ export class MemberHomePage {
   }
 
   /**
-   * Les parcours cible n'existent pas encore dans `member.routes.ts`. L'action rend
-   * donc l'indisponibilité explicite, sans simuler paiement, téléchargement ou envoi.
+   * Réservé aux actions RÉELLEMENT bloquées par une décision de gouvernance : paiement en
+   * ligne (DEC-002/003/005), téléchargement de reçu signé (DEC-005), avantages/assistance
+   * non raccordés. Les raccourcis de navigation, eux, pointent vers des écrans livrés via
+   * `routerLink` — ne jamais annoncer « indisponible » une page qui existe.
    */
   protected announceUnavailable(feature: string): void {
     this.toasts.info(`${feature} n’est pas encore disponible. Aucune opération n’a été initiée.`);
