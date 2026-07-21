@@ -167,7 +167,11 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
           icon: 'settings',
           requiredPermission: 'ADMIN.REFERENTIAL.READ',
         },
-        { label: 'Administration', route: '/admin/security/users', icon: 'administration' },
+        {
+          label: 'Gestion des utilisateurs',
+          route: '/admin/security/users',
+          icon: 'administration',
+        },
       ],
     },
   },

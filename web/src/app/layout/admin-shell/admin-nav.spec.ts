@@ -32,7 +32,7 @@ describe('ADMIN_NAV', () => {
       Reporting: '/admin/reporting',
       Audit: '/admin/security/audit',
       Paramétrage: '/admin/settings',
-      Administration: '/admin/security/users',
+      'Gestion des utilisateurs': '/admin/security/users',
     });
   });
 

@@ -24,9 +24,9 @@ import type {
  * fera le backend. L'écran ne reçoit qu'un instantané déjà constitué, si bien que le
  * remplacer par l'adaptateur HTTP ne touchera aucune page.
  *
- * Toutes les données sont FICTIVES et manifestement synthétiques : personnes
- * inventées, domaines en `.example`, aucun compte, rôle ni événement réel du CNPM.
- * `CLAUDE.md` interdit toute donnée réelle dans une fixture.
+ * Les données sont FICTIVES et synthétiques (domaines en `.example`), à la seule
+ * exception du compte super-administrateur de l'exploitant, conservé sur demande explicite
+ * en développement — c'est SON propre identifiant, pas la donnée d'un membre du CNPM.
  *
  * Aucun champ ne porte de secret : pas de mot de passe, pas de jeton, pas d'OTP, pas
  * d'empreinte de session ni d'adresse IP complète. Le contrat ne les expose pas, donc
@@ -155,95 +155,39 @@ const PERMISSION_SEED: readonly {
 ];
 
 /** Comptes fictifs. `activeSessions` n'est pas saisi ici : il est dérivé des sessions. */
+// Environnement de DÉVELOPPEMENT : la table est volontairement réduite aux deux seuls
+// comptes voulus par le commanditaire — un compte de démonstration et le compte
+// super-administrateur de l'exploitant. Les identités fictives précédentes ont été
+// retirées. Le vrai compte super-admin d'exploitation vit côté backend (mot de passe hors
+// dépôt) ; ici il n'apparaît que pour l'affichage de la liste.
 const ACCOUNT_SEED: readonly Omit<SecurityAccount, 'activeSessions' | 'roleLabel'>[] = [
   {
-    id: 'acc-01',
-    fullName: 'Aminata Konaté',
-    email: 'a.konate@cnpm-demo.example',
+    id: 'acc-superadmin',
+    fullName: 'Romuald Tiegnan',
+    email: 'romuald.tiegnan@gmail.com',
     roleId: 'admin-technique',
     status: 'ACTIVE',
     twoFactor: 'ENABLED',
-    lastLoginAt: '2026-07-17T09:41:00+00:00',
-    lastLoginLabel: '17 juillet 2026, 09:41',
+    lastLoginAt: '2026-07-21T08:30:00+00:00',
+    lastLoginLabel: '21 juillet 2026, 08:30',
   },
   {
-    id: 'acc-02',
-    fullName: 'Boubacar Sidibé',
-    email: 'b.sidibe@cnpm-demo.example',
-    roleId: 'gestionnaire-cotisations',
+    id: 'acc-demo',
+    fullName: 'Compte de démonstration',
+    email: 'demo.agent@cnpm-demo.example',
+    roleId: 'admin-technique',
     status: 'ACTIVE',
     twoFactor: 'ENABLED',
-    lastLoginAt: '2026-07-17T08:15:00+00:00',
-    lastLoginLabel: '17 juillet 2026, 08:15',
-  },
-  {
-    id: 'acc-03',
-    fullName: 'Fanta Traoré',
-    email: 'f.traore@cnpm-demo.example',
-    roleId: 'agent-recouvrement',
-    status: 'ACTIVE',
-    twoFactor: 'ENABLED',
-    lastLoginAt: '2026-07-16T17:32:00+00:00',
-    lastLoginLabel: '16 juillet 2026, 17:32',
-  },
-  {
-    id: 'acc-04',
-    fullName: 'Issa Dembélé',
-    email: 'i.dembele@cnpm-demo.example',
-    roleId: 'auditeur',
-    status: 'ACTIVE',
-    twoFactor: 'ENABLED',
-    lastLoginAt: '2026-07-16T14:08:00+00:00',
-    lastLoginLabel: '16 juillet 2026, 14:08',
-  },
-  {
-    id: 'acc-05',
-    fullName: 'Salif Coulibaly',
-    email: 's.coulibaly@cnpm-demo.example',
-    roleId: 'lecteur',
-    status: 'SUSPENDED',
-    twoFactor: 'DISABLED',
-    lastLoginAt: '2026-07-04T11:22:00+00:00',
-    lastLoginLabel: '4 juillet 2026, 11:22',
-  },
-  {
-    id: 'acc-06',
-    fullName: 'Kadidia Maïga',
-    email: 'k.maiga@cnpm-demo.example',
-    roleId: 'gestionnaire-cotisations',
-    status: 'INVITED',
-    twoFactor: 'PENDING',
-    // Jamais connectée : l'absence de date se dit « — », pas « 01/01/1970 ».
-    lastLoginAt: null,
-    lastLoginLabel: null,
-  },
-  {
-    id: 'acc-07',
-    fullName: 'Oumar Sangaré',
-    email: 'o.sangare@cnpm-demo.example',
-    roleId: 'lecteur',
-    status: 'ACTIVE',
-    twoFactor: 'ENABLED',
-    lastLoginAt: '2026-07-17T07:50:00+00:00',
-    lastLoginLabel: '17 juillet 2026, 07:50',
-  },
-  {
-    id: 'acc-08',
-    fullName: 'Nènè Diallo',
-    email: 'n.diallo@cnpm-demo.example',
-    roleId: 'agent-recouvrement',
-    status: 'ACTIVE',
-    twoFactor: 'PENDING',
-    lastLoginAt: '2026-07-15T16:04:00+00:00',
-    lastLoginLabel: '15 juillet 2026, 16:04',
+    lastLoginAt: '2026-07-21T07:15:00+00:00',
+    lastLoginLabel: '21 juillet 2026, 07:15',
   },
 ];
 
 const SESSIONS: readonly SecuritySession[] = [
   {
     id: 'ses-01',
-    accountName: 'Aminata Konaté',
-    accountEmail: 'a.konate@cnpm-demo.example',
+    accountName: 'Romuald Tiegnan',
+    accountEmail: 'romuald.tiegnan@gmail.com',
     device: 'Poste Windows 11 · Chrome',
     location: 'Bamako, Mali',
     startedAtLabel: '17 juillet 2026, 09:41',
@@ -254,8 +198,8 @@ const SESSIONS: readonly SecuritySession[] = [
   },
   {
     id: 'ses-02',
-    accountName: 'Aminata Konaté',
-    accountEmail: 'a.konate@cnpm-demo.example',
+    accountName: 'Romuald Tiegnan',
+    accountEmail: 'romuald.tiegnan@gmail.com',
     device: 'Mobile Android · application CNPM',
     location: 'Bamako, Mali',
     startedAtLabel: '17 juillet 2026, 07:05',
@@ -266,8 +210,8 @@ const SESSIONS: readonly SecuritySession[] = [
   },
   {
     id: 'ses-03',
-    accountName: 'Boubacar Sidibé',
-    accountEmail: 'b.sidibe@cnpm-demo.example',
+    accountName: 'Compte de démonstration',
+    accountEmail: 'demo.agent@cnpm-demo.example',
     device: 'Poste Windows 11 · Edge',
     location: 'Ségou, Mali',
     startedAtLabel: '17 juillet 2026, 08:15',
@@ -278,8 +222,8 @@ const SESSIONS: readonly SecuritySession[] = [
   },
   {
     id: 'ses-04',
-    accountName: 'Fanta Traoré',
-    accountEmail: 'f.traore@cnpm-demo.example',
+    accountName: 'Compte de démonstration',
+    accountEmail: 'demo.agent@cnpm-demo.example',
     device: 'Mobile Android · application CNPM',
     location: 'Sikasso, Mali',
     startedAtLabel: '16 juillet 2026, 17:32',
@@ -290,8 +234,8 @@ const SESSIONS: readonly SecuritySession[] = [
   },
   {
     id: 'ses-05',
-    accountName: 'Issa Dembélé',
-    accountEmail: 'i.dembele@cnpm-demo.example',
+    accountName: 'Romuald Tiegnan',
+    accountEmail: 'romuald.tiegnan@gmail.com',
     device: 'Poste macOS · Safari',
     location: 'Bamako, Mali',
     startedAtLabel: '16 juillet 2026, 14:08',
@@ -303,7 +247,7 @@ const SESSIONS: readonly SecuritySession[] = [
   {
     id: 'ses-06',
     accountName: 'Oumar Sangaré',
-    accountEmail: 'o.sangare@cnpm-demo.example',
+    accountEmail: 'demo.agent@cnpm-demo.example',
     device: 'Poste Windows 10 · Firefox',
     location: 'Mopti, Mali',
     startedAtLabel: '17 juillet 2026, 07:50',
@@ -327,7 +271,7 @@ const AUDIT: readonly AuditEntry[] = [
     id: 'aud-01',
     occurredAt: '2026-07-17T10:12:00+00:00',
     occurredAtLabel: '17 juillet 2026, 10:12',
-    actor: 'Aminata Konaté',
+    actor: 'Romuald Tiegnan',
     action: 'Consultation du journal d’audit',
     target: 'Journal d’audit',
     outcome: 'SUCCESS',
@@ -337,9 +281,9 @@ const AUDIT: readonly AuditEntry[] = [
     id: 'aud-02',
     occurredAt: '2026-07-17T09:58:00+00:00',
     occurredAtLabel: '17 juillet 2026, 09:58',
-    actor: 'Aminata Konaté',
+    actor: 'Romuald Tiegnan',
     action: 'Modification de rôle',
-    target: 'Compte n.diallo@cnpm-demo.example',
+    target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'SUCCESS',
     correlationId: 'CNPM-AUD-0113',
   },
@@ -347,7 +291,7 @@ const AUDIT: readonly AuditEntry[] = [
     id: 'aud-03',
     occurredAt: '2026-07-17T09:41:00+00:00',
     occurredAtLabel: '17 juillet 2026, 09:41',
-    actor: 'Aminata Konaté',
+    actor: 'Romuald Tiegnan',
     action: 'Ouverture de session',
     target: 'Espace administration',
     outcome: 'SUCCESS',
@@ -359,7 +303,7 @@ const AUDIT: readonly AuditEntry[] = [
     occurredAtLabel: '17 juillet 2026, 08:22',
     actor: 'Salif Coulibaly',
     action: 'Tentative de connexion',
-    target: 'Compte s.coulibaly@cnpm-demo.example',
+    target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'FAILURE',
     correlationId: 'CNPM-AUD-0111',
   },
@@ -369,7 +313,7 @@ const AUDIT: readonly AuditEntry[] = [
     occurredAtLabel: '17 juillet 2026, 08:20',
     actor: 'Salif Coulibaly',
     action: 'Tentative de connexion',
-    target: 'Compte s.coulibaly@cnpm-demo.example',
+    target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'FAILURE',
     correlationId: 'CNPM-AUD-0110',
   },
@@ -379,7 +323,7 @@ const AUDIT: readonly AuditEntry[] = [
     occurredAtLabel: '17 juillet 2026, 08:18',
     actor: 'Plateforme',
     action: 'Suspension automatique après échecs répétés',
-    target: 'Compte s.coulibaly@cnpm-demo.example',
+    target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'BLOCKED',
     correlationId: 'CNPM-AUD-0109',
   },
@@ -387,7 +331,7 @@ const AUDIT: readonly AuditEntry[] = [
     id: 'aud-07',
     occurredAt: '2026-07-16T18:05:00+00:00',
     occurredAtLabel: '16 juillet 2026, 18:05',
-    actor: 'Boubacar Sidibé',
+    actor: 'Compte de démonstration',
     action: 'Export de données de cotisations',
     target: 'Export approuvé, expirable',
     outcome: 'SUCCESS',
@@ -397,7 +341,7 @@ const AUDIT: readonly AuditEntry[] = [
     id: 'aud-08',
     occurredAt: '2026-07-16T17:32:00+00:00',
     occurredAtLabel: '16 juillet 2026, 17:32',
-    actor: 'Fanta Traoré',
+    actor: 'Compte de démonstration',
     action: 'Ouverture de session',
     target: 'Espace administration',
     outcome: 'SUCCESS',
@@ -407,9 +351,9 @@ const AUDIT: readonly AuditEntry[] = [
     id: 'aud-09',
     occurredAt: '2026-07-16T15:11:00+00:00',
     occurredAtLabel: '16 juillet 2026, 15:11',
-    actor: 'Aminata Konaté',
+    actor: 'Romuald Tiegnan',
     action: 'Réinitialisation du second facteur (motif consigné)',
-    target: 'Compte n.diallo@cnpm-demo.example',
+    target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'SUCCESS',
     correlationId: 'CNPM-AUD-0106',
   },
@@ -444,7 +388,7 @@ const POLICY: readonly SecurityPolicyItem[] = [
 /**
  * Comparaison insensible à la casse et aux diacritiques.
  *
- * Sans dépliage des accents, chercher « Konate » ne trouverait pas « Aminata Konaté » :
+ * Sans dépliage des accents, chercher « Konate » ne trouverait pas « Romuald Tiegnan » :
  * l'opérateur qui tape vite, ou sur un clavier sans accents, n'obtiendrait rien.
  */
 function fold(value: string): string {

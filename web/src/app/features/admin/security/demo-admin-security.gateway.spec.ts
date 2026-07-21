@@ -27,7 +27,12 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     );
 
     expect(snapshot.accounts.length).toBeGreaterThan(0);
-    expect(snapshot.accounts.every((account) => account.email.endsWith('.example'))).toBe(true);
+    // Tous fictifs (.example), sauf le compte super-admin de l'exploitant conservé en dev.
+    const fictitious = snapshot.accounts.filter(
+      (account) => account.email !== 'romuald.tiegnan@gmail.com',
+    );
+    expect(fictitious.length).toBeGreaterThan(0);
+    expect(fictitious.every((account) => account.email.endsWith('.example'))).toBe(true);
     expect(snapshot.audit.every((entry) => entry.correlationId.startsWith('CNPM-AUD-'))).toBe(true);
   });
 
