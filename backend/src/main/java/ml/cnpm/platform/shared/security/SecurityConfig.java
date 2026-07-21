@@ -49,7 +49,13 @@ public class SecurityConfig {
         "/actuator/health/**",
         "/actuator/info",
         // Vérification publique d'un reçu par jeton opaque (docs/04-api : verifyReceipt).
-        "/receipts/verify/**"
+        "/receipts/verify/**",
+        // Authentification NATIVE (AUTH-DEC-020) : ces routes établissent l'identité, elles
+        // ne peuvent donc pas exiger un jeton préalable. Le mot de passe et le second facteur
+        // y sont vérifiés ; l'accès aux autres routes reste refusé par défaut. /auth/me, lui,
+        // reste protégé (il projette une identité déjà authentifiée).
+        "/auth/login",
+        "/auth/mfa/**"
     };
 
     @Bean
