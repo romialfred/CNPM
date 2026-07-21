@@ -3,17 +3,20 @@
 .cnpm-2fa {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-4);
+  gap: var(--cnpm-space-3);
 }
 
+/* Logo et accroche sur une seule ligne : compact, sans bloc de marque encombrant. */
 .cnpm-2fa__brand {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: var(--cnpm-space-3);
 }
 
 .cnpm-2fa__logo {
   width: auto;
-  height: var(--cnpm-space-12);
+  height: var(--cnpm-space-10);
+  flex: none;
 }
 
 .cnpm-2fa__intro {
@@ -32,7 +35,7 @@
 .cnpm-2fa__steps {
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-5);
+  gap: var(--cnpm-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -86,7 +89,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--cnpm-space-4);
-  margin-block-start: var(--cnpm-space-3);
+  margin-block-start: var(--cnpm-space-2);
 }
 
 .cnpm-2fa__qr {
@@ -103,8 +106,8 @@
 
 .cnpm-2fa__qr-image {
   display: block;
-  width: 10rem;
-  height: 10rem;
+  width: 8.5rem;
+  height: 8.5rem;
 }
 
 .cnpm-2fa__qr-note {
@@ -157,7 +160,7 @@
 }
 
 .cnpm-2fa__form {
-  margin-block-start: var(--cnpm-space-3);
+  margin-block-start: var(--cnpm-space-2);
 }
 
 /* La déconnexion est discrète mais présente : l'utilisateur ne doit jamais être piégé. */

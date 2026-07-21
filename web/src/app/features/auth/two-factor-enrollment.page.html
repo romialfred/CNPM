@@ -13,15 +13,13 @@
         class="cnpm-2fa__logo"
         src="/assets/brand/logo-CNPM.png"
         alt="Conseil National du Patronat du Mali"
-        width="96"
-        height="96"
+        width="40"
+        height="40"
       />
+      <p class="cnpm-2fa__intro" id="cnpm-2fa-intro">
+        Un code temporaire vous sera demandé à chaque connexion.
+      </p>
     </div>
-
-    <p class="cnpm-2fa__intro" id="cnpm-2fa-intro">
-      Pour protéger votre compte, activez une authentification à deux facteurs. Elle demande,
-      à chaque connexion, un code temporaire généré par une application sur votre téléphone.
-    </p>
 
     @switch (state().kind) {
       @case ('loading') {
@@ -55,20 +53,13 @@
           <li class="cnpm-2fa__step">
             <span class="cnpm-2fa__step-index" aria-hidden="true">1</span>
             <span class="cnpm-2fa__step-body">
-              <span class="cnpm-2fa__step-title">Installez une application d’authentification</span>
-              <span class="cnpm-2fa__step-text">
-                Microsoft Authenticator, ou toute application compatible TOTP, sur votre
-                téléphone.
-              </span>
+              <span class="cnpm-2fa__step-title">Installez Microsoft Authenticator (ou une app TOTP)</span>
             </span>
           </li>
           <li class="cnpm-2fa__step">
             <span class="cnpm-2fa__step-index" aria-hidden="true">2</span>
             <span class="cnpm-2fa__step-body">
-              <span class="cnpm-2fa__step-title">Scannez le code, ou saisissez la clé</span>
-              <span class="cnpm-2fa__step-text">
-                Ajoutez un compte dans l’application, puis scannez l’image ci-dessous.
-              </span>
+              <span class="cnpm-2fa__step-title">Scannez le QR, ou saisissez la clé</span>
 
               <div class="cnpm-2fa__qr-zone">
                 <figure class="cnpm-2fa__qr">
@@ -97,10 +88,7 @@
           <li class="cnpm-2fa__step">
             <span class="cnpm-2fa__step-index" aria-hidden="true">3</span>
             <span class="cnpm-2fa__step-body">
-              <span class="cnpm-2fa__step-title">Saisissez le code affiché</span>
-              <span class="cnpm-2fa__step-text">
-                Entrez le code à six chiffres que l’application vient de générer.
-              </span>
+              <span class="cnpm-2fa__step-title">Entrez le code à 6 chiffres</span>
 
               <form class="cnpm-2fa__form" [formGroup]="form" (ngSubmit)="activate()" novalidate>
                 <cnpm-otp-input
