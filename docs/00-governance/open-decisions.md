@@ -922,5 +922,30 @@ lecture et écriture** de `professional_group` et `group_membership` — cohére
 Quand GRP existera, il ne lira pas directement ces tables : il passera par un port exposé
 par MEMBER, ou les tables seront déplacées vers un schéma `grp` via un ADR dédié.
 
+## AUTH-DEC-020 — 2FA natif applicatif, supplantant Keycloak pour le second facteur
+
+**Propriétaire.** Product owner (demande explicite) + Architecture.
+**Impact.** Module AUTH / IAM, ADR-003 (délégation IAM à Keycloak).
+**Statut.** Tranché par le commanditaire ; consigné pour traçabilité et à reporter dans l'ADR.
+
+**Constat.** L'ADR-003 déléguait identité et TOTP à Keycloak. En pratique, la page
+d'enrôlement hébergée par Keycloak est jugée non conforme à l'expérience attendue : le
+commanditaire veut un 2FA **intégré à l'application**, avec enrôlement forcé à la première
+connexion, exactement comme son produit SafeX 360 (`C:\MineXpert\SafeX`), qui fonctionne.
+
+**Décision.** Le second facteur (TOTP RFC 6238) est **porté par l'application**, sur le
+modèle du `MfaService` de SafeX : génération du secret, URI `otpauth://` et QR scannables,
+vérification des codes, codes de secours mono-usage, anti-rejeu, politique de rôles (MFA
+obligatoire ; désactivation réservée au super-administrateur). Keycloak n'est plus requis
+pour le 2FA.
+
+**Portée livrée (incrément 1, front).** Module `web/src/app/core/auth/totp.ts` (validé
+contre les vecteurs RFC 6238) + QR réel (`qr.ts`) ; enrôlement démo rendu réel et
+scannable ; codes de secours à l'activation.
+
+**Reste à faire.** Portage backend natif (Account + login + JWT + `MfaService`/`TotpService`
+/`MfaCryptoService`/`MfaChallengeService`/`MfaRolePolicy`) et migration Flyway des colonnes
+MFA ; l'ADR-003 doit être amendé ou remplacé pour acter cette bascule.
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.

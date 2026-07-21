@@ -66,6 +66,13 @@ export class TwoFactorEnrollmentPage {
   protected readonly codeError = signal<string | undefined>(undefined);
   protected readonly copied = signal(false);
 
+  /**
+   * Codes de secours affichés APRÈS activation réussie : l'utilisateur doit les conserver
+   * avant d'entrer dans l'application. Tant qu'ils sont présents, on ne redirige pas.
+   */
+  protected readonly recoveryCodes = signal<readonly string[] | null>(null);
+  private readonly pendingRedirect = signal<string | null>(null);
+
   /** Défi d'enrôlement obtenu de la source ; chargement / prêt / erreur. */
   protected readonly state = toSignal(
     this.gateway.beginTotpEnrollment().pipe(
@@ -119,6 +126,13 @@ export class TwoFactorEnrollmentPage {
       next: (result) => {
         this.submitting.set(false);
         if (result.outcome === 'activated') {
+          if (result.recoveryCodes && result.recoveryCodes.length > 0) {
+            // On montre d'abord les codes de secours ; l'entrée dans l'app attend leur
+            // sauvegarde explicite. Aucune redirection tant qu'ils ne sont pas confirmés.
+            this.recoveryCodes.set(result.recoveryCodes);
+            this.pendingRedirect.set(result.redirectTo);
+            return;
+          }
           void this.router.navigateByUrl(result.redirectTo);
           return;
         }
@@ -132,6 +146,14 @@ export class TwoFactorEnrollmentPage {
         this.codeError.set('L’activation a échoué. Réessayez dans un instant.');
       },
     });
+  }
+
+  /** Après avoir noté ses codes de secours, l'utilisateur entre dans l'application. */
+  protected continueToApp(): void {
+    const target = this.pendingRedirect();
+    if (target) {
+      void this.router.navigateByUrl(target);
+    }
   }
 
   protected signOut(): void {

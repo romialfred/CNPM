@@ -1,7 +1,13 @@
 import { firstValueFrom } from 'rxjs';
 import { describe, expect, it } from 'vitest';
+import { generateTotpCode } from '../../core/auth/totp';
 import type { AuthSpace } from './auth-gateway';
 import { DemoAuthGateway } from './demo-auth.gateway';
+
+/** Code TOTP réellement valide pour le secret d'enrôlement, à l'instant présent. */
+function currentCode(secret: string): Promise<string> {
+  return generateTotpCode(secret, Math.floor(Date.now() / 1000 / 30));
+}
 
 const EMAIL = 'demo.agent@cnpm.example';
 const SUSPENDED_EMAIL = 'demo.suspendu@cnpm.example';
@@ -80,24 +86,27 @@ describe('DemoAuthGateway', () => {
     ).resolves.toEqual({ outcome: 'invalid-code' });
   });
 
-  it('ouvre un enrôlement TOTP avec un QR image et une clé, sans exposer de secret brut', async () => {
+  it('ouvre un enrôlement TOTP avec un vrai QR scannable et une clé, sans exposer de secret brut', async () => {
     const enrollment = await firstValueFrom(gateway.beginTotpEnrollment());
 
     expect(enrollment.enrollmentId).toBeTruthy();
     expect(enrollment.issuer).toBe('CNPM');
-    // Le QR est une image data URI prête à peindre, jamais un secret exploitable en clair.
-    expect(enrollment.qrImage.startsWith('data:image/svg+xml')).toBe(true);
-    expect(enrollment.manualKey.length).toBeGreaterThan(0);
+    // QR réel (PNG data URI) généré localement, scannable par Microsoft Authenticator.
+    expect(enrollment.qrImage.startsWith('data:image/')).toBe(true);
+    // La clé manuelle est le secret Base32 réel (regroupé par blocs pour la lisibilité).
+    expect(enrollment.manualKey.replace(/\s/gu, '')).toMatch(/^[A-Z2-7]+$/u);
   });
 
-  it('active le second facteur avec le premier code, et conduit vers l’espace choisi', async () => {
+  it('active le second facteur avec le vrai code TOTP, et conduit vers l’espace choisi', async () => {
     const enrollment = await firstValueFrom(gateway.beginTotpEnrollment());
-    await expect(
-      firstValueFrom(gateway.activateTotp(enrollment.enrollmentId, CODE, 'member')),
-    ).resolves.toEqual({ outcome: 'activated', redirectTo: '/member' });
-    await expect(
-      firstValueFrom(gateway.activateTotp(enrollment.enrollmentId, CODE, 'admin')),
-    ).resolves.toEqual({ outcome: 'activated', redirectTo: '/admin' });
+    const code = await currentCode(enrollment.manualKey);
+    const result = await firstValueFrom(gateway.activateTotp(enrollment.enrollmentId, code, 'member'));
+
+    expect(result.outcome).toBe('activated');
+    if (result.outcome !== 'activated') throw new Error('activation attendue');
+    expect(result.redirectTo).toBe('/member');
+    // Parité SafeX : des codes de secours mono-usage sont remis à l'activation.
+    expect(result.recoveryCodes?.length).toBeGreaterThan(0);
   });
 
   it('refuse un code d’activation erroné, sans activer', async () => {

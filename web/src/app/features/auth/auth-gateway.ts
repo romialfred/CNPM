@@ -59,7 +59,15 @@ export interface TotpEnrollment {
  * bonne suite (ressaisir vs réessayer plus tard).
  */
 export type TotpActivationResult =
-  | { readonly outcome: 'activated'; readonly redirectTo: string }
+  | {
+      readonly outcome: 'activated';
+      readonly redirectTo: string;
+      /**
+       * Codes de secours mono-usage remis À L'ACTIVATION, à conserver hors de l'appareil
+       * d'authentification (parité SafeX). Absents si la source n'en délivre pas.
+       */
+      readonly recoveryCodes?: readonly string[];
+    }
   | { readonly outcome: 'invalid-code' };
 
 /**

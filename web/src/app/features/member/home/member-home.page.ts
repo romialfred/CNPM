@@ -80,7 +80,7 @@ const MEMBERSHIP_LABELS: Readonly<Record<MembershipStatus, string>> = {
     LucideWalletCards,
   ],
   templateUrl: './member-home.page.html',
-  styleUrl: './member-home.page.scss',
+  styleUrls: ['./member-home.page.scss', './member-home.due-stats.scss'],
 })
 export class MemberHomePage {
   private readonly gateway = inject(MEMBER_HOME_GATEWAY);

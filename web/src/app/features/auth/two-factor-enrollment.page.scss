@@ -176,3 +176,31 @@
   outline: 2px solid var(--cnpm-color-brand-blue-700);
   outline-offset: 2px;
 }
+
+.cnpm-2fa__recovery {
+  display: grid;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-2fa__recovery-title {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-2fa__recovery-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: var(--cnpm-space-3);
+  list-style: none;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-page);
+  font-family: var(--cnpm-font-family-mono, monospace);
+  font-size: var(--cnpm-font-size-sm);
+  letter-spacing: 0.04em;
+  color: var(--cnpm-color-text-primary);
+}

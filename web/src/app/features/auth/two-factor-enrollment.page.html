@@ -33,7 +33,25 @@
         </cnpm-alert>
       }
       @case ('ready') {
-        <ol class="cnpm-2fa__steps">
+        @if (recoveryCodes(); as codes) {
+          <div class="cnpm-2fa__recovery" role="group" aria-labelledby="cnpm-2fa-recovery-title">
+            <cnpm-alert tone="success" title="Authentification activée">
+              <p>
+                Conservez ces codes de secours en lieu sûr, hors de votre téléphone. Chacun ne
+                sert qu’une seule fois, si vous perdez l’accès à votre application.
+              </p>
+            </cnpm-alert>
+            <p id="cnpm-2fa-recovery-title" class="cnpm-2fa__recovery-title">
+              Vos codes de secours
+            </p>
+            <ul class="cnpm-2fa__recovery-list" aria-label="Codes de secours à usage unique">
+              @for (code of codes; track code) {
+                <li>{{ code }}</li>
+              }
+            </ul>
+          </div>
+        } @else {
+          <ol class="cnpm-2fa__steps">
           <li class="cnpm-2fa__step">
             <span class="cnpm-2fa__step-index" aria-hidden="true">1</span>
             <span class="cnpm-2fa__step-body">
@@ -61,7 +79,9 @@
                     width="160"
                     height="160"
                   />
-                  <figcaption class="cnpm-2fa__qr-note">Aperçu de démonstration</figcaption>
+                  <figcaption class="cnpm-2fa__qr-note">
+                    Scannez avec Microsoft Authenticator
+                  </figcaption>
                 </figure>
 
                 <div class="cnpm-2fa__manual">
@@ -93,22 +113,29 @@
               </form>
             </span>
           </li>
-        </ol>
+          </ol>
+        }
       }
     }
   </div>
 
   <ng-container cnpm-dialog-footer>
-    <button type="button" class="cnpm-2fa__signout" (click)="signOut()">
-      Ce n’est pas vous ? Se déconnecter
-    </button>
-    <cnpm-button
-      variant="primary"
-      (click)="activate()"
-      [loading]="submitting()"
-      [disabled]="state().kind !== 'ready'"
-    >
-      Activer et continuer
-    </cnpm-button>
+    @if (recoveryCodes()) {
+      <cnpm-button variant="primary" (click)="continueToApp()">
+        J’ai enregistré mes codes — Continuer
+      </cnpm-button>
+    } @else {
+      <button type="button" class="cnpm-2fa__signout" (click)="signOut()">
+        Ce n’est pas vous ? Se déconnecter
+      </button>
+      <cnpm-button
+        variant="primary"
+        (click)="activate()"
+        [loading]="submitting()"
+        [disabled]="state().kind !== 'ready'"
+      >
+        Activer et continuer
+      </cnpm-button>
+    }
   </ng-container>
 </cnpm-dialog>
