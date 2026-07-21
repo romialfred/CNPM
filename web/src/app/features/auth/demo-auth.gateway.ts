@@ -62,6 +62,12 @@ export class DemoAuthGateway implements AuthGateway {
   private static readonly DEMO_PASSWORD = 'demo-pass';
   /** Identifiant fictif permettant d'exercer l'état « accès interdit ». */
   private static readonly DEMO_SUSPENDED_EMAIL = 'demo.suspendu@cnpm.example';
+  /**
+   * Compte fictif « première connexion » : identifiants valides mais 2FA jamais activé.
+   * Il déclenche l'enrôlement forcé, pour démontrer le blocage tant que le second facteur
+   * n'est pas configuré.
+   */
+  private static readonly DEMO_ENROLL_EMAIL = 'demo.nouveau@cnpm.example';
   private static readonly DEMO_CODE = '123456';
   private static readonly CHALLENGE_ID = 'demo-challenge';
   private static readonly LATENCY_MS = 400;
@@ -72,6 +78,9 @@ export class DemoAuthGateway implements AuthGateway {
     let result: CredentialsResult;
     if (email === DemoAuthGateway.DEMO_SUSPENDED_EMAIL && passwordMatches) {
       result = { outcome: 'forbidden' };
+    } else if (email === DemoAuthGateway.DEMO_ENROLL_EMAIL && passwordMatches) {
+      // Première connexion : identifiants bons, mais aucun second facteur encore actif.
+      result = { outcome: 'enrollment-required' };
     } else if (email === DemoAuthGateway.DEMO_EMAIL && passwordMatches) {
       result = { outcome: 'mfa-required', challengeId: DemoAuthGateway.CHALLENGE_ID };
     } else {

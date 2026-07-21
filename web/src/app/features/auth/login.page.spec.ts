@@ -8,7 +8,7 @@ import { LoginPage } from './login.page';
 /** Passerelle contrôlée : aucun identifiant réel, aucune latence, résultat piloté par le test. */
 class StubGateway implements AuthGateway {
   lastRequest?: CredentialsRequest;
-  outcome: 'mfa-required' | 'invalid' | 'forbidden' = 'mfa-required';
+  outcome: 'mfa-required' | 'enrollment-required' | 'invalid' | 'forbidden' = 'mfa-required';
   unavailable = false;
 
   submitCredentials(request: CredentialsRequest) {
@@ -55,7 +55,10 @@ describe('LoginPage (AUTH-001)', () => {
       providers: [
         // Route de destination minimale : la navigation doit se résoudre sans charger
         // la vraie page de vérification, qui n'est pas le sujet de ces tests.
-        provideRouter([{ path: 'auth/verify', children: [] }]),
+        provideRouter([
+          { path: 'auth/verify', children: [] },
+          { path: 'auth/2fa-enrollment', children: [] },
+        ]),
         { provide: AUTH_GATEWAY, useValue: gateway },
       ],
     }).compileComponents();
@@ -164,6 +167,24 @@ describe('LoginPage (AUTH-001)', () => {
 
     expect(TestBed.inject(AuthFlowStore).activeChallenge()?.id).toBe('challenge-1');
     expect(navigate).toHaveBeenCalledWith(['/auth/verify']);
+  });
+
+  it('conduit à l’enrôlement forcé à la première connexion, sans atteindre le tableau de bord', async () => {
+    const { fixture, element } = await setup();
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    gateway.outcome = 'enrollment-required';
+
+    fill(fixture, element, 'nouveau@cnpm.example', 'secret');
+    submit(element);
+
+    // On va vers l'enrôlement, jamais vers la vérification d'un code inexistant.
+    expect(navigate).toHaveBeenCalledWith(['/auth/2fa-enrollment']);
+    expect(navigate).not.toHaveBeenCalledWith(['/auth/verify']);
+    // L'espace choisi (admin par défaut) est porté par le flow pour la redirection finale.
+    const challenge = TestBed.inject(AuthFlowStore).activeChallenge();
+    expect(challenge?.space).toBe('admin');
+    expect(challenge?.id).toBe('enrollment-pending');
   });
 
   it('n’appelle pas la passerelle si le formulaire est invalide', async () => {

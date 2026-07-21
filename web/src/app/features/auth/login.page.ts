@@ -132,6 +132,14 @@ export class LoginPage {
           void this.router.navigate(['/auth/verify']);
           return;
         }
+        if (result.outcome === 'enrollment-required') {
+          // Première connexion : on conduit à l'enrôlement forcé (popup non fermable).
+          // Le flow porte l'espace, seule information dont la page d'enrôlement a besoin
+          // pour rediriger après activation. Aucun accès au tableau de bord d'ici là.
+          this.flow.startChallenge('enrollment-pending', space);
+          void this.router.navigate(['/auth/2fa-enrollment']);
+          return;
+        }
         // Erreur neutre : la saisie de l'email est préservée, le mot de passe effacé.
         this.form.controls.password.reset('');
         this.state.set(result.outcome === 'forbidden' ? 'forbidden' : 'error');

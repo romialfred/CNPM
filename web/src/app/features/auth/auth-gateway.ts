@@ -15,6 +15,14 @@ export interface CredentialsRequest {
 /** Résultat neutre : ne révèle jamais si l'adresse existe (pattern 2FA du handoff). */
 export type CredentialsResult =
   | { readonly outcome: 'mfa-required'; readonly challengeId: string }
+  /**
+   * Identifiants valides mais second facteur PAS ENCORE activé (première connexion) :
+   * l'accès complet est bloqué et l'application conduit à l'enrôlement forcé. Traduit le
+   * scénario « à la connexion, si 2FA non activé → afficher automatiquement la popup ».
+   * En production, ce forçage est porté par Keycloak (ADR-003) ; ici l'issue pilote le
+   * parcours applicatif/démo.
+   */
+  | { readonly outcome: 'enrollment-required' }
   | { readonly outcome: 'invalid' }
   /** Identité connue mais accès refusé (compte suspendu, espace non autorisé). */
   | { readonly outcome: 'forbidden' };

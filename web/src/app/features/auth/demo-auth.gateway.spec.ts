@@ -5,6 +5,7 @@ import { DemoAuthGateway } from './demo-auth.gateway';
 
 const EMAIL = 'demo.agent@cnpm.example';
 const SUSPENDED_EMAIL = 'demo.suspendu@cnpm.example';
+const ENROLL_EMAIL = 'demo.nouveau@cnpm.example';
 const PASSWORD = 'demo-pass';
 const CODE = '123456';
 
@@ -27,6 +28,16 @@ describe('DemoAuthGateway', () => {
     await expect(credentials(SUSPENDED_EMAIL, PASSWORD)).resolves.toEqual({
       outcome: 'forbidden',
     });
+  });
+
+  it('exige l’enrôlement à la première connexion (2FA jamais activé)', async () => {
+    // Identifiants valides mais aucun second facteur : on ne délivre PAS de défi 2FA,
+    // on conduit à l'enrôlement forcé.
+    await expect(credentials(ENROLL_EMAIL, PASSWORD)).resolves.toEqual({
+      outcome: 'enrollment-required',
+    });
+    // Un mot de passe erroné reste indifférencié, pour ne pas trahir l'existence du compte.
+    await expect(credentials(ENROLL_EMAIL, 'mauvais')).resolves.toEqual({ outcome: 'invalid' });
   });
 
   it('refuse un mot de passe erroné sans révéler l’existence de l’adresse', async () => {
