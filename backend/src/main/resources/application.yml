@@ -1,9 +1,12 @@
 spring:
   application:
     name: cnpm-platform
+  # Base locale du projet (PGAdmin) : CNPM_DB / app_user sur le PostgreSQL 18 (5432).
+  # Le nom et l'utilisateur ne sont pas des secrets ; le mot de passe reste fail-closed
+  # (ci-dessous, sans repli). Ces valeurs restent surchargeables par l'environnement.
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/cnpm}
-    username: ${DATABASE_USER:cnpm_app}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/CNPM_DB}
+    username: ${DATABASE_USER:app_user}
     # Aucune valeur de repli : le démarrage doit échouer si le mot de passe n'est
     # pas fourni par l'environnement, plutôt que de démarrer en silence avec un
     # identifiant faible et versionné (fail-open). Le développement local

@@ -5,6 +5,8 @@
 CLAUDE.local.md
 .claude/settings.local.json
 **/secrets/**
+# Lanceur local du backend : contient des secrets de dev, ne jamais committer.
+run-backend-local.ps1
 
 # Python
 __pycache__/

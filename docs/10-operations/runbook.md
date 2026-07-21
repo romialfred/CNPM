@@ -23,16 +23,39 @@ enrôlement forcé à la première connexion). À utiliser pour brancher un comp
 - **Laisser `cnpm.security.jwt.expected-audiences` non défini** en mode natif : sinon
   `JwtValidationConfig` publie un second `JwtDecoder` (issuer Keycloak) et le contexte échoue.
 
+### Base de données locale (poste de développement)
+
+Le projet pointe par défaut sur `jdbc:postgresql://localhost:5432/CNPM_DB` avec l’utilisateur
+`app_user` (PostgreSQL 18, administré via PGAdmin). Le rôle applicatif doit pouvoir se connecter
+**et** créer les 17 schémas métier (Flyway). À exécuter une fois, en superutilisateur `postgres`
+dans PGAdmin (Query Tool) — remplacer le mot de passe par le vôtre :
+
+```sql
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'app_user') THEN
+    CREATE ROLE app_user LOGIN PASSWORD 'change-me';
+  ELSE
+    ALTER ROLE app_user WITH LOGIN PASSWORD 'change-me';
+  END IF;
+END $$;
+ALTER DATABASE "CNPM_DB" OWNER TO app_user;   -- permet à Flyway de créer les schémas
+```
+
 ### Procédure
 
-1. Démarrer PostgreSQL et créer la base `cnpm` (Flyway applique les migrations, dont
-   `V11__native_mfa_and_password_on_user_account.sql`, au premier démarrage).
-2. Exporter les variables ci-dessus (au minimum `APP_JWT_SECRET`, `MFA_ENCRYPTION_KEY`,
-   `CNPM_BOOTSTRAP_ADMIN_EMAIL`, `CNPM_BOOTSTRAP_ADMIN_PASSWORD`) puis lancer le backend avec
-   `-Dcnpm.security.native-jwt.enabled=true`. Le compte super-admin est amorcé s’il est absent.
-3. Basculer le web en mode HTTP : dans `web/public/runtime-config.js`, mettre `dataMode: 'http'`
+1. Vérifier que PostgreSQL tourne (5432) et que la base `CNPM_DB` existe ; appliquer le bloc SQL
+   ci-dessus pour garantir l’accès de `app_user`. Flyway applique ensuite les migrations (dont
+   `V11__native_mfa_and_password_on_user_account.sql`) au premier démarrage.
+2. Renseigner les secrets et l’amorçage dans le lanceur local **non versionné**
+   `run-backend-local.ps1` (`DATABASE_PASSWORD`, `APP_JWT_SECRET`, `MFA_ENCRYPTION_KEY`,
+   `CNPM_BOOTSTRAP_ADMIN_EMAIL/PASSWORD`, `RABBITMQ_DEFAULT_USER/PASS`). RabbitMQ n’est pas requis
+   pour tester le login : sa santé restera `DOWN` sans bloquer les endpoints `/auth/**`.
+3. Lancer : `powershell -ExecutionPolicy Bypass -File .\run-backend-local.ps1`. Le script
+   construit le jar au besoin puis démarre le backend avec `-Dcnpm.security.native-jwt.enabled=true`.
+   Le super-admin natif est amorcé s’il est absent.
+4. Basculer le web en mode HTTP : dans `web/public/runtime-config.js`, mettre `dataMode: 'http'`
    et `baseUrl` vers le préfixe d’API du backend (`/v1` derrière un proxy, sinon l’URL absolue).
-4. Ouvrir l’application, se connecter avec l’e-mail et le mot de passe amorcés.
+5. Ouvrir l’application, se connecter avec l’e-mail et le mot de passe amorcés.
 
 ### Comportement attendu du parcours
 
