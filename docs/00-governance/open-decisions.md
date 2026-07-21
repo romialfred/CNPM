@@ -947,5 +947,27 @@ scannable ; codes de secours à l'activation.
 /`MfaCryptoService`/`MfaChallengeService`/`MfaRolePolicy`) et migration Flyway des colonnes
 MFA ; l'ADR-003 doit être amendé ou remplacé pour acter cette bascule.
 
+## AUTH-DEC-021 — Le super-admin technique reçoit toutes les permissions
+
+**Propriétaire.** Product owner (demande explicite).
+**Impact.** RBAC / séparation des tâches (`docs/05-security/`), rôle `SUPER_ADMIN_TECH`.
+**Statut.** Tranché par le commanditaire ; consigné pour traçabilité.
+
+**Constat.** Par conception (séparation des tâches, moindre privilège), `SUPER_ADMIN_TECH`
+n'avait que 4 permissions d'exploitation (DATA.RESTORE, INTEGRATION.REPLAY, OPS.DEPLOY,
+OPS.MONITOR.READ) et **aucune** permission fonctionnelle/financière. Le compte super-admin
+natif (`romuald.tiegnan@gmail.com`) portait donc de vrais refus (403) sur les endpoints
+métier exigeant `PERM_*` via `@PreAuthorize`.
+
+**Décision.** Le commanditaire veut ce compte **sans restriction**. La migration
+`V12__grant_all_permissions_to_super_admin_tech.sql` accorde les 66 permissions à
+`SUPER_ADMIN_TECH`. Conséquence assumée : ce rôle n'est plus soumis à la séparation des
+tâches. Si une séparation doit être conservée pour d'autres porteurs de ce rôle, créer un
+rôle distinct « accès total » et le réserver au compte propriétaire (à arbitrer).
+
+**Hors périmètre.** Les écrans « service indisponible » (tableau de bord/indicateurs,
+paiements, recouvrement, reporting…) ne sont **pas** un problème de permission : ils n'ont
+pas encore d'implémentation backend en mode http. Ce point est distinct de cette décision.
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.
