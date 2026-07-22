@@ -123,10 +123,13 @@
   color: var(--cnpm-color-brand-blue-700);
 }
 
-/* Photo illustrative en tete de tuile : bord a bord, hauteur fixe, coins arrondis. */
+/* Photo illustrative en tete de tuile : bord a bord, hauteur fixe, coins arrondis.
+   Hauteur = plus grand token d'espacement defini (6rem). L'ancienne valeur
+   `--cnpm-space-28` n'existe pas dans le bareme : la regle etait invalide et chaque
+   image tombait sur sa hauteur intrinseque, d'ou des tuiles de tailles differentes. */
 .cnpm-home__module-image {
   width: 100%;
-  height: var(--cnpm-space-28);
+  height: var(--cnpm-space-24);
   object-fit: cover;
   border-radius: var(--cnpm-radius-md);
   margin-block-end: var(--cnpm-space-4);

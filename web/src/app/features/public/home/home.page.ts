@@ -150,36 +150,42 @@ export class HomePage {
     },
   ];
 
+  /**
+   * Illustrations : photographies réelles du Mali (Wikimedia Commons, libres de droits),
+   * servies en local depuis `public/assets/tiles/`. Crédits et licences dans
+   * `assets/tiles/CREDITS.md`. L'attribut `alt` reste vide : l'image est décorative,
+   * le titre voisin porte le sens.
+   */
   protected readonly modules = [
     {
       id: 'cotisations',
       title: 'Cotisations',
       text: 'Suivre les appels et la situation de paiement.',
-      image: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=640&q=70',
+      image: '/assets/tiles/cotisations-bceao.jpg',
     },
     {
       id: 'requetes',
       title: 'Requêtes',
       text: 'Créer et suivre une demande adressée au CNPM.',
-      image: 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=640&q=70',
+      image: '/assets/tiles/requetes-marche.jpg',
     },
     {
       id: 'recus',
       title: 'Reçus',
       text: 'Retrouver les documents disponibles après émission.',
-      image: 'https://images.unsplash.com/photo-1586281380117-5a60ae2050cc?auto=format&fit=crop&w=640&q=70',
+      image: '/assets/tiles/recus-arche-bamako.jpg',
     },
     {
       id: 'reporting',
       title: 'Tableaux de bord',
       text: 'Consulter des indicateurs adaptés à son espace.',
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=640&q=70',
+      image: '/assets/tiles/reporting-aci2000.jpg',
     },
     {
       id: 'vitrine',
       title: 'Vitrine publique',
       text: 'Valoriser une entreprise selon les règles de publication.',
-      image: 'https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?auto=format&fit=crop&w=640&q=70',
+      image: '/assets/tiles/vitrine-djenne.jpg',
     },
   ];
 
