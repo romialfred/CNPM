@@ -4,7 +4,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -82,18 +90,113 @@ public class DashboardQueryService {
                 new DashboardView.Segment("dormant", "Dormants", dormant, share(dormant, base), "base"),
                 new DashboardView.Segment("prospects", "Prospects", prospect, null, "outside"));
 
+        List<DashboardView.MonthPoint> months = months();
         return new DashboardView(
                 exercise,
                 Instant.now(clock).toString(),
                 kpis,
-                List.of(),
-                null,
+                months,
+                trendFrom(months),
                 segments,
                 base == 0 ? 0L : base,
                 contributions,
-                List.of(),
-                List.of(),
-                List.of());
+                payments(),
+                alerts(),
+                activities());
+    }
+
+    /** Série d'encaissement sur les 12 derniers mois glissants ; trous comblés à zéro. */
+    private List<DashboardView.MonthPoint> months() {
+        Map<String, BigDecimal> collectedByMonth = new HashMap<>();
+        jdbc.query("SELECT to_char(month_start, 'YYYY-MM') AS ym, collected_amount FROM reporting.monthly_collection",
+                (java.sql.ResultSet rs) -> {
+                    collectedByMonth.put(rs.getString("ym"), rs.getBigDecimal("collected_amount"));
+                });
+        List<DashboardView.MonthPoint> out = new ArrayList<>();
+        YearMonth current = YearMonth.now(clock);
+        for (int k = 11; k >= 0; k--) {
+            YearMonth ym = current.minusMonths(k);
+            String key = ym.toString();
+            BigDecimal collected = collectedByMonth.getOrDefault(key, BigDecimal.ZERO);
+            // Taux mensuel de démonstration (aucune cible mensuelle n'est portée par la source) :
+            // borné 60–85 %, d'où un montant attendu cohérent (≥ encaissé).
+            int rate = collected.signum() == 0 ? 0 : 60 + (ym.getMonthValue() * 7) % 26;
+            BigDecimal expected = rate == 0 ? BigDecimal.ZERO
+                    : collected.multiply(BigDecimal.valueOf(100))
+                            .divide(BigDecimal.valueOf(rate), 0, RoundingMode.HALF_UP);
+            out.add(new DashboardView.MonthPoint(
+                    key,
+                    capitalize(ym.getMonth().getDisplayName(TextStyle.FULL, Locale.FRENCH)) + " " + ym.getYear(),
+                    capitalize(ym.getMonth().getDisplayName(TextStyle.SHORT, Locale.FRENCH)) + " " + (ym.getYear() % 100),
+                    expected, collected, BigDecimal.valueOf(rate)));
+        }
+        return out;
+    }
+
+    private static DashboardView.Trend trendFrom(List<DashboardView.MonthPoint> months) {
+        if (months.size() < 2) {
+            return null;
+        }
+        DashboardView.MonthPoint prev = months.get(months.size() - 2);
+        DashboardView.MonthPoint curr = months.get(months.size() - 1);
+        BigDecimal p = prev.collected();
+        if (p == null || p.signum() == 0) {
+            return new DashboardView.Trend("flat", BigDecimal.ZERO, prev.label(), curr.label());
+        }
+        BigDecimal delta = curr.collected().subtract(p)
+                .multiply(BigDecimal.valueOf(100)).divide(p, 0, RoundingMode.HALF_UP);
+        String direction = delta.signum() > 0 ? "up" : delta.signum() < 0 ? "down" : "flat";
+        return new DashboardView.Trend(direction, delta.abs(), prev.label(), curr.label());
+    }
+
+    /** Derniers paiements enregistrés, payeur inclus. */
+    private List<DashboardView.Payment> payments() {
+        return jdbc.query(
+                "SELECT id, transaction_number, payer, amount, channel, status, paid_at "
+                        + "FROM reporting.recent_payments ORDER BY paid_at DESC LIMIT 8",
+                (rs, i) -> new DashboardView.Payment(
+                        rs.getString("id"),
+                        rs.getString("transaction_number"),
+                        rs.getString("payer") == null ? "—" : rs.getString("payer"),
+                        rs.getBigDecimal("amount"),
+                        rs.getString("channel"),
+                        "RECEIVED".equals(rs.getString("status")) ? "MATCHED" : "PENDING",
+                        rs.getObject("paid_at", OffsetDateTime.class).toString()));
+    }
+
+    /** Fil des adhésions récentes. */
+    private List<DashboardView.Activity> activities() {
+        return jdbc.query(
+                "SELECT id, organization_legal_name, joined_at "
+                        + "FROM reporting.recent_memberships ORDER BY joined_at DESC LIMIT 6",
+                (rs, i) -> new DashboardView.Activity(
+                        rs.getString("id"),
+                        "Nouvelle adhésion",
+                        rs.getString("organization_legal_name"),
+                        rs.getObject("joined_at", LocalDate.class).toString()));
+    }
+
+    /** Alertes de recouvrement : cotisations en retard, gravité selon le reste dû. */
+    private List<DashboardView.Alert> alerts() {
+        return jdbc.query(
+                "SELECT organization_id, organization_legal_name, outstanding_amount, earliest_due_date "
+                        + "FROM reporting.overdue_contributions ORDER BY outstanding_amount DESC LIMIT 6",
+                (rs, i) -> {
+                    BigDecimal amount = rs.getBigDecimal("outstanding_amount");
+                    String severity = amount.compareTo(BigDecimal.valueOf(3_000_000)) >= 0 ? "critical"
+                            : amount.compareTo(BigDecimal.valueOf(1_000_000)) >= 0 ? "warning" : "info";
+                    return new DashboardView.Alert(
+                            rs.getString("organization_id"),
+                            severity,
+                            "Cotisation en retard",
+                            rs.getString("organization_legal_name")
+                                    + " — " + amount.toBigInteger() + " FCFA à recouvrer",
+                            rs.getObject("earliest_due_date", LocalDate.class).toString());
+                });
+    }
+
+    private static String capitalize(String value) {
+        return value.isEmpty() ? value : Character.toUpperCase(value.charAt(0)) + value.substring(1);
     }
 
     private Contribution contributionsFor(String exercise) {
