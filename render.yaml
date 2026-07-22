@@ -1,0 +1,39 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploiement de DEMONSTRATION du CNPM Digital Platform : le front Angular publie en
+# site statique, en mode 'demo' (toutes les vues fonctionnent sur fixtures, sans backend).
+# C'est le deploiement qui fonctionne immediatement et gratuitement (free plan).
+#
+# Le deploiement complet (backend Spring Boot + PostgreSQL + RabbitMQ, mode 'http')
+# est documente dans deploy/render/README.md : il exige des services payants, des
+# secrets et une approbation humaine (voir CLAUDE.md), il n'est donc PAS active ici.
+
+services:
+  - type: web
+    name: cnpm-web
+    runtime: static
+    # Build du bundle de production, puis bascule de la config d'execution en mode demo.
+    buildCommand: cd web && npm ci && npm run build && cp ../deploy/render/runtime-config.demo.js dist/cnpm-web/browser/runtime-config.js
+    staticPublishPath: web/dist/cnpm-web/browser
+    # Ne reconstruire que si le front change.
+    buildFilter:
+      paths:
+        - web/**
+        - deploy/render/**
+        - render.yaml
+    envVars:
+      # engines de web/package.json : node ^22.22.3 || ^24 || >=26.
+      - key: NODE_VERSION
+        value: 22.22.3
+    # SPA : toute route inconnue est servie par index.html (routage cote client Angular).
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
