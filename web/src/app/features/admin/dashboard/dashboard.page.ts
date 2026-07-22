@@ -325,6 +325,30 @@ export class DashboardPage {
   protected readonly trend = computed(() => this.data()?.trend ?? null);
   protected readonly payments = computed(() => this.data()?.payments ?? []);
   protected readonly alerts = computed(() => this.data()?.alerts ?? []);
+  /** Le panneau n'affiche que les 3 alertes les plus prioritaires ; « voir toutes » déplie. */
+  protected readonly showAllAlerts = signal(false);
+  protected readonly visibleAlerts = computed(() =>
+    this.showAllAlerts() ? this.alerts() : this.alerts().slice(0, 3),
+  );
+  protected readonly hiddenAlertCount = computed(() => Math.max(0, this.alerts().length - 3));
+
+  protected toggleAlerts(): void {
+    this.showAllAlerts.update((shown) => !shown);
+  }
+
+  protected readonly channels = computed(() => this.data()?.channels ?? []);
+  /** Barres proportionnelles au montant du canal le plus élevé (jamais une division par zéro). */
+  protected readonly channelBars = computed(() => {
+    const channels = this.channels();
+    const max = Math.max(1, ...channels.map((slice) => slice.amount));
+    return channels.map((slice) => ({
+      channel: slice.channel,
+      label: this.channelLabel(slice.channel),
+      count: slice.count,
+      amount: slice.amount,
+      width: Math.round((slice.amount / max) * 100),
+    }));
+  });
 
   /** Tuiles KPI assemblées une fois : habillage décoratif et tracé de la courbe. */
   protected readonly kpiCards = computed<readonly DashboardKpiCard[]>(() =>

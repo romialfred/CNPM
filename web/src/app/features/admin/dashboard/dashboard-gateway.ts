@@ -128,6 +128,14 @@ export interface DashboardContributions {
   readonly recoveryRate: number | null;
 }
 
+/** Part d'un canal d'encaissement dans la répartition des paiements. */
+export interface DashboardChannelSlice {
+  readonly channel: DashboardPaymentChannel;
+  readonly count: number;
+  /** Montant total encaissé par ce canal, en XOF entier. */
+  readonly amount: number;
+}
+
 export interface DashboardSnapshot {
   readonly exercise: string;
   /** Horodatage ISO de la mesure : « le rafraîchissement conserve la dernière donnée
@@ -148,6 +156,8 @@ export interface DashboardSnapshot {
    */
   readonly alerts: readonly DashboardAlert[];
   readonly activities: readonly DashboardActivity[];
+  /** Répartition par canal d'encaissement ; optionnelle (la démo ne la fournit pas). */
+  readonly channels?: readonly DashboardChannelSlice[];
 }
 
 export interface DashboardGateway {

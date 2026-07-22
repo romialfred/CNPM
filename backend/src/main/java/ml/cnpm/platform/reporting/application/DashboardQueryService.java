@@ -102,7 +102,19 @@ public class DashboardQueryService {
                 contributions,
                 payments(),
                 alerts(),
-                activities());
+                activities(),
+                channels());
+    }
+
+    /** Répartition des encaissements par canal, du plus au moins utilisé. */
+    private List<DashboardView.ChannelSlice> channels() {
+        return jdbc.query(
+                "SELECT channel, payment_count, total_amount FROM reporting.payment_channel_breakdown "
+                        + "ORDER BY total_amount DESC",
+                (rs, i) -> new DashboardView.ChannelSlice(
+                        rs.getString("channel"),
+                        rs.getLong("payment_count"),
+                        rs.getBigDecimal("total_amount").longValue()));
     }
 
     /** Série d'encaissement sur les 12 derniers mois glissants ; trous comblés à zéro. */
@@ -190,13 +202,18 @@ public class DashboardQueryService {
                             severity,
                             "Cotisation en retard",
                             rs.getString("organization_legal_name")
-                                    + " — " + amount.toBigInteger() + " FCFA à recouvrer",
+                                    + " : " + formatFcfa(amount) + " FCFA à recouvrer",
                             rs.getObject("earliest_due_date", LocalDate.class).toString());
                 });
     }
 
     private static String capitalize(String value) {
         return value.isEmpty() ? value : Character.toUpperCase(value.charAt(0)) + value.substring(1);
+    }
+
+    /** Montant groupé à la française (« 3 600 000 »), sans symbole ; le « FCFA » suit dans le texte. */
+    private static String formatFcfa(BigDecimal amount) {
+        return java.text.NumberFormat.getInstance(java.util.Locale.FRENCH).format(amount.longValue());
     }
 
     private Contribution contributionsFor(String exercise) {

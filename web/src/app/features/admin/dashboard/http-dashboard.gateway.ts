@@ -70,6 +70,7 @@ export class HttpDashboardGateway implements DashboardGateway {
       payments: response.payments ?? [],
       alerts: response.alerts ?? [],
       activities: response.activities ?? [],
+      channels: response.channels ?? [],
     };
   }
 }

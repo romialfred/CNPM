@@ -23,7 +23,11 @@ public record DashboardView(
         Contributions contributions,
         List<Payment> payments,
         List<Alert> alerts,
-        List<Activity> activities) {
+        List<Activity> activities,
+        List<ChannelSlice> channels) {
+
+    /** Part d'un canal d'encaissement (Mobile Money, virement, espèces) : nombre et montant. */
+    public record ChannelSlice(String channel, long count, long amount) { }
 
     /** Indicateur clé ; {@code value} nul quand la mesure est indisponible pour l'exercice. */
     public record Kpi(

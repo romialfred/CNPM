@@ -649,7 +649,7 @@
             />
           } @else {
             <ul class="cnpm-dashboard__alerts">
-              @for (alert of alerts(); track alert.id) {
+              @for (alert of visibleAlerts(); track alert.id) {
                 <li>
                   <!-- `live=false` : la liste est peinte d'un bloc au chargement. Cinq
                        régions live imbriquées provoqueraient cinq annonces pour un
@@ -671,12 +671,54 @@
                 </li>
               }
             </ul>
+            @if (hiddenAlertCount() > 0 || showAllAlerts()) {
+              <button
+                type="button"
+                class="cnpm-dashboard__alerts-toggle"
+                (click)="toggleAlerts()"
+              >
+                @if (showAllAlerts()) {
+                  Réduire les alertes
+                } @else {
+                  Voir toutes les alertes ({{ alerts().length }})
+                }
+              </button>
+            }
             <p class="cnpm-dashboard__note">
               Alertes classées par gravité, puis de la plus récente à la plus ancienne.
             </p>
           }
         </section>
       </div>
+
+      @if (channels().length > 0) {
+        <section
+          class="cnpm-dashboard__panel cnpm-dashboard__channels"
+          aria-labelledby="titre-canaux"
+        >
+          <h2 class="cnpm-dashboard__panel-title" id="titre-canaux">
+            Répartition des encaissements par canal
+          </h2>
+          <ul class="cnpm-dashboard__channel-list">
+            @for (bar of channelBars(); track bar.channel) {
+              <li class="cnpm-dashboard__channel">
+                <div class="cnpm-dashboard__channel-head">
+                  <span class="cnpm-dashboard__channel-label">{{ bar.label }}</span>
+                  <span class="cnpm-dashboard__channel-value">
+                    {{ bar.amount | number: '1.0-0' }} FCFA · {{ bar.count }} paiement(s)
+                  </span>
+                </div>
+                <div class="cnpm-dashboard__channel-track" aria-hidden="true">
+                  <div
+                    class="cnpm-dashboard__channel-bar cnpm-dashboard__channel-bar--{{ bar.channel }}"
+                    [style.inline-size.%]="bar.width"
+                  ></div>
+                </div>
+              </li>
+            }
+          </ul>
+        </section>
+      }
     } @else {
       <cnpm-empty-state
         variant="no-data"

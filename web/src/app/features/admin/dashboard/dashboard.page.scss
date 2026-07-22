@@ -515,3 +515,74 @@
     outline-offset: 1px;
   }
 }
+
+/* Bouton « voir toutes les alertes » : lien discret, aligné sous la liste. */
+.cnpm-dashboard__alerts-toggle {
+  display: inline-flex;
+  margin-block-start: var(--cnpm-space-3);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--cnpm-color-text-brand);
+  font: inherit;
+  font-weight: var(--cnpm-font-weight-medium);
+  cursor: pointer;
+}
+
+.cnpm-dashboard__alerts-toggle:hover {
+  text-decoration: underline;
+}
+
+.cnpm-dashboard__alerts-toggle:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+  border-radius: var(--cnpm-radius-md);
+}
+
+/* Répartition des encaissements par canal : barres horizontales proportionnelles. */
+.cnpm-dashboard__channel-list {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  margin: var(--cnpm-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-dashboard__channel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  margin-block-end: var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-dashboard__channel-label {
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-dashboard__channel-value {
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-dashboard__channel-track {
+  block-size: var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-surface-subtle);
+  overflow: hidden;
+}
+
+.cnpm-dashboard__channel-bar {
+  block-size: 100%;
+  min-inline-size: 2px;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-600);
+}
+
+.cnpm-dashboard__channel-bar--BANK_TRANSFER {
+  background: var(--cnpm-color-semantic-info-500);
+}
+
+.cnpm-dashboard__channel-bar--CASH {
+  background: var(--cnpm-color-semantic-success-600);
+}
