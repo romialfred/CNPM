@@ -76,19 +76,38 @@ describe('HttpMembersGateway', () => {
       totalPages: 1,
     });
 
+    // La synthèse (volet, facettes, financiers) vient du read-model reporting.
+    http.expectOne('/v1/reporting/member-overview').flush({
+      overview: {
+        membersTotal: 12,
+        active: 9,
+        dormant: 3,
+        prospects: 2,
+        largeContributors: 4,
+        expected: 27000000,
+        collected: 15300000,
+        recoveryRate: 57,
+      },
+      categories: ['GRANDE_ENTREPRISE', 'PME', 'TPE'],
+      groups: ['Industries'],
+      financials: [
+        { organizationId: '22222222-2222-4222-8222-222222222222', due: 5000000, paid: 3000000 },
+      ],
+    });
+
     const result = await resultPromise;
     expect(result.rows[0]).toMatchObject({
       id: '11111111-1111-4111-8111-111111111111',
       organizationId: '22222222-2222-4222-8222-222222222222',
       organization: 'Mali Industrie SA',
-      due: null,
-      paid: null,
+      due: 5000000,
+      paid: 3000000,
       lastActivity: null,
-      isLargeContributor: null,
+      isLargeContributor: false,
     });
-    expect(result.overview).toBeNull();
-    expect(result.categories).toBeNull();
-    expect(result.groups).toBeNull();
+    expect(result.overview?.recoveryRate).toBe(57);
+    expect(result.categories).toEqual(['GRANDE_ENTREPRISE', 'PME', 'TPE']);
+    expect(result.groups).toEqual(['Industries']);
     expect(result.supportedSortKeys).toEqual(['code', 'organization', 'status', 'group']);
   });
 
@@ -103,6 +122,12 @@ describe('HttpMembersGateway', () => {
   it('transforme un 403 normalisé en erreur d accès BO-002', async () => {
     const resultPromise = firstValueFrom(gateway.search({ ...QUERY, sort: null }));
     const request = http.expectOne((candidate) => candidate.url === '/v1/memberships');
+    http.expectOne('/v1/reporting/member-overview').flush({
+      overview: null,
+      categories: [],
+      groups: [],
+      financials: [],
+    });
     request.flush(
       {
         timestamp: '2026-07-18T12:00:00Z',
@@ -120,6 +145,12 @@ describe('HttpMembersGateway', () => {
   it('refuse un nouveau statut backend non pris en charge par la fiche', async () => {
     const resultPromise = firstValueFrom(gateway.search({ ...QUERY, sort: null }));
     const request = http.expectOne((candidate) => candidate.url === '/v1/memberships');
+    http.expectOne('/v1/reporting/member-overview').flush({
+      overview: null,
+      categories: [],
+      groups: [],
+      financials: [],
+    });
     request.flush({
       items: [
         {

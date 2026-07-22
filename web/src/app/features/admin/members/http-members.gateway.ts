@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, defer, map, type Observable, throwError } from 'rxjs';
+import { catchError, defer, forkJoin, map, type Observable, of, throwError } from 'rxjs';
 import { buildCnpmApiUrl, CNPM_API_BASE_URL } from '../../../core/api/api.config';
 import { CnpmApiError } from '../../../core/api/api-problem';
 import {
@@ -34,6 +34,26 @@ interface MembershipPageResponse {
   readonly size: number;
   readonly totalElements: number;
   readonly totalPages?: number;
+}
+
+interface MemberOverviewResponse {
+  readonly overview: {
+    readonly membersTotal: number;
+    readonly active: number;
+    readonly dormant: number;
+    readonly prospects: number;
+    readonly largeContributors: number;
+    readonly expected: number;
+    readonly collected: number;
+    readonly recoveryRate: number | null;
+  };
+  readonly categories: readonly string[];
+  readonly groups: readonly string[];
+  readonly financials: readonly {
+    readonly organizationId: string;
+    readonly due: number;
+    readonly paid: number;
+  }[];
 }
 
 const STATUS_VALUES = new Set<MemberStatus>(['ACTIVE', 'DORMANT', 'PROSPECT']);
@@ -79,27 +99,48 @@ export class HttpMembersGateway implements MembersGateway {
         params = params.set('sort', sort);
       }
 
-      return this.http
-        .get<MembershipPageResponse>(buildCnpmApiUrl(this.baseUrl, 'memberships'), { params })
-        .pipe(
-          map((response) => ({
-            rows: response.items.map((item) => this.mapRow(item)),
-            totalItems: response.totalElements,
-            overview: null,
-            // Le contrat R0 ne livre pas de facettes globales. Les déduire de la page
-            // courante rendrait les filtres incomplets et trompeurs.
-            categories: null,
-            groups: null,
+      // La synthèse (volet, facettes, financiers) provient du read-model reporting, seul
+      // habilité à croiser membre et cotisation. Son échec ne doit pas masquer la liste :
+      // on dégrade en `null` (le volet disparaît) plutôt que de faire échouer la page.
+      const overview$ = this.http
+        .get<MemberOverviewResponse>(buildCnpmApiUrl(this.baseUrl, 'reporting/member-overview'))
+        .pipe(catchError(() => of(null)));
+
+      return forkJoin({
+        page: this.http.get<MembershipPageResponse>(buildCnpmApiUrl(this.baseUrl, 'memberships'), {
+          params,
+        }),
+        overview: overview$,
+      }).pipe(
+        map(({ page, overview }) => {
+          const financials = new Map(
+            (overview?.financials ?? []).map((f) => [f.organizationId, f]),
+          );
+          return {
+            rows: page.items.map((item) => {
+              const fin = financials.get(item.organizationId);
+              return {
+                ...this.mapRow(item),
+                due: fin ? fin.due : null,
+                paid: fin ? fin.paid : null,
+                isLargeContributor: item.categoryCode === 'GRANDE_ENTREPRISE',
+              };
+            }),
+            totalItems: page.totalElements,
+            overview: overview?.overview ?? null,
+            categories: overview ? [...overview.categories] : null,
+            groups: overview ? [...overview.groups] : null,
             supportedSortKeys: Object.keys(API_SORT_KEYS),
-          })),
-          catchError((error: unknown) =>
-            throwError(() =>
-              error instanceof CnpmApiError && error.category === 'authorization'
-                ? new MembersAccessError()
-                : error,
-            ),
+          };
+        }),
+        catchError((error: unknown) =>
+          throwError(() =>
+            error instanceof CnpmApiError && error.category === 'authorization'
+              ? new MembersAccessError()
+              : error,
           ),
-        );
+        ),
+      );
     });
   }
 

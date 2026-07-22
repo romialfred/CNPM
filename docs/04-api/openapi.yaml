@@ -3652,6 +3652,27 @@ paths:
                 $ref: '#/components/schemas/MemberDetail'
       x-requirements:
       - BO-003
+  /reporting/member-overview:
+    get:
+      tags:
+      - MEMBER
+      summary: Restituer la synthèse du répertoire des membres.
+      operationId: getMemberOverview
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Synthèse du répertoire (effectifs, cotisations, filtres, agrégats financiers).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberOverview'
+      x-requirements:
+      - BO-002
 components:
   securitySchemes:
     oauth2:
@@ -3877,6 +3898,31 @@ components:
           nullable: true
         permissions:
           type: object
+    MemberOverview:
+      type: object
+      description: >-
+        Synthèse du répertoire des membres (BO-002) : volet de synthèse, options de filtre et
+        agrégats de cotisation (due/payée) par organisation.
+      required:
+      - overview
+      - categories
+      - groups
+      - financials
+      properties:
+        overview:
+          type: object
+        categories:
+          type: array
+          items:
+            type: string
+        groups:
+          type: array
+          items:
+            type: string
+        financials:
+          type: array
+          items:
+            type: object
     Money:
       type: object
       required:
