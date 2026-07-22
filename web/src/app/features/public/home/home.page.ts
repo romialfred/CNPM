@@ -125,28 +125,28 @@ export class HomePage {
       title: 'Représentation et plaidoyer',
       text: 'Porter la voix des entreprises et défendre leurs intérêts dans un cadre structuré.',
       accent: 'indigo',
-      image: '',
+      image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=640&q=70',
     },
     {
       id: 'accompagnement',
       title: 'Accompagnement et services',
       text: 'Simplifier les démarches courantes et rendre les services plus faciles à suivre.',
       accent: 'teal',
-      image: '',
+      image: 'https://images.unsplash.com/photo-1568234928966-359c35dd8327?auto=format&fit=crop&w=640&q=70',
     },
     {
       id: 'reseau',
       title: 'Réseau et opportunités',
       text: 'Relier groupements, conseils régionaux et entreprises autour d’un réseau commun.',
       accent: 'sky',
-      image: '',
+      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=640&q=70',
     },
     {
       id: 'information',
       title: 'Information économique',
       text: 'Mettre à disposition des repères utiles dans un espace numérique cohérent.',
       accent: 'amber',
-      image: '',
+      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=640&q=70',
     },
   ];
 

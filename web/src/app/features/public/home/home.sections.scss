@@ -157,11 +157,20 @@
 
 .cnpm-home__benefit-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Les quatre axes d'action sur une seule ligne (demande du commanditaire). */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--cnpm-space-4);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Repli intermédiaire : deux colonnes sur tablette (l'empilement mobile ≤ 47.94rem est
+   géré ailleurs). Plage bornée pour ne pas écraser la règle mobile à une colonne. */
+@media (min-width: 48rem) and (max-width: 63.9375rem) {
+  .cnpm-home__benefit-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* La carte des axes d'action est désormais rendue par `cnpm-feature-tile`, qui porte

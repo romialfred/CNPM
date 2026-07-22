@@ -22,9 +22,6 @@ export type CnpmTileAccent = 'indigo' | 'blue' | 'sky' | 'teal' | 'amber';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article class="cnpm-tile cnpm-liftable" [class]="accentClass()">
-      @if (image()) {
-        <img class="cnpm-tile__media" [src]="image()" alt="" loading="lazy" />
-      }
       <span class="cnpm-tile__icon" aria-hidden="true">
         <ng-content select="[tileIcon]" />
       </span>
@@ -32,6 +29,10 @@ export type CnpmTileAccent = 'indigo' | 'blue' | 'sky' | 'teal' | 'amber';
         <h3 class="cnpm-tile__heading">{{ heading() }}</h3>
         <p class="cnpm-tile__text"><ng-content /></p>
       </div>
+      @if (image()) {
+        <!-- Photo en BAS de la tuile : le texte reste en tête, l'illustration suit. -->
+        <img class="cnpm-tile__media" [src]="image()" alt="" loading="lazy" />
+      }
     </article>
   `,
   styleUrl: './feature-tile.component.scss',
