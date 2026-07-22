@@ -9,6 +9,10 @@ interface CurrentUserResponse {
   readonly subject: string;
   readonly username: string | null;
   readonly email: string | null;
+  /** Nom lisible résolu par le backend (`iam.user_account.display_name`). */
+  readonly displayName: string | null;
+  /** Libellé de rôle résolu par le backend (source `iam.role.label`). */
+  readonly roleLabel: string | null;
   readonly roles: readonly string[];
   readonly permissions: readonly string[];
 }
@@ -27,8 +31,9 @@ export class HttpSessionGateway implements SessionGateway {
     this.http.get<CurrentUserResponse>(buildCnpmApiUrl(this.baseUrl, 'auth/me')),
   ).pipe(
     map((user) => ({
-      displayName: user.username ?? user.email ?? user.subject,
-      roleLabel: user.roles.length > 0 ? user.roles.join(' · ') : 'Aucun rôle attribué',
+      displayName: user.displayName ?? user.username ?? user.email ?? user.subject,
+      roleLabel:
+        user.roleLabel ?? (user.roles.length > 0 ? user.roles.join(' · ') : 'Aucun rôle attribué'),
       // Le contrat courant ne fournit ni exercice actif ni agrégat de notifications.
       exerciseLabel: null,
       notificationCount: null,

@@ -3,6 +3,7 @@ import type { Routes } from '@angular/router';
 import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoHomeGateway } from './home/demo-home.gateway';
 import { HOME_GATEWAY } from './home/home-gateway';
+import { HttpHomeGateway } from './home/http-home.gateway';
 import { DemoEditorialGateway } from './editorial/demo-editorial.gateway';
 import { EDITORIAL_GATEWAY } from './editorial/editorial-gateway';
 import { DemoShowcaseGateway } from './showcase/demo-showcase.gateway';
@@ -12,7 +13,6 @@ import { RECEIPT_VERIFICATION_GATEWAY } from './verification/receipt-verificatio
 import { pendingPublicEnrollmentChangesGuard } from './enrollment/pending-public-enrollment-changes.guard';
 import { PublicEnrollmentSession } from './enrollment/public-enrollment-session';
 import {
-  UNAVAILABLE_HOME_GATEWAY,
   UNAVAILABLE_EDITORIAL_GATEWAY,
   UNAVAILABLE_SHOWCASE_GATEWAY,
   UNAVAILABLE_RECEIPT_VERIFICATION_GATEWAY,
@@ -136,10 +136,11 @@ export const publicRoutes: Routes = [
     pathMatch: 'full',
     providers: [
       DemoHomeGateway,
+      HttpHomeGateway,
       {
         provide: HOME_GATEWAY,
         useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo' ? inject(DemoHomeGateway) : UNAVAILABLE_HOME_GATEWAY,
+          inject(CNPM_DATA_MODE) === 'demo' ? inject(DemoHomeGateway) : inject(HttpHomeGateway),
       },
     ],
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),

@@ -44,13 +44,11 @@ import { memberRoutes } from '../../features/member/member.routes';
 import { UNAVAILABLE_MEMBER_HOME_GATEWAY } from '../../features/member/unavailable-member-gateways';
 import { DemoHomeGateway } from '../../features/public/home/demo-home.gateway';
 import { HOME_GATEWAY } from '../../features/public/home/home-gateway';
+import { HttpHomeGateway } from '../../features/public/home/http-home.gateway';
 import { publicRoutes, showcaseRoutes } from '../../features/public/public.routes';
 import { DemoShowcaseGateway } from '../../features/public/showcase/demo-showcase.gateway';
 import { SHOWCASE_GATEWAY } from '../../features/public/showcase/showcase-gateway';
-import {
-  UNAVAILABLE_HOME_GATEWAY,
-  UNAVAILABLE_SHOWCASE_GATEWAY,
-} from '../../features/public/unavailable-public-gateways';
+import { UNAVAILABLE_SHOWCASE_GATEWAY } from '../../features/public/unavailable-public-gateways';
 import { DemoSessionGateway } from '../../layout/admin-shell/demo-session.gateway';
 import { HttpSessionGateway } from '../../layout/admin-shell/http-session.gateway';
 import { SESSION_GATEWAY } from '../../layout/admin-shell/session-gateway';
@@ -104,7 +102,7 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(RECOVERY_GATEWAY)).toBe(UNAVAILABLE_RECOVERY_GATEWAY);
     expect(TestBed.inject(REPORTING_GATEWAY)).toBe(UNAVAILABLE_REPORTING_GATEWAY);
     expect(TestBed.inject(ADMIN_SECURITY_GATEWAY)).toBe(UNAVAILABLE_ADMIN_SECURITY_GATEWAY);
-    expect(TestBed.inject(HOME_GATEWAY)).toBe(UNAVAILABLE_HOME_GATEWAY);
+    expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(HttpHomeGateway);
     expect(TestBed.inject(SHOWCASE_GATEWAY)).toBe(UNAVAILABLE_SHOWCASE_GATEWAY);
     expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBe(UNAVAILABLE_MEMBER_HOME_GATEWAY);
   });

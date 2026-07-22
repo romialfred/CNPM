@@ -10,7 +10,13 @@ import {
   viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { LucideChevronDown, LucideLogOut, LucideUserRound } from '@lucide/angular';
+import {
+  LucideChevronDown,
+  LucideCircleHelp,
+  LucideLogOut,
+  LucideSettings,
+  LucideUserRound,
+} from '@lucide/angular';
 
 /**
  * Menu du compte connecté — avatar, nom et rôle en déclencheur, déroulé avec « Se
@@ -24,7 +30,14 @@ import { LucideChevronDown, LucideLogOut, LucideUserRound } from '@lucide/angula
 @Component({
   selector: 'cnpm-account-menu',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, LucideChevronDown, LucideLogOut, LucideUserRound],
+  imports: [
+    RouterLink,
+    LucideChevronDown,
+    LucideCircleHelp,
+    LucideLogOut,
+    LucideSettings,
+    LucideUserRound,
+  ],
   templateUrl: './account-menu.component.html',
   styleUrl: './account-menu.component.scss',
 })
@@ -37,6 +50,10 @@ export class AccountMenuComponent {
   readonly secondary = input('');
   /** Route facultative « Mon profil » ; masquée si absente. */
   readonly profileLink = input('');
+  /** Route facultative « Mes préférences » ; masquée si absente. */
+  readonly preferencesLink = input('');
+  /** Route facultative « Aides » ; masquée si absente. */
+  readonly helpLink = input('');
   /** Identifiant stable pour les liaisons ARIA. */
   readonly menuId = input('account-menu');
 

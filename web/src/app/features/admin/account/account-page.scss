@@ -1,0 +1,42 @@
+.cnpm-account-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+}
+
+.cnpm-account-page__card {
+  background: var(--cnpm-color-surface-primary);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  padding: var(--cnpm-space-5);
+}
+
+.cnpm-account-page__list {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  margin: 0;
+}
+
+.cnpm-account-page__list > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+}
+
+.cnpm-account-page__list dt {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-account-page__list dd {
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-account-page__prose {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+}

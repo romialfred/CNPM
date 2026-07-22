@@ -50,6 +50,8 @@ public class SecurityConfig {
         "/actuator/info",
         // Vérification publique d'un reçu par jeton opaque (docs/04-api : verifyReceipt).
         "/receipts/verify/**",
+        // Chiffres clés publics de l'accueil (PUB-001) : dénombrements agrégés, non nominatifs.
+        "/public/highlights",
         // Authentification NATIVE (AUTH-DEC-020) : ces routes établissent l'identité, elles
         // ne peuvent donc pas exiger un jeton préalable. Le mot de passe et le second facteur
         // y sont vérifiés ; l'accès aux autres routes reste refusé par défaut. /auth/me, lui,

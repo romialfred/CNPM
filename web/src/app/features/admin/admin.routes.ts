@@ -301,6 +301,21 @@ export const adminRoutes: Routes = [
         title: 'Tableau de bord — Administration CNPM',
       },
       {
+        path: 'profile',
+        loadComponent: () => import('./account/profile.page').then((m) => m.ProfilePage),
+        title: 'Mon profil — Administration CNPM',
+      },
+      {
+        path: 'preferences',
+        loadComponent: () => import('./account/preferences.page').then((m) => m.PreferencesPage),
+        title: 'Mes préférences — Administration CNPM',
+      },
+      {
+        path: 'help',
+        loadComponent: () => import('./account/help.page').then((m) => m.HelpPage),
+        title: 'Aides — Administration CNPM',
+      },
+      {
         path: 'members',
         loadComponent: () => import('./members/members.page').then((m) => m.MembersPage),
         title: 'Membres — Administration CNPM',

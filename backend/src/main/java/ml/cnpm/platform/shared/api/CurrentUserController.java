@@ -25,6 +25,12 @@ public class CurrentUserController {
     private static final String ROLE_PREFIX = "ROLE_";
     private static final String PERMISSION_PREFIX = "PERM_";
 
+    private final SessionIdentityProjection identities;
+
+    CurrentUserController(SessionIdentityProjection identities) {
+        this.identities = identities;
+    }
+
     /** Revendications d'état 2FA fournies par Keycloak ; le serveur ne fait que les lire. */
     private static final String CLAIM_MFA_ENROLLED = "mfa_enrolled";
     private static final String CLAIM_MFA_REQUIRED = "mfa_required";
@@ -42,10 +48,13 @@ public class CurrentUserController {
         Jwt jwt = authentication.getToken();
         List<String> roles = authoritiesWithPrefix(authentication, ROLE_PREFIX);
         List<String> permissions = authoritiesWithPrefix(authentication, PERMISSION_PREFIX);
+        SessionIdentityProjection.Identity identity = identities.resolve(jwt.getSubject(), roles);
         return new CurrentUserResponse(
                 jwt.getSubject(),
                 jwt.getClaimAsString("preferred_username"),
                 jwt.getClaimAsString("email"),
+                identity.displayName(),
+                identity.roleLabel(),
                 roles,
                 permissions,
                 mfaEnrolled(jwt),

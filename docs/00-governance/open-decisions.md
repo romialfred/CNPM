@@ -969,5 +969,22 @@ rôle distinct « accès total » et le réserver au compte propriétaire (à ar
 paiements, recouvrement, reporting…) ne sont **pas** un problème de permission : ils n'ont
 pas encore d'implémentation backend en mode http. Ce point est distinct de cette décision.
 
+## AUTH-DEC-022 — Libellé « Propriétaire » affiché pour le compte owner
+
+**Propriétaire.** Product owner (demande explicite).
+**Impact.** Affichage du shell (`/auth/me` → `roleLabel`), catalogue `iam.role`.
+**Statut.** Tranché par le commanditaire ; consigné pour traçabilité.
+
+**Constat.** Le catalogue de rôles (`iam.role.label`, source de vérité) libelle
+`SUPER_ADMIN_TECH` « Superadministrateur technique ». Le commanditaire veut voir son compte
+owner affiché comme **« Propriétaire »**.
+
+**Décision.** La projection d'identité `SessionIdentityProjection` présente le rôle privilégié
+`SUPER_ADMIN_TECH` comme « Propriétaire » **à l'affichage uniquement**, sans altérer le
+catalogue `iam.role` (où le libellé reste « Superadministrateur technique » pour tout autre
+usage). Le nom affiché du compte (`display_name`) est fixé à « TIEGNAN Romuald » à la demande
+du commanditaire. Divergence assumée et localisée à la couche de présentation ; à revoir si un
+rôle « Propriétaire » distinct est introduit au catalogue.
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.

@@ -3606,6 +3606,24 @@ paths:
       - INT-004
       - INT-005
       - INT-006
+  /public/highlights:
+    get:
+      tags:
+      - REPORT
+      summary: Restituer les chiffres clés publics de l'accueil.
+      operationId: getPublicHighlights
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200':
+          description: Chiffres clés publics de l'accueil (dénombrements agrégés).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicHighlights'
+      x-requirements:
+      - PUB-001
 components:
   securitySchemes:
     oauth2:
@@ -3680,6 +3698,18 @@ components:
           format: email
           nullable: true
           description: Adresse e-mail lorsque la revendication est présente.
+        displayName:
+          type: string
+          nullable: true
+          description: >-
+            Nom lisible du compte, résolu depuis iam.user_account.display_name pour
+            l'affichage du shell ; null lorsqu'il est absent (le client retombe sur l'e-mail).
+        roleLabel:
+          type: string
+          nullable: true
+          description: >-
+            Libellé de rôle lisible pour l'affichage, résolu depuis iam.role.label ; null
+            lorsqu'il n'est pas résolu.
         roles:
           type: array
           uniqueItems: true
@@ -3714,6 +3744,52 @@ components:
     Uuid:
       type: string
       format: uuid
+    PublicHighlights:
+      type: object
+      description: >-
+        Chiffres clés publics de l'accueil (PUB-001) : dénombrements agrégés non nominatifs.
+        L'éditorial (`news`) reste vide côté serveur — il est réservé au profil de démonstration.
+      required:
+      - metrics
+      - news
+      - sourceNotice
+      properties:
+        metrics:
+          type: array
+          description: Indicateurs publics du CNPM.
+          items:
+            type: object
+            required:
+            - id
+            - label
+            - value
+            properties:
+              id:
+                type: string
+              label:
+                type: string
+              value:
+                type: integer
+                format: int64
+              unit:
+                type: string
+                nullable: true
+                enum:
+                - percent
+                - currency
+        news:
+          type: array
+          description: Toujours vide via cette API publique (éditorial réservé à la démonstration).
+          items:
+            type: object
+        sourceNotice:
+          type: string
+          description: Provenance affichée avec les valeurs pour éviter toute confusion institutionnelle.
+        dataAsOf:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date de constat des chiffres ; null si la source ne la porte pas.
     Money:
       type: object
       required:

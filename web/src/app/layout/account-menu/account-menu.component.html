@@ -32,6 +32,28 @@
           Mon profil
         </a>
       }
+      @if (preferencesLink(); as link) {
+        <a
+          class="cnpm-account-menu__item"
+          role="menuitem"
+          [routerLink]="link"
+          (click)="close()"
+        >
+          <svg lucideSettings aria-hidden="true"></svg>
+          Mes préférences
+        </a>
+      }
+      @if (helpLink(); as link) {
+        <a
+          class="cnpm-account-menu__item"
+          role="menuitem"
+          [routerLink]="link"
+          (click)="close()"
+        >
+          <svg lucideCircleHelp aria-hidden="true"></svg>
+          Aides
+        </a>
+      }
       <a
         class="cnpm-account-menu__item cnpm-account-menu__item--danger"
         role="menuitem"

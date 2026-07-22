@@ -13,7 +13,20 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 class CurrentUserControllerTest {
 
-    private final CurrentUserController controller = new CurrentUserController();
+    /**
+     * Projection déterministe sans base : le contrôleur ne fait que composer son résultat,
+     * on vérifie ici sa projection du jeton, pas la résolution SQL de {@link SessionIdentityProjection}.
+     */
+    private final CurrentUserController controller =
+            new CurrentUserController(
+                    new SessionIdentityProjection(null) {
+                        @Override
+                        public Identity resolve(String subject, List<String> roleCodes) {
+                            return new Identity(
+                                    "Nom " + subject,
+                                    roleCodes.isEmpty() ? "Aucun rôle attribué" : String.join(" · ", roleCodes));
+                        }
+                    });
 
     @Test
     void exposesOnlySortedRealmRolesAndServerDerivedPermissions() {
@@ -42,6 +55,9 @@ class CurrentUserControllerTest {
         assertEquals("user-123", response.subject());
         assertEquals("acomptable", response.username());
         assertEquals("a.comptable@example.test", response.email());
+        // Nom et libellé de rôle projetés par la résolution d'identité (source iam.*).
+        assertEquals("Nom user-123", response.displayName());
+        assertEquals("COMPTABLE · SUPPORT", response.roleLabel());
         assertEquals(List.of("COMPTABLE", "SUPPORT"), response.roles());
         assertEquals(List.of("MEMBER.READ", "PAYMENT.READ"), response.permissions());
         assertThrows(UnsupportedOperationException.class, () -> response.roles().add("OTHER"));

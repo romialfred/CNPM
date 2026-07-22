@@ -56,6 +56,29 @@ describe('AccountMenuComponent', () => {
     );
   });
 
+  it('propose « Mes préférences » et « Aides » quand leurs routes sont fournies', () => {
+    fixture.componentRef.setInput('preferencesLink', '/admin/preferences');
+    fixture.componentRef.setInput('helpLink', '/admin/help');
+    fixture.detectChanges();
+    host.querySelector<HTMLButtonElement>('.cnpm-account-menu__trigger')?.click();
+    fixture.detectChanges();
+
+    expect(
+      host.querySelector<HTMLAnchorElement>('a[href="/admin/preferences"]')?.textContent,
+    ).toContain('Mes préférences');
+    expect(host.querySelector<HTMLAnchorElement>('a[href="/admin/help"]')?.textContent).toContain(
+      'Aides',
+    );
+  });
+
+  it('masque « Mes préférences » et « Aides » sans routes fournies', () => {
+    host.querySelector<HTMLButtonElement>('.cnpm-account-menu__trigger')?.click();
+    fixture.detectChanges();
+
+    expect(host.textContent).not.toContain('Mes préférences');
+    expect(host.textContent).not.toContain('Aides');
+  });
+
   it('referme le menu à la touche Échap', () => {
     host.querySelector<HTMLButtonElement>('.cnpm-account-menu__trigger')?.click();
     fixture.detectChanges();
