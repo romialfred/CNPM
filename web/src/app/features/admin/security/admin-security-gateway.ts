@@ -164,6 +164,11 @@ export interface AdminSecuritySnapshot {
   readonly posture: SecurityPosture;
   readonly counts: SecurityCounts;
   /**
+   * Membres (adhésions) sans compte utilisateur, proposés à la création d'un compte membre.
+   * Vide côté professionnel, mais toujours présent pour un contrat stable.
+   */
+  readonly membersWithoutAccount: readonly MemberWithoutAccount[];
+  /**
    * Le compte courant peut-il MODIFIER la matrice des droits ? Décidé par la source (le
    * serveur reste l'autorité) : l'UI n'ouvre l'édition que si ce drapeau est vrai, sinon
    * la matrice reste en lecture seule.
@@ -187,6 +192,28 @@ export interface AdminSecuritySnapshot {
  */
 export type AccountType = 'PROFESSIONAL' | 'MEMBER';
 
+/**
+ * Membre (adhésion) ne disposant pas encore d'un compte utilisateur.
+ *
+ * Sert à créer un COMPTE MEMBRE sans ressaisir l'identité : l'opérateur choisit le membre
+ * dans la liste, et l'identité proposée (contact principal / représentant légal) pré-remplit
+ * le formulaire. La source garantit qu'un membre déjà pourvu d'un compte n'y figure pas.
+ */
+export interface MemberWithoutAccount {
+  readonly id: string;
+  /** Raison sociale de l'entreprise adhérente. */
+  readonly organizationName: string;
+  readonly membershipNumber: string;
+  readonly categoryLabel: string;
+  readonly groupLabel?: string;
+  /** Contact principal proposé pour amorcer le compte (modifiable par l'opérateur). */
+  readonly contactFirstName?: string;
+  readonly contactLastName?: string;
+  readonly contactEmail?: string;
+  readonly contactPhone?: string;
+  readonly contactJobTitle?: string;
+}
+
 export interface NewAccountInput {
   readonly accountType: AccountType;
   readonly firstName: string;
@@ -200,6 +227,11 @@ export interface NewAccountInput {
   readonly roleId: string;
   /** Permissions accordées EN PLUS de celles du rôle ; le serveur reste l'autorité. */
   readonly extraPermissionIds?: readonly string[];
+  /**
+   * Membre rattaché lorsqu'il s'agit d'un compte MEMBER (choisi dans la liste des membres
+   * sans compte). La source relie le compte à l'adhésion correspondante.
+   */
+  readonly memberId?: string;
 }
 
 export interface AdminSecurityGateway {

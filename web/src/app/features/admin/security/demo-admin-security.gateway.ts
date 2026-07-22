@@ -6,6 +6,7 @@ import type {
   AdminSecurityQuery,
   AdminSecuritySnapshot,
   AuditEntry,
+  MemberWithoutAccount,
   NewAccountInput,
   PermissionGrant,
   PermissionRow,
@@ -16,6 +17,99 @@ import type {
   SecurityRole,
   SecuritySession,
 } from './admin-security-gateway';
+
+/**
+ * Membres (entreprises adhérentes) sans compte utilisateur — fixtures FICTIVES.
+ *
+ * Alimente le sélecteur de la création d'un compte membre : choisir un membre pré-remplit
+ * l'identité à partir de son contact principal (représentant légal), sans ressaisie.
+ */
+const MEMBERS_WITHOUT_ACCOUNT: readonly MemberWithoutAccount[] = [
+  {
+    id: 'mem-2041',
+    organizationName: 'Société Malienne de Négoce SA',
+    membershipNumber: 'ADH-2041',
+    categoryLabel: 'Grande Entreprise',
+    groupLabel: 'Commerce et distribution',
+    contactFirstName: 'Oumar',
+    contactLastName: 'Diallo',
+    contactEmail: 'o.diallo@somane.example',
+    contactPhone: '+223 70 12 34 56',
+    contactJobTitle: 'Directeur général',
+  },
+  {
+    id: 'mem-2042',
+    organizationName: 'Faso Textile SARL',
+    membershipNumber: 'ADH-2042',
+    categoryLabel: 'Moyenne Entreprise',
+    groupLabel: 'Industrie',
+    contactFirstName: 'Aïssata',
+    contactLastName: 'Coulibaly',
+    contactEmail: 'a.coulibaly@fasotextile.example',
+    contactPhone: '+223 76 44 21 09',
+    contactJobTitle: 'Responsable administrative',
+  },
+  {
+    id: 'mem-2043',
+    organizationName: 'Agro Sahel Services',
+    membershipNumber: 'ADH-2043',
+    categoryLabel: 'PME',
+    groupLabel: 'Agro-industrie',
+    contactFirstName: 'Modibo',
+    contactLastName: 'Keïta',
+    contactEmail: 'm.keita@agrosahel.example',
+    contactPhone: '+223 65 88 77 10',
+    contactJobTitle: 'Gérant',
+  },
+  {
+    id: 'mem-2044',
+    organizationName: 'BTP Niger Construction',
+    membershipNumber: 'ADH-2044',
+    categoryLabel: 'Grande Entreprise',
+    groupLabel: 'Bâtiment et travaux publics',
+    contactFirstName: 'Fatoumata',
+    contactLastName: 'Sidibé',
+    contactEmail: 'f.sidibe@btpniger.example',
+    contactPhone: '+223 79 02 55 41',
+    contactJobTitle: 'Secrétaire générale',
+  },
+  {
+    id: 'mem-2045',
+    organizationName: 'Bamako Digital Solutions',
+    membershipNumber: 'ADH-2045',
+    categoryLabel: 'TPE',
+    groupLabel: 'Numérique et services',
+    contactFirstName: 'Ibrahim',
+    contactLastName: 'Traoré',
+    contactEmail: 'i.traore@bko-digital.example',
+    contactPhone: '+223 90 33 12 88',
+    contactJobTitle: 'Fondateur',
+  },
+  {
+    id: 'mem-2046',
+    organizationName: 'Transport Fluvial du Niger',
+    membershipNumber: 'ADH-2046',
+    categoryLabel: 'Moyenne Entreprise',
+    groupLabel: 'Transport et logistique',
+    contactFirstName: 'Kadiatou',
+    contactLastName: 'Maïga',
+    contactEmail: 'k.maiga@tfn.example',
+    contactPhone: '+223 66 19 74 30',
+    contactJobTitle: 'Directrice des opérations',
+  },
+  {
+    id: 'mem-2047',
+    organizationName: 'Énergie Solaire du Mali',
+    membershipNumber: 'ADH-2047',
+    categoryLabel: 'PME',
+    groupLabel: 'Énergie',
+    contactFirstName: 'Souleymane',
+    contactLastName: 'Cissé',
+    contactEmail: 's.cisse@esm.example',
+    contactPhone: '+223 73 41 60 22',
+    contactJobTitle: 'Directeur technique',
+  },
+];
 
 /**
  * Adaptateur de démonstration du port `ADMIN_SECURITY_GATEWAY`.
@@ -423,6 +517,8 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
   private accounts: SecurityAccount[] = [...buildAccounts()];
   private createdCount = 0;
   private resetCount = 0;
+  /** Membres déjà rattachés à un compte pendant la session démo (retirés de la liste). */
+  private readonly linkedMemberIds = new Set<string>();
 
   load(query: AdminSecurityQuery): Observable<AdminSecuritySnapshot> {
     const term = fold(query.search.trim());
@@ -449,6 +545,10 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
       // Un backend renverrait `false` pour un profil sans le droit, et l'UI resterait en
       // lecture seule.
       canManagePermissions: true,
+      // Un membre pour lequel un compte vient d'être créé disparaît de la liste.
+      membersWithoutAccount: MEMBERS_WITHOUT_ACCOUNT.filter(
+        (member) => !this.linkedMemberIds.has(member.id),
+      ),
     };
 
     // Latence simulée : sans elle, l'état de chargement ne serait jamais peint, donc
@@ -483,6 +583,10 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
       lastLoginLabel: null,
       activeSessions: 0,
     };
+    // Compte membre rattaché : le membre quitte la liste « sans compte ».
+    if (input.memberId) {
+      this.linkedMemberIds.add(input.memberId);
+    }
     // En tête de liste : l'opérateur voit immédiatement le compte qu'il vient de créer.
     this.accounts = [account, ...this.accounts];
     return of(account).pipe(delay(180));

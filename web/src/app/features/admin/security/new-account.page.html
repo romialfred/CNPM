@@ -44,9 +44,96 @@
             </div>
           </fieldset>
 
+          <!-- Membre à rattacher (compte membre uniquement) -->
+          @if (isMember()) {
+            <fieldset class="cnpm-new-account__section">
+              <legend class="cnpm-new-account__legend">Membre à rattacher</legend>
+              @if (membersWithoutAccount().length === 0) {
+                <p class="cnpm-new-account__empty" role="status">
+                  Tous les membres disposent déjà d’un compte.
+                </p>
+              } @else {
+                <div class="cnpm-new-account__field">
+                  <label class="cnpm-new-account__label" for="member-search">
+                    Rechercher un membre sans compte
+                  </label>
+                  <input
+                    id="member-search"
+                    class="cnpm-new-account__search"
+                    type="search"
+                    placeholder="Raison sociale, numéro d’adhésion, contact…"
+                    [value]="memberSearch()"
+                    (input)="updateMemberSearch($any($event.target).value)"
+                  />
+                </div>
+
+                @if (memberSelectionError()) {
+                  <p class="cnpm-new-account__field-error">{{ memberSelectionError() }}</p>
+                }
+
+                @if (filteredMembers().length === 0) {
+                  <p class="cnpm-new-account__empty" role="status">
+                    Aucun membre ne correspond à la recherche.
+                  </p>
+                } @else {
+                  <ul class="cnpm-new-account__members" role="listbox" aria-label="Membres sans compte">
+                    @for (member of filteredMembers(); track member.id) {
+                      <li>
+                        <button
+                          type="button"
+                          role="option"
+                          class="cnpm-new-account__member"
+                          [class.cnpm-new-account__member--selected]="isMemberSelected(member.id)"
+                          [attr.aria-selected]="isMemberSelected(member.id)"
+                          (click)="selectMember(member)"
+                        >
+                          <span class="cnpm-new-account__member-body">
+                            <strong class="cnpm-new-account__member-name">{{
+                              member.organizationName
+                            }}</strong>
+                            <span class="cnpm-new-account__member-meta">
+                              {{ member.membershipNumber }} · {{ member.categoryLabel }}
+                              @if (member.groupLabel) {
+                                · {{ member.groupLabel }}
+                              }
+                            </span>
+                            @if (member.contactFirstName || member.contactLastName) {
+                              <span class="cnpm-new-account__member-contact">
+                                {{ member.contactFirstName }} {{ member.contactLastName }}
+                                @if (member.contactJobTitle) {
+                                  — {{ member.contactJobTitle }}
+                                }
+                              </span>
+                            }
+                          </span>
+                          @if (isMemberSelected(member.id)) {
+                            <span class="cnpm-new-account__member-badge">Sélectionné</span>
+                          }
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+
+                @if (selectedMember(); as member) {
+                  <p class="cnpm-new-account__selected" role="status">
+                    Membre sélectionné : <strong>{{ member.organizationName }}</strong>
+                    ({{ member.membershipNumber }}). L’identité ci-dessous a été pré-remplie depuis
+                    son contact principal ; ajustez-la si nécessaire.
+                  </p>
+                }
+              }
+            </fieldset>
+          }
+
           <!-- Identité -->
           <fieldset class="cnpm-new-account__section">
-            <legend class="cnpm-new-account__legend">Informations</legend>
+            <legend class="cnpm-new-account__legend">
+              Informations
+              @if (isMember()) {
+                <span class="cnpm-new-account__legend-hint">— pré-remplies depuis le membre</span>
+              }
+            </legend>
             <div class="cnpm-new-account__grid">
               <cnpm-text-input
                 formControlName="firstName"

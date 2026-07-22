@@ -102,4 +102,72 @@ describe('NewAccountPage (création de compte)', () => {
     );
     expect(navigate).toHaveBeenCalledWith(['/admin/security/users']);
   });
+
+  it('affiche la liste des membres sans compte pour un compte membre', async () => {
+    await settle();
+    host.querySelector<HTMLInputElement>('input[type="radio"][value="MEMBER"]')!.click();
+    fixture.detectChanges();
+    await settle();
+
+    const members = host.querySelectorAll('.cnpm-new-account__member');
+    expect(members.length).toBeGreaterThan(0);
+    expect(host.textContent).toContain('Société Malienne de Négoce SA');
+  });
+
+  it('pré-remplit l’identité en choisissant un membre et transmet son identifiant', async () => {
+    await settle();
+    const router = TestBed.inject(Router);
+    const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    const gateway = TestBed.inject(ADMIN_SECURITY_GATEWAY) as DemoAdminSecurityGateway;
+    const created = vi.spyOn(gateway, 'createAccount');
+
+    host.querySelector<HTMLInputElement>('input[type="radio"][value="MEMBER"]')!.click();
+    fixture.detectChanges();
+    await settle();
+
+    // Choix du premier membre → pré-remplissage de l'identité.
+    host.querySelector<HTMLButtonElement>('.cnpm-new-account__member')!.click();
+    fixture.detectChanges();
+    await settle();
+
+    expect(host.querySelector<HTMLInputElement>('input[name="firstName"]')?.value).toBe('Oumar');
+    expect(host.querySelector<HTMLInputElement>('input[name="organization"]')?.value).toBe(
+      'Société Malienne de Négoce SA',
+    );
+
+    const submit = Array.from(host.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'Créer le compte',
+    );
+    submit?.click();
+    await settle();
+
+    expect(created).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accountType: 'MEMBER',
+        memberId: 'mem-2041',
+        roleId: 'membre-cnpm',
+        organization: 'Société Malienne de Négoce SA',
+      }),
+    );
+    expect(navigate).toHaveBeenCalledWith(['/admin/security/users']);
+  });
+
+  it('bloque la création d’un compte membre si aucun membre n’est choisi', async () => {
+    await settle();
+    const gateway = TestBed.inject(ADMIN_SECURITY_GATEWAY) as DemoAdminSecurityGateway;
+    const created = vi.spyOn(gateway, 'createAccount');
+
+    host.querySelector<HTMLInputElement>('input[type="radio"][value="MEMBER"]')!.click();
+    fixture.detectChanges();
+    await settle();
+
+    const submit = Array.from(host.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'Créer le compte',
+    );
+    submit?.click();
+    await settle();
+
+    expect(created).not.toHaveBeenCalled();
+    expect(host.textContent).toContain('Sélectionnez le membre à rattacher.');
+  });
 });

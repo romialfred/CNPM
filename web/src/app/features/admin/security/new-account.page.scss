@@ -114,6 +114,115 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
+.cnpm-new-account__legend-hint {
+  margin-inline-start: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-regular);
+}
+
+.cnpm-new-account__empty {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-new-account__search {
+  width: 100%;
+  min-height: var(--cnpm-size-control-lg);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  padding-inline: var(--cnpm-space-3);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-primary);
+  font: inherit;
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-new-account__members {
+  display: grid;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: var(--cnpm-space-1);
+  list-style: none;
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+/* Chaque membre est un bouton sélectionnable (motif listbox), pleine largeur. */
+.cnpm-new-account__member {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  width: 100%;
+  text-align: start;
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  background: var(--cnpm-color-surface-primary);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cnpm-new-account__member:hover {
+  border-color: var(--cnpm-color-brand-blue-500);
+  background: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-new-account__member:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+.cnpm-new-account__member--selected {
+  border-color: var(--cnpm-color-brand-blue-500);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-new-account__member-body {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.cnpm-new-account__member-name {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-new-account__member-meta {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__member-contact {
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__member-badge {
+  flex: 0 0 auto;
+  border-radius: var(--cnpm-radius-pill);
+  padding: 0.125rem var(--cnpm-space-3);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-new-account__selected {
+  margin: 0;
+  border-inline-start: var(--cnpm-space-1) solid var(--cnpm-color-semantic-success-500);
+  border-radius: var(--cnpm-radius-sm);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  background: var(--cnpm-color-semantic-success-50);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
 .cnpm-new-account__preview,
 .cnpm-new-account__extra {
   display: grid;

@@ -19,6 +19,7 @@ import {
   ADMIN_SECURITY_GATEWAY,
   type AccountType,
   type AdminSecuritySnapshot,
+  type MemberWithoutAccount,
   type NewAccountInput,
   type PermissionRow,
   type SecurityRole,
@@ -75,9 +76,14 @@ export class NewAccountPage {
     organization: ['', [Validators.maxLength(160)]],
     department: ['', [Validators.maxLength(120)]],
     roleId: ['', [Validators.required]],
+    /** Membre rattaché pour un compte membre ; renseigné par le sélecteur. */
+    memberId: [''],
   });
 
   private readonly submitted = signal(false);
+
+  /** Filtre de recherche du sélecteur de membre. */
+  protected readonly memberSearch = signal('');
 
   private readonly accountType = toSignal(this.form.controls.accountType.valueChanges, {
     initialValue: this.form.controls.accountType.value,
@@ -115,12 +121,86 @@ export class NewAccountPage {
     );
   });
 
+  /** Membres (adhésions) sans compte, proposés à la création d'un compte membre. */
+  protected readonly membersWithoutAccount = computed<readonly MemberWithoutAccount[]>(
+    () => this.snapshot()?.membersWithoutAccount ?? [],
+  );
+
+  /** Liste filtrée par la recherche (raison sociale, numéro, catégorie, contact). */
+  protected readonly filteredMembers = computed<readonly MemberWithoutAccount[]>(() => {
+    const term = this.memberSearch().trim().toLowerCase();
+    const members = this.membersWithoutAccount();
+    if (!term) {
+      return members;
+    }
+    return members.filter((member) =>
+      [
+        member.organizationName,
+        member.membershipNumber,
+        member.categoryLabel,
+        member.groupLabel,
+        member.contactFirstName,
+        member.contactLastName,
+        member.contactEmail,
+      ].some((value) => (value ?? '').toLowerCase().includes(term)),
+    );
+  });
+
+  private readonly selectedMemberId = toSignal(this.form.controls.memberId.valueChanges, {
+    initialValue: this.form.controls.memberId.value,
+  });
+
+  protected readonly selectedMember = computed<MemberWithoutAccount | null>(
+    () => this.membersWithoutAccount().find((member) => member.id === this.selectedMemberId()) ?? null,
+  );
+
+  /** Pour un compte membre, un membre DOIT être choisi (l'identité en découle). */
+  protected readonly memberSelectionError = computed<string | null>(() =>
+    this.isMember() && this.submitted() && !this.selectedMemberId()
+      ? 'Sélectionnez le membre à rattacher.'
+      : null,
+  );
+
+  protected isMemberSelected(memberId: string): boolean {
+    return this.selectedMemberId() === memberId;
+  }
+
+  protected updateMemberSearch(value: string): void {
+    this.memberSearch.set(value);
+  }
+
+  /** Choisir un membre pré-remplit l'identité depuis son contact principal (modifiable). */
+  protected selectMember(member: MemberWithoutAccount): void {
+    this.form.patchValue({
+      memberId: member.id,
+      firstName: member.contactFirstName ?? '',
+      lastName: member.contactLastName ?? '',
+      email: member.contactEmail ?? '',
+      phone: member.contactPhone ?? '',
+      jobTitle: member.contactJobTitle ?? '',
+      organization: member.organizationName,
+    });
+  }
+
   constructor() {
     // Le type de compte pilote le rôle : un membre reçoit d'office le rôle « Membre CNPM ».
     this.form.controls.accountType.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((type) => {
         this.extraPermissions.set(new Set());
+        // Changer de type repart d'une identité vierge : côté membre le sélecteur la
+        // remplira, côté professionnel elle se saisit à la main.
+        this.memberSearch.set('');
+        this.form.patchValue({
+          memberId: '',
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          jobTitle: '',
+          organization: '',
+          department: '',
+        });
         if (type === 'MEMBER') {
           this.form.controls.roleId.setValue(MEMBER_ROLE_ID);
         } else if (this.form.controls.roleId.value === MEMBER_ROLE_ID) {
@@ -178,6 +258,11 @@ export class NewAccountPage {
   protected submit(): void {
     this.submitted.set(true);
     this.submitError.set(null);
+    // Un compte membre exige un membre rattaché : l'identité en découle.
+    if (this.isMember() && !this.form.controls.memberId.value) {
+      this.form.markAllAsTouched();
+      return;
+    }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -194,6 +279,7 @@ export class NewAccountPage {
       department: value.department,
       roleId: value.roleId,
       extraPermissionIds: [...this.extraPermissions()],
+      memberId: value.memberId || undefined,
     };
     this.submitting.set(true);
     this.gateway

@@ -32,7 +32,14 @@ export class HttpAdminSecurityGateway implements AdminSecurityGateway {
     return this.http
       .get<AdminSecuritySnapshot>(buildCnpmApiUrl(this.baseUrl, 'admin/security/snapshot'))
       .pipe(
-        map((snapshot) => this.filter(snapshot, query.search)),
+        // Le backend n'expose pas encore les membres sans compte : défaut vide pour un
+        // contrat stable (le sélecteur affichera alors son état « aucun membre »).
+        map((snapshot) =>
+          this.filter(
+            { ...snapshot, membersWithoutAccount: snapshot.membersWithoutAccount ?? [] },
+            query.search,
+          ),
+        ),
         catchError((error: unknown) =>
           throwError(() =>
             error instanceof CnpmApiError && error.category === 'authorization'
