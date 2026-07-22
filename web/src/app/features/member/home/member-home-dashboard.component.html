@@ -6,10 +6,11 @@
     </div>
 
     @if (receipts().length) {
-      <table>
-        <caption class="member-home__sr-only">
-          Cinq reçus les plus récents
-        </caption>
+      <div class="member-home__table-wrap">
+        <table>
+          <caption class="member-home__sr-only">
+            Cinq reçus les plus récents
+          </caption>
         <thead>
           <tr>
             <th scope="col">N° reçu</th>
@@ -53,7 +54,8 @@
             </tr>
           }
         </tbody>
-      </table>
+        </table>
+      </div>
       <a
         class="member-home__list-action member-home__button member-home__button--secondary"
         routerLink="/member/receipts"

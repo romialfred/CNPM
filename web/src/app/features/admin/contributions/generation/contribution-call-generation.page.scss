@@ -330,7 +330,8 @@
 .contribution-generation__table-scroll {
   overflow-x: auto;
   border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-md);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
 }
 
 .contribution-generation__exceptions table {
@@ -340,22 +341,27 @@
   font-size: var(--cnpm-font-size-sm);
 }
 
-.contribution-generation__exceptions th,
-.contribution-generation__exceptions td {
-  padding: var(--cnpm-space-3);
+.contribution-generation__exceptions thead th {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  background: transparent;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-default);
+}
+
+.contribution-generation__exceptions tbody td,
+.contribution-generation__exceptions tbody th {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  vertical-align: middle;
+  color: var(--cnpm-color-text-primary);
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
   text-align: left;
-  vertical-align: top;
-}
-
-.contribution-generation__exceptions thead th {
-  background: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-secondary);
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.contribution-generation__exceptions tbody th {
-  color: var(--cnpm-color-text-primary);
 }
 
 .contribution-generation__exceptions tbody th small {
@@ -365,8 +371,9 @@
   font-weight: var(--cnpm-font-weight-regular);
 }
 
-.contribution-generation__exceptions tbody tr:last-child > * {
-  border-bottom: 0;
+.contribution-generation__exceptions tbody tr:last-child td,
+.contribution-generation__exceptions tbody tr:last-child th {
+  border-bottom: none;
 }
 
 .contribution-generation__review {

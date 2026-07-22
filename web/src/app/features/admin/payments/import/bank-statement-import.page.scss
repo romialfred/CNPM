@@ -376,7 +376,8 @@
 .statement-import__table-scroll {
   overflow-x: auto;
   border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-md);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
 }
 
 .statement-import__lines table {
@@ -386,26 +387,35 @@
   font-size: var(--cnpm-font-size-sm);
 }
 
-.statement-import__lines th,
-.statement-import__lines td {
-  padding: var(--cnpm-space-3);
+.statement-import__lines tbody td,
+.statement-import__lines tbody th {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  vertical-align: middle;
+  color: var(--cnpm-color-text-primary);
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
-  text-align: left;
-  vertical-align: top;
 }
 
 .statement-import__lines thead th {
-  background: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-secondary);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  background: transparent;
+  color: var(--cnpm-color-text-muted);
   font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-default);
 }
 
-.statement-import__lines tbody tr:last-child > * {
-  border-bottom: 0;
+.statement-import__lines tbody tr:last-child td,
+.statement-import__lines tbody tr:last-child th {
+  border-bottom: none;
 }
 
 .statement-import__amount {
-  text-align: right !important;
+  text-align: right;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }

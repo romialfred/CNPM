@@ -195,14 +195,14 @@
   max-width: 100%;
   overflow-x: auto;
   border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-md);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
 }
 
 .showcase-analytics table {
   width: 100%;
-  min-width: 34rem;
   border-collapse: collapse;
-  font-variant-numeric: tabular-nums;
+  font-size: var(--cnpm-font-size-sm);
 }
 
 .showcase-analytics caption {
@@ -211,17 +211,36 @@
   text-align: start;
 }
 
-.showcase-analytics :is(th, td) {
-  border-block-start: 1px solid var(--cnpm-color-border-subtle);
-  padding: var(--cnpm-space-3);
-  text-align: start;
+.showcase-analytics thead th {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  background: transparent;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-default);
 }
 
-.showcase-analytics thead th {
-  background: var(--cnpm-color-surface-secondary);
-  color: var(--cnpm-color-text-secondary);
+.showcase-analytics tbody :is(td, th) {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  color: var(--cnpm-color-text-primary);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.showcase-analytics tbody tr:last-child :is(td, th) {
+  border-bottom: none;
 }
 
 .showcase-analytics tbody th {
   font-weight: var(--cnpm-font-weight-medium);
+}
+
+.showcase-analytics .showcase-analytics__amount {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }

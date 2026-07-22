@@ -121,6 +121,7 @@
   width: 100%;
   min-width: 58rem;
   border-collapse: collapse;
+  font-size: var(--cnpm-font-size-sm);
 }
 .cnpm-contacts caption {
   position: absolute;
@@ -129,19 +130,29 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
-.cnpm-contacts th,
-.cnpm-contacts td {
-  padding: var(--cnpm-space-4);
-  border-bottom: 1px solid var(--cnpm-color-border-subtle);
-  text-align: left;
-  vertical-align: top;
-}
-.cnpm-contacts th {
-  color: var(--cnpm-color-text-secondary);
+.cnpm-contacts thead th {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  background: transparent;
+  color: var(--cnpm-color-text-muted);
   font-size: var(--cnpm-font-size-xs);
-  letter-spacing: 0.04em;
+  font-weight: var(--cnpm-font-weight-semibold);
   text-transform: uppercase;
-  background: var(--cnpm-color-surface-secondary);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-default);
+}
+.cnpm-contacts tbody td,
+.cnpm-contacts tbody th {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  vertical-align: middle;
+  color: var(--cnpm-color-text-primary);
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+.cnpm-contacts tbody tr:last-child td,
+.cnpm-contacts tbody tr:last-child th {
+  border-bottom: none;
 }
 .cnpm-contacts td strong,
 .cnpm-contacts td span,

@@ -180,7 +180,7 @@
                   <thead>
                     <tr>
                       <th scope="col">Date</th>
-                      <th scope="col">Vues agrégées</th>
+                      <th scope="col" class="showcase-analytics__amount">Vues agrégées</th>
                       <th scope="col">Actions de contact</th>
                     </tr>
                   </thead>
@@ -192,7 +192,7 @@
                             day.date | date: 'dd/MM/yyyy' : 'UTC'
                           }}</time>
                         </th>
-                        <td>{{ day.views | number }}</td>
+                        <td class="showcase-analytics__amount">{{ day.views | number }}</td>
                         <td>{{ day.contactActions | number }} — suivi désactivé</td>
                       </tr>
                     }
