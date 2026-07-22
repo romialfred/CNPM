@@ -56,7 +56,7 @@ describe('AccountMenuComponent', () => {
     );
   });
 
-  it('propose « Mes préférences » et « Aides » quand leurs routes sont fournies', () => {
+  it('propose « Mes préférences » et « Aide et documentation » quand leurs routes sont fournies', () => {
     fixture.componentRef.setInput('preferencesLink', '/admin/preferences');
     fixture.componentRef.setInput('helpLink', '/admin/help');
     fixture.detectChanges();
@@ -67,16 +67,16 @@ describe('AccountMenuComponent', () => {
       host.querySelector<HTMLAnchorElement>('a[href="/admin/preferences"]')?.textContent,
     ).toContain('Mes préférences');
     expect(host.querySelector<HTMLAnchorElement>('a[href="/admin/help"]')?.textContent).toContain(
-      'Aides',
+      'Aide et documentation',
     );
   });
 
-  it('masque « Mes préférences » et « Aides » sans routes fournies', () => {
+  it('masque « Mes préférences » et « Aide et documentation » sans routes fournies', () => {
     host.querySelector<HTMLButtonElement>('.cnpm-account-menu__trigger')?.click();
     fixture.detectChanges();
 
     expect(host.textContent).not.toContain('Mes préférences');
-    expect(host.textContent).not.toContain('Aides');
+    expect(host.textContent).not.toContain('Aide et documentation');
   });
 
   it('referme le menu à la touche Échap', () => {

@@ -1,0 +1,90 @@
+@for (block of blocks(); track $index) {
+  @switch (block.kind) {
+    @case ('paragraph') {
+      <p class="cnpm-doc__p">{{ asParagraph(block).text }}</p>
+    }
+    @case ('steps') {
+      <ol class="cnpm-doc__steps">
+        @for (item of asSteps(block).items; track $index) {
+          <li>{{ item }}</li>
+        }
+      </ol>
+    }
+    @case ('list') {
+      <ul class="cnpm-doc__list">
+        @for (item of asList(block).items; track $index) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+    }
+    @case ('table') {
+      <figure class="cnpm-doc__figure">
+        @if (asTable(block).caption; as caption) {
+          <figcaption class="cnpm-doc__figcaption">{{ caption }}</figcaption>
+        }
+        <div
+          class="cnpm-doc__table-scroll"
+          role="region"
+          tabindex="0"
+          [attr.aria-label]="asTable(block).caption || 'Tableau de données'"
+        >
+          <table class="cnpm-doc__table">
+            <thead>
+              <tr>
+                @for (header of asTable(block).headers; track $index) {
+                  <th scope="col">{{ header }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of asTable(block).rows; track $index) {
+                <tr>
+                  @for (cell of row; track $index) {
+                    <td>{{ cell }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </figure>
+    }
+    @case ('code') {
+      <figure class="cnpm-doc__figure">
+        @if (asCode(block).caption; as caption) {
+          <figcaption class="cnpm-doc__figcaption">{{ caption }}</figcaption>
+        }
+        <pre class="cnpm-doc__code"><code>{{ asCode(block).lines.join('\n') }}</code></pre>
+      </figure>
+    }
+    @case ('tree') {
+      <figure class="cnpm-doc__figure">
+        @if (asTree(block).caption; as caption) {
+          <figcaption class="cnpm-doc__figcaption">{{ caption }}</figcaption>
+        }
+        <pre class="cnpm-doc__tree"><code>{{ asTree(block).lines.join('\n') }}</code></pre>
+      </figure>
+    }
+    @case ('callout') {
+      <div class="cnpm-doc__callout cnpm-doc__callout--{{ asCallout(block).tone }}" role="note">
+        <span class="cnpm-doc__callout-icon" aria-hidden="true">
+          @switch (asCallout(block).tone) {
+            @case ('warning') {
+              <svg lucideTriangleAlert [size]="iconSize.compact"></svg>
+            }
+            @case ('tip') {
+              <svg lucideLightbulb [size]="iconSize.compact"></svg>
+            }
+            @default {
+              <svg lucideInfo [size]="iconSize.compact"></svg>
+            }
+          }
+        </span>
+        <p class="cnpm-doc__callout-text">
+          <strong class="cnpm-doc__callout-label">{{ calloutLabel(asCallout(block).tone) }}.</strong>
+          {{ asCallout(block).text }}
+        </p>
+      </div>
+    }
+  }
+}

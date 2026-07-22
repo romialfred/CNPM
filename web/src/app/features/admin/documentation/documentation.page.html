@@ -1,0 +1,58 @@
+<cnpm-admin-shell>
+  <div class="cnpm-doc-page">
+    <cnpm-page-header
+      title="Aide et documentation"
+      description="Manuel d'utilisation des parcours et documentation technique de la plateforme."
+    />
+
+    <div class="cnpm-doc-page__switch" role="group" aria-label="Type de documentation">
+      @for (item of manuals; track item.id) {
+        <button
+          type="button"
+          class="cnpm-doc-page__switch-btn"
+          [class.cnpm-doc-page__switch-btn--active]="activeManualId() === item.id"
+          [attr.aria-pressed]="activeManualId() === item.id"
+          (click)="select(item.id)"
+        >
+          {{ item.label }}
+        </button>
+      }
+    </div>
+
+    <p class="cnpm-doc-page__tagline">{{ manual().tagline }}</p>
+
+    <div class="cnpm-doc-page__layout">
+      <nav class="cnpm-doc-page__toc" aria-label="Sommaire de la documentation">
+        <p class="cnpm-doc-page__toc-title">Sommaire</p>
+        <ol class="cnpm-doc-page__toc-list">
+          @for (section of manual().sections; track section.id) {
+            <li>
+              <a class="cnpm-doc-page__toc-link" [href]="'#' + section.id">{{ section.title }}</a>
+            </li>
+          }
+        </ol>
+      </nav>
+
+      <div class="cnpm-doc-page__content">
+        @for (section of manual().sections; track section.id) {
+          <section
+            class="cnpm-doc-section"
+            [id]="section.id"
+            tabindex="-1"
+            [attr.aria-labelledby]="section.id + '-title'"
+          >
+            <h2 class="cnpm-doc-section__title" [id]="section.id + '-title'">{{ section.title }}</h2>
+            <p class="cnpm-doc-section__summary">{{ section.summary }}</p>
+
+            @for (sub of section.subsections; track sub.id) {
+              <div class="cnpm-doc-subsection" [id]="sub.id">
+                <h3 class="cnpm-doc-subsection__heading">{{ sub.heading }}</h3>
+                <cnpm-doc-content [blocks]="sub.blocks" />
+              </div>
+            }
+          </section>
+        }
+      </div>
+    </div>
+  </div>
+</cnpm-admin-shell>

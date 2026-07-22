@@ -52,7 +52,7 @@ export class AccountMenuComponent {
   readonly profileLink = input('');
   /** Route facultative « Mes préférences » ; masquée si absente. */
   readonly preferencesLink = input('');
-  /** Route facultative « Aides » ; masquée si absente. */
+  /** Route facultative « Aide et documentation » ; masquée si absente. */
   readonly helpLink = input('');
   /** Identifiant stable pour les liaisons ARIA. */
   readonly menuId = input('account-menu');

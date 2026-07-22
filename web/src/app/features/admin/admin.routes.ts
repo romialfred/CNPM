@@ -314,8 +314,9 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'help',
-        loadComponent: () => import('./account/help.page').then((m) => m.HelpPage),
-        title: 'Aides — Administration CNPM',
+        loadComponent: () =>
+          import('./documentation/documentation.page').then((m) => m.DocumentationPage),
+        title: 'Aide et documentation — Administration CNPM',
       },
       {
         path: 'members',

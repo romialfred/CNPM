@@ -1,0 +1,152 @@
+:host {
+  display: block;
+}
+
+.cnpm-doc__p {
+  margin: 0 0 var(--cnpm-space-4);
+  color: var(--cnpm-color-text-secondary);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+.cnpm-doc__steps,
+.cnpm-doc__list {
+  margin: 0 0 var(--cnpm-space-4);
+  padding-inline-start: var(--cnpm-space-6);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-doc__steps li,
+.cnpm-doc__list li {
+  margin-block-end: var(--cnpm-space-2);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+.cnpm-doc__steps li::marker {
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-doc__figure {
+  margin: 0 0 var(--cnpm-space-5);
+}
+
+.cnpm-doc__figcaption {
+  margin-block-end: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
+/* Tableaux larges : région défilable et focalisable au clavier (WCAG reflow). */
+.cnpm-doc__table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+}
+
+.cnpm-doc__table-scroll:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+}
+
+.cnpm-doc__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-doc__table th,
+.cnpm-doc__table td {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  text-align: start;
+  vertical-align: top;
+  border-block-end: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-doc__table thead th {
+  position: sticky;
+  inset-block-start: 0;
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+  white-space: nowrap;
+}
+
+.cnpm-doc__table tbody tr:nth-child(even) {
+  background: var(--cnpm-color-surface-secondary);
+}
+
+.cnpm-doc__table tbody tr:last-child td {
+  border-block-end: none;
+}
+
+.cnpm-doc__code,
+.cnpm-doc__tree {
+  margin: 0;
+  padding: var(--cnpm-space-4);
+  overflow-x: auto;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-neutral-900);
+  color: var(--cnpm-color-neutral-50);
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+.cnpm-doc__tree {
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Encadrés : le mot d'état (« Attention », « Astuce »…) double la couleur et l'icône. */
+.cnpm-doc__callout {
+  display: flex;
+  gap: var(--cnpm-space-3);
+  margin: 0 0 var(--cnpm-space-5);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-inline-start-width: var(--cnpm-space-1);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-secondary);
+}
+
+.cnpm-doc__callout-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  margin-block-start: var(--cnpm-space-1);
+}
+
+.cnpm-doc__callout-text {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+.cnpm-doc__callout-label {
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-doc__callout--info {
+  border-inline-start-color: var(--cnpm-color-semantic-info-500);
+  background: var(--cnpm-color-semantic-info-50);
+}
+.cnpm-doc__callout--info .cnpm-doc__callout-icon {
+  color: var(--cnpm-color-semantic-info-700);
+}
+
+.cnpm-doc__callout--warning {
+  border-inline-start-color: var(--cnpm-color-semantic-warning-500);
+  background: var(--cnpm-color-semantic-warning-50);
+}
+.cnpm-doc__callout--warning .cnpm-doc__callout-icon {
+  color: var(--cnpm-color-semantic-warning-700);
+}
+
+.cnpm-doc__callout--tip {
+  border-inline-start-color: var(--cnpm-color-semantic-success-500);
+  background: var(--cnpm-color-semantic-success-50);
+}
+.cnpm-doc__callout--tip .cnpm-doc__callout-icon {
+  color: var(--cnpm-color-semantic-success-700);
+}
