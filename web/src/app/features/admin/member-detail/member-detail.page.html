@@ -72,89 +72,114 @@
 
       @default {
         @if (detail(); as member) {
+          <!-- Héros vitrine : nom en grand sur une illustration topique du secteur, avec
+               un voile qui garantit le contraste du texte blanc (WCAG 1.4.3). L'image est
+               décorative — l'information est déjà écrite —, d'où `alt=""`. Le statut est
+               porté par le libellé d'un badge, jamais par la seule couleur. -->
+          <header class="cnpm-member__hero">
+            <img class="cnpm-member__hero-media" [src]="heroImage()" alt="" loading="lazy" />
+            <div class="cnpm-member__hero-body">
+              <div class="cnpm-member__hero-badges">
+                <cnpm-badge [tone]="verificationTone(member.identity.verification)">
+                  {{ verificationLabel(member.identity.verification) }}
+                </cnpm-badge>
+                <cnpm-badge [tone]="memberStatusTone(member.identity.status)">
+                  {{ memberStatusLabel(member.identity.status) }}
+                </cnpm-badge>
+                <!-- « Grand cotisant » est un marqueur, pas un statut : il se lit à côté
+                     et ne s'y substitue jamais. -->
+                @if (member.identity.isLargeContributor) {
+                  <cnpm-badge tone="neutral">Grand cotisant</cnpm-badge>
+                }
+              </div>
+
+              <h1 class="cnpm-member__hero-title">{{ member.identity.organization }}</h1>
+
+              <p class="cnpm-member__hero-lead">
+                <span class="cnpm-member__hero-code">{{ member.identity.code }}</span>
+                <span aria-hidden="true">·</span>
+                {{ member.identity.category | cnpmMemberCategory }}
+                <span aria-hidden="true">·</span>
+                {{ member.identity.legalForm }}
+              </p>
+
+              <p class="cnpm-member__hero-tagline">{{ sectorTagline() }}</p>
+            </div>
+          </header>
+
+          <!-- Barre d'actions sur surface claire : les boutons du design system restent
+               lisibles avec leur apparence normale, hors du héros sombre. Une action
+               primaire dominante par zone. -->
+          <div class="cnpm-member__toolbar">
+            <cnpm-button
+              variant="primary"
+              [disabled]="!member.permissions.canEdit"
+              [describedBy]="member.permissions.canEdit ? null : 'droit-modifier'"
+              (click)="openMemberEdit(member.identity.id)"
+            >
+              <svg lucidePencil [size]="iconSize.compact"></svg>
+              Modifier
+            </cnpm-button>
+            <cnpm-button variant="secondary" [disabled]="true" describedBy="vue-impression">
+              <svg lucidePrinter [size]="iconSize.compact"></svg>
+              Imprimer
+            </cnpm-button>
+            <cnpm-button
+              variant="tertiary"
+              routerLink="/admin/members"
+              [queryParams]="listQueryParams()"
+            >
+              Retour à la liste
+            </cnpm-button>
+
+            <p class="cnpm-member__hint" id="droit-modifier">
+              Votre rôle ne permet pas de modifier cette fiche.
+            </p>
+            <p class="cnpm-member__hint" id="vue-impression">
+              La vue d’impression dédiée de la fiche n’est pas encore disponible ; la capture de
+              l’écran ne la remplace pas.
+            </p>
+          </div>
+
+          <!-- Bandeau de profil : la ligne de statistiques attendue sur une vitrine.
+               Chaque valeur vient de la source ; aucune n'est recalculée. -->
+          <section class="cnpm-member__card cnpm-member__profile" aria-labelledby="profil-titre">
+            <h2 class="cnpm-member__card-title" id="profil-titre">Profil du membre</h2>
+            <dl class="cnpm-member__facts">
+              @for (fact of showcaseFacts(); track fact.label) {
+                <div class="cnpm-member__fact">
+                  <dt>{{ fact.label }}</dt>
+                  <dd [class.cnpm-member__missing]="fact.muted">{{ fact.value }}</dd>
+                </div>
+              }
+            </dl>
+            <div class="cnpm-member__verify">
+              <cnpm-verification-badge
+                [status]="member.identity.verification"
+                [explanation]="verificationExplanation"
+                [verifiedAt]="
+                  member.identity.verifiedAt ? formatDay(member.identity.verifiedAt) : null
+                "
+              />
+            </div>
+          </section>
+
+          <!-- Activités principales : tuiles générées selon le secteur, pour situer le
+               métier du membre d'un coup d'œil. -->
+          <section class="cnpm-member__card" aria-labelledby="activites-titre">
+            <h2 class="cnpm-member__card-title" id="activites-titre">Activités principales</h2>
+            <ul class="cnpm-member__activities">
+              @for (activity of sectorActivities(); track activity.title) {
+                <li class="cnpm-member__activity">
+                  <h3 class="cnpm-member__activity-title">{{ activity.title }}</h3>
+                  <p class="cnpm-member__activity-text">{{ activity.description }}</p>
+                </li>
+              }
+            </ul>
+          </section>
+
           <div class="cnpm-member__layout">
             <div class="cnpm-member__main">
-              <!-- En-tête d'identité pleine largeur : statut, actions et vérification.
-                   Le statut est porté par un libellé, jamais par la seule couleur. -->
-              <header class="cnpm-member__identity">
-                <div class="cnpm-member__identity-text">
-                  <div class="cnpm-member__title-row">
-                    <h1 class="cnpm-member__title">{{ member.identity.organization }}</h1>
-                    <cnpm-badge [tone]="memberStatusTone(member.identity.status)">
-                      {{ memberStatusLabel(member.identity.status) }}
-                    </cnpm-badge>
-                    <!-- « Grand cotisant » est un marqueur, pas un statut : il se lit à
-                         côté et ne s'y substitue jamais. -->
-                    @if (member.identity.isLargeContributor) {
-                      <cnpm-badge tone="neutral">Grand cotisant</cnpm-badge>
-                    }
-                    <cnpm-verification-badge
-                      [status]="member.identity.verification"
-                      [explanation]="verificationExplanation"
-                      [verifiedAt]="
-                        member.identity.verifiedAt ? formatDay(member.identity.verifiedAt) : null
-                      "
-                    />
-                  </div>
-
-                  <dl class="cnpm-member__meta">
-                    <div class="cnpm-member__meta-item">
-                      <dt>Code membre</dt>
-                      <dd>{{ member.identity.code }}</dd>
-                    </div>
-                    <div class="cnpm-member__meta-item">
-                      <dt>Catégorie</dt>
-                      <dd>{{ member.identity.category }}</dd>
-                    </div>
-                    <div class="cnpm-member__meta-item">
-                      <dt>Groupement</dt>
-                      <dd>{{ member.identity.group }}</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <!-- Les commandes non câblées annoncent leur indisponibilité plutôt que
-                     de conduire à un écran absent ; le motif est lu par `aria-describedby`,
-                     donc annoncé au clavier comme à la souris. -->
-                <div class="cnpm-member__identity-actions">
-                  <cnpm-button
-                    variant="primary"
-                    [disabled]="!member.permissions.canEdit"
-                    [describedBy]="member.permissions.canEdit ? null : 'droit-modifier'"
-                    (click)="openMemberEdit(member.identity.id)"
-                  >
-                    <svg lucidePencil [size]="iconSize.compact"></svg>
-                    Modifier
-                  </cnpm-button>
-                  <cnpm-button variant="secondary" [disabled]="true" describedBy="vue-impression">
-                    <svg lucidePrinter [size]="iconSize.compact"></svg>
-                    Imprimer
-                  </cnpm-button>
-                  <cnpm-button
-                    variant="tertiary"
-                    routerLink="/admin/members"
-                    [queryParams]="listQueryParams()"
-                  >
-                    Retour à la liste
-                  </cnpm-button>
-
-                  <p class="cnpm-member__hint" id="droit-modifier">
-                    Votre rôle ne permet pas de modifier cette fiche.
-                  </p>
-                  <p class="cnpm-member__hint" id="vue-impression">
-                    La vue d’impression dédiée de la fiche n’est pas encore disponible ; la capture
-                    de l’écran ne la remplace pas.
-                  </p>
-                </div>
-              </header>
-
-              <section class="cnpm-member__card" aria-labelledby="informations-titre">
-                <h2 class="cnpm-member__card-title" id="informations-titre">
-                  Informations générales
-                </h2>
-                <cnpm-definition-list [items]="generalFacts()" />
-              </section>
-
               <cnpm-tabs
                 [tabs]="tabs"
                 ariaLabel="Sections de la fiche membre"
@@ -188,63 +213,6 @@
                           [stats]="followUpStats()"
                           note="Un reçu n’est émis qu’après rapprochement du paiement."
                         />
-
-
-                        @if (member.risk; as risk) {
-                          <!-- Le score n'est jamais affiché seul : la fiche impose ses
-                               facteurs et sa date d'évaluation. Un nombre nu ne se
-                               conteste pas et n'oriente aucune action. -->
-                          <section class="cnpm-member__card" aria-labelledby="risque-titre">
-                            <h2 class="cnpm-member__card-title" id="risque-titre">
-                              Score de risque
-                            </h2>
-                            <p class="cnpm-member__score">
-                              <span class="cnpm-member__score-value">{{ risk.score }}</span>
-                              <span class="cnpm-member__score-total">/ 100</span>
-                            </p>
-                            <cnpm-badge [tone]="riskLevelTone(risk.level)">
-                              {{ riskLevelLabel(risk.level) }}
-                            </cnpm-badge>
-                            <div
-                              class="cnpm-member__gauge"
-                              role="img"
-                              [attr.aria-label]="'Score de ' + risk.score + ' sur 100'"
-                            >
-                              <span class="cnpm-member__gauge-fill" [style.width.%]="risk.score">
-                              </span>
-                            </div>
-                            <p class="cnpm-member__card-note">
-                              Évalué le {{ formatDay(risk.assessedOn) }}
-                            </p>
-                            <h3 class="cnpm-member__subtitle">Facteurs retenus</h3>
-                            <ul class="cnpm-member__list">
-                              @for (factor of risk.factors; track factor) {
-                                <li>{{ factor }}</li>
-                              }
-                            </ul>
-                          </section>
-                        }
-                        <section class="cnpm-member__card cnpm-member__kpi">
-                          <h2 class="cnpm-member__kpi-title">Dernière activité</h2>
-                          @if (member.history[0]; as latestActivity) {
-                            <p class="cnpm-member__kpi-activity">{{ latestActivity.action }}</p>
-                            <p class="cnpm-member__kpi-note">
-                              {{ latestActivity.at | date: 'dd/MM/yyyy HH:mm' }}
-                            </p>
-                          } @else {
-                            <p class="cnpm-member__missing">Aucune activité enregistrée</p>
-                          }
-                        </section>
-
-                        <section class="cnpm-member__card cnpm-member__kpi">
-                          <h2 class="cnpm-member__kpi-title">
-                            Reçus émis ({{ member.summary.year }})
-                          </h2>
-                          <p class="cnpm-member__kpi-value">
-                            {{ member.summary.receiptsIssued | number }}
-                          </p>
-                          <p class="cnpm-member__kpi-note">Après rapprochement validé</p>
-                        </section>
                       </div>
 
                       @if (member.summary.nextDueOn) {
@@ -252,6 +220,43 @@
                           Prochaine échéance : {{ member.summary.nextDueLabel }}, à régler avant le
                           {{ formatDay(member.summary.nextDueOn) }}.
                         </p>
+                      }
+
+                      @if (member.risk; as risk) {
+                        <!-- Le score n'est jamais affiché seul : la fiche impose ses
+                             facteurs et sa date d'évaluation. Un nombre nu ne se conteste
+                             pas et n'oriente aucune action. -->
+                        <section class="cnpm-member__card" aria-labelledby="risque-titre">
+                          <div class="cnpm-member__score-head">
+                            <h2 class="cnpm-member__card-title" id="risque-titre">
+                              Score de risque
+                            </h2>
+                            <cnpm-badge [tone]="riskLevelTone(risk.level)">
+                              {{ riskLevelLabel(risk.level) }}
+                            </cnpm-badge>
+                          </div>
+                          <p class="cnpm-member__score">
+                            <span class="cnpm-member__score-value">{{ risk.score }}</span>
+                            <span class="cnpm-member__score-total">/ 100</span>
+                          </p>
+                          <div
+                            class="cnpm-member__gauge"
+                            role="img"
+                            [attr.aria-label]="'Score de ' + risk.score + ' sur 100'"
+                          >
+                            <span class="cnpm-member__gauge-fill" [style.width.%]="risk.score">
+                            </span>
+                          </div>
+                          <p class="cnpm-member__card-note">
+                            Évalué le {{ formatDay(risk.assessedOn) }}
+                          </p>
+                          <h3 class="cnpm-member__subtitle">Facteurs retenus</h3>
+                          <ul class="cnpm-member__list">
+                            @for (factor of risk.factors; track factor) {
+                              <li>{{ factor }}</li>
+                            }
+                          </ul>
+                        </section>
                       }
                     } @else {
                       <!-- Masquage selon le rôle : l'absence est expliquée plutôt que
@@ -263,13 +268,6 @@
                         </p>
                       </cnpm-alert>
                     }
-
-                    <!-- Les listes « Historique », « Derniers paiements » et
-                         « Documents recents » ont ete retirees de la synthese : elles
-                         dupliquaient trait pour trait les onglets dedies, et la grille a
-                         trois colonnes les ecrasait a 192, 384 et 224 px — un historique
-                         y etait illisible. La synthese redevient une synthese ; le detail
-                         vit dans son onglet. -->
 
                     @if (member.contributions.length) {
                       <section class="cnpm-member__card" aria-labelledby="rythme-titre">
@@ -332,46 +330,58 @@
                     >
                       <h2 class="cnpm-member__card-title" id="agent-titre">Agent affecté</h2>
                       @if (member.agent; as agent) {
-                        <p class="cnpm-member__strong">{{ agent.name }}</p>
-                        <p class="cnpm-member__card-note">{{ agent.role }}</p>
-                        <ul class="cnpm-member__contact-lines">
-                          @if (agent.phone) {
-                            <li>
-                              <svg lucidePhone [size]="iconSize.compact" aria-hidden="true"></svg>
-                              <a class="cnpm-member__link" [href]="'tel:' + agent.phone">
-                                {{ agent.phone }}
-                              </a>
-                            </li>
-                          }
-                          @if (agent.email) {
-                            <li>
-                              <svg lucideMail [size]="iconSize.compact" aria-hidden="true"></svg>
-                              <a class="cnpm-member__link" [href]="'mailto:' + agent.email">
-                                {{ agent.email }}
-                              </a>
-                            </li>
-                          }
-                        </ul>
-                        <dl class="cnpm-member__meta">
-                          <div class="cnpm-member__meta-item">
-                            <dt>Portefeuille</dt>
-                            <dd>{{ agent.portfolio | number }} membres</dd>
-                          </div>
-                          <div class="cnpm-member__meta-item">
-                            <dt>Taux de recouvrement</dt>
-                            <dd>{{ agent.recoveryRate | number: '1.0-0' }} %</dd>
-                          </div>
-                          <div class="cnpm-member__meta-item">
-                            <dt>Dernier contact</dt>
-                            <dd>
-                              @if (agent.lastContactOn) {
-                                {{ agent.lastContactOn | date: 'dd/MM/yyyy' }}
-                              } @else {
-                                <span class="cnpm-member__missing">{{ missingLabel }}</span>
+                        <div class="cnpm-member__agent-body">
+                          <div>
+                            <p class="cnpm-member__strong">{{ agent.name }}</p>
+                            <p class="cnpm-member__card-note">{{ agent.role }}</p>
+                            <ul class="cnpm-member__contact-lines">
+                              @if (agent.phone) {
+                                <li>
+                                  <svg
+                                    lucidePhone
+                                    [size]="iconSize.compact"
+                                    aria-hidden="true"
+                                  ></svg>
+                                  <a class="cnpm-member__link" [href]="'tel:' + agent.phone">
+                                    {{ agent.phone }}
+                                  </a>
+                                </li>
                               }
-                            </dd>
+                              @if (agent.email) {
+                                <li>
+                                  <svg
+                                    lucideMail
+                                    [size]="iconSize.compact"
+                                    aria-hidden="true"
+                                  ></svg>
+                                  <a class="cnpm-member__link" [href]="'mailto:' + agent.email">
+                                    {{ agent.email }}
+                                  </a>
+                                </li>
+                              }
+                            </ul>
                           </div>
-                        </dl>
+                          <dl class="cnpm-member__meta">
+                            <div class="cnpm-member__meta-item">
+                              <dt>Portefeuille</dt>
+                              <dd>{{ agent.portfolio | number }} membres</dd>
+                            </div>
+                            <div class="cnpm-member__meta-item">
+                              <dt>Taux de recouvrement</dt>
+                              <dd>{{ agent.recoveryRate | number: '1.0-0' }} %</dd>
+                            </div>
+                            <div class="cnpm-member__meta-item">
+                              <dt>Dernier contact</dt>
+                              <dd>
+                                @if (agent.lastContactOn) {
+                                  {{ agent.lastContactOn | date: 'dd/MM/yyyy' }}
+                                } @else {
+                                  <span class="cnpm-member__missing">{{ missingLabel }}</span>
+                                }
+                              </dd>
+                            </div>
+                          </dl>
+                        </div>
                       } @else {
                         <cnpm-empty-state
                           variant="no-data"
@@ -388,6 +398,13 @@
                         Dossier d’adhésion
                       </h2>
                       <cnpm-definition-list [items]="membershipFacts()" />
+                    </section>
+
+                    <section class="cnpm-member__card" aria-labelledby="legales-titre">
+                      <h2 class="cnpm-member__card-title" id="legales-titre">
+                        Informations légales et administratives
+                      </h2>
+                      <cnpm-definition-list [items]="generalFacts()" />
                       <p class="cnpm-member__card-note">
                         Les données d’adhésion sont issues du dossier validé par le CNPM. Toute
                         correction passe par l’écran d’enrôlement.
@@ -585,7 +602,7 @@
               </section>
             </div>
 
-            <!-- Panneau d'alertes et d'actions. Au-dessous de 1440 px, il repasse dans le
+            <!-- Panneau d'alertes et d'actions. Au-dessous de 1280 px, il repasse dans le
                  flux sous la fiche plutôt que d'être masqué derrière un tiroir non
                  spécifié : son contenu reste lisible et complet. -->
             <aside class="cnpm-member__aside" aria-label="Rappels et prochaines actions">

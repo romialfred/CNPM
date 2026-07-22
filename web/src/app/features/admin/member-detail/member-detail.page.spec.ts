@@ -247,3 +247,57 @@ describe('MemberDetailPage — synthèse', () => {
     expect(legende?.textContent).toContain('Réglé');
   });
 });
+
+describe('MemberDetailPage — vitrine', () => {
+  beforeEach(() => TestBed.resetTestingModule());
+
+  async function ready() {
+    const contexte = await setup();
+    const detail = await firstValueFrom(new DemoMemberDetailGateway().load(MEMBER_ID));
+    contexte.gateway.latest.next(detail);
+    await contexte.fixture.whenStable();
+    contexte.fixture.detectChanges();
+    return { ...contexte, detail };
+  }
+
+  it('sert une illustration réelle et topique dans le héros, décorative', async () => {
+    const { host } = await ready();
+    const media = host.querySelector('.cnpm-member__hero-media') as HTMLImageElement | null;
+
+    expect(media).not.toBeNull();
+    // Photo réelle, déterministe (paramètre `lock`), et différée pour ne pas retarder la fiche.
+    expect(media?.getAttribute('src')).toContain('loremflickr.com');
+    expect(media?.getAttribute('src')).toContain('lock=');
+    expect(media?.getAttribute('loading')).toBe('lazy');
+    // Illustration décorative : l'information est déjà écrite, l'alt reste vide.
+    expect(media?.getAttribute('alt')).toBe('');
+  });
+
+  it('affiche le bandeau de profil attendu sur une vitrine', async () => {
+    const { host } = await ready();
+    const labels = Array.from(host.querySelectorAll('.cnpm-member__facts dt')).map(
+      (node) => node.textContent?.trim() ?? '',
+    );
+
+    for (const attendu of ['Secteur', 'Localisation', 'Effectif', 'Statut', 'Membre CNPM']) {
+      expect(labels).toContain(attendu);
+    }
+  });
+
+  it('génère des tuiles d’activités principales selon le secteur', async () => {
+    const { host } = await ready();
+    const tuiles = host.querySelectorAll('.cnpm-member__activity-title');
+
+    // Le mapping secteur → activités produit trois à six tuiles ; jamais une section vide.
+    expect(tuiles.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('humanise la catégorie via le pipe partagé, sans en changer la source', async () => {
+    const { host, detail } = await ready();
+    const lead = host.querySelector('.cnpm-member__hero-lead');
+
+    // Le pipe rend « GRANDE_ENTREPRISE » → « Grande Entreprise » et laisse tout libellé
+    // déjà lisible intact : ici, le libellé du jeu de démonstration doit apparaître tel quel.
+    expect(lead?.textContent).toContain(detail.identity.category);
+  });
+});

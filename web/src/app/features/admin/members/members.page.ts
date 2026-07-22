@@ -38,6 +38,7 @@ import {
   type InsightStat,
 } from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
+import { MemberCategoryLabelPipe } from '../../../core/formatting/member-category-label.pipe';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
@@ -103,6 +104,7 @@ const DEFAULT_PAGE_SIZE = 10;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     DecimalPipe,
+    MemberCategoryLabelPipe,
     RouterLink,
     FormsModule,
     AdminShellComponent,

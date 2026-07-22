@@ -50,7 +50,19 @@
 
           <div class="cnpm-group-detail__grid">
             <section class="cnpm-group-detail__card" aria-labelledby="group-identity-title">
-              <h2 id="group-identity-title">Identité descriptive</h2>
+              <div class="cnpm-group-detail__identity">
+                <span class="cnpm-group-detail__avatar" aria-hidden="true">
+                  @if (groupImage(); as image) {
+                    <img [src]="image" alt="" loading="lazy" />
+                  } @else {
+                    <svg lucideBuilding2 [size]="iconSize.navigation"></svg>
+                  }
+                </span>
+                <div class="cnpm-group-detail__identity-text">
+                  <span class="cnpm-group-detail__eyebrow">{{ group.code }}</span>
+                  <h2 id="group-identity-title">Identité descriptive</h2>
+                </div>
+              </div>
               <cnpm-definition-list [items]="facts()" />
             </section>
 

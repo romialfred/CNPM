@@ -5,21 +5,28 @@
   min-width: 0;
 }
 
+/* ------------------------------------------------------------------- Filtres.
+   Rangée compacte : chaque champ s'étire à parts égales, la recherche compte
+   double, et « Appliquer » reste ancré à droite. Sous 767 px les champs passent
+   en pleine largeur (media query en fin de fichier). */
 .cnpm-organizations__filters {
-  display: grid;
-  grid-template-columns:
-    minmax(10rem, 0.8fr) minmax(16rem, 1.5fr) minmax(12rem, 1fr) minmax(12rem, 1fr)
-    auto;
-  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   gap: var(--cnpm-space-3);
   width: 100%;
 }
 
 .cnpm-organizations__field {
   display: flex;
+  flex: 1 1 12rem;
   flex-direction: column;
   gap: var(--cnpm-space-2);
   min-width: 0;
+}
+
+.cnpm-organizations__field--search {
+  flex: 2 1 18rem;
 }
 
 .cnpm-organizations__field label {
@@ -39,43 +46,148 @@
   background: var(--cnpm-color-surface-primary);
   color: var(--cnpm-color-text-primary);
   font: inherit;
+  font-size: var(--cnpm-font-size-sm);
 }
 
 .cnpm-organizations__field input:focus-visible,
 .cnpm-organizations__field select:focus-visible,
 .cnpm-organizations__icon-link:focus-visible {
-  outline: 2px solid var(--cnpm-color-border-focus);
-  outline-offset: 2px;
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
 }
 
-.cnpm-organizations__toolbar {
+.cnpm-organizations__submit {
+  flex: 0 0 auto;
+  align-self: flex-end;
+}
+
+/* -------------------------------------------------------------------- Layout.
+   Colonne principale + rail de synthèse de 20 rem, alignés en haut. `minmax(0,
+   1fr)` empêche la table de dimensionner la grille sur son contenu : sans lui,
+   une table large pousserait la page au lieu de défiler dans son conteneur. */
+.cnpm-organizations__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  align-items: start;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-organizations__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-organizations__results {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
   min-height: var(--cnpm-space-5);
 }
 
-.cnpm-organizations__toolbar p {
+.cnpm-organizations__count {
   margin: 0;
   font-size: var(--cnpm-font-size-sm);
   color: var(--cnpm-color-text-secondary);
 }
 
+.cnpm-organizations__count strong {
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.cnpm-organizations__hint {
+  margin: 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+/* --------------------------------------------------------------- Corps de table.
+   Les cellules `<td>` du corps sont projetées via `<ng-template #row>` : elles
+   portent l'encapsulation de CETTE page, non celle du composant de table. Leur
+   marge et leur filet se définissent donc ici — comme le fait déjà l'écran
+   Journal d'audit — sans toucher au design system. Les en-têtes `<th>` restent la
+   propriété du composant et conservent leur style (capitales, fond, tri). */
+.cnpm-organizations__table .cnpm-table__cell {
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  vertical-align: middle;
+  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-organizations__table .cnpm-table__cell:first-child {
+  padding-left: var(--cnpm-space-5);
+}
+
+.cnpm-organizations__table .cnpm-table__cell:last-child {
+  padding-right: var(--cnpm-space-5);
+}
+
+/* Une seule colonne absorbe l'espace disponible : la raison sociale. Les autres se
+   réduisent à leur contenu (`nowrap`, largeur minimale), ce qui supprime les grands
+   vides horizontaux qu'une répartition uniforme creusait entre six colonnes courtes. */
+.cnpm-organizations__cell--identity {
+  width: 100%;
+}
+
+.cnpm-organizations__cell--nowrap,
+.cnpm-organizations__cell--shrink,
+.cnpm-organizations__cell--actions {
+  white-space: nowrap;
+}
+
+.cnpm-organizations__cell--shrink,
+.cnpm-organizations__cell--actions {
+  width: 1%;
+}
+
 .cnpm-organizations__identity,
-.cnpm-organizations__card-head > div {
+.cnpm-organizations__card-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+/* Vignette illustrative — un carré discret, cadré comme un logo. */
+.cnpm-organizations__logo {
+  flex: none;
+  width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  object-fit: cover;
+  background: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-organizations__identity-text,
+.cnpm-organizations__card-identity > div {
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-1);
-  min-width: 12rem;
+  min-width: 0;
 }
 
-.cnpm-organizations__identity strong,
-.cnpm-organizations__card-head strong {
+.cnpm-organizations__identity-text strong,
+.cnpm-organizations__card-identity strong {
   color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
   overflow-wrap: anywhere;
 }
 
-.cnpm-organizations__identity span,
-.cnpm-organizations__card-head span {
-  font-size: var(--cnpm-font-size-xs);
+.cnpm-organizations__identity-text span,
+.cnpm-organizations__card-identity span {
   color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-organizations__sector {
+  color: var(--cnpm-color-text-secondary);
 }
 
 .cnpm-organizations__actions {
@@ -100,6 +212,15 @@
   background: var(--cnpm-color-brand-blue-50);
 }
 
+/* ------------------------------------------------------------------- Synthèse. */
+.cnpm-organizations__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------- Cartes mobiles. */
 .cnpm-organizations__cards {
   display: none;
   margin: 0;
@@ -107,20 +228,47 @@
   list-style: none;
 }
 
-@media (max-width: 1199px) {
-  .cnpm-organizations__filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Densité compacte au desktop, composée uniquement de tokens : la table et les
+   panneaux resserrent interligne et typographie sans aucune valeur brute. Les
+   surcharges de variables héritent dans le composant enfant, dont les cellules
+   projetées ci-dessus lisent alors l'espacement réduit. */
+@media (min-width: 1024px) {
+  cnpm-data-table {
+    --cnpm-space-3: var(--cnpm-space-2);
+    --cnpm-font-size-sm: var(--cnpm-font-size-xs);
+  }
+
+  cnpm-insight-summary {
+    --cnpm-space-3: var(--cnpm-space-2);
+    --cnpm-font-size-sm: var(--cnpm-font-size-xs);
+  }
+}
+
+/* Le rail passe sous la liste puis se scinde en deux panneaux côte à côte : à cette
+   largeur, une colonne de 20 rem étrécirait trop la table. */
+@media (max-width: 1279px) {
+  .cnpm-organizations__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cnpm-organizations__aside {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  cnpm-insight-summary {
+    flex: 1 1 18rem;
   }
 }
 
 @media (max-width: 767px) {
-  .cnpm-organizations__filters {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .cnpm-organizations__field input,
   .cnpm-organizations__field select {
     height: var(--cnpm-size-control-lg);
+  }
+
+  .cnpm-organizations__aside {
+    flex-direction: column;
   }
 
   .cnpm-organizations__table {

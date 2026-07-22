@@ -7,9 +7,12 @@
 
     <div class="cnpm-groups__summary" aria-live="polite">
       @if (state() === 'ready' || state() === 'empty' || state() === 'pageEmpty') {
-        <p>
-          <strong>{{ totalItems() }}</strong>
-          {{ totalItems() === 1 ? 'groupement disponible' : 'groupements disponibles' }}
+        <p class="cnpm-groups__count">
+          <svg lucideBuilding2 [size]="iconSize.compact" aria-hidden="true"></svg>
+          <span>
+            <strong>{{ totalItems() }}</strong>
+            {{ totalItems() === 1 ? 'groupement disponible' : 'groupements disponibles' }}
+          </span>
         </p>
       }
     </div>
@@ -63,7 +66,7 @@
       @case ('ready') {
         <div class="cnpm-groups__table">
           <cnpm-data-table
-            caption="Groupements professionnels, secteurs et statuts."
+            caption="Groupements professionnels : identité, secteur et statut."
             [columns]="columns"
             [rows]="rows()"
             state="ready"
@@ -71,16 +74,33 @@
           >
             <ng-template #row let-group>
               <td class="cnpm-table__cell">
-                <strong>{{ group.code }}</strong>
+                <div class="cnpm-groups__identity">
+                  <span class="cnpm-groups__avatar" aria-hidden="true">
+                    @if (sectorImage(group.sectorCode); as image) {
+                      <img [src]="image" alt="" loading="lazy" />
+                    } @else {
+                      <svg lucideBuilding2 [size]="iconSize.control"></svg>
+                    }
+                  </span>
+                  <span class="cnpm-groups__identity-text">
+                    <span class="cnpm-groups__code">{{ group.code }}</span>
+                    <strong class="cnpm-groups__name">{{ group.name }}</strong>
+                  </span>
+                </div>
               </td>
-              <td class="cnpm-table__cell">{{ group.name }}</td>
-              <td class="cnpm-table__cell">{{ sectorLabel(group.sectorCode) }}</td>
+              <td class="cnpm-table__cell">
+                @if (hasSector(group.sectorCode)) {
+                  <span class="cnpm-groups__sector">{{ sectorLabel(group.sectorCode) }}</span>
+                } @else {
+                  <span class="cnpm-groups__sector-empty">{{ sectorLabel(group.sectorCode) }}</span>
+                }
+              </td>
               <td class="cnpm-table__cell">
                 <cnpm-badge [tone]="statusTone(group.status)">{{
                   statusLabel(group.status)
                 }}</cnpm-badge>
               </td>
-              <td class="cnpm-table__cell">
+              <td class="cnpm-table__cell cnpm-table__cell--end">
                 <a
                   class="cnpm-groups__detail-link"
                   [routerLink]="['/admin/groups', group.id]"
@@ -97,25 +117,39 @@
 
         <ul class="cnpm-groups__cards" aria-label="Groupements professionnels">
           @for (group of rows(); track group.id) {
-            <li>
-              <div class="cnpm-groups__card-head">
-                <div>
-                  <span>{{ group.code }}</span>
-                  <strong>{{ group.name }}</strong>
-                </div>
-                <cnpm-badge [tone]="statusTone(group.status)">{{
-                  statusLabel(group.status)
-                }}</cnpm-badge>
-              </div>
-              <dl>
-                <div>
-                  <dt>Secteur</dt>
-                  <dd>{{ sectorLabel(group.sectorCode) }}</dd>
-                </div>
-              </dl>
-              <cnpm-button variant="secondary" size="sm" (click)="viewGroup(group.id)"
-                >Voir la fiche</cnpm-button
+            <li class="cnpm-groups__card">
+              <a
+                class="cnpm-groups__card-link"
+                [routerLink]="['/admin/groups', group.id]"
+                [queryParams]="listQueryParams()"
+                [attr.aria-label]="'Voir le groupement ' + group.name"
               >
+                <span class="cnpm-groups__card-media" aria-hidden="true">
+                  @if (sectorImage(group.sectorCode); as image) {
+                    <img [src]="image" alt="" loading="lazy" />
+                  } @else {
+                    <svg lucideBuilding2 [size]="iconSize.navigation"></svg>
+                  }
+                </span>
+                <span class="cnpm-groups__card-body">
+                  <span class="cnpm-groups__card-top">
+                    <span class="cnpm-groups__code">{{ group.code }}</span>
+                    <cnpm-badge [tone]="statusTone(group.status)">{{
+                      statusLabel(group.status)
+                    }}</cnpm-badge>
+                  </span>
+                  <strong class="cnpm-groups__card-name">{{ group.name }}</strong>
+                  <span class="cnpm-groups__card-sector">
+                    {{ sectorLabel(group.sectorCode) }}
+                  </span>
+                </span>
+                <svg
+                  lucideChevronRight
+                  [size]="iconSize.control"
+                  class="cnpm-groups__card-chevron"
+                  aria-hidden="true"
+                ></svg>
+              </a>
             </li>
           }
         </ul>

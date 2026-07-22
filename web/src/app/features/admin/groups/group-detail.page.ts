@@ -9,6 +9,7 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { LucideBuilding2 } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
@@ -18,10 +19,12 @@ import {
   type CnpmDefinition,
 } from '../../../design-system/definition-list/definition-list.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
+import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import { GROUPS_GATEWAY, GroupAccessError, GroupNotFoundError } from './groups-gateway';
+import { sectorImage, sectorLabel } from './sector-presentation';
 
 /** BO-025 — fiche descriptive d'un groupement, sans agrégat ni écriture inventés. */
 @Component({
@@ -37,6 +40,7 @@ import { GROUPS_GATEWAY, GroupAccessError, GroupNotFoundError } from './groups-g
     ErrorStateComponent,
     PageHeaderComponent,
     SkeletonComponent,
+    LucideBuilding2,
   ],
   templateUrl: './group-detail.page.html',
   styleUrl: './group-detail.page.scss',
@@ -45,6 +49,8 @@ export class GroupDetailPage {
   private readonly gateway = inject(GROUPS_GATEWAY);
   private readonly route = inject(ActivatedRoute);
   private readonly title = inject(Title);
+
+  protected readonly iconSize = CNPM_ICON_SIZE;
 
   private readonly params = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
@@ -83,13 +89,14 @@ export class GroupDetailPage {
     return result.kind === 'ready' ? result.group : null;
   });
   protected readonly pageTitle = computed(() => this.group()?.name ?? 'Fiche groupement');
+  protected readonly groupImage = computed(() => sectorImage(this.group()?.sectorCode ?? null));
   protected readonly facts = computed<readonly CnpmDefinition[]>(() => {
     const group = this.group();
     if (!group) return [];
     return [
       { label: 'Code', value: group.code },
       { label: 'Dénomination', value: group.name },
-      { label: 'Code secteur', value: group.sectorCode ?? 'Non renseigné' },
+      { label: 'Secteur', value: sectorLabel(group.sectorCode) },
     ];
   });
 

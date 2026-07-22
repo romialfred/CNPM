@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { LucideEye } from '@lucide/angular';
+import { LucideBuilding2, LucideChevronRight, LucideEye } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -21,6 +21,10 @@ import {
   type ProfessionalGroup,
   type ProfessionalGroupQuery,
 } from './groups-gateway';
+import {
+  sectorImage as resolveSectorImage,
+  sectorLabel as resolveSectorLabel,
+} from './sector-presentation';
 
 const PAGE_SIZES = [10, 25, 50] as const;
 const DEFAULT_PAGE_SIZE = 10;
@@ -40,6 +44,8 @@ const DEFAULT_PAGE_SIZE = 10;
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
+    LucideBuilding2,
+    LucideChevronRight,
     LucideEye,
   ],
   templateUrl: './groups.page.html',
@@ -105,11 +111,10 @@ export class GroupsPage {
   });
 
   protected readonly columns: readonly DataTableColumn[] = [
-    { key: 'code', label: 'Code' },
     { key: 'name', label: 'Groupement professionnel' },
     { key: 'sectorCode', label: 'Secteur' },
     { key: 'status', label: 'Statut' },
-    { key: 'actions', label: 'Action' },
+    { key: 'actions', label: 'Action', align: 'end' },
   ];
   protected readonly rowKey = (group: ProfessionalGroup): string => group.id;
 
@@ -121,14 +126,19 @@ export class GroupsPage {
     return value === 'ACTIVE' ? 'success' : 'neutral';
   }
 
+  /** Libellé humain du secteur ; `null` restitue « Non renseigné ». */
   protected sectorLabel(value: string | null): string {
-    return value ?? 'Non renseigné';
+    return resolveSectorLabel(value);
   }
 
-  protected viewGroup(id: string): void {
-    void this.router.navigate(['/admin/groups', id], {
-      queryParams: this.listQueryParams(),
-    });
+  /** Vrai lorsque le groupement porte un secteur exploitable pour la présentation. */
+  protected hasSector(value: string | null): boolean {
+    return value !== null && value.trim().length > 0;
+  }
+
+  /** Photo topique et stable du secteur ; `null` déclenche l'icône de repli. */
+  protected sectorImage(value: string | null): string | null {
+    return resolveSectorImage(value);
   }
 
   protected onPageChange(page: number): void {

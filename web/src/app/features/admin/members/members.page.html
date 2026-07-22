@@ -122,7 +122,7 @@
               >
                 <option value="">Toutes les catégories</option>
                 @for (value of categoryOptions; track value) {
-                  <option [value]="value">{{ value }}</option>
+                  <option [value]="value">{{ value | cnpmMemberCategory }}</option>
                 }
               </select>
             </div>
@@ -363,7 +363,7 @@
                   {{ member.organization }}
                 </a>
                 <p class="cnpm-members__tile-meta">
-                  {{ member.category }}
+                  {{ member.category | cnpmMemberCategory }}
                   @if (member.group) {
                     <span aria-hidden="true"> · </span>{{ member.group }}
                   }

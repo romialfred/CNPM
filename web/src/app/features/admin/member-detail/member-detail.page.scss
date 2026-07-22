@@ -37,94 +37,104 @@
   border-radius: var(--cnpm-radius-xs);
 }
 
-/* Fiche à gauche, rappels à droite. Le panneau n'existe qu'au-delà de 1440 px,
-   conformément à la fiche ; `minmax(0, 1fr)` empêche un tableau large de pousser la
-   grille hors de la page au lieu de défiler dans son propre conteneur. */
-.cnpm-member__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
-  gap: var(--cnpm-space-6);
-  min-width: 0;
-}
-
-.cnpm-member__main,
-.cnpm-member__aside {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-4);
-  min-width: 0;
-}
-
-.cnpm-member__identity,
-.cnpm-member__card {
-  padding: var(--cnpm-layout-cardPadding);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-surface-primary);
-  min-width: 0;
-}
-
-.cnpm-member__identity {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--cnpm-space-4);
-}
-
-.cnpm-member__identity-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-3);
-  min-width: 0;
-}
-
-.cnpm-member__title-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--cnpm-space-2);
-  min-width: 0;
-}
-
+/* Titre de secours de l'état de chargement (une seule occurrence à l'écran). */
 .cnpm-member__title {
   margin: 0;
   font-size: var(--cnpm-font-size-2xl);
   line-height: var(--cnpm-font-lineHeight-2xl);
   font-weight: var(--cnpm-font-weight-semibold);
   color: var(--cnpm-color-text-primary);
-  overflow-wrap: anywhere;
 }
 
-.cnpm-member__meta {
+/* — Héros vitrine ————————————————————————————————————————————————————— */
+
+.cnpm-member__hero {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--cnpm-space-2) var(--cnpm-space-6);
-  margin: 0;
+  min-height: 15rem;
+  overflow: hidden;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-inverse);
+  isolation: isolate;
 }
 
-.cnpm-member__meta-item {
+.cnpm-member__hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Voile fonctionnel, non décoratif : il garantit le contraste du texte blanc quelle que
+   soit la photo servie — opaque en bas, où se lit le contenu, transparent en haut, où la
+   photo reste visible (WCAG 1.4.3). */
+.cnpm-member__hero::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  content: '';
+  background-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--cnpm-color-surface-overlay) 55%,
+    var(--cnpm-color-surface-inverse) 100%
+  );
+}
+
+.cnpm-member__hero-body {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: var(--cnpm-space-1);
-  min-width: 0;
+  gap: var(--cnpm-space-3);
+  width: 100%;
+  margin-top: auto;
+  padding: var(--cnpm-space-6);
 }
 
-.cnpm-member__meta-item dt {
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
+.cnpm-member__hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
 }
 
-.cnpm-member__meta-item dd {
+.cnpm-member__hero-title {
   margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-medium);
-  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-4xl);
+  line-height: var(--cnpm-font-lineHeight-4xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-tight);
+  color: var(--cnpm-color-text-inverse);
   overflow-wrap: anywhere;
 }
 
-.cnpm-member__identity-actions {
+.cnpm-member__hero-lead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-inverse);
+}
+
+.cnpm-member__hero-code {
+  font-family: var(--cnpm-font-family-mono);
+}
+
+.cnpm-member__hero-tagline {
+  max-width: 46rem;
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  line-height: var(--cnpm-font-lineHeight-lg);
+  color: var(--cnpm-color-text-inverse);
+}
+
+/* — Barre d'actions ——————————————————————————————————————————————————— */
+
+.cnpm-member__toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -143,6 +153,16 @@
   clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
+}
+
+/* — Cartes ————————————————————————————————————————————————————————————— */
+
+.cnpm-member__card {
+  padding: var(--cnpm-layout-cardPadding);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background-color: var(--cnpm-color-surface-primary);
+  min-width: 0;
 }
 
 .cnpm-member__card-title {
@@ -166,6 +186,99 @@
   color: var(--cnpm-color-text-muted);
 }
 
+/* — Bandeau de profil ————————————————————————————————————————————————— */
+
+.cnpm-member__profile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-member__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--cnpm-space-4);
+  margin: 0;
+}
+
+.cnpm-member__fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-member__fact dt {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-member__fact dd {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cnpm-member__verify {
+  padding-top: var(--cnpm-space-4);
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+}
+
+/* — Activités principales —————————————————————————————————————————————— */
+
+.cnpm-member__activities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--cnpm-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-member__activity {
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-secondary);
+}
+
+.cnpm-member__activity-title {
+  margin: 0 0 var(--cnpm-space-1);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-member__activity-text {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  line-height: var(--cnpm-font-lineHeight-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+/* — Grille principale / panneau latéral ——————————————————————————————— */
+
+/* Fiche à gauche, rappels à droite. Le panneau latéral n'apparaît qu'au-delà de 1280 px ;
+   `minmax(0, 1fr)` empêche un tableau large de pousser la grille hors de la page au lieu
+   de défiler dans son propre conteneur. */
+.cnpm-member__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--cnpm-space-6);
+  min-width: 0;
+}
+
+.cnpm-member__main,
+.cnpm-member__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
 .cnpm-member__panel {
   display: flex;
   flex-direction: column;
@@ -179,135 +292,34 @@
   border-radius: var(--cnpm-radius-md);
 }
 
-/* Minimum ramené de 16 à 11 rem : à 1 280 px la colonne principale ne fait que 613 px,
-   et deux cartes par rangée seulement portaient le bloc d'indicateurs à 756 px de haut
-   contre 378 à 1 440. Une carte de chiffre n'a pas besoin de 256 px. */
 .cnpm-member__stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
   align-items: start;
   gap: var(--cnpm-space-4);
   min-width: 0;
 }
 
-.cnpm-member__kpi {
+/* — Score de risque ——————————————————————————————————————————————————— */
+
+.cnpm-member__score-head {
   display: flex;
-  flex-direction: column;
-  min-height: 8rem;
-}
-
-.cnpm-member__kpi-title {
-  margin: 0 0 var(--cnpm-space-3);
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-member__kpi-value {
-  margin: 0;
-  font-size: var(--cnpm-font-size-2xl);
-  line-height: var(--cnpm-font-lineHeight-2xl);
-  font-weight: var(--cnpm-font-weight-bold);
-  font-variant-numeric: tabular-nums;
-  color: var(--cnpm-color-text-brand);
-}
-
-.cnpm-member__kpi-activity {
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-member__kpi-note {
-  margin: auto 0 0;
-  padding-top: var(--cnpm-space-2);
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
-}
-
-.cnpm-member__overview-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--cnpm-space-4);
-  min-width: 0;
-}
-
-.cnpm-member__timeline,
-.cnpm-member__documents-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.cnpm-member__timeline li {
-  position: relative;
-  padding: 0 0 var(--cnpm-space-3) var(--cnpm-space-5);
-  border-left: 1px solid var(--cnpm-color-border-default);
-}
-
-.cnpm-member__timeline li:last-child {
-  padding-bottom: 0;
-  border-left-color: transparent;
-}
-
-.cnpm-member__timeline-dot {
-  position: absolute;
-  top: var(--cnpm-space-1);
-  left: -0.3rem;
-  width: 0.55rem;
-  height: 0.55rem;
-  border: 2px solid var(--cnpm-color-surface-primary);
-  border-radius: var(--cnpm-radius-pill);
-  background: var(--cnpm-color-brand-blue-700);
-}
-
-.cnpm-member__compact-table-region {
-  overflow-x: auto;
-}
-
-.cnpm-member__compact-table-region:focus-visible {
-  outline: 2px solid var(--cnpm-color-border-focus);
-  outline-offset: 2px;
-}
-
-.cnpm-member__compact-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.cnpm-member__compact-table th,
-.cnpm-member__compact-table td {
-  padding: var(--cnpm-space-2);
-  border-bottom: 1px solid var(--cnpm-color-border-subtle);
-  text-align: left;
-  white-space: nowrap;
-}
-
-.cnpm-member__compact-table th {
-  color: var(--cnpm-color-text-secondary);
-  background: var(--cnpm-color-surface-secondary);
-}
-
-.cnpm-member__documents-list li {
-  display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--cnpm-space-3);
-  padding: var(--cnpm-space-2) 0;
-  border-bottom: 1px solid var(--cnpm-color-border-subtle);
+  gap: var(--cnpm-space-2);
+  margin-bottom: var(--cnpm-space-3);
 }
 
-.cnpm-member__documents-list li:last-child {
-  border-bottom: 0;
+.cnpm-member__score-head .cnpm-member__card-title {
+  margin: 0;
 }
 
 .cnpm-member__score {
   display: flex;
   align-items: baseline;
   gap: var(--cnpm-space-1);
-  margin: 0 0 var(--cnpm-space-2);
+  margin: 0;
 }
 
 .cnpm-member__score-value {
@@ -323,8 +335,8 @@
   color: var(--cnpm-color-text-muted);
 }
 
-/* Jauge purement illustrative : la valeur est déjà écrite en clair et doublée d'un
-   libellé de niveau. Teinte de marque et non sémantique — la couleur ne porte rien. */
+/* Jauge illustrative : la valeur est déjà écrite en clair et doublée d'un libellé de
+   niveau. Teinte de marque et non sémantique — la couleur ne porte rien. */
 .cnpm-member__gauge {
   height: var(--cnpm-space-2);
   margin-top: var(--cnpm-space-3);
@@ -339,6 +351,42 @@
   border-radius: var(--cnpm-radius-pill);
   background-color: var(--cnpm-color-brand-blue-700);
 }
+
+/* — Agent affecté ————————————————————————————————————————————————————— */
+
+.cnpm-member__agent-body {
+  display: grid;
+  gap: var(--cnpm-space-4);
+}
+
+.cnpm-member__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2) var(--cnpm-space-6);
+  margin: var(--cnpm-space-3) 0 0;
+}
+
+.cnpm-member__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  min-width: 0;
+}
+
+.cnpm-member__meta-item dt {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-member__meta-item dd {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+/* — Listes, contacts, alertes, actions ————————————————————————————————— */
 
 .cnpm-member__list,
 .cnpm-member__contact-lines,
@@ -357,6 +405,10 @@
 .cnpm-member__list {
   list-style: disc;
   padding-left: var(--cnpm-space-5);
+}
+
+.cnpm-member__contact-lines {
+  margin-top: var(--cnpm-space-2);
 }
 
 .cnpm-member__contact-lines li {
@@ -393,6 +445,8 @@
   margin: 0 0 var(--cnpm-space-1);
 }
 
+/* — Éléments de texte partagés ————————————————————————————————————————— */
+
 .cnpm-member__strong {
   margin: 0;
   font-weight: var(--cnpm-font-weight-semibold);
@@ -422,90 +476,39 @@
   color: var(--cnpm-color-text-muted);
 }
 
-/* Deux colonnes dès 1 280 px et non 1 440 : entre les deux, la colonne latérale
-   passait sous le contenu principal alors que la place existait, et la fiche
-   s'allongeait d'autant. */
+/* — Points de rupture ————————————————————————————————————————————————— */
+
+@media (min-width: 768px) {
+  .cnpm-member__agent-body {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .cnpm-member__agent-body .cnpm-member__meta {
+    margin-top: 0;
+  }
+}
+
+/* Deux colonnes dès 1 280 px : la colonne latérale porte les alertes et les prochaines
+   actions, qui restent lisibles pendant qu'on parcourt les cotisations. */
 @media (min-width: 1280px) {
   .cnpm-member__layout {
     grid-template-columns: minmax(0, 1fr) 20rem;
   }
 
-  /* La colonne latérale suit le défilement : elle porte les alertes et les prochaines
-     actions, qui doivent rester lisibles pendant qu'on parcourt les cotisations. */
   .cnpm-member__aside {
     position: sticky;
     top: calc(var(--cnpm-size-topbar) + var(--cnpm-space-16));
   }
 }
 
-@media (min-width: 1440px) {
-  .cnpm-member__layout {
-    gap: var(--cnpm-space-4);
-  }
-
-  .cnpm-member,
-  .cnpm-member__main,
-  .cnpm-member__aside,
-  .cnpm-member__panel {
-    gap: var(--cnpm-space-3);
-  }
-
-  .cnpm-member__identity,
-  .cnpm-member__card {
-    padding: var(--cnpm-space-3);
-  }
-
-  .cnpm-member__identity {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .cnpm-member__identity-actions {
-    align-self: center;
-  }
-
-  .cnpm-member__identity-text {
-    gap: var(--cnpm-space-2);
-  }
-
-  .cnpm-member__meta-item {
-    flex-direction: row;
-    align-items: baseline;
-    gap: var(--cnpm-space-1);
-  }
-
-  .cnpm-member__meta-item dt::after {
-    content: ' :';
-  }
-
-  .cnpm-member__stats {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--cnpm-space-3);
-  }
-
-  .cnpm-member__stats > :nth-child(1),
-  .cnpm-member__stats > :nth-child(2) {
-    min-width: 0;
-  }
-
-  .cnpm-member__overview-grid {
-    grid-template-columns: minmax(12rem, 0.9fr) minmax(24rem, 1.7fr) minmax(14rem, 1.1fr);
-    gap: var(--cnpm-space-3);
-  }
-
-  .cnpm-member__agent {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: start;
-  }
-}
-
 @media (max-width: 767px) {
-  .cnpm-member__identity-actions {
-    width: 100%;
+  .cnpm-member__toolbar .cnpm-button {
+    flex: 1 1 auto;
   }
 
-  .cnpm-member__meta {
-    gap: var(--cnpm-space-3);
+  .cnpm-member__hero-title {
+    font-size: var(--cnpm-font-size-3xl);
+    line-height: var(--cnpm-font-lineHeight-3xl);
   }
 }

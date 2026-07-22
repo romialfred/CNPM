@@ -35,7 +35,11 @@ import {
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TabsComponent, type CnpmTab } from '../../../design-system/tabs/tabs.component';
-import { VerificationBadgeComponent } from '../../../design-system/verification-badge/verification-badge.component';
+import {
+  VerificationBadgeComponent,
+  type CnpmVerificationStatus,
+} from '../../../design-system/verification-badge/verification-badge.component';
+import { MemberCategoryLabelPipe } from '../../../core/formatting/member-category-label.pipe';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import {
   MEMBER_DETAIL_GATEWAY,
@@ -153,8 +157,225 @@ const PRIORITY_TONES: Readonly<Record<ActionPriority, CnpmBadgeTone>> = {
   LOW: 'neutral',
 };
 
+const VERIFICATION_LABELS: Readonly<Record<CnpmVerificationStatus, string>> = {
+  VERIFIED: 'Membre vérifié par le CNPM',
+  PENDING: 'Vérification en cours',
+  EXPIRED: 'Vérification expirée',
+  SUSPENDED: 'Membre suspendu',
+};
+
+const VERIFICATION_TONES: Readonly<Record<CnpmVerificationStatus, CnpmBadgeTone>> = {
+  VERIFIED: 'success',
+  PENDING: 'info',
+  EXPIRED: 'warning',
+  SUSPENDED: 'error',
+};
+
 /** Marque explicitement une donnée absente, jamais confondue avec une valeur vide. */
 const MISSING = 'Non renseigné';
+
+/**
+ * Grande famille d'activité de la vitrine. La source ne transmet qu'un `sector` libre
+ * (« Bâtiment et travaux publics », « Services aux entreprises »…) ; la fiche le classe
+ * dans une de ces familles pour choisir une illustration et des activités cohérentes.
+ */
+type SectorKey =
+  | 'BTP'
+  | 'AGRICULTURE'
+  | 'MINES'
+  | 'FINANCE'
+  | 'COMMERCE'
+  | 'ENERGIE'
+  | 'INDUSTRIE'
+  | 'TRANSPORT'
+  | 'TELECOM'
+  | 'SANTE'
+  | 'TOURISME'
+  | 'SERVICES'
+  | 'DEFAULT';
+
+/** Une tuile « Activités principales » : un intitulé et une courte description. */
+interface SectorActivity {
+  readonly title: string;
+  readonly description: string;
+}
+
+interface SectorProfile {
+  /** Mots-clés loremflickr de l'illustration topique du secteur. */
+  readonly imageKeywords: string;
+  /** Accroche courte affichée dans le héros, propre au secteur. */
+  readonly tagline: string;
+  /** Trois à six activités générées selon le secteur, rendues en tuiles. */
+  readonly activities: readonly SectorActivity[];
+}
+
+/** Enlève diacritiques et casse pour un classement robuste du libellé de secteur. */
+function normalizeSectorText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
+}
+
+/**
+ * Jetons de reconnaissance par famille, du plus spécifique au plus générique :
+ * « Services » ne doit capter que ce qu'aucune famille précise n'a déjà reconnu.
+ * Le libellé de secteur ET le groupement sont fouillés, l'un complétant l'autre.
+ */
+const SECTOR_MATCHERS: readonly (readonly [SectorKey, readonly string[]])[] = [
+  ['BTP', ['btp', 'batiment', 'travaux publics', 'construction', 'infrastructure', 'immobilier', 'genie civil']],
+  ['AGRICULTURE', ['agricultur', 'agro', 'ferme', 'elevage', 'peche', 'agroalimentaire']],
+  ['MINES', ['mine', 'minier', 'extractif', 'carriere', 'aurifere', 'orpaillage']],
+  ['FINANCE', ['financ', 'banque', 'assurance', 'microfinance', 'credit', 'monetique']],
+  ['ENERGIE', ['energie', 'energ', 'solaire', 'electric', 'petrol', 'hydrocarbure', 'renouvelable']],
+  ['TRANSPORT', ['transport', 'logistique', 'fret', 'mobilite', 'acheminement']],
+  ['TELECOM', ['telecom', 'reseau', 'numerique', 'digital', 'informatique', 'internet', 'ntic']],
+  ['SANTE', ['sante', 'pharma', 'medical', 'clinique', 'hopital']],
+  ['TOURISME', ['tourisme', 'hotel', 'hospitalit', 'restaur', 'voyage', 'loisir']],
+  ['COMMERCE', ['commerce', 'distribution', 'negoce', 'detail', 'import', 'export']],
+  ['INDUSTRIE', ['industrie', 'manufactur', 'usine', 'transformation', 'fabrication']],
+  ['SERVICES', ['service', 'conseil', 'consulting', 'prestation']],
+];
+
+const SECTOR_PROFILES: Readonly<Record<SectorKey, SectorProfile>> = {
+  BTP: {
+    imageKeywords: 'construction,building',
+    tagline: 'Construire les infrastructures qui font avancer le Mali.',
+    activities: [
+      { title: 'Gros œuvre et structures', description: 'Fondations, ossatures et bâtiments livrés clés en main.' },
+      { title: 'Voirie et réseaux divers', description: 'Routes, assainissement et réseaux enterrés.' },
+      { title: 'Génie civil', description: 'Ouvrages d’art, ponts et infrastructures publiques.' },
+      { title: 'Réhabilitation', description: 'Rénovation et mise aux normes du bâti existant.' },
+    ],
+  },
+  AGRICULTURE: {
+    imageKeywords: 'agriculture,farm',
+    tagline: 'Nourrir le pays et valoriser les filières agricoles.',
+    activities: [
+      { title: 'Production végétale', description: 'Cultures vivrières et cultures de rente.' },
+      { title: 'Élevage', description: 'Filières bovine, avicole et laitière.' },
+      { title: 'Agro-transformation', description: 'Conditionnement et valorisation des récoltes.' },
+      { title: 'Intrants et semences', description: 'Approvisionnement et appui aux exploitations.' },
+    ],
+  },
+  MINES: {
+    imageKeywords: 'mining',
+    tagline: 'Valoriser les ressources minières de façon responsable.',
+    activities: [
+      { title: 'Exploration', description: 'Prospection et évaluation des gisements.' },
+      { title: 'Extraction', description: 'Exploitation minière et traitement du minerai.' },
+      { title: 'Logistique minière', description: 'Transport et stockage de la production.' },
+      { title: 'Réhabilitation des sites', description: 'Remise en état et suivi environnemental.' },
+    ],
+  },
+  FINANCE: {
+    imageKeywords: 'bank,office',
+    tagline: 'Financer la croissance des entreprises maliennes.',
+    activities: [
+      { title: 'Financement', description: 'Crédits et lignes de trésorerie aux entreprises.' },
+      { title: 'Moyens de paiement', description: 'Comptes, cartes et transferts.' },
+      { title: 'Assurance', description: 'Couverture des risques professionnels.' },
+      { title: 'Conseil financier', description: 'Structuration et gestion d’actifs.' },
+    ],
+  },
+  COMMERCE: {
+    imageKeywords: 'retail,store',
+    tagline: 'Distribuer et approvisionner les marchés du pays.',
+    activities: [
+      { title: 'Distribution de gros', description: 'Approvisionnement du réseau de revendeurs.' },
+      { title: 'Vente au détail', description: 'Réseau de points de vente de proximité.' },
+      { title: 'Import-export', description: 'Sourcing et négoce à l’international.' },
+      { title: 'Logistique commerciale', description: 'Entreposage et livraison des commandes.' },
+    ],
+  },
+  ENERGIE: {
+    imageKeywords: 'solar,energy',
+    tagline: 'Produire une énergie fiable et durable.',
+    activities: [
+      { title: 'Production d’énergie', description: 'Solaire, thermique et hydroélectrique.' },
+      { title: 'Distribution', description: 'Raccordement et fourniture aux clients.' },
+      { title: 'Solutions solaires', description: 'Installations photovoltaïques sur mesure.' },
+      { title: 'Maintenance', description: 'Exploitation des installations énergétiques.' },
+    ],
+  },
+  INDUSTRIE: {
+    imageKeywords: 'factory,industry',
+    tagline: 'Transformer localement pour créer de la valeur.',
+    activities: [
+      { title: 'Fabrication', description: 'Lignes de production et assemblage.' },
+      { title: 'Transformation', description: 'Valorisation des matières premières.' },
+      { title: 'Contrôle qualité', description: 'Normes et certification des produits.' },
+      { title: 'Maintenance industrielle', description: 'Fiabilité de l’outil de production.' },
+    ],
+  },
+  TRANSPORT: {
+    imageKeywords: 'logistics,truck',
+    tagline: 'Relier les territoires et fluidifier les échanges.',
+    activities: [
+      { title: 'Transport de marchandises', description: 'Fret routier et messagerie.' },
+      { title: 'Logistique et entreposage', description: 'Stockage et gestion des flux.' },
+      { title: 'Affrètement', description: 'Organisation des acheminements.' },
+      { title: 'Dernier kilomètre', description: 'Livraison finale aux destinataires.' },
+    ],
+  },
+  TELECOM: {
+    imageKeywords: 'telecom,network',
+    tagline: 'Connecter les entreprises à l’économie numérique.',
+    activities: [
+      { title: 'Réseaux et connectivité', description: 'Déploiement et exploitation des liens.' },
+      { title: 'Services numériques', description: 'Solutions logicielles et cloud.' },
+      { title: 'Infrastructure', description: 'Centres de données et équipements réseau.' },
+      { title: 'Support et intégration', description: 'Accompagnement technique des clients.' },
+    ],
+  },
+  SANTE: {
+    imageKeywords: 'pharmacy,health',
+    tagline: 'Rendre les soins et les produits de santé accessibles.',
+    activities: [
+      { title: 'Distribution pharmaceutique', description: 'Approvisionnement en médicaments.' },
+      { title: 'Équipements médicaux', description: 'Matériel et dispositifs de soin.' },
+      { title: 'Services de soin', description: 'Offre clinique et diagnostic.' },
+      { title: 'Prévention', description: 'Programmes de santé et sensibilisation.' },
+    ],
+  },
+  TOURISME: {
+    imageKeywords: 'hotel,tourism',
+    tagline: 'Faire rayonner l’accueil et le patrimoine malien.',
+    activities: [
+      { title: 'Hébergement', description: 'Hôtellerie et résidences.' },
+      { title: 'Restauration', description: 'Services de bouche et événementiel.' },
+      { title: 'Voyages et séjours', description: 'Organisation de circuits.' },
+      { title: 'Accueil et animation', description: 'Expérience client et loisirs.' },
+    ],
+  },
+  SERVICES: {
+    imageKeywords: 'office,business',
+    tagline: 'Accompagner les organisations dans leur activité quotidienne.',
+    activities: [
+      { title: 'Conseil aux entreprises', description: 'Accompagnement stratégique et opérationnel.' },
+      { title: 'Services support', description: 'Externalisation de fonctions clés.' },
+      { title: 'Solutions sur mesure', description: 'Prestations adaptées au besoin.' },
+      { title: 'Formation', description: 'Montée en compétences des équipes.' },
+    ],
+  },
+  DEFAULT: {
+    imageKeywords: 'business,office',
+    tagline: 'Un membre engagé au sein du patronat malien.',
+    activities: [
+      { title: 'Cœur de métier', description: 'Activité principale de l’organisation.' },
+      { title: 'Services aux clients', description: 'Offre commerciale et relation client.' },
+      { title: 'Partenariats', description: 'Réseau de fournisseurs et de clients.' },
+      { title: 'Développement', description: 'Croissance et ouverture de nouveaux marchés.' },
+    ],
+  },
+};
+
+/** Une mesure du bandeau de profil : un intitulé, sa valeur, et l'absence signalée. */
+interface ShowcaseFact {
+  readonly label: string;
+  readonly value: string;
+  readonly muted?: boolean;
+}
 
 /**
  * BO-003 — fiche membre 360°.
@@ -194,6 +415,7 @@ const MISSING = 'Non renseigné';
     SkeletonComponent,
     TabsComponent,
     VerificationBadgeComponent,
+    MemberCategoryLabelPipe,
     LucideMail,
     LucidePencil,
     LucidePhone,
@@ -238,6 +460,13 @@ export class MemberDetailPage {
    */
   protected readonly verificationExplanation =
     'Le CNPM a constaté l’existence du membre et l’état de son dossier d’adhésion. Les critères détaillés et la durée de validité du badge restent à arrêter.';
+
+  /**
+   * Humanise le code de catégorie hors gabarit, là où la valeur alimente un composant
+   * qui n'attend qu'une chaîne (la liste de définitions). Le même libellé que le pipe
+   * du gabarit produit ainsi « Grande Entreprise » partout, code ou libellé en entrée.
+   */
+  private readonly categoryLabel = new MemberCategoryLabelPipe();
 
   private readonly params = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
@@ -342,6 +571,88 @@ export class MemberDetailPage {
     });
   }
 
+  // — Vitrine : secteur, illustration et activités ——————————————————————
+
+  /** Famille d'activité déduite du secteur (et du groupement) de la source. */
+  protected readonly sectorKey = computed<SectorKey>(() => {
+    const identity = this.detail()?.identity;
+    if (!identity) {
+      return 'DEFAULT';
+    }
+    const haystack = `${normalizeSectorText(identity.sector)} ${normalizeSectorText(identity.group)}`;
+    for (const [key, tokens] of SECTOR_MATCHERS) {
+      if (tokens.some((token) => haystack.includes(token))) {
+        return key;
+      }
+    }
+    return 'DEFAULT';
+  });
+
+  protected readonly sectorProfile = computed<SectorProfile>(
+    () => SECTOR_PROFILES[this.sectorKey()],
+  );
+
+  protected readonly sectorTagline = computed(() => this.sectorProfile().tagline);
+
+  protected readonly sectorActivities = computed<readonly SectorActivity[]>(
+    () => this.sectorProfile().activities,
+  );
+
+  /**
+   * Illustration du héros, photo réelle et topique servie par loremflickr. Le paramètre
+   * `lock`, dérivé du code membre, rend l'image déterministe (une fiche montre toujours
+   * la même) tout en la différenciant d'un membre à l'autre. Décorative : `alt=""`.
+   */
+  protected readonly heroImage = computed(() => {
+    const identity = this.detail()?.identity;
+    if (!identity) {
+      return '';
+    }
+    const lock = (this.hashCode(identity.code) % 1000) + 1;
+    return `https://loremflickr.com/1280/420/${this.sectorProfile().imageKeywords}?lock=${lock}`;
+  });
+
+  /** Hachage stable et positif d'un code membre, pour un `lock` d'image reproductible. */
+  private hashCode(value: string): number {
+    let hash = 0;
+    for (let index = 0; index < value.length; index += 1) {
+      hash = (Math.imul(hash, 31) + value.charCodeAt(index)) | 0;
+    }
+    return Math.abs(hash);
+  }
+
+  /** Libellé et teinte du badge de vérification affiché dans le héros. */
+  protected verificationLabel(status: CnpmVerificationStatus): string {
+    return VERIFICATION_LABELS[status];
+  }
+
+  protected verificationTone(status: CnpmVerificationStatus): CnpmBadgeTone {
+    return VERIFICATION_TONES[status];
+  }
+
+  /**
+   * Bandeau de profil : secteur, localisation, effectif, adhésion, statut et ancienneté
+   * d'appartenance. Chiffres et libellés viennent tels quels de la source ; rien n'est
+   * recalculé. Une valeur absente est marquée pour ne pas se confondre avec un vide.
+   */
+  protected readonly showcaseFacts = computed<readonly ShowcaseFact[]>(() => {
+    const detail = this.detail();
+    if (!detail) {
+      return [];
+    }
+    const { identity, profile } = detail;
+    return [
+      { label: 'Secteur', value: identity.sector },
+      { label: 'Localisation', value: identity.region },
+      profile.employeeRange
+        ? { label: 'Effectif', value: profile.employeeRange }
+        : { label: 'Effectif', value: MISSING, muted: true },
+      { label: 'Date d’adhésion', value: this.formatDay(profile.joinedOn) },
+      { label: 'Statut', value: MEMBER_STATUS_LABELS[identity.status] },
+      { label: 'Membre CNPM', value: `Depuis ${profile.joinedOn.slice(0, 4)}` },
+    ];
+  });
+
   // — Informations générales et adhésion ————————————————————————————————
 
   protected readonly generalFacts = computed<readonly CnpmDefinition[]>(() => {
@@ -351,13 +662,11 @@ export class MemberDetailPage {
     }
     const { identity, profile, permissions } = detail;
     const facts: CnpmDefinition[] = [
+      { label: 'Forme juridique', value: identity.legalForm },
       { label: 'RCCM', value: profile.rccm ?? MISSING },
       { label: 'NIF', value: profile.nif ?? MISSING },
-      { label: 'Secteur d’activité', value: identity.sector },
-      { label: 'Taille de l’entreprise', value: profile.employeeRange ?? MISSING },
-      { label: 'Date d’adhésion', value: this.formatDay(profile.joinedOn) },
-      { label: 'Région', value: identity.region },
       { label: 'Adresse', value: identity.address },
+      { label: 'Site web', value: profile.website ?? MISSING },
     ];
     // Les coordonnées sont masquées quand le rôle ne les autorise pas : la fiche
     // l'exige. Le backend reste seul juge — ce masquage n'est qu'un confort.
@@ -383,7 +692,7 @@ export class MemberDetailPage {
         label: 'Ancienneté',
         value: `${profile.seniorityYears} an${profile.seniorityYears > 1 ? 's' : ''}`,
       },
-      { label: 'Catégorie', value: identity.category },
+      { label: 'Catégorie', value: this.categoryLabel.transform(identity.category) },
       { label: 'Groupement', value: identity.group },
       {
         label: 'Année de création',
