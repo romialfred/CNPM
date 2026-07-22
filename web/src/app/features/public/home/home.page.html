@@ -9,11 +9,7 @@
         <h1 class="cnpm-home__title" id="accueil-titre">{{ institution.title }}</h1>
         <p class="cnpm-home__baseline">{{ institution.baseline }}</p>
         <div class="cnpm-home__actions">
-          <cnpm-button variant="public-cta" size="lg" routerLink="/auth/login">
-            <svg lucideBriefcaseBusiness [size]="iconSize.control" aria-hidden="true"></svg>
-            Accéder à mon espace membre
-          </cnpm-button>
-          <cnpm-button variant="secondary" size="lg" routerLink="/adhesion">
+          <cnpm-button variant="primary" size="lg" routerLink="/adhesion">
             Préparer une adhésion
           </cnpm-button>
         </div>
@@ -243,6 +239,7 @@
       <ul class="cnpm-home__module-list">
         @for (module of modules; track module.id) {
           <li class="cnpm-home__module">
+            <img class="cnpm-home__module-image" [src]="module.image" alt="" loading="lazy" />
             <span aria-hidden="true">
               @switch (module.id) {
                 @case ('cotisations') {

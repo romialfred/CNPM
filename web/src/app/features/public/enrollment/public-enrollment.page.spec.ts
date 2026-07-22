@@ -147,9 +147,11 @@ describe('PublicEnrollmentPage (PUB-012)', () => {
     await expect(Promise.resolve(decision)).resolves.toBe(false);
   });
 
-  it('reste fermé en profil HTTP tant que le contrat public est incomplet', async () => {
+  it('présente un guide d’adhésion sans formulaire tant que le contrat public est incomplet', async () => {
     const { harness } = await setup('http');
-    expect(harness.routeNativeElement?.textContent).toContain('Demande d’adhésion non raccordée');
+    // La soumission en ligne n'est pas raccordée : on affiche les étapes, jamais le formulaire.
+    expect(harness.routeNativeElement?.textContent).toContain('Préparer votre adhésion au CNPM');
+    expect(harness.routeNativeElement?.textContent).toContain('sera bientôt disponible');
     expect(harness.routeNativeElement?.querySelector('form')).toBeNull();
   });
 });

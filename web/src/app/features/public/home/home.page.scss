@@ -123,6 +123,16 @@
   color: var(--cnpm-color-brand-blue-700);
 }
 
+/* Photo illustrative en tete de tuile : bord a bord, hauteur fixe, coins arrondis. */
+.cnpm-home__module-image {
+  width: 100%;
+  height: var(--cnpm-space-28);
+  object-fit: cover;
+  border-radius: var(--cnpm-radius-md);
+  margin-block-end: var(--cnpm-space-4);
+  background: var(--cnpm-color-neutral-100);
+}
+
 .cnpm-home__promise-icon {
   display: inline-flex;
   width: var(--cnpm-space-10);

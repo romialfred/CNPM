@@ -28,7 +28,6 @@ import {
   DefinitionListComponent,
   type CnpmDefinition,
 } from '../../../design-system/definition-list/definition-list.component';
-import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import {
   InlineErrorSummaryComponent,
   type CnpmFieldError,
@@ -118,7 +117,6 @@ function isStep(value: string | null): value is EnrollmentStepId {
     AlertComponent,
     ButtonComponent,
     DefinitionListComponent,
-    ErrorStateComponent,
     InlineErrorSummaryComponent,
     PublicShellComponent,
     ReactiveFormsModule,

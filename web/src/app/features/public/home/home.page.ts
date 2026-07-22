@@ -150,18 +150,31 @@ export class HomePage {
       id: 'cotisations',
       title: 'Cotisations',
       text: 'Suivre les appels et la situation de paiement.',
+      image: 'https://loremflickr.com/640/380/finance,payment?lock=21',
     },
-    { id: 'requetes', title: 'Requêtes', text: 'Créer et suivre une demande adressée au CNPM.' },
-    { id: 'recus', title: 'Reçus', text: 'Retrouver les documents disponibles après émission.' },
+    {
+      id: 'requetes',
+      title: 'Requêtes',
+      text: 'Créer et suivre une demande adressée au CNPM.',
+      image: 'https://loremflickr.com/640/380/office,support?lock=22',
+    },
+    {
+      id: 'recus',
+      title: 'Reçus',
+      text: 'Retrouver les documents disponibles après émission.',
+      image: 'https://loremflickr.com/640/380/receipt,accounting?lock=23',
+    },
     {
       id: 'reporting',
       title: 'Tableaux de bord',
       text: 'Consulter des indicateurs adaptés à son espace.',
+      image: 'https://loremflickr.com/640/380/analytics,chart?lock=24',
     },
     {
       id: 'vitrine',
       title: 'Vitrine publique',
       text: 'Valoriser une entreprise selon les règles de publication.',
+      image: 'https://loremflickr.com/640/380/business,building?lock=25',
     },
   ];
 

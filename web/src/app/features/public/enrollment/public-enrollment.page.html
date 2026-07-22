@@ -1,14 +1,51 @@
 <cnpm-public-shell>
   @if (!isDemo) {
-    <section class="enrollment-unavailable">
-      <cnpm-error-state
-        variant="not-found"
-        title="Demande d’adhésion non raccordée"
-        description="Le contrat HTTP public ne décrit pas encore la collecte de l’entreprise, des contacts, des pièces et du consentement. Le parcours reste fermé pour éviter une soumission incomplète."
-        titleAs="h1"
-      >
+    <section class="enrollment-prepare" aria-labelledby="adhesion-titre">
+      <p class="enrollment-prepare__kicker">Adhésion</p>
+      <h1 class="enrollment-prepare__title" id="adhesion-titre">Préparer votre adhésion au CNPM</h1>
+      <p class="enrollment-prepare__lead">
+        Rejoignez le réseau des entreprises membres du Conseil National du Patronat du Mali. Voici
+        les étapes pour constituer votre demande d’adhésion.
+      </p>
+      <ol class="enrollment-prepare__steps">
+        <li class="enrollment-prepare__step">
+          <span class="enrollment-prepare__num" aria-hidden="true">1</span>
+          <div>
+            <h2>Constituer votre dossier</h2>
+            <p>
+              Rassemblez vos statuts, votre RCCM, votre NIF et les coordonnées de votre représentant
+              légal.
+            </p>
+          </div>
+        </li>
+        <li class="enrollment-prepare__step">
+          <span class="enrollment-prepare__num" aria-hidden="true">2</span>
+          <div>
+            <h2>Prendre contact avec le CNPM</h2>
+            <p>
+              Un conseiller vérifie votre éligibilité et votre catégorie de cotisation, puis vous
+              accompagne dans la démarche.
+            </p>
+          </div>
+        </li>
+        <li class="enrollment-prepare__step">
+          <span class="enrollment-prepare__num" aria-hidden="true">3</span>
+          <div>
+            <h2>Validation et enrôlement</h2>
+            <p>
+              Après examen de votre dossier, votre adhésion est enregistrée et votre espace membre
+              est activé.
+            </p>
+          </div>
+        </li>
+      </ol>
+      <p class="enrollment-prepare__note">
+        La soumission entièrement en ligne sera bientôt disponible. En attendant, rapprochez-vous du
+        CNPM pour finaliser votre adhésion.
+      </p>
+      <div class="enrollment-prepare__actions">
         <cnpm-button variant="secondary" routerLink="/">Revenir à l’accueil</cnpm-button>
-      </cnpm-error-state>
+      </div>
     </section>
   } @else {
     <header class="enrollment-hero">
