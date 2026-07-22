@@ -79,3 +79,4 @@ POST;/audit-exports;AUDIT;createAuditExport;Générer une preuve d’audit.
 GET;/integration-partners;INTEGRATION;listIntegrationPartners;Lister les partenaires.
 POST;/webhook-subscriptions;INTEGRATION;createWebhookSubscription;Créer un abonnement sortant.
 GET;/public/highlights;REPORT;getPublicHighlights;Chiffres clés publics de l’accueil.
+GET;/organizations/{id}/member-detail;MEMBER;getMemberDetail;Restituer la fiche membre 360°.

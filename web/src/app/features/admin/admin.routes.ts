@@ -34,6 +34,7 @@ import { INTEGRATIONS_GATEWAY } from './integrations/integrations-gateway';
 import { integrationsReadGuard } from './integrations/integrations-read.guard';
 import { DemoMemberDetailGateway } from './member-detail/demo-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from './member-detail/member-detail-gateway';
+import { HttpMemberDetailGateway } from './member-detail/http-member-detail.gateway';
 import { DemoMemberEditGateway } from './member-edit/demo-member-edit.gateway';
 import { HttpMemberEditGateway } from './member-edit/http-member-edit.gateway';
 import { MEMBER_EDIT_GATEWAY } from './member-edit/member-edit-gateway';
@@ -82,7 +83,6 @@ import {
   UNAVAILABLE_DOCUMENTS_GATEWAY,
   UNAVAILABLE_ENROLLMENT_GATEWAY,
   UNAVAILABLE_INTEGRATIONS_GATEWAY,
-  UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
   UNAVAILABLE_PAYMENTS_GATEWAY,
   UNAVAILABLE_RECEIPTS_GATEWAY,
   UNAVAILABLE_RECOVERY_GATEWAY,
@@ -188,7 +188,7 @@ export const adminRoutes: Routes = [
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoMemberDetailGateway)
-            : UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
+            : inject(HttpMemberDetailGateway),
       },
       DemoMemberEditGateway,
       HttpMemberEditGateway,
@@ -283,6 +283,7 @@ export const adminRoutes: Routes = [
       HttpDashboardGateway,
       DemoDocumentsGateway,
       DemoMemberDetailGateway,
+      HttpMemberDetailGateway,
       DemoEnrollmentGateway,
       DemoContributionsGateway,
       DemoPaymentsGateway,

@@ -3624,6 +3624,34 @@ paths:
                 $ref: '#/components/schemas/PublicHighlights'
       x-requirements:
       - PUB-001
+  /organizations/{id}/member-detail:
+    get:
+      tags:
+      - MEMBER
+      summary: Restituer la fiche membre 360°.
+      operationId: getMemberDetail
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Fiche membre 360° agrégée en lecture seule.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDetail'
+      x-requirements:
+      - BO-003
 components:
   securitySchemes:
     oauth2:
@@ -3790,6 +3818,65 @@ components:
           format: date-time
           nullable: true
           description: Date de constat des chiffres ; null si la source ne la porte pas.
+    MemberDetail:
+      type: object
+      description: >-
+        Fiche membre 360° (BO-003) : identité, adhésion, cotisations, paiements, historique,
+        alertes et risque, agrégés en lecture seule. Le showcase public R4 (réalisations,
+        galerie, certifications) reste hors périmètre tant que sa checklist n'est pas close.
+      required:
+      - identity
+      - profile
+      - summary
+      - contributions
+      - payments
+      - documents
+      - history
+      - alerts
+      - nextActions
+      - permissions
+      properties:
+        identity:
+          type: object
+        profile:
+          type: object
+        mainContact:
+          type: object
+          nullable: true
+        summary:
+          type: object
+        contributions:
+          type: array
+          items:
+            type: object
+        payments:
+          type: array
+          items:
+            type: object
+        documents:
+          type: array
+          items:
+            type: object
+        history:
+          type: array
+          items:
+            type: object
+        alerts:
+          type: array
+          items:
+            type: object
+        nextActions:
+          type: array
+          items:
+            type: object
+        risk:
+          type: object
+          nullable: true
+        agent:
+          type: object
+          nullable: true
+        permissions:
+          type: object
     Money:
       type: object
       required:

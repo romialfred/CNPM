@@ -11,6 +11,7 @@ import { DASHBOARD_GATEWAY } from '../../features/admin/dashboard/dashboard-gate
 import { DemoDashboardGateway } from '../../features/admin/dashboard/demo-dashboard.gateway';
 import { HttpDashboardGateway } from '../../features/admin/dashboard/http-dashboard.gateway';
 import { ENROLLMENT_GATEWAY } from '../../features/admin/enrollment-form/enrollment-gateway';
+import { HttpMemberDetailGateway } from '../../features/admin/member-detail/http-member-detail.gateway';
 import { MEMBER_DETAIL_GATEWAY } from '../../features/admin/member-detail/member-detail-gateway';
 import { DemoGroupsGateway } from '../../features/admin/groups/demo-groups.gateway';
 import { GROUPS_GATEWAY } from '../../features/admin/groups/groups-gateway';
@@ -29,7 +30,6 @@ import {
   UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
   UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_ENROLLMENT_GATEWAY,
-  UNAVAILABLE_MEMBER_DETAIL_GATEWAY,
   UNAVAILABLE_PAYMENTS_GATEWAY,
   UNAVAILABLE_RECOVERY_GATEWAY,
   UNAVAILABLE_REPORTING_GATEWAY,
@@ -95,7 +95,7 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(AUDIT_GATEWAY)).toBeInstanceOf(HttpAuditGateway);
     expect(TestBed.inject(SETTINGS_GATEWAY)).toBeInstanceOf(HttpSettingsGateway);
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBeInstanceOf(HttpDashboardGateway);
-    expect(TestBed.inject(MEMBER_DETAIL_GATEWAY)).toBe(UNAVAILABLE_MEMBER_DETAIL_GATEWAY);
+    expect(TestBed.inject(MEMBER_DETAIL_GATEWAY)).toBeInstanceOf(HttpMemberDetailGateway);
     expect(TestBed.inject(ENROLLMENT_GATEWAY)).toBe(UNAVAILABLE_ENROLLMENT_GATEWAY);
     expect(TestBed.inject(CONTRIBUTIONS_GATEWAY)).toBe(UNAVAILABLE_CONTRIBUTIONS_GATEWAY);
     expect(TestBed.inject(PAYMENTS_GATEWAY)).toBe(UNAVAILABLE_PAYMENTS_GATEWAY);
