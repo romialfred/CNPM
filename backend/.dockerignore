@@ -1,0 +1,8 @@
+# N'envoie au démon Docker que le nécessaire au build (contexte = backend/).
+target/
+*.iml
+.idea/
+.vscode/
+*.log
+# Le wrapper télécharge Maven ; pas besoin d'un dépôt .m2 local.
+.m2/

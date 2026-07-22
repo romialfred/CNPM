@@ -5,7 +5,11 @@ spring:
   # Le nom et l'utilisateur ne sont pas des secrets ; le mot de passe reste fail-closed
   # (ci-dessous, sans repli). Ces valeurs restent surchargeables par l'environnement.
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/CNPM_DB}
+    # URL composable depuis des variables separees (DATABASE_HOST/PORT/NAME) : un
+    # hebergeur managé (ex. Render) expose l'hote, le port et la base separement, sans
+    # possibilite de les concatener dans son blueprint. DATABASE_URL, si fournie, prime
+    # et court-circuite la composition. Le defaut local reste identique a l'existant.
+    url: ${DATABASE_URL:jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:CNPM_DB}}
     username: ${DATABASE_USER:app_user}
     # Aucune valeur de repli : le démarrage doit échouer si le mot de passe n'est
     # pas fourni par l'environnement, plutôt que de démarrer en silence avec un

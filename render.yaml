@@ -1,30 +1,87 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 #
-# Deploiement de DEMONSTRATION du CNPM Digital Platform : le front Angular publie en
-# site statique, en mode 'demo' (toutes les vues fonctionnent sur fixtures, sans backend).
-# C'est le deploiement qui fonctionne immediatement et gratuitement (free plan).
+# Deploiement COMPLET « http » du CNPM Digital Platform :
+#   - cnpm-db      : PostgreSQL manage (Flyway applique les migrations au demarrage) ;
+#   - cnpm-backend : API Spring Boot 4.1 / Java 25 (image Docker), auth NATIVE (sans Keycloak) ;
+#   - cnpm-web     : front Angular en site statique, mode 'http', appelant le backend.
 #
-# Le deploiement complet (backend Spring Boot + PostgreSQL + RabbitMQ, mode 'http')
-# est documente dans deploy/render/README.md : il exige des services payants, des
-# secrets et une approbation humaine (voir CLAUDE.md), il n'est donc PAS active ici.
+# L'apply, les secrets et l'acceptation du cout se font dans le tableau de bord Render.
+# Voir deploy/render/README.md (prerequis, RabbitMQ, versions, tailles d'instance, limites).
+
+databases:
+  - name: cnpm-db
+    databaseName: cnpm
+    user: cnpm
+    plan: free # 1 Go, expire ~90 jours. Passer a un plan payant pour un usage durable.
+    region: frankfurt # proche de l'Afrique de l'Ouest ; memes region pour le reseau prive.
+    postgresMajorVersion: "16" # Render ne propose pas encore PG18 ; migrations compatibles.
 
 services:
+  # ---------------- Backend (API) ----------------
+  - type: web
+    name: cnpm-backend
+    runtime: docker
+    plan: starter # Java + Spring : 512 Mo est juste ; passer a 'standard' si OOM au boot.
+    region: frankfurt
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    # Sonde de liveness : ne depend ni de la base ni de RabbitMQ, l'instance reste saine
+    # meme sans broker. La base, elle, est requise des le demarrage (Flyway + JPA validate).
+    healthCheckPath: /actuator/health/liveness
+    buildFilter:
+      paths:
+        - backend/**
+        - render.yaml
+    envVars:
+      # Base : composee depuis host/port/name (voir application.yml).
+      - key: DATABASE_HOST
+        fromDatabase: { name: cnpm-db, property: host }
+      - key: DATABASE_PORT
+        fromDatabase: { name: cnpm-db, property: port }
+      - key: DATABASE_NAME
+        fromDatabase: { name: cnpm-db, property: database }
+      - key: DATABASE_USER
+        fromDatabase: { name: cnpm-db, property: user }
+      - key: DATABASE_PASSWORD
+        fromDatabase: { name: cnpm-db, property: password }
+      # Secret de signature des jetons natifs (HS256). Genere par Render, jamais commite.
+      - key: APP_JWT_SECRET
+        generateValue: true
+      # Bascule « adieu Keycloak » : le resource-server valide les jetons natifs.
+      - key: CNPM_SECURITY_NATIVE_JWT_ENABLED
+        value: "true"
+      # Origine du front autorisee en CORS. Ajuster si Render attribue un autre sous-domaine.
+      - key: CNPM_WEB_CORS_ALLOWED_ORIGINS
+        value: https://cnpm-web.onrender.com
+      # RabbitMQ : identifiants requis pour charger le contexte. Sans broker joignable,
+      # l'app demarre quand meme (connexion paresseuse) ; les evenements outbox sont
+      # alors differes. Brancher un broker reel (ex. CloudAMQP) via ces variables +
+      # RABBITMQ_HOST/RABBITMQ_PORT pour la fonctionnalite complete (voir README).
+      - key: RABBITMQ_DEFAULT_USER
+        value: cnpm
+      - key: RABBITMQ_DEFAULT_PASS
+        generateValue: true
+
+  # ---------------- Front (site statique) ----------------
   - type: web
     name: cnpm-web
     runtime: static
-    # Build du bundle de production, puis bascule de la config d'execution en mode demo.
-    buildCommand: cd web && npm ci && npm run build && cp ../deploy/render/runtime-config.demo.js dist/cnpm-web/browser/runtime-config.js
+    # Build de prod, puis ecriture du runtime-config (mode http, baseUrl = hote du backend).
+    buildCommand: cd web && npm ci && npm run build && node ../deploy/render/make-runtime-config.mjs dist/cnpm-web/browser/runtime-config.js
     staticPublishPath: web/dist/cnpm-web/browser
-    # Ne reconstruire que si le front change.
     buildFilter:
       paths:
         - web/**
         - deploy/render/**
         - render.yaml
     envVars:
-      # engines de web/package.json : node ^22.22.3 || ^24 || >=26.
       - key: NODE_VERSION
         value: 22.22.3
+      - key: CNPM_DATA_MODE
+        value: http
+      # Cablage automatique : l'hote reel du backend alimente le baseUrl du front.
+      - key: API_HOST
+        fromService: { type: web, name: cnpm-backend, property: host }
     # SPA : toute route inconnue est servie par index.html (routage cote client Angular).
     routes:
       - type: rewrite

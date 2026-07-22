@@ -1,51 +1,71 @@
 # Déploiement Render — CNPM Digital Platform
 
-Ce dossier contient les artefacts de déploiement pour [Render](https://render.com).
+Configuration de déploiement pour [Render](https://render.com). Le blueprint
+[`render.yaml`](../../render.yaml) décrit le déploiement **complet « http »**.
 
 ## Ce que je peux et ne peux pas faire
 
-Je prépare la **configuration** (ce dépôt). Je **ne peux pas** créer ton compte Render,
-autoriser la connexion GitHub↔Render, provisionner des services, ni engager une
-facturation : ces étapes se font dans ton tableau de bord Render, avec ton compte.
+Je prépare et vérifie la **configuration** (ce dépôt). Je **ne peux pas**, à ta place :
+créer ton compte Render, autoriser la connexion Render↔GitHub, provisionner des
+services, saisir les secrets ni accepter la facturation. Ces étapes se font dans ton
+tableau de bord Render — la config est faite pour que ta part soit minimale.
+
+`CLAUDE.md` interdit un déploiement sans **approbation humaine explicite** : c'est
+précisément l'Apply que tu déclenches toi-même ci-dessous.
 
 ---
 
-## Option A — Démonstration (recommandée, gratuite, fonctionne tout de suite)
+## Architecture déployée (mode `http`)
 
-Le front Angular publié en **site statique**, en mode `demo` : toutes les vues
-fonctionnent sur données fictives, **sans aucun backend**. C'est ce que décrit
-[`render.yaml`](../../render.yaml) à la racine.
-
-### Étapes (dans le navigateur, connecté à Render)
-1. Sur Render : **New +** → **Blueprint**.
-2. Connecte le dépôt GitHub **`romialfred/CNPM`** (autorise l'accès Render↔GitHub).
-3. Choisis la branche (`main` ou `Dev`). Render lit `render.yaml` automatiquement.
-4. **Apply** → Render construit et publie le site. Tu obtiens une URL
-   `https://cnpm-web.onrender.com`.
-
-Détails techniques : build `npm ci && npm run build`, publication de
-`web/dist/cnpm-web/browser`, config d'exécution basculée en `demo` via
-[`runtime-config.demo.js`](runtime-config.demo.js), routage SPA vers `index.html`.
-
----
-
-## Option B — Complet « http » (backend réel) — préparation requise, payant
-
-Le mode `http` fait dialoguer le front avec le backend Spring Boot (auth native).
-Ce déploiement n'est **pas** activé dans `render.yaml` : il demande des décisions et
-des moyens que seul un humain fournit. À prévoir :
-
-| Élément | Sur Render | Remarque |
+| Service | Type Render | Rôle |
 |---|---|---|
-| PostgreSQL | Base managée | Flyway applique les migrations au démarrage. Vérifier la version PG proposée vs 18. |
-| Backend Spring Boot (Java 25) | Web Service **Docker** | Nécessite un `Dockerfile` (à écrire) ; `mvn package` → jar exécutable. |
-| RabbitMQ | **Non managé par Render** | Service privé Docker (payant) ou fournisseur externe (ex. CloudAMQP). Sans lui, la santé AMQP reste DOWN et les événements outbox échouent. |
-| Front Angular | Servi par le backend (même origine) **ou** site statique + `baseUrl` absolue + CORS | Le front appelle `/v1` : le plus simple est de servir l'Angular depuis le backend. |
-| Secrets | `DATABASE_PASSWORD`, `RABBITMQ_*`, `APP_JWT_SECRET`, `OIDC_ISSUER_URI`… | Jamais commités ; saisis dans Render (env vars `sync:false`). |
+| `cnpm-db` | PostgreSQL managé | Flyway applique les 16 migrations au démarrage. |
+| `cnpm-backend` | Web Service **Docker** (Java 25) | API Spring Boot, **auth native** (sans Keycloak). |
+| `cnpm-web` | Site statique | Front Angular (mode `http`) appelant le backend. |
 
-Contraintes du dépôt (voir `CLAUDE.md`) : **ne pas déployer sans approbation humaine
-explicite**, et certaines décisions produit sont encore bloquées
-(`docs/00-governance/open-decisions.md`).
+- Le front et le backend sont sur **deux origines** : le backend autorise l'origine du
+  front en **CORS** (`CNPM_WEB_CORS_ALLOWED_ORIGINS`). Le `baseUrl` du front est câblé
+  automatiquement sur l'hôte du backend (`API_HOST` via `fromService`).
+- **Auth native** : `CNPM_SECURITY_NATIVE_JWT_ENABLED=true` + `APP_JWT_SECRET` (généré
+  par Render). L'auto-configuration Keycloak se retire ; aucun appel réseau OIDC au boot.
 
-👉 Si tu veux ce déploiement complet, dis-le : je prépare le `Dockerfile` backend, le
-blueprint multi-services et le service de RabbitMQ, après ta validation du coût et du périmètre.
+---
+
+## Étapes (dans le navigateur, connecté à Render)
+
+1. Render → **New +** → **Blueprint**.
+2. Connecte le dépôt GitHub **`romialfred/CNPM`** (autorise l'accès Render↔GitHub).
+3. Branche **`main`**. Render lit `render.yaml` et liste les 3 services + la base.
+4. **Apply**. Render génère les secrets (`APP_JWT_SECRET`, mot de passe RabbitMQ),
+   provisionne la base, construit l'image backend puis le site statique.
+5. À la fin : front `https://cnpm-web.onrender.com`, API `https://cnpm-backend.onrender.com`.
+
+---
+
+## Points à connaître (limites honnêtes)
+
+- **Coût.** La base free expire ~90 jours ; le backend est en `starter` (payant). Un
+  site statique est gratuit. Ajuste les `plan:` selon ton budget.
+- **Mémoire.** Spring Boot + Hibernate sur 512 Mo, c'est juste. En cas d'OOM au
+  démarrage, monte `cnpm-backend` en `plan: standard`.
+- **Version PostgreSQL.** Render ne propose pas encore PG18 ; le blueprint cible PG16.
+  Les migrations n'utilisent pas de syntaxe PG18 (vérifié), mais teste après le 1er déploiement.
+- **CORS.** Si Render attribue au front un sous-domaine différent de
+  `https://cnpm-web.onrender.com`, mets à jour `CNPM_WEB_CORS_ALLOWED_ORIGINS` sur le backend.
+- **RabbitMQ.** Render n'a pas de broker managé. Par défaut l'app **démarre sans broker**
+  (connexion paresseuse) : lecture et parcours OK, mais les événements outbox sont différés.
+  Pour la fonctionnalité complète, crée un broker (ex. [CloudAMQP](https://www.cloudamqp.com)
+  plan gratuit) et renseigne sur `cnpm-backend` : `RABBITMQ_HOST`, `RABBITMQ_PORT`,
+  `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS`.
+- **Cold start.** Une instance qui s'endort (plans économiques) répond en ~50 s au premier appel.
+- **Première fois.** Un déploiement multi-services demande souvent 1–2 ajustements en
+  direct (mémoire, CORS, base). Les logs Render de chaque service indiquent la cause.
+
+---
+
+## Variante démonstration (gratuite, sans backend)
+
+Pour publier uniquement le front sur fixtures : déploie le seul service `cnpm-web` en
+mettant sa variable `CNPM_DATA_MODE` à **`demo`** (le script
+[`make-runtime-config.mjs`](make-runtime-config.mjs) bascule alors le `baseUrl` sur `/v1`
+sans appeler de backend).

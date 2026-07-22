@@ -1,12 +1,15 @@
 package ml.cnpm.platform.shared.security;
 
+import java.util.List;
 import java.util.UUID;
 import ml.cnpm.platform.audit.SecurityEvent;
 import ml.cnpm.platform.audit.SecurityEventRecorder;
 import ml.cnpm.platform.shared.api.ProblemResponseWriter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,6 +18,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +74,11 @@ public class SecurityConfig {
             JwtAuthenticationConverter jwtAuthenticationConverter)
             throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                // CORS piloté par cnpm.web.cors.allowed-origins (voir corsConfigurationSource) :
+                // sans origine configurée, aucune règle n'est posée et le comportement local est
+                // inchangé. En production, le front est servi depuis une origine distincte
+                // (site statique) et doit être explicitement autorisé.
+                .cors(Customizer.withDefaults())
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
@@ -110,6 +121,36 @@ public class SecurityConfig {
                                                             "Permission ou périmètre insuffisant.");
                                                 }));
         return http.build();
+    }
+
+    /**
+     * Source CORS de l'API stateless.
+     *
+     * <p>Vide par défaut (dev, test) : aucune règle enregistrée, donc aucun en-tête CORS et
+     * comportement identique à l'existant. En production, {@code cnpm.web.cors.allowed-origins}
+     * (variable {@code CNPM_WEB_CORS_ALLOWED_ORIGINS}, valeurs séparées par des virgules)
+     * autorise l'origine du front. Les jetons sont portés par l'en-tête {@code Authorization}
+     * (aucun cookie), on n'active donc pas {@code allowCredentials}.
+     */
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(
+            @Value("${cnpm.web.cors.allowed-origins:}") List<String> allowedOrigins) {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        List<String> origins =
+                allowedOrigins.stream().map(String::trim).filter(o -> !o.isBlank()).toList();
+        if (!origins.isEmpty()) {
+            CorsConfiguration config = new CorsConfiguration();
+            // Patterns (et non origines exactes) : tolère un sous-domaine attribué par
+            // l'hébergeur (ex. suffixe Render) sans rouvrir à tout le monde.
+            config.setAllowedOriginPatterns(origins);
+            config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+            config.setAllowedHeaders(
+                    List.of("Authorization", "Content-Type", "X-Correlation-Id", "Idempotency-Key"));
+            config.setExposedHeaders(List.of("X-Correlation-Id"));
+            config.setMaxAge(3600L);
+            source.registerCorsConfiguration("/**", config);
+        }
+        return source;
     }
 
     private static void recordDenial(SecurityEventRecorder securityEvents) {
