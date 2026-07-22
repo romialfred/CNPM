@@ -2,14 +2,31 @@ import { Injectable } from '@angular/core';
 import { delay, of, throwError, type Observable } from 'rxjs';
 import {
   MemberPaymentNotFoundError,
+  type InitiateMemberPaymentInput,
   type MemberPaymentChannel,
   type MemberPaymentContributionOption,
   type MemberPaymentDetail,
   type MemberPaymentPage,
   type MemberPaymentQuery,
   type MemberPaymentsGateway,
+  type PaymentInitiationResult,
+  type PaymentOperator,
   type PrepareMemberPaymentDemoInput,
 } from './member-payments-gateway';
+
+/** Ce qui se produirait, par opérateur, une fois la passerelle branchée. */
+const OPERATOR_NEXT_STEP: Readonly<
+  Record<PaymentOperator, (input: InitiateMemberPaymentInput) => string>
+> = {
+  ORANGE_MONEY: (input) =>
+    `Une demande de confirmation Orange Money serait envoyée au ${input.phone ?? 'numéro saisi'} ; vous la valideriez par votre code secret sur votre téléphone.`,
+  MTN_MONEY: (input) =>
+    `Un push USSD MTN MoMo serait envoyé au ${input.phone ?? 'numéro saisi'} pour approbation avant débit.`,
+  WAVE: () =>
+    'Vous seriez redirigé vers l’application Wave pour approuver le paiement, puis ramené automatiquement sur votre espace.',
+  VISA: (input) =>
+    `Votre carte se terminant par ${input.cardLast4 ?? '••••'} serait débitée après authentification 3-D Secure de votre banque.`,
+};
 
 const BLOCKED_STEPS = [
   {
@@ -233,6 +250,23 @@ export class DemoMemberPaymentsGateway implements MemberPaymentsGateway {
           'Demande enregistrée. La transmission au canal reste à venir.',
       });
     return of(this.createdDetail).pipe(delay(0));
+  }
+
+  initiatePayment(input: InitiateMemberPaymentInput): Observable<PaymentInitiationResult> {
+    const contribution = CONTRIBUTIONS.find((item) => item.id === input.contributionId);
+    if (!contribution) {
+      return throwError(() => new MemberPaymentNotFoundError(input.contributionId));
+    }
+    // Parcours complet, mais AUCUN débit : la passerelle opérateur n'est pas branchée.
+    // Latence simulée pour éprouver l'état « traitement en cours ».
+    return of<PaymentInitiationResult>({
+      outcome: 'GATEWAY_NOT_CONFIGURED',
+      operator: input.operator,
+      reference: 'PAY-2026-LOCAL',
+      amountXof: contribution.outstandingAmountXof,
+      contributionReference: contribution.reference,
+      nextStep: OPERATOR_NEXT_STEP[input.operator](input),
+    }).pipe(delay(1100));
   }
 
   loadStatus(id: string): Observable<MemberPaymentDetail> {

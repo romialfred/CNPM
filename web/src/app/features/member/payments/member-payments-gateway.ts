@@ -61,6 +61,46 @@ export interface PrepareMemberPaymentDemoInput {
   readonly simulationAcknowledged: true;
 }
 
+/** Opérateurs de règlement proposés au membre. */
+export type PaymentOperator = 'ORANGE_MONEY' | 'WAVE' | 'MTN_MONEY' | 'VISA';
+export type PaymentOperatorKind = 'mobile-money' | 'card';
+
+/**
+ * Ordre d'initiation d'un paiement par opérateur.
+ *
+ * Aucun secret ne transite : pour une carte, seuls les 4 derniers chiffres (affichage) et
+ * le nom du porteur circulent — jamais le PAN complet, la date d'expiration ni le CVC, qui
+ * ne quittent pas le navigateur tant qu'aucune passerelle certifiée n'est branchée.
+ */
+export interface InitiateMemberPaymentInput {
+  readonly contributionId: string;
+  readonly operator: PaymentOperator;
+  /** Numéro Mobile Money (opérateurs mobile), au format local. */
+  readonly phone?: string;
+  /** Quatre derniers chiffres de la carte (VISA), pour l'affichage uniquement. */
+  readonly cardLast4?: string;
+  readonly cardHolder?: string;
+}
+
+/**
+ * Issue de l'initiation.
+ *
+ * `GATEWAY_NOT_CONFIGURED` : le parcours est complet côté membre, mais aucune passerelle
+ * opérateur (clés/API) n'est encore branchée — aucun montant n'est débité. C'est le seul
+ * reliquat pour rendre le module fonctionnel.
+ */
+export type PaymentInitiationOutcome = 'GATEWAY_NOT_CONFIGURED';
+
+export interface PaymentInitiationResult {
+  readonly outcome: PaymentInitiationOutcome;
+  readonly operator: PaymentOperator;
+  readonly reference: string;
+  readonly amountXof: number;
+  readonly contributionReference: string;
+  /** Ce qui se produirait une fois la passerelle branchée (instruction propre à l'opérateur). */
+  readonly nextStep: string;
+}
+
 export interface MemberPaymentQuery {
   readonly search?: string;
   readonly status?: MemberPaymentStatus;
@@ -98,6 +138,11 @@ export interface MemberPaymentsGateway {
   listContributionOptions(): Observable<readonly MemberPaymentContributionOption[]>;
   prepareDemo(input: PrepareMemberPaymentDemoInput): Observable<MemberPaymentDetail>;
   loadStatus(id: string): Observable<MemberPaymentDetail>;
+  /**
+   * Initie un règlement via un opérateur. Tant que les passerelles ne sont pas branchées,
+   * l'issue est `GATEWAY_NOT_CONFIGURED` : le parcours est complet mais rien n'est débité.
+   */
+  initiatePayment(input: InitiateMemberPaymentInput): Observable<PaymentInitiationResult>;
 }
 
 export const MEMBER_PAYMENTS_GATEWAY = new InjectionToken<MemberPaymentsGateway>(

@@ -35,6 +35,7 @@ export const UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY: MemberPaymentsGateway = {
   listContributionOptions: () => unavailableFeature$('MP-004'),
   prepareDemo: () => unavailableFeature$('MP-004'),
   loadStatus: () => unavailableFeature$('MP-005'),
+  initiatePayment: () => unavailableFeature$('MP-004'),
 };
 
 /** `/receipts*` reste générique et ne fournit aucun document membre typé. */

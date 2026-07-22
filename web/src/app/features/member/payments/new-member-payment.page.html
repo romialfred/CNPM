@@ -4,191 +4,314 @@
   memberCode="CNPM-MBR-0142"
   [notificationCount]="0"
 >
-  <main class="new-member-payment" id="contenu-principal">
+  <main class="cnpm-pay" id="contenu-principal">
     <cnpm-page-header
-      title="Payer une cotisation"
-      description="Préparez le règlement d’une cotisation de votre organisation."
+      title="Régler une cotisation"
+      description="Choisissez la cotisation, un moyen de paiement, puis validez. Paiement sécurisé."
     >
-      <cnpm-button variant="secondary" routerLink="/member/payments">
-        Voir l’historique
-      </cnpm-button>
+      <cnpm-button variant="secondary" routerLink="/member/payments">Voir l’historique</cnpm-button>
     </cnpm-page-header>
-
-    <cnpm-alert tone="info" title="Encaissement en ligne à venir" [live]="false">
-      Aucun opérateur ni compte bancaire n’est encore raccordé : ce parcours enregistre votre
-      demande sans donner lieu à une transaction, une confirmation CNPM ou un reçu. Les décisions
-      DEC-002, DEC-003 et DEC-005 restent ouvertes.
-    </cnpm-alert>
 
     @switch (state()) {
       @case ('loading') {
-        <section class="new-member-payment__loading" aria-label="Chargement du formulaire">
-          <cnpm-skeleton variant="card" [rows]="5" label="Chargement des cotisations…" />
-        </section>
+        <cnpm-skeleton variant="card" [rows]="6" label="Chargement des cotisations à régler…" />
       }
       @case ('unavailable') {
         <cnpm-error-state
           variant="recoverable"
-          title="Paiement indisponible en mode HTTP"
-          description="OpenAPI ne définit aucune commande d’initiation auto-scopée membre et expose encore GET /portal/payments sous forme générique. Aucune fixture n’est injectée dans ce mode."
+          title="Paiement indisponible"
+          description="Aucune cotisation à régler n’est disponible pour le moment."
         />
       }
       @case ('error') {
-        <cnpm-error-state
-          variant="recoverable"
-          title="Les cotisations n’ont pas pu être chargées"
-          description="Rechargez la page pour reprendre."
-        >
-          <cnpm-button variant="secondary" size="sm" (click)="retry()">Recharger</cnpm-button>
+        <cnpm-error-state variant="recoverable" title="Chargement impossible" description="Réessayez dans un instant.">
+          <cnpm-button variant="secondary" (click)="retry()">Réessayer</cnpm-button>
         </cnpm-error-state>
       }
       @case ('ready') {
-        <form class="new-member-payment__layout" [formGroup]="form" (ngSubmit)="submit()">
-          <section class="new-member-payment__form-card" aria-labelledby="payment-form-title">
-            <div class="new-member-payment__section-heading">
-              <span aria-hidden="true">1</span>
-              <div>
-                <h2 id="payment-form-title">Préparer le règlement</h2>
-                <p>Les montants proviennent de votre appel de cotisation ; aucun barème n’est recalculé.</p>
-              </div>
+        @if (result(); as outcome) {
+          <section class="cnpm-pay__result" aria-labelledby="pay-result-title">
+            <span class="cnpm-pay__result-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+            </span>
+            <h2 id="pay-result-title" class="cnpm-pay__result-title">Paiement prêt — en attente de la passerelle</h2>
+            <p class="cnpm-pay__result-lead">
+              Votre demande de <strong>{{ outcome.amountXof | number: '1.0-0' }} FCFA</strong>
+              pour la cotisation <strong>{{ outcome.contributionReference }}</strong> est complète.
+              <strong>Aucun montant n’a été débité.</strong>
+            </p>
+            <div class="cnpm-pay__result-next">
+              <p class="cnpm-pay__result-next-label">Ce qui se produirait une fois la passerelle branchée</p>
+              <p>{{ outcome.nextStep }}</p>
             </div>
-
-            @if (formErrors().length > 0) {
-              <cnpm-inline-error-summary [errors]="formErrors()" />
-            }
-
-            @if (submitError()) {
-              <cnpm-alert tone="error" title="Le règlement n’a pas pu être préparé">
-                Vérifiez la sélection puis réessayez.
-              </cnpm-alert>
-            }
-
-            <div class="new-member-payment__field">
-              <label for="payment-contribution">Cotisation — obligatoire</label>
-              <select
-                id="payment-contribution"
-                formControlName="contributionId"
-                [attr.aria-invalid]="submitted() && form.controls.contributionId.invalid"
-                [attr.aria-describedby]="
-                  submitted() && form.controls.contributionId.invalid
-                    ? 'payment-contribution-error'
-                    : 'payment-contribution-help'
-                "
-              >
-                <option value="">Sélectionner une cotisation</option>
-                @for (option of options(); track option.id) {
-                  <option [value]="option.id">
-                    {{ option.reference }} — solde
-                    {{ option.outstandingAmountXof | number: '1.0-0' }} FCFA
-                  </option>
-                }
-              </select>
-              <p class="new-member-payment__help" id="payment-contribution-help">
-                La sélection est conservée dans l’adresse pour pouvoir retrouver ce formulaire.
-              </p>
-              @if (submitted() && form.controls.contributionId.invalid) {
-                <p class="new-member-payment__field-error" id="payment-contribution-error">
-                  Choisissez une cotisation.
-                </p>
-              }
-            </div>
-
-            <fieldset class="new-member-payment__channels">
-              <legend>Canal de règlement — obligatoire</legend>
-              <p id="payment-channel-help">
-                Aucun numéro ni coordonnée bancaire n’est collecté à cette étape.
-              </p>
-              <div class="new-member-payment__channel-grid" aria-describedby="payment-channel-help">
-                @for (channel of channels; track channel; let first = $first) {
-                  <label>
-                    <input
-                      [id]="first ? 'payment-channel-mobile-money' : 'payment-channel-' + channel"
-                      type="radio"
-                      formControlName="channel"
-                      [value]="channel"
-                    />
-                    <span>
-                      <strong>{{ channelLabel(channel) }}</strong>
-                      <small>Raccordement à venir</small>
-                    </span>
-                  </label>
-                }
-              </div>
-              @if (submitted() && form.controls.channel.invalid) {
-                <p class="new-member-payment__field-error">Choisissez un canal de règlement.</p>
-              }
-            </fieldset>
-
-            <label class="new-member-payment__acknowledgement">
-              <input
-                id="payment-simulation-acknowledgement"
-                type="checkbox"
-                formControlName="simulationAcknowledged"
-              />
-              <span>
-                Je comprends que cette demande ne constitue pas un paiement et qu’aucun montant ne
-                sera prélevé.
-              </span>
-            </label>
-            @if (submitted() && form.controls.simulationAcknowledged.invalid) {
-              <p class="new-member-payment__field-error">
-                Confirmez avoir compris qu’aucun montant ne sera prélevé.
-              </p>
-            }
-
-            <div class="new-member-payment__actions">
-              <cnpm-button type="submit" [loading]="submitting()">
-                Préparer le règlement
-              </cnpm-button>
-              <a routerLink="/member/contributions">Retour aux cotisations</a>
+            <cnpm-alert tone="info" title="Il ne reste que le raccordement des opérateurs">
+              Le parcours de paiement est entièrement en place. Seules les clés/API des passerelles
+              (Orange Money, Wave, MTN, Visa) restent à configurer pour rendre le débit effectif.
+            </cnpm-alert>
+            <div class="cnpm-pay__result-actions">
+              <cnpm-button variant="secondary" routerLink="/member/payments">Voir mes paiements</cnpm-button>
+              <cnpm-button variant="primary" (click)="restart()">Nouveau paiement</cnpm-button>
             </div>
           </section>
+        } @else {
+          <div class="cnpm-pay__layout">
+            <div class="cnpm-pay__main">
+              <ol class="cnpm-pay__steps" aria-label="Étapes du paiement">
+                @for (item of steps; track item.n) {
+                  <li
+                    class="cnpm-pay__step"
+                    [class.cnpm-pay__step--current]="step() === item.n"
+                    [class.cnpm-pay__step--done]="step() > item.n"
+                    [attr.aria-current]="step() === item.n ? 'step' : null"
+                  >
+                    <button type="button" class="cnpm-pay__step-btn" (click)="goToStep(item.n)">
+                      <span class="cnpm-pay__step-index" aria-hidden="true">{{ item.n }}</span>
+                      <span class="cnpm-pay__step-label">{{ item.label }}</span>
+                    </button>
+                  </li>
+                }
+              </ol>
 
-          <aside class="new-member-payment__summary" aria-labelledby="payment-summary-title">
-            <p class="new-member-payment__eyebrow">Aperçu avant création</p>
-            <h2 id="payment-summary-title">Résumé du règlement</h2>
-            @if (selectedContribution(); as contribution) {
-              <dl>
-                <div>
-                  <dt>Référence</dt>
-                  <dd>{{ contribution.reference }}</dd>
-                </div>
-                <div>
-                  <dt>Exercice</dt>
-                  <dd>{{ contribution.exercise }}</dd>
-                </div>
-                <div>
-                  <dt>Échéance</dt>
-                  <dd>{{ contribution.dueDate | date: 'dd/MM/yyyy' }}</dd>
-                </div>
-                <div class="new-member-payment__amount">
-                  <dt>Solde</dt>
-                  <dd>{{ contribution.outstandingAmountXof | number: '1.0-0' }} FCFA</dd>
-                </div>
-                <div>
-                  <dt>Canal</dt>
-                  <dd>
-                    <!-- `@if ... as` restreint le type : le ternaire ne le faisait pas d'un
-                         appel à l'autre, laissant passer '' et undefined vers channelLabel. -->
-                    @if (formValue().channel; as channel) {
-                      {{ channelLabel(channel) }}
-                    } @else {
-                      À sélectionner
+              @if (submitError()) {
+                <cnpm-alert tone="error" title="Initiation impossible">
+                  <p>La demande n’a pas pu être préparée. Réessayez.</p>
+                </cnpm-alert>
+              }
+
+              <form [formGroup]="form" (ngSubmit)="pay()" novalidate>
+                @if (step() === 1) {
+                  <fieldset class="cnpm-pay__card">
+                    <legend class="cnpm-pay__legend">Quelle cotisation régler&nbsp;?</legend>
+                    <div class="cnpm-pay__choices" role="radiogroup" aria-label="Cotisations à régler">
+                      @for (option of options(); track option.id) {
+                        <label class="cnpm-pay__choice" [class.cnpm-pay__choice--selected]="value().contributionId === option.id">
+                          <input type="radio" formControlName="contributionId" [value]="option.id" />
+                          <span class="cnpm-pay__choice-body">
+                            <strong>{{ option.reference }}</strong>
+                            <small>Exercice {{ option.exercise }} · échéance {{ option.dueDate }}</small>
+                          </span>
+                          <span class="cnpm-pay__choice-amount">{{ option.outstandingAmountXof | number: '1.0-0' }} FCFA</span>
+                        </label>
+                      }
+                    </div>
+                    @if (fieldInvalid('contributionId')) {
+                      <p class="cnpm-pay__error">Choisissez une cotisation à régler.</p>
                     }
-                  </dd>
+                  </fieldset>
+                }
+
+                @if (step() === 2) {
+                  <fieldset class="cnpm-pay__card">
+                    <legend class="cnpm-pay__legend">Comment souhaitez-vous payer&nbsp;?</legend>
+                    <p class="cnpm-pay__group-title">Mobile Money</p>
+                    <div class="cnpm-pay__operators" role="radiogroup" aria-label="Moyens de paiement mobile">
+                      @for (operator of operators; track operator.id) {
+                        @if (operator.kind === 'mobile-money') {
+                          <button
+                            type="button"
+                            class="cnpm-pay__operator"
+                            [class.cnpm-pay__operator--selected]="value().operator === operator.id"
+                            [attr.aria-pressed]="value().operator === operator.id"
+                            [style.--op-brand]="operator.brand"
+                            (click)="chooseOperator(operator.id)"
+                          >
+                            <img class="cnpm-pay__operator-logo" [src]="operator.logo" [alt]="operator.name" />
+                            <span class="cnpm-pay__operator-tagline">{{ operator.tagline }}</span>
+                          </button>
+                        }
+                      }
+                    </div>
+                    <p class="cnpm-pay__group-title">Carte bancaire</p>
+                    <div class="cnpm-pay__operators" role="radiogroup" aria-label="Paiement par carte">
+                      @for (operator of operators; track operator.id) {
+                        @if (operator.kind === 'card') {
+                          <button
+                            type="button"
+                            class="cnpm-pay__operator"
+                            [class.cnpm-pay__operator--selected]="value().operator === operator.id"
+                            [attr.aria-pressed]="value().operator === operator.id"
+                            [style.--op-brand]="operator.brand"
+                            (click)="chooseOperator(operator.id)"
+                          >
+                            <img class="cnpm-pay__operator-logo" [src]="operator.logo" [alt]="operator.name" />
+                            <span class="cnpm-pay__operator-tagline">{{ operator.tagline }}</span>
+                          </button>
+                        }
+                      }
+                    </div>
+                    @if (fieldInvalid('operator')) {
+                      <p class="cnpm-pay__error">Choisissez un moyen de paiement.</p>
+                    }
+                  </fieldset>
+                }
+
+                @if (step() === 3) {
+                  <fieldset class="cnpm-pay__card">
+                    <legend class="cnpm-pay__legend">Coordonnées de paiement</legend>
+
+                    @if (isMobile()) {
+                      <div class="cnpm-pay__operator-banner" [style.--op-brand]="selectedOperator()?.brand">
+                        <img [src]="selectedOperator()?.logo" [alt]="selectedOperator()?.name" />
+                        <span>{{ selectedOperator()?.tagline }}</span>
+                      </div>
+                      <div class="cnpm-pay__field">
+                        <label for="pay-phone">Numéro {{ selectedOperator()?.name }}</label>
+                        <div class="cnpm-pay__phone">
+                          <span class="cnpm-pay__phone-prefix" aria-hidden="true">+223</span>
+                          <input
+                            id="pay-phone"
+                            type="tel"
+                            inputmode="tel"
+                            autocomplete="tel-national"
+                            formControlName="phone"
+                            placeholder="70 00 00 00"
+                            [attr.aria-invalid]="fieldInvalid('phone') ? 'true' : null"
+                          />
+                        </div>
+                        @if (fieldInvalid('phone')) {
+                          <p class="cnpm-pay__error">Saisissez un numéro de téléphone valide.</p>
+                        } @else {
+                          <p class="cnpm-pay__hint">Vous recevrez une demande de confirmation sur ce numéro.</p>
+                        }
+                      </div>
+                    }
+
+                    @if (isCard()) {
+                      <div class="cnpm-pay__card-preview" [style.--op-brand]="selectedOperator()?.brand" aria-hidden="true">
+                        <div class="cnpm-pay__card-top">
+                          <span class="cnpm-pay__card-chip"></span>
+                          <img class="cnpm-pay__card-brand" [src]="selectedOperator()?.logo" alt="" />
+                        </div>
+                        <p class="cnpm-pay__card-number">{{ cardPreviewNumber() }}</p>
+                        <div class="cnpm-pay__card-foot">
+                          <span>{{ cardPreviewHolder() }}</span>
+                          <span>{{ cardPreviewExpiry() }}</span>
+                        </div>
+                      </div>
+
+                      <div class="cnpm-pay__field">
+                        <label for="pay-card-number">Numéro de carte</label>
+                        <input
+                          id="pay-card-number"
+                          type="text"
+                          inputmode="numeric"
+                          autocomplete="cc-number"
+                          formControlName="cardNumber"
+                          placeholder="1234 5678 9012 3456"
+                          (input)="onCardNumberInput($event)"
+                          [attr.aria-invalid]="fieldInvalid('cardNumber') ? 'true' : null"
+                        />
+                        @if (fieldInvalid('cardNumber')) {
+                          <p class="cnpm-pay__error">Numéro de carte à 16 chiffres attendu.</p>
+                        }
+                      </div>
+                      <div class="cnpm-pay__field">
+                        <label for="pay-card-holder">Nom du porteur</label>
+                        <input
+                          id="pay-card-holder"
+                          type="text"
+                          autocomplete="cc-name"
+                          formControlName="cardHolder"
+                          placeholder="Prénom Nom"
+                          [attr.aria-invalid]="fieldInvalid('cardHolder') ? 'true' : null"
+                        />
+                        @if (fieldInvalid('cardHolder')) {
+                          <p class="cnpm-pay__error">Indiquez le nom figurant sur la carte.</p>
+                        }
+                      </div>
+                      <div class="cnpm-pay__field-row">
+                        <div class="cnpm-pay__field">
+                          <label for="pay-card-expiry">Expiration</label>
+                          <input
+                            id="pay-card-expiry"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="cc-exp"
+                            formControlName="cardExpiry"
+                            placeholder="MM/AA"
+                            (input)="onExpiryInput($event)"
+                            [attr.aria-invalid]="fieldInvalid('cardExpiry') ? 'true' : null"
+                          />
+                          @if (fieldInvalid('cardExpiry')) {
+                            <p class="cnpm-pay__error">Format MM/AA.</p>
+                          }
+                        </div>
+                        <div class="cnpm-pay__field">
+                          <label for="pay-card-cvc">CVC</label>
+                          <input
+                            id="pay-card-cvc"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="cc-csc"
+                            formControlName="cardCvc"
+                            placeholder="123"
+                            maxlength="4"
+                            [attr.aria-invalid]="fieldInvalid('cardCvc') ? 'true' : null"
+                          />
+                          @if (fieldInvalid('cardCvc')) {
+                            <p class="cnpm-pay__error">3 chiffres.</p>
+                          }
+                        </div>
+                      </div>
+                      <p class="cnpm-pay__hint">
+                        Vos données de carte ne quittent pas votre navigateur tant qu’aucune passerelle certifiée n’est branchée.
+                      </p>
+                    }
+                  </fieldset>
+                }
+
+                @if (step() === 4) {
+                  <fieldset class="cnpm-pay__card">
+                    <legend class="cnpm-pay__legend">Vérifiez et confirmez</legend>
+                    <dl class="cnpm-pay__recap">
+                      <div><dt>Cotisation</dt><dd>{{ selectedContribution()?.reference }}</dd></div>
+                      <div><dt>Moyen de paiement</dt><dd>{{ selectedOperator()?.name }}</dd></div>
+                      @if (isMobile()) {
+                        <div><dt>Numéro</dt><dd>+223 {{ value().phone }}</dd></div>
+                      }
+                      @if (isCard()) {
+                        <div><dt>Carte</dt><dd>•••• {{ value().cardNumber.slice(-4) }}</dd></div>
+                      }
+                      <div class="cnpm-pay__recap-total"><dt>Montant à payer</dt><dd>{{ amountXof() | number: '1.0-0' }} FCFA</dd></div>
+                    </dl>
+                    <p class="cnpm-pay__secure">
+                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
+                      Paiement sécurisé — aucun débit ne sera effectué tant que la passerelle n’est pas active.
+                    </p>
+                  </fieldset>
+                }
+
+                <div class="cnpm-pay__nav">
+                  @if (step() > 1) {
+                    <cnpm-button variant="secondary" type="button" (click)="back()">Précédent</cnpm-button>
+                  }
+                  @if (step() < 4) {
+                    <cnpm-button variant="primary" type="button" (click)="next()" [disabled]="!isStepValid(step())">Continuer</cnpm-button>
+                  } @else {
+                    <cnpm-button variant="primary" type="submit" [loading]="submitting()">
+                      Payer {{ amountXof() | number: '1.0-0' }} FCFA
+                    </cnpm-button>
+                  }
                 </div>
-              </dl>
-            } @else {
-              <p class="new-member-payment__placeholder">
-                Sélectionnez une cotisation pour afficher son aperçu.
-              </p>
-            }
-            <div class="new-member-payment__guardrail">
-              <strong>Résultat attendu</strong>
-              <span>Statut « Préparé » — la confirmation CNPM reste à venir.</span>
+              </form>
             </div>
-          </aside>
-        </form>
+
+            <aside class="cnpm-pay__summary" aria-label="Récapitulatif">
+              <p class="cnpm-pay__summary-title">Récapitulatif</p>
+              <dl class="cnpm-pay__summary-list">
+                <div><dt>Cotisation</dt><dd>{{ selectedContribution()?.reference ?? '—' }}</dd></div>
+                <div><dt>Moyen</dt><dd>{{ selectedOperator()?.name ?? '—' }}</dd></div>
+              </dl>
+              <div class="cnpm-pay__summary-total">
+                <span>Total</span>
+                <strong>{{ amountXof() | number: '1.0-0' }} FCFA</strong>
+              </div>
+              @if (selectedOperator(); as operator) {
+                <img class="cnpm-pay__summary-logo" [src]="operator.logo" [alt]="operator.name" />
+              }
+            </aside>
+          </div>
+        }
       }
     }
   </main>
