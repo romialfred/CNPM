@@ -45,10 +45,19 @@
 }
 
 .cnpm-table__cell {
-  padding: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
   text-align: left;
   vertical-align: middle;
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+/* Respiration aux bords : la première et la dernière colonne ne collent pas au cadre. */
+.cnpm-table__cell:first-child {
+  padding-left: var(--cnpm-space-5);
+}
+
+.cnpm-table__cell:last-child {
+  padding-right: var(--cnpm-space-5);
 }
 
 .cnpm-table__cell--end {
@@ -72,8 +81,13 @@
   background-color: var(--cnpm-color-surface-subtle);
   color: var(--cnpm-color-text-secondary);
   font-weight: var(--cnpm-font-weight-semibold);
+  font-size: var(--cnpm-font-size-xs);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
   vertical-align: middle;
   white-space: nowrap;
+  /* Séparateur d'en-tête plus marqué que les filets de lignes : le header se détache. */
+  border-bottom: 1px solid var(--cnpm-color-neutral-300);
 }
 
 /* Libelle et note sur une MEME ligne. Empiles, ils donnaient un en-tete de deux lignes
@@ -122,19 +136,19 @@
   color: var(--cnpm-color-neutral-500);
 }
 
-/* Zebrure. Elle vient AVANT le survol et la selection dans la feuille : a specificite
-   egale, la derniere regle l'emporte, et une ligne survolee ou selectionnee doit garder
-   sa propre teinte. Purement decorative — elle aide a suivre une ligne du regard et ne
-   porte aucune information. */
+/* Zebrure visible pour suivre une ligne du regard. Survol et sélection sont scopés sous
+   `.cnpm-table__body .cnpm-table__row` pour EGALER la spécificité de la zébrure (sans ce
+   scope la zébrure, plus spécifique, gagnait et masquait survol/sélection sur les lignes
+   paires) ; l'ordre source fait ensuite gagner la dernière règle. Purement décorative. */
 .cnpm-table__body .cnpm-table__row:nth-child(even) {
-  background-color: var(--cnpm-color-surface-page);
+  background-color: var(--cnpm-color-surface-subtle);
 }
 
-.cnpm-table__row:hover {
-  background-color: var(--cnpm-color-surface-secondary);
+.cnpm-table__body .cnpm-table__row:hover {
+  background-color: var(--cnpm-color-neutral-200);
 }
 
-.cnpm-table__row--selected {
+.cnpm-table__body .cnpm-table__row.cnpm-table__row--selected {
   background-color: var(--cnpm-color-brand-blue-50);
 }
 

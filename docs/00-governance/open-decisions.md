@@ -986,5 +986,23 @@ usage). Le nom affiché du compte (`display_name`) est fixé à « TIEGNAN Romua
 du commanditaire. Divergence assumée et localisée à la couche de présentation ; à revoir si un
 rôle « Propriétaire » distinct est introduit au catalogue.
 
+## AUTH-DEC-023 — Persistance du jeton natif en sessionStorage
+
+**Propriétaire.** Product owner (demande explicite).
+**Impact.** Sécurité de session (exposition du jeton), continuité UX.
+**Statut.** Tranché par le commanditaire ; consigné pour traçabilité.
+
+**Constat.** Le jeton natif vivait uniquement EN MÉMOIRE : tout rafraîchissement (F5) perdait
+la session et renvoyait à la connexion. Le commanditaire exige que la session survive au
+rafraîchissement et à la navigation.
+
+**Décision.** `NativeSessionStore` conserve le jeton dans **`sessionStorage`** (restauré au
+démarrage). Choix de `sessionStorage` plutôt que `localStorage` pour borner l'exposition : la
+session se termine à la fermeture de l'onglet et n'est pas partagée entre onglets. Un jeton
+expiré restauré est rejeté par le backend (401) et ramène à la connexion. Compromis assumé :
+un jeton persisté est plus exposé à une XSS qu'un jeton purement en mémoire ; la contrepartie
+est la continuité de session demandée. À revoir si un cookie httpOnly + rafraîchissement natif
+est livré (posture idéale).
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.
