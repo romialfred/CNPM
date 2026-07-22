@@ -255,11 +255,14 @@ describe('LoginPage (AUTH-001)', () => {
     );
   });
 
-  it('n’affiche aucun lien inerte tant que la destination n’existe pas (UX-DEC-011)', async () => {
+  it('n’expose que le retour au site public, aucun lien inerte (UX-DEC-011)', async () => {
     const { element } = await setup();
-    // Un lien visible qui ne mène nulle part est un défaut : tant que la récupération
-    // et le support ne sont pas arbitrés, aucune affordance n'est exposée.
-    expect(element.querySelectorAll('a')).toHaveLength(0);
+    // Un lien visible qui ne mène nulle part reste un défaut (récupération, support :
+    // non arbitrés, donc absents). Seule exception demandée : le retour vers la vitrine,
+    // dont la destination « / » existe bel et bien.
+    const links = [...element.querySelectorAll('a')];
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('/');
   });
 
   it('ne signale pas en erreur un champ vide simplement traversé au clavier', async () => {

@@ -46,10 +46,10 @@ describe('BlockedAuthPage (AUTH-003 à AUTH-007)', () => {
     expect(element.textContent).toContain("Aucune opération n'est simulée");
   });
 
-  it('propose uniquement le retour à la connexion', async () => {
+  it('propose le retour à la connexion et le retour au site public', async () => {
     const { element } = await setup();
     const links = [...element.querySelectorAll<HTMLAnchorElement>('a')];
-    expect(links).toHaveLength(1);
-    expect(links[0].getAttribute('href')).toBe('/auth/login');
+    // Le retour au site (shell, en tête de DOM) précède le retour à la connexion (contenu).
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/', '/auth/login']);
   });
 });

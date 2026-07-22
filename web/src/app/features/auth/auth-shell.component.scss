@@ -95,12 +95,6 @@
   line-height: 1.15;
 }
 
-.cnpm-auth__accent {
-  width: 3.75rem;
-  height: 0.1875rem;
-  border-radius: var(--cnpm-radius-pill);
-  background: var(--cnpm-color-brand-red-600);
-}
 
 .cnpm-auth__trust-text {
   max-width: 30rem;
@@ -169,8 +163,30 @@
   display: flex;
   min-height: 5rem;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: var(--cnpm-space-4);
   padding: var(--cnpm-space-5) var(--cnpm-space-10) 0;
+}
+
+.cnpm-auth__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  text-decoration: none;
+  border-radius: var(--cnpm-radius-md);
+}
+
+.cnpm-auth__back:hover {
+  color: var(--cnpm-color-text-brand);
+  text-decoration: underline;
+}
+
+.cnpm-auth__back svg {
+  width: var(--cnpm-space-4);
+  height: var(--cnpm-space-4);
 }
 
 .cnpm-auth__lang {

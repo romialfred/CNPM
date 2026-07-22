@@ -177,10 +177,13 @@ describe('VerifyPage (AUTH-001 — 2FA)', () => {
     expect(verifySpy).toHaveBeenCalledWith('challenge-1', '123456', 'admin');
   });
 
-  it('n’expose aucun lien inerte (UX-DEC-011)', async () => {
+  it('n’expose que le retour au site public, aucun lien inerte (UX-DEC-011)', async () => {
     const { element } = await setup();
 
-    // Seul le retour à la connexion existe, et uniquement en état « session expirée ».
-    expect(element.querySelectorAll('a')).toHaveLength(0);
+    // Hors état « session expirée », la seule affordance de navigation est le retour à la
+    // vitrine (destination « / » réelle) ; aucun lien vers une destination non arbitrée.
+    const links = [...element.querySelectorAll('a')];
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('/');
   });
 });

@@ -1,5 +1,6 @@
 import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { type ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AuthShellComponent } from './auth-shell.component';
 
@@ -21,7 +22,7 @@ describe('AuthShellComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HostComponent],
-      providers: [provideZonelessChangeDetection()],
+      providers: [provideZonelessChangeDetection(), provideRouter([])],
     }).compileComponents();
     fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();

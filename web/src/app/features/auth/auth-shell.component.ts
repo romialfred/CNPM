@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
+  LucideArrowLeft,
   LucideChartColumnIncreasing,
   LucideFileChartColumn,
   LucideShieldCheck,
@@ -16,7 +18,14 @@ import {
 @Component({
   selector: 'cnpm-auth-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LucideChartColumnIncreasing, LucideFileChartColumn, LucideShieldCheck, LucideUsers],
+  imports: [
+    RouterLink,
+    LucideArrowLeft,
+    LucideChartColumnIncreasing,
+    LucideFileChartColumn,
+    LucideShieldCheck,
+    LucideUsers,
+  ],
   template: `
     <div class="cnpm-auth">
       <!-- Le formulaire vient en PREMIER dans le DOM : c'est la tâche principale, et son
@@ -24,6 +33,12 @@ import {
            à gauche sur desktop — est rétabli par le placement en grille. -->
       <div class="cnpm-auth__side">
         <header class="cnpm-auth__topbar">
+          <!-- Sortie du tunnel d'authentification vers le site public : une personne
+               arrivée par erreur, ou qui renonce, doit pouvoir revenir à la vitrine. -->
+          <a class="cnpm-auth__back" routerLink="/">
+            <svg lucideArrowLeft aria-hidden="true"></svg>
+            Retour au site
+          </a>
           <!-- À décider (UX-DEC-007) : les langues publiques ne sont pas arbitrées.
                Tant qu'une seule est disponible, la langue est affichée en texte plutôt
                qu'en contrôle : un sélecteur à option unique est focalisable et annoncé
@@ -76,7 +91,6 @@ import {
 
           <div class="cnpm-auth__trust">
             <h2 id="cnpm-auth-trust-title" class="cnpm-auth__trust-title">{{ trustTitle() }}</h2>
-            <span class="cnpm-auth__accent" aria-hidden="true"></span>
             <p class="cnpm-auth__trust-text">{{ trustText() }}</p>
           </div>
 
