@@ -1,11 +1,22 @@
 .cnpm-tile {
   display: flex;
+  flex-wrap: wrap;
   height: 100%;
   padding: var(--cnpm-space-5);
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-lg);
   background: var(--cnpm-color-surface-primary);
   gap: var(--cnpm-space-4);
+}
+
+/* Photo illustrative optionnelle : première ligne pleine largeur (grâce au wrap),
+   l'icône et le texte se replient dessous. Absente, la tuile reste inchangée. */
+.cnpm-tile__media {
+  width: 100%;
+  height: var(--cnpm-space-24);
+  object-fit: cover;
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-neutral-100);
 }
 
 /* Teinte translucide dérivée de l'accent : une seule couleur source par variante,

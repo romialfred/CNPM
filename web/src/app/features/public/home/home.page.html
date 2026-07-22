@@ -206,7 +206,11 @@
       <ul class="cnpm-home__benefit-list">
         @for (benefit of benefits; track benefit.id) {
           <li>
-            <cnpm-feature-tile [heading]="benefit.title" [accent]="benefit.accent">
+            <cnpm-feature-tile
+              [heading]="benefit.title"
+              [accent]="benefit.accent"
+              [image]="benefit.image"
+            >
               @switch (benefit.id) {
                 @case ('representation') {
                   <svg tileIcon lucideLandmark [size]="iconSize.navigation"></svg>

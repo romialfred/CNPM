@@ -118,30 +118,35 @@ export class HomePage {
     title: string;
     text: string;
     accent: CnpmTileAccent;
+    image: string;
   }[] = [
     {
       id: 'representation',
       title: 'Représentation et plaidoyer',
       text: 'Porter la voix des entreprises et défendre leurs intérêts dans un cadre structuré.',
       accent: 'indigo',
+      image: 'https://loremflickr.com/640/380/conference,meeting?lock=31',
     },
     {
       id: 'accompagnement',
       title: 'Accompagnement et services',
       text: 'Simplifier les démarches courantes et rendre les services plus faciles à suivre.',
       accent: 'teal',
+      image: 'https://loremflickr.com/640/380/teamwork,office?lock=32',
     },
     {
       id: 'reseau',
       title: 'Réseau et opportunités',
       text: 'Relier groupements, conseils régionaux et entreprises autour d’un réseau commun.',
       accent: 'sky',
+      image: 'https://loremflickr.com/640/380/handshake,business?lock=33',
     },
     {
       id: 'information',
       title: 'Information économique',
       text: 'Mettre à disposition des repères utiles dans un espace numérique cohérent.',
       accent: 'amber',
+      image: 'https://loremflickr.com/640/380/data,economy?lock=34',
     },
   ];
 

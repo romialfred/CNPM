@@ -22,6 +22,9 @@ export type CnpmTileAccent = 'indigo' | 'blue' | 'sky' | 'teal' | 'amber';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article class="cnpm-tile cnpm-liftable" [class]="accentClass()">
+      @if (image()) {
+        <img class="cnpm-tile__media" [src]="image()" alt="" loading="lazy" />
+      }
       <span class="cnpm-tile__icon" aria-hidden="true">
         <ng-content select="[tileIcon]" />
       </span>
@@ -36,6 +39,8 @@ export type CnpmTileAccent = 'indigo' | 'blue' | 'sky' | 'teal' | 'amber';
 export class FeatureTileComponent {
   readonly heading = input.required<string>();
   readonly accent = input<CnpmTileAccent>('indigo');
+  /** Photo illustrative optionnelle, affichée en tête de tuile ; masquée si absente. */
+  readonly image = input('');
 
   protected readonly accentClass = computed(() => `cnpm-tile--${this.accent()}`);
 }
