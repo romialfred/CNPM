@@ -3673,6 +3673,27 @@ paths:
                 $ref: '#/components/schemas/MemberOverview'
       x-requirements:
       - BO-002
+  /admin/security/snapshot:
+    get:
+      tags:
+      - ADMIN
+      summary: Restituer l'instantané Administration et sécurité.
+      operationId: getAdminSecuritySnapshot
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Comptes, rôles, matrice de permissions et posture (lecture seule).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSecuritySnapshot'
+      x-requirements:
+      - BO-030
 components:
   securitySchemes:
     oauth2:
@@ -3923,6 +3944,52 @@ components:
           type: array
           items:
             type: object
+    AdminSecuritySnapshot:
+      type: object
+      description: >-
+        Instantané Administration et sécurité (BO-030) : comptes, rôles, matrice de
+        permissions (lecture seule), sessions, audit, posture et compteurs. Aucun secret.
+      required:
+      - accounts
+      - roles
+      - permissions
+      - sessions
+      - audit
+      - policy
+      - posture
+      - counts
+      - canManagePermissions
+      properties:
+        accounts:
+          type: array
+          items:
+            type: object
+        roles:
+          type: array
+          items:
+            type: object
+        permissions:
+          type: array
+          items:
+            type: object
+        sessions:
+          type: array
+          items:
+            type: object
+        audit:
+          type: array
+          items:
+            type: object
+        policy:
+          type: array
+          items:
+            type: object
+        posture:
+          type: object
+        counts:
+          type: object
+        canManagePermissions:
+          type: boolean
     Money:
       type: object
       required:

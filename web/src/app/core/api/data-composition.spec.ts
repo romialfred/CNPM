@@ -23,11 +23,11 @@ import { PAYMENTS_GATEWAY } from '../../features/admin/payments/payments-gateway
 import { RECOVERY_GATEWAY } from '../../features/admin/recovery/recovery-gateway';
 import { REPORTING_GATEWAY } from '../../features/admin/reporting/reporting-gateway';
 import { ADMIN_SECURITY_GATEWAY } from '../../features/admin/security/admin-security-gateway';
+import { HttpAdminSecurityGateway } from '../../features/admin/security/http-admin-security.gateway';
 import { DemoSettingsGateway } from '../../features/admin/settings/demo-settings.gateway';
 import { HttpSettingsGateway } from '../../features/admin/settings/http-settings.gateway';
 import { SETTINGS_GATEWAY } from '../../features/admin/settings/settings-gateway';
 import {
-  UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
   UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_ENROLLMENT_GATEWAY,
   UNAVAILABLE_PAYMENTS_GATEWAY,
@@ -101,7 +101,7 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(PAYMENTS_GATEWAY)).toBe(UNAVAILABLE_PAYMENTS_GATEWAY);
     expect(TestBed.inject(RECOVERY_GATEWAY)).toBe(UNAVAILABLE_RECOVERY_GATEWAY);
     expect(TestBed.inject(REPORTING_GATEWAY)).toBe(UNAVAILABLE_REPORTING_GATEWAY);
-    expect(TestBed.inject(ADMIN_SECURITY_GATEWAY)).toBe(UNAVAILABLE_ADMIN_SECURITY_GATEWAY);
+    expect(TestBed.inject(ADMIN_SECURITY_GATEWAY)).toBeInstanceOf(HttpAdminSecurityGateway);
     expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(HttpHomeGateway);
     expect(TestBed.inject(SHOWCASE_GATEWAY)).toBe(UNAVAILABLE_SHOWCASE_GATEWAY);
     expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBe(UNAVAILABLE_MEMBER_HOME_GATEWAY);

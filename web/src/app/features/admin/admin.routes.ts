@@ -64,6 +64,7 @@ import { requestReadGuard } from './requests/request-read.guard';
 import { REQUESTS_GATEWAY } from './requests/requests-gateway';
 import { ADMIN_SECURITY_GATEWAY } from './security/admin-security-gateway';
 import { DemoAdminSecurityGateway } from './security/demo-admin-security.gateway';
+import { HttpAdminSecurityGateway } from './security/http-admin-security.gateway';
 import { DemoSettingsGateway } from './settings/demo-settings.gateway';
 import { HttpSettingsGateway } from './settings/http-settings.gateway';
 import { pendingSettingsChangesGuard } from './settings/pending-settings-changes.guard';
@@ -76,7 +77,6 @@ import {
 } from './showcase-moderation/showcase-moderation-gateway';
 import { adminSessionGuard } from './admin-session.guard';
 import {
-  UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
   UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
   UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
@@ -270,7 +270,7 @@ export const adminRoutes: Routes = [
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoAdminSecurityGateway)
-            : UNAVAILABLE_ADMIN_SECURITY_GATEWAY,
+            : inject(HttpAdminSecurityGateway),
       },
       {
         provide: INTEGRATIONS_GATEWAY,
@@ -292,6 +292,7 @@ export const adminRoutes: Routes = [
       DemoReportingGateway,
       DemoRequestsGateway,
       DemoAdminSecurityGateway,
+      HttpAdminSecurityGateway,
       DemoIntegrationsGateway,
     ],
     canActivate: [adminSessionGuard],
