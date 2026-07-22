@@ -70,17 +70,15 @@ describe('ADMIN_NAV', () => {
     ).toBe(true);
   });
 
-  it('expose BO-038 à la persona démo sans lui accorder de permission d’écriture', async () => {
+  it('donne à la persona démo (propriétaire) un accès complet couvrant toutes les rubriques', async () => {
     const identity = await firstValueFrom(new DemoSessionGateway().identity);
+    // Profil propriétaire de la démonstration : accès complet (tout le catalogue).
     expect(identity?.permissions).toContain('OPS.MONITOR.READ');
-    expect(
-      identity?.permissions.filter((permission) => permission.startsWith('INTEGRATION.')),
-    ).toEqual([]);
-    expect(
-      visibleAdminNav(identity?.permissions ?? []).some(
-        (entry) => entry.route === '/admin/integrations',
-      ),
-    ).toBe(true);
+    expect(identity?.permissions.length).toBeGreaterThan(60);
+    // Toutes les rubriques gouvernées par une permission sont visibles.
+    const routes = visibleAdminNav(identity?.permissions ?? []).map((entry) => entry.route);
+    expect(routes).toContain('/admin/integrations');
+    expect(routes).toContain('/admin/security/audit');
   });
 
   it('filtre les rubriques sensibles selon la projection de permissions', () => {

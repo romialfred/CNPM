@@ -63,9 +63,9 @@ describe('TopBarComponent', () => {
     expect(action?.getAttribute('href')).toBe('/admin/enrollments/new');
     expect(action?.getAttribute('aria-label')).toBe('Créer un nouvel enrôlement');
     // L'identité devient un menu de compte : initiales, nom + rôle, et la déconnexion.
-    expect(host.querySelector('.cnpm-account-menu__avatar')?.textContent?.trim()).toBe('AT');
+    expect(host.querySelector('.cnpm-account-menu__avatar')?.textContent?.trim()).toBe('TR');
     expect(host.querySelector('.cnpm-account-menu__trigger')?.getAttribute('aria-label')).toBe(
-      'Compte de Aminata Traoré, Administrateur',
+      'Compte de TIEGNAN Romuald, Propriétaire',
     );
   });
 
@@ -228,7 +228,7 @@ describe('TopBarComponent', () => {
     const title = host.querySelector<HTMLElement>('.cnpm-topbar__title');
 
     expect(title?.textContent).toContain('Plateforme Nationale de Gestion des Membres du CNPM');
-    expect(title?.textContent).toContain('Bonjour Aminata');
+    expect(title?.textContent).toContain('Bonjour TIEGNAN');
     // La barre est présente sur toutes les pages : un `h1` ici en ferait deux par écran.
     expect(host.querySelector('h1')).toBeNull();
   });
