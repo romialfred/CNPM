@@ -63,17 +63,19 @@
   border-block-end: 1px solid var(--cnpm-color-border-subtle);
 }
 
+/* En-tête épuré, aligné sur le système de tableaux : capitales discrètes, fond blanc
+   (indispensable pour rester lisible en position collante), filet marqué en bas. */
 .cnpm-doc__table thead th {
   position: sticky;
   inset-block-start: 0;
-  background: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-primary);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-muted);
   font-weight: var(--cnpm-font-weight-semibold);
+  font-size: var(--cnpm-font-size-xs);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
   white-space: nowrap;
-}
-
-.cnpm-doc__table tbody tr:nth-child(even) {
-  background: var(--cnpm-color-surface-secondary);
+  border-bottom: 1px solid var(--cnpm-color-border-default);
 }
 
 .cnpm-doc__table tbody tr:last-child td {
