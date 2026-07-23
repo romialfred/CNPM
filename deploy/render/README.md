@@ -1,71 +1,71 @@
 # Déploiement Render — CNPM Digital Platform
 
-Configuration de déploiement pour [Render](https://render.com). Le blueprint
-[`render.yaml`](../../render.yaml) décrit le déploiement **complet « http »**.
+Deux profils de déploiement :
 
-## Ce que je peux et ne peux pas faire
+| Fichier | Ce qu'il déploie | Coût | Quand |
+|---|---|---|---|
+| [`render.yaml`](../../render.yaml) (par défaut) | **Site statique, mode démo** — tous les écrans sur fixtures, sans backend | Gratuit | Démo / vitrine accessible à un domaine |
+| [`render.full-stack.yaml`](render.full-stack.yaml) | PostgreSQL + API Spring Boot + front (mode http) | Payant | Backend réel |
 
-Je prépare et vérifie la **configuration** (ce dépôt). Je **ne peux pas**, à ta place :
-créer ton compte Render, autoriser la connexion Render↔GitHub, provisionner des
-services, saisir les secrets ni accepter la facturation. Ces étapes se font dans ton
-tableau de bord Render — la config est faite pour que ta part soit minimale.
+## Ce que je peux / ne peux pas faire
 
-`CLAUDE.md` interdit un déploiement sans **approbation humaine explicite** : c'est
-précisément l'Apply que tu déclenches toi-même ci-dessous.
-
----
-
-## Architecture déployée (mode `http`)
-
-| Service | Type Render | Rôle |
-|---|---|---|
-| `cnpm-db` | PostgreSQL managé | Flyway applique les 16 migrations au démarrage. |
-| `cnpm-backend` | Web Service **Docker** (Java 25) | API Spring Boot, **auth native** (sans Keycloak). |
-| `cnpm-web` | Site statique | Front Angular (mode `http`) appelant le backend. |
-
-- Le front et le backend sont sur **deux origines** : le backend autorise l'origine du
-  front en **CORS** (`CNPM_WEB_CORS_ALLOWED_ORIGINS`). Le `baseUrl` du front est câblé
-  automatiquement sur l'hôte du backend (`API_HOST` via `fromService`).
-- **Auth native** : `CNPM_SECURITY_NATIVE_JWT_ENABLED=true` + `APP_JWT_SECRET` (généré
-  par Render). L'auto-configuration Keycloak se retire ; aucun appel réseau OIDC au boot.
+Je prépare la **configuration**. Je **ne peux pas** créer ton compte Render, autoriser
+Render↔GitHub, cliquer « Apply », ajouter le domaine ni modifier ton DNS — ce sont tes
+actions. La config ci-dessous rend ta part minimale.
 
 ---
 
-## Étapes (dans le navigateur, connecté à Render)
+## 1) Déployer (site statique démo)
 
 1. Render → **New +** → **Blueprint**.
-2. Connecte le dépôt GitHub **`romialfred/CNPM`** (autorise l'accès Render↔GitHub).
-3. Branche **`main`**. Render lit `render.yaml` et liste les 3 services + la base.
-4. **Apply**. Render génère les secrets (`APP_JWT_SECRET`, mot de passe RabbitMQ),
-   provisionne la base, construit l'image backend puis le site statique.
-5. À la fin : front `https://cnpm-web.onrender.com`, API `https://cnpm-backend.onrender.com`.
+2. Connecte le dépôt **`romialfred/CNPM`**, branche **`main`**.
+3. Render lit `render.yaml` → un seul service **`cnpm-web`** (site statique gratuit).
+4. **Apply** → build (`npm ci && npm run build`) puis publication.
+5. À la fin : `https://cnpm-web.onrender.com` (l'URL Render par défaut).
+
+Le site est en **mode démo** : connexion avec n'importe quels identifiants + code `123456`,
+et tous les modules fonctionnent (répertoire, cotisations, paiement, etc.).
 
 ---
 
-## Points à connaître (limites honnêtes)
+## 2) Brancher le domaine `cnmp.data-univers.com`
 
-- **Coût.** La base free expire ~90 jours ; le backend est en `starter` (payant). Un
-  site statique est gratuit. Ajuste les `plan:` selon ton budget.
-- **Mémoire.** Spring Boot + Hibernate sur 512 Mo, c'est juste. En cas d'OOM au
-  démarrage, monte `cnpm-backend` en `plan: standard`.
-- **Version PostgreSQL.** Render ne propose pas encore PG18 ; le blueprint cible PG16.
-  Les migrations n'utilisent pas de syntaxe PG18 (vérifié), mais teste après le 1er déploiement.
-- **CORS.** Si Render attribue au front un sous-domaine différent de
-  `https://cnpm-web.onrender.com`, mets à jour `CNPM_WEB_CORS_ALLOWED_ORIGINS` sur le backend.
-- **RabbitMQ.** Render n'a pas de broker managé. Par défaut l'app **démarre sans broker**
-  (connexion paresseuse) : lecture et parcours OK, mais les événements outbox sont différés.
-  Pour la fonctionnalité complète, crée un broker (ex. [CloudAMQP](https://www.cloudamqp.com)
-  plan gratuit) et renseigne sur `cnpm-backend` : `RABBITMQ_HOST`, `RABBITMQ_PORT`,
-  `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS`.
-- **Cold start.** Une instance qui s'endort (plans économiques) répond en ~50 s au premier appel.
-- **Première fois.** Un déploiement multi-services demande souvent 1–2 ajustements en
-  direct (mémoire, CORS, base). Les logs Render de chaque service indiquent la cause.
+**a. Côté Render** — service `cnpm-web` → **Settings → Custom Domains → Add Custom Domain**
+→ saisis `cnmp.data-univers.com`. Render affiche alors **la valeur DNS exacte à créer**
+(un enregistrement CNAME) et vérifiera le domaine.
+
+**b. Côté DNS** (chez ton registrar / hébergeur de `data-univers.com`) — crée **un seul
+enregistrement CNAME** :
+
+| Champ | Valeur |
+|---|---|
+| **Type** | `CNAME` |
+| **Nom / Host** | `cnmp` *(juste le sous-domaine ; la zone `data-univers.com` est ajoutée automatiquement)* |
+| **Valeur / Cible** | **la cible affichée par Render** — en général `cnpm-web.onrender.com` |
+| **TTL** | défaut (Auto / 3600) |
+| **Proxy (Cloudflare)** | **désactivé** (DNS only / nuage gris) le temps de la validation |
+
+- Si un ancien enregistrement `cnmp` existe déjà (A ou CNAME), **remplace-le** par ce CNAME.
+- **HTTPS** : Render émet le certificat TLS (Let's Encrypt) automatiquement une fois le
+  CNAME propagé — rien à faire.
+- Propagation : quelques minutes à ~1 h.
+
+> ⚠️ Orthographe : tu as écrit **`cnmp`** (et non `cnpm`). Utilise exactement le
+> sous-domaine que tu as créé — le CNAME doit porter le même libellé.
 
 ---
 
-## Variante démonstration (gratuite, sans backend)
+## Variante backend réel
 
-Pour publier uniquement le front sur fixtures : déploie le seul service `cnpm-web` en
-mettant sa variable `CNPM_DATA_MODE` à **`demo`** (le script
-[`make-runtime-config.mjs`](make-runtime-config.mjs) bascule alors le `baseUrl` sur `/v1`
-sans appeler de backend).
+Pour PostgreSQL + API : dans Render, crée le Blueprint à partir de
+`deploy/render/render.full-stack.yaml` (renomme-le `render.yaml` ou pointe-le), puis
+renseigne les secrets. Voir les limites (mémoire, version PG, RabbitMQ) plus bas.
+
+### Points à connaître (full-stack)
+
+- **Coût** : base free (~90 j), backend `starter` (payant), front gratuit.
+- **Mémoire** : si le backend OOM au démarrage, passe `cnpm-backend` en `plan: standard`.
+- **PostgreSQL 16** (Render n'a pas PG18 ; migrations compatibles).
+- **RabbitMQ** : non managé sur Render ; l'app démarre sans broker (événements différés),
+  brancher un CloudAMQP gratuit via les variables `RABBITMQ_*`.
+- **CORS** : ajuste `CNPM_WEB_CORS_ALLOWED_ORIGINS` si le front reçoit un autre sous-domaine.
