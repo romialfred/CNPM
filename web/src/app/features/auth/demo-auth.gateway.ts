@@ -29,9 +29,8 @@ import type {
  */
 @Injectable()
 export class DemoAuthGateway implements AuthGateway {
-  /** Identifiants fictifs acceptés par la démo. */
+  /** Identité fictive utilisée pour l'étiquette d'enrôlement TOTP. */
   private static readonly DEMO_EMAIL = 'demo.agent@cnpm.example';
-  private static readonly DEMO_PASSWORD = 'demo-pass';
   /** Identifiant fictif permettant d'exercer l'état « accès interdit ». */
   private static readonly DEMO_SUSPENDED_EMAIL = 'demo.suspendu@cnpm.example';
   /**
@@ -54,17 +53,22 @@ export class DemoAuthGateway implements AuthGateway {
 
   submitCredentials(request: CredentialsRequest): Observable<CredentialsResult> {
     const email = request.email.trim().toLowerCase();
-    const passwordMatches = request.password === DemoAuthGateway.DEMO_PASSWORD;
+    const password = request.password;
     let result: CredentialsResult;
-    if (email === DemoAuthGateway.DEMO_SUSPENDED_EMAIL && passwordMatches) {
-      result = { outcome: 'forbidden' };
-    } else if (email === DemoAuthGateway.DEMO_ENROLL_EMAIL && passwordMatches) {
-      // Première connexion : identifiants bons, mais aucun second facteur encore actif.
-      result = { outcome: 'enrollment-required', challengeId: DemoAuthGateway.CHALLENGE_ID };
-    } else if (email === DemoAuthGateway.DEMO_EMAIL && passwordMatches) {
-      result = { outcome: 'mfa-required', challengeId: DemoAuthGateway.CHALLENGE_ID };
-    } else {
+    if (!email || !password) {
+      // Le formulaire exige déjà les deux champs ; garde-fou de dernier recours.
       result = { outcome: 'invalid' };
+    } else if (email === DemoAuthGateway.DEMO_SUSPENDED_EMAIL) {
+      // Compte fictif suspendu : démontre l'état « accès interdit ».
+      result = { outcome: 'forbidden' };
+    } else if (email === DemoAuthGateway.DEMO_ENROLL_EMAIL) {
+      // Compte fictif « première connexion » : impose l'enrôlement du second facteur.
+      result = { outcome: 'enrollment-required', challengeId: DemoAuthGateway.CHALLENGE_ID };
+    } else {
+      // Démonstration accueillante : TOUT autre identifiant non vide mène à la vérification
+      // 2FA. Le code de vérification (123456) reste le seul secret de la démo. En production,
+      // l'authentification native du backend valide réellement l'identité et le mot de passe.
+      result = { outcome: 'mfa-required', challengeId: DemoAuthGateway.CHALLENGE_ID };
     }
     return of(result).pipe(delay(DemoAuthGateway.LATENCY_MS));
   }

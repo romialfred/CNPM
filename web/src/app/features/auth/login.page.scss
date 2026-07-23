@@ -50,6 +50,28 @@
   font-size: var(--cnpm-font-size-sm);
 }
 
+/* Indice de démonstration : discret, surface info, séparé de la marque. */
+.cnpm-login__demo {
+  display: grid;
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-semantic-info-100);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-semantic-info-50);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-login__demo strong {
+  color: var(--cnpm-color-semantic-info-700);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-login__demo b {
+  color: var(--cnpm-color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
 .cnpm-login__row {
   display: flex;
   align-items: center;

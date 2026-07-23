@@ -17,6 +17,7 @@ import { OfflineNoticeComponent } from '../../design-system/offline-notice/offli
 import { PasswordInputComponent } from '../../design-system/password-input/password-input.component';
 import { TabsComponent, type CnpmTab } from '../../design-system/tabs/tabs.component';
 import { TextInputComponent } from '../../design-system/text-input/text-input.component';
+import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { AuthShellComponent } from './auth-shell.component';
 import { AUTH_GATEWAY, type AuthSpace } from './auth-gateway';
 import { AuthFlowStore } from './auth-flow.store';
@@ -72,6 +73,9 @@ export class LoginPage {
     { id: 'admin', label: 'Espace administration' },
     { id: 'member', label: 'Espace membre' },
   ];
+
+  /** En mode démonstration, tout identifiant est accepté ; on l'indique clairement. */
+  protected readonly demoMode = inject(CNPM_DATA_MODE) === 'demo';
 
   protected readonly space = signal<string>('admin');
   protected readonly state = signal<FormState>('idle');

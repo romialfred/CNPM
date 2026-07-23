@@ -14,6 +14,7 @@ import { AlertComponent } from '../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../design-system/button/button.component';
 import { OfflineNoticeComponent } from '../../design-system/offline-notice/offline-notice.component';
 import { OtpInputComponent } from '../../design-system/otp-input/otp-input.component';
+import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { AuthShellComponent } from './auth-shell.component';
 import { AUTH_GATEWAY } from './auth-gateway';
 import { AuthFlowStore } from './auth-flow.store';
@@ -53,6 +54,9 @@ export class VerifyPage {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly otpField = viewChild<OtpInputComponent>('otpField');
+
+  /** En mode démonstration, on rappelle le code de vérification à saisir. */
+  protected readonly demoMode = inject(CNPM_DATA_MODE) === 'demo';
 
   protected readonly state = signal<VerifyState>(this.flow.activeChallenge() ? 'idle' : 'expired');
   protected readonly resendCountdown = signal(RESEND_DELAY_SECONDS);

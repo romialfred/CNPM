@@ -27,6 +27,28 @@
   color: var(--cnpm-color-text-secondary);
 }
 
+/* Indice de démonstration : discret, surface info. */
+.cnpm-verify__demo {
+  display: grid;
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-semantic-info-100);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-semantic-info-50);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-verify__demo strong {
+  color: var(--cnpm-color-semantic-info-700);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-verify__demo b {
+  color: var(--cnpm-color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
 .cnpm-verify__form {
   display: flex;
   flex-direction: column;

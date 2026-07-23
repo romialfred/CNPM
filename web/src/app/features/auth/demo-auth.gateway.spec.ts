@@ -36,23 +36,27 @@ describe('DemoAuthGateway', () => {
     });
   });
 
-  it('exige l’enrôlement à la première connexion (2FA jamais activé)', async () => {
-    // Identifiants valides mais aucun second facteur : on ne délivre PAS de défi 2FA,
-    // on conduit à l'enrôlement forcé.
+  it('impose l’enrôlement sur l’identité fictive « première connexion » (2FA jamais activé)', async () => {
+    // Aucun second facteur : on ne délivre PAS de défi 2FA, on conduit à l'enrôlement forcé.
     await expect(credentials(ENROLL_EMAIL, PASSWORD)).resolves.toMatchObject({
       outcome: 'enrollment-required',
     });
-    // Un mot de passe erroné reste indifférencié, pour ne pas trahir l'existence du compte.
-    await expect(credentials(ENROLL_EMAIL, 'mauvais')).resolves.toEqual({ outcome: 'invalid' });
   });
 
-  it('refuse un mot de passe erroné sans révéler l’existence de l’adresse', async () => {
-    // Le résultat doit être identique pour une adresse connue et une inconnue,
-    // sinon l'écran devient un oracle d'existence de compte.
-    await expect(credentials(EMAIL, 'mauvais')).resolves.toEqual({ outcome: 'invalid' });
-    await expect(credentials('inconnu@cnpm.example', PASSWORD)).resolves.toEqual({
-      outcome: 'invalid',
+  it('accepte tout identifiant non vide et conduit au 2FA (démonstration accueillante)', async () => {
+    // En démonstration, le code de vérification (123456) est le seul secret : toute
+    // identité non vide — connue ou non — mène à l'étape 2FA.
+    await expect(credentials('inconnu@cnpm.example', 'nimporte')).resolves.toMatchObject({
+      outcome: 'mfa-required',
     });
+    await expect(credentials(EMAIL, 'un-autre-mot-de-passe')).resolves.toMatchObject({
+      outcome: 'mfa-required',
+    });
+  });
+
+  it('refuse une saisie vide (garde-fou de dernier recours)', async () => {
+    await expect(credentials('', PASSWORD)).resolves.toEqual({ outcome: 'invalid' });
+    await expect(credentials(EMAIL, '')).resolves.toEqual({ outcome: 'invalid' });
   });
 
   it('renvoie vers l’espace réellement choisi après vérification', async () => {

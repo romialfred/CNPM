@@ -18,6 +18,13 @@
         Saisissez le code à six chiffres envoyé par votre méthode d'authentification.
       </p>
 
+      @if (demoMode) {
+        <div class="cnpm-verify__demo" role="note">
+          <strong>Mode démonstration</strong>
+          <span>Saisissez le code <b>123456</b>.</span>
+        </div>
+      }
+
       @if (state() === 'success') {
         <cnpm-alert tone="success" title="Connexion réussie">
           Redirection vers votre espace…

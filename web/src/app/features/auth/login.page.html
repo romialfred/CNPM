@@ -10,6 +10,16 @@
       [(selected)]="space"
     />
 
+    @if (demoMode) {
+      <div class="cnpm-login__demo" role="note">
+        <strong>Mode démonstration</strong>
+        <span>
+          Connectez-vous avec n’importe quel e-mail et mot de passe, puis saisissez le code de
+          vérification <b>123456</b>.
+        </span>
+      </div>
+    }
+
     <cnpm-offline-notice />
 
     <!-- tabindex=-1 : le focus est amené ici après l'échec, faute de quoi il
