@@ -4,18 +4,18 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
+  LucideCalendarPlus,
   LucideDownload,
   LucideEye,
   LucideHistory,
   LucideLayoutGrid,
   LucideMoon,
-  LucidePercent,
   LucidePlus,
+  LucideSparkles,
   LucideTable,
   LucideUpload,
   LucideUserCheck,
   LucideUsers,
-  LucideWallet,
 } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
@@ -33,10 +33,6 @@ import {
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
-import {
-  InsightSummaryComponent,
-  type InsightStat,
-} from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { MemberCategoryLabelPipe } from '../../../core/formatting/member-category-label.pipe';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
@@ -60,7 +56,7 @@ import {
  */
 interface MembersOverviewKpi {
   readonly key: string;
-  readonly icon: 'total' | 'active' | 'dormant' | 'recovery';
+  readonly icon: 'total' | 'active' | 'dormant' | 'new';
   /** Classe d'accent de `_accents.scss`, issue de `chart.categorical`. */
   readonly accent: string;
   readonly label: string;
@@ -114,17 +110,17 @@ const DEFAULT_PAGE_SIZE = 10;
     EmptyStateComponent,
     ErrorStateComponent,
     FilterBarComponent,
-    InsightSummaryComponent,
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
+    LucideCalendarPlus,
     LucideDownload,
     LucideEye,
     LucideHistory,
     LucidePlus,
     LucideLayoutGrid,
     LucideMoon,
-    LucidePercent,
+    LucideSparkles,
     LucideTable,
     LucideUpload,
     LucideUserCheck,
@@ -141,19 +137,6 @@ export class MembersPage {
 
   protected readonly iconSize = CNPM_ICON_SIZE;
 
-  /**
-   * Pictogrammes des panneaux de synthese.
-   *
-   * On passe la DONNEE d'icone (`.icon`), pas son nom. `LucideDynamicIcon` accepte bien
-   * une chaine, mais elle suppose un registre nom -> icone que ce depot n'installe pas :
-   * `provideCnpmIcons()` ne configure que taille, trait et couleur, l'API par icone etant
-   * retenue pour son tree-shaking. Une chaine leve donc « Unable to resolve icon » a
-   * l'execution, et l'exception vide tout le panneau — c'est arrive.
-   */
-  protected readonly panelIcons = {
-    membres: LucideUsers.icon,
-    cotisations: LucideWallet.icon,
-  } as const;
   protected readonly pageSizes = PAGE_SIZES;
   protected readonly statusLabels = STATUS_LABELS;
   protected readonly statuses = Object.keys(STATUS_LABELS) as readonly MemberStatus[];
@@ -388,6 +371,20 @@ export class MembersPage {
     return accents[status];
   }
 
+  /** Année civile courante, pour la tuile « Nouveaux membres ». */
+  private readonly currentYear = new Date().getFullYear();
+
+  /**
+   * Bandeau de tuiles, épuré à la demande du commanditaire : quatre indicateurs d'effectif
+   * sur une seule ligne — base, actifs, dormants, nouveaux de l'année. Les tuiles de
+   * cotisation (dû, payé, taux), grands cotisants et prospects ont été retirées ; ces
+   * chiffres restent lus depuis la même source (`MembersOverview`) lorsqu'ils réapparaîtront
+   * ailleurs, jamais recalculés ici.
+   *
+   * Chaque tuile porte un accent distinct (`chart.categorical`) qui teinte son fond et son
+   * pictogramme : une différenciation, pas un signal — une tuile ambre n'annonce aucune
+   * alerte.
+   */
   protected overviewKpis(summary: MembersOverview): readonly MembersOverviewKpi[] {
     const part = (valeur: number) =>
       summary.membersTotal > 0
@@ -425,69 +422,36 @@ export class MembersPage {
         caption: part(summary.dormant),
       },
       {
-        key: 'recovery',
-        icon: 'recovery',
+        key: 'new',
+        icon: 'new',
         accent: 'sky',
-        label: 'Taux de recouvrement',
-        value: summary.recoveryRate,
-        format: '1.1-1',
-        suffix: ' %',
-        caption: 'Part du montant attendu encaissée.',
+        label: `Nouveaux membres (${this.currentYear})`,
+        value: summary.newThisYear,
+        format: '1.0-0',
+        suffix: '',
+        caption: 'Adhésions de l’année en cours.',
       },
     ];
   }
 
   /**
-   * Les statistiques sont recopiées telles quelles depuis la source ; aucune n'est
-   * recalculée ici. Un second calcul côté écran pourrait diverger de celui qui
-   * alimente le tableau, et c'est exactement le total incohérent que la fiche proscrit.
+   * « Membre depuis » : année d'adhésion et ancienneté en années révolues. `null` si la
+   * date n'est pas connue — on n'invente pas une ancienneté qu'aucune donnée ne porte.
    */
-  protected readonly memberStats = computed<readonly InsightStat[]>(() => {
-    const summary = this.overview();
-    if (!summary) {
-      return [];
+  protected memberSince(joinedAt: string | null): string | null {
+    if (!joinedAt) {
+      return null;
     }
-    // Barres horizontales situees sur une meme echelle : la base de membres. Chaque
-    // effectif se lit d'un coup d'oeil face au total, la valeur restant affichee en
-    // clair. « Base de membres » est la reference — sa barre est donc pleine. Les
-    // prospects, comptes hors base, gardent la meme echelle pour rester comparables.
-    const base = summary.membersTotal;
-    return [
-      { label: 'Base de membres', value: base, display: 'barre', barMax: base },
-      { label: 'Actifs', value: summary.active, display: 'barre', barMax: base },
-      { label: 'Dormants', value: summary.dormant, display: 'barre', barMax: base },
-      {
-        label: 'Grands cotisants',
-        value: summary.largeContributors,
-        display: 'barre',
-        barMax: base,
-      },
-      { label: 'Prospects', value: summary.prospects, display: 'barre', barMax: base, apart: true },
-    ];
-  });
-
-  protected readonly contributionStats = computed<readonly InsightStat[]>(() => {
-    const summary = this.overview();
-    if (!summary) {
-      return [];
+    const year = Number.parseInt(joinedAt.slice(0, 4), 10);
+    if (Number.isNaN(year)) {
+      return null;
     }
-    return [
-      { label: 'Total dû', value: summary.expected },
-      { label: 'Total payé', value: summary.collected },
-      {
-        // Rendu en jauge : une part se lit d'un coup d'œil sur une échelle, là où un
-        // nombre seul demande de le rapporter mentalement à 100. Le chiffre reste
-        // affiché à côté de la barre — une barre seule ne se lit pas, et la valeur ne
-        // doit jamais dépendre de la seule longueur d'un trait.
-        label: 'Taux de recouvrement',
-        value: summary.recoveryRate,
-        suffix: ' %',
-        decimals: 1,
-        display: 'jauge',
-        apart: true,
-      },
-    ];
-  });
+    const years = this.currentYear - year;
+    if (years <= 0) {
+      return `${year}`;
+    }
+    return `${year} (${years} ${years === 1 ? 'an' : 'ans'})`;
+  }
 
   protected readonly rowKey = (row: MemberRow): string => row.id;
   protected readonly rowLabel = (row: MemberRow): string => `${row.organization} (${row.code})`;
@@ -499,7 +463,6 @@ export class MembersPage {
   protected statusTone(status: MemberStatus): CnpmBadgeTone {
     return STATUS_TONES[status];
   }
-
 
   protected applySearch(): void {
     this.patch({ q: this.searchDraft().trim() || null, page: null });
@@ -542,9 +505,6 @@ export class MembersPage {
     this.searchDraft.set('');
     this.patch({ q: null, statut: null, categorie: null, groupement: null, page: null });
   }
-
-
-
 
   /** BO-009 est le parcours canonique de création actuellement livré. */
   protected startEnrollment(): void {

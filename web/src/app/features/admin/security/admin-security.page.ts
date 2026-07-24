@@ -10,8 +10,17 @@ import {
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LucideCheck, LucideMinus, LucideUserPlus } from '@lucide/angular';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import {
+  LucideBan,
+  LucideCheck,
+  LucideKeyRound,
+  LucideMinus,
+  LucideSend,
+  LucideTrash2,
+  LucideUserCheck,
+  LucideUserPlus,
+} from '@lucide/angular';
+import { catchError, map, type Observable, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { DialogComponent } from '../../../design-system/dialog/dialog.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
@@ -22,14 +31,9 @@ import type {
   DataTableColumn,
   DataTableState,
 } from '../../../design-system/data-table/data-table.model';
-import { DefinitionListComponent } from '../../../design-system/definition-list/definition-list.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
-import {
-  InsightSummaryComponent,
-  type InsightStat,
-} from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TabsComponent, type CnpmTab } from '../../../design-system/tabs/tabs.component';
@@ -41,6 +45,7 @@ import {
   type AdminSecuritySnapshot,
   type AuditEntry,
   type AuditOutcome,
+  type CredentialTokenResult,
   type PermissionGrant,
   type PermissionRow,
   type SecurityAccount,
@@ -111,14 +116,23 @@ const AUDIT_OUTCOME_TONES: Readonly<Record<AuditOutcome, CnpmBadgeTone>> = {
   BLOCKED: 'warning',
 };
 
+// Colonnes épurées (inspiration SafeX) : l'identité porte déjà le courriel, le statut et
+// le second facteur suffisent au coup d'œil sécurité. Dernière connexion et sessions
+// ouvertes ont quitté le tableau — elles relèvent du détail d'un compte, pas de la liste.
 const ACCOUNT_COLUMNS: readonly DataTableColumn[] = [
   { key: 'account', label: 'Utilisateur' },
   { key: 'role', label: 'Rôle' },
-  { key: 'status', label: 'Statut du compte' },
+  { key: 'status', label: 'Statut' },
   { key: 'twoFactor', label: 'Second facteur', note: '(2FA)' },
-  { key: 'lastLogin', label: 'Dernière connexion' },
-  { key: 'sessions', label: 'Sessions ouvertes', align: 'end' },
-  { key: 'actions', label: 'Actions' },
+  { key: 'actions', label: 'Actions', align: 'end' },
+];
+
+/** Options du filtre de statut. `null` = tous. */
+const STATUS_FILTERS: readonly { value: AccountStatus | ''; label: string }[] = [
+  { value: '', label: 'Tous les statuts' },
+  { value: 'ACTIVE', label: 'Actif' },
+  { value: 'SUSPENDED', label: 'Suspendu' },
+  { value: 'INVITED', label: 'Invitation en attente' },
 ];
 
 const SESSION_COLUMNS: readonly DataTableColumn[] = [
@@ -176,16 +190,19 @@ const AUDIT_COLUMNS: readonly DataTableColumn[] = [
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
-    DefinitionListComponent,
     DialogComponent,
     EmptyStateComponent,
     ErrorStateComponent,
-    InsightSummaryComponent,
     PageHeaderComponent,
     SkeletonComponent,
     TabsComponent,
+    LucideBan,
     LucideCheck,
+    LucideKeyRound,
     LucideMinus,
+    LucideSend,
+    LucideTrash2,
+    LucideUserCheck,
     LucideUserPlus,
   ],
   templateUrl: './admin-security.page.html',
@@ -228,6 +245,19 @@ export class AdminSecurityPage {
   });
 
   protected readonly search = computed(() => this.params().get('q') ?? '');
+
+  /** Filtres du tableau des comptes, portés par l'URL (vue partageable). */
+  protected readonly statusFilter = computed<AccountStatus | ''>(() => {
+    const value = this.params().get('statut');
+    return value === 'ACTIVE' || value === 'SUSPENDED' || value === 'INVITED' ? value : '';
+  });
+  protected readonly roleFilter = computed(() => this.params().get('role') ?? '');
+  protected readonly statusFilters = STATUS_FILTERS;
+
+  /** Ne propose « Réinitialiser » que lorsqu'il y a réellement quelque chose à défaire. */
+  protected readonly hasActiveFilters = computed(
+    () => Boolean(this.search()) || Boolean(this.statusFilter()) || Boolean(this.roleFilter()),
+  );
 
   /** Saisie en cours ; ne devient un filtre qu'à la validation du formulaire. */
   protected readonly searchDraft = signal(this.route.snapshot.queryParamMap.get('q') ?? '');
@@ -288,15 +318,30 @@ export class AdminSecurityPage {
   protected readonly accounts = computed<readonly SecurityAccount[]>(
     () => this.data()?.accounts ?? [],
   );
-  /** Six lignes au premier écran, puis la vue complète reste accessible par recherche. */
-  protected readonly accountPreview = computed<readonly SecurityAccount[]>(() =>
-    this.accounts().slice(0, 6),
-  );
+  /**
+   * Comptes affichés : la recherche est déjà appliquée par la source ; on filtre en plus
+   * par statut et par rôle (filtres portés par l'URL). La liste complète s'affiche —
+   * plus de coupe à six lignes, comme une gestion des utilisateurs standard.
+   */
+  protected readonly filteredAccounts = computed<readonly SecurityAccount[]>(() => {
+    const status = this.statusFilter();
+    const role = this.roleFilter();
+    return this.accounts().filter(
+      (account) => (!status || account.status === status) && (!role || account.roleId === role),
+    );
+  });
+  /** Rôles présents parmi les comptes, pour alimenter le filtre de rôle. */
+  protected readonly accountRoleOptions = computed(() => {
+    const seen = new Map<string, string>();
+    for (const account of this.accounts()) {
+      if (!seen.has(account.roleId)) {
+        seen.set(account.roleId, account.roleLabel);
+      }
+    }
+    return [...seen].map(([value, label]) => ({ value, label }));
+  });
   protected readonly permissions = computed<readonly PermissionRow[]>(
     () => this.data()?.permissions ?? [],
-  );
-  protected readonly permissionPreview = computed<readonly PermissionRow[]>(() =>
-    this.permissions().slice(0, 6),
   );
   protected readonly roles = computed(() => this.data()?.roles ?? []);
   /** L'édition de la matrice n'est ouverte que si la source y autorise le compte courant. */
@@ -347,7 +392,6 @@ export class AdminSecurityPage {
     () => this.data()?.sessions ?? [],
   );
   protected readonly audit = computed<readonly AuditEntry[]>(() => this.data()?.audit ?? []);
-  protected readonly policy = computed(() => this.data()?.policy ?? []);
   protected readonly counts = computed(() => this.data()?.counts ?? null);
 
   protected readonly accountColumns = ACCOUNT_COLUMNS;
@@ -369,7 +413,7 @@ export class AdminSecurityPage {
   protected readonly visibleRowCount = computed(() => {
     switch (this.activeTab()) {
       case 'comptes':
-        return this.accountPreview().length;
+        return this.filteredAccounts().length;
       case 'roles':
         return this.permissions().length;
       case 'sessions':
@@ -424,29 +468,10 @@ export class AdminSecurityPage {
       return 'ready';
     }
     // Une collection vide et un filtre trop étroit appellent des gestes opposés :
-    // les confondre mène l'un des deux dans une impasse.
-    return this.search() ? 'noResult' : 'empty';
-  });
-
-  /**
-   * Agrégats de posture, recopiés tels quels depuis la source.
-   *
-   * Aucun n'est recalculé ici : un second calcul côté écran pourrait diverger de celui
-   * qui alimente les tableaux, et afficher un total que la liste juste en dessous
-   * contredit.
-   */
-  protected readonly postureStats = computed<readonly InsightStat[]>(() => {
-    const posture = this.data()?.posture;
-    if (!posture) {
-      return [];
-    }
-    return [
-      { label: 'Comptes ouverts', value: posture.accountsTotal },
-      { label: 'Comptes actifs', value: posture.activeAccounts },
-      { label: 'Comptes suspendus', value: posture.suspendedAccounts },
-      { label: 'Second facteur activé', value: posture.twoFactorEnabled },
-      { label: 'Sessions ouvertes', value: posture.openSessions, apart: true },
-    ];
+    // les confondre mène l'un des deux dans une impasse. Le statut et le rôle comptent
+    // autant que la recherche — sans eux, filtrer sur « Suspendu » sur une plateforme
+    // sans compte suspendu annoncerait « aucun compte enregistré », ce qui est faux.
+    return this.hasActiveFilters() ? 'noResult' : 'empty';
   });
 
   protected readonly accountKey = (row: SecurityAccount): string => row.id;
@@ -504,16 +529,24 @@ export class AdminSecurityPage {
    */
   protected onTabChange(tab: string): void {
     this.searchDraft.set('');
-    this.patch({ onglet: tab === this.defaultTab ? null : tab, q: null });
+    this.patch({ onglet: tab === this.defaultTab ? null : tab, q: null, statut: null, role: null });
   }
 
   protected applySearch(): void {
     this.patch({ q: this.searchDraft().trim() || null });
   }
 
+  protected setStatusFilter(value: string): void {
+    this.patch({ statut: value || null });
+  }
+
+  protected setRoleFilter(value: string): void {
+    this.patch({ role: value || null });
+  }
+
   protected resetFilters(): void {
     this.searchDraft.set('');
-    this.patch({ q: null });
+    this.patch({ q: null, statut: null, role: null });
   }
 
   /** Relance le chargement après une erreur récupérable, sans recharger la page. */
@@ -535,34 +568,65 @@ export class AdminSecurityPage {
   protected readonly actioning = signal(false);
 
   /**
-   * Motif de la réinitialisation du second facteur. OBLIGATOIRE (BO-030) : il est saisi
-   * dans la confirmation, transmis au port et consigné dans la trace d'audit. On exige
+   * Motif de l'action sensible. OBLIGATOIRE pour les trois gestes (BO-030) : suspendre,
+   * réactiver et réinitialiser un second facteur se consignent au journal d'audit, et une
+   * décision sans raison écrite ne peut ni s'expliquer ni se contester plus tard. On exige
    * un minimum de substance — quelques caractères — pour qu'un simple espace ne passe pas.
    */
-  protected readonly resetReason = signal('');
-  protected readonly resetReasonValid = computed(() => this.resetReason().trim().length >= 5);
+  protected readonly actionReason = signal('');
+  protected readonly actionReasonValid = computed(() => this.actionReason().trim().length >= 5);
 
   protected askSuspend(account: SecurityAccount): void {
+    this.actionReason.set('');
     this.pendingAction.set({ kind: 'suspend', account });
   }
 
   protected askReactivate(account: SecurityAccount): void {
+    this.actionReason.set('');
     this.pendingAction.set({ kind: 'reactivate', account });
   }
 
+  protected askDelete(account: SecurityAccount): void {
+    this.actionReason.set('');
+    this.pendingAction.set({ kind: 'delete', account });
+  }
+
   protected askResetTwoFactor(account: SecurityAccount): void {
-    this.resetReason.set('');
+    this.actionReason.set('');
     this.pendingAction.set({ kind: 'reset2fa', account });
   }
 
-  protected updateResetReason(value: string): void {
-    this.resetReason.set(value);
+  protected updateActionReason(value: string): void {
+    this.actionReason.set(value);
   }
+
+  /** Libellé du champ de motif, propre au geste demandé. */
+  protected readonly actionReasonLabel = computed(() => {
+    switch (this.pendingAction()?.kind) {
+      case 'suspend':
+        return 'Motif de la suspension (obligatoire)';
+      case 'reactivate':
+        return 'Motif de la réactivation (obligatoire)';
+      default:
+        return 'Motif de la réinitialisation (obligatoire)';
+    }
+  });
+
+  protected readonly actionReasonPlaceholder = computed(() => {
+    switch (this.pendingAction()?.kind) {
+      case 'suspend':
+        return 'Ex. départ de l’organisation constaté le 12 juin';
+      case 'reactivate':
+        return 'Ex. retour de mission, accès rétabli à la demande du responsable';
+      default:
+        return 'Ex. demande du membre après perte de son téléphone';
+    }
+  });
 
   protected cancelAction(): void {
     if (!this.actioning()) {
       this.pendingAction.set(null);
-      this.resetReason.set('');
+      this.actionReason.set('');
     }
   }
 
@@ -574,6 +638,8 @@ export class AdminSecurityPage {
         return 'Réactiver le compte';
       case 'reset2fa':
         return 'Réinitialiser le second facteur';
+      case 'delete':
+        return 'Supprimer le compte';
       default:
         return '';
     }
@@ -592,6 +658,8 @@ export class AdminSecurityPage {
         return `${name} pourra de nouveau se connecter.`;
       case 'reset2fa':
         return `${name} devra réenrôler son second facteur à la prochaine connexion. La protection n’est pas désactivée, elle est relancée.`;
+      case 'delete':
+        return `Le compte de ${name} sera supprimé définitivement, avec ses rôles et son second facteur. Cette action est irréversible. Une adhésion rattachée redeviendra disponible pour un nouveau compte.`;
       default:
         return '';
     }
@@ -605,34 +673,50 @@ export class AdminSecurityPage {
         return 'Réactiver';
       case 'reset2fa':
         return 'Réinitialiser';
+      case 'delete':
+        return 'Supprimer définitivement';
       default:
         return 'Confirmer';
     }
   });
+
+  /** L'action destructive porte un bouton de confirmation en variante critique. */
+  protected readonly actionIsDestructive = computed(() => this.pendingAction()?.kind === 'delete');
 
   protected confirmAction(): void {
     const action = this.pendingAction();
     if (!action || this.actioning()) {
       return;
     }
-    // Le reset 2FA ne part jamais sans motif : garde-fou en plus du bouton désactivé.
-    if (action.kind === 'reset2fa' && !this.resetReasonValid()) {
+    // Aucune action sensible ne part sans motif : garde-fou en plus du bouton désactivé.
+    if (!this.actionReasonValid()) {
       return;
     }
-    const request$ =
-      action.kind === 'reset2fa'
-        ? this.gateway.resetTwoFactor(action.account.id, this.resetReason().trim())
-        : this.gateway.changeAccountStatus(
-            action.account.id,
-            action.kind === 'suspend' ? 'SUSPENDED' : 'ACTIVE',
-          );
+    const reason = this.actionReason().trim();
+    let request$: Observable<unknown>;
+    switch (action.kind) {
+      case 'reset2fa':
+        request$ = this.gateway.resetTwoFactor(action.account.id, reason);
+        break;
+      case 'delete':
+        request$ = this.gateway.deleteAccount(action.account.id, reason);
+        break;
+      default:
+        request$ = this.gateway.changeAccountStatus(
+          action.account.id,
+          action.kind === 'suspend' ? 'SUSPENDED' : 'ACTIVE',
+          reason,
+        );
+    }
     this.actioning.set(true);
+    // Le nom vient de la ligne, pas de la réponse : la suppression ne renvoie aucun compte.
+    const name = action.account.fullName;
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (account) => {
+      next: () => {
         this.actioning.set(false);
         this.pendingAction.set(null);
-        this.resetReason.set('');
-        this.toast.success(this.successMessage(action.kind, account.fullName));
+        this.actionReason.set('');
+        this.toast.success(this.successMessage(action.kind, name));
         this.retryTick.update((tick) => tick + 1);
       },
       error: () => {
@@ -650,7 +734,117 @@ export class AdminSecurityPage {
         return `Compte de ${name} réactivé.`;
       case 'reset2fa':
         return `Second facteur de ${name} réinitialisé.`;
+      case 'delete':
+        return `Compte de ${name} supprimé.`;
     }
+  }
+
+  // ------------------------------------------------- Lien d'activation / récupération
+
+  /**
+   * Émission d'un lien d'accès. Deux temps distincts : d'abord une confirmation
+   * (`credentialCandidate`), puis l'affichage du lien produit (`issuedCredential`). Le lien
+   * n'est montré QU'UNE FOIS — le serveur n'en garde que l'empreinte — d'où un dialogue
+   * dédié plutôt qu'un simple toast qui disparaîtrait avant d'être copié.
+   */
+  protected readonly credentialCandidate = signal<SecurityAccount | null>(null);
+  protected readonly issuingCredential = signal(false);
+  protected readonly issuedCredential = signal<IssuedCredential | null>(null);
+  protected readonly linkCopied = signal(false);
+
+  protected askIssueCredential(account: SecurityAccount): void {
+    this.credentialCandidate.set(account);
+  }
+
+  protected cancelIssueCredential(): void {
+    if (!this.issuingCredential()) {
+      this.credentialCandidate.set(null);
+    }
+  }
+
+  /** Vrai lorsque le compte n'a encore jamais pu se connecter : c'est une activation. */
+  protected readonly credentialIsActivation = computed(
+    () => this.credentialCandidate()?.status === 'INVITED',
+  );
+
+  protected confirmIssueCredential(): void {
+    const account = this.credentialCandidate();
+    if (!account || this.issuingCredential()) {
+      return;
+    }
+    this.issuingCredential.set(true);
+    this.gateway
+      .issueCredentialToken(account.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.issuingCredential.set(false);
+          this.credentialCandidate.set(null);
+          this.linkCopied.set(false);
+          this.issuedCredential.set({
+            accountName: account.fullName,
+            link: this.buildCredentialLink(result, account),
+            expiresAtLabel: this.formatExpiry(result.expiresAt),
+            activation: result.activation,
+          });
+          // La liste rafraîchit l'état 2FA / statut, inchangé ici mais cohérent avec l'audit.
+          this.retryTick.update((tick) => tick + 1);
+        },
+        error: () => {
+          this.issuingCredential.set(false);
+          this.toast.error('Le lien n’a pas pu être émis. Réessayez ou contactez le support.');
+        },
+      });
+  }
+
+  protected closeIssuedCredential(): void {
+    this.issuedCredential.set(null);
+    this.linkCopied.set(false);
+  }
+
+  /** Copie le lien dans le presse-papiers ; l'état copié double le retour visuel. */
+  protected copyIssuedLink(): void {
+    const issued = this.issuedCredential();
+    if (!issued) {
+      return;
+    }
+    void navigator.clipboard
+      ?.writeText(issued.link)
+      .then(() => this.linkCopied.set(true))
+      .catch(() => this.linkCopied.set(false));
+  }
+
+  /**
+   * Construit le lien que l'opérateur transmet. La route diffère selon qu'il s'agit d'une
+   * activation ou d'une récupération : l'écran d'arrivée n'annonce pas la même chose.
+   *
+   * L'e-mail du titulaire est porté par le lien (`login`) pour enchaîner automatiquement,
+   * après la pose du mot de passe, sur la connexion puis l'enrôlement du second facteur —
+   * sans ressaisie. Ce n'est pas un secret (un jeton invalide échoue de toute façon) ; le
+   * mot de passe, lui, ne transite jamais par l'URL.
+   */
+  private buildCredentialLink(result: CredentialTokenResult, account: SecurityAccount): string {
+    const path = result.activation ? '/auth/activate' : '/auth/reset-password';
+    const origin = typeof window !== 'undefined' && window.location ? window.location.origin : '';
+    // Un compte membre atterrit dans l'espace membre, un compte professionnel dans le
+    // back-office : l'espace guide la redirection finale après le second facteur.
+    const space = account.accountType === 'MEMBER' ? 'member' : 'admin';
+    return (
+      `${origin}${path}?token=${encodeURIComponent(result.token)}` +
+      `&login=${encodeURIComponent(account.email)}&space=${space}`
+    );
+  }
+
+  /** Échéance formatée fr-ML ; à défaut d'une date lisible, on rend la valeur brute. */
+  private formatExpiry(iso: string): string {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+      return iso;
+    }
+    return new Intl.DateTimeFormat('fr-ML', {
+      dateStyle: 'long',
+      timeStyle: 'short',
+    }).format(date);
   }
 
   private patch(params: Record<string, string | null>): void {
@@ -662,7 +856,15 @@ export class AdminSecurityPage {
   }
 }
 
-type AccountActionKind = 'suspend' | 'reactivate' | 'reset2fa';
+/** Lien d'accès émis, tel que le dialogue le présente à l'opérateur. */
+interface IssuedCredential {
+  readonly accountName: string;
+  readonly link: string;
+  readonly expiresAtLabel: string;
+  readonly activation: boolean;
+}
+
+type AccountActionKind = 'suspend' | 'reactivate' | 'reset2fa' | 'delete';
 interface AccountAction {
   readonly kind: AccountActionKind;
   readonly account: SecurityAccount;

@@ -10,7 +10,9 @@ describe('memberRoutes', () => {
 
   it('expose MP-002 et MP-003 sous une composition de données commune', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'contributions');
-    expect(route?.providers).toHaveLength(2);
+    // Trois fournisseurs : l'adaptateur de démonstration, l'adaptateur HTTP et le port qui
+    // choisit entre les deux. C'est le seul écran membre raccordé au backend réel.
+    expect(route?.providers).toHaveLength(3);
     expect(route?.children).toHaveLength(2);
     expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
     expect(route?.children?.[0]?.loadComponent).toBeTypeOf('function');

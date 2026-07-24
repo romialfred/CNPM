@@ -89,6 +89,8 @@ export const UNAVAILABLE_ADMIN_SECURITY_GATEWAY: AdminSecurityGateway = {
   createAccount: () => unavailableFeature$('BO-030'),
   changeAccountStatus: () => unavailableFeature$('BO-030'),
   resetTwoFactor: () => unavailableFeature$('BO-030'),
+  deleteAccount: () => unavailableFeature$('BO-030'),
+  issueCredentialToken: () => unavailableFeature$('BO-030'),
   setPermissionGrant: () => unavailableFeature$('BO-030'),
 };
 

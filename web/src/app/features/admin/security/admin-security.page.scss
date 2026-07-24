@@ -7,13 +7,13 @@
   min-width: 0;
 }
 
-/* Panneau principal et synthèse latérale, comme la fiche BO-030 (320–360 px).
-   `minmax(0, 1fr)` empêche la colonne du tableau de se dimensionner sur son
-   min-content : sans cela, une matrice à six colonnes pousserait la grille au-delà de
-   la page au lieu de défiler dans son propre conteneur. */
+/* Une seule colonne : la synthèse latérale a été retirée au profit d'un écran de
+   gestion pleine largeur. `minmax(0, 1fr)` empêche la colonne du tableau de se
+   dimensionner sur son min-content : sans cela, une matrice à six colonnes pousserait
+   la grille au-delà de la page au lieu de défiler dans son propre conteneur. */
 .cnpm-security__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 20rem;
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: var(--cnpm-space-4);
   min-width: 0;
@@ -48,6 +48,16 @@
   border: 0;
 }
 
+/* Recherche et filtres sur une même ligne, qui s'enroule quand la largeur manque. */
+.cnpm-security__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
 .cnpm-security__filter {
   width: min(24rem, 100%);
 }
@@ -71,6 +81,15 @@
   outline-offset: 1px;
 }
 
+/* Le select garde la hauteur de contrôle standard ; sa largeur suit son libellé le plus
+   long plutôt que d'occuper toute la ligne. */
+.cnpm-security__select {
+  width: auto;
+  min-width: 11rem;
+  padding-right: var(--cnpm-space-2);
+  cursor: pointer;
+}
+
 .cnpm-security__total {
   margin: 0;
   font-size: var(--cnpm-font-size-sm);
@@ -78,9 +97,7 @@
   color: var(--cnpm-color-text-secondary);
 }
 
-.cnpm-security__panel-tools,
-.cnpm-security__matrix-head,
-.cnpm-security__card-head {
+.cnpm-security__panel-tools {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -258,42 +275,6 @@
   color: var(--cnpm-color-text-primary);
 }
 
-.cnpm-security__matrix-preview {
-  padding: var(--cnpm-space-3);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-surface-primary);
-}
-
-.cnpm-security__matrix-head p {
-  margin: var(--cnpm-space-1) 0 0;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-security__matrix-scroll {
-  margin-top: var(--cnpm-space-2);
-  overflow-x: auto;
-}
-
-.cnpm-security__matrix {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.cnpm-security__matrix th,
-.cnpm-security__matrix td {
-  padding: var(--cnpm-space-2);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  text-align: center;
-}
-
-.cnpm-security__matrix th:first-child {
-  min-width: 13rem;
-  text-align: left;
-}
-
 .cnpm-security__roles {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
@@ -333,96 +314,26 @@
   color: var(--cnpm-color-text-muted);
 }
 
-/* -------------------------------- Panneau ---------------------------------- */
-
-.cnpm-security__aside {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-3);
-  min-width: 0;
-}
-
-.cnpm-security__card {
-  padding: var(--cnpm-space-4);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-surface-primary);
-}
-
-.cnpm-security__card-title {
-  margin: 0 0 var(--cnpm-space-3);
-  font-size: var(--cnpm-font-size-md);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-security__card-head .cnpm-security__card-title {
-  margin: 0;
-}
-
-.cnpm-security__card-note {
-  margin: var(--cnpm-space-3) 0 0;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-security__audit-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-3);
-  margin: var(--cnpm-space-3) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.cnpm-security__audit-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--cnpm-space-2);
-}
-
-.cnpm-security__audit-list span {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.cnpm-security__audit-list small {
-  color: var(--cnpm-color-text-secondary);
-}
-
-/* Sous 1440 px, la synthèse passe sous le panneau : elle reste lisible et complète,
-   plutôt que d'être masquée derrière un tiroir non spécifié. */
-@media (max-width: 1439px) {
-  .cnpm-security__layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .cnpm-security__aside {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  cnpm-insight-summary,
-  .cnpm-security__card {
-    flex: 1 1 18rem;
-  }
-}
-
 @media (max-width: 767px) {
-  .cnpm-security__aside {
-    flex-direction: column;
-  }
-
   .cnpm-security__input {
     height: var(--cnpm-size-control-lg);
   }
 
-  .cnpm-security__panel-tools,
-  .cnpm-security__matrix-head {
+  .cnpm-security__panel-tools {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  /* Sur mobile les filtres s'empilent et s'étirent : une cible tactile pleine largeur
+     vaut mieux qu'une rangée de contrôles serrés. */
+  .cnpm-security__tools {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cnpm-security__select {
+    width: 100%;
+    height: var(--cnpm-size-control-lg);
   }
 
   .cnpm-security__filter {
@@ -443,11 +354,102 @@
   gap: var(--cnpm-space-1);
 }
 
+/* Bouton d'action en icône. Le libellé accessible est porté par `aria-label` dans le
+   gabarit : l'icône seule ne dit rien à un lecteur d'écran. Hauteur de contrôle
+   standard (40 px), portée à 44 px sur mobile pour la cible tactile. */
+.cnpm-security__icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
+  padding: 0;
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background-color: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-secondary);
+  cursor: pointer;
+}
+
+.cnpm-security__icon-btn:hover {
+  border-color: var(--cnpm-color-border-strong);
+  background-color: var(--cnpm-color-neutral-50);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__icon-btn:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 2px;
+}
+
+/* La teinte double le sens porté par le libellé accessible et l'infobulle ; elle ne le
+   porte jamais seule (WCAG 1.4.1). */
+.cnpm-security__icon-btn--go {
+  color: var(--cnpm-color-semantic-success-700);
+}
+
+.cnpm-security__icon-btn--go:hover {
+  border-color: var(--cnpm-color-semantic-success-500);
+  background-color: var(--cnpm-color-semantic-success-50);
+  color: var(--cnpm-color-semantic-success-700);
+}
+
+.cnpm-security__icon-btn--warn {
+  color: var(--cnpm-color-semantic-warning-700);
+}
+
+.cnpm-security__icon-btn--warn:hover {
+  border-color: var(--cnpm-color-semantic-warning-500);
+  background-color: var(--cnpm-color-semantic-warning-50);
+  color: var(--cnpm-color-semantic-warning-700);
+}
+
+/* La corbeille est la seule action destructive : teinte critique au survol, mais le sens
+   reste porté par le libellé accessible et l'infobulle (WCAG 1.4.1). */
+.cnpm-security__icon-btn--danger {
+  color: var(--cnpm-color-semantic-error-600);
+}
+
+.cnpm-security__icon-btn--danger:hover {
+  border-color: var(--cnpm-color-semantic-error-500);
+  background-color: var(--cnpm-color-semantic-error-50);
+  color: var(--cnpm-color-semantic-error-700);
+}
+
+@media (max-width: 767px) {
+  .cnpm-security__icon-btn {
+    width: var(--cnpm-size-control-lg);
+    height: var(--cnpm-size-control-lg);
+  }
+}
+
 .cnpm-security__confirm-text {
   margin: 0;
   color: var(--cnpm-color-text-secondary);
   font-size: var(--cnpm-font-size-sm);
   line-height: var(--cnpm-font-lineHeight-sm);
+}
+
+/* Champ en lecture seule + bouton copier, sur une ligne qui s'enroule si l'espace manque. */
+.cnpm-security__link-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  margin-block-start: var(--cnpm-space-3);
+}
+
+.cnpm-security__link-input {
+  flex: 1 1 18rem;
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+/* Note explicative sous le lien : rappelle qu'il ne sera plus affiché et que le secret
+   n'est jamais connu de l'administration. */
+.cnpm-security__card-note {
+  margin: var(--cnpm-space-3) 0 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
 }
 
 .cnpm-security__reason {

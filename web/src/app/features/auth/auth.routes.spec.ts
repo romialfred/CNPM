@@ -19,20 +19,31 @@ describe('authRoutes', () => {
     );
   });
 
-  it('porte une configuration fermée et traçable sur AUTH-003 à AUTH-006', () => {
-    // AUTH-007 (enrôlement 2FA) n'est plus un écran « bloqué » : il est livré comme popup
-    // premium pilotant le TOTP du fournisseur d'identité. Restent bloqués les quatre
-    // parcours dont la politique dépend encore d'UX-DEC-011.
+  it('ne laisse bloqués que les parcours dont la politique n’est pas tranchée', () => {
+    // AUTH-005 (réinitialisation) et AUTH-006 (activation) sont livrés : le titulaire pose
+    // son mot de passe avec un jeton à usage unique. AUTH-004 reste bloqué — la demande
+    // en LIBRE-SERVICE d'un lien suppose un canal d'envoi (courriel, SMS) non livré ;
+    // aujourd'hui le lien est émis par un administrateur.
     const children = authRoutes[0].children ?? [];
     const blocked = children.filter((route) => route.data?.['blockedAuth']);
 
-    expect(blocked).toHaveLength(4);
+    expect(blocked).toHaveLength(2);
     expect(blocked.map((route) => route.data?.['blockedAuth'].screenId)).toEqual([
       'AUTH-003',
       'AUTH-004',
-      'AUTH-005',
-      'AUTH-006',
     ]);
+  });
+
+  it('livre la pose du mot de passe sur les deux routes qui la demandent', () => {
+    const children = authRoutes[0].children ?? [];
+    const routes = children.filter((route) =>
+      ['reset-password', 'activate'].includes(route.path ?? ''),
+    );
+
+    expect(routes).toHaveLength(2);
+    expect(routes.every((route) => route.loadComponent)).toBe(true);
+    // Le drapeau distingue l'activation d'un compte neuf d'une récupération d'accès.
+    expect(routes.map((route) => route.data?.['activation'])).toEqual([false, true]);
   });
 
   it('livre l’enrôlement 2FA comme composant réel, non comme écran bloqué', () => {

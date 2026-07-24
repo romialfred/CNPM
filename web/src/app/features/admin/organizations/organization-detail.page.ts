@@ -9,7 +9,15 @@ import {
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { LucidePencil } from '@lucide/angular';
+import {
+  LucideBanknote,
+  LucideBell,
+  LucideFileText,
+  LucidePencil,
+  LucideReceiptText,
+  LucideRefreshCw,
+  LucideUsers,
+} from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
@@ -28,8 +36,13 @@ import {
   OrganizationAccessError,
   OrganizationNotFoundError,
 } from './organizations-gateway';
+import {
+  buildOrganizationProfile,
+  type ActivityKind,
+  type OrganizationProfile,
+} from './organization-profile';
 
-/** BO-006 — fiche cœur d'une entreprise, sans agrégats intermodules inventés. */
+/** BO-006 — fiche entreprise enrichie et « vivante » (activités, chiffres clés). */
 @Component({
   selector: 'cnpm-organization-detail-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,7 +56,13 @@ import {
     ErrorStateComponent,
     PageHeaderComponent,
     SkeletonComponent,
+    LucideBanknote,
+    LucideBell,
+    LucideFileText,
     LucidePencil,
+    LucideReceiptText,
+    LucideRefreshCw,
+    LucideUsers,
   ],
   templateUrl: './organization-detail.page.html',
   styleUrl: './organization-detail.page.scss',
@@ -105,9 +124,63 @@ export class OrganizationDetailPage {
       { label: 'Raison sociale', value: organization.legalName },
       { label: 'Nom commercial', value: organization.tradeName ?? 'Non renseigné' },
       { label: 'Type d’entreprise', value: organization.organizationType },
-      { label: 'Code secteur', value: organization.sectorCode ?? 'Non renseigné' },
+      { label: 'Secteur d’activité', value: this.sectorLabel(organization.sectorCode) },
     ];
   });
+
+  /** Année civile courante, pour l'ancienneté et le fil d'activité du profil. */
+  private readonly currentYear = new Date().getFullYear();
+
+  /**
+   * Profil enrichi (chiffres clés, activités) — DÉTERMINISTE et illustratif. La bannière de
+   * la page indique clairement qu'il s'agit de données de démonstration, jamais de faits
+   * officiels du registre.
+   */
+  protected readonly profile = computed<OrganizationProfile | null>(() => {
+    const organization = this.organization();
+    return organization ? buildOrganizationProfile(organization, this.currentYear) : null;
+  });
+
+  private readonly SECTOR_LABELS: Readonly<Record<string, string>> = {
+    AGRICULTURE: 'Agriculture',
+    BTP: 'BTP & Génie civil',
+    COMMERCE: 'Commerce',
+    ENERGIE: 'Énergie',
+    FINANCE: 'Finance',
+    INDUSTRIE: 'Industrie',
+    MINES: 'Mines',
+    SANTE: 'Santé',
+    SERVICES: 'Services',
+    TELECOM: 'Télécommunications',
+    TRANSPORT: 'Transport & Logistique',
+    TOURISME: 'Tourisme & Hôtellerie',
+  };
+
+  protected sectorLabel(code: string | null): string {
+    if (!code) {
+      return 'Non renseigné';
+    }
+    return this.SECTOR_LABELS[code.toUpperCase()] ?? code;
+  }
+
+  /** Initiale de l'entreprise pour l'avatar, à défaut de logo. */
+  protected initial(name: string): string {
+    return name.trim().charAt(0).toUpperCase() || '?';
+  }
+
+  /** Date d'activité formatée fr-ML ; à défaut, la valeur brute. */
+  protected activityDate(iso: string): string {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+      return iso;
+    }
+    return new Intl.DateTimeFormat('fr-ML', { dateStyle: 'long' }).format(date);
+  }
+
+  /** Classe de couleur de la pastille d'activité, selon la nature. */
+  protected activityToneClass(kind: ActivityKind): string {
+    return `cnpm-organization-detail__dot--${kind}`;
+  }
 
   constructor() {
     effect(() => {

@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DemoSessionGateway } from '../../../layout/admin-shell/demo-session.gateway';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
 import { OrganizationDetailPage } from './organization-detail.page';
+import { buildOrganizationProfile } from './organization-profile';
 import { OrganizationEditPage } from './organization-edit.page';
 import {
   ORGANIZATIONS_GATEWAY,
@@ -92,13 +93,35 @@ describe('écrans organisations', () => {
     expect(host.querySelector('table caption')?.textContent).toContain('Entreprises');
   });
 
-  it('BO-006 affiche uniquement le cœur contractuel de la fiche', async () => {
+  it('BO-006 rend une fiche enrichie et « vivante », avec activités et données illustratives', async () => {
     const { gateway, host } = await setup(OrganizationDetailPage, ORGANIZATION.id);
     expect(gateway.get).toHaveBeenCalledWith(ORGANIZATION.id);
-    expect(host.textContent).toContain('Identité descriptive');
+    // L'identité vient du registre…
+    expect(host.textContent).toContain(ORGANIZATION.legalName);
     expect(host.textContent).toContain(ORGANIZATION.organizationType);
     expect(host.textContent).toContain('État courant');
+    // …le reste est un profil enrichi, clairement marqué comme démonstration.
+    expect(host.textContent).toContain('Données de démonstration');
+    expect(host.textContent).toContain('Dernières activités');
+    expect(host.textContent).toContain('Membre depuis');
+    expect(host.querySelectorAll('.cnpm-organization-detail__figure').length).toBeGreaterThan(0);
+    // Le fil d'activité porte au moins un événement, avec sa pastille colorée.
+    expect(host.querySelectorAll('.cnpm-organization-detail__event').length).toBeGreaterThan(0);
+    expect(host.querySelector('.cnpm-organization-detail__dot')).not.toBeNull();
+    // Aucun agrégat financier réel n'est présenté comme officiel.
     expect(host.textContent).not.toContain('Montant dû');
+  });
+
+  it('BO-006 produit un profil DÉTERMINISTE — même entreprise, même profil', () => {
+    // La stabilité vaut aussi pour les captures de régression : deux appels doivent rendre
+    // exactement le même profil, et deux entreprises différentes doivent diverger.
+    const profileA = buildOrganizationProfile(ORGANIZATION, 2026);
+    const profileAbis = buildOrganizationProfile(ORGANIZATION, 2026);
+    expect(profileAbis).toEqual(profileA);
+
+    const other = { ...ORGANIZATION, id: 'other-org', legalName: 'Autre Entreprise SARL' };
+    const profileB = buildOrganizationProfile(other, 2026);
+    expect(profileB.keyFigures).not.toEqual(profileA.keyFigures);
   });
 
   it('BO-004 transmet la version chargée au PATCH et conserve le contexte de liste', async () => {

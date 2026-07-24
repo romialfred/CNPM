@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import type { Routes } from '@angular/router';
 import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoMemberContributionsGateway } from './contributions/demo-member-contributions.gateway';
+import { HttpMemberContributionsGateway } from './contributions/http-member-contributions.gateway';
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
 import { DemoMemberDirectoryGateway } from './directory/demo-member-directory.gateway';
 import { MEMBER_DIRECTORY_GATEWAY } from './directory/member-directory.gateway';
@@ -25,7 +26,6 @@ import { MEMBER_SHOWCASE_ANALYTICS_GATEWAY } from './showcase-analytics/member-s
 import { DemoMemberUsersGateway } from './users/demo-member-users.gateway';
 import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
-  UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
   UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
@@ -64,12 +64,15 @@ export const memberRoutes: Routes = [
     path: 'contributions',
     providers: [
       DemoMemberContributionsGateway,
+      HttpMemberContributionsGateway,
       {
+        // Premier écran de l'espace membre raccordé au backend réel : hors démonstration,
+        // les cotisations viennent de `GET /portal/contributions`, bornées au compte connecté.
         provide: MEMBER_CONTRIBUTIONS_GATEWAY,
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoMemberContributionsGateway)
-            : UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
+            : inject(HttpMemberContributionsGateway),
       },
     ],
     children: [

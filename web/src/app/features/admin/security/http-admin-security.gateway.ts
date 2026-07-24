@@ -1,14 +1,16 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, type Observable, throwError } from 'rxjs';
+import { catchError, defer, map, type Observable, tap, throwError } from 'rxjs';
 import { buildCnpmApiUrl, CNPM_API_BASE_URL } from '../../../core/api/api.config';
 import { CnpmApiError } from '../../../core/api/api-problem';
+import { IdempotencyKeyService } from '../../../core/api/idempotency-key.service';
 import {
   type AccountStatus,
   AdminSecurityAccessError,
   type AdminSecurityGateway,
   type AdminSecurityQuery,
   type AdminSecuritySnapshot,
+  type CredentialTokenResult,
   type NewAccountInput,
   type PermissionRow,
   type SecurityAccount,
@@ -19,14 +21,19 @@ import {
  *
  * <p>La lecture ({@code load}) provient de {@code GET /admin/security/snapshot} : le service
  * assemble comptes, rôles et matrice de permissions depuis {@code iam}. La recherche filtre
- * l'instantané côté client (les compteurs restent ceux d'avant recherche). Les mutations
- * (création de compte, statut, réinitialisation 2FA, matrice) ne sont pas raccordées à ce
- * stade : elles échouent explicitement plutôt que de simuler une écriture.
+ * l'instantané côté client (les compteurs restent ceux d'avant recherche).
+ *
+ * <p>Les écritures sur les comptes — création, suspension/réactivation, réinitialisation
+ * du second facteur — sont raccordées aux endpoints dédiés, qui portent l'habilitation,
+ * la transaction et l'audit. La matrice des permissions reste en lecture : aucun endpoint
+ * ne la modifie encore, et l'adaptateur échoue explicitement plutôt que de simuler une
+ * écriture qui n'aurait pas lieu.
  */
 @Injectable()
 export class HttpAdminSecurityGateway implements AdminSecurityGateway {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = inject(CNPM_API_BASE_URL);
+  private readonly idempotencyKeys = inject(IdempotencyKeyService);
 
   load(query: AdminSecurityQuery): Observable<AdminSecuritySnapshot> {
     return this.http
@@ -50,16 +57,81 @@ export class HttpAdminSecurityGateway implements AdminSecurityGateway {
       );
   }
 
+  /**
+   * `POST /admin/security/accounts`. La création est protégée par une clé d'idempotence
+   * portée par l'adresse de connexion : une panne réseau suivie d'un nouvel envoi rejoue
+   * la même commande au lieu d'ouvrir un second compte. Le serveur reste l'autorité —
+   * l'unicité réelle tient à l'adresse, en base.
+   */
   createAccount(input: NewAccountInput): Observable<SecurityAccount> {
-    return this.unavailable(`la création du compte « ${input.email} »`);
+    return defer(() => {
+      const commandId = `admin-security:create-account:${input.email.trim().toLowerCase()}`;
+      const idempotencyKey = this.idempotencyKeys.getOrCreate(commandId);
+      const headers = new HttpHeaders().set('Idempotency-Key', idempotencyKey);
+
+      return this.http
+        .post<SecurityAccount>(buildCnpmApiUrl(this.baseUrl, 'admin/security/accounts'), input, {
+          headers,
+        })
+        .pipe(
+          tap(() => this.idempotencyKeys.release(commandId)),
+          catchError((error: unknown) => {
+            // Une panne temporaire conserve la clé pour un vrai rejeu ; une réponse
+            // terminale (refus, conflit) libère l'intention.
+            if (!(error instanceof CnpmApiError) || !error.retryable) {
+              this.idempotencyKeys.release(commandId);
+            }
+            return throwError(() => this.mapError(error));
+          }),
+        );
+    });
   }
 
-  changeAccountStatus(accountId: string, status: AccountStatus): Observable<SecurityAccount> {
-    return this.unavailable(`le passage du compte ${accountId} au statut ${status}`);
+  changeAccountStatus(
+    accountId: string,
+    status: AccountStatus,
+    reason: string,
+  ): Observable<SecurityAccount> {
+    return this.action(`${accountId}/status`, { status, reason });
   }
 
   resetTwoFactor(accountId: string, reason: string): Observable<SecurityAccount> {
-    return this.unavailable(`la réinitialisation du second facteur du compte ${accountId} (${reason})`);
+    return this.action(`${accountId}/two-factor/reset`, { reason });
+  }
+
+  deleteAccount(accountId: string, reason: string): Observable<void> {
+    return this.http
+      .delete<void>(buildCnpmApiUrl(this.baseUrl, `admin/security/accounts/${accountId}`), {
+        body: { reason },
+      })
+      .pipe(catchError((error: unknown) => throwError(() => this.mapError(error))));
+  }
+
+  issueCredentialToken(accountId: string): Observable<CredentialTokenResult> {
+    return this.http
+      .post<CredentialTokenResult>(
+        buildCnpmApiUrl(this.baseUrl, `admin/security/accounts/${accountId}/password-reset`),
+        {},
+      )
+      .pipe(catchError((error: unknown) => throwError(() => this.mapError(error))));
+  }
+
+  /**
+   * Action sur un compte existant. Ces opérations sont idempotentes par nature côté
+   * serveur — suspendre un compte déjà suspendu ne produit ni changement ni trace — donc
+   * aucune clé d'en-tête n'est nécessaire pour les protéger d'un rejeu.
+   */
+  private action(path: string, body: object): Observable<SecurityAccount> {
+    return this.http
+      .post<SecurityAccount>(buildCnpmApiUrl(this.baseUrl, `admin/security/accounts/${path}`), body)
+      .pipe(catchError((error: unknown) => throwError(() => this.mapError(error))));
+  }
+
+  /** Un refus d'habilitation se dit dans le vocabulaire de l'écran, pas en HTTP brut. */
+  private mapError(error: unknown): unknown {
+    return error instanceof CnpmApiError && error.category === 'authorization'
+      ? new AdminSecurityAccessError()
+      : error;
   }
 
   setPermissionGrant(
@@ -73,12 +145,13 @@ export class HttpAdminSecurityGateway implements AdminSecurityGateway {
   }
 
   /**
-   * Les écritures ne sont pas raccordées à ce stade : on échoue explicitement (en nommant
-   * l'action tentée) plutôt que de simuler une mutation.
+   * Aucun endpoint ne modifie encore la matrice des permissions : on échoue explicitement
+   * (en nommant l'action tentée) plutôt que de simuler une mutation qui n'aurait pas lieu.
    */
   private unavailable<T>(action: string): Observable<T> {
     return throwError(
-      () => new Error(`Action indisponible (${action}) : la gestion des comptes est en lecture seule.`),
+      () =>
+        new Error(`Action indisponible (${action}) : la matrice des droits est en lecture seule.`),
     );
   }
 

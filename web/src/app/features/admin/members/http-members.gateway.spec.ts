@@ -84,6 +84,7 @@ describe('HttpMembersGateway', () => {
         dormant: 3,
         prospects: 2,
         largeContributors: 4,
+        newThisYear: 2,
         expected: 27000000,
         collected: 15300000,
         recoveryRate: 57,

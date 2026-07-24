@@ -14,8 +14,8 @@
         Nouveau compte
       </cnpm-button>
       <p class="cnpm-security__sr" [id]="sensitiveHintId">
-        Les opérations sensibles s’effectuent compte par compte depuis les tableaux ci-dessous :
-        la réinitialisation d’un second facteur exige un motif et produit une trace d’audit.
+        Les opérations sensibles s’effectuent compte par compte depuis les tableaux ci-dessous : la
+        réinitialisation d’un second facteur exige un motif et produit une trace d’audit.
       </p>
     </cnpm-page-header>
 
@@ -62,30 +62,69 @@
               }
             </p>
           </div>
-          @if (supportsSearch()) {
-            <form class="cnpm-security__filter" role="search" (ngSubmit)="applySearch()">
-              <label class="cnpm-security__sr" for="filtre-securite">Rechercher</label>
-              <input
-                id="filtre-securite"
-                class="cnpm-security__input"
-                type="search"
-                name="recherche"
-                autocomplete="off"
-                placeholder="Rechercher un utilisateur…"
-                [ngModel]="searchDraft()"
-                (ngModelChange)="searchDraft.set($event)"
-              />
-            </form>
-          }
+          <!-- Recherche et filtres vivent dans l'URL : une vue filtrée se partage telle
+               quelle et survit à un rechargement. -->
+          <div class="cnpm-security__tools">
+            @if (supportsSearch()) {
+              <form class="cnpm-security__filter" role="search" (ngSubmit)="applySearch()">
+                <label class="cnpm-security__sr" for="filtre-securite">Rechercher</label>
+                <input
+                  id="filtre-securite"
+                  class="cnpm-security__input"
+                  type="search"
+                  name="recherche"
+                  autocomplete="off"
+                  placeholder="Rechercher un utilisateur…"
+                  [ngModel]="searchDraft()"
+                  (ngModelChange)="searchDraft.set($event)"
+                />
+              </form>
+            }
+
+            @if (activeTab() === 'comptes') {
+              <label class="cnpm-security__sr" for="filtre-statut">Filtrer par statut</label>
+              <select
+                id="filtre-statut"
+                class="cnpm-security__input cnpm-security__select"
+                name="statut"
+                [ngModel]="statusFilter()"
+                (ngModelChange)="setStatusFilter($event)"
+              >
+                @for (option of statusFilters; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+
+              <label class="cnpm-security__sr" for="filtre-role">Filtrer par rôle</label>
+              <select
+                id="filtre-role"
+                class="cnpm-security__input cnpm-security__select"
+                name="role"
+                [ngModel]="roleFilter()"
+                (ngModelChange)="setRoleFilter($event)"
+              >
+                <option value="">Tous les rôles</option>
+                @for (option of accountRoleOptions(); track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+
+              @if (hasActiveFilters()) {
+                <cnpm-button variant="tertiary" size="sm" (click)="resetFilters()">
+                  Réinitialiser
+                </cnpm-button>
+              }
+            }
+          </div>
         </div>
 
         @switch (activeTab()) {
           <!-- ======================= Comptes ======================= -->
           @case ('comptes') {
             <cnpm-data-table
-              caption="Comptes de la plateforme, avec leur rôle, leur statut, l’état de leur second facteur, leur dernière connexion et leurs sessions ouvertes."
+              caption="Comptes de la plateforme, avec leur rôle, leur statut et l’état de leur second facteur."
               [columns]="accountColumns"
-              [rows]="accountPreview()"
+              [rows]="filteredAccounts()"
               [state]="tableState()"
               [rowKey]="accountKey"
             >
@@ -98,6 +137,27 @@
                     <span class="cnpm-security__identity">
                       <span class="cnpm-security__identity-name">{{ account.fullName }}</span>
                       <span class="cnpm-security__identity-detail">{{ account.email }}</span>
+                      <!-- Dernière connexion et sessions ouvertes ne prennent plus une colonne
+                           chacune, mais l'information reste exposée sous l'identité. L'absence
+                           de connexion se dit « jamais connecté » : un tiret seul laisserait
+                           croire à une donnée manquante. -->
+                      <span class="cnpm-security__identity-detail cnpm-security__muted">
+                        @if (account.lastLoginLabel) {
+                          Dernière connexion :
+                          <time [attr.datetime]="account.lastLoginAt">
+                            {{ account.lastLoginLabel }}
+                          </time>
+                        } @else {
+                          Jamais connecté
+                        }
+                        @if (account.activeSessions > 0) {
+                          ·
+                          <span class="cnpm-security__count">
+                            {{ account.activeSessions | number }}
+                          </span>
+                          {{ account.activeSessions > 1 ? 'sessions ouvertes' : 'session ouverte' }}
+                        }
+                      </span>
                     </span>
                   </span>
                 </td>
@@ -112,49 +172,69 @@
                     {{ twoFactorLabel(account.twoFactor) }}
                   </cnpm-badge>
                 </td>
-                <!-- L'absence de connexion se dit « jamais connecté », pas une date
-                     nulle : un tiret seul laisserait croire à une donnée manquante. -->
-                <td class="cnpm-table__cell">
-                  @if (account.lastLoginLabel) {
-                    <time class="cnpm-security__moment" [attr.datetime]="account.lastLoginAt">
-                      {{ account.lastLoginLabel }}
-                    </time>
-                  } @else {
-                    <span class="cnpm-security__muted">Jamais connecté</span>
-                  }
-                </td>
+                <!-- Actions en icônes (inspiration SafeX) : compactes, chacune porte un
+                     libellé accessible ; le geste sensible passe toujours par une confirmation. -->
                 <td class="cnpm-table__cell cnpm-table__cell--end">
-                  <span class="cnpm-security__count">{{ account.activeSessions | number }}</span>
-                </td>
-                <td class="cnpm-table__cell">
                   <span class="cnpm-security__row-actions">
                     @if (account.status === 'SUSPENDED') {
-                      <cnpm-button
-                        variant="tertiary"
-                        size="sm"
+                      <button
+                        type="button"
+                        class="cnpm-security__icon-btn cnpm-security__icon-btn--go"
                         (click)="askReactivate(account)"
-                        [accessibleLabel]="'Réactiver le compte de ' + account.fullName"
+                        [attr.aria-label]="'Réactiver le compte de ' + account.fullName"
+                        title="Réactiver"
                       >
-                        Réactiver
-                      </cnpm-button>
+                        <svg lucideUserCheck [size]="iconSize.compact" aria-hidden="true"></svg>
+                      </button>
                     } @else {
-                      <cnpm-button
-                        variant="tertiary"
-                        size="sm"
+                      <button
+                        type="button"
+                        class="cnpm-security__icon-btn cnpm-security__icon-btn--warn"
                         (click)="askSuspend(account)"
-                        [accessibleLabel]="'Suspendre le compte de ' + account.fullName"
+                        [attr.aria-label]="'Suspendre le compte de ' + account.fullName"
+                        title="Suspendre"
                       >
-                        Suspendre
-                      </cnpm-button>
+                        <svg lucideBan [size]="iconSize.compact" aria-hidden="true"></svg>
+                      </button>
                     }
-                    <cnpm-button
-                      variant="tertiary"
-                      size="sm"
+                    <button
+                      type="button"
+                      class="cnpm-security__icon-btn"
                       (click)="askResetTwoFactor(account)"
-                      [accessibleLabel]="'Réinitialiser le second facteur de ' + account.fullName"
+                      [attr.aria-label]="'Réinitialiser le second facteur de ' + account.fullName"
+                      title="Réinitialiser le 2FA"
                     >
-                      Réinit. 2FA
-                    </cnpm-button>
+                      <svg lucideKeyRound [size]="iconSize.compact" aria-hidden="true"></svg>
+                    </button>
+                    <!-- Émission d'un lien d'activation (compte invité) ou de récupération
+                         d'accès. L'administration ne pose jamais le mot de passe : elle ne
+                         fait qu'émettre le lien que le titulaire échange contre son secret. -->
+                    <button
+                      type="button"
+                      class="cnpm-security__icon-btn"
+                      (click)="askIssueCredential(account)"
+                      [attr.aria-label]="
+                        (account.status === 'INVITED'
+                          ? 'Émettre un lien d’activation pour '
+                          : 'Émettre un lien de récupération d’accès pour ') + account.fullName
+                      "
+                      [attr.title]="
+                        account.status === 'INVITED' ? 'Lien d’activation' : 'Lien de récupération'
+                      "
+                    >
+                      <svg lucideSend [size]="iconSize.compact" aria-hidden="true"></svg>
+                    </button>
+                    <!-- Suppression définitive : confirmation avec motif, tracée. Libère
+                         l'adhésion rattachée, qui redevient disponible pour un nouveau compte. -->
+                    <button
+                      type="button"
+                      class="cnpm-security__icon-btn cnpm-security__icon-btn--danger"
+                      (click)="askDelete(account)"
+                      [attr.aria-label]="'Supprimer le compte de ' + account.fullName"
+                      title="Supprimer le compte"
+                    >
+                      <svg lucideTrash2 [size]="iconSize.compact" aria-hidden="true"></svg>
+                    </button>
                   </span>
                 </td>
               </ng-template>
@@ -180,10 +260,10 @@
                     <cnpm-empty-state
                       variant="no-results"
                       title="Aucun compte ne correspond"
-                      description="Élargissez la recherche ou retirez le filtre."
+                      description="Élargissez la recherche ou retirez les filtres de statut et de rôle."
                     >
                       <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
-                        Réinitialiser la recherche
+                        Réinitialiser les filtres
                       </cnpm-button>
                     </cnpm-empty-state>
                   }
@@ -214,80 +294,19 @@
                 }
               </div>
             </cnpm-data-table>
-
-            @if (tableState() === 'ready') {
-              <section class="cnpm-security__matrix-preview" aria-labelledby="apercu-matrice">
-                <div class="cnpm-security__matrix-head">
-                  <div>
-                    <h2 class="cnpm-security__subtitle" id="apercu-matrice">
-                      Matrice des rôles et permissions
-                    </h2>
-                    <p>Aperçu en lecture seule · droits fournis par le backend</p>
-                  </div>
-                  <cnpm-button variant="tertiary" size="sm" (click)="onTabChange('roles')">
-                    Voir la matrice complète
-                  </cnpm-button>
-                </div>
-                <div class="cnpm-security__matrix-scroll" tabindex="0">
-                  <table class="cnpm-security__matrix">
-                    <caption class="cnpm-security__sr">
-                      Aperçu des permissions accordées à chaque rôle
-                    </caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">Permissions</th>
-                        @for (role of roles(); track role.id) {
-                          <th scope="col">{{ role.label }}</th>
-                        }
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (permission of permissionPreview(); track permission.id) {
-                        <tr>
-                          <th scope="row">{{ permission.label }}</th>
-                          @for (grant of permission.grants; track grant.roleId) {
-                            <td>
-                              @if (grant.granted) {
-                                <svg
-                                  lucideCheck
-                                  class="cnpm-security__grant-yes"
-                                  [size]="iconSize.compact"
-                                  aria-hidden="true"
-                                ></svg>
-                              } @else {
-                                <svg
-                                  lucideMinus
-                                  class="cnpm-security__grant-no"
-                                  [size]="iconSize.compact"
-                                  aria-hidden="true"
-                                ></svg>
-                              }
-                              <span class="cnpm-security__sr">
-                                {{ grant.roleLabel }} :
-                                {{ grant.granted ? 'autorisé' : 'non autorisé' }}
-                              </span>
-                            </td>
-                          }
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            }
           }
 
           <!-- ================ Rôles et permissions ================ -->
           @case ('roles') {
             @if (canManagePermissions()) {
               <cnpm-alert tone="info" title="Matrice éditable" [live]="false">
-                Cliquez une cellule pour accorder ou retirer un droit à un rôle. Chaque
-                modification est tracée. Le rôle technique ne reçoit aucun droit financier.
+                Cliquez une cellule pour accorder ou retirer un droit à un rôle. Chaque modification
+                est tracée. Le rôle technique ne reçoit aucun droit financier.
               </cnpm-alert>
             } @else {
               <cnpm-alert tone="info" title="Matrice en lecture seule" [live]="false">
-                Vous n’avez pas le droit de modifier les permissions : elles s’affichent en
-                lecture seule. Le rôle technique ne reçoit aucun droit financier.
+                Vous n’avez pas le droit de modifier les permissions : elles s’affichent en lecture
+                seule. Le rôle technique ne reçoit aucun droit financier.
               </cnpm-alert>
             }
 
@@ -643,53 +662,6 @@
           }
         }
       </div>
-
-      <!-- Panneau de synthèse. Ses chiffres viennent de la même source que les
-           tableaux ; aucun n'est recalculé ici. -->
-      @if (data()) {
-        <aside class="cnpm-security__aside">
-          <cnpm-insight-summary
-            title="Posture des comptes"
-            headingId="synthese-securite"
-            [stats]="postureStats()"
-            note="Comptes actifs, suspendus et invités composent les comptes ouverts. Les sessions expirées ne sont pas comptées comme ouvertes."
-          />
-
-          <section class="cnpm-security__card" aria-labelledby="politique-securite">
-            <h2 class="cnpm-security__card-title" id="politique-securite">Politique appliquée</h2>
-            <cnpm-definition-list [items]="policy()" />
-            <!-- La politique réelle n'est pas arbitrée : `CLAUDE.md` interdit d'inventer
-                 une règle, et `documentation.md` impose de marquer toute hypothèse. -->
-            <p class="cnpm-security__card-note">
-              Valeurs à confirmer par la politique de sécurité approuvée. Aucun
-              mot de passe, jeton, code à usage unique ni empreinte de session n’est affiché sur cet
-              écran.
-            </p>
-          </section>
-
-          <section class="cnpm-security__card" aria-labelledby="alertes-audit">
-            <div class="cnpm-security__card-head">
-              <h2 class="cnpm-security__card-title" id="alertes-audit">Alertes d’audit récentes</h2>
-              <cnpm-button variant="tertiary" size="sm" (click)="onTabChange('audit')">
-                Voir tout
-              </cnpm-button>
-            </div>
-            <ul class="cnpm-security__audit-list">
-              @for (entry of audit().slice(0, 4); track entry.id) {
-                <li>
-                  <cnpm-badge [tone]="auditOutcomeTone(entry.outcome)">
-                    {{ auditOutcomeLabel(entry.outcome) }}
-                  </cnpm-badge>
-                  <span>
-                    <strong>{{ entry.action }}</strong>
-                    <small>{{ entry.target }} · {{ entry.occurredAtLabel }}</small>
-                  </span>
-                </li>
-              }
-            </ul>
-          </section>
-        </aside>
-      }
     </div>
   </div>
 
@@ -704,41 +676,122 @@
   >
     <p class="cnpm-security__confirm-text">{{ actionMessage() }}</p>
 
-    @if (pendingAction()?.kind === 'reset2fa') {
-      <!-- Motif OBLIGATOIRE : consigné dans la trace d'audit (BO-030). Le bouton de
-           confirmation reste bloqué tant qu'il n'est pas renseigné. -->
-      <div class="cnpm-security__reason">
-        <label for="reset-2fa-reason">Motif de la réinitialisation (obligatoire)</label>
-        <textarea
-          #reasonField
-          id="reset-2fa-reason"
-          rows="3"
-          maxlength="240"
-          [value]="resetReason()"
-          (input)="updateResetReason(reasonField.value)"
-          aria-required="true"
-          [attr.aria-invalid]="resetReasonValid() ? null : 'true'"
-          aria-describedby="reset-2fa-reason-hint"
-          placeholder="Ex. demande du membre après perte de son téléphone"
-        ></textarea>
-        <p id="reset-2fa-reason-hint" class="cnpm-security__reason-hint">
-          Le motif est consigné dans le journal d’audit, corrélé à cette action.
-        </p>
-      </div>
-    }
+    <!-- Motif OBLIGATOIRE pour les trois gestes : consigné dans la trace d'audit (BO-030).
+         Le bouton de confirmation reste bloqué tant qu'il n'est pas renseigné. -->
+    <div class="cnpm-security__reason">
+      <label for="action-reason">{{ actionReasonLabel() }}</label>
+      <textarea
+        #reasonField
+        id="action-reason"
+        rows="3"
+        maxlength="240"
+        [value]="actionReason()"
+        (input)="updateActionReason(reasonField.value)"
+        aria-required="true"
+        [attr.aria-invalid]="actionReasonValid() ? null : 'true'"
+        aria-describedby="action-reason-hint"
+        [attr.placeholder]="actionReasonPlaceholder()"
+      ></textarea>
+      <p id="action-reason-hint" class="cnpm-security__reason-hint">
+        Le motif est consigné dans le journal d’audit, corrélé à cette action.
+      </p>
+    </div>
 
     <ng-container cnpm-dialog-footer>
       <cnpm-button variant="secondary" (click)="cancelAction()" [disabled]="actioning()">
         Annuler
       </cnpm-button>
       <cnpm-button
-        variant="primary"
+        [variant]="actionIsDestructive() ? 'danger' : 'primary'"
         (click)="confirmAction()"
         [loading]="actioning()"
-        [disabled]="pendingAction()?.kind === 'reset2fa' && !resetReasonValid()"
+        [disabled]="!actionReasonValid()"
       >
         {{ actionConfirmLabel() }}
       </cnpm-button>
+    </ng-container>
+  </cnpm-dialog>
+
+  <!-- Confirmation avant d'émettre un lien d'accès. Geste réversible (un nouveau lien
+       annule le précédent) mais non anodin : on le confirme tout de même. -->
+  <cnpm-dialog
+    [open]="credentialCandidate() !== null"
+    [title]="
+      credentialIsActivation() ? 'Émettre un lien d’activation' : 'Émettre un lien de récupération'
+    "
+    eyebrow="Gestion des utilisateurs"
+    [dismissible]="!issuingCredential()"
+    (dismiss)="cancelIssueCredential()"
+  >
+    <p class="cnpm-security__confirm-text">
+      @if (credentialIsActivation()) {
+        Un lien à usage unique sera généré pour
+        <strong>{{ credentialCandidate()?.fullName }}</strong> afin qu’il choisisse lui-même son mot
+        de passe. Vous ne verrez jamais ce mot de passe.
+      } @else {
+        Un lien à usage unique sera généré pour
+        <strong>{{ credentialCandidate()?.fullName }}</strong> afin qu’il définisse un nouveau mot
+        de passe. Le lien annule tout lien précédent encore valable.
+      }
+    </p>
+
+    <ng-container cnpm-dialog-footer>
+      <cnpm-button
+        variant="secondary"
+        (click)="cancelIssueCredential()"
+        [disabled]="issuingCredential()"
+      >
+        Annuler
+      </cnpm-button>
+      <cnpm-button
+        variant="primary"
+        (click)="confirmIssueCredential()"
+        [loading]="issuingCredential()"
+      >
+        Émettre le lien
+      </cnpm-button>
+    </ng-container>
+  </cnpm-dialog>
+
+  <!-- Affichage du lien produit. Montré UNE SEULE FOIS : le serveur n'en garde que
+       l'empreinte, il ne pourra pas être relu. -->
+  <cnpm-dialog
+    [open]="issuedCredential() !== null"
+    [title]="
+      issuedCredential()?.activation ? 'Lien d’activation émis' : 'Lien de récupération émis'
+    "
+    eyebrow="Gestion des utilisateurs"
+    [dismissible]="true"
+    (dismiss)="closeIssuedCredential()"
+  >
+    @if (issuedCredential(); as issued) {
+      <p class="cnpm-security__confirm-text">
+        Transmettez ce lien à <strong>{{ issued.accountName }}</strong> par un canal sûr. Il expire
+        le {{ issued.expiresAtLabel }} et ne fonctionnera qu’une fois.
+      </p>
+
+      <label class="cnpm-security__sr" for="lien-credential">Lien à transmettre</label>
+      <div class="cnpm-security__link-row">
+        <input
+          id="lien-credential"
+          class="cnpm-security__input cnpm-security__link-input"
+          type="text"
+          readonly
+          [value]="issued.link"
+        />
+        <cnpm-button variant="secondary" size="sm" (click)="copyIssuedLink()">
+          {{ linkCopied() ? 'Copié' : 'Copier' }}
+        </cnpm-button>
+      </div>
+
+      <p class="cnpm-security__card-note">
+        Ce lien ne sera plus affiché après la fermeture de cette fenêtre. Le mot de passe est choisi
+        par le titulaire du compte ; il n’apparaît nulle part côté administration.
+      </p>
+    }
+
+    <ng-container cnpm-dialog-footer>
+      <cnpm-button variant="primary" (click)="closeIssuedCredential()">Fermer</cnpm-button>
     </ng-container>
   </cnpm-dialog>
 </cnpm-admin-shell>

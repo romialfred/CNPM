@@ -49,9 +49,18 @@ public class MemberOverviewService {
         long collected = money == null ? 0 : money[1].longValue();
         Integer recoveryRate = expected > 0 ? (int) Math.round(collected * 100.0 / expected) : null;
 
+        // Nouvelles adhésions de l'année civile en cours (base : actifs et dormants). La date
+        // vient du read model reporting ; l'année de référence est celle du serveur, pas une
+        // constante figée, pour que la tuile suive l'exercice courant.
+        Long newThisYear = jdbc.queryForObject(
+                "SELECT count(*) FROM reporting.recent_memberships"
+                        + " WHERE status IN ('ACTIVE', 'DORMANT')"
+                        + " AND extract(year FROM joined_at) = extract(year FROM current_date)",
+                Long.class);
+
         MemberOverviewView.Overview overview = new MemberOverviewView.Overview(
                 active + dormant, active, dormant, prospects, large == null ? 0 : large,
-                expected, collected, recoveryRate);
+                newThisYear == null ? 0 : newThisYear, expected, collected, recoveryRate);
 
         List<String> categories = jdbc.query(
                 "SELECT category_code FROM reporting.member_category_counts ORDER BY category_code",

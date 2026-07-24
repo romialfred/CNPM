@@ -80,12 +80,14 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     const actif = initial.accounts.find((account) => account.status === 'ACTIVE');
     if (!actif) throw new Error('compte actif attendu dans la démo');
 
-    const suspendu = await firstValueFrom(gateway.changeAccountStatus(actif.id, 'SUSPENDED'));
+    const suspendu = await firstValueFrom(
+      gateway.changeAccountStatus(actif.id, 'SUSPENDED', 'Départ de l’organisation'),
+    );
     expect(suspendu.status).toBe('SUSPENDED');
     const apresSuspension = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));
     expect(apresSuspension.accounts.find((a) => a.id === actif.id)?.status).toBe('SUSPENDED');
 
-    await firstValueFrom(gateway.changeAccountStatus(actif.id, 'ACTIVE'));
+    await firstValueFrom(gateway.changeAccountStatus(actif.id, 'ACTIVE', 'Retour de mission'));
     const apresReactivation = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));
     expect(apresReactivation.accounts.find((a) => a.id === actif.id)?.status).toBe('ACTIVE');
   });
@@ -116,6 +118,46 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     await expect(
       firstValueFrom(gateway.resetTwoFactor('compte-inexistant', 'motif quelconque')),
     ).rejects.toThrow();
+    await expect(
+      firstValueFrom(gateway.issueCredentialToken('compte-inexistant')),
+    ).rejects.toThrow();
+  });
+
+  it('émet un lien d’activation pour un compte invité et le trace', async () => {
+    const gateway = new DemoAdminSecurityGateway();
+    // Un compte fraîchement créé est « invité » : c'est le cas d'activation.
+    const invite = await firstValueFrom(
+      gateway.createAccount({
+        accountType: 'PROFESSIONAL',
+        firstName: 'Nouveau',
+        lastName: 'Compte',
+        email: 'nouveau.compte@cnpm.example',
+        roleId: 'admin-technique',
+      }),
+    );
+    expect(invite.status).toBe('INVITED');
+
+    const result = await firstValueFrom(gateway.issueCredentialToken(invite.id));
+    // Un compte invité n'a jamais eu de mot de passe : c'est une activation, pas une
+    // « réinitialisation ».
+    expect(result.activation).toBe(true);
+    expect(result.token).toBeTruthy();
+    expect(result.expiresAt).toBeTruthy();
+
+    const apres = await firstValueFrom(gateway.load({ tab: 'audit', search: '' }));
+    const trace = apres.audit.find((entry) => entry.action.includes('lien d’activation'));
+    expect(trace).toBeDefined();
+    expect(trace?.correlationId.startsWith('CNPM-AUD-LNK-')).toBe(true);
+  });
+
+  it('émet un lien de récupération pour un compte déjà actif', async () => {
+    const gateway = new DemoAdminSecurityGateway();
+    const initial = await firstValueFrom(gateway.load({ tab: 'comptes', search: '' }));
+    const actif = initial.accounts.find((account) => account.status === 'ACTIVE');
+    if (!actif) throw new Error('compte actif attendu dans la démo');
+
+    const result = await firstValueFrom(gateway.issueCredentialToken(actif.id));
+    expect(result.activation).toBe(false);
   });
 
   it('déclare la matrice éditable et persiste l’accord puis le retrait d’un droit', async () => {
@@ -153,7 +195,9 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
 
   it('rejette l’édition d’une permission inconnue', async () => {
     await expect(
-      firstValueFrom(new DemoAdminSecurityGateway().setPermissionGrant('inconnue', 'auditeur', true)),
+      firstValueFrom(
+        new DemoAdminSecurityGateway().setPermissionGrant('inconnue', 'auditeur', true),
+      ),
     ).rejects.toThrow();
   });
 });

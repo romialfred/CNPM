@@ -63,7 +63,11 @@ public class SecurityConfig {
         // y sont vérifiés ; l'accès aux autres routes reste refusé par défaut. /auth/me, lui,
         // reste protégé (il projette une identité déjà authentifiée).
         "/auth/login",
-        "/auth/mfa/**"
+        "/auth/mfa/**",
+        // Pose du mot de passe sur présentation d'un jeton à usage unique (ENR étape 18,
+        // PRT-001). C'est le jeton qui autorise : exiger une session ici rendrait la
+        // récupération d'accès impossible, précisément pour qui l'a perdu.
+        "/auth/password"
     };
 
     @Bean

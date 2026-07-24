@@ -76,17 +76,18 @@
   padding-right: var(--cnpm-space-2);
 }
 
-/* En-tête épuré : pas de fond teinté, micro-libellés en capitales discrètes, séparé du
-   corps par un filet un cran plus marqué que ceux des lignes. Sur une seule ligne : le
-   débordement éventuel est absorbé par le conteneur défilant, jamais par la page. */
+/* En-tête épuré : casse normale (demande du commanditaire — plus lisible que des
+   capitales), séparé du corps par un filet un cran plus marqué que ceux des lignes. Sur
+   une seule ligne : le débordement éventuel est absorbé par le conteneur défilant, jamais
+   par la page. */
 .cnpm-table__head .cnpm-table__cell {
   padding-block: var(--cnpm-space-3);
   background-color: transparent;
-  color: var(--cnpm-color-text-muted);
+  color: var(--cnpm-color-text-secondary);
   font-weight: var(--cnpm-font-weight-semibold);
-  font-size: var(--cnpm-font-size-xs);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  text-transform: uppercase;
+  font-size: var(--cnpm-font-size-sm);
+  letter-spacing: normal;
+  text-transform: none;
   vertical-align: middle;
   white-space: nowrap;
   border-bottom: 1px solid var(--cnpm-color-border-default);

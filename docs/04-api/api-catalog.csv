@@ -1,6 +1,11 @@
 ﻿Méthode;Chemin;Tag;Operation ID;Finalité
 GET;/auth/me;AUTH;getCurrentUser;Lire le profil, les rôles et le périmètre courant.
 POST;/auth/step-up;AUTH;requestStepUp;Déclencher une authentification renforcée.
+POST;/auth/login;AUTH;submitNativeCredentials;Etape identifiants de l authentification native.
+POST;/auth/password;AUTH;setAccountPassword;Poser son mot de passe avec un jeton a usage unique.
+POST;/auth/mfa/enroll/start;AUTH;startTotpEnrollment;Commencer l enrolement du second facteur.
+POST;/auth/mfa/enroll/confirm;AUTH;confirmTotpEnrollment;Activer le second facteur avec le premier code.
+POST;/auth/mfa/verify;AUTH;verifyTotpCode;Verifier le second facteur et ouvrir la session.
 GET;/reference-values;ADMIN;listReferenceValues;Lister les valeurs de référentiel.
 POST;/reference-values;ADMIN;createReferenceValue;Créer une valeur de référentiel.
 PATCH;/reference-values/{id};ADMIN;updateReferenceValue;Mettre à jour une valeur de référentiel.
@@ -48,6 +53,7 @@ POST;/recovery-cases/{id}/actions;RECOVERY;recordRecoveryAction;Tracer une actio
 POST;/recovery-cases/{id}/promises;RECOVERY;createPromiseToPay;Enregistrer une promesse.
 GET;/portal/dashboard;PORTAL;getMemberDashboard;Afficher la synthèse membre.
 GET;/portal/contributions;PORTAL;getMemberContributions;Afficher cotisations et soldes.
+GET;/portal/contributions/{contributionId};PORTAL;getMemberContributionDetail;Afficher le detail d un appel de cotisation.
 GET;/portal/payments;PORTAL;getMemberPayments;Afficher paiements et statuts.
 GET;/portal/documents;PORTAL;getMemberDocuments;Afficher reçus et attestations.
 GET;/service-requests;REQUEST;listServiceRequests;Lister les requêtes.
@@ -82,3 +88,8 @@ GET;/public/highlights;REPORT;getPublicHighlights;Chiffres clés publics de l’
 GET;/organizations/{id}/member-detail;MEMBER;getMemberDetail;Restituer la fiche membre 360°.
 GET;/reporting/member-overview;MEMBER;getMemberOverview;Restituer la synthèse du répertoire des membres.
 GET;/admin/security/snapshot;ADMIN;getAdminSecuritySnapshot;Restituer l instantane Administration et securite.
+POST;/admin/security/accounts;ADMIN;createAdminSecurityAccount;Creer un compte de la plateforme.
+POST;/admin/security/accounts/{accountId}/status;ADMIN;changeAdminSecurityAccountStatus;Suspendre ou reactiver un compte.
+DELETE;/admin/security/accounts/{accountId};ADMIN;deleteAdminSecurityAccount;Supprimer un compte de la plateforme.
+POST;/admin/security/accounts/{accountId}/password-reset;ADMIN;issueAccountCredentialToken;Emettre un lien d activation ou de recuperation d acces.
+POST;/admin/security/accounts/{accountId}/two-factor/reset;ADMIN;resetAdminSecurityAccountTwoFactor;Reinitialiser le second facteur d un compte.

@@ -1,8 +1,9 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { LucideBuilding2, LucideEye, LucideLayers, LucidePencil } from '@lucide/angular';
+import { LucideEye, LucidePencil } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -18,10 +19,6 @@ import {
   type FilterChip,
 } from '../../../design-system/filter-bar/filter-bar.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
-import {
-  InsightSummaryComponent,
-  type InsightStat,
-} from '../../../design-system/insight-summary/insight-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
@@ -38,11 +35,17 @@ const DEFAULT_PAGE_SIZE = 10;
 const KNOWN_STATUSES = ['ACTIVE', 'DORMANT', 'PROSPECT'] as const;
 const SORT_KEYS = new Set(['legalName', 'status']);
 
+/** Géométrie du donut, alignée sur le tableau de bord. */
+const DONUT_RADIUS = 52;
+const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
+const DONUT_GAP = 4;
+
 /** BO-005 — liste paginée des entreprises, partageable par son URL. */
 @Component({
   selector: 'cnpm-organizations-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    DecimalPipe,
     FormsModule,
     RouterLink,
     AdminShellComponent,
@@ -52,7 +55,6 @@ const SORT_KEYS = new Set(['legalName', 'status']);
     EmptyStateComponent,
     ErrorStateComponent,
     FilterBarComponent,
-    InsightSummaryComponent,
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
@@ -71,16 +73,6 @@ export class OrganizationsPage {
   protected readonly pageSizes = PAGE_SIZES;
   protected readonly statuses = KNOWN_STATUSES;
   protected readonly filtersExpanded = signal(true);
-
-  /**
-   * Pictogrammes des panneaux de synthèse. On passe la donnée d'icône (`.icon`) et non
-   * une chaîne : ce dépôt n'installe pas le registre nom → icône de `@lucide/angular`,
-   * et une chaîne y lèverait « Unable to resolve icon » à l'exécution.
-   */
-  protected readonly panelIcons = {
-    statut: LucideBuilding2.icon,
-    secteur: LucideLayers.icon,
-  } as const;
 
   private readonly params = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
@@ -202,26 +194,58 @@ export class OrganizationsPage {
     return `Portée : ${shown} ${noun} sur cette page, sur ${total} au total.`;
   });
 
-  protected readonly statusStats = computed<readonly InsightStat[]>(() => {
+  /** Rayon du donut, aligné sur celui du tableau de bord pour un rendu homogène. */
+  protected readonly donutRadius = DONUT_RADIUS;
+
+  /**
+   * Répartition par statut, rendue en donut. Chaque segment porte sa part (0–100) et une
+   * clé de couleur ; le total au centre est le nombre d'entreprises de la page.
+   */
+  protected readonly statusSegments = computed(() => {
     const rows = this.rows();
     const total = rows.length;
-    const stats: InsightStat[] = KNOWN_STATUSES.map(
-      (status): InsightStat => ({
-        label: this.statusLabel(status),
-        value: rows.filter((organization) => organization.status === status).length,
-        display: 'barre',
-        barMax: total,
+    return {
+      total,
+      segments: KNOWN_STATUSES.map((status) => {
+        const count = rows.filter((organization) => organization.status === status).length;
+        return {
+          key: status.toLowerCase(),
+          label: this.statusLabel(status),
+          count,
+          percent: total > 0 ? Math.round((count / total) * 100) : 0,
+        };
       }),
-    );
-    const known = stats.reduce((sum, stat) => sum + (stat.value ?? 0), 0);
-    const others = total - known;
-    if (others > 0) {
-      stats.push({ label: 'Autres', value: others, display: 'barre', barMax: total, apart: true });
-    }
-    return stats;
+    };
   });
 
-  protected readonly sectorStats = computed<readonly InsightStat[]>(() => {
+  /** Arcs SVG du donut, calculés comme au tableau de bord (vide de séparation compris). */
+  protected readonly statusArcs = computed(() => {
+    const { segments } = this.statusSegments();
+    const total = segments.reduce((sum, segment) => sum + segment.count, 0);
+    if (total === 0) {
+      return [];
+    }
+    let start = 0;
+    return segments
+      .filter((segment) => segment.count > 0)
+      .map((segment) => {
+        const length = (segment.count / total) * DONUT_CIRCUMFERENCE;
+        const visible = Math.max(0, length - DONUT_GAP);
+        const arc = {
+          key: segment.key,
+          dashArray: `${visible} ${DONUT_CIRCUMFERENCE - visible}`,
+          dashOffset: -start,
+        };
+        start += length;
+        return arc;
+      });
+  });
+
+  /**
+   * Principaux secteurs : nom, effectif, part et une couleur distincte par rang. La barre
+   * situe la part face au plus gros secteur, la valeur restant lue en clair et en pourcent.
+   */
+  protected readonly sectorBars = computed(() => {
     const rows = this.rows();
     const total = rows.length;
     const counts = new Map<string, number>();
@@ -229,14 +253,23 @@ export class OrganizationsPage {
       const label = this.sectorLabel(organization.sectorCode);
       counts.set(label, (counts.get(label) ?? 0) + 1);
     }
-    return [...counts.entries()]
-      .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0], 'fr'))
-      .slice(0, 5)
-      .map(([label, value]): InsightStat => ({ label, value, display: 'barre', barMax: total }));
+    const ranked = [...counts.entries()].sort(
+      (left, right) => right[1] - left[1] || left[0].localeCompare(right[0], 'fr'),
+    );
+    const max = ranked.length > 0 ? ranked[0][1] : 0;
+    return ranked.slice(0, 5).map(([label, value], index) => ({
+      label,
+      value,
+      percent: total > 0 ? Math.round((value / total) * 100) : 0,
+      // Largeur de barre relative au plus gros secteur, pour que le premier remplisse la piste.
+      fill: max > 0 ? Math.round((value / max) * 100) : 0,
+      colorIndex: index % 5,
+    }));
   });
 
   protected readonly columns: readonly DataTableColumn[] = [
     { key: 'legalName', label: 'Entreprise', sortable: true },
+    { key: 'tradeName', label: 'Sigle' },
     { key: 'organizationType', label: 'Type' },
     { key: 'sectorCode', label: 'Secteur' },
     { key: 'status', label: 'Statut', sortable: true },
@@ -429,7 +462,10 @@ const SECTOR_IMAGE_KEYWORDS: Readonly<Record<string, string>> = {
 };
 
 function normalizeSectorCode(value: string): string {
-  return value.trim().toUpperCase().replace(/^SECTEUR[_ ]+/, '');
+  return value
+    .trim()
+    .toUpperCase()
+    .replace(/^SECTEUR[_ ]+/, '');
 }
 
 function titleCaseWords(value: string): string {

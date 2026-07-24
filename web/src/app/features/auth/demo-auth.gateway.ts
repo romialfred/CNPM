@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { delay, from, Observable, of } from 'rxjs';
+import { delay, from, Observable, of, throwError } from 'rxjs';
 import {
   buildOtpauthUri,
   formatManualKey,
@@ -95,15 +95,13 @@ export class DemoAuthGateway implements AuthGateway {
     this.activeSecret = secret;
     const account = DemoAuthGateway.DEMO_EMAIL;
     const otpauthUri = buildOtpauthUri({ issuer: 'CNPM', account, secret });
-    const enrollment$ = renderOtpauthQr(otpauthUri).then(
-      (qrImage): TotpEnrollment => ({
-        enrollmentId: DemoAuthGateway.ENROLLMENT_ID,
-        qrImage,
-        manualKey: formatManualKey(secret),
-        issuer: 'CNPM',
-        account,
-      }),
-    );
+    const enrollment$ = renderOtpauthQr(otpauthUri).then((qrImage): TotpEnrollment => ({
+      enrollmentId: DemoAuthGateway.ENROLLMENT_ID,
+      qrImage,
+      manualKey: formatManualKey(secret),
+      issuer: 'CNPM',
+      account,
+    }));
     return from(enrollment$).pipe(delay(DemoAuthGateway.LATENCY_MS));
   }
 
@@ -131,5 +129,17 @@ export class DemoAuthGateway implements AuthGateway {
       };
     })();
     return from(activation$).pipe(delay(DemoAuthGateway.LATENCY_MS));
+  }
+
+  /**
+   * En démonstration, aucun jeton n'a été émis par un serveur : on accepte tout jeton non
+   * vide, mais on applique la MÊME longueur minimale que le serveur. Un formulaire plus
+   * permissif ici donnerait une fausse assurance à la recette.
+   */
+  setPassword(token: string, password: string): Observable<void> {
+    if (!token.trim() || password.trim().length < 12) {
+      return throwError(() => new Error('Lien ou mot de passe invalide.'));
+    }
+    return of(undefined).pipe(delay(DemoAuthGateway.LATENCY_MS));
   }
 }

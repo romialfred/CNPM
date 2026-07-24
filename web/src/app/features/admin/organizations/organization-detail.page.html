@@ -57,47 +57,146 @@
       }
       @case ('ready') {
         @if (organization(); as organization) {
-          <cnpm-alert tone="info" title="Périmètre de la fiche">
-            Cette vue présente le cœur contractuel de l’entreprise. Les contacts disposent de leur
-            parcours dédié ; l’adhésion, l’historique et les données financières restent séparés.
-          </cnpm-alert>
-
-          <div class="cnpm-organization-detail__grid">
+          @if (profile(); as profile) {
+            <!-- HÉROS : identité, secteur, statut et signature. -->
             <section
-              class="cnpm-organization-detail__card"
-              aria-labelledby="organization-identity-title"
+              class="cnpm-organization-detail__hero"
+              aria-label="Présentation de l’entreprise"
             >
-              <h2 id="organization-identity-title">Identité descriptive</h2>
-              <cnpm-definition-list [items]="facts()" />
-            </section>
-
-            <aside
-              class="cnpm-organization-detail__card"
-              aria-labelledby="organization-state-title"
-            >
-              <h2 id="organization-state-title">État courant</h2>
-              <div class="cnpm-organization-detail__badges">
-                <div>
-                  <span>Statut</span>
-                  <cnpm-badge [tone]="statusTone(organization.status)">{{
-                    statusLabel(organization.status)
-                  }}</cnpm-badge>
-                </div>
-                <div>
-                  <span>Niveau de risque</span>
-                  <cnpm-badge [tone]="riskTone(organization.riskLevel)">{{
-                    riskLabel(organization.riskLevel)
-                  }}</cnpm-badge>
+              <span class="cnpm-organization-detail__avatar" aria-hidden="true">
+                {{ initial(organization.legalName) }}
+              </span>
+              <div class="cnpm-organization-detail__hero-body">
+                <p class="cnpm-organization-detail__eyebrow">
+                  {{ sectorLabel(organization.sectorCode) }} · {{ organization.organizationType }}
+                </p>
+                <h2 class="cnpm-organization-detail__hero-name">
+                  {{ organization.legalName }}
+                  @if (organization.tradeName) {
+                    <span class="cnpm-organization-detail__hero-trade">
+                      {{ organization.tradeName }}
+                    </span>
+                  }
+                </h2>
+                <p class="cnpm-organization-detail__tagline">{{ profile.tagline }}</p>
+                <div class="cnpm-organization-detail__hero-badges">
+                  <cnpm-badge [tone]="statusTone(organization.status)">
+                    {{ statusLabel(organization.status) }}
+                  </cnpm-badge>
+                  <cnpm-badge [tone]="riskTone(organization.riskLevel)">
+                    Risque {{ riskLabel(organization.riskLevel) }}
+                  </cnpm-badge>
+                  <span class="cnpm-organization-detail__since">
+                    Membre depuis {{ profile.foundedYear }}
+                  </span>
                 </div>
               </div>
-              <p>
-                Version de la fiche&nbsp;: <strong>{{ organization.version }}</strong>
-              </p>
-              <p class="cnpm-organization-detail__note">
-                Le statut et le risque ne sont pas modifiables depuis le formulaire descriptif.
-              </p>
-            </aside>
-          </div>
+            </section>
+
+            <cnpm-alert tone="info" title="Données de démonstration">
+              Les chiffres clés et le fil d’activité ci-dessous sont illustratifs, en attendant le
+              flux réel du backend. L’identité provient du registre.
+            </cnpm-alert>
+
+            <!-- CHIFFRES CLÉS -->
+            <ul class="cnpm-organization-detail__figures" aria-label="Chiffres clés">
+              @for (figure of profile.keyFigures; track figure.key) {
+                <li class="cnpm-organization-detail__figure">
+                  <p class="cnpm-organization-detail__figure-label">{{ figure.label }}</p>
+                  <p class="cnpm-organization-detail__figure-value">{{ figure.value }}</p>
+                  <p class="cnpm-organization-detail__figure-caption">{{ figure.caption }}</p>
+                </li>
+              }
+            </ul>
+
+            <div class="cnpm-organization-detail__grid">
+              <!-- FIL D'ACTIVITÉ (page vivante) -->
+              <section
+                class="cnpm-organization-detail__card"
+                aria-labelledby="organization-activity-title"
+              >
+                <h2 id="organization-activity-title">Dernières activités</h2>
+                <ol class="cnpm-organization-detail__timeline">
+                  @for (activity of profile.activities; track $index) {
+                    <li class="cnpm-organization-detail__event">
+                      <span
+                        class="cnpm-organization-detail__dot {{ activityToneClass(activity.kind) }}"
+                        aria-hidden="true"
+                      >
+                        @switch (activity.kind) {
+                          @case ('payment') {
+                            <svg lucideBanknote [size]="iconSize.compact"></svg>
+                          }
+                          @case ('receipt') {
+                            <svg lucideReceiptText [size]="iconSize.compact"></svg>
+                          }
+                          @case ('reminder') {
+                            <svg lucideBell [size]="iconSize.compact"></svg>
+                          }
+                          @case ('update') {
+                            <svg lucideRefreshCw [size]="iconSize.compact"></svg>
+                          }
+                          @case ('document') {
+                            <svg lucideFileText [size]="iconSize.compact"></svg>
+                          }
+                          @case ('meeting') {
+                            <svg lucideUsers [size]="iconSize.compact"></svg>
+                          }
+                        }
+                      </span>
+                      <div class="cnpm-organization-detail__event-body">
+                        <p class="cnpm-organization-detail__event-title">{{ activity.title }}</p>
+                        <p class="cnpm-organization-detail__event-detail">{{ activity.detail }}</p>
+                        <time
+                          class="cnpm-organization-detail__event-date"
+                          [attr.datetime]="activity.date"
+                        >
+                          {{ activityDate(activity.date) }}
+                        </time>
+                      </div>
+                    </li>
+                  }
+                </ol>
+              </section>
+
+              <div class="cnpm-organization-detail__side">
+                <!-- PRÉSENTATION + IDENTITÉ -->
+                <section
+                  class="cnpm-organization-detail__card"
+                  aria-labelledby="organization-identity-title"
+                >
+                  <h2 id="organization-identity-title">Présentation</h2>
+                  <p class="cnpm-organization-detail__presentation">{{ profile.presentation }}</p>
+                  <cnpm-definition-list [items]="facts()" />
+                </section>
+
+                <!-- ÉTAT COURANT -->
+                <section
+                  class="cnpm-organization-detail__card"
+                  aria-labelledby="organization-state-title"
+                >
+                  <h2 id="organization-state-title">État courant</h2>
+                  <div class="cnpm-organization-detail__badges">
+                    <div>
+                      <span>Statut</span>
+                      <cnpm-badge [tone]="statusTone(organization.status)">{{
+                        statusLabel(organization.status)
+                      }}</cnpm-badge>
+                    </div>
+                    <div>
+                      <span>Niveau de risque</span>
+                      <cnpm-badge [tone]="riskTone(organization.riskLevel)">{{
+                        riskLabel(organization.riskLevel)
+                      }}</cnpm-badge>
+                    </div>
+                  </div>
+                  <p class="cnpm-organization-detail__note">
+                    Le statut et le risque ne sont pas modifiables depuis le formulaire descriptif.
+                  </p>
+                </section>
+              </div>
+            </div>
+          }
         }
       }
     }

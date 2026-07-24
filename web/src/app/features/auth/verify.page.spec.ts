@@ -40,6 +40,10 @@ class StubGateway implements AuthGateway {
   activateTotp() {
     return of({ outcome: 'activated', redirectTo: '/' } as const);
   }
+
+  setPassword() {
+    return of(undefined);
+  }
 }
 
 describe('VerifyPage (AUTH-001 — 2FA)', () => {

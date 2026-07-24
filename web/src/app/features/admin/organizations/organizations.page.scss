@@ -190,6 +190,18 @@
   color: var(--cnpm-color-text-secondary);
 }
 
+/* Sigle : monospace léger pour le distinguer de la raison sociale et faciliter la lecture
+   d'un code court en majuscules. */
+.cnpm-organizations__trade {
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organizations__muted {
+  color: var(--cnpm-color-text-muted);
+}
+
 .cnpm-organizations__actions {
   display: flex;
   gap: var(--cnpm-space-2);
@@ -218,6 +230,203 @@
   flex-direction: column;
   gap: var(--cnpm-space-4);
   min-width: 0;
+}
+
+/* Panneau de synthèse : carte blanche bordée, comme les autres regroupements. */
+.cnpm-organizations__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-organizations__panel-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-organizations__panel-note,
+.cnpm-organizations__panel-empty {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* -------------------------------------------------------------------- Donut statut. */
+.cnpm-organizations__donut-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 9rem;
+}
+
+.cnpm-organizations__donut {
+  width: 9rem;
+  height: 9rem;
+}
+
+.cnpm-organizations__donut-track {
+  fill: none;
+  stroke: var(--cnpm-color-border-subtle);
+  stroke-width: 12;
+}
+
+.cnpm-organizations__donut-arc {
+  fill: none;
+  stroke-width: 12;
+  stroke-linecap: round;
+}
+
+/* Couleurs de statut par tokens : vert actif, ambre dormant, bleu prospect. Le sens
+   n'est jamais porté par la seule couleur — la légende écrit le statut et sa part. */
+.cnpm-organizations__donut-arc--active,
+.cnpm-organizations__swatch--active {
+  stroke: var(--cnpm-color-semantic-success-600);
+  background: var(--cnpm-color-semantic-success-600);
+}
+
+.cnpm-organizations__donut-arc--dormant,
+.cnpm-organizations__swatch--dormant {
+  stroke: var(--cnpm-color-semantic-warning-600);
+  background: var(--cnpm-color-semantic-warning-600);
+}
+
+.cnpm-organizations__donut-arc--prospect,
+.cnpm-organizations__swatch--prospect {
+  stroke: var(--cnpm-color-semantic-info-600);
+  background: var(--cnpm-color-semantic-info-600);
+}
+
+.cnpm-organizations__donut-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+
+.cnpm-organizations__donut-total {
+  font-size: var(--cnpm-font-size-xl);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organizations__donut-caption {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* Légende du donut. */
+.cnpm-organizations__legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+}
+
+.cnpm-organizations__legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-organizations__legend-term {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organizations__swatch {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--cnpm-radius-pill);
+  flex: none;
+}
+
+.cnpm-organizations__legend-value {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organizations__legend-pct {
+  font-weight: var(--cnpm-font-weight-regular);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* -------------------------------------------------------------- Barres de secteur. */
+.cnpm-organizations__sectors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-organizations__sector-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--cnpm-space-2);
+  margin-bottom: var(--cnpm-space-1);
+}
+
+.cnpm-organizations__sector-name {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organizations__sector-value {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organizations__sector-pct {
+  font-weight: var(--cnpm-font-weight-regular);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-organizations__sector-track {
+  height: 0.5rem;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-neutral-100);
+  overflow: hidden;
+}
+
+.cnpm-organizations__sector-bar {
+  display: block;
+  height: 100%;
+  border-radius: var(--cnpm-radius-pill);
+}
+
+/* Une couleur distincte par rang de secteur, toutes tokenisées. */
+.cnpm-organizations__sector-bar--0 {
+  background: var(--cnpm-color-brand-blue-600);
+}
+.cnpm-organizations__sector-bar--1 {
+  background: var(--cnpm-color-semantic-success-600);
+}
+.cnpm-organizations__sector-bar--2 {
+  background: var(--cnpm-color-semantic-warning-600);
+}
+.cnpm-organizations__sector-bar--3 {
+  background: var(--cnpm-color-semantic-info-600);
+}
+.cnpm-organizations__sector-bar--4 {
+  background: var(--cnpm-color-brand-blue-400);
 }
 
 /* --------------------------------------------------------------- Cartes mobiles. */

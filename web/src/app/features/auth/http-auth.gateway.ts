@@ -133,15 +133,13 @@ export class HttpAuthGateway implements AuthGateway {
       .pipe(
         switchMap((body) =>
           from(renderOtpauthQr(body.otpAuthUri)).pipe(
-            map(
-              (qrImage): TotpEnrollment => ({
-                enrollmentId: challenge,
-                qrImage,
-                manualKey: formatManualKey(body.manualKey),
-                issuer: 'CNPM',
-                account: accountFromUri(body.otpAuthUri),
-              }),
-            ),
+            map((qrImage): TotpEnrollment => ({
+              enrollmentId: challenge,
+              qrImage,
+              manualKey: formatManualKey(body.manualKey),
+              issuer: 'CNPM',
+              account: accountFromUri(body.otpAuthUri),
+            })),
           ),
         ),
       );
@@ -168,5 +166,16 @@ export class HttpAuthGateway implements AuthGateway {
         }),
         catchError((): Observable<TotpActivationResult> => of({ outcome: 'invalid-code' })),
       );
+  }
+
+  /**
+   * `POST /auth/password`. Le jeton et le mot de passe ne partent que dans le CORPS de la
+   * requête : une URL se retrouve dans les journaux de serveurs, de proxys et d'historiques
+   * de navigateur.
+   */
+  setPassword(token: string, password: string): Observable<void> {
+    return this.http
+      .post<void>(this.url('auth/password'), { token, password })
+      .pipe(map(() => undefined));
   }
 }

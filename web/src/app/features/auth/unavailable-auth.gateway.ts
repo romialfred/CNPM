@@ -31,4 +31,8 @@ export class UnavailableAuthGateway implements AuthGateway {
   activateTotp(): Observable<TotpActivationResult> {
     return unavailableFeature$('AUTH-007');
   }
+
+  setPassword(): Observable<void> {
+    return unavailableFeature$('PRT-001');
+  }
 }

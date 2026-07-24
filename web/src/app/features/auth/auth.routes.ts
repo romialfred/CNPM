@@ -24,23 +24,6 @@ const BLOCKED_AUTH_SCREENS = {
     decision:
       'Destination Keycloak ou parcours CNPM natif, ainsi que le canal de support, à arbitrer.',
   },
-  reset: {
-    screenId: 'AUTH-005',
-    eyebrow: 'Accès au compte',
-    title: 'Réinitialiser le mot de passe',
-    description:
-      "Aucun jeton de réinitialisation n'est accepté par l'application tant que le flux d'identité n'est pas provisionné.",
-    decision:
-      "Cycle de vie, durée et validation des jetons à porter par le fournisseur d'identité.",
-  },
-  activate: {
-    screenId: 'AUTH-006',
-    eyebrow: 'Première connexion',
-    title: 'Activation du compte',
-    description:
-      "L'activation en libre-service reste fermée jusqu'au raccordement du fournisseur d'identité et des invitations CNPM.",
-    decision: "Canal d'invitation, preuve d'identité et durée du lien à valider.",
-  },
 } as const satisfies Record<string, BlockedAuthContent>;
 
 /**
@@ -61,9 +44,7 @@ export const authRoutes: Routes = [
         // NATIVE réelle (AUTH-DEC-020) qui parle au backend — Keycloak est abandonné.
         provide: AUTH_GATEWAY,
         useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoAuthGateway)
-            : inject(HttpAuthGateway),
+          inject(CNPM_DATA_MODE) === 'demo' ? inject(DemoAuthGateway) : inject(HttpAuthGateway),
       },
     ],
     children: [
@@ -89,17 +70,20 @@ export const authRoutes: Routes = [
         title: 'Mot de passe oublié — CNPM',
         data: { blockedAuth: BLOCKED_AUTH_SCREENS.forgot },
       },
+      // Les deux routes servent le même geste — le titulaire pose son propre mot de passe
+      // avec le jeton reçu — et ne diffèrent que par les libellés : on n'annonce pas une
+      // « réinitialisation » à quelqu'un qui n'a jamais eu de mot de passe.
       {
         path: 'reset-password',
-        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        loadComponent: () => import('./set-password.page').then((module) => module.SetPasswordPage),
         title: 'Réinitialiser le mot de passe — CNPM',
-        data: { blockedAuth: BLOCKED_AUTH_SCREENS.reset },
+        data: { activation: false },
       },
       {
         path: 'activate',
-        loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
+        loadComponent: () => import('./set-password.page').then((module) => module.SetPasswordPage),
         title: 'Activer le compte — CNPM',
-        data: { blockedAuth: BLOCKED_AUTH_SCREENS.activate },
+        data: { activation: true },
       },
       {
         // AUTH-007 : enrôlement du second facteur à la première connexion. En mode démo,
@@ -113,8 +97,7 @@ export const authRoutes: Routes = [
       {
         // Retour de la redirection OIDC Keycloak : échange le code contre un jeton.
         path: 'callback',
-        loadComponent: () =>
-          import('./oidc-callback.page').then((m) => m.OidcCallbackPage),
+        loadComponent: () => import('./oidc-callback.page').then((m) => m.OidcCallbackPage),
         title: 'Connexion — CNPM',
       },
       {

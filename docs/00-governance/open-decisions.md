@@ -1004,5 +1004,129 @@ un jeton persisté est plus exposé à une XSS qu'un jeton purement en mémoire 
 est la continuité de session demandée. À revoir si un cookie httpOnly + rafraîchissement natif
 est livré (posture idéale).
 
+## AUTH-DEC-024 — Format d'erreur propre au parcours de connexion
+
+**Propriétaire.** Architecte + Sécurité.
+**Impact.** Cohérence du contrat d'API, exploitation des erreurs côté client et supervision.
+**Statut.** Divergence constatée et consignée ; arbitrage demandé.
+
+**Constat.** `.claude/rules/api.md` impose des réponses d'erreur normalisées — le `Problem`
+(`application/problem+json`, `code`, `status`, `correlationId`) que sert `ApiExceptionHandler`
+pour tout le reste de l'API. Les endpoints d'authentification (`/auth/login`,
+`/auth/mfa/enroll/start`, `/auth/mfa/enroll/confirm`, `/auth/mfa/verify`) répondent en
+revanche par un objet `{errorCode, errorMessage}`, avec un `challenge` pour l'étape
+identifiants. Le front dépend aujourd'hui de ces codes (`MFA_REQUIRED`,
+`MFA_ENROLLMENT_REQUIRED`) pour orienter le parcours.
+
+**Décision provisoire.** Le contrat OpenAPI décrit le format RÉELLEMENT servi
+(`AuthFailure`, `AuthChallenge`) plutôt qu'un format idéal que le code ne produit pas : un
+contrat qui ment est plus dangereux qu'un contrat qui documente une exception. La connexion
+n'est pas réécrite dans le même mouvement — c'est le chemin critique de toute la plateforme,
+et le convertir au `Problem` sans campagne de tests dédiée risquerait une régression
+d'authentification.
+
+**Options.**
+1. Aligner les endpoints d'authentification sur `Problem` en portant `errorCode` dans le champ
+   `code` et `challenge` dans une extension — impose une migration coordonnée du front.
+2. Entériner la divergence et l'inscrire dans `.claude/rules/api.md` comme exception explicite
+   pour les endpoints antérieurs à l'ouverture de session.
+
+**À trancher.** Option 1 recommandée à moyen terme, sous couverture de tests de connexion de
+bout en bout (enrôlement, vérification, verrouillage, code de secours).
+
+## API-DEC-025 — Sérialisation des montants : nombre JSON contre chaîne décimale
+
+**Propriétaire.** Architecte + Direction financière.
+**Impact.** Exactitude des montants côté client, conformité du contrat, interopérabilité.
+**Statut.** Écart constaté entre contrat et implémentation ; arbitrage demandé.
+
+**Constat.** Le schéma `Money` du contrat déclare les montants en **chaîne** décimale
+(`pattern: ^-?\d{1,17}(\.\d{1,2})?$`). Or les vues d'API antérieures (`ContributionCallView`,
+`MemberContributionsView`) exposent des `BigDecimal` que Jackson sérialise en **nombre JSON**.
+Un nombre JSON est lu comme un `double` par tout client JavaScript — exactement ce que
+`CLAUDE.md` interdit pour une valeur financière — et l'échelle se perd au passage : un solde
+nul stocké `0.00` arrive `0.0`.
+
+**Décision partielle.** La projection « mes cotisations » de l'espace membre
+(`MemberContributionView`) sérialise ses montants **en chaîne**, conformément au contrat, via
+`@JsonFormat(shape = STRING)`. Les vues antérieures n'ont pas été converties dans le même
+mouvement : leur changement de format est une rupture pour tout client déjà branché, et il
+doit être planifié comme tel.
+
+**À trancher.** Généraliser la chaîne décimale à toutes les vues financières (option
+recommandée, cohérente avec le contrat), ou aligner le contrat sur le nombre JSON en assumant
+le risque de précision. Tant que l'écart subsiste, deux endpoints du même module répondent
+dans deux formats différents pour la même notion de montant.
+
+## PRT-DEC-026 — Requêtes membre : ce que les sources tranchent déjà, et ce qui reste à bâtir
+
+**Propriétaire.** Architecte (construction) ; Relation membre pour le seul point ouvert.
+**Impact.** Livraison de l'espace « Mes requêtes » en données réelles.
+**Statut.** **Non bloquant.** Une première lecture avait conclu à un blocage ; la relecture des
+sources normatives l'infirme sur l'essentiel. Entrée corrigée.
+
+**Ce que les sources tranchent.** Les spécifications fonctionnelles v1.1 § 12 et l'exigence
+PRT-006 définissent le domaine :
+
+- **§ 12.1 Catalogue de services** — la taxonomie n'est pas un `enum` figé mais un catalogue
+  paramétrable : attestation, mise en relation, accompagnement administratif, formation, appui
+  juridique, documentation, inscription événement, demande de représentation, « ou tout autre
+  service paramétrable ». Chaque service porte son **SLA** (délai cible, calendrier ouvré,
+  niveau de priorité, escalades), son formulaire, son workflow et ses modèles de réponse. Les
+  valeurs `DEMO_*` de l'écran actuel sont donc des marqueurs de démonstration à remplacer par
+  ce catalogue, pas une taxonomie à inventer.
+- **REQ-002** — la qualification retient catégorie, priorité, service, confidentialité et
+  responsable.
+- **REQ-004** — les notes internes ne sont **jamais** visibles du membre. La colonne
+  `service.request_message.visibility` existe déjà pour porter cette séparation ; c'est une
+  règle de sécurité, pas une préférence d'affichage.
+- **REQ-005** — le suivi SLA déclenche des alertes **avant** et après dépassement : l'état
+  « bientôt échue » se calcule à partir du délai cible du service concerné, il ne demande donc
+  aucune constante inventée.
+- **PRT-006** — le membre voit le SLA, les réponses et **les pièces demandées**.
+
+**Ce qui reste à bâtir** (travail d'implémentation, pas arbitrage) :
+
+1. Une table de catalogue de services portant le SLA et le workflow (§ 12.1), et le
+   rattachement de `service.request` à ce catalogue.
+2. Une table des pièces demandées, exigée par PRT-006.
+3. Le filtrage des messages sur `visibility` dans toute projection membre (REQ-004).
+
+**Le seul point réellement ouvert.** Le **seuil d'alerte avant échéance** (REQ-005) : à quelle
+fraction du délai cible une requête bascule-t-elle en « bientôt échue » ? C'est un paramètre
+d'exploitation à fixer par la Relation membre, service par service ou globalement.
+
+**Hors périmètre à ce stade.** Les pièces jointes réelles supposent le module documentaire
+(stockage objet + analyse antivirus), non livré : l'écran ne doit pas promettre un dépôt de
+fichier que rien ne reçoit.
+
+## AUTH-DEC-027 — Paramètres du parcours de mot de passe
+
+**Propriétaire.** Sécurité (RSSI) + Relation membre.
+**Impact.** Fenêtre d'exposition d'un lien intercepté, robustesse des secrets, charge du
+support.
+**Statut.** Valeurs par défaut posées pour livrer ; à confirmer par la politique de sécurité
+approuvée.
+
+**Constat.** L'activation d'un compte et la récupération d'accès sont normatives (processus
+d'enrôlement étape 18 « activation du compte […] et invitation au portail » ; PRT-001, Must :
+« le membre peut récupérer son accès sans intervention manuelle abusive »). Leur mise en
+œuvre exige deux paramètres qu'aucune source ne chiffre :
+
+| Paramètre | Valeur retenue | Raison |
+|---|---|---|
+| Durée de vie du jeton | **24 heures** | Ferme la fenêtre d'usage d'un lien intercepté tout en laissant un délai ouvré au destinataire. |
+| Longueur minimale du mot de passe | **12 caractères** | Plancher aligné sur la recommandation NIST de privilégier la longueur plutôt qu'une complexité imposée. |
+
+**Ce qui n'est pas paramétrable et ne se négocie pas.** Le mot de passe ne transite jamais
+par l'administration : l'opérateur n'émet qu'un jeton, le titulaire pose son propre secret.
+Seule l'empreinte SHA-256 du jeton et l'empreinte bcrypt du mot de passe sont conservées.
+Émettre un nouveau jeton invalide les précédents. Un jeton ne sert qu'une fois. Un compte
+suspendu ne peut pas voir son accès rétabli sans être réactivé au préalable.
+
+**À trancher.** Confirmer ou corriger les deux valeurs ci-dessus, et décider du canal de
+remise du lien (courriel, SMS) une fois le module de notification livré : aujourd'hui, le
+jeton est remis à l'opérateur, qui le transmet.
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.

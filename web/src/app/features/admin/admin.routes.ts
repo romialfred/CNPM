@@ -77,13 +77,8 @@ import {
 } from './showcase-moderation/showcase-moderation-gateway';
 import { adminSessionGuard } from './admin-session.guard';
 import {
-  UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
-  UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
-  UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
   UNAVAILABLE_DOCUMENTS_GATEWAY,
-  UNAVAILABLE_ENROLLMENT_GATEWAY,
   UNAVAILABLE_INTEGRATIONS_GATEWAY,
-  UNAVAILABLE_PAYMENTS_GATEWAY,
   UNAVAILABLE_RECEIPTS_GATEWAY,
   UNAVAILABLE_RECOVERY_GATEWAY,
   UNAVAILABLE_REPORTING_GATEWAY,
@@ -93,8 +88,10 @@ import {
 /**
  * Routes d'administration, chargées à la demande.
  *
- * Les ports sont composés ici selon `CNPM_DATA_MODE`. En HTTP, une feature non
- * raccordée devient explicitement indisponible et ne retombe jamais sur ses fixtures.
+ * Les ports sont composés ici selon `CNPM_DATA_MODE`. Une feature dotée d'un adaptateur
+ * HTTP l'utilise en mode HTTP. Faute d'adaptateur HTTP (enrôlement, cotisations, paiements,
+ * génération d'appels, import de relevé), on sert les fixtures de démonstration plutôt qu'un
+ * écran d'erreur : la page reste utilisable, en attendant le raccordement au backend.
  *
  * Le garde de session améliore uniquement l'expérience en cas de 401. Il ne remplace
  * jamais la vérification des permissions et du périmètre côté backend (ADR-008).
@@ -162,19 +159,15 @@ export const adminRoutes: Routes = [
       },
       DemoContributionCallGenerationGateway,
       {
+        // Repli démonstration en attendant le backend (voir cotisations/paiements ci-dessous).
         provide: CONTRIBUTION_CALL_GENERATION_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoContributionCallGenerationGateway)
-            : UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
+        useFactory: () => inject(DemoContributionCallGenerationGateway),
       },
       DemoBankStatementImportGateway,
       {
+        // Repli démonstration (import de relevé bancaire) en attendant le backend.
         provide: BANK_STATEMENT_IMPORT_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoBankStatementImportGateway)
-            : UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
+        useFactory: () => inject(DemoBankStatementImportGateway),
       },
       {
         provide: DOCUMENTS_GATEWAY,
@@ -200,11 +193,12 @@ export const adminRoutes: Routes = [
             : inject(HttpMemberEditGateway),
       },
       {
+        // Enrôlement, cotisations et paiements n'ont pas encore d'adaptateur HTTP réel :
+        // leur read-model backend n'est pas raccordé. Plutôt qu'un écran d'erreur en mode
+        // HTTP, on sert les fixtures de démonstration — la page reste fonctionnelle et
+        // navigable. Le raccordement au backend viendra remplacer ce repli.
         provide: ENROLLMENT_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoEnrollmentGateway)
-            : UNAVAILABLE_ENROLLMENT_GATEWAY,
+        useFactory: () => inject(DemoEnrollmentGateway),
       },
       DemoEnrollmentsGateway,
       HttpEnrollmentsGateway,
@@ -217,17 +211,11 @@ export const adminRoutes: Routes = [
       },
       {
         provide: CONTRIBUTIONS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoContributionsGateway)
-            : UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
+        useFactory: () => inject(DemoContributionsGateway),
       },
       {
         provide: PAYMENTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoPaymentsGateway)
-            : UNAVAILABLE_PAYMENTS_GATEWAY,
+        useFactory: () => inject(DemoPaymentsGateway),
       },
       {
         provide: RECOVERY_GATEWAY,

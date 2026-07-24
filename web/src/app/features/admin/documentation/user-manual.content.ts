@@ -10,7 +10,7 @@ import type { DocManual } from './documentation.model';
 export const USER_MANUAL: DocManual = {
   id: 'user',
   label: 'Manuel utilisateur',
-  tagline: "Prise en main des parcours du portail, écran par écran, avec les étapes clés.",
+  tagline: 'Prise en main des parcours du portail, écran par écran, avec les étapes clés.',
   sections: [
     {
       id: 'um-demarrage',
@@ -36,6 +36,10 @@ export const USER_MANUAL: DocManual = {
               tone: 'info',
               text: "La session est conservée lors d'un rafraîchissement de page : actualiser ne déconnecte pas. Pour quitter, utilisez « Se déconnecter » dans le menu du compte.",
             },
+            {
+              kind: 'paragraph',
+              text: "Première connexion ou mot de passe perdu : votre administrateur CNPM vous transmet un lien à usage unique, valable 24 heures. Vous y choisissez vous-même votre mot de passe — personne au CNPM ne le connaît, pas même l'administrateur qui a émis le lien. Le lien ne sert qu'une fois ; en demander un nouveau annule le précédent.",
+            },
           ],
         },
         {
@@ -44,7 +48,7 @@ export const USER_MANUAL: DocManual = {
           blocks: [
             {
               kind: 'paragraph',
-              text: "La 2FA est obligatoire pour les rôles sensibles. Elle repose sur un code temporaire (TOTP) généré par une application dédiée sur votre téléphone.",
+              text: 'La 2FA est obligatoire pour les rôles sensibles. Elle repose sur un code temporaire (TOTP) généré par une application dédiée sur votre téléphone.',
             },
             {
               kind: 'list',
@@ -148,7 +152,7 @@ export const USER_MANUAL: DocManual = {
           blocks: [
             {
               kind: 'paragraph',
-              text: "Les pages Entreprises et Groupements présentent les personnes morales et les groupements professionnels du CNPM, avec recherche, filtres et accès au détail.",
+              text: 'Les pages Entreprises et Groupements présentent les personnes morales et les groupements professionnels du CNPM, avec recherche, filtres et accès au détail.',
             },
           ],
         },
@@ -175,7 +179,7 @@ export const USER_MANUAL: DocManual = {
             {
               kind: 'callout',
               tone: 'warning',
-              text: "Les montants sont des données financières : ils ne sont jamais modifiés directement. Une correction passe par un ajustement compensatoire tracé.",
+              text: 'Les montants sont des données financières : ils ne sont jamais modifiés directement. Une correction passe par un ajustement compensatoire tracé.',
             },
           ],
         },
@@ -302,9 +306,21 @@ export const USER_MANUAL: DocManual = {
               kind: 'list',
               items: [
                 'Consultez la liste des comptes (administrateurs et membres) et leur état.',
+                'Filtrez la liste par statut et par rôle ; l’adresse de la page conserve vos filtres, vous pouvez donc la partager telle quelle.',
+                'Chaque ligne porte quatre actions : suspendre (ou réactiver) le compte, réinitialiser son second facteur, et émettre un lien d’activation ou de récupération d’accès.',
                 'Visualisez les rôles applicatifs et la matrice des permissions atomiques.',
                 'La création de compte, la réinitialisation 2FA et l’attribution de droits obéissent au principe du moindre privilège et à la séparation des tâches.',
               ],
+            },
+            {
+              kind: 'callout',
+              tone: 'info',
+              text: "Suspendre, réactiver ou réinitialiser un second facteur exige un motif écrit : il est consigné au journal d'audit avec l'action. Un compte suspendu ne peut plus se connecter ; une réinitialisation du second facteur ne désactive pas la protection, elle oblige à la réenrôler à la prochaine connexion.",
+            },
+            {
+              kind: 'callout',
+              tone: 'info',
+              text: "Émettre un lien d'accès génère un lien à usage unique, valable 24 heures, que vous transmettez au titulaire par un canal sûr. Il choisit lui-même son mot de passe : vous ne le voyez jamais. Le lien n'est affiché qu'une fois ; en émettre un nouveau annule le précédent.",
             },
             {
               kind: 'callout',
