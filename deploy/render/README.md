@@ -28,10 +28,10 @@ et tous les modules fonctionnent (répertoire, cotisations, paiement, etc.).
 
 ---
 
-## 2) Brancher le domaine `cnmp.data-univers.com`
+## 2) Brancher le domaine `cnpm.data-univers.com`
 
 **a. Côté Render** — service `cnpm-web` → **Settings → Custom Domains → Add Custom Domain**
-→ saisis `cnmp.data-univers.com`. Render affiche alors **la valeur DNS exacte à créer**
+→ saisis `cnpm.data-univers.com`. Render affiche alors **la valeur DNS exacte à créer**
 (un enregistrement CNAME) et vérifiera le domaine.
 
 **b. Côté DNS** (chez ton registrar / hébergeur de `data-univers.com`) — crée **un seul
@@ -40,18 +40,17 @@ enregistrement CNAME** :
 | Champ | Valeur |
 |---|---|
 | **Type** | `CNAME` |
-| **Nom / Host** | `cnmp` *(juste le sous-domaine ; la zone `data-univers.com` est ajoutée automatiquement)* |
+| **Nom / Host** | `cnpm` *(juste le sous-domaine ; la zone `data-univers.com` est ajoutée automatiquement)* |
 | **Valeur / Cible** | **la cible affichée par Render** — en général `cnpm-web.onrender.com` |
 | **TTL** | défaut (Auto / 3600) |
 | **Proxy (Cloudflare)** | **désactivé** (DNS only / nuage gris) le temps de la validation |
 
-- Si un ancien enregistrement `cnmp` existe déjà (A ou CNAME), **remplace-le** par ce CNAME.
+- **Attention** : `cnpm.data-univers.com` pointe actuellement (via alias) vers `data-univers.com`,
+  hébergé sur **Netlify** (`75.2.60.5`). Ce CNAME vers Render **remplace** ce routage : tu ne
+  verras la plateforme CNPM qu'une fois l'ancien enregistrement supprimé et le CNAME Render propagé.
 - **HTTPS** : Render émet le certificat TLS (Let's Encrypt) automatiquement une fois le
   CNAME propagé — rien à faire.
 - Propagation : quelques minutes à ~1 h.
-
-> ⚠️ Orthographe : tu as écrit **`cnmp`** (et non `cnpm`). Utilise exactement le
-> sous-domaine que tu as créé — le CNAME doit porter le même libellé.
 
 ---
 
