@@ -1560,6 +1560,122 @@ paths:
       - COT-006
       - COT-007
       - COT-008
+  /collection-accounts:
+    get:
+      tags:
+      - PAYMENT
+      summary: Lister les comptes d'encaissement de la CNPM.
+      operationId: listCollectionAccounts
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Liste des comptes d'encaissement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+    post:
+      tags:
+      - PAYMENT
+      summary: Enregistrer un compte d'encaissement en brouillon.
+      operationId: createCollectionAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+  /collection-accounts/{id}/approve:
+    post:
+      tags:
+      - PAYMENT
+      summary: Valider un compte d'encaissement (le rendre diffusable).
+      operationId: approveCollectionAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /collection-accounts/{id}/disable:
+    post:
+      tags:
+      - PAYMENT
+      summary: Désactiver un compte d'encaissement.
+      operationId: disableCollectionAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
   /payment-references:
     post:
       tags:

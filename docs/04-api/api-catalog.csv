@@ -32,6 +32,10 @@ GET;/contribution-calls;CONTRIBUTION;listContributionCalls;Lister les appels.
 POST;/contribution-campaigns/simulate;CONTRIBUTION;simulateContributionCampaign;Simuler une campagne.
 POST;/contribution-campaigns/{id}/issue;CONTRIBUTION;issueContributionCampaign;Émettre les appels.
 GET;/organizations/{id}/account-statement;CONTRIBUTION;getAccountStatement;Produire une situation de compte.
+GET;/collection-accounts;PAYMENT;listCollectionAccounts;Lister les comptes d'encaissement de la CNPM.
+POST;/collection-accounts;PAYMENT;createCollectionAccount;Enregistrer un compte d'encaissement en brouillon.
+POST;/collection-accounts/{id}/approve;PAYMENT;approveCollectionAccount;Valider un compte d'encaissement.
+POST;/collection-accounts/{id}/disable;PAYMENT;disableCollectionAccount;Désactiver un compte d'encaissement.
 POST;/payment-references;PAYMENT;createPaymentReference;Créer une référence validée CNPM.
 GET;/payments;PAYMENT;listPayments;Lister les transactions.
 GET;/payments/{id};PAYMENT;getPayment;Consulter une transaction.
