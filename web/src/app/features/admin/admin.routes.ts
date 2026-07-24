@@ -70,6 +70,8 @@ import { HttpSettingsGateway } from './settings/http-settings.gateway';
 import { pendingSettingsChangesGuard } from './settings/pending-settings-changes.guard';
 import { SETTINGS_GATEWAY } from './settings/settings-gateway';
 import { settingsReadGuard } from './settings/settings-read.guard';
+import { COLLECTION_ACCOUNTS_GATEWAY } from './collection-accounts/collection-accounts-gateway';
+import { HttpCollectionAccountsGateway } from './collection-accounts/http-collection-accounts.gateway';
 import { DemoShowcaseModerationGateway } from './showcase-moderation/demo-showcase-moderation.gateway';
 import {
   SHOWCASE_MODERATION_GATEWAY,
@@ -150,6 +152,10 @@ export const adminRoutes: Routes = [
             ? inject(DemoSettingsGateway)
             : inject(HttpSettingsGateway),
       },
+      // Refonte « zéro démo » : les comptes d'encaissement n'ont qu'un adaptateur HTTP réel,
+      // quel que soit CNPM_DATA_MODE. Aucune passerelle de démonstration n'est fournie.
+      HttpCollectionAccountsGateway,
+      { provide: COLLECTION_ACCOUNTS_GATEWAY, useExisting: HttpCollectionAccountsGateway },
       {
         provide: DASHBOARD_GATEWAY,
         useFactory: () =>
@@ -529,6 +535,14 @@ export const adminRoutes: Routes = [
         canDeactivate: [pendingSettingsChangesGuard],
         loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
         title: 'Paramétrage fonctionnel — Administration CNPM',
+      },
+      {
+        path: 'collection-accounts',
+        loadComponent: () =>
+          import('./collection-accounts/collection-accounts.page').then(
+            (m) => m.CollectionAccountsPage,
+          ),
+        title: 'Comptes d’encaissement — Administration CNPM',
       },
       // Compatibilité des favoris et captures antérieurs à l'alignement sur
       // l'inventaire UI. Les nouveaux liens utilisent exclusivement les routes canoniques.

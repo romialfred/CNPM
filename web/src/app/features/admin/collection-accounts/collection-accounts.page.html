@@ -1,0 +1,166 @@
+<cnpm-admin-shell>
+  <main class="cnpm-collection-accounts" id="contenu-principal">
+    <cnpm-page-header
+      title="Comptes d’encaissement"
+      description="Coordonnées d’encaissement de la CNPM (Orange Money, Wave, MTN, virement). Un compte n’est proposé au paiement qu’après validation par un second agent."
+    />
+
+    @if (canWrite()) {
+      <div class="cnpm-collection-accounts__toolbar">
+        <p class="cnpm-collection-accounts__count" role="status">
+          @if (draftCount() > 0) {
+            {{ draftCount() }} compte{{ draftCount() > 1 ? 's' : '' }} en attente de validation.
+          } @else {
+            Tous les comptes enregistrés sont validés.
+          }
+        </p>
+        @if (!showForm()) {
+          <cnpm-button variant="primary" (click)="openForm()">Ajouter un compte</cnpm-button>
+        }
+      </div>
+    }
+
+    @if (showForm()) {
+      <form class="cnpm-collection-accounts__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <h2 class="cnpm-collection-accounts__form-title">Nouveau compte d’encaissement</h2>
+
+        @if (formError()) {
+          <cnpm-alert tone="error" title="Enregistrement impossible">
+            <p>{{ formError() }}</p>
+          </cnpm-alert>
+        }
+
+        <div class="cnpm-collection-accounts__field">
+          <label class="cnpm-collection-accounts__label" for="ca-channel">Canal</label>
+          <select id="ca-channel" class="cnpm-collection-accounts__select" formControlName="channel">
+            @for (option of channels; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="cnpm-collection-accounts__grid">
+          <cnpm-text-input
+            formControlName="label"
+            label="Libellé"
+            name="label"
+            [required]="true"
+          />
+          <cnpm-text-input
+            formControlName="accountHolder"
+            label="Titulaire"
+            name="accountHolder"
+            [required]="true"
+          />
+          <cnpm-text-input
+            formControlName="accountIdentifier"
+            [label]="isBankTransfer() === 'BANK_TRANSFER' ? 'IBAN / numéro de compte' : 'Numéro Mobile Money'"
+            name="accountIdentifier"
+            [required]="true"
+          />
+          @if (isBankTransfer() === 'BANK_TRANSFER') {
+            <cnpm-text-input
+              formControlName="bankName"
+              label="Banque"
+              name="bankName"
+              [required]="true"
+            />
+          }
+        </div>
+
+        <cnpm-text-input
+          formControlName="instructions"
+          label="Consignes de paiement (facultatif)"
+          name="instructions"
+        />
+
+        <div class="cnpm-collection-accounts__form-actions">
+          <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="submitting()">
+            Annuler
+          </cnpm-button>
+          <cnpm-button variant="primary" (click)="submit()" [loading]="submitting()">
+            Enregistrer en brouillon
+          </cnpm-button>
+        </div>
+      </form>
+    }
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="cnpm-collection-accounts__status" role="status">Chargement des comptes…</p>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les comptes d’encaissement n’ont pas pu être chargés.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (accounts().length === 0) {
+          <p class="cnpm-collection-accounts__status" role="status">
+            Aucun compte d’encaissement n’est encore configuré.
+          </p>
+        } @else {
+          <div class="cnpm-collection-accounts__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Canal</th>
+                  <th scope="col">Libellé</th>
+                  <th scope="col">Titulaire</th>
+                  <th scope="col">Coordonnées</th>
+                  <th scope="col">État</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (account of accounts(); track account.id) {
+                  <tr>
+                    <td>{{ channelLabel(account.channel) }}</td>
+                    <td>{{ account.label }}</td>
+                    <td>{{ account.accountHolder }}</td>
+                    <td>
+                      <span class="cnpm-collection-accounts__identifier">{{
+                        account.accountIdentifier
+                      }}</span>
+                      @if (account.bankName) {
+                        <span class="cnpm-collection-accounts__bank">{{ account.bankName }}</span>
+                      }
+                    </td>
+                    <td>
+                      <cnpm-badge [tone]="statusTone(account.status)">{{
+                        statusLabel(account.status)
+                      }}</cnpm-badge>
+                    </td>
+                    <td>
+                      <div class="cnpm-collection-accounts__row-actions">
+                        @if (account.status === 'DRAFT' && canApprove()) {
+                          <cnpm-button
+                            variant="primary"
+                            [loading]="busyId() === account.id"
+                            (click)="approve(account)"
+                          >
+                            Valider
+                          </cnpm-button>
+                        }
+                        @if (account.status === 'ACTIVE' && canWrite()) {
+                          <cnpm-button
+                            variant="secondary"
+                            [loading]="busyId() === account.id"
+                            (click)="disable(account)"
+                          >
+                            Désactiver
+                          </cnpm-button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>
