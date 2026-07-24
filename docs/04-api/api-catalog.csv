@@ -36,7 +36,10 @@ GET;/collection-accounts;PAYMENT;listCollectionAccounts;Lister les comptes d'enc
 POST;/collection-accounts;PAYMENT;createCollectionAccount;Enregistrer un compte d'encaissement en brouillon.
 POST;/collection-accounts/{id}/approve;PAYMENT;approveCollectionAccount;Valider un compte d'encaissement.
 POST;/collection-accounts/{id}/disable;PAYMENT;disableCollectionAccount;Désactiver un compte d'encaissement.
-POST;/payment-references;PAYMENT;createPaymentReference;Créer une référence validée CNPM.
+GET;/payment-references;PAYMENT;listPaymentReferences;Lister les références de paiement.
+POST;/payment-references;PAYMENT;createPaymentReference;Générer la référence de paiement d'un cotisant.
+POST;/payment-references/{id}/validate;PAYMENT;validatePaymentReference;Valider une référence de paiement.
+POST;/payment-references/{id}/revoke;PAYMENT;revokePaymentReference;Révoquer une référence de paiement.
 GET;/payments;PAYMENT;listPayments;Lister les transactions.
 GET;/payments/{id};PAYMENT;getPayment;Consulter une transaction.
 POST;/payments/{id}/confirm;PAYMENT;confirmPayment;Confirmer un paiement rapproché.

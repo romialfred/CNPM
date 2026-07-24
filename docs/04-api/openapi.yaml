@@ -1677,10 +1677,28 @@ paths:
             schema:
               $ref: '#/components/schemas/ResourceInput'
   /payment-references:
+    get:
+      tags:
+      - PAYMENT
+      summary: Lister les références de paiement.
+      operationId: listPaymentReferences
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Liste des références de paiement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
     post:
       tags:
       - PAYMENT
-      summary: Créer une référence validée CNPM.
+      summary: Générer la référence de paiement d'un cotisant.
       operationId: createPaymentReference
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
@@ -1725,6 +1743,72 @@ paths:
       - PAY-006
       - PAY-007
       - PAY-008
+  /payment-references/{id}/validate:
+    post:
+      tags:
+      - PAYMENT
+      summary: Valider une référence de paiement (la rendre diffusable).
+      operationId: validatePaymentReference
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /payment-references/{id}/revoke:
+    post:
+      tags:
+      - PAYMENT
+      summary: Révoquer une référence de paiement.
+      operationId: revokePaymentReference
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
   /payments:
     get:
       tags:
