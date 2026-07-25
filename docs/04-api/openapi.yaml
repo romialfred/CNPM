@@ -2989,6 +2989,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resource'
+  /portal/users:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister les utilisateurs de l'organisation du cotisant.
+      operationId: getMemberUsers
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Utilisateurs de l'organisation du cotisant connecté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
   /portal/payment-instructions:
     get:
       tags:

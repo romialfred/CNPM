@@ -25,14 +25,13 @@ import { DemoMemberShowcaseGateway } from './showcase/demo-member-showcase.gatew
 import { MEMBER_SHOWCASE_GATEWAY } from './showcase/member-showcase-gateway';
 import { DemoMemberShowcaseAnalyticsGateway } from './showcase-analytics/demo-member-showcase-analytics.gateway';
 import { MEMBER_SHOWCASE_ANALYTICS_GATEWAY } from './showcase-analytics/member-showcase-analytics.gateway';
-import { DemoMemberUsersGateway } from './users/demo-member-users.gateway';
+import { HttpMemberUsersGateway } from './users/http-member-users.gateway';
 import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
   UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
-  UNAVAILABLE_MEMBER_USERS_GATEWAY,
 } from './unavailable-member-gateways';
 
 /**
@@ -197,14 +196,9 @@ export const memberRoutes: Routes = [
   {
     path: 'users',
     providers: [
-      DemoMemberUsersGateway,
-      {
-        provide: MEMBER_USERS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberUsersGateway)
-            : UNAVAILABLE_MEMBER_USERS_GATEWAY,
-      },
+      // Refonte « zéro démo » : utilisateurs réels via /portal/users, bornés à l'organisation.
+      HttpMemberUsersGateway,
+      { provide: MEMBER_USERS_GATEWAY, useExisting: HttpMemberUsersGateway },
     ],
     loadComponent: () =>
       import('./users/member-users.page').then((module) => module.MemberUsersPage),

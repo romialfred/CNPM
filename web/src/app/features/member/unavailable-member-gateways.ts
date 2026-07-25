@@ -4,7 +4,6 @@ import type { MemberDirectoryGateway } from './directory/member-directory.gatewa
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
 import type { MemberShowcaseGateway } from './showcase/member-showcase-gateway';
 import type { MemberShowcaseAnalyticsGateway } from './showcase-analytics/member-showcase-analytics.gateway';
-import type { MemberUsersGateway } from './users/member-users-gateway';
 
 /**
  * Le contrat HTTP expose encore `GET /portal/contributions` comme `Resource`
@@ -19,11 +18,6 @@ export const UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY: MemberContributionsGatewa
 /** `/portal/documents` ne décrit encore aucune projection documentaire membre typée. */
 export const UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY: MemberDocumentsGateway = {
   list: () => unavailableFeature$('MP-012'),
-};
-
-/** Aucun endpoint membre ne garantit encore le périmètre d’organisation IAM. */
-export const UNAVAILABLE_MEMBER_USERS_GATEWAY: MemberUsersGateway = {
-  list: () => unavailableFeature$('MP-014'),
 };
 
 /** L’addendum R4 n’est pas promu dans OpenAPI/RBAC/SoD ; tout accès HTTP reste fermé. */
