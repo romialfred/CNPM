@@ -4,7 +4,6 @@ import type { MemberDirectoryGateway } from './directory/member-directory.gatewa
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
 import type { MemberHomeGateway } from './home/member-home-gateway';
 import type { MemberPaymentsGateway } from './payments/member-payments-gateway';
-import type { MemberProfileGateway } from './profile/member-profile-gateway';
 import type { MemberReceiptsGateway } from './receipts/member-receipts-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
 import type { MemberShowcaseGateway } from './showcase/member-showcase-gateway';
@@ -55,11 +54,6 @@ export const UNAVAILABLE_MEMBER_REQUESTS_GATEWAY: MemberRequestsGateway = {
 /** `/portal/documents` ne décrit encore aucune projection documentaire membre typée. */
 export const UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY: MemberDocumentsGateway = {
   list: () => unavailableFeature$('MP-012'),
-};
-
-/** Aucun endpoint typé et auto-scopé ne porte encore le profil membre. */
-export const UNAVAILABLE_MEMBER_PROFILE_GATEWAY: MemberProfileGateway = {
-  load: () => unavailableFeature$('MP-013'),
 };
 
 /** Aucun endpoint membre ne garantit encore le périmètre d’organisation IAM. */

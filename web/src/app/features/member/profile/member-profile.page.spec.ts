@@ -1,43 +1,26 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Subject } from 'rxjs';
+import { of, throwError, type Observable } from 'rxjs';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
 import {
   MEMBER_PROFILE_GATEWAY,
+  type MemberProfile,
   type MemberProfileGateway,
-  type MemberProfileSnapshot,
 } from './member-profile-gateway';
 import { MemberProfilePage } from './member-profile.page';
 
-const READY_PROFILE: MemberProfileSnapshot = {
-  displayLabel: 'Responsable adhésion',
-  roleLabel: 'Administrateur de l’entreprise',
-  organizationName: 'Sahel Agro SA',
-  memberReference: 'CNPM-2026-0001',
-  organizationTypeLabel: 'Société anonyme',
-  membershipLabel: 'Adhésion active',
-  membershipSince: '2024-03-18',
-  disclosure: 'Profil consultable en lecture seule.',
+const PROFILE: MemberProfile = {
+  displayName: 'Adhérent de test',
+  email: 'membre1@cnpm-portail.test',
+  organization: 'Société de test',
+  jobTitle: 'Gérant',
+  phone: null,
+  avatarDataUri: null,
+  avatarUpdatedAt: null,
 };
 
-class ControllableGateway implements MemberProfileGateway {
-  readonly responses: Subject<MemberProfileSnapshot | null>[] = [];
-
-  load(): Subject<MemberProfileSnapshot | null> {
-    const response = new Subject<MemberProfileSnapshot | null>();
-    this.responses.push(response);
-    return response;
-  }
-
-  get latest(): Subject<MemberProfileSnapshot | null> {
-    return this.responses[this.responses.length - 1];
-  }
-}
-
-async function setup() {
-  const gateway = new ControllableGateway();
+async function setup(gateway: MemberProfileGateway) {
   await TestBed.configureTestingModule({
     imports: [MemberProfilePage],
     providers: [
@@ -50,50 +33,35 @@ async function setup() {
   fixture.detectChanges();
   await fixture.whenStable();
   fixture.detectChanges();
-  return { fixture, gateway, host: fixture.nativeElement as HTMLElement };
+  return { host: fixture.nativeElement as HTMLElement };
 }
 
-describe('MemberProfilePage — MP-013', () => {
+describe('MemberProfilePage', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('affiche un profil en lecture seule, sans donnée sensible ni action', async () => {
-    const { fixture, gateway, host } = await setup();
-    expect(host.textContent).toContain('Chargement du profil entreprise');
+  it('affiche le profil et des initiales à défaut de photo', async () => {
+    const gateway: MemberProfileGateway = {
+      load: () => of(PROFILE),
+      updateAvatar: () => of(PROFILE),
+      deleteAvatar: () => of(PROFILE),
+    };
+    const { host } = await setup(gateway);
 
-    gateway.latest.next(READY_PROFILE);
-    await fixture.whenStable();
-    fixture.detectChanges();
-
-    expect(host.querySelectorAll('h1')).toHaveLength(1);
-    expect(host.textContent).toContain('Sahel Agro SA');
-    expect(host.textContent).toContain('CNPM-2026-0001');
-    expect(host.textContent).toContain('18/03/2024');
-    expect(host.querySelector('.member-profile h1')).toBe(document.activeElement);
-    expect(host.querySelectorAll('.member-profile form, .member-profile input')).toHaveLength(0);
-    expect(host.querySelectorAll('.member-profile button, .member-profile a')).toHaveLength(0);
-    expect(host.textContent).not.toMatch(/Keycloak|secret|jeton|RCCM|NIF|KYC/i);
+    expect(host.textContent).toContain('Adhérent de test');
+    expect(host.textContent).toContain('membre1@cnpm-portail.test');
+    expect(host.querySelector('.member-profile__avatar-initials')?.textContent?.trim()).toBe('AD');
+    // Le champ de fichier permet de changer la photo.
+    expect(host.querySelector('input[type="file"]')).not.toBeNull();
   });
 
-  it('distingue vide, erreur récupérable et indisponibilité HTTP', async () => {
-    const empty = await setup();
-    empty.gateway.latest.next(null);
-    await empty.fixture.whenStable();
-    empty.fixture.detectChanges();
-    expect(empty.host.textContent).toContain('Aucun profil entreprise');
+  it('rend un état d’erreur si le chargement échoue', async () => {
+    const gateway: MemberProfileGateway = {
+      load: (): Observable<MemberProfile> => throwError(() => new Error('boom')),
+      updateAvatar: () => of(PROFILE),
+      deleteAvatar: () => of(PROFILE),
+    };
+    const { host } = await setup(gateway);
 
-    TestBed.resetTestingModule();
-    const failed = await setup();
-    failed.gateway.latest.error(new Error('indisponible'));
-    await failed.fixture.whenStable();
-    failed.fixture.detectChanges();
-    expect(failed.host.textContent).toContain('Le profil n’a pas pu être chargé');
-    expect(failed.host.textContent).toContain('Réessayer');
-
-    TestBed.resetTestingModule();
-    const unavailable = await setup();
-    unavailable.gateway.latest.error(new UnavailableHttpFeatureError('MP-013'));
-    await unavailable.fixture.whenStable();
-    unavailable.fixture.detectChanges();
-    expect(unavailable.host.textContent).toContain('Profil entreprise indisponible en mode HTTP');
+    expect(host.textContent).toContain('Chargement impossible');
   });
 });

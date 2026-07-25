@@ -14,7 +14,7 @@ import { DemoMemberPaymentsGateway } from './payments/demo-member-payments.gatew
 import { MEMBER_PAYMENTS_GATEWAY } from './payments/member-payments-gateway';
 import { PAYMENT_INSTRUCTIONS_GATEWAY } from './payments/payment-instructions-gateway';
 import { HttpPaymentInstructionsGateway } from './payments/http-payment-instructions.gateway';
-import { DemoMemberProfileGateway } from './profile/demo-member-profile.gateway';
+import { HttpMemberProfileGateway } from './profile/http-member-profile.gateway';
 import { MEMBER_PROFILE_GATEWAY } from './profile/member-profile-gateway';
 import { DemoMemberReceiptsGateway } from './receipts/demo-member-receipts.gateway';
 import { MEMBER_RECEIPTS_GATEWAY } from './receipts/member-receipts-gateway';
@@ -32,7 +32,6 @@ import {
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
   UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY,
-  UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
   UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
@@ -234,14 +233,9 @@ export const memberRoutes: Routes = [
   {
     path: 'profile',
     providers: [
-      DemoMemberProfileGateway,
-      {
-        provide: MEMBER_PROFILE_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberProfileGateway)
-            : UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
-      },
+      // Refonte « zéro démo » : le profil membre n'a qu'un adaptateur HTTP réel.
+      HttpMemberProfileGateway,
+      { provide: MEMBER_PROFILE_GATEWAY, useExisting: HttpMemberProfileGateway },
     ],
     loadComponent: () =>
       import('./profile/member-profile.page').then((module) => module.MemberProfilePage),
