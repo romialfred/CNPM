@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -41,6 +41,7 @@ export class NewMemberRequestPage {
   private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly toasts = inject(ToastService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly title = inject(Title);
 
   protected readonly types = REQUEST_TYPES;
@@ -92,7 +93,7 @@ export class NewMemberRequestPage {
         subject: value.subject,
         description: value.description,
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (detail) => {
           this.submitted.set(true);

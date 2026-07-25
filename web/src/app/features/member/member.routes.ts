@@ -4,7 +4,7 @@ import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoMemberContributionsGateway } from './contributions/demo-member-contributions.gateway';
 import { HttpMemberContributionsGateway } from './contributions/http-member-contributions.gateway';
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
-import { DemoMemberDirectoryGateway } from './directory/demo-member-directory.gateway';
+import { HttpMemberDirectoryGateway } from './directory/http-member-directory.gateway';
 import { MEMBER_DIRECTORY_GATEWAY } from './directory/member-directory.gateway';
 import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.gateway';
 import { MEMBER_DOCUMENTS_GATEWAY } from './documents/member-documents-gateway';
@@ -28,7 +28,6 @@ import { MEMBER_SHOWCASE_ANALYTICS_GATEWAY } from './showcase-analytics/member-s
 import { HttpMemberUsersGateway } from './users/http-member-users.gateway';
 import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
-  UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
@@ -265,14 +264,9 @@ export const memberRoutes: Routes = [
   {
     path: 'directory',
     providers: [
-      DemoMemberDirectoryGateway,
-      {
-        provide: MEMBER_DIRECTORY_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberDirectoryGateway)
-            : UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
-      },
+      // Refonte « zéro démo » : annuaire réel via /portal/directory (organisations actives).
+      HttpMemberDirectoryGateway,
+      { provide: MEMBER_DIRECTORY_GATEWAY, useExisting: HttpMemberDirectoryGateway },
     ],
     loadComponent: () =>
       import('./directory/member-directory.page').then((module) => module.MemberDirectoryPage),

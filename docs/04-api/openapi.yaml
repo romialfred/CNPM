@@ -3010,6 +3010,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageResource'
+  /portal/directory:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister l'annuaire des organisations membres.
+      operationId: getMemberDirectory
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Organisations membres actives (projection non nominative)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
   /portal/payment-instructions:
     get:
       tags:

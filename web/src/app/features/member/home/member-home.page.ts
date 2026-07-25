@@ -1,5 +1,5 @@
 import { DecimalPipe, SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
@@ -54,6 +54,7 @@ const MEMBERSHIP_TONES: Readonly<Record<MembershipStatus, CnpmBadgeTone>> = {
 })
 export class MemberHomePage {
   private readonly gateway = inject(MEMBER_HOME_GATEWAY);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly title = inject(Title);
 
   protected readonly state = signal<PageState>('loading');
@@ -73,7 +74,7 @@ export class MemberHomePage {
     this.state.set('loading');
     this.gateway
       .load()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (dashboard) => {
           this.dashboard.set(dashboard);

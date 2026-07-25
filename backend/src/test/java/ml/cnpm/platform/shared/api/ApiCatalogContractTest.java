@@ -33,7 +33,7 @@ class ApiCatalogContractTest {
                         .toList();
 
         assertEquals(openApiOperationIds, catalogOperationIds);
-        assertEquals(112, catalogOperationIds.size());
+        assertEquals(113, catalogOperationIds.size());
         assertTrue(catalogOperationIds.contains("startEnrollmentReview"));
     }
 

@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -48,6 +48,7 @@ export class MemberRequestDetailPage {
   private readonly gateway = inject(MEMBER_REQUESTS_GATEWAY);
   private readonly formBuilder = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly title = inject(Title);
 
   /** Identifiant de la requête, lu depuis la route. */
@@ -70,7 +71,7 @@ export class MemberRequestDetailPage {
     this.state.set('loading');
     this.gateway
       .loadDetail(this.requestId)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (detail) => {
           this.request.set(detail);
@@ -90,7 +91,7 @@ export class MemberRequestDetailPage {
     this.sending.set(true);
     this.gateway
       .addMessage(this.requestId, this.replyForm.getRawValue().body)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (detail) => {
           this.request.set(detail);

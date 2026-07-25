@@ -1,5 +1,5 @@
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
@@ -44,6 +44,7 @@ type LoadState = 'loading' | 'ready' | 'error' | 'noMembership';
 })
 export class MemberRequestsPage {
   private readonly gateway = inject(MEMBER_REQUESTS_GATEWAY);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly title = inject(Title);
 
   protected readonly state = signal<LoadState>('loading');
@@ -58,7 +59,7 @@ export class MemberRequestsPage {
     this.state.set('loading');
     this.gateway
       .list(0, 50)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (page) => {
           this.requests.set(page.items);

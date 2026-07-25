@@ -1,5 +1,5 @@
 import { DecimalPipe, SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
@@ -44,6 +44,7 @@ const CHANNEL_LABELS: Readonly<Record<MemberPaymentChannel, string>> = {
 })
 export class MemberPaymentsPage {
   private readonly gateway = inject(MEMBER_PAYMENTS_GATEWAY);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly title = inject(Title);
 
   protected readonly state = signal<LoadState>('loading');
@@ -65,7 +66,7 @@ export class MemberPaymentsPage {
     this.state.set('loading');
     this.gateway
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (payments) => {
           this.payments.set(payments);

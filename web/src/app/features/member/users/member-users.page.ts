@@ -1,5 +1,5 @@
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
@@ -47,6 +47,7 @@ const STATUS_TONES: Readonly<Record<MemberUserStatus, CnpmBadgeTone>> = {
 })
 export class MemberUsersPage {
   private readonly gateway = inject(MEMBER_USERS_GATEWAY);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly title = inject(Title);
 
   protected readonly state = signal<LoadState>('loading');
@@ -61,7 +62,7 @@ export class MemberUsersPage {
     this.state.set('loading');
     this.gateway
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (users) => {
           this.users.set(users);

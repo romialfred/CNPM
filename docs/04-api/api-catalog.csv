@@ -69,6 +69,7 @@ POST;/portal/requests;PORTAL;createMemberRequest;Soumettre une requête depuis l
 GET;/portal/requests/{id};PORTAL;getMemberRequest;Consulter une requête du cotisant.
 POST;/portal/requests/{id}/messages;PORTAL;addMemberRequestMessage;Ajouter un échange à une requête du cotisant.
 GET;/portal/users;PORTAL;getMemberUsers;Lister les utilisateurs de l'organisation du cotisant.
+GET;/portal/directory;PORTAL;getMemberDirectory;Lister l'annuaire des organisations membres.
 GET;/portal/payment-instructions;PORTAL;getMemberPaymentInstructions;Afficher les instructions de paiement du cotisant.
 GET;/portal/profile;PORTAL;getMemberProfile;Afficher le profil du membre connecté.
 PUT;/portal/profile/avatar;PORTAL;updateMemberAvatar;Changer la photo de profil.
