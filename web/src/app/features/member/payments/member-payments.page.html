@@ -1,251 +1,85 @@
-<cnpm-member-portal-shell
-  organization="Sahel Agro SA"
-  userName="Responsable cotisations"
-  memberCode="CNPM-MBR-0142"
-  [notificationCount]="0"
->
+<cnpm-member-portal-shell>
   <main class="member-payments" id="contenu-principal">
     <cnpm-page-header
       title="Mes paiements"
-      description="Suivez l’avancement de vos règlements de cotisation."
-    >
-      <cnpm-button routerLink="/member/payments/new">Préparer un règlement</cnpm-button>
-    </cnpm-page-header>
+      description="Historique de vos encaissements et de leur confirmation par la CNPM."
+    />
 
-    <cnpm-alert tone="info" title="Encaissement en ligne à venir" [live]="false">
-      Le raccordement des canaux de paiement n’est pas encore actif : les demandes préparées ici
-      ne sont pas transmises à un opérateur et aucun reçu n’est encore émis.
-    </cnpm-alert>
-
-    @if (data(); as pageData) {
-      <section class="member-payments__metrics" aria-label="Synthèse des règlements filtrés" tabindex="0">
-        <article>
-          <span>Règlements trouvés</span>
-          <strong>{{ pageData.totalElements | number }}</strong>
-          <small>sur la période filtrée</small>
-        </article>
-        <article>
-          <span>Montants affichés</span>
-          <strong>{{ pageData.summary.displayedAmountXof | number: '1.0-0' }} FCFA</strong>
-          <small>hors confirmation CNPM</small>
-        </article>
-        <article>
-          <span>En examen</span>
-          <strong>{{ pageData.summary.processingCount | number }}</strong>
-          <small>en cours de traitement</small>
-        </article>
-        <article>
-          <span>Attention requise</span>
-          <strong>{{ pageData.summary.attentionCount | number }}</strong>
-          <small>avec explication</small>
-        </article>
-      </section>
-    }
-
-    <cnpm-filter-bar
-      [expanded]="filtersExpanded()"
-      [chips]="chips()"
-      (expandedChange)="filtersExpanded.set($event)"
-      (chipRemove)="removeFilter($event)"
-      (resetAll)="resetFilters()"
-    >
-      <form class="member-payments__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
-        <div class="member-payments__field member-payments__field--search">
-          <label for="member-payment-search">Recherche</label>
-          <input
-            id="member-payment-search"
-            type="search"
-            maxlength="80"
-            formControlName="search"
-            placeholder="Référence de suivi ou cotisation"
-          />
-        </div>
-        <div class="member-payments__field">
-          <label for="member-payment-status">Statut</label>
-          <select id="member-payment-status" formControlName="status">
-            <option value="">Tous les statuts</option>
-            @for (item of statuses; track item) {
-              <option [value]="item">{{ statusLabel(item) }}</option>
-            }
-          </select>
-        </div>
-        <div class="member-payments__field">
-          <label for="member-payment-channel">Canal</label>
-          <select id="member-payment-channel" formControlName="channel">
-            <option value="">Tous les canaux</option>
-            @for (item of channels; track item) {
-              <option [value]="item">{{ channelLabel(item) }}</option>
-            }
-          </select>
-        </div>
-        <div class="member-payments__field">
-          <label for="member-payment-sort">Tri et ordre</label>
-          <select id="member-payment-sort" formControlName="sortOption">
-            <option value="updatedAt:desc">Mise à jour — plus récente</option>
-            <option value="updatedAt:asc">Mise à jour — plus ancienne</option>
-            <option value="reference:asc">Référence — croissante</option>
-            <option value="reference:desc">Référence — décroissante</option>
-            <option value="amountXof:desc">Montant — décroissant</option>
-            <option value="amountXof:asc">Montant — croissant</option>
-            <option value="status:asc">Statut — croissant</option>
-          </select>
-        </div>
-        <cnpm-button type="submit">Appliquer</cnpm-button>
-      </form>
-    </cnpm-filter-bar>
-
-    <section class="member-payments__panel" aria-labelledby="member-payments-results-title">
-      <div class="member-payments__toolbar">
-        <div>
-          <h2 id="member-payments-results-title" #resultsTitle tabindex="-1">Historique</h2>
-          <p>Chaque statut explicite ce qui a été transmis ou confirmé.</p>
-        </div>
-        @if (data()) {
-          <p class="member-payments__count" aria-live="polite">
-            {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'règlement' : 'règlements' }}
-          </p>
-        }
-      </div>
-
-      @switch (state()) {
-        @case ('loading') {
-          <cnpm-skeleton
-            variant="table"
-            [rows]="pageSize()"
-            [columns]="columns.length"
-            label="Chargement des règlements…"
-          />
-        }
-        @case ('error') {
-          <cnpm-error-state
-            variant="recoverable"
-            title="L’historique n’a pas pu être chargé"
-            description="Réessayez la lecture de votre historique."
-          >
-            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
-          </cnpm-error-state>
-        }
-        @case ('unavailable') {
-          <cnpm-error-state
-            variant="recoverable"
-            title="Paiements indisponibles en mode HTTP"
-            description="GET /portal/payments ne décrit pas encore une projection membre typée. Aucune fixture n’est injectée dans ce mode."
-          />
-        }
-        @case ('empty') {
-          <cnpm-empty-state
-            variant="no-data"
-            title="Aucun règlement"
-            description="Aucun règlement n’est encore enregistré pour votre organisation."
-          >
-            <cnpm-button routerLink="/member/payments/new">Préparer un règlement</cnpm-button>
-          </cnpm-empty-state>
-        }
-        @case ('no-results') {
-          <cnpm-empty-state
-            variant="no-results"
-            title="Aucun règlement ne correspond"
-            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
-          >
-            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
-              Réinitialiser les filtres
-            </cnpm-button>
-          </cnpm-empty-state>
-        }
-        @case ('ready') {
-          <div class="member-payments__desktop-table">
-            <cnpm-data-table
-              caption="Règlements : référence, cotisation, date, montant, canal, statut et lien de suivi."
-              [columns]="columns"
-              [rows]="payments()"
-              [rowKey]="rowKey"
-            >
-              <ng-template #row let-payment>
-                <td class="cnpm-table__cell"><code>{{ payment.reference }}</code></td>
-                <td class="cnpm-table__cell"><code>{{ payment.contributionReference }}</code></td>
-                <td class="cnpm-table__cell">
-                  <time [attr.datetime]="payment.updatedAt">
-                    {{ payment.updatedAt | date: 'dd/MM/yyyy' }}
-                  </time>
-                </td>
-                <td class="cnpm-table__cell member-payments__amount">
-                  {{ payment.amountXof | number: '1.0-0' }} FCFA
-                </td>
-                <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
-                <td class="cnpm-table__cell">
-                  <cnpm-badge [tone]="statusTone(payment.status)">
-                    {{ statusLabel(payment.status) }}
-                  </cnpm-badge>
-                </td>
-                <td class="cnpm-table__cell">
-                  <a
-                    class="member-payments__detail-link"
-                    [routerLink]="['/member/payments', payment.id, 'status']"
-                    [queryParams]="detailQueryParams()"
-                    [attr.aria-label]="'Suivre le règlement ' + payment.reference"
-                  >
-                    Suivre
-                  </a>
-                </td>
-              </ng-template>
-            </cnpm-data-table>
+    @switch (state()) {
+      @case ('loading') {
+        <p class="member-payments__status" role="status">Chargement de vos paiements…</p>
+      }
+      @case ('noMembership') {
+        <cnpm-alert tone="info" title="Aucune adhésion rattachée">
+          <p>Ce compte n’est rattaché à aucune adhésion cotisante.</p>
+        </cnpm-alert>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Vos paiements n’ont pas pu être chargés.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (payments().length === 0) {
+          <cnpm-alert tone="info" title="Aucun paiement">
+            <p>
+              Aucun encaissement n’est encore enregistré pour votre organisation. Rendez-vous dans
+              « Comment payer » pour régler votre cotisation.
+            </p>
+          </cnpm-alert>
+        } @else {
+          <div class="member-payments__totals">
+            <div class="member-payments__total">
+              <span class="member-payments__total-label">Total encaissé</span>
+              <span class="member-payments__total-value">
+                {{ total() | number: '1.0-0' : 'fr' }} FCFA
+              </span>
+            </div>
+            <div class="member-payments__total">
+              <span class="member-payments__total-label">Confirmés</span>
+              <span class="member-payments__total-value">
+                {{ confirmedCount() }} / {{ payments().length }}
+              </span>
+            </div>
           </div>
 
-          <ol class="member-payments__mobile-list" aria-label="Règlements">
-            @for (payment of payments(); track payment.id) {
-              <li>
-                <article [attr.aria-labelledby]="'member-payment-' + payment.id">
-                  <header>
-                    <div>
-                      <h3 [id]="'member-payment-' + payment.id">{{ payment.reference }}</h3>
-                      <p>{{ payment.contributionReference }}</p>
-                    </div>
-                    <cnpm-badge [tone]="statusTone(payment.status)">
-                      {{ statusLabel(payment.status) }}
-                    </cnpm-badge>
-                  </header>
-                  <dl>
-                    <div>
-                      <dt>Montant</dt>
-                      <dd>{{ payment.amountXof | number: '1.0-0' }} FCFA</dd>
-                    </div>
-                    <div>
-                      <dt>Canal</dt>
-                      <dd>{{ channelLabel(payment.channel) }}</dd>
-                    </div>
-                    <div>
-                      <dt>Mise à jour</dt>
-                      <dd>{{ payment.updatedAt | date: 'dd/MM/yyyy' }}</dd>
-                    </div>
-                  </dl>
-                  @if (payment.failureExplanation) {
-                    <p class="member-payments__failure">{{ payment.failureExplanation }}</p>
-                  }
-                  <a
-                    class="member-payments__detail-link"
-                    [routerLink]="['/member/payments', payment.id, 'status']"
-                    [queryParams]="detailQueryParams()"
-                  >
-                    Voir le suivi expliqué
-                  </a>
-                </article>
-              </li>
-            }
-          </ol>
+          <div class="member-payments__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Transaction</th>
+                  <th scope="col">Référence</th>
+                  <th scope="col">Canal</th>
+                  <th scope="col" class="member-payments__num">Montant</th>
+                  <th scope="col">Payé le</th>
+                  <th scope="col">Statut</th>
+                  <th scope="col">Reçu</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (payment of payments(); track payment.id) {
+                  <tr>
+                    <td class="member-payments__mono">{{ payment.transactionNumber }}</td>
+                    <td class="member-payments__mono">{{ payment.referenceValue ?? '—' }}</td>
+                    <td>{{ channelLabel(payment.channel) }}</td>
+                    <td class="member-payments__num">
+                      {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
+                    </td>
+                    <td>{{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}</td>
+                    <td>
+                      <cnpm-badge [tone]="statusTone(payment.confirmed)">
+                        {{ statusLabel(payment.confirmed) }}
+                      </cnpm-badge>
+                    </td>
+                    <td class="member-payments__mono">{{ payment.receiptNumber ?? '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
       }
-
-      @if (state() === 'ready') {
-        <cnpm-pagination
-          [page]="page()"
-          [pageSize]="pageSize()"
-          [totalItems]="totalItems()"
-          [pageSizeOptions]="pageSizes"
-          (pageChange)="onPageChange($event)"
-          (pageSizeChange)="onPageSizeChange($event)"
-        />
-      }
-    </section>
+    }
   </main>
 </cnpm-member-portal-shell>

@@ -30,6 +30,8 @@ export interface MemberRow {
   readonly status: MemberStatus;
   /** Date ISO `AAAA-MM-JJ`, formatée à l'affichage seulement. */
   readonly lastActivity: string | null;
+  /** Date d'adhésion ISO `AAAA-MM-JJ` ; alimente « Membre depuis ». `null` si inconnue. */
+  readonly joinedAt: string | null;
   /** `null` tant que DATA-DEC-001 n'est pas portée par un contrat backend. */
   readonly isLargeContributor: boolean | null;
 }
@@ -58,6 +60,8 @@ export interface MembersOverview {
   readonly dormant: number;
   readonly prospects: number;
   readonly largeContributors: number;
+  /** Adhésions dont la date d'adhésion tombe dans l'année civile en cours. */
+  readonly newThisYear: number;
   readonly expected: number;
   readonly collected: number;
   /** Pourcentage 0–100 ; `null` si aucun montant n'est attendu, pour éviter une division par zéro. */

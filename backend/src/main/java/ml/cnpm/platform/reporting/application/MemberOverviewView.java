@@ -14,7 +14,7 @@ public record MemberOverviewView(
 
     public record Overview(
             long membersTotal, long active, long dormant, long prospects, long largeContributors,
-            long expected, long collected, Integer recoveryRate) { }
+            long newThisYear, long expected, long collected, Integer recoveryRate) { }
 
     /** Cotisation due (appelée) et payée (réglée) d'une organisation, pour la ligne du répertoire. */
     public record Financial(String organizationId, long due, long paid) { }

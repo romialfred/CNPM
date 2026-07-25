@@ -102,8 +102,19 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
       icon: 'contributions',
       entries: [
         { label: 'Cotisations', route: '/admin/contributions', icon: 'contributions' },
-        { label: 'Paiements', route: '/admin/payments/reconciliation', icon: 'payments' },
-        { label: 'Reçus', route: '/admin/receipts', icon: 'receipts' },
+        {
+          label: 'Comptes d’encaissement',
+          route: '/admin/collection-accounts',
+          icon: 'payments',
+        },
+        {
+          label: 'Références de paiement',
+          route: '/admin/payment-references',
+          icon: 'payments',
+        },
+        { label: 'Encaissements', route: '/admin/payments/recording', icon: 'payments' },
+        { label: 'Rapprochement', route: '/admin/reconciliation', icon: 'payments' },
+        { label: 'Reçus', route: '/admin/receipts-registry', icon: 'receipts' },
         { label: 'Relances', route: '/admin/recovery/campaigns', icon: 'reminders' },
       ],
     },

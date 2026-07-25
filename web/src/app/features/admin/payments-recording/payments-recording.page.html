@@ -1,0 +1,193 @@
+<cnpm-admin-shell>
+  <main class="cnpm-payments-recording" id="contenu-principal">
+    <cnpm-page-header
+      title="Encaissements"
+      description="Enregistrez un encaissement reçu contre la référence validée d’un cotisant. L’écriture est définitive et rattache le versement à son compte cotisant."
+    />
+
+    @if (canRecord()) {
+      <div class="cnpm-payments-recording__toolbar">
+        <p class="cnpm-payments-recording__count" role="status">
+          {{ payments().length }} encaissement{{ payments().length > 1 ? 's' : '' }} enregistré{{
+            payments().length > 1 ? 's' : ''
+          }}.
+        </p>
+        @if (!showForm()) {
+          <cnpm-button variant="primary" (click)="openForm()">Enregistrer un encaissement</cnpm-button>
+        }
+      </div>
+    }
+
+    @if (issuedReceipt(); as receipt) {
+      <cnpm-alert tone="success" title="Reçu officiel émis">
+        <p>
+          Reçu <strong>{{ receipt.number }}</strong> délivré au nom de la CNPM.
+        </p>
+        @if (receipt.token) {
+          <p class="cnpm-payments-recording__verify">
+            Jeton de vérification (à conserver, affiché une seule fois) :
+            <code>{{ receipt.token }}</code>
+          </p>
+        }
+        <cnpm-button variant="secondary" (click)="dismissReceipt()">Fermer</cnpm-button>
+      </cnpm-alert>
+    }
+
+    @if (showForm()) {
+      <section class="cnpm-payments-recording__form">
+        <h2 class="cnpm-payments-recording__form-title">Nouvel encaissement</h2>
+
+        @if (formError()) {
+          <cnpm-alert tone="error" title="Enregistrement impossible">
+            <p>{{ formError() }}</p>
+          </cnpm-alert>
+        }
+
+        <div class="cnpm-payments-recording__field">
+          <label class="cnpm-payments-recording__label" for="pr-reference">Référence du cotisant</label>
+          @if (loadingReferences()) {
+            <p class="cnpm-payments-recording__hint" role="status">Chargement des références validées…</p>
+          } @else if (validatedReferences().length === 0) {
+            <p class="cnpm-payments-recording__hint" role="status">
+              Aucune référence validée disponible. Validez d’abord une référence de paiement.
+            </p>
+          } @else {
+            <select
+              id="pr-reference"
+              class="cnpm-payments-recording__select"
+              [ngModel]="referenceId()"
+              (ngModelChange)="referenceId.set($event)"
+            >
+              <option value="">Choisir une référence…</option>
+              @for (reference of validatedReferences(); track reference.id) {
+                <option [value]="reference.id">
+                  {{ reference.referenceValue }} — {{ reference.organizationName }}
+                </option>
+              }
+            </select>
+          }
+        </div>
+
+        <div class="cnpm-payments-recording__grid">
+          <div class="cnpm-payments-recording__field">
+            <label class="cnpm-payments-recording__label" for="pr-channel">Canal</label>
+            <select
+              id="pr-channel"
+              class="cnpm-payments-recording__select"
+              [ngModel]="channel()"
+              (ngModelChange)="channel.set($event)"
+            >
+              @for (option of channels; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="cnpm-payments-recording__field">
+            <label class="cnpm-payments-recording__label" for="pr-amount">Montant (XOF)</label>
+            <input
+              id="pr-amount"
+              class="cnpm-payments-recording__input"
+              type="text"
+              inputmode="decimal"
+              placeholder="Ex. 150000"
+              [ngModel]="amount()"
+              (ngModelChange)="amount.set($event)"
+            />
+          </div>
+
+          <div class="cnpm-payments-recording__field">
+            <label class="cnpm-payments-recording__label" for="pr-provider">
+              Référence opérateur (facultatif)
+            </label>
+            <input
+              id="pr-provider"
+              class="cnpm-payments-recording__input"
+              type="text"
+              autocomplete="off"
+              placeholder="Ex. OM-TX-99312"
+              [ngModel]="providerTransactionId()"
+              (ngModelChange)="providerTransactionId.set($event)"
+            />
+          </div>
+        </div>
+
+        <div class="cnpm-payments-recording__form-actions">
+          <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="submitting()">
+            Annuler
+          </cnpm-button>
+          <cnpm-button
+            variant="primary"
+            (click)="submit()"
+            [loading]="submitting()"
+            [disabled]="validatedReferences().length === 0"
+          >
+            Enregistrer l’encaissement
+          </cnpm-button>
+        </div>
+      </section>
+    }
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="cnpm-payments-recording__status" role="status">Chargement des encaissements…</p>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les encaissements n’ont pas pu être chargés.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (payments().length === 0) {
+          <p class="cnpm-payments-recording__status" role="status">
+            Aucun encaissement n’a encore été enregistré.
+          </p>
+        } @else {
+          <div class="cnpm-payments-recording__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Transaction</th>
+                  <th scope="col">Cotisant</th>
+                  <th scope="col">Référence</th>
+                  <th scope="col">Canal</th>
+                  <th scope="col" class="cnpm-payments-recording__num">Montant</th>
+                  <th scope="col">Payé le</th>
+                  @if (canConfirm()) {
+                    <th scope="col">Action</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (payment of payments(); track payment.id) {
+                  <tr>
+                    <td class="cnpm-payments-recording__mono">{{ payment.transactionNumber }}</td>
+                    <td>{{ payment.organizationName ?? '—' }}</td>
+                    <td class="cnpm-payments-recording__mono">{{ payment.referenceValue ?? '—' }}</td>
+                    <td>{{ channelLabel(payment.channel) }}</td>
+                    <td class="cnpm-payments-recording__num">
+                      {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
+                    </td>
+                    <td>{{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}</td>
+                    @if (canConfirm()) {
+                      <td>
+                        <cnpm-button
+                          variant="primary"
+                          [loading]="confirmingId() === payment.id"
+                          (click)="confirm(payment)"
+                        >
+                          Confirmer &amp; émettre le reçu
+                        </cnpm-button>
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

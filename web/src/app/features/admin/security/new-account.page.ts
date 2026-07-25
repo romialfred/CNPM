@@ -7,10 +7,17 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
+import { LucideChevronRight } from '@lucide/angular';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
+import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
@@ -43,11 +50,13 @@ const MEMBER_ROLE_ID = 'membre-cnpm';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
+    FormsModule,
     AdminShellComponent,
     PageHeaderComponent,
     TextInputComponent,
     ButtonComponent,
     AlertComponent,
+    LucideChevronRight,
   ],
   templateUrl: './new-account.page.html',
   styleUrl: './new-account.page.scss',
@@ -59,6 +68,7 @@ export class NewAccountPage {
   private readonly toasts = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
+  protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly state = signal<PageState>('loading');
   protected readonly submitting = signal(false);
   protected readonly submitError = signal<string | null>(null);
@@ -121,6 +131,66 @@ export class NewAccountPage {
     );
   });
 
+  /** Recherche des permissions supplémentaires (par libellé humain ou code). */
+  protected readonly permissionSearch = signal('');
+
+  /** Domaines développés dans la matrice ; un domaine replié masque ses permissions. */
+  private readonly expandedDomains = signal<ReadonlySet<string>>(new Set());
+
+  /**
+   * Permissions supplémentaires regroupées par domaine, filtrées par la recherche. Chaque
+   * groupe porte son nombre de permissions accordées, pour situer d'un coup d'œil ce que
+   * l'opérateur a ajouté. Une recherche active développe d'office les domaines qui
+   * correspondent — sans elle, on ne verrait que des en-têtes.
+   */
+  protected readonly extraPermissionGroups = computed(() => {
+    const term = this.permissionSearch().trim().toLowerCase();
+    const selected = this.extraPermissions();
+    const byDomain = new Map<string, PermissionRow[]>();
+    for (const permission of this.extraPermissionOptions()) {
+      if (
+        term &&
+        !permission.description.toLowerCase().includes(term) &&
+        !permission.label.toLowerCase().includes(term)
+      ) {
+        continue;
+      }
+      const list = byDomain.get(permission.domain) ?? [];
+      list.push(permission);
+      byDomain.set(permission.domain, list);
+    }
+    return [...byDomain.entries()]
+      .sort((left, right) => left[0].localeCompare(right[0], 'fr'))
+      .map(([domain, permissions]) => ({
+        domain,
+        permissions: permissions
+          .slice()
+          .sort((a, b) => a.description.localeCompare(b.description, 'fr')),
+        selectedCount: permissions.filter((permission) => selected.has(permission.id)).length,
+        // Développé si demandé explicitement, ou pendant une recherche qui a filtré le groupe.
+        expanded: Boolean(term) || this.expandedDomains().has(domain),
+      }));
+  });
+
+  /** Nombre total de permissions supplémentaires accordées, pour le compteur. */
+  protected readonly extraSelectedCount = computed(() => this.extraPermissions().size);
+
+  protected isDomainExpanded(domain: string): boolean {
+    return Boolean(this.permissionSearch().trim()) || this.expandedDomains().has(domain);
+  }
+
+  protected toggleDomain(domain: string): void {
+    this.expandedDomains.update((current) => {
+      const next = new Set(current);
+      if (next.has(domain)) {
+        next.delete(domain);
+      } else {
+        next.add(domain);
+      }
+      return next;
+    });
+  }
+
   /** Membres (adhésions) sans compte, proposés à la création d'un compte membre. */
   protected readonly membersWithoutAccount = computed<readonly MemberWithoutAccount[]>(
     () => this.snapshot()?.membersWithoutAccount ?? [],
@@ -151,7 +221,8 @@ export class NewAccountPage {
   });
 
   protected readonly selectedMember = computed<MemberWithoutAccount | null>(
-    () => this.membersWithoutAccount().find((member) => member.id === this.selectedMemberId()) ?? null,
+    () =>
+      this.membersWithoutAccount().find((member) => member.id === this.selectedMemberId()) ?? null,
   );
 
   /** Pour un compte membre, un membre DOIT être choisi (l'identité en découle). */

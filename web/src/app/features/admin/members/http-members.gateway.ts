@@ -43,6 +43,7 @@ interface MemberOverviewResponse {
     readonly dormant: number;
     readonly prospects: number;
     readonly largeContributors: number;
+    readonly newThisYear: number;
     readonly expected: number;
     readonly collected: number;
     readonly recoveryRate: number | null;
@@ -170,6 +171,7 @@ export class HttpMembersGateway implements MembersGateway {
       paid: null,
       status: this.mapStatus(item.status),
       lastActivity: null,
+      joinedAt: item.joinedAt ?? null,
       isLargeContributor: null,
     };
   }

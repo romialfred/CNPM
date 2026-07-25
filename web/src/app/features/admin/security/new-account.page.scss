@@ -254,26 +254,180 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
-.cnpm-new-account__checks {
-  display: grid;
-  gap: var(--cnpm-space-2);
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+/* Texte réservé aux lecteurs d'écran. */
+.cnpm-new-account__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
-.cnpm-new-account__check {
+/* En-tête des permissions supplémentaires : titre + compteur des droits ajoutés. */
+.cnpm-new-account__extra-head {
   display: flex;
   align-items: flex-start;
-  gap: var(--cnpm-space-2);
-  font-size: var(--cnpm-font-size-sm);
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
 }
 
-.cnpm-new-account__check span {
-  display: grid;
-}
-
-.cnpm-new-account__check small {
+.cnpm-new-account__extra-hint {
+  margin: var(--cnpm-space-1) 0 0;
   color: var(--cnpm-color-text-muted);
   font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__counter {
+  flex: none;
+  padding: 0.125rem var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-neutral-100);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  white-space: nowrap;
+}
+
+.cnpm-new-account__counter--active {
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+}
+
+/* Recherche des permissions. */
+.cnpm-new-account__search-input {
+  width: 100%;
+  height: var(--cnpm-size-control-md);
+  padding: 0 var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  font-family: var(--cnpm-font-family-sans);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-new-account__search-input:focus-visible {
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+/* Matrice repliable : un domaine par section, bordée. */
+.cnpm-new-account__domains {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-new-account__domain {
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-surface-primary);
+  overflow: hidden;
+}
+
+.cnpm-new-account__domain-head {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  width: 100%;
+  padding: var(--cnpm-space-3);
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--cnpm-color-text-primary);
+  cursor: pointer;
+  text-align: start;
+}
+
+.cnpm-new-account__domain-head:hover {
+  background: var(--cnpm-color-neutral-50);
+}
+
+.cnpm-new-account__domain-head:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: -2px;
+}
+
+.cnpm-new-account__domain-chevron {
+  flex: none;
+  color: var(--cnpm-color-text-muted);
+  transition: transform var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+}
+
+.cnpm-new-account__domain-chevron--open {
+  transform: rotate(90deg);
+}
+
+.cnpm-new-account__domain-name {
+  flex: 1 1 auto;
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+/* Pastille du nombre de droits accordés dans le domaine. */
+.cnpm-new-account__domain-badge {
+  flex: none;
+  min-width: 1.25rem;
+  padding: 0 var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-align: center;
+}
+
+.cnpm-new-account__domain-total {
+  flex: none;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-new-account__perms {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 var(--cnpm-space-3) var(--cnpm-space-2);
+  list-style: none;
+}
+
+.cnpm-new-account__perm {
+  border-top: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-new-account__perm-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3) 0;
+  cursor: pointer;
+}
+
+.cnpm-new-account__perm-toggle {
+  margin-top: 0.15rem;
+  flex: none;
+}
+
+.cnpm-new-account__perm-text {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.cnpm-new-account__perm-name {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+}
+
+/* Le code technique reste visible, mais discret : repère pour l'expert, pas le titre. */
+.cnpm-new-account__perm-code {
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
 }
 
 .cnpm-new-account__note {

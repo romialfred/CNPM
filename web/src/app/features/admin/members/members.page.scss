@@ -18,9 +18,11 @@
    `minmax(0, 1fr)` empêche la colonne du tableau de se dimensionner sur son min-content :
    sans cela, une table pousserait la grille au-delà de la page au lieu de défiler dans
    son propre conteneur. */
+/* Colonne unique : le volet latéral a été supprimé (ses chiffres sont remontés dans les
+   tuiles). L'écran s'étend désormais sur toute la largeur disponible. */
 .cnpm-members__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 20rem;
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: var(--cnpm-space-4);
   min-width: 0;
@@ -58,6 +60,12 @@
 
 .cnpm-members__filter-row .cnpm-members__filter {
   flex: 1 1 8rem;
+}
+
+/* La bascule tableau/tuiles ne s'étire pas comme un champ : elle garde sa largeur
+   naturelle à droite de la rangée de filtres. */
+.cnpm-members__filter-row .cnpm-members__filter--views {
+  flex: 0 0 auto;
 }
 
 /* Total et bascule de présentation sur une même ligne, aux deux extrémités. */
@@ -238,13 +246,6 @@
   border: 0;
 }
 
-.cnpm-members__aside {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-4);
-  min-width: 0;
-}
-
 /* BO-002 est un outil expert : la densite compacte est activee au desktop tout en
    restant composee exclusivement avec les tokens du socle. Les viewports tactiles
    conservent leurs cibles de 44 px dans les media queries existantes. */
@@ -261,42 +262,13 @@
     --cnpm-font-size-sm: var(--cnpm-font-size-xs);
   }
 
-  cnpm-insight-summary {
-    --cnpm-layout-cardPadding: var(--cnpm-space-4);
-    --cnpm-space-3: var(--cnpm-space-2);
-    --cnpm-font-size-sm: var(--cnpm-font-size-xs);
-  }
-
   cnpm-pagination {
     --cnpm-size-control-md: var(--cnpm-size-control-sm);
     --cnpm-font-size-sm: var(--cnpm-font-size-xs);
   }
 }
 
-/* Sous 1440 px, la fiche fait du panneau un tiroir. Faute de spécification de ce
-   tiroir, la synthèse passe sous la liste : elle reste lisible et complète, plutôt
-   que d'être masquée derrière un contrôle non spécifié. */
-/* Sous 1280 px, tout s'empile en une colonne : bandeau, filtres, tableau, puis la
-   synthèse. Le tableau garde ainsi la pleine largeur et la synthèse reste lisible sous
-   lui. Le seuil est descendu de 1440 à 1280 pour que le panneau « monte » au niveau des
-   tuiles sur les écrans d'ordinateur portable courants, et pas seulement sur les très
-   grands écrans. */
-@media (max-width: 1279px) {
-  .cnpm-members__layout {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .cnpm-members__aside {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  cnpm-insight-summary {
-    flex: 1 1 18rem;
-  }
-}
-
-/* La colonne de gauche devient trop étroite pour quatre filtres alignés : ils s'empilent. */
+/* La colonne devient trop étroite pour quatre filtres alignés : ils s'empilent. */
 @media (max-width: 1023px) {
   .cnpm-members__filter-row .cnpm-members__filter {
     flex-basis: 100%;
@@ -304,10 +276,6 @@
 }
 
 @media (max-width: 767px) {
-  .cnpm-members__aside {
-    flex-direction: column;
-  }
-
   .cnpm-members__select,
   .cnpm-members__input {
     height: var(--cnpm-size-control-lg);
@@ -329,20 +297,19 @@
   border-radius: var(--cnpm-radius-md);
 }
 
+/* Icônes seules (demande du commanditaire) : le bouton devient carré à la hauteur de
+   contrôle standard ; son libellé vit dans `aria-label` et l'infobulle. */
 .cnpm-members__view {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--cnpm-space-2);
-  min-height: var(--cnpm-size-control-md);
-  padding-inline: var(--cnpm-space-4);
+  display: inline-grid;
+  place-items: center;
+  width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
   border: 0;
   border-radius: var(--cnpm-radius-sm);
   background: transparent;
   color: var(--cnpm-color-text-secondary);
   cursor: pointer;
   font: inherit;
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .cnpm-members__view--active {
@@ -438,4 +405,19 @@
   margin: 0;
   color: var(--cnpm-color-text-secondary);
   font-size: var(--cnpm-font-size-sm);
+}
+
+/* Ancienneté : ligne discrète avec pictogramme, sous la catégorie. */
+.cnpm-members__tile-since {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-members__tile-since svg {
+  flex: none;
+  color: var(--cnpm-color-text-muted);
 }

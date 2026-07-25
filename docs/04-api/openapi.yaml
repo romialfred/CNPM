@@ -115,6 +115,209 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ResourceInput'
+  /auth/login:
+    post:
+      tags:
+      - AUTH
+      summary: Étape identifiants de l'authentification native.
+      description: >-
+        Vérifie l'identifiant et le mot de passe applicatif, puis émet un défi de second
+        facteur. **Aucune session n'est jamais délivrée ici** : l'accès complet ne s'obtient
+        qu'après `/auth/mfa/verify` (compte enrôlé) ou `/auth/mfa/enroll/confirm` (première
+        connexion). Identifiant inconnu et mot de passe erroné produisent la même réponse
+        401, pour ne pas révéler l'existence d'un compte.
+      operationId: submitNativeCredentials
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NativeCredentialsInput'
+      responses:
+        '401':
+          description: Identifiants non reconnus (réponse volontairement indifférenciée).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '403':
+          description: Aucun rôle attribué — sans rôle, aucun second facteur n'est exigible, donc aucun accès n'est ouvert.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '428':
+          description: >-
+            Second facteur requis. `MFA_REQUIRED` pour un compte déjà enrôlé,
+            `MFA_ENROLLMENT_REQUIRED` pour une première connexion. Le défi renvoyé est
+            l'unique entrée des étapes suivantes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthChallenge'
+      x-requirements:
+      - AUTH-007
+  /auth/password:
+    post:
+      tags:
+      - AUTH
+      summary: Poser son mot de passe avec un jeton à usage unique.
+      description: >-
+        Le titulaire du compte pose lui-même son secret, sur présentation du jeton reçu à
+        l'activation ou à la récupération d'accès. Route publique par nécessité : c'est le
+        jeton qui autorise, et exiger une session rendrait la récupération impossible pour
+        qui a justement perdu son accès. Le second facteur déjà enrôlé n'est pas touché.
+        La réponse est vide : confirmer quoi que ce soit sur le compte ferait de ce point
+        d'entrée un oracle d'existence.
+      operationId: setAccountPassword
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPasswordInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: >-
+            Jeton inconnu, expiré ou déjà consommé, ou mot de passe trop court. Les trois
+            premiers cas se répondent à l'identique, pour ne pas indiquer lequel est vrai.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '204':
+          description: Mot de passe posé ; le jeton est consommé.
+      x-requirements:
+      - PRT-001
+  /auth/mfa/enroll/start:
+    post:
+      tags:
+      - AUTH
+      summary: Commencer l'enrôlement du second facteur.
+      description: >-
+        Remet la clé manuelle et l'URI `otpauth://` à présenter en QR code. Le secret est
+        détenu chiffré par l'application (AES-GCM) et n'est jamais renvoyé en clair au-delà
+        de cet enrôlement, qui exige un défi valide obtenu à l'étape identifiants.
+      operationId: startTotpEnrollment
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthChallengeInput'
+      responses:
+        '401':
+          description: Défi absent, expiré ou invalide.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '429':
+          description: Trop de tentatives — le défi est verrouillé.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '200':
+          description: Éléments d'enrôlement à afficher une seule fois.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotpEnrollment'
+      x-requirements:
+      - AUTH-007
+  /auth/mfa/enroll/confirm:
+    post:
+      tags:
+      - AUTH
+      summary: Activer le second facteur avec le premier code produit.
+      description: >-
+        Le premier code valide prouve la possession de l'appareil : le second facteur
+        devient actif et la session s'ouvre dans la foulée, sans imposer une reconnexion.
+        Les codes de secours sont remis **une seule fois** ici ; seules leurs empreintes
+        sont conservées.
+      operationId: confirmTotpEnrollment
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthCodeInput'
+      responses:
+        '401':
+          description: Code refusé, ou défi absent, expiré ou invalide.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '429':
+          description: Trop de tentatives — le défi est verrouillé.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '200':
+          description: Second facteur activé, session ouverte, codes de secours remis.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+      x-requirements:
+      - AUTH-007
+  /auth/mfa/verify:
+    post:
+      tags:
+      - AUTH
+      summary: Vérifier le second facteur et ouvrir la session.
+      description: >-
+        Accepte un code TOTP à six chiffres ou un code de secours mono-usage. Un même pas
+        TOTP ne peut pas être rejoué. C'est le seul point qui délivre un jeton de session à
+        un compte déjà enrôlé.
+      operationId: verifyTotpCode
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthCodeInput'
+      responses:
+        '401':
+          description: Code refusé, rejoué, ou défi absent, expiré ou invalide.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '429':
+          description: Trop de tentatives — le défi est verrouillé.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthFailure'
+        '200':
+          description: Session ouverte.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+      x-requirements:
+      - AUTH-007
   /reference-values:
     get:
       tags:
@@ -1357,11 +1560,145 @@ paths:
       - COT-006
       - COT-007
       - COT-008
-  /payment-references:
+  /collection-accounts:
+    get:
+      tags:
+      - PAYMENT
+      summary: Lister les comptes d'encaissement de la CNPM.
+      operationId: listCollectionAccounts
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Liste des comptes d'encaissement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
     post:
       tags:
       - PAYMENT
-      summary: Créer une référence validée CNPM.
+      summary: Enregistrer un compte d'encaissement en brouillon.
+      operationId: createCollectionAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+  /collection-accounts/{id}/approve:
+    post:
+      tags:
+      - PAYMENT
+      summary: Valider un compte d'encaissement (le rendre diffusable).
+      operationId: approveCollectionAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /collection-accounts/{id}/disable:
+    post:
+      tags:
+      - PAYMENT
+      summary: Désactiver un compte d'encaissement.
+      operationId: disableCollectionAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+  /payment-references:
+    get:
+      tags:
+      - PAYMENT
+      summary: Lister les références de paiement.
+      operationId: listPaymentReferences
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Liste des références de paiement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+    post:
+      tags:
+      - PAYMENT
+      summary: Générer la référence de paiement d'un cotisant.
       operationId: createPaymentReference
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
@@ -1406,6 +1743,72 @@ paths:
       - PAY-006
       - PAY-007
       - PAY-008
+  /payment-references/{id}/validate:
+    post:
+      tags:
+      - PAYMENT
+      summary: Valider une référence de paiement (la rendre diffusable).
+      operationId: validatePaymentReference
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /payment-references/{id}/revoke:
+    post:
+      tags:
+      - PAYMENT
+      summary: Révoquer une référence de paiement.
+      operationId: revokePaymentReference
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
   /payments:
     get:
       tags:
@@ -1444,6 +1847,45 @@ paths:
       - PAY-006
       - PAY-007
       - PAY-008
+    post:
+      tags:
+      - PAYMENT
+      summary: Enregistrer un encaissement reçu.
+      operationId: recordPayment
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Opération effectuée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '201':
+          description: Ressource créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
   /payments/{id}:
     get:
       tags:
@@ -2281,9 +2723,47 @@ paths:
       tags:
       - PORTAL
       summary: Afficher cotisations et soldes.
+      description: >-
+        Appels de cotisation du membre connecté. Le périmètre est déduit du compte
+        authentifié : **aucun identifiant d'adhésion n'est accepté en entrée**, et un compte
+        sans adhésion rattachée obtient 404. Collection paginée et bornée côté serveur.
       operationId: getMemberContributions
       parameters:
       - $ref: '#/components/parameters/CorrelationId'
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - A_ECHOIR
+          - EN_RETARD
+          - PARTIELLE
+          - REGLEE
+      - name: exercise
+        in: query
+        schema:
+          type: integer
+          minimum: 2000
+          maximum: 2999
+      - name: sort
+        in: query
+        schema:
+          type: string
+          enum:
+          - dueDate
+          - reference
+          - status
+          default: dueDate
+      - name: direction
+        in: query
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+          default: asc
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
       responses:
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -2293,16 +2773,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '422':
-          $ref: '#/components/responses/Unprocessable'
         '200':
-          description: Ressource
+          description: Page d'appels de cotisation du membre connecté.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Resource'
+                $ref: '#/components/schemas/MemberContributionPage'
       x-requirements:
       - PRT-001
       - PRT-002
@@ -2312,6 +2788,38 @@ paths:
       - PRT-006
       - PRT-007
       - PRT-008
+  /portal/contributions/{contributionId}:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher le détail d'un appel de cotisation.
+      description: >-
+        Échéancier et ajustements de l'appel. Un appel appartenant à une autre adhésion
+        répond 404, exactement comme un appel inexistant : la réponse ne révèle pas
+        l'existence de la cotisation d'un autre membre.
+      operationId: getMemberContributionDetail
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: contributionId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Détail de l'appel, échéancier et ajustements compris.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberContributionDetail'
+      x-requirements:
+      - PRT-006
   /portal/payments:
     get:
       tags:
@@ -2348,6 +2856,285 @@ paths:
       - PRT-006
       - PRT-007
       - PRT-008
+  /portal/receipts:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher les reçus officiels du cotisant.
+      operationId: getMemberReceipts
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Reçus émis pour l'adhésion du cotisant connecté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/requests:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister les requêtes du cotisant.
+      operationId: getMemberRequests
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Requêtes de l'organisation du cotisant connecté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+    post:
+      tags:
+      - PORTAL
+      summary: Soumettre une requête depuis le portail membre.
+      operationId: createMemberRequest
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '201':
+          description: Requête créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/requests/{id}:
+    get:
+      tags:
+      - PORTAL
+      summary: Consulter une requête du cotisant.
+      operationId: getMemberRequest
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Détail et conversation partagée de la requête
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/requests/{id}/messages:
+    post:
+      tags:
+      - PORTAL
+      summary: Ajouter un échange à une requête du cotisant.
+      operationId: addMemberRequestMessage
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '201':
+          description: Échange ajouté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/users:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister les utilisateurs de l'organisation du cotisant.
+      operationId: getMemberUsers
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Utilisateurs de l'organisation du cotisant connecté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+  /portal/directory:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister l'annuaire des organisations membres.
+      operationId: getMemberDirectory
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Organisations membres actives (projection non nominative)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+  /portal/events:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister les actualités et événements publiés du CNPM.
+      operationId: getMemberEvents
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Événements CNPM publiés (hors brouillon et annulés)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+  /portal/payment-instructions:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher les instructions de paiement du cotisant.
+      operationId: getMemberPaymentInstructions
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Références validées et coordonnées d'encaissement actives
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/profile:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher le profil du membre connecté.
+      operationId: getMemberProfile
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Profil du compte
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/profile/avatar:
+    put:
+      tags:
+      - PORTAL
+      summary: Changer la photo de profil.
+      operationId: updateMemberAvatar
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+    delete:
+      tags:
+      - PORTAL
+      summary: Retirer la photo de profil.
+      operationId: deleteMemberAvatar
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
   /portal/documents:
     get:
       tags:
@@ -3694,6 +4481,213 @@ paths:
                 $ref: '#/components/schemas/AdminSecuritySnapshot'
       x-requirements:
       - BO-030
+  /admin/security/accounts:
+    post:
+      tags:
+      - ADMIN
+      summary: Créer un compte de la plateforme.
+      description: >-
+        Le compte naît « invité » : aucun mot de passe ne transite par cette API et le
+        second facteur reste à enrôler à la première connexion (AUTH-007). Création
+        sensible, donc protégée par une clé d'idempotence — un rejeu de la même clé
+        renvoie le compte déjà créé sans en créer un second.
+      operationId: createAdminSecurityAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSecurityAccountInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Rejeu idempotent — le compte existait déjà pour cette clé.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSecurityAccount'
+        '201':
+          description: Compte créé, invité, second facteur en attente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSecurityAccount'
+      x-requirements:
+      - BO-030
+  /admin/security/accounts/{accountId}/status:
+    post:
+      tags:
+      - ADMIN
+      summary: Suspendre ou réactiver un compte.
+      description: >-
+        Opération sensible : le motif est obligatoire et l'événement d'audit est écrit
+        dans la même transaction que le changement d'état.
+      operationId: changeAdminSecurityAccountStatus
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSecurityAccountStatusInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '200':
+          description: Compte dans son nouvel état.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSecurityAccount'
+      x-requirements:
+      - BO-030
+  /admin/security/accounts/{accountId}:
+    delete:
+      tags:
+      - ADMIN
+      summary: Supprimer un compte de la plateforme.
+      description: >-
+        Supprime définitivement le compte et ses rattachements (rôles, second facteur,
+        jetons d'accès), libérant l'adhésion éventuellement liée. Aucune écriture financière
+        n'étant rattachée à un compte, rien d'immuable n'est touché. Un opérateur ne peut pas
+        supprimer son propre compte. Le motif est obligatoire et tracé avant la suppression.
+      operationId: deleteAdminSecurityAccount
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSecurityReasonInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: L'opérateur vise son propre compte.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '204':
+          description: Compte supprimé.
+      x-requirements:
+      - BO-030
+  /admin/security/accounts/{accountId}/password-reset:
+    post:
+      tags:
+      - ADMIN
+      summary: Émettre un lien d'activation ou de récupération d'accès.
+      description: >-
+        Émet un jeton à usage unique et à durée bornée, remis **une seule fois** dans cette
+        réponse : seule son empreinte est conservée, il ne pourra pas être relu. Le
+        titulaire pose ensuite lui-même son mot de passe via `/auth/password` —
+        l'administration ne le connaît jamais, ce qui préserve la non-répudiation des
+        actions de l'utilisateur. Émettre un nouveau jeton invalide les précédents.
+      operationId: issueAccountCredentialToken
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Compte suspendu — rétablir son accès contournerait la suspension.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '200':
+          description: Jeton émis, à transmettre au titulaire du compte.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountCredentialToken'
+      x-requirements:
+      - BO-030
+  /admin/security/accounts/{accountId}/two-factor/reset:
+    post:
+      tags:
+      - ADMIN
+      summary: Réinitialiser le second facteur d'un compte.
+      description: >-
+        Efface le secret TOTP et les codes de secours du compte visé : à sa prochaine
+        connexion, l'utilisateur ré-enrôle son second facteur. Aucun secret n'est renvoyé.
+        Le motif est obligatoire et tracé.
+      operationId: resetAdminSecurityAccountTwoFactor
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: accountId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSecurityReasonInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Compte dont le second facteur est repassé en attente d'enrôlement.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSecurityAccount'
+      x-requirements:
+      - BO-030
 components:
   securitySchemes:
     oauth2:
@@ -3963,7 +4957,7 @@ components:
         accounts:
           type: array
           items:
-            type: object
+            $ref: '#/components/schemas/AdminSecurityAccount'
         roles:
           type: array
           items:
@@ -3990,6 +4984,468 @@ components:
           type: object
         canManagePermissions:
           type: boolean
+    MemberContributionStatus:
+      type: string
+      description: >-
+        État d'affichage dérivé du solde et de l'échéance : REGLEE si le solde est nul,
+        EN_RETARD si l'échéance est passée et qu'il reste un solde, PARTIELLE si un
+        paiement a réduit le solde sans l'éteindre, A_ECHOIR sinon. Le retard prime sur le
+        partiel.
+      enum:
+      - A_ECHOIR
+      - EN_RETARD
+      - PARTIELLE
+      - REGLEE
+    MemberContributionSummary:
+      type: object
+      required:
+      - id
+      - reference
+      - exercise
+      - dueDate
+      - calledAmount
+      - paidAmount
+      - outstandingAmount
+      - currency
+      - status
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        reference:
+          type: string
+          maxLength: 60
+        exercise:
+          type: integer
+        dueDate:
+          type: string
+          format: date
+        calledAmount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+        paidAmount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+        outstandingAmount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        status:
+          $ref: '#/components/schemas/MemberContributionStatus'
+    MemberContributionPage:
+      type: object
+      required:
+      - items
+      - page
+      - size
+      - totalElements
+      - totalPages
+      - availableExercises
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberContributionSummary'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        availableExercises:
+          type: array
+          description: Exercices réellement présents pour cette adhésion, pour ne pas proposer une année vide au filtre.
+          items:
+            type: integer
+    MemberContributionInstallment:
+      type: object
+      required:
+      - id
+      - label
+      - dueDate
+      - expectedAmount
+      - paidAmount
+      - outstandingAmount
+      - currency
+      - status
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        label:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        expectedAmount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+        paidAmount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+        outstandingAmount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        status:
+          $ref: '#/components/schemas/MemberContributionStatus'
+    MemberContributionAdjustment:
+      type: object
+      required:
+      - reference
+      - direction
+      - amount
+      - currency
+      - reason
+      - recordedOn
+      properties:
+        reference:
+          type: string
+        direction:
+          type: string
+          enum:
+          - CREDIT
+          - DEBIT
+        amount:
+          type: string
+          pattern: ^-?\d{1,17}(\.\d{1,2})?$
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        reason:
+          type: string
+        recordedOn:
+          type: string
+          format: date
+    MemberContributionDetail:
+      allOf:
+      - $ref: '#/components/schemas/MemberContributionSummary'
+      - type: object
+        required:
+        - issuedOn
+        - amountOriginNote
+        - adjustments
+        - schedule
+        properties:
+          issuedOn:
+            type: string
+            format: date
+          amountOriginNote:
+            type: string
+            description: Note factuelle situant l'appel ; elle n'explique aucun calcul de barème que cette projection ne connaît pas.
+          adjustments:
+            type: array
+            items:
+              $ref: '#/components/schemas/MemberContributionAdjustment'
+          schedule:
+            type: array
+            items:
+              $ref: '#/components/schemas/MemberContributionInstallment'
+    AccountCredentialToken:
+      type: object
+      description: >-
+        Jeton d'activation ou de récupération, restitué une seule fois. Seule son empreinte
+        SHA-256 est conservée : il ne peut pas être relu, et une fuite de la base ne livre
+        aucun jeton utilisable.
+      required:
+      - token
+      - expiresAt
+      - activation
+      properties:
+        token:
+          type: string
+          description: À transmettre au titulaire du compte et à ne conserver nulle part.
+        expiresAt:
+          type: string
+          format: date-time
+        activation:
+          type: boolean
+          description: >-
+            Vrai pour une première mise en service (le compte n'avait aucun mot de passe),
+            faux pour une récupération d'accès. Distinguer les deux évite d'annoncer une
+            « réinitialisation » à qui n'a jamais eu de mot de passe.
+    SetPasswordInput:
+      type: object
+      description: >-
+        Le mot de passe n'est accepté que dans le corps de la requête, jamais en paramètre
+        d'URL : une URL se retrouve dans les journaux de serveurs, de proxys et d'historiques.
+      required:
+      - token
+      - password
+      properties:
+        token:
+          type: string
+          maxLength: 200
+        password:
+          type: string
+          format: password
+          minLength: 12
+          maxLength: 200
+          description: Longueur minimale de 12 caractères (plancher technique, cf. AUTH-DEC-027).
+      additionalProperties: false
+    NativeCredentialsInput:
+      type: object
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        password:
+          type: string
+          format: password
+          description: Mot de passe applicatif. Jamais journalisé, jamais renvoyé, jamais placé en paramètre d'URL.
+      additionalProperties: false
+    AuthChallengeInput:
+      type: object
+      required:
+      - challenge
+      properties:
+        challenge:
+          type: string
+          description: Jeton de défi remis par `/auth/login`. Opaque, à durée de vie courte, à usage unique.
+      additionalProperties: false
+    AuthCodeInput:
+      type: object
+      description: >-
+        Un code TOTP OU un code de secours. Fournir les deux n'ouvre aucun droit
+        supplémentaire ; le serveur tranche selon ce qu'il reçoit.
+      required:
+      - challenge
+      properties:
+        challenge:
+          type: string
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+          description: Code à usage unique à six chiffres produit par l'application d'authentification.
+        recoveryCode:
+          type: string
+          description: Code de secours mono-usage, accepté à la place du code TOTP.
+      additionalProperties: false
+    TotpEnrollment:
+      type: object
+      description: >-
+        Éléments d'enrôlement, à afficher une seule fois. La clé manuelle est l'alternative
+        au QR code lorsque la caméra n'est pas utilisable ; elle n'est plus jamais restituée
+        ensuite.
+      required:
+      - manualKey
+      - otpAuthUri
+      properties:
+        manualKey:
+          type: string
+        otpAuthUri:
+          type: string
+          description: URI `otpauth://totp/...` à encoder en QR code côté client.
+    AuthSession:
+      type: object
+      required:
+      - status
+      - accessToken
+      properties:
+        status:
+          type: string
+          enum:
+          - AUTHENTICATED
+        accessToken:
+          type: string
+          description: Jeton de session applicatif (HS256, durée de vie bornée).
+        recoveryCodes:
+          type: array
+          description: Remis UNIQUEMENT à l'activation du second facteur ; seules leurs empreintes sont conservées.
+          items:
+            type: string
+    AuthChallenge:
+      type: object
+      required:
+      - errorCode
+      - errorMessage
+      - challenge
+      properties:
+        errorCode:
+          type: string
+          enum:
+          - MFA_REQUIRED
+          - MFA_ENROLLMENT_REQUIRED
+        errorMessage:
+          type: string
+        challenge:
+          type: string
+    AuthFailure:
+      type: object
+      description: >-
+        Échec d'une étape d'authentification. Format propre au parcours de connexion et
+        distinct du `Problem` du reste de l'API — divergence assumée et consignée
+        (AUTH-DEC-024). Le message reste volontairement pauvre : il ne dit ni si le compte
+        existe, ni quelle partie a échoué.
+      required:
+      - errorCode
+      - errorMessage
+      properties:
+        errorCode:
+          type: string
+          enum:
+          - INVALID_CREDENTIALS
+          - NO_ROLE_ASSIGNED
+          - MFA_ERROR
+          - MFA_CHALLENGE_LOCKED
+          - MFA_CHALLENGE_INVALID
+          - MFA_CODE_INVALID
+        errorMessage:
+          type: string
+    AdminSecurityAccount:
+      type: object
+      description: >-
+        Compte de la plateforme tel qu'exposé à l'écran d'administration. Aucun secret n'y
+        figure : ni mot de passe, ni jeton, ni secret TOTP, ni code de secours. `INVITED`
+        désigne un compte créé qui n'a pas encore ouvert de session ; il se distingue d'un
+        compte suspendu. De même, un second facteur `PENDING` (jamais enrôlé) n'est pas un
+        second facteur `DISABLED` (retiré) — les confondre relancerait le mauvais flux.
+      required:
+      - id
+      - fullName
+      - email
+      - roleId
+      - roleLabel
+      - status
+      - twoFactor
+      - activeSessions
+      properties:
+        id:
+          $ref: '#/components/schemas/Uuid'
+        fullName:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 320
+        roleId:
+          type: string
+          description: Identifiant du rôle principal, ou chaîne vide si aucun rôle n'est attribué.
+        roleLabel:
+          type: string
+        accountType:
+          type: string
+          enum:
+          - PROFESSIONAL
+          - MEMBER
+        phone:
+          type: string
+          maxLength: 40
+        jobTitle:
+          type: string
+          maxLength: 150
+        organization:
+          type: string
+          maxLength: 255
+        department:
+          type: string
+          maxLength: 150
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - SUSPENDED
+          - INVITED
+        twoFactor:
+          type: string
+          enum:
+          - ENABLED
+          - PENDING
+          - DISABLED
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastLoginLabel:
+          type: string
+          nullable: true
+          description: Libellé fr-ML déjà formaté par le serveur, pour un rendu stable quel que soit le fuseau du poste.
+        activeSessions:
+          type: integer
+          minimum: 0
+    AdminSecurityAccountInput:
+      type: object
+      description: >-
+        Création d'un compte. Aucun mot de passe n'est accepté : l'accès s'établit à la
+        première connexion, où le second facteur est enrôlé.
+      required:
+      - accountType
+      - firstName
+      - lastName
+      - email
+      - roleId
+      properties:
+        accountType:
+          type: string
+          enum:
+          - PROFESSIONAL
+          - MEMBER
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        email:
+          type: string
+          format: email
+          minLength: 3
+          maxLength: 320
+        phone:
+          type: string
+          maxLength: 40
+        jobTitle:
+          type: string
+          maxLength: 150
+        organization:
+          type: string
+          maxLength: 255
+        department:
+          type: string
+          maxLength: 150
+        roleId:
+          $ref: '#/components/schemas/Uuid'
+        memberId:
+          $ref: '#/components/schemas/Uuid'
+      additionalProperties: false
+    AdminSecurityAccountStatusInput:
+      type: object
+      required:
+      - status
+      - reason
+      properties:
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - SUSPENDED
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+      additionalProperties: false
+    AdminSecurityReasonInput:
+      type: object
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+      additionalProperties: false
     Money:
       type: object
       required:

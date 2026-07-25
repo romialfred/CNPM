@@ -1,205 +1,63 @@
-<cnpm-member-portal-shell
-  organization="Sahel Agro SA"
-  userName="Responsable adhésion"
-  memberCode="CNPM-2026-0001"
-  [notificationCount]="0"
->
+<cnpm-member-portal-shell>
   <main class="member-users" id="contenu-principal">
     <cnpm-page-header
       title="Utilisateurs de l’entreprise"
-      description="Consultez les utilisateurs rattachés à votre organisation."
+      description="Les comptes rattachés à votre organisation et leur rôle."
     />
 
-    <cnpm-alert tone="warning" title="Gestion des accès non disponible" [live]="false">
-      Inviter un utilisateur, attribuer un rôle, réinitialiser un second facteur ou révoquer une
-      session n’est pas disponible depuis cet espace.
-    </cnpm-alert>
-
-    <cnpm-filter-bar
-      [expanded]="filtersExpanded()"
-      [chips]="chips()"
-      (expandedChange)="filtersExpanded.set($event)"
-      (chipRemove)="removeFilter($event)"
-      (resetAll)="resetFilters()"
-    >
-      <form class="member-users__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
-        <div class="member-users__field member-users__field--search">
-          <label for="member-user-search">Recherche</label>
-          <input
-            id="member-user-search"
-            type="search"
-            formControlName="search"
-            placeholder="Référence, libellé ou adresse"
-          />
-        </div>
-        <div class="member-users__field">
-          <label for="member-user-status">État</label>
-          <select id="member-user-status" formControlName="status">
-            <option value="">Tous les états</option>
-            @for (status of statuses; track status) {
-              <option [value]="status">{{ statusLabel(status) }}</option>
-            }
-          </select>
-        </div>
-        <div class="member-users__field">
-          <label for="member-user-sort">Tri et ordre</label>
-          <select id="member-user-sort" formControlName="sortOption">
-            <option value="displayLabel:asc">Utilisateur — alphabétique</option>
-            <option value="displayLabel:desc">Utilisateur — alphabétique inverse</option>
-            <option value="roleLabel:asc">Profil déclaré — alphabétique</option>
-            <option value="roleLabel:desc">Profil déclaré — alphabétique inverse</option>
-            <option value="lastActivityOn:desc">Activité — plus récente</option>
-            <option value="lastActivityOn:asc">Activité — plus ancienne</option>
-          </select>
-        </div>
-        <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
-      </form>
-    </cnpm-filter-bar>
-
-    <section class="member-users__panel" aria-labelledby="member-users-results-title">
-      <div class="member-users__toolbar">
-        <div>
-          <h2 id="member-users-results-title" #resultsTitle tabindex="-1">Utilisateurs</h2>
-          <p>Lecture seule, limitée au périmètre de votre organisation.</p>
-        </div>
-        @if (data()) {
-          <p class="member-users__count" aria-live="polite">
-            {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'utilisateur' : 'utilisateurs' }}
-          </p>
-        }
-      </div>
-
-      @switch (state()) {
-        @case ('loading') {
-          <cnpm-skeleton
-            variant="table"
-            [rows]="pageSize()"
-            [columns]="columns.length"
-            label="Chargement des utilisateurs…"
-          />
-        }
-        @case ('error') {
-          <cnpm-error-state
-            variant="recoverable"
-            title="Les utilisateurs n’ont pas pu être chargés"
-            description="Le service est momentanément indisponible. Vous pouvez relancer le chargement."
-          >
-            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
-          </cnpm-error-state>
-        }
-        @case ('unavailable') {
-          <cnpm-error-state
-            variant="recoverable"
-            title="Utilisateurs indisponibles en mode HTTP"
-            description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible."
-          />
-        }
-        @case ('empty') {
-          <cnpm-empty-state
-            variant="no-data"
-            title="Aucun utilisateur"
-            description="Aucune métadonnée utilisateur n’est disponible pour cette session."
-          />
-        }
-        @case ('no-result') {
-          <cnpm-empty-state
-            variant="no-results"
-            title="Aucun utilisateur ne correspond"
-            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
-          >
-            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
-              Réinitialiser les filtres
-            </cnpm-button>
-          </cnpm-empty-state>
-        }
-        @case ('ready') {
-          <div class="member-users__desktop-table">
-            <cnpm-data-table
-              caption="Utilisateurs : référence, libellé, adresse, profil déclaré, dernière activité et état, sans action IAM."
-              [columns]="columns"
-              [rows]="users()"
-              [rowKey]="rowKey"
-            >
-              <ng-template #row let-user>
-                <td class="cnpm-table__cell">
-                  <code>{{ user.reference }}</code>
-                </td>
-                <td class="cnpm-table__cell member-users__identity">
-                  <strong>{{ user.displayLabel }}</strong>
-                  <span>{{ user.email }}</span>
-                </td>
-                <td class="cnpm-table__cell">{{ user.roleLabel }}</td>
-                <td class="cnpm-table__cell member-users__date">
-                  @if (user.lastActivityOn) {
-                    <time [attr.datetime]="user.lastActivityOn">
-                      {{ user.lastActivityOn | date: 'dd/MM/yyyy' : 'UTC' }}
-                    </time>
-                  } @else {
-                    Jamais
-                  }
-                </td>
-                <td class="cnpm-table__cell">
-                  <cnpm-badge [tone]="statusTone(user.status)">
-                    {{ statusLabel(user.status) }}
-                  </cnpm-badge>
-                </td>
-              </ng-template>
-            </cnpm-data-table>
+    @switch (state()) {
+      @case ('loading') {
+        <p class="member-users__status" role="status">Chargement des utilisateurs…</p>
+      }
+      @case ('noMembership') {
+        <cnpm-alert tone="info" title="Aucune adhésion rattachée">
+          <p>Ce compte n’est rattaché à aucune adhésion cotisante.</p>
+        </cnpm-alert>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les utilisateurs n’ont pas pu être chargés.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (users().length === 0) {
+          <cnpm-alert tone="info" title="Aucun utilisateur">
+            <p>Aucun compte n’est encore rattaché à votre organisation.</p>
+          </cnpm-alert>
+        } @else {
+          <div class="member-users__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Nom</th>
+                  <th scope="col">Courriel</th>
+                  <th scope="col">Rôle</th>
+                  <th scope="col">Statut</th>
+                  <th scope="col">Dernière connexion</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (user of users(); track user.id) {
+                  <tr>
+                    <td>{{ user.displayName }}</td>
+                    <td class="member-users__mono">{{ user.email }}</td>
+                    <td>{{ user.roleLabel }}</td>
+                    <td>
+                      <cnpm-badge [tone]="statusTone(user.status)">
+                        {{ statusLabel(user.status) }}
+                      </cnpm-badge>
+                    </td>
+                    <td>
+                      {{ user.lastActivityAt ? (user.lastActivityAt | slice: 0 : 10) : 'Jamais' }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
-
-          <ol class="member-users__mobile-list" aria-label="Utilisateurs">
-            @for (user of users(); track user.id) {
-              <li>
-                <article [attr.aria-labelledby]="'member-user-' + user.id">
-                  <header>
-                    <div>
-                      <h3 [id]="'member-user-' + user.id">{{ user.displayLabel }}</h3>
-                      <p>{{ user.reference }}</p>
-                    </div>
-                    <cnpm-badge [tone]="statusTone(user.status)">
-                      {{ statusLabel(user.status) }}
-                    </cnpm-badge>
-                  </header>
-                  <dl>
-                    <div>
-                      <dt>Adresse</dt>
-                      <dd>{{ user.email }}</dd>
-                    </div>
-                    <div>
-                      <dt>Profil déclaré</dt>
-                      <dd>{{ user.roleLabel }}</dd>
-                    </div>
-                    <div>
-                      <dt>Dernière activité</dt>
-                      <dd>
-                        @if (user.lastActivityOn) {
-                          <time [attr.datetime]="user.lastActivityOn">
-                            {{ user.lastActivityOn | date: 'dd/MM/yyyy' : 'UTC' }}
-                          </time>
-                        } @else {
-                          Jamais
-                        }
-                      </dd>
-                    </div>
-                  </dl>
-                </article>
-              </li>
-            }
-          </ol>
         }
       }
-
-      @if (state() === 'ready') {
-        <cnpm-pagination
-          [page]="page()"
-          [pageSize]="pageSize()"
-          [totalItems]="totalItems()"
-          [pageSizeOptions]="pageSizes"
-          (pageChange)="onPageChange($event)"
-          (pageSizeChange)="onPageSizeChange($event)"
-        />
-      }
-    </section>
+    }
   </main>
 </cnpm-member-portal-shell>

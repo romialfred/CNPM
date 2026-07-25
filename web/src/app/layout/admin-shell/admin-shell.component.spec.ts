@@ -107,7 +107,7 @@ describe('AdminShellComponent — drawer accessible', () => {
     expect(accents('a.cnpm-sidebar__item[href="/admin/members"]')).toContain(
       'cnpm-nav-accent--repertoire',
     );
-    expect(accents('a.cnpm-sidebar__item[href="/admin/payments/reconciliation"]')).toContain(
+    expect(accents('a.cnpm-sidebar__item[href="/admin/reconciliation"]')).toContain(
       'cnpm-nav-accent--recouvrement',
     );
     expect(accents('a.cnpm-sidebar__item[href="/admin/requests"]')).toContain(

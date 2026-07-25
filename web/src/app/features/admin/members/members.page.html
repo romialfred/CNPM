@@ -27,316 +27,322 @@
       </p>
     </cnpm-page-header>
 
-
     <div class="cnpm-members__layout">
       <!-- Colonne principale continue : indicateurs, filtres et tableau s'enchaînent sans
            vide. Le rail de synthèse est une colonne à part, alignée en haut — plus de
            rangée étirée par un rail plus haut que la colonne de gauche. -->
       <div class="cnpm-members__main">
-    <!-- Bandeau d'indicateurs.
+        <!-- Bandeau d'indicateurs.
          Les quatre chiffres viennent tous de `MembersOverview`, donc du même jeu que le
          tableau : un bandeau qui contredirait le total affiché plus bas serait exactement
          le « total incohérent » que la fiche BO-002 interdit.
          Le bandeau ne paraît qu'une fois la synthèse disponible — elle est absente du
          contrat R0. Afficher des zéros en attendant se lirait comme une base vide. -->
-    @if (overview(); as synthese) {
-      <ul class="cnpm-members__kpis" aria-label="Indicateurs de la base de membres">
-        @for (kpi of overviewKpis(synthese); track kpi.key) {
-          <li class="cnpm-members__kpi">
-            <div
-              class="cnpm-members__kpi-card cnpm-liftable"
-              [class]="'cnpm-tile-accent--' + kpi.accent"
-            >
-              <span class="cnpm-members__kpi-icon" aria-hidden="true">
-                @switch (kpi.icon) {
-                  @case ('total') {
-                    <svg lucideUsers [size]="iconSize.control"></svg>
-                  }
-                  @case ('active') {
-                    <svg lucideUserCheck [size]="iconSize.control"></svg>
-                  }
-                  @case ('dormant') {
-                    <svg lucideMoon [size]="iconSize.control"></svg>
-                  }
-                  @case ('recovery') {
-                    <svg lucidePercent [size]="iconSize.control"></svg>
-                  }
-                }
-              </span>
-              <p class="cnpm-members__kpi-label">{{ kpi.label }}</p>
-              <p class="cnpm-members__kpi-value">
-                <!-- Une mesure absente n'est pas un zéro : un taux nul se lirait comme
+        @if (overview(); as synthese) {
+          <ul class="cnpm-members__kpis" aria-label="Indicateurs de la base de membres">
+            @for (kpi of overviewKpis(synthese); track kpi.key) {
+              <li class="cnpm-members__kpi">
+                <div
+                  class="cnpm-members__kpi-card cnpm-liftable"
+                  [class]="'cnpm-tile-accent--' + kpi.accent"
+                >
+                  <span class="cnpm-members__kpi-icon" aria-hidden="true">
+                    @switch (kpi.icon) {
+                      @case ('total') {
+                        <svg lucideUsers [size]="iconSize.control"></svg>
+                      }
+                      @case ('active') {
+                        <svg lucideUserCheck [size]="iconSize.control"></svg>
+                      }
+                      @case ('dormant') {
+                        <svg lucideMoon [size]="iconSize.control"></svg>
+                      }
+                      @case ('new') {
+                        <svg lucideSparkles [size]="iconSize.control"></svg>
+                      }
+                    }
+                  </span>
+                  <p class="cnpm-members__kpi-label">{{ kpi.label }}</p>
+                  <p class="cnpm-members__kpi-value">
+                    <!-- Une mesure absente n'est pas un zéro : un taux nul se lirait comme
                      une contre-performance réelle, pas comme une donnée manquante. -->
-                @if (kpi.value === null) {
-                  <span class="cnpm-members__kpi-missing">Donnée indisponible</span>
-                } @else {
-                  {{ kpi.value | number: kpi.format }}{{ kpi.suffix }}
-                }
-              </p>
-              <p class="cnpm-members__kpi-caption">{{ kpi.caption }}</p>
-            </div>
-          </li>
+                    @if (kpi.value === null) {
+                      <span class="cnpm-members__kpi-missing">Donnée indisponible</span>
+                    } @else {
+                      {{ kpi.value | number: kpi.format }}{{ kpi.suffix }}
+                    }
+                  </p>
+                  <p class="cnpm-members__kpi-caption">{{ kpi.caption }}</p>
+                </div>
+              </li>
+            }
+          </ul>
         }
-      </ul>
-    }
 
-      <div class="cnpm-members__filters">
-        <cnpm-filter-bar
-          [expanded]="filtersExpanded()"
-          [chips]="chips()"
-          (expandedChange)="filtersExpanded.set($event)"
-          (chipRemove)="removeChip($event)"
-          (resetAll)="resetFilters()"
-        >
-          <div class="cnpm-members__filter-row">
-          <div class="cnpm-members__filter">
-            <label class="cnpm-members__label" for="filtre-statut">Statut</label>
-            <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique
+        <div class="cnpm-members__filters">
+          <cnpm-filter-bar
+            [expanded]="filtersExpanded()"
+            [chips]="chips()"
+            (expandedChange)="filtersExpanded.set($event)"
+            (chipRemove)="removeChip($event)"
+            (resetAll)="resetFilters()"
+          >
+            <div class="cnpm-members__filter-row">
+              <div class="cnpm-members__filter">
+                <label class="cnpm-members__label" for="filtre-statut">Statut</label>
+                <!-- `ngModel` plutôt que `[value]` : sur un `select`, `[value]` s'applique
                  avant que le `@for` n'ait créé les options, le navigateur rejette une
                  valeur qui ne correspond à aucune option, et le filtre ne se
                  restaure pas au rechargement. L'accessor de `ngModel`, lui, suit la
                  création des options. -->
-            <select
-              id="filtre-statut"
-              class="cnpm-members__select"
-              name="statut"
-              [ngModel]="status() ?? ''"
-              (ngModelChange)="setStatus($event)"
-            >
-              <option value="">Tous les statuts</option>
-              @for (value of statuses; track value) {
-                <option [value]="value">{{ statusLabels[value] }}</option>
+                <select
+                  id="filtre-statut"
+                  class="cnpm-members__select"
+                  name="statut"
+                  [ngModel]="status() ?? ''"
+                  (ngModelChange)="setStatus($event)"
+                >
+                  <option value="">Tous les statuts</option>
+                  @for (value of statuses; track value) {
+                    <option [value]="value">{{ statusLabels[value] }}</option>
+                  }
+                </select>
+              </div>
+
+              @if (categories(); as categoryOptions) {
+                <div class="cnpm-members__filter">
+                  <label class="cnpm-members__label" for="filtre-categorie">Catégorie</label>
+                  <select
+                    id="filtre-categorie"
+                    class="cnpm-members__select"
+                    name="categorie"
+                    [ngModel]="category() ?? ''"
+                    (ngModelChange)="setCategory($event)"
+                  >
+                    <option value="">Toutes les catégories</option>
+                    @for (value of categoryOptions; track value) {
+                      <option [value]="value">{{ value | cnpmMemberCategory }}</option>
+                    }
+                  </select>
+                </div>
               }
-            </select>
-          </div>
 
-          @if (categories(); as categoryOptions) {
-            <div class="cnpm-members__filter">
-              <label class="cnpm-members__label" for="filtre-categorie">Catégorie</label>
-              <select
-                id="filtre-categorie"
-                class="cnpm-members__select"
-                name="categorie"
-                [ngModel]="category() ?? ''"
-                (ngModelChange)="setCategory($event)"
-              >
-                <option value="">Toutes les catégories</option>
-                @for (value of categoryOptions; track value) {
-                  <option [value]="value">{{ value | cnpmMemberCategory }}</option>
-                }
-              </select>
-            </div>
-          }
+              @if (groups(); as groupOptions) {
+                <div class="cnpm-members__filter">
+                  <label class="cnpm-members__label" for="filtre-groupement">Groupement</label>
+                  <select
+                    id="filtre-groupement"
+                    class="cnpm-members__select"
+                    name="groupement"
+                    [ngModel]="group() ?? ''"
+                    (ngModelChange)="setGroup($event)"
+                  >
+                    <option value="">Tous les groupements</option>
+                    @for (value of groupOptions; track value) {
+                      <option [value]="value">{{ value }}</option>
+                    }
+                  </select>
+                </div>
+              }
 
-          @if (groups(); as groupOptions) {
-            <div class="cnpm-members__filter">
-              <label class="cnpm-members__label" for="filtre-groupement">Groupement</label>
-              <select
-                id="filtre-groupement"
-                class="cnpm-members__select"
-                name="groupement"
-                [ngModel]="group() ?? ''"
-                (ngModelChange)="setGroup($event)"
-              >
-                <option value="">Tous les groupements</option>
-                @for (value of groupOptions; track value) {
-                  <option [value]="value">{{ value }}</option>
-                }
-              </select>
-            </div>
-          }
-
-          <!-- `search` plutôt que `text` : le champ reçoit sa croix d'effacement
+              <!-- `search` plutôt que `text` : le champ reçoit sa croix d'effacement
                native et son rôle est annoncé. -->
-          <form class="cnpm-members__filter" role="search" (ngSubmit)="applySearch()">
-            <label class="cnpm-members__label" for="filtre-recherche">Recherche</label>
-            <input
-              id="filtre-recherche"
-              class="cnpm-members__input"
-              type="search"
-              name="recherche"
-              autocomplete="off"
-              placeholder="Code membre, raison sociale, contact…"
-              [ngModel]="searchDraft()"
-              (ngModelChange)="searchDraft.set($event)"
-            />
-          </form>
-          </div>
-        </cnpm-filter-bar>
-      </div>
+              <form class="cnpm-members__filter" role="search" (ngSubmit)="applySearch()">
+                <label class="cnpm-members__label" for="filtre-recherche">Recherche</label>
+                <input
+                  id="filtre-recherche"
+                  class="cnpm-members__input"
+                  type="search"
+                  name="recherche"
+                  autocomplete="off"
+                  placeholder="Code membre, raison sociale, contact…"
+                  [ngModel]="searchDraft()"
+                  (ngModelChange)="searchDraft.set($event)"
+                />
+              </form>
 
-      <div class="cnpm-members__list">
+              <!-- Bascule tableau / tuiles sur la même ligne que les filtres, en icônes
+               seules (demande du commanditaire) : le libellé écrit passe en `aria-label`
+               et en infobulle, jamais perdu pour les technologies d'assistance. -->
+              <div class="cnpm-members__filter cnpm-members__filter--views">
+                <span class="cnpm-members__label" id="vue-liste-label">Affichage</span>
+                <div class="cnpm-members__views" role="group" aria-labelledby="vue-liste-label">
+                  <button
+                    type="button"
+                    class="cnpm-members__view"
+                    [class.cnpm-members__view--active]="view() === 'table'"
+                    [attr.aria-pressed]="view() === 'table'"
+                    (click)="setView('table')"
+                    aria-label="Afficher en tableau"
+                    title="Tableau"
+                  >
+                    <svg lucideTable [size]="iconSize.compact" aria-hidden="true"></svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="cnpm-members__view"
+                    [class.cnpm-members__view--active]="view() === 'tiles'"
+                    [attr.aria-pressed]="view() === 'tiles'"
+                    (click)="setView('tiles')"
+                    aria-label="Afficher en tuiles"
+                    title="Tuiles"
+                  >
+                    <svg lucideLayoutGrid [size]="iconSize.compact" aria-hidden="true"></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </cnpm-filter-bar>
+        </div>
 
-        <!-- La selection de lignes est retiree a la demande du client.
+        <div class="cnpm-members__list">
+          <!-- La selection de lignes est retiree a la demande du client.
              Elle ne servait a rien : la seule action groupee livree etait « Effacer la
              selection », qui ne fait que defaire la selection elle-meme. La fiche BO-002
              exige pourtant `BulkActionBar` et une « selection groupee avec portee
              explicite » ; l'ecart est consigne en UX-DEC-017 et la selection reviendra
              avec une action groupee reelle (export, relance). -->
-        <div class="cnpm-members__controls">
-          <p class="cnpm-members__total">
-            @if (data()) {
-              Total&nbsp;: {{ totalItems() | number }}
-              {{ totalItems() === 1 ? 'membre' : 'membres' }}
-            }
-          </p>
-
-          <div class="cnpm-members__views" role="group" aria-label="Présentation de la liste">
-          <button
-            type="button"
-            class="cnpm-members__view"
-            [class.cnpm-members__view--active]="view() === 'table'"
-            [attr.aria-pressed]="view() === 'table'"
-            (click)="setView('table')"
-          >
-            <svg lucideTable [size]="iconSize.compact" aria-hidden="true"></svg>
-            Tableau
-          </button>
-          <button
-            type="button"
-            class="cnpm-members__view"
-            [class.cnpm-members__view--active]="view() === 'tiles'"
-            [attr.aria-pressed]="view() === 'tiles'"
-            (click)="setView('tiles')"
-          >
-            <svg lucideLayoutGrid [size]="iconSize.compact" aria-hidden="true"></svg>
-            Tuiles
-          </button>
+          <div class="cnpm-members__controls">
+            <p class="cnpm-members__total">
+              @if (data()) {
+                Total&nbsp;: {{ totalItems() | number }}
+                {{ totalItems() === 1 ? 'membre' : 'membres' }}
+              }
+            </p>
           </div>
-        </div>
 
-        @if (view() === 'table') {
-        <cnpm-data-table
-          caption="Liste des membres du CNPM, avec leur groupement, contact, cotisations et statut."
-          [columns]="columns()"
-          [rows]="rows()"
-          [state]="tableState()"
-          [sort]="sort()"
-          [rowKey]="rowKey"
-          [rowLabel]="rowLabel"
-          (sortChange)="onSortChange($event)"
-        >
-          <ng-template #row let-member>
-            <td class="cnpm-table__cell">
-              <span class="cnpm-members__code">{{ member.code }}</span>
-            </td>
-            <td class="cnpm-table__cell">
-              <span class="cnpm-members__organization">{{ member.organization }}</span>
-            </td>
-            <td class="cnpm-table__cell">{{ member.group ?? '—' }}</td>
-            <td class="cnpm-table__cell">
-              <!-- Le nom seul. Telephone et courriel occupaient deux lignes de plus par
+          @if (view() === 'table') {
+            <cnpm-data-table
+              caption="Liste des membres du CNPM, avec leur groupement, contact, cotisations et statut."
+              [columns]="columns()"
+              [rows]="rows()"
+              [state]="tableState()"
+              [sort]="sort()"
+              [rowKey]="rowKey"
+              [rowLabel]="rowLabel"
+              (sortChange)="onSortChange($event)"
+            >
+              <ng-template #row let-member>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-members__code">{{ member.code }}</span>
+                </td>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-members__organization">{{ member.organization }}</span>
+                </td>
+                <td class="cnpm-table__cell">{{ member.group ?? '—' }}</td>
+                <td class="cnpm-table__cell">
+                  <!-- Le nom seul. Telephone et courriel occupaient deux lignes de plus par
                    ligne de tableau ; ils restent sur la fiche du membre. -->
-              <span class="cnpm-members__contact-name">{{ member.contactName ?? '—' }}</span>
-            </td>
-            <!-- Montants alignés à droite et formatés fr-ML : critère de la fiche.
+                  <span class="cnpm-members__contact-name">{{ member.contactName ?? '—' }}</span>
+                </td>
+                <!-- Montants alignés à droite et formatés fr-ML : critère de la fiche.
                  L'unité est portée une fois par l'en-tête, pas répétée à chaque ligne. -->
-            <td class="cnpm-table__cell cnpm-table__cell--end">
-              @if (member.due !== null) {
-                <span class="cnpm-members__amount">{{ member.due | number: '1.0-0' }}</span>
-              } @else {
-                <span aria-label="Donnée non disponible">—</span>
-              }
-            </td>
-            <td class="cnpm-table__cell cnpm-table__cell--end">
-              @if (member.paid !== null) {
-                <span class="cnpm-members__amount">{{ member.paid | number: '1.0-0' }}</span>
-              } @else {
-                <span aria-label="Donnée non disponible">—</span>
-              }
-            </td>
-            <td class="cnpm-table__cell">
-              <!-- Le seul statut, sans marqueur surajoute. « Grand cotisant » se lit
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  @if (member.due !== null) {
+                    <span class="cnpm-members__amount">{{ member.due | number: '1.0-0' }}</span>
+                  } @else {
+                    <span aria-label="Donnée non disponible">—</span>
+                  }
+                </td>
+                <td class="cnpm-table__cell cnpm-table__cell--end">
+                  @if (member.paid !== null) {
+                    <span class="cnpm-members__amount">{{ member.paid | number: '1.0-0' }}</span>
+                  } @else {
+                    <span aria-label="Donnée non disponible">—</span>
+                  }
+                </td>
+                <td class="cnpm-table__cell">
+                  <!-- Le seul statut, sans marqueur surajoute. « Grand cotisant » se lit
                    desormais sur la fiche du membre : dans une liste, il empilait une
                    seconde ligne sous le statut. Voir DATA-DEC-001. -->
-              <cnpm-badge [tone]="statusTone(member.status)">
-                {{ statusLabel(member.status) }}
-              </cnpm-badge>
-            </td>
-            <!-- La fiche impose « Voir, Modifier si autorisé, Historique ; pas trois
+                  <cnpm-badge [tone]="statusTone(member.status)">
+                    {{ statusLabel(member.status) }}
+                  </cnpm-badge>
+                </td>
+                <!-- La fiche impose « Voir, Modifier si autorisé, Historique ; pas trois
                  icônes sans tooltip ». Les actions sont donc écrites en toutes
                  lettres : trois pictogrammes muets rendraient la colonne indéchiffrable. -->
-            <td class="cnpm-table__cell">
-              <span class="cnpm-members__actions">
-                <button
-                  type="button"
-                  class="cnpm-members__row-action"
-                  (click)="viewMember(member.organizationId)"
-                  title="Voir le membre"
-                >
-                  <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
-                  <span class="cnpm-members__row-action-label">Voir</span>
-                </button>
-                <button
-                  type="button"
-                  class="cnpm-members__row-action"
-                  (click)="viewHistory(member.organizationId)"
-                  title="Voir l'historique du membre"
-                >
-                  <svg lucideHistory [size]="iconSize.compact" aria-hidden="true"></svg>
-                  <span class="cnpm-members__row-action-label">Historique</span>
-                </button>
-              </span>
-            </td>
-          </ng-template>
+                <td class="cnpm-table__cell">
+                  <span class="cnpm-members__actions">
+                    <button
+                      type="button"
+                      class="cnpm-members__row-action"
+                      (click)="viewMember(member.organizationId)"
+                      title="Voir le membre"
+                    >
+                      <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
+                      <span class="cnpm-members__row-action-label">Voir</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="cnpm-members__row-action"
+                      (click)="viewHistory(member.organizationId)"
+                      title="Voir l'historique du membre"
+                    >
+                      <svg lucideHistory [size]="iconSize.compact" aria-hidden="true"></svg>
+                      <span class="cnpm-members__row-action-label">Historique</span>
+                    </button>
+                  </span>
+                </td>
+              </ng-template>
 
-          <!-- Les états de la table s'appuient sur les composants du socle (FDB-005/006/007) :
+              <!-- Les états de la table s'appuient sur les composants du socle (FDB-005/006/007) :
                chargement, base vide, filtre sans résultat et erreur ne sont plus
                réécrits localement. « base vide » et « aucun résultat » restent bien
                distincts — le premier invite à créer, le second à élargir la recherche. -->
-          <div data-table-status>
-            @switch (tableState()) {
-              @case ('loading') {
-                <cnpm-skeleton
-                  variant="table"
-                  [rows]="pageSize()"
-                  [columns]="columns().length"
-                  label="Chargement des membres…"
-                />
-              }
-              @case ('empty') {
-                <cnpm-empty-state
-                  variant="first-use"
-                  title="Aucun membre enregistré"
-                  description="La base de membres est vide. Créez un premier membre pour commencer."
-                />
-              }
-              @case ('noResult') {
-                <cnpm-empty-state
-                  variant="no-results"
-                  title="Aucun membre ne correspond"
-                  description="Élargissez la recherche ou retirez un filtre."
-                >
-                  <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
-                    Réinitialiser les filtres
-                  </cnpm-button>
-                </cnpm-empty-state>
-              }
-              @case ('error') {
-                <cnpm-error-state
-                  variant="recoverable"
-                  title="La liste n’a pas pu être chargée"
-                  description="Le service des membres est momentanément indisponible. Vos filtres sont conservés."
-                >
-                  <!-- La matrice loading-empty-error impose « réessayer » : le bouton
+              <div data-table-status>
+                @switch (tableState()) {
+                  @case ('loading') {
+                    <cnpm-skeleton
+                      variant="table"
+                      [rows]="pageSize()"
+                      [columns]="columns().length"
+                      label="Chargement des membres…"
+                    />
+                  }
+                  @case ('empty') {
+                    <cnpm-empty-state
+                      variant="first-use"
+                      title="Aucun membre enregistré"
+                      description="La base de membres est vide. Créez un premier membre pour commencer."
+                    />
+                  }
+                  @case ('noResult') {
+                    <cnpm-empty-state
+                      variant="no-results"
+                      title="Aucun membre ne correspond"
+                      description="Élargissez la recherche ou retirez un filtre."
+                    >
+                      <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                        Réinitialiser les filtres
+                      </cnpm-button>
+                    </cnpm-empty-state>
+                  }
+                  @case ('error') {
+                    <cnpm-error-state
+                      variant="recoverable"
+                      title="La liste n’a pas pu être chargée"
+                      description="Le service des membres est momentanément indisponible. Vos filtres sont conservés."
+                    >
+                      <!-- La matrice loading-empty-error impose « réessayer » : le bouton
                        relance le chargement en place, sans recharger toute la page. -->
-                  <cnpm-button variant="secondary" size="sm" (click)="retry()">
-                    Réessayer
-                  </cnpm-button>
-                </cnpm-error-state>
-              }
-              @case ('forbidden') {
-                <!-- Accès refusé (403) : la fiche exige cet état. Aucune action
+                      <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                        Réessayer
+                      </cnpm-button>
+                    </cnpm-error-state>
+                  }
+                  @case ('forbidden') {
+                    <!-- Accès refusé (403) : la fiche exige cet état. Aucune action
                      « réessayer » — répéter une requête que le droit condamne n'a pas
                      de sens ; l'état d'erreur en donne la raison générique. -->
-                <cnpm-error-state variant="forbidden" />
-              }
-            }
-          </div>
-        </cnpm-data-table>
-        }
+                    <cnpm-error-state variant="forbidden" />
+                  }
+                }
+              </div>
+            </cnpm-data-table>
+          }
 
-        <!-- Vue en tuiles, calquee sur la maquette du client : carte fixe, statut en
+          <!-- Vue en tuiles, calquee sur la maquette du client : carte fixe, statut en
              pastille, code, raison sociale, categorie et groupement, puis les actions en
              pied.
 
@@ -345,111 +351,91 @@
              revelee au seul survol est inatteignable au toucher, et un contenu qui pivote
              sous le curseur ne se lit pas. Les informations qui vivaient au dos (contact,
              telephone, derniere activite) restent sur la fiche du membre. -->
-        @if (view() === 'tiles' && tableState() === 'ready') {
-          <ul class="cnpm-members__tiles" aria-label="Membres du CNPM">
-            @for (member of rows(); track member.id) {
-              <li class="cnpm-members__tile" [class]="statusAccentClass(member.status)">
-                <div class="cnpm-members__tile-head">
-                  <cnpm-badge [tone]="statusTone(member.status)">
-                    {{ statusLabel(member.status) }}
-                  </cnpm-badge>
-                  <span class="cnpm-members__tile-code">{{ member.code }}</span>
-                </div>
-                <a
-                  class="cnpm-members__tile-name"
-                  [routerLink]="['/admin/members', member.organizationId]"
-                  queryParamsHandling="preserve"
-                >
-                  {{ member.organization }}
-                </a>
-                <p class="cnpm-members__tile-meta">
-                  {{ member.category | cnpmMemberCategory }}
-                  @if (member.group) {
-                    <span aria-hidden="true"> · </span>{{ member.group }}
+          @if (view() === 'tiles' && tableState() === 'ready') {
+            <ul class="cnpm-members__tiles" aria-label="Membres du CNPM">
+              @for (member of rows(); track member.id) {
+                <li class="cnpm-members__tile" [class]="statusAccentClass(member.status)">
+                  <div class="cnpm-members__tile-head">
+                    <cnpm-badge [tone]="statusTone(member.status)">
+                      {{ statusLabel(member.status) }}
+                    </cnpm-badge>
+                    <span class="cnpm-members__tile-code">{{ member.code }}</span>
+                  </div>
+                  <a
+                    class="cnpm-members__tile-name"
+                    [routerLink]="['/admin/members', member.organizationId]"
+                    queryParamsHandling="preserve"
+                  >
+                    {{ member.organization }}
+                  </a>
+                  <p class="cnpm-members__tile-meta">
+                    {{ member.category | cnpmMemberCategory }}
+                    @if (member.group) {
+                      <span aria-hidden="true"> · </span>{{ member.group }}
+                    }
+                  </p>
+                  <!-- Ancienneté : année d'adhésion et durée révolue. Absente si la date
+                     n'est pas connue — on n'affiche pas une ancienneté inventée. -->
+                  @if (memberSince(member.joinedAt); as since) {
+                    <p class="cnpm-members__tile-since">
+                      <svg lucideCalendarPlus [size]="iconSize.compact" aria-hidden="true"></svg>
+                      <span>Membre depuis : {{ since }}</span>
+                    </p>
                   }
-                </p>
-                <!-- « Grand cotisant » est un marqueur, pas un statut. Voir DATA-DEC-001. -->
-                @if (member.isLargeContributor) {
-                  <p class="cnpm-members__marker">Grand cotisant</p>
-                }
+                  <!-- « Grand cotisant » est un marqueur, pas un statut. Voir DATA-DEC-001. -->
+                  @if (member.isLargeContributor) {
+                    <p class="cnpm-members__marker">Grand cotisant</p>
+                  }
 
-                <!-- Les memes deux actions que le tableau, pas davantage : la maquette en
+                  <!-- Les memes deux actions que le tableau, pas davantage : la maquette en
                      montre trois, mais aucun ecran de modification n'est livre et un
                      troisieme bouton conduirait a une page absente.
                      Chaque bouton garde un libelle ecrit, retire de la peinture mais lu
                      par les technologies d'assistance : trois pictogrammes muets rendent
                      une rangee d'actions indechiffrable. -->
-                <div class="cnpm-members__tile-actions">
-                  <button
-                    type="button"
-                    class="cnpm-members__tile-action"
-                    (click)="viewMember(member.organizationId)"
-                    [title]="'Voir ' + member.organization"
-                  >
-                    <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
-                    <span class="cnpm-members__row-action-label">
-                      Voir {{ member.organization }}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    class="cnpm-members__tile-action"
-                    (click)="viewHistory(member.organizationId)"
-                    [title]="'Historique de ' + member.organization"
-                  >
-                    <svg lucideHistory [size]="iconSize.compact" aria-hidden="true"></svg>
-                    <span class="cnpm-members__row-action-label">
-                      Historique de {{ member.organization }}
-                    </span>
-                  </button>
-                </div>
-              </li>
-            }
-          </ul>
-        }
+                  <div class="cnpm-members__tile-actions">
+                    <button
+                      type="button"
+                      class="cnpm-members__tile-action"
+                      (click)="viewMember(member.organizationId)"
+                      [title]="'Voir ' + member.organization"
+                    >
+                      <svg lucideEye [size]="iconSize.compact" aria-hidden="true"></svg>
+                      <span class="cnpm-members__row-action-label">
+                        Voir {{ member.organization }}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      class="cnpm-members__tile-action"
+                      (click)="viewHistory(member.organizationId)"
+                      [title]="'Historique de ' + member.organization"
+                    >
+                      <svg lucideHistory [size]="iconSize.compact" aria-hidden="true"></svg>
+                      <span class="cnpm-members__row-action-label">
+                        Historique de {{ member.organization }}
+                      </span>
+                    </button>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
 
-        @if (tableState() === 'ready') {
-          <cnpm-pagination
-            [page]="page()"
-            [pageSize]="pageSize()"
-            [totalItems]="totalItems()"
-            [pageSizeOptions]="pageSizes"
-            (pageChange)="onPageChange($event)"
-            (pageSizeChange)="onPageSizeChange($event)"
-          />
-        }
+          @if (tableState() === 'ready') {
+            <cnpm-pagination
+              [page]="page()"
+              [pageSize]="pageSize()"
+              [totalItems]="totalItems()"
+              [pageSizeOptions]="pageSizes"
+              (pageChange)="onPageChange($event)"
+              (pageSizeChange)="onPageSizeChange($event)"
+            />
+          }
+        </div>
       </div>
-      </div>
-      <!-- fin de la colonne principale -->
-
-      <!-- Panneau de synthèse de la fiche : 280–300 px sur grand desktop. Ses chiffres
-           sont dérivés du même jeu que le tableau — un panneau qui contredirait le
-           total affiché serait précisément le « total incohérent » que la fiche
-           interdit. -->
-      @if (overview()) {
-        <aside class="cnpm-members__aside">
-          <!-- La note explicative a ete retiree a la demande du client : les barres
-               situent chaque effectif face a la base, la lecture est desormais visuelle.
-               « Grands cotisants » et « Prospects » restent distingues par leur libelle
-               et, pour les prospects, par le filet de separation. -->
-          <cnpm-insight-summary
-            title="Vue d’ensemble des membres"
-            headingId="synthese-membres"
-            [icon]="panelIcons.membres"
-            tone="indigo"
-            [stats]="memberStats()"
-          />
-          <cnpm-insight-summary
-            title="Cotisations"
-            headingId="synthese-cotisations"
-            unit="(FCFA)"
-            [icon]="panelIcons.cotisations"
-            tone="sarcelle"
-            [stats]="contributionStats()"
-            note="Montants portant sur la base de membres, prospects exclus."
-          />
-        </aside>
-      }
+      <!-- fin de la colonne principale ; le volet de synthèse a été supprimé, ses
+           chiffres remontent désormais dans les tuiles du haut. -->
     </div>
   </div>
 </cnpm-admin-shell>

@@ -146,11 +146,17 @@
                       />
                       <span class="cnpm-organizations__identity-text">
                         <strong>{{ organization.legalName }}</strong>
-                        @if (organization.tradeName) {
-                          <span>{{ organization.tradeName }}</span>
-                        }
                       </span>
                     </span>
+                  </td>
+                  <td class="cnpm-table__cell cnpm-organizations__cell--nowrap">
+                    <!-- Sigle (nom commercial) dans sa propre colonne, plus sous la raison
+                         sociale : demande du commanditaire. -->
+                    @if (organization.tradeName) {
+                      <span class="cnpm-organizations__trade">{{ organization.tradeName }}</span>
+                    } @else {
+                      <span class="cnpm-organizations__muted" aria-label="Aucun sigle">—</span>
+                    }
                   </td>
                   <td class="cnpm-table__cell cnpm-organizations__cell--nowrap">
                     {{ organization.organizationType }}
@@ -261,22 +267,125 @@
           </div>
 
           <aside class="cnpm-organizations__aside" aria-label="Synthèse de la page">
-            <cnpm-insight-summary
-              title="Répartition par statut"
-              headingId="synthese-statut"
-              [icon]="panelIcons.statut"
-              tone="indigo"
-              [stats]="statusStats()"
-              [note]="pageScopeNote()"
-            />
-            <cnpm-insight-summary
-              title="Principaux secteurs"
-              headingId="synthese-secteur"
-              [icon]="panelIcons.secteur"
-              tone="sarcelle"
-              [stats]="sectorStats()"
-              [note]="pageScopeNote()"
-            />
+            <!-- Répartition par statut, en donut. Le graphe est décoratif (aria-hidden) :
+                 la légende en dessous porte l'information en toutes lettres, chiffre et part
+                 compris, seule source lue par les technologies d'assistance. -->
+            <section class="cnpm-organizations__panel" aria-labelledby="synthese-statut">
+              <h2 class="cnpm-organizations__panel-title" id="synthese-statut">
+                Répartition par statut
+              </h2>
+
+              @if (statusSegments().total > 0) {
+                <div class="cnpm-organizations__donut-wrap">
+                  <svg
+                    class="cnpm-organizations__donut"
+                    viewBox="0 0 120 120"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <circle
+                      class="cnpm-organizations__donut-track"
+                      cx="60"
+                      cy="60"
+                      [attr.r]="donutRadius"
+                    ></circle>
+                    <g transform="rotate(-90 60 60)">
+                      @for (arc of statusArcs(); track arc.key) {
+                        <circle
+                          [attr.class]="
+                            'cnpm-organizations__donut-arc cnpm-organizations__donut-arc--' +
+                            arc.key
+                          "
+                          cx="60"
+                          cy="60"
+                          [attr.r]="donutRadius"
+                          [attr.stroke-dasharray]="arc.dashArray"
+                          [attr.stroke-dashoffset]="arc.dashOffset"
+                        ></circle>
+                      }
+                    </g>
+                  </svg>
+                  <p class="cnpm-organizations__donut-center" aria-hidden="true">
+                    <span class="cnpm-organizations__donut-total">
+                      {{ statusSegments().total | number: '1.0-0' }}
+                    </span>
+                    <span class="cnpm-organizations__donut-caption">entreprises</span>
+                  </p>
+                </div>
+
+                <dl class="cnpm-organizations__legend">
+                  @for (segment of statusSegments().segments; track segment.key) {
+                    <div class="cnpm-organizations__legend-row">
+                      <dt class="cnpm-organizations__legend-term">
+                        <span
+                          class="cnpm-organizations__swatch cnpm-organizations__swatch--{{
+                            segment.key
+                          }}"
+                          aria-hidden="true"
+                        ></span>
+                        {{ segment.label }}
+                      </dt>
+                      <dd class="cnpm-organizations__legend-value">
+                        {{ segment.count | number }}
+                        <span class="cnpm-organizations__legend-pct"
+                          >· {{ segment.percent }} %</span
+                        >
+                      </dd>
+                    </div>
+                  }
+                </dl>
+              } @else {
+                <p class="cnpm-organizations__panel-empty">Aucune entreprise sur cette page.</p>
+              }
+
+              <p class="cnpm-organizations__panel-note">{{ pageScopeNote() }}</p>
+            </section>
+
+            <!-- Principaux secteurs : nom, effectif, part et barre colorée par rang. -->
+            <section class="cnpm-organizations__panel" aria-labelledby="synthese-secteur">
+              <h2 class="cnpm-organizations__panel-title" id="synthese-secteur">
+                Principaux secteurs
+              </h2>
+
+              @if (sectorBars().length > 0) {
+                <ul class="cnpm-organizations__sectors">
+                  @for (sector of sectorBars(); track sector.label) {
+                    <li class="cnpm-organizations__sector-row">
+                      <div class="cnpm-organizations__sector-head">
+                        <span class="cnpm-organizations__sector-name">{{ sector.label }}</span>
+                        <span class="cnpm-organizations__sector-value">
+                          {{ sector.value | number }}
+                          <span class="cnpm-organizations__sector-pct"
+                            >· {{ sector.percent }} %</span
+                          >
+                        </span>
+                      </div>
+                      <div
+                        class="cnpm-organizations__sector-track"
+                        role="img"
+                        [attr.aria-label]="
+                          sector.label +
+                          ' : ' +
+                          sector.value +
+                          ' entreprises, ' +
+                          sector.percent +
+                          ' %'
+                        "
+                      >
+                        <span
+                          class="cnpm-organizations__sector-bar cnpm-organizations__sector-bar--{{
+                            sector.colorIndex
+                          }}"
+                          [style.width.%]="sector.fill"
+                        ></span>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="cnpm-organizations__panel-empty">Aucun secteur à afficher.</p>
+              }
+            </section>
           </aside>
         </div>
       }

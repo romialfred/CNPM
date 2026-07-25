@@ -1,0 +1,58 @@
+<cnpm-admin-shell>
+  <main class="cnpm-receipts-registry" id="contenu-principal">
+    <cnpm-page-header
+      title="Reçus"
+      description="Registre des reçus officiels délivrés par la CNPM après confirmation d’un encaissement."
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="cnpm-receipts-registry__status" role="status">Chargement des reçus…</p>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les reçus n’ont pas pu être chargés.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (receipts().length === 0) {
+          <p class="cnpm-receipts-registry__status" role="status">
+            Aucun reçu n’a encore été délivré.
+          </p>
+        } @else {
+          <div class="cnpm-receipts-registry__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Reçu</th>
+                  <th scope="col">Cotisant</th>
+                  <th scope="col">Référence</th>
+                  <th scope="col" class="cnpm-receipts-registry__num">Montant</th>
+                  <th scope="col">Émis le</th>
+                  <th scope="col">État</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (receipt of receipts(); track receipt.id) {
+                  <tr>
+                    <td class="cnpm-receipts-registry__mono">{{ receipt.receiptNumber }}</td>
+                    <td>{{ receipt.organizationName ?? '—' }}</td>
+                    <td class="cnpm-receipts-registry__mono">{{ receipt.referenceValue ?? '—' }}</td>
+                    <td class="cnpm-receipts-registry__num">
+                      {{ receipt.amount | number: '1.0-0' : 'fr' }} {{ receipt.currency }}
+                    </td>
+                    <td>{{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}</td>
+                    <td>
+                      <cnpm-badge tone="success">{{ receipt.status }}</cnpm-badge>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

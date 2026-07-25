@@ -115,7 +115,7 @@ export class HttpAuthGateway implements AuthGateway {
           if (body.accessToken) {
             this.session.set(body.accessToken);
           }
-          return { outcome: 'authenticated', redirectTo: space === 'admin' ? '/admin' : '/member' };
+          return { outcome: 'authenticated', redirectTo: destinationFor(body.accessToken, space) };
         }),
         catchError((): Observable<VerificationResult> => of({ outcome: 'invalid-code' })),
       );
@@ -133,15 +133,13 @@ export class HttpAuthGateway implements AuthGateway {
       .pipe(
         switchMap((body) =>
           from(renderOtpauthQr(body.otpAuthUri)).pipe(
-            map(
-              (qrImage): TotpEnrollment => ({
-                enrollmentId: challenge,
-                qrImage,
-                manualKey: formatManualKey(body.manualKey),
-                issuer: 'CNPM',
-                account: accountFromUri(body.otpAuthUri),
-              }),
-            ),
+            map((qrImage): TotpEnrollment => ({
+              enrollmentId: challenge,
+              qrImage,
+              manualKey: formatManualKey(body.manualKey),
+              issuer: 'CNPM',
+              account: accountFromUri(body.otpAuthUri),
+            })),
           ),
         ),
       );
@@ -162,11 +160,59 @@ export class HttpAuthGateway implements AuthGateway {
           }
           return {
             outcome: 'activated',
-            redirectTo: space === 'admin' ? '/admin' : '/member',
+            redirectTo: destinationFor(body.accessToken, space),
             recoveryCodes: body.recoveryCodes,
           };
         }),
         catchError((): Observable<TotpActivationResult> => of({ outcome: 'invalid-code' })),
       );
+  }
+
+  /**
+   * `POST /auth/password`. Le jeton et le mot de passe ne partent que dans le CORPS de la
+   * requête : une URL se retrouve dans les journaux de serveurs, de proxys et d'historiques
+   * de navigateur.
+   */
+  setPassword(token: string, password: string): Observable<void> {
+    return this.http
+      .post<void>(this.url('auth/password'), { token, password })
+      .pipe(map(() => undefined));
+  }
+}
+
+/** Rôles portés par un compte purement membre : ils n'ouvrent que l'espace membre. */
+const MEMBER_ONLY_ROLES = new Set(['MEMBRE_UTILISATEUR', 'MEMBRE_ADMIN']);
+
+/**
+ * Destination après authentification, déterminée par le RÔLE RÉEL du compte et non par le seul
+ * espace choisi à l'écran : un compte purement membre est toujours conduit à son espace, jamais
+ * dans l'administration où il n'aurait que des « accès refusé ». À défaut de rôle lisible, on
+ * respecte l'espace demandé.
+ */
+function destinationFor(accessToken: string | undefined, space: AuthSpace): string {
+  const roles = rolesFromToken(accessToken);
+  if (roles.length === 0) {
+    return space === 'admin' ? '/admin' : '/member';
+  }
+  const memberOnly = roles.every((role) => MEMBER_ONLY_ROLES.has(role));
+  return memberOnly ? '/member' : '/admin';
+}
+
+/** Lit les rôles du jeton applicatif sans le vérifier : la lecture ne sert qu'à router. */
+function rolesFromToken(accessToken: string | undefined): readonly string[] {
+  if (!accessToken) {
+    return [];
+  }
+  const parts = accessToken.split('.');
+  if (parts.length < 2) {
+    return [];
+  }
+  try {
+    const normalized = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(normalized)) as { realm_access?: { roles?: unknown } };
+    const roles = payload.realm_access?.roles;
+    return Array.isArray(roles) ? roles.filter((role): role is string => typeof role === 'string') : [];
+  } catch {
+    return [];
   }
 }

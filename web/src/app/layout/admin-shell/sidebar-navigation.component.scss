@@ -130,11 +130,13 @@
   color: var(--cnpm-chrome-text-muted);
   cursor: pointer;
   font: inherit;
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-bold);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  /* Libellés de groupe en casse normale (demande du commanditaire, inspiration SafeX) :
+     plus lisibles et moins « criards » que des capitales espacées. */
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: normal;
   text-align: start;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .cnpm-sidebar__group-trigger:hover {

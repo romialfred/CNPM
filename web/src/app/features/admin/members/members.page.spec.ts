@@ -28,6 +28,7 @@ const EMPTY_OVERVIEW: MembersOverview = {
   dormant: 0,
   prospects: 0,
   largeContributors: 0,
+  newThisYear: 0,
   expected: 0,
   collected: 0,
   recoveryRate: null,
@@ -56,6 +57,7 @@ const MEMBER_ROW: MemberRow = {
   paid: 750_000,
   status: 'ACTIVE',
   lastActivity: '2026-07-18',
+  joinedAt: '2020-01-01',
   isLargeContributor: false,
 };
 
@@ -290,36 +292,24 @@ describe('MembersPage — vue en tuiles', () => {
     }
   });
 
-  it('rend les panneaux de synthèse en entier, pictogramme compris', async () => {
-    // Régression vécue : le pictogramme était passé par son NOM (`icon="users"`).
-    // `LucideDynamicIcon` accepte une chaîne, mais elle suppose un registre nom → icône
-    // que ce dépôt n'installe pas ; l'exception « Unable to resolve icon » vidait tout le
-    // panneau. Les chiffres disparaissaient sans qu'aucun test n'échoue.
+  it('a supprimé le volet latéral et n’affiche que quatre tuiles d’effectif', async () => {
+    // Le commanditaire a demandé un bandeau épuré : plus de volet, et seulement quatre
+    // tuiles d'effectif. Le test verrouille les deux faces — l'`aside` absent, et les
+    // tuiles de cotisation / prospects / grands cotisants retirées.
     const { host } = await rendu();
-    const panneaux = Array.from(host.querySelectorAll('cnpm-insight-summary'));
 
-    expect(panneaux).toHaveLength(2);
-    for (const panneau of panneaux) {
-      expect(panneau.querySelector('.cnpm-insight__emblem svg')).not.toBeNull();
-      // Le panneau porte bien ses mesures, pas seulement son titre.
-      expect(panneau.querySelectorAll('.cnpm-insight__stat').length).toBeGreaterThan(0);
-      expect(panneau.querySelector('.cnpm-insight__stat dt')?.textContent?.trim()).toBeTruthy();
-      expect(panneau.querySelector('.cnpm-insight__stat dd')?.textContent?.trim()).toBeTruthy();
+    expect(host.querySelector('cnpm-insight-summary')).toBeNull();
+    expect(host.querySelector('.cnpm-members__aside')).toBeNull();
+
+    const libelles = Array.from(host.querySelectorAll('.cnpm-members__kpi-label')).map((element) =>
+      element.textContent?.trim(),
+    );
+    expect(libelles).toHaveLength(4);
+    for (const retiree of ['Grands cotisants', 'Prospects', 'Total dû', 'Total payé']) {
+      expect(libelles).not.toContain(retiree);
     }
-  });
-
-  it('rend le taux de recouvrement en jauge accessible', async () => {
-    const { host } = await rendu();
-    const jauge = host.querySelector('[role="progressbar"]');
-
-    expect(jauge).not.toBeNull();
-    expect(jauge?.getAttribute('aria-valuemin')).toBe('0');
-    expect(jauge?.getAttribute('aria-valuemax')).toBe('100');
-    // Le nom accessible est le libellé affiché, et la valeur est lisible en toutes
-    // lettres : une barre dont la valeur ne dépend que d'une longueur ne se lit pas.
-    const libelle = jauge?.getAttribute('aria-labelledby');
-    expect(host.querySelector(`#${libelle}`)?.textContent?.trim()).toBe('Taux de recouvrement');
-    expect(jauge?.getAttribute('aria-valuetext')).toContain('%');
+    // La jauge de recouvrement vivait dans le volet supprimé : plus aucune barre de progrès.
+    expect(host.querySelector('[role="progressbar"]')).toBeNull();
   });
 
   it('allège le tableau des colonnes et mentions retirées', async () => {
@@ -351,26 +341,23 @@ describe('MembersPage — vue en tuiles', () => {
     const { host } = await rendu('tuiles');
     const boutons = Array.from(host.querySelectorAll('.cnpm-members__view'));
 
-    expect(boutons.map((bouton) => bouton.getAttribute('aria-pressed'))).toEqual([
-      'false',
-      'true',
-    ]);
+    expect(boutons.map((bouton) => bouton.getAttribute('aria-pressed'))).toEqual(['false', 'true']);
   });
 
-  it('accompagne chaque presentation d un pictogramme decoratif', async () => {
+  it('présente la bascule en icônes seules, le libellé porté par aria-label', async () => {
     const { host } = await rendu('tuiles');
     const boutons = Array.from(host.querySelectorAll('.cnpm-members__view'));
 
-    // On n'assere PAS `aria-hidden` sur le pictogramme : `@lucide/angular` le pose de
-    // lui-meme en l'absence de `title`. L'affirmer testerait la bibliotheque, pas ce
-    // code — l'audit independant l'a montre en le mutant sans faire echouer le test.
-    // Ce qui doit etre verifie ici, c'est que le libelle ecrit reste la seule source du
-    // nom accessible : aucun `aria-label` ne doit le supplanter.
+    // Icônes seules (demande du commanditaire) : plus de texte visible, mais un nom
+    // accessible explicite et un pictogramme présent.
     expect(boutons).toHaveLength(2);
-    expect(boutons.map((bouton) => bouton.textContent?.trim())).toEqual(['Tableau', 'Tuiles']);
+    expect(boutons.map((bouton) => bouton.getAttribute('aria-label'))).toEqual([
+      'Afficher en tableau',
+      'Afficher en tuiles',
+    ]);
     for (const bouton of boutons) {
       expect(bouton.querySelector('svg')).not.toBeNull();
-      expect(bouton.getAttribute('aria-label')).toBeNull();
+      expect(bouton.textContent?.trim()).toBe('');
     }
   });
 
@@ -378,16 +365,18 @@ describe('MembersPage — vue en tuiles', () => {
     // Un bandeau qui contredirait le total affiche plus bas serait le « total
     // incoherent » que la fiche BO-002 interdit : les deux viennent d'`overview`.
     const { host } = await rendu();
-    const libelles = Array.from(host.querySelectorAll('.cnpm-members__kpi-label')).map(
-      (element) => element.textContent?.trim(),
+    const libelles = Array.from(host.querySelectorAll('.cnpm-members__kpi-label')).map((element) =>
+      element.textContent?.trim(),
     );
 
-    expect(libelles).toEqual([
+    // Quatre tuiles d'effectif dans l'ordre. La tuile « Nouveaux membres » porte l'année
+    // courante, donc on la reconnaît par son préfixe plutôt que par une année figée.
+    expect(libelles.slice(0, 3)).toEqual([
       'Base de membres',
       'Membres actifs',
       'Cotisants dormants',
-      'Taux de recouvrement',
     ]);
+    expect(libelles[3]?.startsWith('Nouveaux membres (')).toBe(true);
     // La base exclut les prospects : la legende doit le dire, faute de quoi le chiffre
     // se lirait comme un total tous statuts confondus.
     expect(host.querySelector('.cnpm-members__kpi-caption')?.textContent).toContain(

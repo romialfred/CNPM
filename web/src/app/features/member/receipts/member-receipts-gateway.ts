@@ -1,62 +1,54 @@
 import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-export type MemberReceiptStatus = 'DEMONSTRATION_AVAILABLE' | 'DEMONSTRATION_CANCELLED';
-export type MemberReceiptSort = 'scenarioDate' | 'reference' | 'amountXof';
-
 /**
- * Projection membre pour MP-007/MP-008.
+ * Contrat de « Mes reçus » (MP-007) : les reçus officiels RÉELS du cotisant.
  *
- * Elle ne porte volontairement aucun contenu PDF, URL de téléchargement,
- * jeton de vérification, QR, signature ou cachet. Un aperçu HTML ne doit pas
- * pouvoir être confondu avec la preuve officielle décrite par REC-001..003.
+ * <p>Un seul adaptateur HTTP réel, aucune démo. Le périmètre est déduit du compte connecté ;
+ * un membre ne voit jamais le reçu d'un autre. Le jeton de vérification n'est jamais exposé.
  */
-export interface MemberReceiptSummary {
+
+export type MemberReceiptChannel =
+  | 'ORANGE_MONEY'
+  | 'WAVE'
+  | 'MTN_MONEY'
+  | 'BANK_TRANSFER'
+  | 'CASH';
+
+export interface MemberReceipt {
   readonly id: string;
-  readonly reference: `RCP-${string}`;
-  readonly periodLabel: string;
-  readonly amountXof: number;
-  readonly scenarioDate: string;
-  readonly status: MemberReceiptStatus;
-}
-
-export interface MemberReceiptDetail extends MemberReceiptSummary {
-  readonly sourceDisclosure: string;
-  readonly paymentDisclosure: string;
-  readonly proofDisclosure: string;
-}
-
-export interface MemberReceiptQuery {
-  readonly search: string;
-  readonly status?: MemberReceiptStatus;
-  readonly exercise?: number;
-  readonly sort: MemberReceiptSort;
-  readonly direction: 'asc' | 'desc';
-  readonly page: number;
-  readonly size: number;
-}
-
-export interface MemberReceiptPage {
-  readonly items: readonly MemberReceiptSummary[];
-  readonly page: number;
-  readonly size: number;
-  readonly totalElements: number;
-  readonly totalPages: number;
-  readonly availableExercises: readonly number[];
+  readonly receiptNumber: string;
+  readonly transactionNumber: string;
+  readonly referenceValue: string | null;
+  readonly exercise: number | null;
+  readonly channel: MemberReceiptChannel;
+  /** Montant en XOF, converti au bord de l'application. */
+  readonly amount: number;
+  readonly currency: string;
+  readonly paidAt: string | null;
+  readonly issuedAt: string | null;
+  readonly status: string;
 }
 
 export interface MemberReceiptsGateway {
-  list(query: MemberReceiptQuery): Observable<MemberReceiptPage>;
-  loadDetail(id: string): Observable<MemberReceiptDetail>;
-}
-
-export class MemberReceiptNotFoundError extends Error {
-  constructor(readonly receiptId: string) {
-    super(`L’aperçu ${receiptId} n’existe pas dans la projection membre.`);
-    this.name = 'MemberReceiptNotFoundError';
-  }
+  list(): Observable<readonly MemberReceipt[]>;
 }
 
 export const MEMBER_RECEIPTS_GATEWAY = new InjectionToken<MemberReceiptsGateway>(
   'MEMBER_RECEIPTS_GATEWAY',
 );
+
+export class MemberReceiptsAuthenticationError extends Error {
+  constructor(message = 'Une authentification valide est requise.') {
+    super(message);
+    this.name = 'MemberReceiptsAuthenticationError';
+  }
+}
+
+/** Le compte n'est rattaché à aucune adhésion (compte professionnel). */
+export class MemberReceiptsNoMembershipError extends Error {
+  constructor(message = 'Aucune adhésion n’est rattachée à ce compte.') {
+    super(message);
+    this.name = 'MemberReceiptsNoMembershipError';
+  }
+}

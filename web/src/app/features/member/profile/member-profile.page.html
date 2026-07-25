@@ -1,103 +1,101 @@
-<cnpm-member-portal-shell
-  organization="Sahel Agro SA"
-  userName="Responsable adhésion"
-  memberCode="CNPM-2026-0001"
-  [notificationCount]="0"
->
+<cnpm-member-portal-shell>
   <main class="member-profile" id="contenu-principal">
     <cnpm-page-header
-      title="Profil entreprise"
-      description="Consultez l’identité et l’adhésion associées à votre espace membre."
+      title="Profil"
+      description="Vos informations et votre photo de profil."
     />
 
-    @switch (result().kind) {
+    @switch (state()) {
       @case ('loading') {
-        <section class="member-profile__panel" aria-label="Chargement du profil entreprise">
-          <cnpm-skeleton variant="card" [rows]="5" label="Chargement du profil entreprise…" />
-        </section>
+        <p class="member-profile__status" role="status">Chargement de votre profil…</p>
       }
       @case ('error') {
-        <cnpm-error-state
-          variant="recoverable"
-          title="Le profil n’a pas pu être chargé"
-          description="Le service est momentanément indisponible. Vous pouvez relancer le chargement."
-        >
-          <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
-        </cnpm-error-state>
-      }
-      @case ('unavailable') {
-        <cnpm-error-state
-          variant="recoverable"
-          title="Profil entreprise indisponible en mode HTTP"
-          description="Aucune projection membre typée et auto-scopée n’est contractuellement disponible."
-        />
-      }
-      @case ('empty') {
-        <cnpm-empty-state
-          variant="no-data"
-          title="Aucun profil entreprise"
-          description="Aucune information de profil n’est disponible pour cette session."
-        />
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Votre profil n’a pas pu être chargé.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
       }
       @case ('ready') {
-        @if (profile(); as profile) {
-          <section class="member-profile__summary" aria-labelledby="member-profile-summary-title">
-            <div>
-              <p class="member-profile__eyebrow">Espace membre</p>
-              <h2 id="member-profile-summary-title">{{ profile.organizationName }}</h2>
-              <p>{{ profile.memberReference }}</p>
-            </div>
-            <cnpm-badge tone="success">{{ profile.membershipLabel }}</cnpm-badge>
-          </section>
-
+        @if (profile(); as p) {
           <div class="member-profile__grid">
-            <section class="member-profile__panel" aria-labelledby="member-profile-identity-title">
-              <h2 id="member-profile-identity-title">Identité de la session</h2>
-              <dl>
-                <div>
-                  <dt>Libellé affiché</dt>
-                  <dd>{{ profile.displayLabel }}</dd>
+            <!-- Photo -->
+            <section class="member-profile__photo-card" aria-label="Photo de profil">
+              <div
+                class="member-profile__avatar"
+                [class.member-profile__avatar--drag]="dragOver()"
+                (dragover)="onDragOver($event)"
+                (dragleave)="onDragLeave()"
+                (drop)="onDrop($event)"
+              >
+                @if (shownImage(); as image) {
+                  <img class="member-profile__avatar-img" [src]="image" alt="Votre photo de profil" />
+                } @else {
+                  <span class="member-profile__avatar-initials" aria-hidden="true">{{ initials() }}</span>
+                }
+                <label class="member-profile__camera" [attr.aria-label]="'Changer la photo'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M4 8h3l1.5-2h7L17 8h3v11H4z" /><circle cx="12" cy="13" r="3.5" />
+                  </svg>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    class="member-profile__file"
+                    (change)="onFileSelected($event)"
+                  />
+                </label>
+              </div>
+
+              @if (photoError()) {
+                <p class="member-profile__photo-error" role="alert">{{ photoError() }}</p>
+              }
+
+              @if (preview()) {
+                <div class="member-profile__photo-actions">
+                  <cnpm-button variant="primary" [loading]="saving()" (click)="save()">
+                    Enregistrer la photo
+                  </cnpm-button>
+                  <cnpm-button variant="secondary" [disabled]="saving()" (click)="cancelPreview()">
+                    Annuler
+                  </cnpm-button>
                 </div>
-                <div>
-                  <dt>Profil déclaré</dt>
-                  <dd>{{ profile.roleLabel }}</dd>
-                </div>
-              </dl>
+              } @else {
+                <p class="member-profile__photo-hint">
+                  Glissez une image ou utilisez l’appareil photo. PNG, JPEG ou WebP, 512 Ko max.
+                </p>
+                @if (p.avatarDataUri) {
+                  <cnpm-button variant="secondary" [loading]="removing()" (click)="removePhoto()">
+                    Retirer la photo
+                  </cnpm-button>
+                }
+              }
             </section>
 
-            <section class="member-profile__panel" aria-labelledby="member-profile-company-title">
-              <h2 id="member-profile-company-title">Entreprise et adhésion</h2>
-              <dl>
+            <!-- Informations -->
+            <section class="member-profile__info-card" aria-label="Informations du profil">
+              <h2 class="member-profile__name">{{ p.displayName }}</h2>
+              @if (p.jobTitle) {
+                <p class="member-profile__role">{{ p.jobTitle }}</p>
+              }
+              <dl class="member-profile__fields">
                 <div>
-                  <dt>Organisation</dt>
-                  <dd>{{ profile.organizationName }}</dd>
+                  <dt>Adresse électronique</dt>
+                  <dd>{{ p.email }}</dd>
                 </div>
-                <div>
-                  <dt>Référence membre</dt>
-                  <dd>
-                    <code>{{ profile.memberReference }}</code>
-                  </dd>
-                </div>
-                <div>
-                  <dt>Type</dt>
-                  <dd>{{ profile.organizationTypeLabel }}</dd>
-                </div>
-                <div>
-                  <dt>Adhésion depuis</dt>
-                  <dd>
-                    <time [attr.datetime]="profile.membershipSince">
-                      {{ profile.membershipSince | date: 'dd/MM/yyyy' : 'UTC' }}
-                    </time>
-                  </dd>
-                </div>
+                @if (p.organization) {
+                  <div>
+                    <dt>Organisation</dt>
+                    <dd>{{ p.organization }}</dd>
+                  </div>
+                }
+                @if (p.phone) {
+                  <div>
+                    <dt>Téléphone</dt>
+                    <dd>{{ p.phone }}</dd>
+                  </div>
+                }
               </dl>
             </section>
           </div>
-
-          <cnpm-alert tone="info" title="Modification non disponible" [live]="false">
-            {{ profile.disclosure }} La modification en ligne des informations n’est pas ouverte à
-            ce jour.
-          </cnpm-alert>
         }
       }
     }

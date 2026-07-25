@@ -10,7 +10,9 @@ describe('memberRoutes', () => {
 
   it('expose MP-002 et MP-003 sous une composition de données commune', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'contributions');
-    expect(route?.providers).toHaveLength(2);
+    // Trois fournisseurs : l'adaptateur de démonstration, l'adaptateur HTTP et le port qui
+    // choisit entre les deux. C'est le seul écran membre raccordé au backend réel.
+    expect(route?.providers).toHaveLength(3);
     expect(route?.children).toHaveLength(2);
     expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
     expect(route?.children?.[0]?.loadComponent).toBeTypeOf('function');
@@ -18,22 +20,27 @@ describe('memberRoutes', () => {
     expect(route?.children?.[1]?.loadComponent).toBeTypeOf('function');
   });
 
-  it('expose MP-006, MP-004 puis MP-005 sous une composition de paiement fermée en HTTP', () => {
+  it('expose l’historique réel des paiements et les instructions sous une composition HTTP', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'payments');
-    expect(route?.providers).toHaveLength(2);
-    expect(route?.children?.map((child) => child.path)).toEqual(['', 'new', ':id/status']);
+    // Le portail « Mes paiements » (MP-006) s’appuie sur un historique réel `GET /portal/payments` :
+    // gateway HTTP concrète + alias `useExisting`, plus les deux fournisseurs du port
+    // toujours-HTTP des instructions de paiement (Lot 3, « zéro démo »).
+    expect(route?.providers).toHaveLength(4);
+    expect(route?.children?.map((child) => child.path)).toEqual(['', 'instructions']);
     expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
     expect(route?.children?.every((child) => child.loadComponent)).toBe(true);
     expect(route?.canActivate).toBeUndefined();
   });
 
-  it('expose MP-007 et MP-008 sous une composition de données commune', () => {
+  it('expose les reçus officiels réels sous une composition HTTP', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'receipts');
+    // « Mes reçus » (MP-007) s’appuie sur `GET /portal/receipts` : gateway HTTP concrète
+    // + alias `useExisting`, sans repli de démonstration ni écran de détail fictif.
     expect(route?.providers).toHaveLength(2);
-    expect(route?.children).toHaveLength(2);
-    expect(route?.children?.map((child) => child.path)).toEqual(['', ':id']);
+    expect(route?.children).toHaveLength(1);
+    expect(route?.children?.map((child) => child.path)).toEqual(['']);
+    expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
     expect(route?.children?.[0]?.loadComponent).toBeTypeOf('function');
-    expect(route?.children?.[1]?.loadComponent).toBeTypeOf('function');
   });
 
   it('expose MP-009, MP-010 et MP-011 sans confondre new avec un identifiant', () => {
@@ -89,11 +96,12 @@ describe('memberRoutes', () => {
     expect(route?.children).toBeUndefined();
   });
 
-  it('expose « Le CNPM » comme écran présentationnel, sans passerelle ni fixture', () => {
+  it('expose « Le CNPM » avec les actualités réelles (événements publiés)', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'cnpm');
     expect(route?.loadComponent).toBeTypeOf('function');
-    // Page institutionnelle sans données membre : aucune passerelle composée, aucun enfant.
-    expect(route?.providers).toBeUndefined();
+    // Les actualités sont désormais des données réelles (`GET /portal/events`) : gateway HTTP
+    // concrète + alias `useExisting`, sans enfant ni fixture.
+    expect(route?.providers).toHaveLength(2);
     expect(route?.children).toBeUndefined();
     expect(route?.canActivate).toBeUndefined();
   });

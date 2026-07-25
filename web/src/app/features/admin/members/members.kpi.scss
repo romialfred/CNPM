@@ -10,8 +10,10 @@
 
 .cnpm-members__kpis {
   display: grid;
+  /* Quatre tuiles d'effectif sur UNE SEULE LIGNE (demande du commanditaire) : quatre
+     colonnes égales. Elles se replient seulement quand la largeur ne les tient plus. */
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--cnpm-space-3);
+  gap: var(--cnpm-space-4);
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -23,23 +25,25 @@
   min-width: 0;
 }
 
-/* Bordure plutot qu'ombre, comme partout ailleurs : `ux-ui.md` demande la bordure
-   d'abord. Le liseré superieur porte l'accent de la tuile. */
+/* Tuile premium à FOND TEINTÉ par l'accent (demande du commanditaire) : chaque tuile porte
+   une couleur distincte, obtenue par mélange de l'accent avec la surface — teinte douce, pas
+   un aplat saturé, pour rester dans la charte. Une seule couleur source (`--cnpm-tile-accent`)
+   accorde fond, bordure et pastille. */
 .cnpm-members__kpi-card {
   position: relative;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: var(--cnpm-space-1);
+  gap: var(--cnpm-space-2);
   min-width: 0;
   overflow: hidden;
-  padding: var(--cnpm-space-4);
-  padding-block-start: var(--cnpm-space-5);
-  border: 1px solid var(--cnpm-color-border-subtle);
+  padding: var(--cnpm-space-5);
+  border: 1px solid color-mix(in srgb, var(--cnpm-tile-accent) 22%, transparent);
   border-radius: var(--cnpm-radius-lg);
-  background: var(--cnpm-color-surface-primary);
+  background: color-mix(in srgb, var(--cnpm-tile-accent) 8%, var(--cnpm-color-surface-primary));
 }
 
+/* Filet d'accent plus franc sur le bord supérieur : il ancre la couleur de la tuile. */
 .cnpm-members__kpi-card::before {
   position: absolute;
   top: 0;
@@ -50,7 +54,7 @@
   content: '';
 }
 
-/* Pastille teintee par l'accent : une seule couleur source, la tuile reste accordee. */
+/* Pastille pleine à l'accent, icône en négatif : contraste premium et lisible. */
 .cnpm-members__kpi-icon {
   display: inline-flex;
   width: var(--cnpm-space-10);
@@ -58,19 +62,21 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--cnpm-radius-md);
-  background: color-mix(in srgb, var(--cnpm-tile-accent) 12%, transparent);
-  color: var(--cnpm-tile-accent);
+  background: var(--cnpm-tile-accent);
+  color: var(--cnpm-color-text-inverse);
   flex: none;
 }
 
+/* Titre de tuile en casse normale (demande du commanditaire) : plus lisible et moins
+   « criard » que des capitales espacées. */
 .cnpm-members__kpi-label {
   margin: 0;
   color: var(--cnpm-color-text-secondary);
-  font-size: var(--cnpm-font-size-xs);
+  font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-semibold);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  line-height: var(--cnpm-font-lineHeight-xs);
-  text-transform: uppercase;
+  letter-spacing: normal;
+  line-height: var(--cnpm-font-lineHeight-sm);
+  text-transform: none;
 }
 
 .cnpm-members__kpi-value {
@@ -117,13 +123,15 @@
 
 /* ------------------------------------------------------------------------ Responsive */
 
-@media (max-width: 79.9375rem) {
+/* Sur desktop, les quatre tuiles restent sur une seule ligne. Elles ne se replient que
+   lorsque la largeur ne les tient plus : deux colonnes en tablette, une sur mobile. */
+@media (max-width: 64rem) {
   .cnpm-members__kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 47.9375rem) {
+@media (max-width: 32rem) {
   .cnpm-members__kpis {
     grid-template-columns: minmax(0, 1fr);
   }

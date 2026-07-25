@@ -49,3 +49,6 @@ visual-diff/
 
 # Artefacts temporaires (rendus de PDF, sorties de travail)
 tmp/
+
+# Proxy LOCAL de test (relaie /v1 vers le backend local) — jamais deploye
+web/proxy.local.json

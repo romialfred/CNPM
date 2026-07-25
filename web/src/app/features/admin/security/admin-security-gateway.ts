@@ -74,9 +74,12 @@ export interface PermissionGrant {
 
 export interface PermissionRow {
   readonly id: string;
+  /** Code technique de la permission, ex. `IAM.USER.READ`. */
   readonly label: string;
   /** Domaine fonctionnel, pour situer la permission sans ouvrir la documentation. */
   readonly domain: string;
+  /** Libellé humain (« Consulter les comptes utilisateurs »), pour ne pas exposer le code. */
+  readonly description: string;
   /**
    * Cellules déjà ordonnées comme `roles`.
    *
@@ -247,8 +250,15 @@ export interface AdminSecurityGateway {
   /**
    * Change le statut d'un compte (suspendre, réactiver). Le serveur applique la règle et
    * trace l'action ; l'écran ne fait que demander et rafraîchir. Renvoie le compte à jour.
+   *
+   * `reason` est OBLIGATOIRE, au même titre que pour le second facteur : une suspension
+   * sans raison consignée est une décision qu'on ne peut ni expliquer ni contester.
    */
-  changeAccountStatus(accountId: string, status: AccountStatus): Observable<SecurityAccount>;
+  changeAccountStatus(
+    accountId: string,
+    status: AccountStatus,
+    reason: string,
+  ): Observable<SecurityAccount>;
 
   /**
    * Réinitialise le second facteur : le compte repasse « en attente » et devra réenrôler
@@ -261,6 +271,21 @@ export interface AdminSecurityGateway {
   resetTwoFactor(accountId: string, reason: string): Observable<SecurityAccount>;
 
   /**
+   * Supprime définitivement un compte. Le serveur trace l'action et refuse qu'un opérateur
+   * se supprime lui-même. Le `reason` est obligatoire et consigné avant la suppression.
+   */
+  deleteAccount(accountId: string, reason: string): Observable<void>;
+
+  /**
+   * Émet un lien à usage unique d'activation ou de récupération d'accès pour un compte.
+   *
+   * L'administration ne pose jamais le mot de passe : elle n'obtient qu'un jeton, remis
+   * une seule fois, que le titulaire échange lui-même contre son secret. Le jeton renvoyé
+   * n'est donc jamais reconservé par l'écran au-delà de son affichage à l'opérateur.
+   */
+  issueCredentialToken(accountId: string): Observable<CredentialTokenResult>;
+
+  /**
    * Accorde ou retire une permission à un rôle dans la matrice. Le serveur applique la
    * règle (séparation des tâches, droit de gérer les permissions) et trace l'action ;
    * l'écran ne fait que demander et rafraîchir. Renvoie la ligne de permission à jour.
@@ -270,6 +295,19 @@ export interface AdminSecurityGateway {
     roleId: string,
     granted: boolean,
   ): Observable<PermissionRow>;
+}
+
+/**
+ * Jeton d'activation ou de récupération, tel que l'écran le reçoit.
+ *
+ * `activation` distingue une première mise en service (le compte n'avait pas de mot de
+ * passe) d'une récupération d'accès : l'écran n'annonce pas une « réinitialisation » à un
+ * compte qui n'a jamais eu de mot de passe.
+ */
+export interface CredentialTokenResult {
+  readonly token: string;
+  readonly expiresAt: string;
+  readonly activation: boolean;
 }
 
 export const ADMIN_SECURITY_GATEWAY = new InjectionToken<AdminSecurityGateway>(

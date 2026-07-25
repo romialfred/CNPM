@@ -32,11 +32,202 @@
   outline-offset: 2px;
 }
 
+/* -------------------------------------------------------------------------- Héros. */
+.cnpm-organization-detail__hero {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  /* Teinte de marque douce : premium sans aplat saturé. */
+  background: color-mix(
+    in srgb,
+    var(--cnpm-color-brand-blue-700) 6%,
+    var(--cnpm-color-surface-primary)
+  );
+}
+
+.cnpm-organization-detail__avatar {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  flex: none;
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-xl);
+  font-weight: var(--cnpm-font-weight-bold);
+}
+
+.cnpm-organization-detail__hero-body {
+  min-width: 0;
+}
+
+.cnpm-organization-detail__eyebrow {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-brand);
+  text-transform: uppercase;
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+}
+
+.cnpm-organization-detail__hero-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--cnpm-space-2);
+  margin: var(--cnpm-space-1) 0;
+  font-size: var(--cnpm-font-size-xl);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organization-detail__hero-trade {
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-regular);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-organization-detail__tagline {
+  margin: 0 0 var(--cnpm-space-3);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organization-detail__hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-organization-detail__since {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+/* ------------------------------------------------------------------ Chiffres clés. */
+.cnpm-organization-detail__figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--cnpm-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-organization-detail__figure {
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-organization-detail__figure-label {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organization-detail__figure-value {
+  margin: var(--cnpm-space-1) 0;
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-bold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organization-detail__figure-caption {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
+}
+
 .cnpm-organization-detail__grid {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 0.8fr);
   align-items: start;
   gap: var(--cnpm-space-4);
+}
+
+.cnpm-organization-detail__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-organization-detail__presentation {
+  margin: 0 0 var(--cnpm-space-4);
+  color: var(--cnpm-color-text-secondary);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+/* ------------------------------------------------------------------ Fil d'activité. */
+.cnpm-organization-detail__timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-organization-detail__event {
+  display: flex;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-organization-detail__dot {
+  display: grid;
+  place-items: center;
+  width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
+  flex: none;
+  border-radius: var(--cnpm-radius-pill);
+  color: var(--cnpm-color-text-inverse);
+}
+
+/* Une couleur par nature d'événement, toutes tokenisées ; le titre porte le sens. */
+.cnpm-organization-detail__dot--payment {
+  background: var(--cnpm-color-semantic-success-600);
+}
+.cnpm-organization-detail__dot--receipt {
+  background: var(--cnpm-color-brand-blue-600);
+}
+.cnpm-organization-detail__dot--reminder {
+  background: var(--cnpm-color-semantic-warning-600);
+}
+.cnpm-organization-detail__dot--update {
+  background: var(--cnpm-color-semantic-info-600);
+}
+.cnpm-organization-detail__dot--document {
+  background: var(--cnpm-color-brand-blue-400);
+}
+.cnpm-organization-detail__dot--meeting {
+  background: var(--cnpm-color-neutral-500);
+}
+
+.cnpm-organization-detail__event-body {
+  min-width: 0;
+}
+
+.cnpm-organization-detail__event-title {
+  margin: 0;
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-organization-detail__event-detail {
+  margin: var(--cnpm-space-1) 0;
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organization-detail__event-date {
+  font-size: var(--cnpm-font-size-xs);
+  color: var(--cnpm-color-text-muted);
 }
 
 .cnpm-organization-detail__card {

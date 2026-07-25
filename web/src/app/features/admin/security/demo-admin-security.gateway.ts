@@ -6,6 +6,7 @@ import type {
   AdminSecurityQuery,
   AdminSecuritySnapshot,
   AuditEntry,
+  CredentialTokenResult,
   MemberWithoutAccount,
   NewAccountInput,
   PermissionGrant,
@@ -365,6 +366,8 @@ const SESSIONS: readonly SecuritySession[] = [
  * fraîcheur sans introduire de valeur non reproductible dans les tests.
  */
 const RESET_AUDIT_TIMESTAMP = '2026-07-21T00:00:00+00:00';
+/** Expiration déterministe d'un lien de démonstration : 24 h après l'horodatage d'audit. */
+const DEMO_TOKEN_EXPIRY = '2026-07-22T00:00:00+00:00';
 
 const AUDIT: readonly AuditEntry[] = [
   {
@@ -517,6 +520,9 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
   private accounts: SecurityAccount[] = [...buildAccounts()];
   private createdCount = 0;
   private resetCount = 0;
+  private statusCount = 0;
+  private tokenCount = 0;
+  private deleteCount = 0;
   /** Membres déjà rattachés à un compte pendant la session démo (retirés de la liste). */
   private readonly linkedMemberIds = new Set<string>();
 
@@ -592,8 +598,29 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
     return of(account).pipe(delay(180));
   }
 
-  changeAccountStatus(accountId: string, status: AccountStatus): Observable<SecurityAccount> {
-    return this.mutate(accountId, (account) => ({ ...account, status }));
+  changeAccountStatus(
+    accountId: string,
+    status: AccountStatus,
+    reason: string,
+  ): Observable<SecurityAccount> {
+    // Comme le serveur : le changement d'état laisse une trace corrélée portant le motif.
+    return this.mutate(accountId, (account) => {
+      this.statusCount += 1;
+      const entry: AuditEntry = {
+        id: `aud-statut-${this.statusCount}`,
+        occurredAt: RESET_AUDIT_TIMESTAMP,
+        occurredAtLabel: 'À l’instant',
+        actor: 'Administrateur sécurité',
+        action:
+          (status === 'SUSPENDED' ? 'Suspension du compte' : 'Réactivation du compte') +
+          ` — motif : ${reason.trim()}`,
+        target: account.fullName,
+        outcome: 'SUCCESS',
+        correlationId: `CNPM-AUD-STA-${String(this.statusCount).padStart(4, '0')}`,
+      };
+      this.audit = [entry, ...this.audit];
+      return { ...account, status };
+    });
   }
 
   resetTwoFactor(accountId: string, reason: string): Observable<SecurityAccount> {
@@ -614,6 +641,60 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
       this.audit = [entry, ...this.audit];
       return { ...account, twoFactor: 'PENDING' };
     });
+  }
+
+  deleteAccount(accountId: string, reason: string): Observable<void> {
+    const account = this.accounts.find((candidate) => candidate.id === accountId);
+    if (!account) {
+      return throwError(() => new Error('Compte introuvable')).pipe(delay(180));
+    }
+    this.deleteCount += 1;
+    const entry: AuditEntry = {
+      id: `aud-suppr-${this.deleteCount}`,
+      occurredAt: RESET_AUDIT_TIMESTAMP,
+      occurredAtLabel: 'À l’instant',
+      actor: 'Administrateur sécurité',
+      action: `Suppression du compte — motif : ${reason.trim()}`,
+      target: account.fullName,
+      outcome: 'SUCCESS',
+      correlationId: `CNPM-AUD-DEL-${String(this.deleteCount).padStart(4, '0')}`,
+    };
+    this.audit = [entry, ...this.audit];
+    this.accounts = this.accounts.filter((candidate) => candidate.id !== accountId);
+    return of(undefined).pipe(delay(200));
+  }
+
+  /**
+   * Émet un jeton fictif. En démonstration, aucun serveur ne le vérifiera : il est là pour
+   * que l'opérateur voie le parcours complet (émission → lien à transmettre), pas pour
+   * ouvrir un accès. `activation` reflète l'état réel du compte — un compte encore invité
+   * n'a jamais eu de mot de passe, c'est donc une activation.
+   */
+  issueCredentialToken(accountId: string): Observable<CredentialTokenResult> {
+    const account = this.accounts.find((candidate) => candidate.id === accountId);
+    if (!account) {
+      return throwError(() => new Error('Compte introuvable')).pipe(delay(180));
+    }
+    this.tokenCount += 1;
+    const activation = account.status === 'INVITED';
+    const entry: AuditEntry = {
+      id: `aud-token-${this.tokenCount}`,
+      occurredAt: RESET_AUDIT_TIMESTAMP,
+      occurredAtLabel: 'À l’instant',
+      actor: 'Administrateur sécurité',
+      action: activation ? 'Émission d’un lien d’activation' : 'Émission d’un lien de récupération',
+      target: account.fullName,
+      outcome: 'SUCCESS',
+      correlationId: `CNPM-AUD-LNK-${String(this.tokenCount).padStart(4, '0')}`,
+    };
+    this.audit = [entry, ...this.audit];
+    return of({
+      // Jeton fictif reconnaissable, jamais un vrai secret. La date d'expiration reflète
+      // la fenêtre réelle (24 h) pour que l'écran affiche un délai crédible.
+      token: `demo-lien-${accountId.slice(0, 8)}-${this.tokenCount}`,
+      expiresAt: DEMO_TOKEN_EXPIRY,
+      activation,
+    }).pipe(delay(220));
   }
 
   setPermissionGrant(
@@ -690,7 +771,9 @@ function buildPermissions(): readonly PermissionRow[] {
       roleLabel: role.label,
       granted: seed.allowed.includes(role.id),
     }));
-    return { id: seed.id, label: seed.label, domain: seed.domain, grants };
+    // La démo porte déjà un libellé humain : il sert de description ; le « code » reprend
+    // le même texte faute de code technique en fixture (l'écran affiche la description).
+    return { id: seed.id, label: seed.label, domain: seed.domain, description: seed.label, grants };
   });
 }
 

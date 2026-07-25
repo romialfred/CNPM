@@ -1,87 +1,169 @@
-import { DatePipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Injector,
-  afterNextRender,
-  computed,
-  effect,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
-import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Title } from '@angular/platform-browser';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
-import { BadgeComponent } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
-import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
-import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
-import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
+import { ToastService } from '../../../design-system/toast/toast.service';
 import { MemberPortalShellComponent } from '../../../layout/member-portal-shell/member-portal-shell.component';
-import { MEMBER_PROFILE_GATEWAY } from './member-profile-gateway';
+import { MEMBER_PROFILE_GATEWAY, type MemberProfile } from './member-profile-gateway';
 
-/** MP-013 — profil d’entreprise, strictement consultatif. */
+type LoadState = 'loading' | 'ready' | 'error';
+
+const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+const MAX_BYTES = 512 * 1024;
+
+/**
+ * Espace membre — « Profil » (MP-013).
+ *
+ * <p>Le cotisant consulte son profil et change sa photo : sélection d'un fichier, aperçu, puis
+ * enregistrement. La photo est bornée en type et en taille côté écran comme côté serveur.
+ */
 @Component({
   selector: 'cnpm-member-profile-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    DatePipe,
-    MemberPortalShellComponent,
-    AlertComponent,
-    BadgeComponent,
-    ButtonComponent,
-    EmptyStateComponent,
-    ErrorStateComponent,
-    PageHeaderComponent,
-    SkeletonComponent,
-  ],
+  imports: [MemberPortalShellComponent, PageHeaderComponent, AlertComponent, ButtonComponent],
   templateUrl: './member-profile.page.html',
   styleUrl: './member-profile.page.scss',
 })
 export class MemberProfilePage {
   private readonly gateway = inject(MEMBER_PROFILE_GATEWAY);
-  private readonly injector = inject(Injector);
-  private readonly retryTick = signal(0);
-  private readonly pageHeader = viewChild(PageHeaderComponent);
-  private focusPending = true;
+  private readonly toast = inject(ToastService);
+  private readonly title = inject(Title);
 
-  protected readonly result = toSignal(
-    toObservable(this.retryTick).pipe(
-      switchMap(() =>
-        this.gateway.load().pipe(
-          map((profile) =>
-            profile ? { kind: 'ready' as const, profile } : { kind: 'empty' as const },
-          ),
-          catchError((error: unknown) =>
-            of(
-              error instanceof UnavailableHttpFeatureError
-                ? { kind: 'unavailable' as const }
-                : { kind: 'error' as const },
-            ),
-          ),
-          startWith({ kind: 'loading' as const }),
-        ),
-      ),
-    ),
-    { initialValue: { kind: 'loading' as const } },
+  protected readonly state = signal<LoadState>('loading');
+  protected readonly profile = signal<MemberProfile | null>(null);
+
+  /** Aperçu d'une photo choisie mais pas encore enregistrée (data-URI), ou `null`. */
+  protected readonly preview = signal<string | null>(null);
+  protected readonly saving = signal(false);
+  protected readonly removing = signal(false);
+  protected readonly photoError = signal<string | null>(null);
+  protected readonly dragOver = signal(false);
+
+  /** Image du médaillon : l'aperçu s'il existe, sinon la photo enregistrée. */
+  protected readonly shownImage = computed(
+    () => this.preview() ?? this.profile()?.avatarDataUri ?? null,
   );
-  protected readonly profile = computed(() => {
-    const result = this.result();
-    return result.kind === 'ready' ? result.profile : null;
+
+  protected readonly initials = computed(() => {
+    const name = this.profile()?.displayName ?? '';
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '—';
+    return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase();
   });
 
   constructor() {
-    effect(() => {
-      if (this.result().kind === 'loading' || !this.focusPending) return;
-      this.focusPending = false;
-      afterNextRender(() => this.pageHeader()?.focusTitle(), { injector: this.injector });
-    });
+    this.title.setTitle('Profil — Espace membre CNPM');
+    this.load();
   }
 
-  protected retry(): void {
-    this.retryTick.update((tick) => tick + 1);
+  protected load(): void {
+    this.state.set('loading');
+    this.gateway
+      .load()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (profile) => {
+          this.profile.set(profile);
+          this.state.set('ready');
+        },
+        error: () => this.state.set('error'),
+      });
+  }
+
+  protected onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      this.acceptFile(file);
+    }
+    input.value = '';
+  }
+
+  protected onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      this.acceptFile(file);
+    }
+  }
+
+  protected onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver.set(true);
+  }
+
+  protected onDragLeave(): void {
+    this.dragOver.set(false);
+  }
+
+  private acceptFile(file: File): void {
+    this.photoError.set(null);
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      this.photoError.set('Format non accepté. Choisissez une image PNG, JPEG ou WebP.');
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      this.photoError.set('L’image dépasse 512 Ko. Choisissez une photo plus légère.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => this.preview.set(typeof reader.result === 'string' ? reader.result : null);
+    reader.onerror = () => this.photoError.set('Lecture de l’image impossible. Réessayez.');
+    reader.readAsDataURL(file);
+  }
+
+  protected save(): void {
+    const dataUri = this.preview();
+    if (!dataUri || this.saving()) return;
+    const match = /^data:([^;]+);base64,(.+)$/.exec(dataUri);
+    if (!match) {
+      this.photoError.set('Image illisible. Choisissez une autre photo.');
+      return;
+    }
+    this.saving.set(true);
+    this.gateway
+      .updateAvatar(match[1], match[2])
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (profile) => {
+          this.saving.set(false);
+          this.preview.set(null);
+          this.profile.set(profile);
+          this.toast.success('Votre photo de profil a été mise à jour.');
+        },
+        error: (error: unknown) => {
+          this.saving.set(false);
+          this.photoError.set(error instanceof Error ? error.message : 'L’enregistrement a échoué.');
+        },
+      });
+  }
+
+  protected cancelPreview(): void {
+    this.preview.set(null);
+    this.photoError.set(null);
+  }
+
+  protected removePhoto(): void {
+    if (this.removing() || !this.profile()?.avatarDataUri) return;
+    if (!globalThis.confirm('Retirer votre photo de profil ?')) return;
+    this.removing.set(true);
+    this.gateway
+      .deleteAvatar()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (profile) => {
+          this.removing.set(false);
+          this.preview.set(null);
+          this.profile.set(profile);
+          this.toast.success('Votre photo de profil a été retirée.');
+        },
+        error: () => {
+          this.removing.set(false);
+          this.toast.error('Le retrait de la photo a échoué.');
+        },
+      });
   }
 }

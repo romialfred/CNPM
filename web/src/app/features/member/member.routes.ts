@@ -2,40 +2,37 @@ import { inject } from '@angular/core';
 import type { Routes } from '@angular/router';
 import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoMemberContributionsGateway } from './contributions/demo-member-contributions.gateway';
+import { HttpMemberContributionsGateway } from './contributions/http-member-contributions.gateway';
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
-import { DemoMemberDirectoryGateway } from './directory/demo-member-directory.gateway';
+import { HttpMemberEventsGateway } from './cnpm/http-member-events.gateway';
+import { MEMBER_EVENTS_GATEWAY } from './cnpm/member-events.gateway';
+import { HttpMemberDirectoryGateway } from './directory/http-member-directory.gateway';
 import { MEMBER_DIRECTORY_GATEWAY } from './directory/member-directory.gateway';
 import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.gateway';
 import { MEMBER_DOCUMENTS_GATEWAY } from './documents/member-documents-gateway';
-import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
+import { HttpMemberHomeGateway } from './home/http-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
-import { DemoMemberPaymentsGateway } from './payments/demo-member-payments.gateway';
+import { HttpMemberPaymentsGateway } from './payments/http-member-payments.gateway';
 import { MEMBER_PAYMENTS_GATEWAY } from './payments/member-payments-gateway';
-import { DemoMemberProfileGateway } from './profile/demo-member-profile.gateway';
+import { PAYMENT_INSTRUCTIONS_GATEWAY } from './payments/payment-instructions-gateway';
+import { HttpPaymentInstructionsGateway } from './payments/http-payment-instructions.gateway';
+import { HttpMemberProfileGateway } from './profile/http-member-profile.gateway';
 import { MEMBER_PROFILE_GATEWAY } from './profile/member-profile-gateway';
-import { DemoMemberReceiptsGateway } from './receipts/demo-member-receipts.gateway';
+import { HttpMemberReceiptsGateway } from './receipts/http-member-receipts.gateway';
 import { MEMBER_RECEIPTS_GATEWAY } from './receipts/member-receipts-gateway';
-import { DemoMemberRequestsGateway } from './requests/demo-member-requests.gateway';
+import { HttpMemberRequestsGateway } from './requests/http-member-requests.gateway';
 import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
 import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
 import { DemoMemberShowcaseGateway } from './showcase/demo-member-showcase.gateway';
 import { MEMBER_SHOWCASE_GATEWAY } from './showcase/member-showcase-gateway';
 import { DemoMemberShowcaseAnalyticsGateway } from './showcase-analytics/demo-member-showcase-analytics.gateway';
 import { MEMBER_SHOWCASE_ANALYTICS_GATEWAY } from './showcase-analytics/member-showcase-analytics.gateway';
-import { DemoMemberUsersGateway } from './users/demo-member-users.gateway';
+import { HttpMemberUsersGateway } from './users/http-member-users.gateway';
 import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
-  UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
-  UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
-  UNAVAILABLE_MEMBER_HOME_GATEWAY,
-  UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY,
-  UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
-  UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
-  UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
-  UNAVAILABLE_MEMBER_USERS_GATEWAY,
 } from './unavailable-member-gateways';
 
 /**
@@ -48,14 +45,10 @@ export const memberRoutes: Routes = [
   {
     path: 'home',
     providers: [
-      DemoMemberHomeGateway,
-      {
-        provide: MEMBER_HOME_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberHomeGateway)
-            : UNAVAILABLE_MEMBER_HOME_GATEWAY,
-      },
+      // Refonte « zéro démo » : le tableau de bord vient de `GET /portal/dashboard`,
+      // borné à l'adhésion du compte connecté.
+      HttpMemberHomeGateway,
+      { provide: MEMBER_HOME_GATEWAY, useExisting: HttpMemberHomeGateway },
     ],
     loadComponent: () => import('./home/member-home.page').then((m) => m.MemberHomePage),
     title: 'Mon espace membre — CNPM',
@@ -64,12 +57,15 @@ export const memberRoutes: Routes = [
     path: 'contributions',
     providers: [
       DemoMemberContributionsGateway,
+      HttpMemberContributionsGateway,
       {
+        // Premier écran de l'espace membre raccordé au backend réel : hors démonstration,
+        // les cotisations viennent de `GET /portal/contributions`, bornées au compte connecté.
         provide: MEMBER_CONTRIBUTIONS_GATEWAY,
         useFactory: () =>
           inject(CNPM_DATA_MODE) === 'demo'
             ? inject(DemoMemberContributionsGateway)
-            : UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY,
+            : inject(HttpMemberContributionsGateway),
       },
     ],
     children: [
@@ -95,14 +91,11 @@ export const memberRoutes: Routes = [
   {
     path: 'payments',
     providers: [
-      DemoMemberPaymentsGateway,
-      {
-        provide: MEMBER_PAYMENTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberPaymentsGateway)
-            : UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY,
-      },
+      // Refonte « zéro démo » : historique réel et instructions de paiement, adaptateurs HTTP.
+      HttpMemberPaymentsGateway,
+      { provide: MEMBER_PAYMENTS_GATEWAY, useExisting: HttpMemberPaymentsGateway },
+      HttpPaymentInstructionsGateway,
+      { provide: PAYMENT_INSTRUCTIONS_GATEWAY, useExisting: HttpPaymentInstructionsGateway },
     ],
     children: [
       {
@@ -113,34 +106,22 @@ export const memberRoutes: Routes = [
         title: 'Mes paiements — CNPM',
       },
       {
-        path: 'new',
+        path: 'instructions',
         loadComponent: () =>
-          import('./payments/new-member-payment.page').then(
-            (module) => module.NewMemberPaymentPage,
+          import('./payments/payment-instructions.page').then(
+            (module) => module.PaymentInstructionsPage,
           ),
-        title: 'Payer une cotisation — CNPM',
-      },
-      {
-        path: ':id/status',
-        loadComponent: () =>
-          import('./payments/member-payment-status.page').then(
-            (module) => module.MemberPaymentStatusPage,
-          ),
-        title: 'Suivi du paiement — CNPM',
+        title: 'Comment payer — CNPM',
       },
     ],
   },
   {
     path: 'receipts',
     providers: [
-      DemoMemberReceiptsGateway,
-      {
-        provide: MEMBER_RECEIPTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberReceiptsGateway)
-            : UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
-      },
+      // Refonte « zéro démo » : les reçus officiels viennent de `GET /portal/receipts`,
+      // bornés à l'adhésion du compte connecté.
+      HttpMemberReceiptsGateway,
+      { provide: MEMBER_RECEIPTS_GATEWAY, useExisting: HttpMemberReceiptsGateway },
     ],
     children: [
       {
@@ -150,27 +131,14 @@ export const memberRoutes: Routes = [
           import('./receipts/member-receipts.page').then((module) => module.MemberReceiptsPage),
         title: 'Mes reçus — CNPM',
       },
-      {
-        path: ':id',
-        loadComponent: () =>
-          import('./receipts/member-receipt-detail.page').then(
-            (module) => module.MemberReceiptDetailPage,
-          ),
-        title: 'Aperçu du reçu — CNPM',
-      },
     ],
   },
   {
     path: 'requests',
     providers: [
-      DemoMemberRequestsGateway,
-      {
-        provide: MEMBER_REQUESTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberRequestsGateway)
-            : UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
-      },
+      // Refonte « zéro démo » : requêtes réelles via /portal/requests*, bornées à l'organisation.
+      HttpMemberRequestsGateway,
+      { provide: MEMBER_REQUESTS_GATEWAY, useExisting: HttpMemberRequestsGateway },
     ],
     children: [
       {
@@ -218,14 +186,9 @@ export const memberRoutes: Routes = [
   {
     path: 'profile',
     providers: [
-      DemoMemberProfileGateway,
-      {
-        provide: MEMBER_PROFILE_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberProfileGateway)
-            : UNAVAILABLE_MEMBER_PROFILE_GATEWAY,
-      },
+      // Refonte « zéro démo » : le profil membre n'a qu'un adaptateur HTTP réel.
+      HttpMemberProfileGateway,
+      { provide: MEMBER_PROFILE_GATEWAY, useExisting: HttpMemberProfileGateway },
     ],
     loadComponent: () =>
       import('./profile/member-profile.page').then((module) => module.MemberProfilePage),
@@ -234,14 +197,9 @@ export const memberRoutes: Routes = [
   {
     path: 'users',
     providers: [
-      DemoMemberUsersGateway,
-      {
-        provide: MEMBER_USERS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberUsersGateway)
-            : UNAVAILABLE_MEMBER_USERS_GATEWAY,
-      },
+      // Refonte « zéro démo » : utilisateurs réels via /portal/users, bornés à l'organisation.
+      HttpMemberUsersGateway,
+      { provide: MEMBER_USERS_GATEWAY, useExisting: HttpMemberUsersGateway },
     ],
     loadComponent: () =>
       import('./users/member-users.page').then((module) => module.MemberUsersPage),
@@ -298,24 +256,23 @@ export const memberRoutes: Routes = [
     ],
   },
   {
-    // Point d'entrée institutionnel « Le CNPM » : page présentationnelle, sans passerelle
-    // de données ni fixture membre. Elle n'expose que des actualités en état vide honnête
-    // et des accès vers des écrans existants.
+    // Point d'entrée institutionnel « Le CNPM » : les actualités sont les événements CNPM
+    // réellement publiés (`GET /portal/events`), en état vide honnête tant qu'aucun n'est
+    // publié ; s'y ajoutent des accès vers des écrans existants.
     path: 'cnpm',
+    providers: [
+      HttpMemberEventsGateway,
+      { provide: MEMBER_EVENTS_GATEWAY, useExisting: HttpMemberEventsGateway },
+    ],
     loadComponent: () => import('./cnpm/member-cnpm.page').then((module) => module.MemberCnpmPage),
     title: 'Le CNPM — actualités et informations',
   },
   {
     path: 'directory',
     providers: [
-      DemoMemberDirectoryGateway,
-      {
-        provide: MEMBER_DIRECTORY_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberDirectoryGateway)
-            : UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
-      },
+      // Refonte « zéro démo » : annuaire réel via /portal/directory (organisations actives).
+      HttpMemberDirectoryGateway,
+      { provide: MEMBER_DIRECTORY_GATEWAY, useExisting: HttpMemberDirectoryGateway },
     ],
     loadComponent: () =>
       import('./directory/member-directory.page').then((module) => module.MemberDirectoryPage),

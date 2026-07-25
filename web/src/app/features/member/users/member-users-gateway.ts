@@ -1,44 +1,43 @@
 import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-export type MemberUserStatus = 'ACTIVE' | 'INACTIVE';
-export type MemberUserSort = 'displayLabel' | 'roleLabel' | 'lastActivityOn';
-
 /**
- * Métadonnées consultatives auto-scopées de MP-014.
+ * Contrat de « Utilisateurs de l'organisation » (MP-014) : la liste RÉELLE des comptes membres
+ * de l'organisation du cotisant connecté.
  *
- * Aucun sujet Keycloak, permission fine, secret MFA, jeton, session, IP ou attribut
- * d’audit n’est exposé. Les rôles restent des libellés indicatifs, non attribuables.
+ * <p>Un seul adaptateur HTTP réel, aucune démo. Le périmètre (organisation) est déduit du compte
+ * connecté ; un membre ne voit jamais les comptes d'une autre organisation. Vue consultative :
+ * aucun sujet Keycloak, permission fine ni secret n'est exposé.
  */
-export interface MemberUserSummary {
+
+export type MemberUserStatus = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+
+export interface MemberUser {
   readonly id: string;
-  readonly reference: `CNPM-USR-${string}`;
-  readonly displayLabel: string;
-  readonly email: `${string}@sahel-agro.example`;
+  readonly displayName: string;
+  readonly email: string;
   readonly roleLabel: string;
   readonly status: MemberUserStatus;
-  readonly lastActivityOn: string | null;
-}
-
-export interface MemberUserQuery {
-  readonly search: string;
-  readonly status?: MemberUserStatus;
-  readonly sort: MemberUserSort;
-  readonly direction: 'asc' | 'desc';
-  readonly page: number;
-  readonly size: number;
-}
-
-export interface MemberUserPage {
-  readonly items: readonly MemberUserSummary[];
-  readonly page: number;
-  readonly size: number;
-  readonly totalElements: number;
-  readonly totalPages: number;
+  readonly lastActivityAt: string | null;
 }
 
 export interface MemberUsersGateway {
-  list(query: MemberUserQuery): Observable<MemberUserPage>;
+  list(): Observable<readonly MemberUser[]>;
 }
 
 export const MEMBER_USERS_GATEWAY = new InjectionToken<MemberUsersGateway>('MEMBER_USERS_GATEWAY');
+
+export class MemberUsersAuthenticationError extends Error {
+  constructor(message = 'Une authentification valide est requise.') {
+    super(message);
+    this.name = 'MemberUsersAuthenticationError';
+  }
+}
+
+/** Le compte n'est rattaché à aucune adhésion (compte professionnel). */
+export class MemberUsersNoMembershipError extends Error {
+  constructor(message = 'Aucune adhésion n’est rattachée à ce compte.') {
+    super(message);
+    this.name = 'MemberUsersNoMembershipError';
+  }
+}

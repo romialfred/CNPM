@@ -7,6 +7,9 @@ import { AUDIT_GATEWAY } from '../../features/admin/audit/audit-gateway';
 import { DemoAuditGateway } from '../../features/admin/audit/demo-audit.gateway';
 import { HttpAuditGateway } from '../../features/admin/audit/http-audit.gateway';
 import { CONTRIBUTIONS_GATEWAY } from '../../features/admin/contributions/contributions-gateway';
+import { DemoContributionsGateway } from '../../features/admin/contributions/demo-contributions.gateway';
+import { DemoEnrollmentGateway } from '../../features/admin/enrollment-form/demo-enrollment.gateway';
+import { DemoPaymentsGateway } from '../../features/admin/payments/demo-payments.gateway';
 import { DASHBOARD_GATEWAY } from '../../features/admin/dashboard/dashboard-gateway';
 import { DemoDashboardGateway } from '../../features/admin/dashboard/demo-dashboard.gateway';
 import { HttpDashboardGateway } from '../../features/admin/dashboard/http-dashboard.gateway';
@@ -28,9 +31,6 @@ import { DemoSettingsGateway } from '../../features/admin/settings/demo-settings
 import { HttpSettingsGateway } from '../../features/admin/settings/http-settings.gateway';
 import { SETTINGS_GATEWAY } from '../../features/admin/settings/settings-gateway';
 import {
-  UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
-  UNAVAILABLE_ENROLLMENT_GATEWAY,
-  UNAVAILABLE_PAYMENTS_GATEWAY,
   UNAVAILABLE_RECOVERY_GATEWAY,
   UNAVAILABLE_REPORTING_GATEWAY,
 } from '../../features/admin/unavailable-admin-gateways';
@@ -38,10 +38,9 @@ import { authRoutes } from '../../features/auth/auth.routes';
 import { AUTH_GATEWAY } from '../../features/auth/auth-gateway';
 import { DemoAuthGateway } from '../../features/auth/demo-auth.gateway';
 import { HttpAuthGateway } from '../../features/auth/http-auth.gateway';
-import { DemoMemberHomeGateway } from '../../features/member/home/demo-member-home.gateway';
+import { HttpMemberHomeGateway } from '../../features/member/home/http-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from '../../features/member/home/member-home-gateway';
 import { memberRoutes } from '../../features/member/member.routes';
-import { UNAVAILABLE_MEMBER_HOME_GATEWAY } from '../../features/member/unavailable-member-gateways';
 import { DemoHomeGateway } from '../../features/public/home/demo-home.gateway';
 import { HOME_GATEWAY } from '../../features/public/home/home-gateway';
 import { HttpHomeGateway } from '../../features/public/home/http-home.gateway';
@@ -83,11 +82,14 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBeInstanceOf(DemoDashboardGateway);
     expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(DemoHomeGateway);
     expect(TestBed.inject(SHOWCASE_GATEWAY)).toBeInstanceOf(DemoShowcaseGateway);
-    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(DemoMemberHomeGateway);
+    // Le tableau de bord membre est désormais toujours-HTTP (refonte « zéro démo ») :
+    // il n'a plus d'adaptateur fictif, même en profil demo.
+    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(HttpMemberHomeGateway);
   });
 
-  it('ne laisse aucune feature non raccordée retomber sur une fixture en profil http', () => {
+  it('utilise l’adaptateur HTTP quand il existe, et un repli fixture explicite sinon', () => {
     configure('http');
+    // Features dotées d'un adaptateur HTTP : elles l'utilisent en profil http.
     expect(TestBed.inject(SESSION_GATEWAY)).toBeInstanceOf(HttpSessionGateway);
     expect(TestBed.inject(AUTH_GATEWAY)).toBeInstanceOf(HttpAuthGateway);
     expect(TestBed.inject(MEMBERS_GATEWAY)).toBeInstanceOf(HttpMembersGateway);
@@ -96,14 +98,17 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(SETTINGS_GATEWAY)).toBeInstanceOf(HttpSettingsGateway);
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBeInstanceOf(HttpDashboardGateway);
     expect(TestBed.inject(MEMBER_DETAIL_GATEWAY)).toBeInstanceOf(HttpMemberDetailGateway);
-    expect(TestBed.inject(ENROLLMENT_GATEWAY)).toBe(UNAVAILABLE_ENROLLMENT_GATEWAY);
-    expect(TestBed.inject(CONTRIBUTIONS_GATEWAY)).toBe(UNAVAILABLE_CONTRIBUTIONS_GATEWAY);
-    expect(TestBed.inject(PAYMENTS_GATEWAY)).toBe(UNAVAILABLE_PAYMENTS_GATEWAY);
-    expect(TestBed.inject(RECOVERY_GATEWAY)).toBe(UNAVAILABLE_RECOVERY_GATEWAY);
-    expect(TestBed.inject(REPORTING_GATEWAY)).toBe(UNAVAILABLE_REPORTING_GATEWAY);
     expect(TestBed.inject(ADMIN_SECURITY_GATEWAY)).toBeInstanceOf(HttpAdminSecurityGateway);
     expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(HttpHomeGateway);
+    // Features SANS adaptateur HTTP : repli sur les fixtures plutôt qu'un écran d'erreur,
+    // pour que la page reste utilisable en attendant le raccordement au backend.
+    expect(TestBed.inject(ENROLLMENT_GATEWAY)).toBeInstanceOf(DemoEnrollmentGateway);
+    expect(TestBed.inject(CONTRIBUTIONS_GATEWAY)).toBeInstanceOf(DemoContributionsGateway);
+    expect(TestBed.inject(PAYMENTS_GATEWAY)).toBeInstanceOf(DemoPaymentsGateway);
+    // Ces deux-là restent volontairement indisponibles (aucune fixture prévue).
+    expect(TestBed.inject(RECOVERY_GATEWAY)).toBe(UNAVAILABLE_RECOVERY_GATEWAY);
+    expect(TestBed.inject(REPORTING_GATEWAY)).toBe(UNAVAILABLE_REPORTING_GATEWAY);
     expect(TestBed.inject(SHOWCASE_GATEWAY)).toBe(UNAVAILABLE_SHOWCASE_GATEWAY);
-    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBe(UNAVAILABLE_MEMBER_HOME_GATEWAY);
+    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(HttpMemberHomeGateway);
   });
 });

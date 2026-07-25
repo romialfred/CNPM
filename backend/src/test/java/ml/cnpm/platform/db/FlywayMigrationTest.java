@@ -30,7 +30,9 @@ class FlywayMigrationTest extends PostgresMigrationSupport {
         assertThat(result.success).isTrue();
         assertThat(result.migrationsExecuted).isEqualTo(allVersions().size());
         assertThat(countSchemas(jdbcUrl)).isEqualTo(17);
-        assertThat(countTables(jdbcUrl)).isEqualTo(73);
+        // 75 depuis V19 (payment.collection_account). Le compte est délibérément figé :
+        // il fait échouer toute table ajoutée sans intention explicite.
+        assertThat(countTables(jdbcUrl)).isEqualTo(75);
     }
 
     @Test

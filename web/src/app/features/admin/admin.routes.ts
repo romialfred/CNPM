@@ -70,6 +70,16 @@ import { HttpSettingsGateway } from './settings/http-settings.gateway';
 import { pendingSettingsChangesGuard } from './settings/pending-settings-changes.guard';
 import { SETTINGS_GATEWAY } from './settings/settings-gateway';
 import { settingsReadGuard } from './settings/settings-read.guard';
+import { COLLECTION_ACCOUNTS_GATEWAY } from './collection-accounts/collection-accounts-gateway';
+import { HttpCollectionAccountsGateway } from './collection-accounts/http-collection-accounts.gateway';
+import { PAYMENT_REFERENCES_GATEWAY } from './payment-references/payment-references-gateway';
+import { HttpPaymentReferencesGateway } from './payment-references/http-payment-references.gateway';
+import { PAYMENTS_RECORDING_GATEWAY } from './payments-recording/payments-recording-gateway';
+import { HttpPaymentsRecordingGateway } from './payments-recording/http-payments-recording.gateway';
+import { RECEIPTS_REGISTRY_GATEWAY } from './receipts-registry/receipts-registry-gateway';
+import { HttpReceiptsRegistryGateway } from './receipts-registry/http-receipts-registry.gateway';
+import { RECONCILIATION_GATEWAY } from './reconciliation/reconciliation-gateway';
+import { HttpReconciliationGateway } from './reconciliation/http-reconciliation.gateway';
 import { DemoShowcaseModerationGateway } from './showcase-moderation/demo-showcase-moderation.gateway';
 import {
   SHOWCASE_MODERATION_GATEWAY,
@@ -77,13 +87,8 @@ import {
 } from './showcase-moderation/showcase-moderation-gateway';
 import { adminSessionGuard } from './admin-session.guard';
 import {
-  UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
-  UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
-  UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
   UNAVAILABLE_DOCUMENTS_GATEWAY,
-  UNAVAILABLE_ENROLLMENT_GATEWAY,
   UNAVAILABLE_INTEGRATIONS_GATEWAY,
-  UNAVAILABLE_PAYMENTS_GATEWAY,
   UNAVAILABLE_RECEIPTS_GATEWAY,
   UNAVAILABLE_RECOVERY_GATEWAY,
   UNAVAILABLE_REPORTING_GATEWAY,
@@ -93,8 +98,10 @@ import {
 /**
  * Routes d'administration, chargées à la demande.
  *
- * Les ports sont composés ici selon `CNPM_DATA_MODE`. En HTTP, une feature non
- * raccordée devient explicitement indisponible et ne retombe jamais sur ses fixtures.
+ * Les ports sont composés ici selon `CNPM_DATA_MODE`. Une feature dotée d'un adaptateur
+ * HTTP l'utilise en mode HTTP. Faute d'adaptateur HTTP (enrôlement, cotisations, paiements,
+ * génération d'appels, import de relevé), on sert les fixtures de démonstration plutôt qu'un
+ * écran d'erreur : la page reste utilisable, en attendant le raccordement au backend.
  *
  * Le garde de session améliore uniquement l'expérience en cas de 401. Il ne remplace
  * jamais la vérification des permissions et du périmètre côté backend (ADR-008).
@@ -153,6 +160,18 @@ export const adminRoutes: Routes = [
             ? inject(DemoSettingsGateway)
             : inject(HttpSettingsGateway),
       },
+      // Refonte « zéro démo » : les comptes d'encaissement n'ont qu'un adaptateur HTTP réel,
+      // quel que soit CNPM_DATA_MODE. Aucune passerelle de démonstration n'est fournie.
+      HttpCollectionAccountsGateway,
+      { provide: COLLECTION_ACCOUNTS_GATEWAY, useExisting: HttpCollectionAccountsGateway },
+      HttpPaymentReferencesGateway,
+      { provide: PAYMENT_REFERENCES_GATEWAY, useExisting: HttpPaymentReferencesGateway },
+      HttpPaymentsRecordingGateway,
+      { provide: PAYMENTS_RECORDING_GATEWAY, useExisting: HttpPaymentsRecordingGateway },
+      HttpReceiptsRegistryGateway,
+      { provide: RECEIPTS_REGISTRY_GATEWAY, useExisting: HttpReceiptsRegistryGateway },
+      HttpReconciliationGateway,
+      { provide: RECONCILIATION_GATEWAY, useExisting: HttpReconciliationGateway },
       {
         provide: DASHBOARD_GATEWAY,
         useFactory: () =>
@@ -162,19 +181,15 @@ export const adminRoutes: Routes = [
       },
       DemoContributionCallGenerationGateway,
       {
+        // Repli démonstration en attendant le backend (voir cotisations/paiements ci-dessous).
         provide: CONTRIBUTION_CALL_GENERATION_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoContributionCallGenerationGateway)
-            : UNAVAILABLE_CONTRIBUTION_CALL_GENERATION_GATEWAY,
+        useFactory: () => inject(DemoContributionCallGenerationGateway),
       },
       DemoBankStatementImportGateway,
       {
+        // Repli démonstration (import de relevé bancaire) en attendant le backend.
         provide: BANK_STATEMENT_IMPORT_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoBankStatementImportGateway)
-            : UNAVAILABLE_BANK_STATEMENT_IMPORT_GATEWAY,
+        useFactory: () => inject(DemoBankStatementImportGateway),
       },
       {
         provide: DOCUMENTS_GATEWAY,
@@ -200,11 +215,12 @@ export const adminRoutes: Routes = [
             : inject(HttpMemberEditGateway),
       },
       {
+        // Enrôlement, cotisations et paiements n'ont pas encore d'adaptateur HTTP réel :
+        // leur read-model backend n'est pas raccordé. Plutôt qu'un écran d'erreur en mode
+        // HTTP, on sert les fixtures de démonstration — la page reste fonctionnelle et
+        // navigable. Le raccordement au backend viendra remplacer ce repli.
         provide: ENROLLMENT_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoEnrollmentGateway)
-            : UNAVAILABLE_ENROLLMENT_GATEWAY,
+        useFactory: () => inject(DemoEnrollmentGateway),
       },
       DemoEnrollmentsGateway,
       HttpEnrollmentsGateway,
@@ -217,17 +233,11 @@ export const adminRoutes: Routes = [
       },
       {
         provide: CONTRIBUTIONS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoContributionsGateway)
-            : UNAVAILABLE_CONTRIBUTIONS_GATEWAY,
+        useFactory: () => inject(DemoContributionsGateway),
       },
       {
         provide: PAYMENTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoPaymentsGateway)
-            : UNAVAILABLE_PAYMENTS_GATEWAY,
+        useFactory: () => inject(DemoPaymentsGateway),
       },
       {
         provide: RECOVERY_GATEWAY,
@@ -541,6 +551,42 @@ export const adminRoutes: Routes = [
         canDeactivate: [pendingSettingsChangesGuard],
         loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
         title: 'Paramétrage fonctionnel — Administration CNPM',
+      },
+      {
+        path: 'collection-accounts',
+        loadComponent: () =>
+          import('./collection-accounts/collection-accounts.page').then(
+            (m) => m.CollectionAccountsPage,
+          ),
+        title: 'Comptes d’encaissement — Administration CNPM',
+      },
+      {
+        path: 'payment-references',
+        loadComponent: () =>
+          import('./payment-references/payment-references.page').then(
+            (m) => m.PaymentReferencesPage,
+          ),
+        title: 'Références de paiement — Administration CNPM',
+      },
+      {
+        path: 'payments/recording',
+        loadComponent: () =>
+          import('./payments-recording/payments-recording.page').then(
+            (m) => m.PaymentsRecordingPage,
+          ),
+        title: 'Encaissements — Administration CNPM',
+      },
+      {
+        path: 'receipts-registry',
+        loadComponent: () =>
+          import('./receipts-registry/receipts-registry.page').then((m) => m.ReceiptsRegistryPage),
+        title: 'Reçus — Administration CNPM',
+      },
+      {
+        path: 'reconciliation',
+        loadComponent: () =>
+          import('./reconciliation/reconciliation.page').then((m) => m.ReconciliationPage),
+        title: 'Rapprochement — Administration CNPM',
       },
       // Compatibilité des favoris et captures antérieurs à l'alignement sur
       // l'inventaire UI. Les nouveaux liens utilisent exclusivement les routes canoniques.

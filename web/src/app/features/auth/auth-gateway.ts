@@ -100,6 +100,16 @@ export interface AuthGateway {
     code: string,
     space: AuthSpace,
   ): Observable<TotpActivationResult>;
+
+  /**
+   * Pose le mot de passe du compte désigné par un jeton à usage unique (activation d'un
+   * compte neuf ou récupération d'accès, PRT-001).
+   *
+   * Le jeton vient du lien reçu ; il n'est jamais conservé par l'application. Un jeton
+   * inconnu, périmé ou déjà consommé produit la même erreur : l'écran ne dit pas lequel,
+   * sous peine de renseigner qui tâtonne.
+   */
+  setPassword(token: string, password: string): Observable<void>;
 }
 
 export const AUTH_GATEWAY = new InjectionToken<AuthGateway>('AUTH_GATEWAY');

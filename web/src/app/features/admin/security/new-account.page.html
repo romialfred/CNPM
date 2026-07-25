@@ -76,7 +76,11 @@
                     Aucun membre ne correspond à la recherche.
                   </p>
                 } @else {
-                  <ul class="cnpm-new-account__members" role="listbox" aria-label="Membres sans compte">
+                  <ul
+                    class="cnpm-new-account__members"
+                    role="listbox"
+                    aria-label="Membres sans compte"
+                  >
                     @for (member of filteredMembers(); track member.id) {
                       <li>
                         <button
@@ -117,9 +121,10 @@
 
                 @if (selectedMember(); as member) {
                   <p class="cnpm-new-account__selected" role="status">
-                    Membre sélectionné : <strong>{{ member.organizationName }}</strong>
-                    ({{ member.membershipNumber }}). L’identité ci-dessous a été pré-remplie depuis
-                    son contact principal ; ajustez-la si nécessaire.
+                    Membre sélectionné : <strong>{{ member.organizationName }}</strong> ({{
+                      member.membershipNumber
+                    }}). L’identité ci-dessous a été pré-remplie depuis son contact principal ;
+                    ajustez-la si nécessaire.
                   </p>
                 }
               }
@@ -214,10 +219,14 @@
 
             @if (rolePermissions().length) {
               <div class="cnpm-new-account__preview">
-                <p class="cnpm-new-account__preview-title">Permissions accordées par ce rôle</p>
+                <p class="cnpm-new-account__preview-title">Ce que ce rôle autorise</p>
                 <ul class="cnpm-new-account__tags">
                   @for (permission of rolePermissions(); track permission.id) {
-                    <li class="cnpm-new-account__tag">{{ permission.label }}</li>
+                    <!-- Libellé HUMAIN (description) et non le code technique : le titre du
+                         droit doit se lire sans documentation. Le code reste en info-bulle. -->
+                    <li class="cnpm-new-account__tag" [title]="permission.label">
+                      {{ permission.description }}
+                    </li>
                   }
                 </ul>
               </div>
@@ -225,20 +234,98 @@
 
             @if (!isMember() && extraPermissionOptions().length) {
               <div class="cnpm-new-account__extra">
-                <p class="cnpm-new-account__preview-title">Permissions supplémentaires (optionnel)</p>
-                <div class="cnpm-new-account__checks">
-                  @for (permission of extraPermissionOptions(); track permission.id) {
-                    <label class="cnpm-new-account__check">
-                      <input
-                        type="checkbox"
-                        [checked]="isExtraSelected(permission.id)"
-                        (change)="toggleExtra(permission.id, $any($event.target).checked)"
-                      />
-                      <span>
-                        {{ permission.label }}
-                        <small>{{ permission.domain }}</small>
-                      </span>
-                    </label>
+                <div class="cnpm-new-account__extra-head">
+                  <div>
+                    <p class="cnpm-new-account__preview-title">Permissions supplémentaires</p>
+                    <p class="cnpm-new-account__extra-hint">
+                      Ajoutez des droits au-delà du rôle. Regroupés par domaine.
+                    </p>
+                  </div>
+                  <!-- Compteur : l'opérateur voit combien de droits il ajoute au rôle. -->
+                  <span
+                    class="cnpm-new-account__counter"
+                    [class.cnpm-new-account__counter--active]="extraSelectedCount() > 0"
+                  >
+                    {{ extraSelectedCount() }} accordée{{ extraSelectedCount() > 1 ? 's' : '' }}
+                  </span>
+                </div>
+
+                <div class="cnpm-new-account__search">
+                  <label class="cnpm-new-account__sr" for="perm-search">
+                    Rechercher une permission
+                  </label>
+                  <input
+                    id="perm-search"
+                    class="cnpm-new-account__search-input"
+                    type="search"
+                    autocomplete="off"
+                    placeholder="Rechercher un droit (ex. « cotisation »)…"
+                    [ngModel]="permissionSearch()"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="permissionSearch.set($event)"
+                  />
+                </div>
+
+                <!-- Matrice repliable par domaine : un domaine par ligne, ses droits en
+                     interrupteurs. Aucune liste plate de codes. -->
+                <div class="cnpm-new-account__domains">
+                  @for (group of extraPermissionGroups(); track group.domain) {
+                    <section class="cnpm-new-account__domain">
+                      <button
+                        type="button"
+                        class="cnpm-new-account__domain-head"
+                        [attr.aria-expanded]="group.expanded"
+                        (click)="toggleDomain(group.domain)"
+                      >
+                        <svg
+                          class="cnpm-new-account__domain-chevron"
+                          [class.cnpm-new-account__domain-chevron--open]="group.expanded"
+                          lucideChevronRight
+                          [size]="iconSize.compact"
+                          aria-hidden="true"
+                        ></svg>
+                        <span class="cnpm-new-account__domain-name">{{ group.domain }}</span>
+                        @if (group.selectedCount > 0) {
+                          <span class="cnpm-new-account__domain-badge">
+                            {{ group.selectedCount }}
+                          </span>
+                        }
+                        <span class="cnpm-new-account__domain-total">
+                          {{ group.permissions.length }} droit{{
+                            group.permissions.length > 1 ? 's' : ''
+                          }}
+                        </span>
+                      </button>
+
+                      @if (group.expanded) {
+                        <ul class="cnpm-new-account__perms">
+                          @for (permission of group.permissions; track permission.id) {
+                            <li class="cnpm-new-account__perm">
+                              <label class="cnpm-new-account__perm-label">
+                                <input
+                                  type="checkbox"
+                                  class="cnpm-new-account__perm-toggle"
+                                  [checked]="isExtraSelected(permission.id)"
+                                  (change)="toggleExtra(permission.id, $any($event.target).checked)"
+                                />
+                                <span class="cnpm-new-account__perm-text">
+                                  <span class="cnpm-new-account__perm-name">
+                                    {{ permission.description }}
+                                  </span>
+                                  <small class="cnpm-new-account__perm-code">{{
+                                    permission.label
+                                  }}</small>
+                                </span>
+                              </label>
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </section>
+                  } @empty {
+                    <p class="cnpm-new-account__empty" role="status">
+                      Aucun droit ne correspond à votre recherche.
+                    </p>
                   }
                 </div>
               </div>
@@ -246,8 +333,8 @@
           </fieldset>
 
           <p class="cnpm-new-account__note">
-            Aucun mot de passe n’est saisi ici : le compte est créé « invité ». La personne
-            définira son mot de passe et enrôlera son second facteur à la première connexion.
+            Aucun mot de passe n’est saisi ici : le compte est créé « invité ». La personne définira
+            son mot de passe et enrôlera son second facteur à la première connexion.
           </p>
 
           <div class="cnpm-new-account__actions">

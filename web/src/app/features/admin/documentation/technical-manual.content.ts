@@ -12,13 +12,13 @@ export const TECHNICAL_MANUAL: DocManual = {
   id: 'technical',
   label: 'Documentation technique',
   tagline:
-    "Architecture, base de données, code source, fonctions principales, API, sécurité, déploiement et tests.",
+    'Architecture, base de données, code source, fonctions principales, API, sécurité, déploiement et tests.',
   sections: [
     {
       id: 'tech-architecture',
       title: '1. Architecture et pile technique',
       summary:
-        "La plateforme est un monolithe modulaire en architecture hexagonale : un seul déployable, des modules à frontières explicites, les frameworks maintenus en périphérie du domaine.",
+        'La plateforme est un monolithe modulaire en architecture hexagonale : un seul déployable, des modules à frontières explicites, les frameworks maintenus en périphérie du domaine.',
       subsections: [
         {
           id: 'tech-architecture-principes',
@@ -49,7 +49,10 @@ export const TECHNICAL_MANUAL: DocManual = {
                 ['Web', 'Angular 22, TypeScript strict, SCSS et tokens de design'],
                 ['Mobile', 'Flutter 3.44 / Dart'],
                 ['Base de données', 'PostgreSQL 18, Flyway, PgBouncer'],
-                ['Identité', 'Auth native (JWT HS256) ; cible IAM Keycloak, OIDC/OAuth 2.0, TOTP, WebAuthn'],
+                [
+                  'Identité',
+                  'Auth native (JWT HS256) ; cible IAM Keycloak, OIDC/OAuth 2.0, TOTP, WebAuthn',
+                ],
                 ['Asynchrone / cache', 'RabbitMQ ; cache technique Valkey'],
                 ['Documents', 'Stockage objet compatible S3 avec analyse antivirus'],
               ],
@@ -114,13 +117,13 @@ export const TECHNICAL_MANUAL: DocManual = {
                 '',
                 'resources/',
                 '├─ application.yml               # configuration',
-                '└─ db/migration/                 # migrations Flyway V1 … V16',
+                '└─ db/migration/                 # migrations Flyway V1 … V17',
               ],
             },
             {
               kind: 'callout',
               tone: 'info',
-              text: "Les schémas financiers (payment, receipt, incentive…) existent dans le modèle de données, mais leurs modules applicatifs relèvent de la feuille de route : ils dépendent de décisions produit encore ouvertes (docs/00-governance/open-decisions.md).",
+              text: 'Les schémas financiers (payment, receipt, incentive…) existent dans le modèle de données, mais leurs modules applicatifs relèvent de la feuille de route : ils dépendent de décisions produit encore ouvertes (docs/00-governance/open-decisions.md).',
             },
           ],
         },
@@ -207,7 +210,7 @@ export const TECHNICAL_MANUAL: DocManual = {
           blocks: [
             {
               kind: 'paragraph',
-              text: "Inventaire des tables par schéma (finalité, nombre de colonnes, immuabilité). Le dictionnaire exhaustif au niveau colonne vit dans docs/03-data/data-dictionary.csv et dans les migrations Flyway.",
+              text: 'Inventaire des tables par schéma (finalité, nombre de colonnes, immuabilité). Le dictionnaire exhaustif au niveau colonne vit dans docs/03-data/data-dictionary.csv et dans les migrations Flyway.',
             },
             {
               kind: 'table',
@@ -243,7 +246,12 @@ export const TECHNICAL_MANUAL: DocManual = {
                 ['contribution.installment', 'Échéances d’un appel', '12', 'Non'],
                 ['contribution.adjustment', 'Ajustements compensatoires', '9', 'Oui'],
                 ['payment.payment_reference', 'Références de paiement validées', '12', 'Non'],
-                ['payment.payment_transaction', 'Transactions financières append-only', '13', 'Oui'],
+                [
+                  'payment.payment_transaction',
+                  'Transactions financières append-only',
+                  '13',
+                  'Oui',
+                ],
                 ['payment.payment_allocation', 'Affectations paiement-échéance', '7', 'Oui'],
                 ['payment.provider_event', 'Événements des prestataires', '10', 'Oui'],
                 ['payment.bank_statement', 'Relevés bancaires importés', '12', 'Non'],
@@ -292,7 +300,7 @@ export const TECHNICAL_MANUAL: DocManual = {
             {
               kind: 'callout',
               tone: 'warning',
-              text: "Les tables financières append-only (payment.payment_transaction, audit.audit_event, integration.outbox_event…) sont protégées contre UPDATE/DELETE/TRUNCATE et partitionnées par RANGE mensuel. Toute correction se fait par écriture compensatrice, jamais par modification.",
+              text: 'Les tables financières append-only (payment.payment_transaction, audit.audit_event, integration.outbox_event…) sont protégées contre UPDATE/DELETE/TRUNCATE et partitionnées par RANGE mensuel. Toute correction se fait par écriture compensatrice, jamais par modification.',
             },
           ],
         },
@@ -315,6 +323,18 @@ export const TECHNICAL_MANUAL: DocManual = {
                 ['display_name', 'varchar(255)', 'Nom affiché'],
                 ['status', 'varchar(30)', 'État du compte (défaut ACTIVE)'],
                 ['last_login_at', 'timestamptz', 'Dernière authentification'],
+                ['first_name · last_name', 'varchar(120)', 'Identité décomposée (V17)'],
+                [
+                  'phone · job_title · organization · department',
+                  'varchar',
+                  'Profil professionnel (V17)',
+                ],
+                ['account_type', 'varchar(20)', 'PROFESSIONAL ou MEMBER (V17, contrainte CHECK)'],
+                [
+                  'member_id',
+                  'uuid',
+                  'Adhésion désignée pour un compte MEMBER, sans clé étrangère inter-module (V17)',
+                ],
               ],
             },
             {
@@ -406,14 +426,46 @@ export const TECHNICAL_MANUAL: DocManual = {
               kind: 'table',
               headers: ['Composant', 'Rôle'],
               rows: [
-                ['SecurityConfig', 'Chaîne de filtres : refus par défaut, endpoints publics, resource-server JWT, CORS, erreurs Problem'],
-                ['AppTokenService', 'Émission des jetons de session natifs (HS256, clé dérivée d’APP_JWT_SECRET, TTL 8 h)'],
-                ['NativeJwtDecoderConfig', 'Décodeur des jetons natifs quand la bascule « auth native » est activée'],
-                ['MfaService · TotpService · MfaCryptoService', 'Enrôlement et vérification du second facteur (TOTP)'],
-                ['KeycloakAuthoritiesConverter · PermissionDirectory', 'Projection des rôles en permissions atomiques (RBAC)'],
-                ['AdminSecurityQueryService', 'Instantané de sécurité du back-office (comptes, rôles, matrice de permissions)'],
-                ['DashboardQueryService', 'Alimente le tableau de bord depuis les read-models reporting'],
-                ['ProblemResponseWriter', 'Rend les erreurs au format normalisé avec correlationId'],
+                [
+                  'SecurityConfig',
+                  'Chaîne de filtres : refus par défaut, endpoints publics, resource-server JWT, CORS, erreurs Problem',
+                ],
+                [
+                  'AppTokenService',
+                  'Émission des jetons de session natifs (HS256, clé dérivée d’APP_JWT_SECRET, TTL 8 h)',
+                ],
+                [
+                  'NativeJwtDecoderConfig',
+                  'Décodeur des jetons natifs quand la bascule « auth native » est activée',
+                ],
+                [
+                  'MfaService · TotpService · MfaCryptoService',
+                  'Enrôlement et vérification du second facteur (TOTP)',
+                ],
+                [
+                  'KeycloakAuthoritiesConverter · PermissionDirectory',
+                  'Projection des rôles en permissions atomiques (RBAC)',
+                ],
+                [
+                  'AdminSecurityQueryService',
+                  'Instantané de sécurité du back-office (comptes, rôles, matrice de permissions)',
+                ],
+                [
+                  'AdminAccountService',
+                  'Écritures sur les comptes : création (idempotente sur l’adresse), suspension/réactivation, réinitialisation du second facteur. Habilitations IAM.USER.WRITE, IAM.ROLE.ASSIGN et IAM.MFA.RESET ; audit corrélé dans la même transaction',
+                ],
+                [
+                  'DashboardQueryService',
+                  'Alimente le tableau de bord depuis les read-models reporting',
+                ],
+                [
+                  'MemberContributionQueryService',
+                  'Projection « mes cotisations » de l’espace membre : le périmètre est déduit du compte connecté (iam.user_account.member_id), jamais d’un identifiant reçu du client',
+                ],
+                [
+                  'ProblemResponseWriter',
+                  'Rend les erreurs au format normalisé avec correlationId',
+                ],
               ],
             },
           ],
@@ -424,17 +476,32 @@ export const TECHNICAL_MANUAL: DocManual = {
           blocks: [
             {
               kind: 'paragraph',
-              text: "Chaque domaine fonctionnel est servi par une passerelle injectable, résolue au démarrage selon le mode de données : http (backend réel), demo (fixtures) ou indisponible (façade explicite).",
+              text: 'Chaque domaine fonctionnel est servi par une passerelle injectable, résolue au démarrage selon le mode de données : http (backend réel), demo (fixtures) ou indisponible (façade explicite).',
             },
             {
               kind: 'table',
               headers: ['Élément', 'Rôle'],
               rows: [
-                ['CNPM_DATA_MODE', 'Mode figé au bootstrap : « http » ou « demo » (jamais modifié par l’URL ou le stockage)'],
-                ['readCnpmRuntimeConfig', 'Lit __CNPM_RUNTIME_CONFIG__ (runtime-config.js) avant l’amorçage Angular'],
-                ['buildCnpmApiUrl / isCnpmApiRequest', 'Compose et reconnaît les URL de l’API sous le baseUrl'],
-                ['Http*Gateway / Demo*Gateway / Unavailable*Gateway', 'Trois implémentations par domaine ; l’intercepteur ajoute l’authentification aux requêtes API'],
-                ['Gardes de route', 'Filtrent l’accès selon les permissions (l’UI ne remplace jamais le contrôle backend)'],
+                [
+                  'CNPM_DATA_MODE',
+                  'Mode figé au bootstrap : « http » ou « demo » (jamais modifié par l’URL ou le stockage)',
+                ],
+                [
+                  'readCnpmRuntimeConfig',
+                  'Lit __CNPM_RUNTIME_CONFIG__ (runtime-config.js) avant l’amorçage Angular',
+                ],
+                [
+                  'buildCnpmApiUrl / isCnpmApiRequest',
+                  'Compose et reconnaît les URL de l’API sous le baseUrl',
+                ],
+                [
+                  'Http*Gateway / Demo*Gateway / Unavailable*Gateway',
+                  'Trois implémentations par domaine ; l’intercepteur ajoute l’authentification aux requêtes API',
+                ],
+                [
+                  'Gardes de route',
+                  'Filtrent l’accès selon les permissions (l’UI ne remplace jamais le contrôle backend)',
+                ],
               ],
             },
           ],
@@ -525,7 +592,7 @@ export const TECHNICAL_MANUAL: DocManual = {
       id: 'tech-deploiement',
       title: '7. Déploiement et exploitation',
       summary:
-        "La plateforme se déploie en conteneurs. Un blueprint Render décrit le déploiement http complet ; un mode démonstration statique fonctionne sans backend.",
+        'La plateforme se déploie en conteneurs. Un blueprint Render décrit le déploiement http complet ; un mode démonstration statique fonctionne sans backend.',
       subsections: [
         {
           id: 'tech-deploiement-images',
@@ -555,11 +622,23 @@ export const TECHNICAL_MANUAL: DocManual = {
               caption: 'Variables d’environnement clés du backend',
               headers: ['Variable', 'Rôle'],
               rows: [
-                ['DATABASE_HOST / PORT / NAME / USER / PASSWORD', 'Connexion à la base (URL composée dans application.yml)'],
-                ['APP_JWT_SECRET', 'Secret de signature des jetons natifs (généré, jamais commité)'],
-                ['CNPM_SECURITY_NATIVE_JWT_ENABLED', 'Active la validation des jetons natifs (sans Keycloak)'],
+                [
+                  'DATABASE_HOST / PORT / NAME / USER / PASSWORD',
+                  'Connexion à la base (URL composée dans application.yml)',
+                ],
+                [
+                  'APP_JWT_SECRET',
+                  'Secret de signature des jetons natifs (généré, jamais commité)',
+                ],
+                [
+                  'CNPM_SECURITY_NATIVE_JWT_ENABLED',
+                  'Active la validation des jetons natifs (sans Keycloak)',
+                ],
                 ['CNPM_WEB_CORS_ALLOWED_ORIGINS', 'Origine du front autorisée en CORS'],
-                ['RABBITMQ_DEFAULT_USER / PASS', 'Identifiants du broker (l’app démarre sans broker, en mode dégradé)'],
+                [
+                  'RABBITMQ_DEFAULT_USER / PASS',
+                  'Identifiants du broker (l’app démarre sans broker, en mode dégradé)',
+                ],
               ],
             },
             {
@@ -575,7 +654,7 @@ export const TECHNICAL_MANUAL: DocManual = {
       id: 'tech-tests',
       title: '8. Tests et qualité',
       summary:
-        "Chaque exigence a au moins un scénario nominal et un scénario de contrôle négatif ; les règles financières, de sécurité et de données ajoutent des tests de répétition, concurrence, idempotence ou intégrité.",
+        'Chaque exigence a au moins un scénario nominal et un scénario de contrôle négatif ; les règles financières, de sécurité et de données ajoutent des tests de répétition, concurrence, idempotence ou intégrité.',
       subsections: [
         {
           id: 'tech-tests-strategie',

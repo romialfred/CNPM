@@ -1,72 +1,44 @@
 import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-export type MemberRequestStatus =
-  'SUBMITTED' | 'IN_PROGRESS' | 'WAITING_MEMBER' | 'RESOLVED' | 'CLOSED';
-export type MemberRequestKind = 'REQUEST' | 'CLAIM';
-export type MemberRequestSlaState = 'ON_TRACK' | 'DUE_SOON' | 'OVERDUE' | 'NOT_APPLICABLE';
-export type MemberRequestSort = 'updatedAt' | 'createdAt' | 'targetAt';
-export type MemberRequestCategory =
-  'DEMO_INFORMATION' | 'DEMO_DOCUMENT' | 'DEMO_PORTAL' | 'DEMO_CLAIM';
-
 /**
- * Métadonnée locale uniquement : aucun octet, URL ou identifiant GED n'est conservé.
+ * Contrat de « Mes requêtes » (MP-009…011) : les requêtes et réclamations RÉELLES du cotisant.
+ *
+ * <p>Un seul adaptateur HTTP réel, aucune démo. Le périmètre est déduit du compte connecté
+ * (organisation de l'adhésion) ; un membre ne voit jamais la requête d'une autre organisation,
+ * ni les notes internes de la CNPM.
  */
-export interface SimulatedMemberAttachment {
-  readonly id: string;
-  readonly fileName: string;
-  readonly sizeBytes: number;
-  readonly mimeType: string;
-  readonly simulated: true;
-}
 
-export interface MemberRequestMessage {
-  readonly id: string;
-  readonly sender: 'MEMBER' | 'CNPM';
-  readonly authorLabel: string;
-  readonly body: string;
-  readonly createdAt: string;
-  readonly attachments: readonly SimulatedMemberAttachment[];
-}
-
-export interface RequestedMemberDocument {
-  readonly id: string;
-  readonly label: string;
-  readonly state: 'REQUESTED' | 'PROVIDED';
-}
+export type MemberRequestType = 'INFORMATION' | 'DOCUMENT' | 'CLAIM' | 'OTHER';
+export type MemberRequestStatus =
+  | 'SUBMITTED'
+  | 'IN_PROGRESS'
+  | 'WAITING_MEMBER'
+  | 'RESOLVED'
+  | 'CLOSED';
+export type MemberRequestMessageSender = 'MEMBER' | 'AGENT';
 
 export interface MemberRequestSummary {
   readonly id: string;
   readonly reference: string;
-  readonly kind: MemberRequestKind;
-  readonly category: MemberRequestCategory;
+  readonly type: MemberRequestType;
   readonly subject: string;
   readonly status: MemberRequestStatus;
+  readonly priority: string;
   readonly createdAt: string;
   readonly updatedAt: string;
-  /** Date cible fournie par la source, jamais recalculée dans l'interface. */
-  readonly targetAt: string | null;
-  readonly slaState: MemberRequestSlaState;
 }
 
-/**
- * Projection membre : elle ne possède volontairement aucun champ de note interne.
- * REQ-004 est ainsi respectée par construction, et non par un simple masquage CSS.
- */
+export interface MemberRequestMessage {
+  readonly id: string;
+  readonly sender: MemberRequestMessageSender;
+  readonly body: string;
+  readonly createdAt: string;
+}
+
 export interface MemberRequestDetail extends MemberRequestSummary {
   readonly description: string;
   readonly conversation: readonly MemberRequestMessage[];
-  readonly requestedDocuments: readonly RequestedMemberDocument[];
-}
-
-export interface MemberRequestQuery {
-  readonly search: string;
-  readonly status?: MemberRequestStatus;
-  readonly kind?: MemberRequestKind;
-  readonly sort: MemberRequestSort;
-  readonly direction: 'asc' | 'desc';
-  readonly page: number;
-  readonly size: number;
 }
 
 export interface MemberRequestPage {
@@ -78,32 +50,33 @@ export interface MemberRequestPage {
 }
 
 export interface CreateMemberRequestInput {
-  readonly kind: MemberRequestKind;
-  readonly category: MemberRequestCategory;
+  readonly type: MemberRequestType;
   readonly subject: string;
   readonly description: string;
-  readonly attachments: readonly SimulatedMemberAttachment[];
-}
-
-export interface AddMemberRequestMessageInput {
-  readonly body: string;
-  readonly attachments: readonly SimulatedMemberAttachment[];
 }
 
 export interface MemberRequestsGateway {
-  list(query: MemberRequestQuery): Observable<MemberRequestPage>;
+  list(page: number, size: number): Observable<MemberRequestPage>;
   create(input: CreateMemberRequestInput): Observable<MemberRequestDetail>;
   loadDetail(id: string): Observable<MemberRequestDetail>;
-  addMessage(id: string, input: AddMemberRequestMessageInput): Observable<MemberRequestDetail>;
-}
-
-export class MemberRequestNotFoundError extends Error {
-  constructor(readonly requestId: string) {
-    super(`La requête ${requestId} n'existe pas dans la projection membre.`);
-    this.name = 'MemberRequestNotFoundError';
-  }
+  addMessage(id: string, body: string): Observable<MemberRequestDetail>;
 }
 
 export const MEMBER_REQUESTS_GATEWAY = new InjectionToken<MemberRequestsGateway>(
   'MEMBER_REQUESTS_GATEWAY',
 );
+
+export class MemberRequestsAuthenticationError extends Error {
+  constructor(message = 'Une authentification valide est requise.') {
+    super(message);
+    this.name = 'MemberRequestsAuthenticationError';
+  }
+}
+
+/** Le compte n'est rattaché à aucune adhésion, ou la requête n'existe pas dans son périmètre. */
+export class MemberRequestNotFoundError extends Error {
+  constructor(message = 'Requête introuvable dans votre périmètre.') {
+    super(message);
+    this.name = 'MemberRequestNotFoundError';
+  }
+}

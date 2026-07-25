@@ -1,44 +1,33 @@
 import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-export type MemberDirectorySector = 'AGRI' | 'SERVICES' | 'CRAFT';
-export type MemberDirectoryZone = 'ZONE_A' | 'ZONE_B' | 'ZONE_C';
-export type MemberDirectoryTheme = 'SKILLS' | 'LOGISTICS' | 'TRAINING';
-export type MemberDirectorySort = 'name' | 'sector';
-
 /**
- * Organisation de l’annuaire privé, volontairement dépourvue de contact, adresse,
- * identifiant métier, URL, média et donnée financière.
+ * Contrat de « Annuaire des membres » (MP-018) : les organisations membres ACTIVES, réelles.
+ *
+ * <p>Un seul adaptateur HTTP réel, aucune démo. Projection non nominative : ni contact, ni
+ * adresse, ni identifiant fiscal, ni donnée financière — ces coordonnées relèvent de la vitrine
+ * membre (R4) et de son consentement.
  */
-export interface PrivateDirectoryOrganization {
-  readonly id: `directory-${string}`;
+
+export interface DirectoryOrganization {
+  readonly id: string;
   readonly name: string;
-  readonly sector: MemberDirectorySector;
-  readonly zone: MemberDirectoryZone;
-  readonly sizeLabel: string;
-  readonly summary: string;
-  readonly themes: readonly MemberDirectoryTheme[];
-}
-
-export interface MemberDirectoryQuery {
-  /** Recherche libre locale, limitée à 80 caractères. */
-  readonly search: string;
-  readonly sector?: MemberDirectorySector;
-  readonly zone?: MemberDirectoryZone;
-  readonly theme?: MemberDirectoryTheme;
-  readonly sort: MemberDirectorySort;
-}
-
-export interface MemberDirectorySnapshot {
-  readonly visibility: 'PRIVATE_MEMBER';
-  readonly items: readonly PrivateDirectoryOrganization[];
-  readonly total: number;
+  readonly sector: string;
+  readonly category: string;
+  readonly memberSince: string | null;
 }
 
 export interface MemberDirectoryGateway {
-  list(query: MemberDirectoryQuery): Observable<MemberDirectorySnapshot>;
+  list(search: string): Observable<readonly DirectoryOrganization[]>;
 }
 
 export const MEMBER_DIRECTORY_GATEWAY = new InjectionToken<MemberDirectoryGateway>(
   'MEMBER_DIRECTORY_GATEWAY',
 );
+
+export class MemberDirectoryAuthenticationError extends Error {
+  constructor(message = 'Une authentification valide est requise.') {
+    super(message);
+    this.name = 'MemberDirectoryAuthenticationError';
+  }
+}
