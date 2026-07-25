@@ -23,6 +23,7 @@ describe('ADMIN_NAV', () => {
       Cotisations: '/admin/contributions',
       'Comptes d’encaissement': '/admin/collection-accounts',
       'Références de paiement': '/admin/payment-references',
+      Encaissements: '/admin/payments/recording',
       Paiements: '/admin/payments/reconciliation',
       Reçus: '/admin/receipts',
       Relances: '/admin/recovery/campaigns',
@@ -105,7 +106,7 @@ describe('ADMIN_NAV_TREE', () => {
     // diverger, et ce test le constate plutot que de le supposer.
     expect(dansArbre).toEqual(ADMIN_NAV.map((entry) => entry.route));
     expect(new Set(dansArbre).size).toBe(dansArbre.length);
-    expect(dansArbre).toHaveLength(19);
+    expect(dansArbre).toHaveLength(20);
   });
 
   it('garde le tableau de bord hors groupe, donc a un seul clic', () => {

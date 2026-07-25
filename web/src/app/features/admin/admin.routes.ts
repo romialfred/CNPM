@@ -74,6 +74,8 @@ import { COLLECTION_ACCOUNTS_GATEWAY } from './collection-accounts/collection-ac
 import { HttpCollectionAccountsGateway } from './collection-accounts/http-collection-accounts.gateway';
 import { PAYMENT_REFERENCES_GATEWAY } from './payment-references/payment-references-gateway';
 import { HttpPaymentReferencesGateway } from './payment-references/http-payment-references.gateway';
+import { PAYMENTS_RECORDING_GATEWAY } from './payments-recording/payments-recording-gateway';
+import { HttpPaymentsRecordingGateway } from './payments-recording/http-payments-recording.gateway';
 import { DemoShowcaseModerationGateway } from './showcase-moderation/demo-showcase-moderation.gateway';
 import {
   SHOWCASE_MODERATION_GATEWAY,
@@ -160,6 +162,8 @@ export const adminRoutes: Routes = [
       { provide: COLLECTION_ACCOUNTS_GATEWAY, useExisting: HttpCollectionAccountsGateway },
       HttpPaymentReferencesGateway,
       { provide: PAYMENT_REFERENCES_GATEWAY, useExisting: HttpPaymentReferencesGateway },
+      HttpPaymentsRecordingGateway,
+      { provide: PAYMENTS_RECORDING_GATEWAY, useExisting: HttpPaymentsRecordingGateway },
       {
         provide: DASHBOARD_GATEWAY,
         useFactory: () =>
@@ -555,6 +559,14 @@ export const adminRoutes: Routes = [
             (m) => m.PaymentReferencesPage,
           ),
         title: 'Références de paiement — Administration CNPM',
+      },
+      {
+        path: 'payments/recording',
+        loadComponent: () =>
+          import('./payments-recording/payments-recording.page').then(
+            (m) => m.PaymentsRecordingPage,
+          ),
+        title: 'Encaissements — Administration CNPM',
       },
       // Compatibilité des favoris et captures antérieurs à l'alignement sur
       // l'inventaire UI. Les nouveaux liens utilisent exclusivement les routes canoniques.
