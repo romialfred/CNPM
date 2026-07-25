@@ -2877,6 +2877,118 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resource'
+  /portal/requests:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister les requêtes du cotisant.
+      operationId: getMemberRequests
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Requêtes de l'organisation du cotisant connecté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
+    post:
+      tags:
+      - PORTAL
+      summary: Soumettre une requête depuis le portail membre.
+      operationId: createMemberRequest
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '201':
+          description: Requête créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/requests/{id}:
+    get:
+      tags:
+      - PORTAL
+      summary: Consulter une requête du cotisant.
+      operationId: getMemberRequest
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Détail et conversation partagée de la requête
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/requests/{id}/messages:
+    post:
+      tags:
+      - PORTAL
+      summary: Ajouter un échange à une requête du cotisant.
+      operationId: addMemberRequestMessage
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '201':
+          description: Échange ajouté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
   /portal/payment-instructions:
     get:
       tags:
