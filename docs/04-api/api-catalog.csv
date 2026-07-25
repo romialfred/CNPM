@@ -64,6 +64,9 @@ GET;/portal/contributions;PORTAL;getMemberContributions;Afficher cotisations et 
 GET;/portal/contributions/{contributionId};PORTAL;getMemberContributionDetail;Afficher le detail d un appel de cotisation.
 GET;/portal/payments;PORTAL;getMemberPayments;Afficher paiements et statuts.
 GET;/portal/payment-instructions;PORTAL;getMemberPaymentInstructions;Afficher les instructions de paiement du cotisant.
+GET;/portal/profile;PORTAL;getMemberProfile;Afficher le profil du membre connecté.
+PUT;/portal/profile/avatar;PORTAL;updateMemberAvatar;Changer la photo de profil.
+DELETE;/portal/profile/avatar;PORTAL;deleteMemberAvatar;Retirer la photo de profil.
 GET;/portal/documents;PORTAL;getMemberDocuments;Afficher reçus et attestations.
 GET;/service-requests;REQUEST;listServiceRequests;Lister les requêtes.
 POST;/service-requests;REQUEST;createServiceRequest;Soumettre une requête.

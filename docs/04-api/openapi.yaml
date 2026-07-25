@@ -2877,6 +2877,72 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Resource'
+  /portal/profile:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher le profil du membre connecté.
+      operationId: getMemberProfile
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Profil du compte
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /portal/profile/avatar:
+    put:
+      tags:
+      - PORTAL
+      summary: Changer la photo de profil.
+      operationId: updateMemberAvatar
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+    delete:
+      tags:
+      - PORTAL
+      summary: Retirer la photo de profil.
+      operationId: deleteMemberAvatar
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Profil mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
   /portal/documents:
     get:
       tags:
