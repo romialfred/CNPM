@@ -1,0 +1,187 @@
+<cnpm-admin-shell>
+  <main class="cnpm-payment-references" id="contenu-principal">
+    <cnpm-page-header
+      title="Références de paiement"
+      description="Générez la référence unique d’un cotisant, validez-la avant diffusion, ou révoquez-la. Une référence n’est communiquée au cotisant qu’une fois validée par la CNPM."
+    />
+
+    @if (canGenerate()) {
+      <div class="cnpm-payment-references__toolbar">
+        <p class="cnpm-payment-references__count" role="status">
+          @if (pendingCount() > 0) {
+            {{ pendingCount() }} référence{{ pendingCount() > 1 ? 's' : '' }} en attente de validation.
+          } @else {
+            Aucune référence en attente de validation.
+          }
+        </p>
+        @if (!showForm()) {
+          <cnpm-button variant="primary" (click)="openForm()">Générer une référence</cnpm-button>
+        }
+      </div>
+    }
+
+    @if (showForm()) {
+      <section class="cnpm-payment-references__form">
+        <h2 class="cnpm-payment-references__form-title">Générer une référence de paiement</h2>
+
+        @if (formError()) {
+          <cnpm-alert tone="error" title="Génération impossible">
+            <p>{{ formError() }}</p>
+          </cnpm-alert>
+        }
+
+        <div class="cnpm-payment-references__field">
+          <label class="cnpm-payment-references__label" for="pr-member">Cotisant</label>
+          <div class="cnpm-payment-references__search-row">
+            <input
+              id="pr-member"
+              class="cnpm-payment-references__input"
+              type="search"
+              autocomplete="off"
+              placeholder="Raison sociale ou numéro d’adhésion…"
+              [value]="memberSearch()"
+              (input)="updateSearch($any($event.target).value)"
+              (keydown.enter)="searchMembers()"
+            />
+            <cnpm-button variant="secondary" [loading]="searching()" (click)="searchMembers()">
+              Rechercher
+            </cnpm-button>
+          </div>
+
+          @if (searchResults().length > 0) {
+            <ul class="cnpm-payment-references__results" role="listbox" aria-label="Cotisants trouvés">
+              @for (member of searchResults(); track member.id) {
+                <li>
+                  <button
+                    type="button"
+                    role="option"
+                    class="cnpm-payment-references__result"
+                    [attr.aria-selected]="selectedMember()?.id === member.id"
+                    (click)="chooseMember(member)"
+                  >
+                    <strong>{{ member.organization }}</strong>
+                    <span>{{ member.code }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (selectedMember(); as member) {
+            <p class="cnpm-payment-references__selected" role="status">
+              Cotisant sélectionné : <strong>{{ member.organization }}</strong> ({{ member.code }}).
+            </p>
+          }
+        </div>
+
+        <div class="cnpm-payment-references__field cnpm-payment-references__field--narrow">
+          <label class="cnpm-payment-references__label" for="pr-exercise">Exercice</label>
+          <input
+            id="pr-exercise"
+            class="cnpm-payment-references__input"
+            type="number"
+            min="2000"
+            max="2100"
+            step="1"
+            [value]="exercise()"
+            (input)="updateExercise($any($event.target).value)"
+          />
+        </div>
+
+        <div class="cnpm-payment-references__form-actions">
+          <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="generating()">
+            Annuler
+          </cnpm-button>
+          <cnpm-button
+            variant="primary"
+            (click)="generate()"
+            [loading]="generating()"
+            [disabled]="!selectedMember()"
+          >
+            Générer la référence
+          </cnpm-button>
+        </div>
+      </section>
+    }
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="cnpm-payment-references__status" role="status">Chargement des références…</p>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les références de paiement n’ont pas pu être chargées.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (references().length === 0) {
+          <p class="cnpm-payment-references__status" role="status">
+            Aucune référence de paiement n’a encore été générée.
+          </p>
+        } @else {
+          <div class="cnpm-payment-references__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Référence</th>
+                  <th scope="col">Cotisant</th>
+                  <th scope="col">Exercice</th>
+                  <th scope="col">État</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (reference of references(); track reference.id) {
+                  <tr>
+                    <td>
+                      <span class="cnpm-payment-references__value">{{ reference.referenceValue }}</span>
+                    </td>
+                    <td>
+                      <span class="cnpm-payment-references__org">{{
+                        reference.organizationName ?? '—'
+                      }}</span>
+                      @if (reference.membershipNumber) {
+                        <span class="cnpm-payment-references__code">{{
+                          reference.membershipNumber
+                        }}</span>
+                      }
+                    </td>
+                    <td>{{ reference.exercise ?? '—' }}</td>
+                    <td>
+                      <cnpm-badge [tone]="statusTone(reference.status)">{{
+                        statusLabel(reference.status)
+                      }}</cnpm-badge>
+                    </td>
+                    <td>
+                      <div class="cnpm-payment-references__row-actions">
+                        @if (reference.status === 'PENDING_VALIDATION' && canValidate()) {
+                          <cnpm-button
+                            variant="primary"
+                            [loading]="busyId() === reference.id"
+                            (click)="validate(reference)"
+                          >
+                            Valider
+                          </cnpm-button>
+                        }
+                        @if (reference.status !== 'REVOKED' && canRevoke()) {
+                          <cnpm-button
+                            variant="secondary"
+                            [loading]="busyId() === reference.id"
+                            (click)="revoke(reference)"
+                          >
+                            Révoquer
+                          </cnpm-button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

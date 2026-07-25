@@ -107,6 +107,11 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
           route: '/admin/collection-accounts',
           icon: 'payments',
         },
+        {
+          label: 'Références de paiement',
+          route: '/admin/payment-references',
+          icon: 'payments',
+        },
         { label: 'Paiements', route: '/admin/payments/reconciliation', icon: 'payments' },
         { label: 'Reçus', route: '/admin/receipts', icon: 'receipts' },
         { label: 'Relances', route: '/admin/recovery/campaigns', icon: 'reminders' },
