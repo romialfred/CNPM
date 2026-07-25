@@ -62,6 +62,7 @@ GET;/portal/dashboard;PORTAL;getMemberDashboard;Afficher la synthèse membre.
 GET;/portal/contributions;PORTAL;getMemberContributions;Afficher cotisations et soldes.
 GET;/portal/contributions/{contributionId};PORTAL;getMemberContributionDetail;Afficher le detail d un appel de cotisation.
 GET;/portal/payments;PORTAL;getMemberPayments;Afficher paiements et statuts.
+GET;/portal/payment-instructions;PORTAL;getMemberPaymentInstructions;Afficher les instructions de paiement du cotisant.
 GET;/portal/documents;PORTAL;getMemberDocuments;Afficher reçus et attestations.
 GET;/service-requests;REQUEST;listServiceRequests;Lister les requêtes.
 POST;/service-requests;REQUEST;createServiceRequest;Soumettre une requête.
