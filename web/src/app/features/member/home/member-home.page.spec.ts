@@ -93,6 +93,7 @@ describe('MemberHomePage', () => {
         '/member/home',
         '/member/contributions',
         '/member/payments',
+        '/member/payments/instructions',
         '/member/receipts',
         '/member/requests',
         '/member/documents',

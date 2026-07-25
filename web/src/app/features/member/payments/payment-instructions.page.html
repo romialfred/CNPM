@@ -1,0 +1,119 @@
+<cnpm-member-portal-shell>
+  <main class="member-payment-instructions" id="contenu-principal">
+    <cnpm-page-header
+      title="Comment payer ma cotisation"
+      description="Choisissez votre moyen de paiement, payez depuis votre compte vers la CNPM en indiquant votre référence. Aucun montant n’est débité sur cette page."
+    />
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="member-payment-instructions__status" role="status">Chargement des instructions…</p>
+      }
+      @case ('noMembership') {
+        <cnpm-alert tone="info" title="Aucune adhésion rattachée">
+          <p>Ce compte n’est rattaché à aucune adhésion cotisante.</p>
+        </cnpm-alert>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les instructions de paiement n’ont pas pu être chargées.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        <!-- Référence de paiement -->
+        @if (primaryReference(); as reference) {
+          <section class="member-payment-instructions__reference" aria-label="Votre référence de paiement">
+            <p class="member-payment-instructions__reference-label">Votre référence de paiement</p>
+            <p class="member-payment-instructions__reference-value">{{ reference.referenceValue }}</p>
+            @if (reference.exercise) {
+              <p class="member-payment-instructions__reference-exercise">
+                Exercice {{ reference.exercise }}
+              </p>
+            }
+            <p class="member-payment-instructions__reference-hint">
+              Indiquez impérativement cette référence au moment du paiement : c’est elle qui
+              rattache votre versement à votre compte cotisant.
+            </p>
+          </section>
+        } @else {
+          <cnpm-alert tone="info" title="Référence en préparation">
+            <p>
+              Votre référence de paiement n’a pas encore été validée par la CNPM. Elle apparaîtra
+              ici dès sa validation ; vous pourrez alors régler votre cotisation.
+            </p>
+          </cnpm-alert>
+        }
+
+        <!-- Moyens de paiement -->
+        @if (channels().length === 0) {
+          <cnpm-alert tone="info" title="Moyens de paiement à venir">
+            <p>La CNPM n’a pas encore publié de coordonnées d’encaissement. Réessayez plus tard.</p>
+          </cnpm-alert>
+        } @else if (primaryReference()) {
+          <section class="member-payment-instructions__channels" aria-label="Choisir un moyen de paiement">
+            <h2 class="member-payment-instructions__section-title">Choisissez votre moyen de paiement</h2>
+            <div class="member-payment-instructions__channel-tabs" role="tablist">
+              @for (channel of channels(); track channel) {
+                <button
+                  type="button"
+                  role="tab"
+                  class="member-payment-instructions__channel-tab"
+                  [class.member-payment-instructions__channel-tab--active]="selectedChannel() === channel"
+                  [attr.aria-selected]="selectedChannel() === channel"
+                  (click)="chooseChannel(channel)"
+                >
+                  {{ channelLabel(channel) }}
+                </button>
+              }
+            </div>
+
+            @for (account of selectedAccounts(); track account.id) {
+              <article class="member-payment-instructions__account">
+                <p class="member-payment-instructions__account-label">{{ account.label }}</p>
+                <dl class="member-payment-instructions__coords">
+                  <div>
+                    <dt>Bénéficiaire</dt>
+                    <dd>{{ account.accountHolder }}</dd>
+                  </div>
+                  <div>
+                    <dt>
+                      {{ account.channel === 'BANK_TRANSFER' ? 'IBAN / numéro de compte' : 'Numéro' }}
+                    </dt>
+                    <dd class="member-payment-instructions__coord-value">
+                      {{ account.accountIdentifier }}
+                    </dd>
+                  </div>
+                  @if (account.bankName) {
+                    <div>
+                      <dt>Banque</dt>
+                      <dd>{{ account.bankName }}</dd>
+                    </div>
+                  }
+                </dl>
+                @if (account.instructions) {
+                  <p class="member-payment-instructions__account-note">{{ account.instructions }}</p>
+                }
+              </article>
+            }
+
+            <ol class="member-payment-instructions__steps">
+              <li>
+                Depuis votre compte
+                <strong>{{ channelLabel(selectedChannel()!) }}</strong>, effectuez le paiement vers
+                les coordonnées ci-dessus.
+              </li>
+              <li>
+                Renseignez votre référence
+                <strong>{{ primaryReference()!.referenceValue }}</strong> dans le motif du paiement.
+              </li>
+              <li>
+                La CNPM confirme la réception, puis votre reçu officiel vous est délivré et notifié.
+              </li>
+            </ol>
+          </section>
+        }
+      }
+    }
+  </main>
+</cnpm-member-portal-shell>

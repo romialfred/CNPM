@@ -49,11 +49,11 @@ describe('MemberPortalShellComponent — barre latérale dédiée au membre', ()
     expect(titles).toEqual(['Mon espace', 'Le CNPM', 'Mon compte']);
   });
 
-  it('rend les douze destinations comme de vrais liens, sans lien mort', () => {
+  it('rend les treize destinations comme de vrais liens, sans lien mort', () => {
     const items = Array.from(
       host.querySelectorAll<HTMLAnchorElement>('.member-shell__nav a.member-shell__item'),
     );
-    expect(items).toHaveLength(12);
+    expect(items).toHaveLength(13);
     expect(items.every((link) => (link.getAttribute('href')?.length ?? 0) > 0)).toBe(true);
     expect(host.querySelectorAll('.member-shell__nav [aria-disabled="true"]')).toHaveLength(0);
   });

@@ -133,6 +133,7 @@ export class MemberPortalShellComponent implements OnDestroy {
         { label: 'Tableau de bord', route: '/member/home', icon: 'dashboard', exact: true },
         { label: 'Mes cotisations', route: '/member/contributions', icon: 'contributions' },
         { label: 'Mes paiements', route: '/member/payments', icon: 'payments' },
+        { label: 'Comment payer', route: '/member/payments/instructions', icon: 'payments' },
         { label: 'Mes reçus', route: '/member/receipts', icon: 'receipts' },
         { label: 'Mes documents', route: '/member/documents', icon: 'documents' },
         { label: 'Mes requêtes', route: '/member/requests', icon: 'requests' },

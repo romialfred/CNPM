@@ -12,6 +12,8 @@ import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
 import { DemoMemberPaymentsGateway } from './payments/demo-member-payments.gateway';
 import { MEMBER_PAYMENTS_GATEWAY } from './payments/member-payments-gateway';
+import { PAYMENT_INSTRUCTIONS_GATEWAY } from './payments/payment-instructions-gateway';
+import { HttpPaymentInstructionsGateway } from './payments/http-payment-instructions.gateway';
 import { DemoMemberProfileGateway } from './profile/demo-member-profile.gateway';
 import { MEMBER_PROFILE_GATEWAY } from './profile/member-profile-gateway';
 import { DemoMemberReceiptsGateway } from './receipts/demo-member-receipts.gateway';
@@ -106,6 +108,9 @@ export const memberRoutes: Routes = [
             ? inject(DemoMemberPaymentsGateway)
             : UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY,
       },
+      // Refonte « zéro démo » : les instructions de paiement n'ont qu'un adaptateur HTTP réel.
+      HttpPaymentInstructionsGateway,
+      { provide: PAYMENT_INSTRUCTIONS_GATEWAY, useExisting: HttpPaymentInstructionsGateway },
     ],
     children: [
       {
@@ -114,6 +119,14 @@ export const memberRoutes: Routes = [
         loadComponent: () =>
           import('./payments/member-payments.page').then((module) => module.MemberPaymentsPage),
         title: 'Mes paiements — CNPM',
+      },
+      {
+        path: 'instructions',
+        loadComponent: () =>
+          import('./payments/payment-instructions.page').then(
+            (module) => module.PaymentInstructionsPage,
+          ),
+        title: 'Comment payer — CNPM',
       },
       {
         path: 'new',

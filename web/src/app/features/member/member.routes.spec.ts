@@ -22,8 +22,15 @@ describe('memberRoutes', () => {
 
   it('expose MP-006, MP-004 puis MP-005 sous une composition de paiement fermée en HTTP', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'payments');
-    expect(route?.providers).toHaveLength(2);
-    expect(route?.children?.map((child) => child.path)).toEqual(['', 'new', ':id/status']);
+    // Deux fournisseurs pour MEMBER_PAYMENTS (démo/indisponible), plus les deux du port
+    // toujours-HTTP des instructions de paiement (Lot 3, « zéro démo »).
+    expect(route?.providers).toHaveLength(4);
+    expect(route?.children?.map((child) => child.path)).toEqual([
+      '',
+      'instructions',
+      'new',
+      ':id/status',
+    ]);
     expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
     expect(route?.children?.every((child) => child.loadComponent)).toBe(true);
     expect(route?.canActivate).toBeUndefined();
