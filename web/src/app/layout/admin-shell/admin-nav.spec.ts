@@ -24,7 +24,7 @@ describe('ADMIN_NAV', () => {
       'Comptes d’encaissement': '/admin/collection-accounts',
       'Références de paiement': '/admin/payment-references',
       Encaissements: '/admin/payments/recording',
-      Paiements: '/admin/payments/reconciliation',
+      Rapprochement: '/admin/reconciliation',
       Reçus: '/admin/receipts-registry',
       Relances: '/admin/recovery/campaigns',
       Requêtes: '/admin/requests',

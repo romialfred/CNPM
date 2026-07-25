@@ -1,0 +1,121 @@
+<cnpm-admin-shell>
+  <main class="cnpm-reconciliation" id="contenu-principal">
+    <cnpm-page-header
+      title="Rapprochement"
+      description="Importez un relevé : les lignes portant une référence validée sont appariées au cotisant. Confirmez pour créer l’encaissement ; les lignes sans référence restent à traiter."
+    />
+
+    @if (canRecord()) {
+      <div class="cnpm-reconciliation__toolbar">
+        <p class="cnpm-reconciliation__count" role="status">
+          {{ proposedCount() }} à confirmer · {{ unmatchedCount() }} non rapproché(s).
+        </p>
+        @if (!showImport()) {
+          <cnpm-button variant="primary" (click)="openImport()">Importer un relevé</cnpm-button>
+        }
+      </div>
+    }
+
+    @if (showImport()) {
+      <section class="cnpm-reconciliation__form">
+        <h2 class="cnpm-reconciliation__form-title">Importer un relevé</h2>
+        @if (importError()) {
+          <cnpm-alert tone="error" title="Import impossible">
+            <p>{{ importError() }}</p>
+          </cnpm-alert>
+        }
+        <div class="cnpm-reconciliation__grid">
+          <div class="cnpm-reconciliation__field">
+            <label class="cnpm-reconciliation__label" for="rc-bank">Banque / opérateur</label>
+            <input id="rc-bank" class="cnpm-reconciliation__input" type="text"
+              [ngModel]="bankCode()" (ngModelChange)="bankCode.set($event)" />
+          </div>
+          <div class="cnpm-reconciliation__field">
+            <label class="cnpm-reconciliation__label" for="rc-ref">Référence du relevé</label>
+            <input id="rc-ref" class="cnpm-reconciliation__input" type="text" placeholder="Ex. REL-2026-07"
+              [ngModel]="statementRef()" (ngModelChange)="statementRef.set($event)" />
+          </div>
+          <div class="cnpm-reconciliation__field">
+            <label class="cnpm-reconciliation__label" for="rc-account">Compte (masqué)</label>
+            <input id="rc-account" class="cnpm-reconciliation__input" type="text"
+              [ngModel]="accountRefMasked()" (ngModelChange)="accountRefMasked.set($event)" />
+          </div>
+        </div>
+        <div class="cnpm-reconciliation__field">
+          <label class="cnpm-reconciliation__label" for="rc-lines">
+            Lignes du relevé — une par ligne, format <code>AAAA-MM-JJ ; montant ; libellé</code>
+          </label>
+          <textarea id="rc-lines" class="cnpm-reconciliation__textarea" rows="5"
+            placeholder="2026-07-15 ; 250000 ; Cotisation CNPM-COT-2026-000001&#10;2026-07-16 ; 90000 ; Virement sans référence"
+            [ngModel]="linesText()" (ngModelChange)="linesText.set($event)"></textarea>
+        </div>
+        <div class="cnpm-reconciliation__form-actions">
+          <cnpm-button variant="secondary" (click)="cancelImport()" [disabled]="importing()">Annuler</cnpm-button>
+          <cnpm-button variant="primary" (click)="runImport()" [loading]="importing()">Importer &amp; apparier</cnpm-button>
+        </div>
+      </section>
+    }
+
+    @switch (state()) {
+      @case ('loading') {
+        <p class="cnpm-reconciliation__status" role="status">Chargement des cas…</p>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Les cas de rapprochement n’ont pas pu être chargés.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (cases().length === 0) {
+          <p class="cnpm-reconciliation__status" role="status">Aucun cas de rapprochement. Importez un relevé.</p>
+        } @else {
+          <div class="cnpm-reconciliation__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col" class="cnpm-reconciliation__num">Montant</th>
+                  <th scope="col">Libellé</th>
+                  <th scope="col">Cotisant apparié</th>
+                  <th scope="col">État</th>
+                  @if (canRecord()) { <th scope="col">Décision</th> }
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of cases(); track c.id) {
+                  <tr>
+                    <td>{{ c.bookingDate ?? '—' }}</td>
+                    <td class="cnpm-reconciliation__num">{{ c.amount | number: '1.0-0' : 'fr' }} {{ c.currency }}</td>
+                    <td class="cnpm-reconciliation__label-cell">{{ c.referenceText ?? '—' }}</td>
+                    <td>
+                      {{ c.organizationName ?? '—' }}
+                      @if (c.matchedReferenceValue) {
+                        <span class="cnpm-reconciliation__ref">{{ c.matchedReferenceValue }}</span>
+                      }
+                    </td>
+                    <td><cnpm-badge [tone]="statusTone(c.status)">{{ statusLabel(c.status) }}</cnpm-badge></td>
+                    @if (canRecord()) {
+                      <td>
+                        @if (c.status === 'PROPOSED') {
+                          <div class="cnpm-reconciliation__row-actions">
+                            <cnpm-button variant="primary" [loading]="busyId() === c.id" (click)="decide(c, 'CONFIRM')">Confirmer</cnpm-button>
+                            <cnpm-button variant="secondary" [loading]="busyId() === c.id" (click)="decide(c, 'REJECT')">Rejeter</cnpm-button>
+                          </div>
+                        } @else if (c.paymentTransactionNumber) {
+                          <span class="cnpm-reconciliation__mono">{{ c.paymentTransactionNumber }}</span>
+                        } @else {
+                          <span aria-hidden="true">—</span>
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  </main>
+</cnpm-admin-shell>

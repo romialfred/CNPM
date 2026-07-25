@@ -78,6 +78,8 @@ import { PAYMENTS_RECORDING_GATEWAY } from './payments-recording/payments-record
 import { HttpPaymentsRecordingGateway } from './payments-recording/http-payments-recording.gateway';
 import { RECEIPTS_REGISTRY_GATEWAY } from './receipts-registry/receipts-registry-gateway';
 import { HttpReceiptsRegistryGateway } from './receipts-registry/http-receipts-registry.gateway';
+import { RECONCILIATION_GATEWAY } from './reconciliation/reconciliation-gateway';
+import { HttpReconciliationGateway } from './reconciliation/http-reconciliation.gateway';
 import { DemoShowcaseModerationGateway } from './showcase-moderation/demo-showcase-moderation.gateway';
 import {
   SHOWCASE_MODERATION_GATEWAY,
@@ -168,6 +170,8 @@ export const adminRoutes: Routes = [
       { provide: PAYMENTS_RECORDING_GATEWAY, useExisting: HttpPaymentsRecordingGateway },
       HttpReceiptsRegistryGateway,
       { provide: RECEIPTS_REGISTRY_GATEWAY, useExisting: HttpReceiptsRegistryGateway },
+      HttpReconciliationGateway,
+      { provide: RECONCILIATION_GATEWAY, useExisting: HttpReconciliationGateway },
       {
         provide: DASHBOARD_GATEWAY,
         useFactory: () =>
@@ -577,6 +581,12 @@ export const adminRoutes: Routes = [
         loadComponent: () =>
           import('./receipts-registry/receipts-registry.page').then((m) => m.ReceiptsRegistryPage),
         title: 'Reçus — Administration CNPM',
+      },
+      {
+        path: 'reconciliation',
+        loadComponent: () =>
+          import('./reconciliation/reconciliation.page').then((m) => m.ReconciliationPage),
+        title: 'Rapprochement — Administration CNPM',
       },
       // Compatibilité des favoris et captures antérieurs à l'alignement sur
       // l'inventaire UI. Les nouveaux liens utilisent exclusivement les routes canoniques.
