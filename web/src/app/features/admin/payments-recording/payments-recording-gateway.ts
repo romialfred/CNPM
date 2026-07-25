@@ -34,9 +34,18 @@ export interface RecordPaymentInput {
   readonly providerTransactionId?: string;
 }
 
+/** Résultat d'une confirmation : le reçu émis, et son jeton révélé une seule fois. */
+export interface PaymentConfirmation {
+  readonly receiptNumber: string;
+  readonly receiptId: string;
+  /** Jeton de vérification en clair, présent seulement à la première émission ; sinon `null`. */
+  readonly verificationToken: string | null;
+}
+
 export interface PaymentsRecordingGateway {
   list(): Observable<readonly RecordedPayment[]>;
   record(input: RecordPaymentInput): Observable<RecordedPayment>;
+  confirm(paymentId: string): Observable<PaymentConfirmation>;
 }
 
 export const PAYMENTS_RECORDING_GATEWAY = new InjectionToken<PaymentsRecordingGateway>(

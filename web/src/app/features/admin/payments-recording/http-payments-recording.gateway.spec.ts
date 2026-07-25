@@ -60,6 +60,22 @@ describe('HttpPaymentsRecordingGateway', () => {
     await result;
   });
 
+  it('confirme un encaissement et récupère le reçu et son jeton', async () => {
+    const result = firstValueFrom(gateway.confirm('tx-1'));
+    const request = http.expectOne((candidate) => candidate.url.endsWith('/payments/tx-1/confirm'));
+    expect(request.request.method).toBe('POST');
+    expect(request.request.headers.get('Idempotency-Key')).toBeTruthy();
+    request.flush({
+      receipt: { id: 'r1', receiptNumber: 'CNPM-REC-00000001' },
+      verificationToken: 'abcdef0123456789',
+      created: true,
+    });
+
+    const confirmation = await result;
+    expect(confirmation.receiptNumber).toBe('CNPM-REC-00000001');
+    expect(confirmation.verificationToken).toBe('abcdef0123456789');
+  });
+
   it('traduit un 409 en conflit d’état de la référence', async () => {
     const result = firstValueFrom(
       gateway.record({ referenceId: 'ref-1', channel: 'WAVE', amount: '1000.00' }),

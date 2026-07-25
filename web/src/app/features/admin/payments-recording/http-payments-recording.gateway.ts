@@ -9,10 +9,16 @@ import {
   PaymentsRecordingAuthenticationError,
   PaymentsRecordingConflictError,
   PaymentsRecordingValidationError,
+  type PaymentConfirmation,
   type PaymentsRecordingGateway,
   type RecordedPayment,
   type RecordPaymentInput,
 } from './payments-recording-gateway';
+
+interface ConfirmationResponse {
+  readonly receipt: { readonly id: string; readonly receiptNumber: string };
+  readonly verificationToken?: string | null;
+}
 
 interface PaymentResponse {
   readonly id: string;
@@ -70,6 +76,36 @@ export class HttpPaymentsRecordingGateway implements PaymentsRecordingGateway {
           return throwError(() => mapDomainError(error));
         }),
       );
+    });
+  }
+
+  confirm(paymentId: string): Observable<PaymentConfirmation> {
+    return defer(() => {
+      const commandId = JSON.stringify(['payment-confirm', paymentId]);
+      const headers = new HttpHeaders().set(
+        'Idempotency-Key',
+        this.idempotencyKeys.getOrCreate(commandId),
+      );
+      return this.http
+        .post<ConfirmationResponse>(
+          buildCnpmApiUrl(this.baseUrl, `payments/${encodeURIComponent(paymentId)}/confirm`),
+          {},
+          { headers },
+        )
+        .pipe(
+          map((response) => ({
+            receiptId: response.receipt.id,
+            receiptNumber: response.receipt.receiptNumber,
+            verificationToken: response.verificationToken ?? null,
+          })),
+          tap(() => this.idempotencyKeys.release(commandId)),
+          catchError((error: unknown) => {
+            if (!(error instanceof CnpmApiError) || !error.retryable) {
+              this.idempotencyKeys.release(commandId);
+            }
+            return throwError(() => mapDomainError(error));
+          }),
+        );
     });
   }
 

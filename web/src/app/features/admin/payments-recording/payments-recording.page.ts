@@ -78,8 +78,18 @@ export class PaymentsRecordingPage {
     () => this.sessionIdentity()?.permissions.includes('PAYMENT.RECORD') ?? false,
   );
 
+  protected readonly canConfirm = computed(
+    () => this.sessionIdentity()?.permissions.includes('PAYMENT.CONFIRM') ?? false,
+  );
+
   protected readonly payments = signal<readonly RecordedPayment[]>([]);
   protected readonly state = signal<LoadState>('loading');
+  protected readonly confirmingId = signal<string | null>(null);
+  /** Dernier reçu émis, avec son jeton de vérification (révélé une seule fois). */
+  protected readonly issuedReceipt = signal<{
+    readonly number: string;
+    readonly token: string | null;
+  } | null>(null);
 
   protected readonly showForm = signal(false);
   protected readonly validatedReferences = signal<readonly PaymentReference[]>([]);
@@ -176,6 +186,33 @@ export class PaymentsRecordingPage {
           this.formError.set(this.messageFor(error));
         },
       });
+  }
+
+  protected confirm(payment: RecordedPayment): void {
+    if (!this.canConfirm() || this.confirmingId()) return;
+    this.confirmingId.set(payment.id);
+    this.gateway
+      .confirm(payment.id)
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (confirmation) => {
+          this.confirmingId.set(null);
+          this.issuedReceipt.set({
+            number: confirmation.receiptNumber,
+            token: confirmation.verificationToken,
+          });
+          this.toast.success(`Reçu ${confirmation.receiptNumber} émis.`);
+          this.load();
+        },
+        error: (error: unknown) => {
+          this.confirmingId.set(null);
+          this.toast.error(this.messageFor(error));
+        },
+      });
+  }
+
+  protected dismissReceipt(): void {
+    this.issuedReceipt.set(null);
   }
 
   protected channelLabel(channel: PaymentChannel): string {

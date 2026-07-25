@@ -18,6 +18,21 @@
       </div>
     }
 
+    @if (issuedReceipt(); as receipt) {
+      <cnpm-alert tone="success" title="Reçu officiel émis">
+        <p>
+          Reçu <strong>{{ receipt.number }}</strong> délivré au nom de la CNPM.
+        </p>
+        @if (receipt.token) {
+          <p class="cnpm-payments-recording__verify">
+            Jeton de vérification (à conserver, affiché une seule fois) :
+            <code>{{ receipt.token }}</code>
+          </p>
+        }
+        <cnpm-button variant="secondary" (click)="dismissReceipt()">Fermer</cnpm-button>
+      </cnpm-alert>
+    }
+
     @if (showForm()) {
       <section class="cnpm-payments-recording__form">
         <h2 class="cnpm-payments-recording__form-title">Nouvel encaissement</h2>
@@ -139,6 +154,9 @@
                   <th scope="col">Canal</th>
                   <th scope="col" class="cnpm-payments-recording__num">Montant</th>
                   <th scope="col">Payé le</th>
+                  @if (canConfirm()) {
+                    <th scope="col">Action</th>
+                  }
                 </tr>
               </thead>
               <tbody>
@@ -152,6 +170,17 @@
                       {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
                     </td>
                     <td>{{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}</td>
+                    @if (canConfirm()) {
+                      <td>
+                        <cnpm-button
+                          variant="primary"
+                          [loading]="confirmingId() === payment.id"
+                          (click)="confirm(payment)"
+                        >
+                          Confirmer &amp; émettre le reçu
+                        </cnpm-button>
+                      </td>
+                    }
                   </tr>
                 }
               </tbody>
