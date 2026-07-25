@@ -41,6 +41,7 @@ POST;/payment-references;PAYMENT;createPaymentReference;Générer la référence
 POST;/payment-references/{id}/validate;PAYMENT;validatePaymentReference;Valider une référence de paiement.
 POST;/payment-references/{id}/revoke;PAYMENT;revokePaymentReference;Révoquer une référence de paiement.
 GET;/payments;PAYMENT;listPayments;Lister les transactions.
+POST;/payments;PAYMENT;recordPayment;Enregistrer un encaissement reçu.
 GET;/payments/{id};PAYMENT;getPayment;Consulter une transaction.
 POST;/payments/{id}/confirm;PAYMENT;confirmPayment;Confirmer un paiement rapproché.
 POST;/payment-provider-events/{partnerCode};PAYMENT;receivePaymentProviderEvent;Recevoir un callback signé.
