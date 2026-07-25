@@ -38,10 +38,9 @@ import { authRoutes } from '../../features/auth/auth.routes';
 import { AUTH_GATEWAY } from '../../features/auth/auth-gateway';
 import { DemoAuthGateway } from '../../features/auth/demo-auth.gateway';
 import { HttpAuthGateway } from '../../features/auth/http-auth.gateway';
-import { DemoMemberHomeGateway } from '../../features/member/home/demo-member-home.gateway';
+import { HttpMemberHomeGateway } from '../../features/member/home/http-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from '../../features/member/home/member-home-gateway';
 import { memberRoutes } from '../../features/member/member.routes';
-import { UNAVAILABLE_MEMBER_HOME_GATEWAY } from '../../features/member/unavailable-member-gateways';
 import { DemoHomeGateway } from '../../features/public/home/demo-home.gateway';
 import { HOME_GATEWAY } from '../../features/public/home/home-gateway';
 import { HttpHomeGateway } from '../../features/public/home/http-home.gateway';
@@ -83,7 +82,9 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(DASHBOARD_GATEWAY)).toBeInstanceOf(DemoDashboardGateway);
     expect(TestBed.inject(HOME_GATEWAY)).toBeInstanceOf(DemoHomeGateway);
     expect(TestBed.inject(SHOWCASE_GATEWAY)).toBeInstanceOf(DemoShowcaseGateway);
-    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(DemoMemberHomeGateway);
+    // Le tableau de bord membre est désormais toujours-HTTP (refonte « zéro démo ») :
+    // il n'a plus d'adaptateur fictif, même en profil demo.
+    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(HttpMemberHomeGateway);
   });
 
   it('utilise l’adaptateur HTTP quand il existe, et un repli fixture explicite sinon', () => {
@@ -108,6 +109,6 @@ describe('composition des sources applicatives', () => {
     expect(TestBed.inject(RECOVERY_GATEWAY)).toBe(UNAVAILABLE_RECOVERY_GATEWAY);
     expect(TestBed.inject(REPORTING_GATEWAY)).toBe(UNAVAILABLE_REPORTING_GATEWAY);
     expect(TestBed.inject(SHOWCASE_GATEWAY)).toBe(UNAVAILABLE_SHOWCASE_GATEWAY);
-    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBe(UNAVAILABLE_MEMBER_HOME_GATEWAY);
+    expect(TestBed.inject(MEMBER_HOME_GATEWAY)).toBeInstanceOf(HttpMemberHomeGateway);
   });
 });

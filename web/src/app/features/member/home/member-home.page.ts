@@ -1,197 +1,101 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  DestroyRef,
-  inject,
-  signal,
-} from '@angular/core';
+import { DecimalPipe, SlicePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
-import {
-  LucideArrowRight,
-  LucideBuilding2,
-  LucideCircleAlert,
-  LucideCreditCard,
-  LucideFileText,
-  LucideHeadset,
-  LucideReceiptText,
-  LucideRefreshCw,
-  LucideWalletCards,
-} from '@lucide/angular';
-import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
-import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
-import { ToastService } from '../../../design-system/toast/toast.service';
+import { AlertComponent } from '../../../design-system/alert/alert.component';
+import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
+import { ButtonComponent } from '../../../design-system/button/button.component';
+import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { MemberPortalShellComponent } from '../../../layout/member-portal-shell/member-portal-shell.component';
-import { MemberHomeDashboardComponent } from './member-home-dashboard.component';
 import {
   MEMBER_HOME_GATEWAY,
   MemberHomeAccessError,
-  type MemberHomeSnapshot,
+  MemberHomeNoMembershipError,
+  type MemberDashboard,
   type MembershipStatus,
 } from './member-home-gateway';
 
-type PageState = 'loading' | 'ready' | 'error' | 'forbidden';
-
-interface MemberRequestDraft {
-  readonly requestType: string;
-  readonly subject: string;
-  readonly message: string;
-}
-
-const REQUEST_DRAFT_STORAGE_KEY = 'cnpm-demo-member-request-draft';
+type PageState = 'loading' | 'ready' | 'error' | 'forbidden' | 'noMembership';
 
 const MEMBERSHIP_LABELS: Readonly<Record<MembershipStatus, string>> = {
-  ACTIVE: 'Membre actif',
+  ACTIVE: 'Adhésion active',
   DORMANT: 'Adhésion dormante',
   SUSPENDED: 'Adhésion suspendue',
 };
 
+const MEMBERSHIP_TONES: Readonly<Record<MembershipStatus, CnpmBadgeTone>> = {
+  ACTIVE: 'success',
+  DORMANT: 'neutral',
+  SUSPENDED: 'error',
+};
+
 /**
- * MP-001 — accueil du portail membre.
+ * MP-001 — tableau de bord du portail membre.
  *
- * La route fournit le port `MEMBER_HOME_GATEWAY`. Le composant ne fournit
- * volontairement aucun adaptateur : un montage HTTP peut donc remplacer la fixture de
- * démonstration sans modifier cette page.
+ * La route fournit le port `MEMBER_HOME_GATEWAY` (adaptateur HTTP réel). L'écran n'affiche que des
+ * données réelles bornées au compte connecté : situation de cotisation, indicateurs et raccourcis.
  */
 @Component({
   selector: 'cnpm-member-home-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    DatePipe,
     DecimalPipe,
-    ReactiveFormsModule,
+    SlicePipe,
     RouterLink,
-    ErrorStateComponent,
-    SkeletonComponent,
     MemberPortalShellComponent,
-    MemberHomeDashboardComponent,
-    LucideArrowRight,
-    LucideBuilding2,
-    LucideCircleAlert,
-    LucideCreditCard,
-    LucideFileText,
-    LucideHeadset,
-    LucideReceiptText,
-    LucideRefreshCw,
-    LucideWalletCards,
+    PageHeaderComponent,
+    AlertComponent,
+    BadgeComponent,
+    ButtonComponent,
   ],
   templateUrl: './member-home.page.html',
-  styleUrls: ['./member-home.page.scss', './member-home.due-stats.scss'],
+  styleUrl: './member-home.page.scss',
 })
 export class MemberHomePage {
   private readonly gateway = inject(MEMBER_HOME_GATEWAY);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly toasts = inject(ToastService);
   private readonly title = inject(Title);
 
   protected readonly state = signal<PageState>('loading');
-  protected readonly snapshot = signal<MemberHomeSnapshot | null>(null);
-  protected readonly draftStatus = signal('Brouillon local non enregistré');
+  protected readonly dashboard = signal<MemberDashboard | null>(null);
 
-  protected readonly requestForm = this.formBuilder.nonNullable.group({
-    requestType: '',
-    subject: '',
-    message: '',
-  });
+  protected readonly identity = computed(() => this.dashboard()?.identity ?? null);
+  protected readonly exercises = computed(() => this.dashboard()?.exercises ?? []);
+  protected readonly hasOutstanding = computed(() => (this.dashboard()?.outstandingTotal ?? 0) > 0);
+  protected readonly hasOverdue = computed(() => (this.dashboard()?.overdueAmount ?? 0) > 0);
 
-  protected readonly identity = computed(() => this.snapshot()?.identity ?? null);
-  protected readonly situation = computed(() => this.snapshot()?.situation ?? null);
-  protected readonly contact = computed(() => this.snapshot()?.contact ?? null);
-  protected readonly welcomeName = computed(
-    () => this.contact()?.contactName.trim().split(/\s+/)[0] || 'membre CNPM',
-  );
-  protected readonly profile = computed(() => this.snapshot()?.profile ?? null);
-  protected readonly support = computed(() => this.snapshot()?.support ?? null);
-  protected readonly paymentCount = computed(() => this.snapshot()?.paymentCount ?? 0);
-  protected readonly requestCount = computed(() => this.snapshot()?.requests.length ?? 0);
-  protected readonly receiptCount = computed(() => this.snapshot()?.receipts.length ?? 0);
-  protected readonly recentReceipts = computed(() => (this.snapshot()?.receipts ?? []).slice(0, 5));
-  protected readonly activities = computed(() => (this.snapshot()?.activities ?? []).slice(0, 4));
   constructor() {
     this.title.setTitle('Accueil du portail membre — CNPM');
-    this.restoreDraft();
-    this.requestForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
-      this.persistDraft(false);
-    });
     this.load();
+  }
+
+  protected load(): void {
+    this.state.set('loading');
+    this.gateway
+      .load()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (dashboard) => {
+          this.dashboard.set(dashboard);
+          this.state.set('ready');
+        },
+        error: (error: unknown) => {
+          if (error instanceof MemberHomeNoMembershipError) {
+            this.state.set('noMembership');
+          } else if (error instanceof MemberHomeAccessError) {
+            this.state.set('forbidden');
+          } else {
+            this.state.set('error');
+          }
+        },
+      });
   }
 
   protected membershipLabel(status: MembershipStatus): string {
     return MEMBERSHIP_LABELS[status];
   }
 
-  protected saveDraft(): void {
-    this.persistDraft(true);
-  }
-
-  /**
-   * Réservé aux actions RÉELLEMENT bloquées par une décision de gouvernance : paiement en
-   * ligne (DEC-002/003/005), téléchargement de reçu signé (DEC-005), avantages/assistance
-   * non raccordés. Les raccourcis de navigation, eux, pointent vers des écrans livrés via
-   * `routerLink` — ne jamais annoncer « indisponible » une page qui existe.
-   */
-  protected announceUnavailable(feature: string): void {
-    this.toasts.info(`${feature} n’est pas encore disponible. Aucune opération n’a été initiée.`);
-  }
-
-  protected retry(): void {
-    this.load();
-  }
-
-  private load(): void {
-    this.state.set('loading');
-    this.gateway
-      .load()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (snapshot) => {
-          this.snapshot.set(snapshot);
-          this.state.set('ready');
-        },
-        error: (error: unknown) => {
-          this.state.set(error instanceof MemberHomeAccessError ? 'forbidden' : 'error');
-        },
-      });
-  }
-
-  private persistDraft(announce: boolean): void {
-    try {
-      sessionStorage.setItem(
-        REQUEST_DRAFT_STORAGE_KEY,
-        JSON.stringify(this.requestForm.getRawValue()),
-      );
-      this.draftStatus.set('Brouillon sauvegardé localement — aucun envoi au CNPM');
-      if (announce) {
-        this.toasts.info('Brouillon sauvegardé localement. Aucun envoi au CNPM.');
-      }
-    } catch {
-      this.draftStatus.set('Le stockage local du brouillon est indisponible');
-    }
-  }
-
-  private restoreDraft(): void {
-    try {
-      const rawDraft = sessionStorage.getItem(REQUEST_DRAFT_STORAGE_KEY);
-      if (!rawDraft) {
-        return;
-      }
-      const draft = JSON.parse(rawDraft) as Partial<MemberRequestDraft>;
-      this.requestForm.patchValue(
-        {
-          requestType: typeof draft.requestType === 'string' ? draft.requestType : '',
-          subject: typeof draft.subject === 'string' ? draft.subject : '',
-          message: typeof draft.message === 'string' ? draft.message : '',
-        },
-        { emitEvent: false },
-      );
-      this.draftStatus.set('Brouillon local restauré — aucun envoi au CNPM');
-    } catch {
-      sessionStorage.removeItem(REQUEST_DRAFT_STORAGE_KEY);
-    }
+  protected membershipTone(status: MembershipStatus): CnpmBadgeTone {
+    return MEMBERSHIP_TONES[status];
   }
 }

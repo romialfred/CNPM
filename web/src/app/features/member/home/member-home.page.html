@@ -1,196 +1,152 @@
-<cnpm-member-portal-shell
-  [organization]="identity()?.organization ?? 'Espace membre'"
-  [userName]="contact()?.contactName ?? 'Membre CNPM'"
-  [memberCode]="identity()?.memberCode ?? ''"
->
+<cnpm-member-portal-shell>
   <main class="member-home" id="contenu-principal">
+    <cnpm-page-header
+      title="Mon espace membre"
+      description="Votre situation de cotisation et vos indicateurs, en temps réel."
+    />
+
     @switch (state()) {
       @case ('loading') {
-        <section class="member-home__loading" aria-label="Chargement de votre portail membre">
-          <cnpm-skeleton variant="card" [rows]="3" label="Chargement de votre espace membre…" />
-          <div class="member-home__loading-grid">
-            <cnpm-skeleton variant="card" [rows]="4" label="" />
-            <cnpm-skeleton variant="card" [rows]="4" label="" />
-            <cnpm-skeleton variant="card" [rows]="4" label="" />
-          </div>
-        </section>
+        <p class="member-home__status" role="status">Chargement de votre tableau de bord…</p>
+      }
+      @case ('noMembership') {
+        <cnpm-alert tone="info" title="Aucune adhésion rattachée">
+          <p>Ce compte n’est rattaché à aucune adhésion cotisante.</p>
+        </cnpm-alert>
       }
       @case ('forbidden') {
-        <cnpm-error-state variant="forbidden" titleAs="h1" />
+        <cnpm-alert tone="error" title="Accès refusé">
+          <p>Vous n’avez pas l’autorisation d’accéder à cet espace.</p>
+        </cnpm-alert>
       }
       @case ('error') {
-        <cnpm-error-state
-          variant="recoverable"
-          titleAs="h1"
-          title="Votre portail membre n’a pas pu être chargé"
-          description="Le service est momentanément indisponible. Vos informations n’ont pas été modifiées."
-        >
-          <button
-            class="member-home__button member-home__button--secondary"
-            type="button"
-            (click)="retry()"
-          >
-            <svg lucideRefreshCw aria-hidden="true"></svg>Réessayer
-          </button>
-        </cnpm-error-state>
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Votre tableau de bord n’a pas pu être chargé.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
       }
       @case ('ready') {
-        @if (identity(); as member) {
-          <section class="member-home__hero" aria-labelledby="member-home-title">
-            <div class="member-home__welcome">
-              <div>
-                <h1 id="member-home-title">
-                  Bienvenue, {{ welcomeName() }} <span aria-hidden="true">👋</span>
-                </h1>
-                <p>Ravi de vous revoir sur votre portail membre du CNPM.</p>
-              </div>
-              <div class="member-home__identity">
-                <span class="member-home__identity-icon" aria-hidden="true"
-                  ><svg lucideBuilding2></svg
-                ></span>
-                <div>
-                  <div class="member-home__identity-line">
-                    <strong>{{ member.organization }}</strong>
-                    <span
-                      class="member-home__status member-home__status--{{
-                        member.status.toLowerCase()
-                      }}"
-                      >{{ membershipLabel(member.status) }}</span
-                    >
-                  </div>
-                  <p>
-                    N° d’adhérent : <strong>{{ member.memberCode }}</strong>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            @if (situation(); as due) {
-              <aside class="member-home__due" aria-labelledby="due-title">
-                <div class="member-home__due-heading">
-                  <span id="due-title">Montant dû actuel</span>
-                  @if (due.nextDueDate) {
-                    <span class="member-home__deadline"
-                      >Prochaine échéance : {{ due.nextDueDate | date: 'dd/MM/yyyy' }}</span
-                    >
-                  }
-                </div>
-                <p class="member-home__amount">
-                  {{ due.outstandingTotal | number: '1.0-0' }} <small>FCFA</small>
-                </p>
-                @if (due.overdueAmount > 0) {
-                  <p class="member-home__overdue">
-                    <svg lucideCircleAlert aria-hidden="true"></svg>dont
-                    {{ due.overdueAmount | number: '1.0-0' }} FCFA échus
-                  </p>
+        @if (identity(); as id) {
+          <section class="member-home__identity" aria-label="Votre adhésion">
+            <div>
+              <h2 class="member-home__org">{{ id.organization }}</h2>
+              <p class="member-home__meta">
+                <span class="member-home__mono">{{ id.memberCode }}</span>
+                · {{ id.category }}
+                @if (id.memberSince) {
+                  · Membre depuis {{ id.memberSince | slice: 0 : 4 }}
                 }
-                <dl class="member-home__due-stats">
-                  <div>
-                    <dt>Total cotisé</dt>
-                    <dd>{{ due.settledTotal | number: '1.0-0' }} FCFA</dd>
-                  </div>
-                  @if (due.lastContribution; as last) {
-                    <div>
-                      <dt>Dernière cotisation</dt>
-                      <dd>
-                        {{ last.amount | number: '1.0-0' }} FCFA
-                        <span>le {{ last.paidOn | date: 'dd/MM/yyyy' }}</span>
-                      </dd>
-                    </div>
-                  }
-                </dl>
-                <button
-                  class="member-home__button member-home__button--primary member-home__payment"
-                  type="button"
-                  aria-describedby="payment-availability-note"
-                  (click)="announceUnavailable('Le paiement en ligne')"
-                >
-                  <svg lucideCreditCard aria-hidden="true"></svg>Payer maintenant
-                </button>
-                <span class="member-home__sr-only" id="payment-availability-note"
-                  >Le paiement en ligne n’est pas encore disponible.</span
-                >
-              </aside>
-            }
-          </section>
-
-          <section class="member-home__metrics" aria-label="Raccourcis du portail membre">
-            <a routerLink="/member/contributions">
-              <span
-                class="member-home__metric-icon member-home__metric-icon--blue"
-                aria-hidden="true"
-                ><svg lucideFileText></svg
-              ></span>
-              <span
-                ><small>Mes cotisations</small
-                ><strong>{{ situation()?.outstandingTotal ?? 0 | number: '1.0-0' }} FCFA</strong
-                ><em>Voir le détail</em></span
-              ><svg lucideArrowRight aria-hidden="true"></svg>
-            </a>
-            <a routerLink="/member/payments">
-              <span
-                class="member-home__metric-icon member-home__metric-icon--green"
-                aria-hidden="true"
-                ><svg lucideWalletCards></svg
-              ></span>
-              <span
-                ><small>Mes paiements</small><strong>{{ paymentCount() }}</strong
-                ><em>Voir l'historique</em></span
-              ><svg lucideArrowRight aria-hidden="true"></svg>
-            </a>
-            <a routerLink="/member/receipts">
-              <span
-                class="member-home__metric-icon member-home__metric-icon--purple"
-                aria-hidden="true"
-                ><svg lucideReceiptText></svg
-              ></span>
-              <span
-                ><small>Mes reçus</small><strong>{{ receiptCount() }}</strong
-                ><em>Voir tous les reçus</em></span
-              ><svg lucideArrowRight aria-hidden="true"></svg>
-            </a>
-            <a routerLink="/member/requests">
-              <span
-                class="member-home__metric-icon member-home__metric-icon--orange"
-                aria-hidden="true"
-                ><svg lucideHeadset></svg
-              ></span>
-              <span
-                ><small>Mes requêtes</small><strong>{{ requestCount() }}</strong
-                ><em>Voir mes requêtes</em></span
-              ><svg lucideArrowRight aria-hidden="true"></svg>
-            </a>
-          </section>
-
-          @if (profile(); as completion) {
-            @if (support(); as desk) {
-              <cnpm-member-home-dashboard
-                [receipts]="recentReceipts()"
-                [activities]="activities()"
-                [profile]="completion"
-                [support]="desk"
-                [requestForm]="requestForm"
-                [draftStatus]="draftStatus()"
-                (unavailable)="announceUnavailable($event)"
-                (saveDraftRequested)="saveDraft()"
-              />
-            }
-          }
-
-          <section class="member-home__benefits" aria-labelledby="benefits-title">
-            <h2 id="benefits-title">Vos avantages membres</h2>
-            <ul>
-              <li>Représentation & plaidoyer</li>
-              <li>Networking & événements</li>
-              <li>Informations économiques</li>
-              <li>Formations & renforcement</li>
-              <li>Opportunités d’affaires</li>
-            </ul>
-            <button type="button" (click)="announceUnavailable('Les avantages membres')">
-              Voir tous les avantages <svg lucideArrowRight aria-hidden="true"></svg>
-            </button>
+              </p>
+            </div>
+            <cnpm-badge [tone]="membershipTone(id.status)">
+              {{ membershipLabel(id.status) }}
+            </cnpm-badge>
           </section>
         }
+
+        @if (dashboard(); as data) {
+          <section class="member-home__kpis" aria-label="Indicateurs de cotisation">
+            <article class="member-home__kpi" [class.member-home__kpi--alert]="hasOutstanding()">
+              <span class="member-home__kpi-label">Reste dû</span>
+              <span class="member-home__kpi-value">
+                {{ data.outstandingTotal | number: '1.0-0' : 'fr' }} FCFA
+              </span>
+            </article>
+            <article class="member-home__kpi" [class.member-home__kpi--alert]="hasOverdue()">
+              <span class="member-home__kpi-label">Dont en retard</span>
+              <span class="member-home__kpi-value">
+                {{ data.overdueAmount | number: '1.0-0' : 'fr' }} FCFA
+              </span>
+            </article>
+            <article class="member-home__kpi">
+              <span class="member-home__kpi-label">Total cotisé</span>
+              <span class="member-home__kpi-value">
+                {{ data.settledTotal | number: '1.0-0' : 'fr' }} FCFA
+              </span>
+            </article>
+            <article class="member-home__kpi">
+              <span class="member-home__kpi-label">Prochaine échéance</span>
+              <span class="member-home__kpi-value">
+                {{ data.nextDueDate ? (data.nextDueDate | slice: 0 : 10) : 'Aucune' }}
+              </span>
+            </article>
+          </section>
+
+          <section class="member-home__counters" aria-label="Vos règlements">
+            <p class="member-home__counter">
+              <strong>{{ data.paymentCount }}</strong> paiement{{
+                data.paymentCount > 1 ? 's' : ''
+              }}
+              enregistré{{ data.paymentCount > 1 ? 's' : '' }}
+            </p>
+            <p class="member-home__counter">
+              <strong>{{ data.receiptCount }}</strong> reçu{{ data.receiptCount > 1 ? 's' : '' }}
+              officiel{{ data.receiptCount > 1 ? 's' : '' }}
+            </p>
+            @if (data.lastPayment; as last) {
+              <p class="member-home__counter">
+                Dernier règlement :
+                <strong>{{ last.amount | number: '1.0-0' : 'fr' }} {{ last.currency }}</strong>
+                @if (last.paidAt) {
+                  le {{ last.paidAt | slice: 0 : 10 }}
+                }
+              </p>
+            }
+          </section>
+
+          @if (exercises().length > 0) {
+            <section class="member-home__exercises" aria-label="Situation par exercice">
+              <h2 class="member-home__section-title">Situation par exercice</h2>
+              <div class="member-home__table-wrap">
+                <table class="cnpm-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Exercice</th>
+                      <th scope="col" class="member-home__num">Appelé</th>
+                      <th scope="col" class="member-home__num">Réglé</th>
+                      <th scope="col" class="member-home__num">Reste dû</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (exercise of exercises(); track exercise.year) {
+                      <tr>
+                        <td>{{ exercise.year }}</td>
+                        <td class="member-home__num">
+                          {{ exercise.called | number: '1.0-0' : 'fr' }}
+                        </td>
+                        <td class="member-home__num">
+                          {{ exercise.settled | number: '1.0-0' : 'fr' }}
+                        </td>
+                        <td class="member-home__num">
+                          {{ exercise.outstanding | number: '1.0-0' : 'fr' }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          }
+        }
+
+        <nav class="member-home__links" aria-label="Accès rapides">
+          <a class="member-home__link" routerLink="/member/contributions">
+            <span class="member-home__link-title">Mes cotisations</span>
+            <span class="member-home__link-desc">Appels, échéances et détails</span>
+          </a>
+          <a class="member-home__link" routerLink="/member/payments">
+            <span class="member-home__link-title">Mes paiements</span>
+            <span class="member-home__link-desc">Historique de vos encaissements</span>
+          </a>
+          <a class="member-home__link" routerLink="/member/receipts">
+            <span class="member-home__link-title">Mes reçus</span>
+            <span class="member-home__link-desc">Reçus officiels émis par la CNPM</span>
+          </a>
+          <a class="member-home__link" routerLink="/member/payments/instructions">
+            <span class="member-home__link-title">Comment payer</span>
+            <span class="member-home__link-desc">Références et comptes d’encaissement</span>
+          </a>
+        </nav>
       }
     }
   </main>

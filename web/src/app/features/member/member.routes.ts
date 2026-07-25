@@ -8,7 +8,7 @@ import { DemoMemberDirectoryGateway } from './directory/demo-member-directory.ga
 import { MEMBER_DIRECTORY_GATEWAY } from './directory/member-directory.gateway';
 import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.gateway';
 import { MEMBER_DOCUMENTS_GATEWAY } from './documents/member-documents-gateway';
-import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
+import { HttpMemberHomeGateway } from './home/http-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
 import { HttpMemberPaymentsGateway } from './payments/http-member-payments.gateway';
 import { MEMBER_PAYMENTS_GATEWAY } from './payments/member-payments-gateway';
@@ -30,7 +30,6 @@ import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
   UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
-  UNAVAILABLE_MEMBER_HOME_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
@@ -47,14 +46,10 @@ export const memberRoutes: Routes = [
   {
     path: 'home',
     providers: [
-      DemoMemberHomeGateway,
-      {
-        provide: MEMBER_HOME_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberHomeGateway)
-            : UNAVAILABLE_MEMBER_HOME_GATEWAY,
-      },
+      // Refonte « zéro démo » : le tableau de bord vient de `GET /portal/dashboard`,
+      // borné à l'adhésion du compte connecté.
+      HttpMemberHomeGateway,
+      { provide: MEMBER_HOME_GATEWAY, useExisting: HttpMemberHomeGateway },
     ],
     loadComponent: () => import('./home/member-home.page').then((m) => m.MemberHomePage),
     title: 'Mon espace membre — CNPM',

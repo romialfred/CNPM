@@ -2,15 +2,10 @@ import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type { MemberContributionsGateway } from './contributions/member-contributions-gateway';
 import type { MemberDirectoryGateway } from './directory/member-directory.gateway';
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
-import type { MemberHomeGateway } from './home/member-home-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
 import type { MemberShowcaseGateway } from './showcase/member-showcase-gateway';
 import type { MemberShowcaseAnalyticsGateway } from './showcase-analytics/member-showcase-analytics.gateway';
 import type { MemberUsersGateway } from './users/member-users-gateway';
-
-export const UNAVAILABLE_MEMBER_HOME_GATEWAY: MemberHomeGateway = {
-  load: () => unavailableFeature$('MP-001'),
-};
 
 /**
  * Le contrat HTTP expose encore `GET /portal/contributions` comme `Resource`
