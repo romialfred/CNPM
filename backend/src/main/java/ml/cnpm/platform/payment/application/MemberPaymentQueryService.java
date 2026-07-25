@@ -105,6 +105,50 @@ public class MemberPaymentQueryService {
         return new MemberPaymentHistoryView.PaymentList(payments);
     }
 
+    /**
+     * Reçus officiels du cotisant connecté.
+     *
+     * <p>Ne remonte que les reçus émis pour un encaissement rattaché à une référence de SON
+     * adhésion : un membre ne voit jamais le reçu d'un autre. Le jeton de vérification n'est jamais
+     * exposé — seule son empreinte est conservée et le QR n'est révélé qu'à l'émission.
+     */
+    @PreAuthorize("hasAuthority('PERM_PAYMENT.READ')")
+    @Transactional(readOnly = true)
+    public MemberReceiptHistoryView.ReceiptList receipts(UUID accountId) {
+        UUID membershipId = requireMembership(accountId);
+        List<MemberReceiptHistoryView.Receipt> receipts =
+                jdbc.query(
+                        "SELECT r.id, r.receipt_number, r.issued_at, r.status,"
+                                + " pt.transaction_number, pt.channel, pt.amount, pt.currency,"
+                                + " pt.paid_at, pr.reference_value, pr.exercise"
+                                + " FROM receipt.receipt r"
+                                + " JOIN payment.payment_transaction pt"
+                                + "   ON pt.id = r.payment_transaction_id"
+                                + " JOIN payment.payment_reference pr ON pr.id = pt.payment_reference_id"
+                                + " WHERE pr.membership_id = ?"
+                                + " ORDER BY r.issued_at DESC",
+                        (rs, i) -> {
+                            java.time.OffsetDateTime paidAt =
+                                    rs.getObject("paid_at", java.time.OffsetDateTime.class);
+                            java.time.OffsetDateTime issuedAt =
+                                    rs.getObject("issued_at", java.time.OffsetDateTime.class);
+                            return new MemberReceiptHistoryView.Receipt(
+                                    rs.getString("id"),
+                                    rs.getString("receipt_number"),
+                                    rs.getString("transaction_number"),
+                                    rs.getString("reference_value"),
+                                    rs.getObject("exercise", Integer.class),
+                                    rs.getString("channel"),
+                                    rs.getBigDecimal("amount"),
+                                    rs.getString("currency"),
+                                    paidAt == null ? null : paidAt.toString(),
+                                    issuedAt == null ? null : issuedAt.toString(),
+                                    rs.getString("status"));
+                        },
+                        membershipId);
+        return new MemberReceiptHistoryView.ReceiptList(receipts);
+    }
+
     /** Adhésion du compte connecté, ou refus si le compte n'en porte aucune. */
     private UUID requireMembership(UUID accountId) {
         return Optional.ofNullable(accountId)

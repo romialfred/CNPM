@@ -3,7 +3,6 @@ import type { MemberContributionsGateway } from './contributions/member-contribu
 import type { MemberDirectoryGateway } from './directory/member-directory.gateway';
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
 import type { MemberHomeGateway } from './home/member-home-gateway';
-import type { MemberReceiptsGateway } from './receipts/member-receipts-gateway';
 import type { MemberRequestsGateway } from './requests/member-requests-gateway';
 import type { MemberShowcaseGateway } from './showcase/member-showcase-gateway';
 import type { MemberShowcaseAnalyticsGateway } from './showcase-analytics/member-showcase-analytics.gateway';
@@ -21,12 +20,6 @@ export const UNAVAILABLE_MEMBER_HOME_GATEWAY: MemberHomeGateway = {
 export const UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY: MemberContributionsGateway = {
   list: () => unavailableFeature$('MP-002'),
   loadDetail: () => unavailableFeature$('MP-003'),
-};
-
-/** `/receipts*` reste générique et ne fournit aucun document membre typé. */
-export const UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY: MemberReceiptsGateway = {
-  list: () => unavailableFeature$('MP-007'),
-  loadDetail: () => unavailableFeature$('MP-008'),
 };
 
 /** OpenAPI ne porte encore que Resource/PageResource/ResourceInput pour ces routes. */

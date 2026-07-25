@@ -120,12 +120,14 @@ class MemberPaymentApiTest {
                 "50000.00",
                 "2026-07-25T09:30:00Z");
         seedReceipt(alphaConfirmed, "CNPM-REC-ALP-0001");
-        seedTransaction(
-                betaReferenceId,
-                "CNPM-PAY-BET-0001",
-                "BANK_TRANSFER",
-                "300000.00",
-                "2026-07-23T08:00:00Z");
+        UUID betaConfirmed =
+                seedTransaction(
+                        betaReferenceId,
+                        "CNPM-PAY-BET-0001",
+                        "BANK_TRANSFER",
+                        "300000.00",
+                        "2026-07-23T08:00:00Z");
+        seedReceipt(betaConfirmed, "CNPM-REC-BET-0001");
     }
 
     private UUID referenceId(String value) {
@@ -154,9 +156,10 @@ class MemberPaymentApiTest {
         jdbcTemplate.update(
                 "INSERT INTO receipt.receipt (payment_transaction_id, receipt_number, issued_at,"
                         + " status, document_id, verification_token_hash, issued_by)"
-                        + " VALUES (?, ?, now(), 'ISSUED', gen_random_uuid(), repeat('0', 64),"
+                        + " VALUES (?, ?, now(), 'ISSUED', gen_random_uuid(), repeat(md5(?), 2),"
                         + " ?)",
                 transactionId,
+                receiptNumber,
                 receiptNumber,
                 professionalAccount);
     }
@@ -284,6 +287,42 @@ class MemberPaymentApiTest {
     void refusesPaymentHistoryForAccountWithoutMembership() throws Exception {
         mockMvc
                 .perform(get("/portal/payments").with(asMember(professionalAccount)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("restitue les reçus officiels du cotisant sans exposer de jeton")
+    void showsOwnOfficialReceipts() throws Exception {
+        mockMvc
+                .perform(get("/portal/receipts").with(asMember(alphaAccount)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.receipts", hasSize(1)))
+                .andExpect(jsonPath("$.receipts[0].receiptNumber").value("CNPM-REC-ALP-0001"))
+                .andExpect(jsonPath("$.receipts[0].transactionNumber").value("CNPM-PAY-ALP-0001"))
+                .andExpect(jsonPath("$.receipts[0].referenceValue").value(ALPHA_REF))
+                .andExpect(jsonPath("$.receipts[0].status").value("ISSUED"))
+                // Le jeton de vérification n'est jamais sérialisé vers le membre.
+                .andExpect(jsonPath("$.receipts[0].verificationToken").doesNotExist())
+                .andExpect(jsonPath("$.receipts[0].verificationTokenHash").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("ne fait jamais fuir le reçu d’un autre cotisant")
+    void neverLeaksAnotherMembersReceipt() throws Exception {
+        mockMvc
+                .perform(get("/portal/receipts").with(asMember(alphaAccount)))
+                .andExpect(status().isOk())
+                .andExpect(
+                        jsonPath(
+                                "$.receipts[*].receiptNumber",
+                                containsInAnyOrder("CNPM-REC-ALP-0001")));
+    }
+
+    @Test
+    @DisplayName("refuse les reçus d’un compte sans adhésion")
+    void refusesReceiptsForAccountWithoutMembership() throws Exception {
+        mockMvc
+                .perform(get("/portal/receipts").with(asMember(professionalAccount)))
                 .andExpect(status().isNotFound());
     }
 }

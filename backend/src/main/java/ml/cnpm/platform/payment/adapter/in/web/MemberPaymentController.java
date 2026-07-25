@@ -34,6 +34,12 @@ public class MemberPaymentController {
         return service.payments(accountId(authentication));
     }
 
+    @GetMapping("/portal/receipts")
+    public ml.cnpm.platform.payment.application.MemberReceiptHistoryView.ReceiptList receipts(
+            JwtAuthenticationToken authentication) {
+        return service.receipts(accountId(authentication));
+    }
+
     /** Compte authentifié ; un sujet non-UUID ne désigne aucun compte et sera refusé au service. */
     private static UUID accountId(JwtAuthenticationToken authentication) {
         String subject = authentication.getToken().getSubject();

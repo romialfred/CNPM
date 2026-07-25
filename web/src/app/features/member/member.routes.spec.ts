@@ -32,13 +32,15 @@ describe('memberRoutes', () => {
     expect(route?.canActivate).toBeUndefined();
   });
 
-  it('expose MP-007 et MP-008 sous une composition de données commune', () => {
+  it('expose les reçus officiels réels sous une composition HTTP', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'receipts');
+    // « Mes reçus » (MP-007) s’appuie sur `GET /portal/receipts` : gateway HTTP concrète
+    // + alias `useExisting`, sans repli de démonstration ni écran de détail fictif.
     expect(route?.providers).toHaveLength(2);
-    expect(route?.children).toHaveLength(2);
-    expect(route?.children?.map((child) => child.path)).toEqual(['', ':id']);
+    expect(route?.children).toHaveLength(1);
+    expect(route?.children?.map((child) => child.path)).toEqual(['']);
+    expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
     expect(route?.children?.[0]?.loadComponent).toBeTypeOf('function');
-    expect(route?.children?.[1]?.loadComponent).toBeTypeOf('function');
   });
 
   it('expose MP-009, MP-010 et MP-011 sans confondre new avec un identifiant', () => {

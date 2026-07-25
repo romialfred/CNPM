@@ -2856,6 +2856,27 @@ paths:
       - PRT-006
       - PRT-007
       - PRT-008
+  /portal/receipts:
+    get:
+      tags:
+      - PORTAL
+      summary: Afficher les reçus officiels du cotisant.
+      operationId: getMemberReceipts
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Reçus émis pour l'adhésion du cotisant connecté
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
   /portal/payment-instructions:
     get:
       tags:

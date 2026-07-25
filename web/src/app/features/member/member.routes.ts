@@ -16,7 +16,7 @@ import { PAYMENT_INSTRUCTIONS_GATEWAY } from './payments/payment-instructions-ga
 import { HttpPaymentInstructionsGateway } from './payments/http-payment-instructions.gateway';
 import { HttpMemberProfileGateway } from './profile/http-member-profile.gateway';
 import { MEMBER_PROFILE_GATEWAY } from './profile/member-profile-gateway';
-import { DemoMemberReceiptsGateway } from './receipts/demo-member-receipts.gateway';
+import { HttpMemberReceiptsGateway } from './receipts/http-member-receipts.gateway';
 import { MEMBER_RECEIPTS_GATEWAY } from './receipts/member-receipts-gateway';
 import { DemoMemberRequestsGateway } from './requests/demo-member-requests.gateway';
 import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
@@ -31,7 +31,6 @@ import {
   UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
-  UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
@@ -125,14 +124,10 @@ export const memberRoutes: Routes = [
   {
     path: 'receipts',
     providers: [
-      DemoMemberReceiptsGateway,
-      {
-        provide: MEMBER_RECEIPTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberReceiptsGateway)
-            : UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
-      },
+      // Refonte « zéro démo » : les reçus officiels viennent de `GET /portal/receipts`,
+      // bornés à l'adhésion du compte connecté.
+      HttpMemberReceiptsGateway,
+      { provide: MEMBER_RECEIPTS_GATEWAY, useExisting: HttpMemberReceiptsGateway },
     ],
     children: [
       {
@@ -141,14 +136,6 @@ export const memberRoutes: Routes = [
         loadComponent: () =>
           import('./receipts/member-receipts.page').then((module) => module.MemberReceiptsPage),
         title: 'Mes reçus — CNPM',
-      },
-      {
-        path: ':id',
-        loadComponent: () =>
-          import('./receipts/member-receipt-detail.page').then(
-            (module) => module.MemberReceiptDetailPage,
-          ),
-        title: 'Aperçu du reçu — CNPM',
       },
     ],
   },

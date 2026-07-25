@@ -1,215 +1,83 @@
-<cnpm-member-portal-shell
-  organization="Sahel Agro SA"
-  userName="Responsable cotisations"
-  memberCode="CNPM-MBR-0142"
-  [notificationCount]="0"
->
+<cnpm-member-portal-shell>
   <main class="member-receipts" id="contenu-principal">
     <cnpm-page-header
       title="Mes reçus"
-      description="Consultez le récapitulatif de vos règlements de cotisation."
+      description="Les reçus officiels émis par la CNPM pour vos encaissements confirmés."
     />
 
-    <cnpm-alert tone="info" title="Reçus officiels à venir" [live]="false">
-      Les éléments affichés sont des récapitulatifs de lecture : le reçu CNPM signé, son
-      téléchargement et sa vérification ne sont pas encore disponibles.
-    </cnpm-alert>
-
-    <cnpm-filter-bar
-      [expanded]="filtersExpanded()"
-      [chips]="chips()"
-      (expandedChange)="filtersExpanded.set($event)"
-      (chipRemove)="removeFilter($event)"
-      (resetAll)="resetFilters()"
-    >
-      <form class="member-receipts__filters" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
-        <div class="member-receipts__field member-receipts__field--search">
-          <label for="member-receipt-search">Recherche</label>
-          <input
-            id="member-receipt-search"
-            type="search"
-            formControlName="search"
-            placeholder="Référence ou période"
-          />
-        </div>
-        <div class="member-receipts__field">
-          <label for="member-receipt-status">Statut</label>
-          <select id="member-receipt-status" formControlName="status">
-            <option value="">Tous les statuts</option>
-            @for (status of statuses; track status) {
-              <option [value]="status">{{ statusLabel(status) }}</option>
-            }
-          </select>
-        </div>
-        <div class="member-receipts__field">
-          <label for="member-receipt-exercise">Exercice</label>
-          <select id="member-receipt-exercise" formControlName="exercise">
-            <option value="">Tous les exercices</option>
-            @for (exercise of exercises(); track exercise) {
-              <option [value]="exercise">{{ exercise }}</option>
-            }
-          </select>
-        </div>
-        <div class="member-receipts__field">
-          <label for="member-receipt-sort">Tri et ordre</label>
-          <select id="member-receipt-sort" formControlName="sortOption">
-            <option value="scenarioDate:desc">Date — plus récente</option>
-            <option value="scenarioDate:asc">Date — plus ancienne</option>
-            <option value="reference:asc">Référence — croissante</option>
-            <option value="reference:desc">Référence — décroissante</option>
-            <option value="amountXof:desc">Montant — décroissant</option>
-            <option value="amountXof:asc">Montant — croissant</option>
-          </select>
-        </div>
-        <cnpm-button type="submit" variant="primary">Appliquer</cnpm-button>
-      </form>
-    </cnpm-filter-bar>
-
-    <section class="member-receipts__panel" aria-labelledby="member-receipts-results-title">
-      <div class="member-receipts__toolbar">
-        <div>
-          <h2 id="member-receipts-results-title" #resultsTitle tabindex="-1">Récapitulatifs</h2>
-          <p>Résumé en lecture seule, distinct du reçu officiel.</p>
-        </div>
-        @if (data()) {
-          <p class="member-receipts__count" aria-live="polite">
-            {{ totalItems() | number }}
-            {{ totalItems() === 1 ? 'récapitulatif' : 'récapitulatifs' }}
-          </p>
-        }
-      </div>
-
-      @switch (state()) {
-        @case ('loading') {
-          <cnpm-skeleton
-            variant="table"
-            [rows]="pageSize()"
-            [columns]="columns.length"
-            label="Chargement des récapitulatifs…"
-          />
-        }
-        @case ('error') {
-          <cnpm-error-state
-            variant="recoverable"
-            title="Les récapitulatifs n’ont pas pu être chargés"
-            description="Le service est momentanément indisponible. Réessayez dans un instant."
-          >
-            <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
-          </cnpm-error-state>
-        }
-        @case ('unavailable') {
-          <cnpm-error-state
-            variant="recoverable"
-            title="Reçus indisponibles en mode HTTP"
-            description="OpenAPI expose encore des ressources génériques sans projection membre ni contrat documentaire typé. Aucune fixture n’est injectée dans ce mode."
-          />
-        }
-        @case ('empty') {
-          <cnpm-empty-state
-            variant="no-data"
-            title="Aucun récapitulatif"
-            description="Aucun récapitulatif n’est encore disponible pour votre organisation."
-          />
-        }
-        @case ('no-result') {
-          <cnpm-empty-state
-            variant="no-results"
-            title="Aucun récapitulatif ne correspond"
-            description="Modifiez ou réinitialisez les filtres conservés dans l’adresse."
-          >
-            <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
-              Réinitialiser les filtres
-            </cnpm-button>
-          </cnpm-empty-state>
-        }
-        @case ('ready') {
-          <div class="member-receipts__desktop-table">
-            <cnpm-data-table
-              caption="Récapitulatifs : référence, période, date, montant, statut et lien de consultation."
-              [columns]="columns"
-              [rows]="receipts()"
-              [rowKey]="rowKey"
-            >
-              <ng-template #row let-receipt>
-                <td class="cnpm-table__cell">
-                  <code>{{ receipt.reference }}</code>
-                </td>
-                <td class="cnpm-table__cell">{{ receipt.periodLabel }}</td>
-                <td class="cnpm-table__cell">
-                  <time [attr.datetime]="receipt.scenarioDate">
-                    {{ receipt.scenarioDate | date: 'dd/MM/yyyy' }}
-                  </time>
-                </td>
-                <td class="cnpm-table__cell member-receipts__amount">
-                  {{ receipt.amountXof | number: '1.0-0' }} FCFA
-                </td>
-                <td class="cnpm-table__cell">
-                  <cnpm-badge [tone]="statusTone(receipt.status)">
-                    {{ statusLabel(receipt.status) }}
-                  </cnpm-badge>
-                </td>
-                <td class="cnpm-table__cell">
-                  <a
-                    class="member-receipts__detail-link"
-                    [routerLink]="['/member/receipts', receipt.id]"
-                    [queryParams]="detailQueryParams()"
-                    [attr.aria-label]="'Consulter le récapitulatif ' + receipt.reference"
-                  >
-                    Consulter
-                  </a>
-                </td>
-              </ng-template>
-            </cnpm-data-table>
+    @switch (state()) {
+      @case ('loading') {
+        <p class="member-receipts__status" role="status">Chargement de vos reçus…</p>
+      }
+      @case ('noMembership') {
+        <cnpm-alert tone="info" title="Aucune adhésion rattachée">
+          <p>Ce compte n’est rattaché à aucune adhésion cotisante.</p>
+        </cnpm-alert>
+      }
+      @case ('error') {
+        <cnpm-alert tone="error" title="Chargement impossible">
+          <p>Vos reçus n’ont pas pu être chargés.</p>
+          <cnpm-button variant="secondary" (click)="load()">Réessayer</cnpm-button>
+        </cnpm-alert>
+      }
+      @case ('ready') {
+        @if (receipts().length === 0) {
+          <cnpm-alert tone="info" title="Aucun reçu">
+            <p>
+              Aucun reçu officiel n’a encore été émis pour votre organisation. Un reçu est délivré
+              dès que la CNPM confirme un encaissement.
+            </p>
+          </cnpm-alert>
+        } @else {
+          <div class="member-receipts__totals">
+            <div class="member-receipts__total">
+              <span class="member-receipts__total-label">Total attesté</span>
+              <span class="member-receipts__total-value">
+                {{ total() | number: '1.0-0' : 'fr' }} FCFA
+              </span>
+            </div>
+            <div class="member-receipts__total">
+              <span class="member-receipts__total-label">Reçus émis</span>
+              <span class="member-receipts__total-value">{{ receipts().length }}</span>
+            </div>
           </div>
 
-          <ol class="member-receipts__mobile-list" aria-label="Récapitulatifs">
-            @for (receipt of receipts(); track receipt.id) {
-              <li>
-                <article [attr.aria-labelledby]="'member-receipt-' + receipt.id">
-                  <header>
-                    <div>
-                      <h3 [id]="'member-receipt-' + receipt.id">{{ receipt.reference }}</h3>
-                      <p>{{ receipt.periodLabel }}</p>
-                    </div>
-                    <cnpm-badge [tone]="statusTone(receipt.status)">
-                      {{ statusLabel(receipt.status) }}
-                    </cnpm-badge>
-                  </header>
-                  <dl>
-                    <div>
-                      <dt>Date</dt>
-                      <dd>{{ receipt.scenarioDate | date: 'dd/MM/yyyy' }}</dd>
-                    </div>
-                    <div>
-                      <dt>Montant</dt>
-                      <dd>{{ receipt.amountXof | number: '1.0-0' }} FCFA</dd>
-                    </div>
-                  </dl>
-                  <a
-                    class="member-receipts__detail-link"
-                    [routerLink]="['/member/receipts', receipt.id]"
-                    [queryParams]="detailQueryParams()"
-                    [attr.aria-label]="'Consulter le récapitulatif ' + receipt.reference"
-                  >
-                    Consulter le récapitulatif
-                  </a>
-                </article>
-              </li>
-            }
-          </ol>
+          <div class="member-receipts__table-wrap">
+            <table class="cnpm-table">
+              <thead>
+                <tr>
+                  <th scope="col">Reçu nº</th>
+                  <th scope="col">Référence</th>
+                  <th scope="col">Canal</th>
+                  <th scope="col" class="member-receipts__num">Montant</th>
+                  <th scope="col">Payé le</th>
+                  <th scope="col">Émis le</th>
+                  <th scope="col">Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (receipt of receipts(); track receipt.id) {
+                  <tr>
+                    <td class="member-receipts__mono">{{ receipt.receiptNumber }}</td>
+                    <td class="member-receipts__mono">{{ receipt.referenceValue ?? '—' }}</td>
+                    <td>{{ channelLabel(receipt.channel) }}</td>
+                    <td class="member-receipts__num">
+                      {{ receipt.amount | number: '1.0-0' : 'fr' }} {{ receipt.currency }}
+                    </td>
+                    <td>{{ receipt.paidAt ? (receipt.paidAt | slice: 0 : 10) : '—' }}</td>
+                    <td>{{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}</td>
+                    <td>
+                      <cnpm-badge [tone]="statusTone(receipt.status)">
+                        {{ statusLabel(receipt.status) }}
+                      </cnpm-badge>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
       }
-
-      @if (state() === 'ready') {
-        <cnpm-pagination
-          [page]="page()"
-          [pageSize]="pageSize()"
-          [totalItems]="totalItems()"
-          [pageSizeOptions]="pageSizes"
-          (pageChange)="onPageChange($event)"
-          (pageSizeChange)="onPageSizeChange($event)"
-        />
-      }
-    </section>
+    }
   </main>
 </cnpm-member-portal-shell>
