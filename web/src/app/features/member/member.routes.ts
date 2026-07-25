@@ -10,7 +10,7 @@ import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.ga
 import { MEMBER_DOCUMENTS_GATEWAY } from './documents/member-documents-gateway';
 import { DemoMemberHomeGateway } from './home/demo-member-home.gateway';
 import { MEMBER_HOME_GATEWAY } from './home/member-home-gateway';
-import { DemoMemberPaymentsGateway } from './payments/demo-member-payments.gateway';
+import { HttpMemberPaymentsGateway } from './payments/http-member-payments.gateway';
 import { MEMBER_PAYMENTS_GATEWAY } from './payments/member-payments-gateway';
 import { PAYMENT_INSTRUCTIONS_GATEWAY } from './payments/payment-instructions-gateway';
 import { HttpPaymentInstructionsGateway } from './payments/http-payment-instructions.gateway';
@@ -31,7 +31,6 @@ import {
   UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_HOME_GATEWAY,
-  UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY,
   UNAVAILABLE_MEMBER_RECEIPTS_GATEWAY,
   UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
@@ -99,15 +98,9 @@ export const memberRoutes: Routes = [
   {
     path: 'payments',
     providers: [
-      DemoMemberPaymentsGateway,
-      {
-        provide: MEMBER_PAYMENTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberPaymentsGateway)
-            : UNAVAILABLE_MEMBER_PAYMENTS_GATEWAY,
-      },
-      // Refonte « zéro démo » : les instructions de paiement n'ont qu'un adaptateur HTTP réel.
+      // Refonte « zéro démo » : historique réel et instructions de paiement, adaptateurs HTTP.
+      HttpMemberPaymentsGateway,
+      { provide: MEMBER_PAYMENTS_GATEWAY, useExisting: HttpMemberPaymentsGateway },
       HttpPaymentInstructionsGateway,
       { provide: PAYMENT_INSTRUCTIONS_GATEWAY, useExisting: HttpPaymentInstructionsGateway },
     ],
@@ -126,22 +119,6 @@ export const memberRoutes: Routes = [
             (module) => module.PaymentInstructionsPage,
           ),
         title: 'Comment payer — CNPM',
-      },
-      {
-        path: 'new',
-        loadComponent: () =>
-          import('./payments/new-member-payment.page').then(
-            (module) => module.NewMemberPaymentPage,
-          ),
-        title: 'Payer une cotisation — CNPM',
-      },
-      {
-        path: ':id/status',
-        loadComponent: () =>
-          import('./payments/member-payment-status.page').then(
-            (module) => module.MemberPaymentStatusPage,
-          ),
-        title: 'Suivi du paiement — CNPM',
       },
     ],
   },

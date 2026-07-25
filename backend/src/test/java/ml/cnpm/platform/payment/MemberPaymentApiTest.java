@@ -101,6 +101,64 @@ class MemberPaymentApiTest {
         // Compte d'encaissement ACTIF : diffusable. Compte en BROUILLON : jamais présenté.
         seedCollectionAccount("ORANGE_MONEY", "Compte principal CNPM", "+22370000000", "ACTIVE");
         seedCollectionAccount("WAVE", "Compte brouillon", "+22371111111", "DRAFT");
+
+        // Historique des encaissements : Alpha a un paiement CONFIRMÉ (reçu émis) et un paiement
+        // RÉCEPTIONNÉ sans reçu. Beta a un paiement isolé qui ne doit jamais fuir vers Alpha.
+        UUID alphaReferenceId = referenceId(ALPHA_REF);
+        UUID betaReferenceId = referenceId(BETA_REF);
+        UUID alphaConfirmed =
+                seedTransaction(
+                        alphaReferenceId,
+                        "CNPM-PAY-ALP-0001",
+                        "ORANGE_MONEY",
+                        "150000.00",
+                        "2026-07-24T10:00:00Z");
+        seedTransaction(
+                alphaReferenceId,
+                "CNPM-PAY-ALP-0002",
+                "WAVE",
+                "50000.00",
+                "2026-07-25T09:30:00Z");
+        seedReceipt(alphaConfirmed, "CNPM-REC-ALP-0001");
+        seedTransaction(
+                betaReferenceId,
+                "CNPM-PAY-BET-0001",
+                "BANK_TRANSFER",
+                "300000.00",
+                "2026-07-23T08:00:00Z");
+    }
+
+    private UUID referenceId(String value) {
+        return jdbcTemplate.queryForObject(
+                "SELECT id FROM payment.payment_reference WHERE reference_value = ?",
+                UUID.class,
+                value);
+    }
+
+    private UUID seedTransaction(
+            UUID referenceId, String number, String channel, String amount, String paidAt) {
+        return jdbcTemplate.queryForObject(
+                "INSERT INTO payment.payment_transaction (payment_reference_id, transaction_number,"
+                        + " channel, amount, paid_at, idempotency_key)"
+                        + " VALUES (?, ?, ?, ?::numeric, ?::timestamptz, ?) RETURNING id",
+                UUID.class,
+                referenceId,
+                number,
+                channel,
+                amount,
+                paidAt,
+                "idem-" + number);
+    }
+
+    private void seedReceipt(UUID transactionId, String receiptNumber) {
+        jdbcTemplate.update(
+                "INSERT INTO receipt.receipt (payment_transaction_id, receipt_number, issued_at,"
+                        + " status, document_id, verification_token_hash, issued_by)"
+                        + " VALUES (?, ?, now(), 'ISSUED', gen_random_uuid(), repeat('0', 64),"
+                        + " ?)",
+                transactionId,
+                receiptNumber,
+                professionalAccount);
     }
 
     private UUID seedMembership(String legalName, String number) {
@@ -188,6 +246,44 @@ class MemberPaymentApiTest {
     void refusesAccountWithoutMembership() throws Exception {
         mockMvc
                 .perform(get("/portal/payment-instructions").with(asMember(professionalAccount)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("restitue l’historique du cotisant avec l’état de confirmation par le reçu")
+    void showsOwnPaymentHistoryWithConfirmationState() throws Exception {
+        mockMvc
+                .perform(get("/portal/payments").with(asMember(alphaAccount)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.payments", hasSize(2)))
+                // Le plus récent d'abord (paid_at décroissant) : ALP-0002, non confirmé.
+                .andExpect(jsonPath("$.payments[0].transactionNumber").value("CNPM-PAY-ALP-0002"))
+                .andExpect(jsonPath("$.payments[0].confirmed").value(false))
+                .andExpect(jsonPath("$.payments[0].receiptNumber").doesNotExist())
+                // Le paiement confirmé porte son numéro de reçu officiel.
+                .andExpect(jsonPath("$.payments[1].transactionNumber").value("CNPM-PAY-ALP-0001"))
+                .andExpect(jsonPath("$.payments[1].confirmed").value(true))
+                .andExpect(jsonPath("$.payments[1].receiptNumber").value("CNPM-REC-ALP-0001"))
+                .andExpect(jsonPath("$.payments[1].referenceValue").value(ALPHA_REF));
+    }
+
+    @Test
+    @DisplayName("ne fait jamais fuir le paiement d’un autre cotisant")
+    void neverLeaksAnotherMembersPayment() throws Exception {
+        mockMvc
+                .perform(get("/portal/payments").with(asMember(alphaAccount)))
+                .andExpect(status().isOk())
+                .andExpect(
+                        jsonPath(
+                                "$.payments[*].transactionNumber",
+                                containsInAnyOrder("CNPM-PAY-ALP-0002", "CNPM-PAY-ALP-0001")));
+    }
+
+    @Test
+    @DisplayName("refuse l’historique d’un compte sans adhésion")
+    void refusesPaymentHistoryForAccountWithoutMembership() throws Exception {
+        mockMvc
+                .perform(get("/portal/payments").with(asMember(professionalAccount)))
                 .andExpect(status().isNotFound());
     }
 }

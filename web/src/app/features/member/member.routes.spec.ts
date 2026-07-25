@@ -20,17 +20,13 @@ describe('memberRoutes', () => {
     expect(route?.children?.[1]?.loadComponent).toBeTypeOf('function');
   });
 
-  it('expose MP-006, MP-004 puis MP-005 sous une composition de paiement fermée en HTTP', () => {
+  it('expose l’historique réel des paiements et les instructions sous une composition HTTP', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'payments');
-    // Deux fournisseurs pour MEMBER_PAYMENTS (démo/indisponible), plus les deux du port
+    // Le portail « Mes paiements » (MP-006) s’appuie sur un historique réel `GET /portal/payments` :
+    // gateway HTTP concrète + alias `useExisting`, plus les deux fournisseurs du port
     // toujours-HTTP des instructions de paiement (Lot 3, « zéro démo »).
     expect(route?.providers).toHaveLength(4);
-    expect(route?.children?.map((child) => child.path)).toEqual([
-      '',
-      'instructions',
-      'new',
-      ':id/status',
-    ]);
+    expect(route?.children?.map((child) => child.path)).toEqual(['', 'instructions']);
     expect(route?.children?.[0]).toMatchObject({ path: '', pathMatch: 'full' });
     expect(route?.children?.every((child) => child.loadComponent)).toBe(true);
     expect(route?.canActivate).toBeUndefined();

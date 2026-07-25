@@ -65,6 +65,46 @@ public class MemberPaymentQueryService {
         return new MemberPaymentInstructionsView.Instructions(references, accounts);
     }
 
+    /**
+     * Historique des encaissements du cotisant connecté.
+     *
+     * <p>Ne remonte que les encaissements rattachés à une référence de SON adhésion : un membre
+     * ne voit jamais le versement d'un autre. La confirmation CNPM se lit à la présence d'un reçu.
+     */
+    @PreAuthorize("hasAuthority('PERM_PAYMENT.READ')")
+    @Transactional(readOnly = true)
+    public MemberPaymentHistoryView.PaymentList payments(UUID accountId) {
+        UUID membershipId = requireMembership(accountId);
+        List<MemberPaymentHistoryView.Payment> payments =
+                jdbc.query(
+                        "SELECT pt.id, pt.transaction_number, pr.reference_value, pr.exercise,"
+                                + " pt.channel, pt.amount, pt.currency, pt.paid_at, r.receipt_number"
+                                + " FROM payment.payment_transaction pt"
+                                + " JOIN payment.payment_reference pr ON pr.id = pt.payment_reference_id"
+                                + " LEFT JOIN receipt.receipt r ON r.payment_transaction_id = pt.id"
+                                + "   AND r.status = 'ISSUED'"
+                                + " WHERE pr.membership_id = ?"
+                                + " ORDER BY pt.paid_at DESC",
+                        (rs, i) -> {
+                            java.time.OffsetDateTime paidAt =
+                                    rs.getObject("paid_at", java.time.OffsetDateTime.class);
+                            String receiptNumber = rs.getString("receipt_number");
+                            return new MemberPaymentHistoryView.Payment(
+                                    rs.getString("id"),
+                                    rs.getString("transaction_number"),
+                                    rs.getString("reference_value"),
+                                    rs.getObject("exercise", Integer.class),
+                                    rs.getString("channel"),
+                                    rs.getBigDecimal("amount"),
+                                    rs.getString("currency"),
+                                    paidAt == null ? null : paidAt.toString(),
+                                    receiptNumber != null,
+                                    receiptNumber);
+                        },
+                        membershipId);
+        return new MemberPaymentHistoryView.PaymentList(payments);
+    }
+
     /** Adhésion du compte connecté, ou refus si le compte n'en porte aucune. */
     private UUID requireMembership(UUID accountId) {
         return Optional.ofNullable(accountId)
