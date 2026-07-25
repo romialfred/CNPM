@@ -4,14 +4,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
+import ml.cnpm.platform.payment.application.IssuedReceipt;
 import ml.cnpm.platform.payment.application.PaymentRecording;
 import ml.cnpm.platform.payment.application.PaymentRecordingService;
 import ml.cnpm.platform.payment.application.PaymentTransactionView;
+import ml.cnpm.platform.payment.application.ReceiptService;
 import ml.cnpm.platform.shared.api.CorrelationId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,9 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
 
     private final PaymentRecordingService service;
+    private final ReceiptService receipts;
 
-    public PaymentController(PaymentRecordingService service) {
+    public PaymentController(PaymentRecordingService service, ReceiptService receipts) {
         this.service = service;
+        this.receipts = receipts;
     }
 
     @GetMapping("/payments")
@@ -56,6 +61,21 @@ public class PaymentController {
                         CorrelationId.current(request));
         return ResponseEntity.status(outcome.created() ? HttpStatus.CREATED : HttpStatus.OK)
                 .body(outcome.payment());
+    }
+
+    /**
+     * Confirme un encaissement rapproché et émet son reçu officiel.
+     *
+     * <p>Le jeton de vérification est révélé UNE SEULE FOIS dans cette réponse (il alimente le
+     * QR) ; à un rejeu, le reçu existant est renvoyé sans jeton.
+     */
+    @PostMapping("/payments/{id}/confirm")
+    public IssuedReceipt confirm(
+            @RequestHeader(name = "Idempotency-Key") @Size(min = 16, max = 160) String idempotencyKey,
+            @PathVariable("id") UUID id,
+            JwtAuthenticationToken authentication,
+            HttpServletRequest request) {
+        return receipts.confirmPayment(id, actorId(authentication), CorrelationId.current(request));
     }
 
     private static UUID actorId(JwtAuthenticationToken authentication) {
