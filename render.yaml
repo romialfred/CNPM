@@ -47,6 +47,11 @@ services:
       # Secret de signature des jetons natifs (HS256). Genere par Render, jamais commite.
       - key: APP_JWT_SECRET
         generateValue: true
+      # Cle de chiffrement AES-GCM des secrets TOTP (MFA). REQUISE hors profils dev/test/local :
+      # sans elle, MfaCryptoService leve MFA_ENCRYPTION_KEY_REQUIRED et l'app ne demarre pas.
+      # Generee et persistee par Render, jamais commitee.
+      - key: MFA_ENCRYPTION_KEY
+        generateValue: true
       # Bascule « adieu Keycloak » : le resource-server valide les jetons natifs.
       - key: CNPM_SECURITY_NATIVE_JWT_ENABLED
         value: "true"
