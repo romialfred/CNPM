@@ -1,9 +1,4 @@
-<cnpm-member-portal-shell
-  organization="Sahel Agro SA"
-  userName="Membre"
-  memberCode="CNPM-MEMBRE-000"
-  [notificationCount]="0"
->
+<cnpm-member-portal-shell>
   <main class="member-cnpm" id="contenu-principal">
     <cnpm-page-header
       title="Le CNPM"
@@ -11,13 +6,46 @@
     />
 
     <section class="member-cnpm__section" aria-labelledby="member-cnpm-news">
-      <h2 id="member-cnpm-news" class="member-cnpm__section-title">Actualités</h2>
+      <h2 id="member-cnpm-news" class="member-cnpm__section-title">Actualités & informations</h2>
       <div class="member-cnpm__panel">
-        <cnpm-empty-state
-          variant="no-data"
-          title="Aucune actualité publiée"
-          description="Les communications officielles du CNPM s’afficheront ici dès leur publication par l’équipe communication."
-        />
+        @switch (eventsState()) {
+          @case ('loading') {
+            <p class="member-cnpm__status" role="status">Chargement des actualités…</p>
+          }
+          @case ('error') {
+            <cnpm-empty-state
+              variant="no-data"
+              title="Actualités indisponibles"
+              description="Les actualités du CNPM n’ont pas pu être chargées pour le moment."
+            />
+          }
+          @case ('ready') {
+            @if (events().length === 0) {
+              <cnpm-empty-state
+                variant="no-data"
+                title="Aucune actualité publiée"
+                description="Les événements et communications officiels du CNPM s’afficheront ici dès leur publication."
+              />
+            } @else {
+              <ul class="member-cnpm__news">
+                @for (event of events(); track event.id) {
+                  <li class="member-cnpm__news-item">
+                    <span class="member-cnpm__news-icon" aria-hidden="true">
+                      <svg lucideCalendarDays></svg>
+                    </span>
+                    <span class="member-cnpm__news-body">
+                      <strong class="member-cnpm__news-title">{{ event.title }}</strong>
+                      <small class="member-cnpm__news-meta">
+                        {{ event.type }} ·
+                        {{ event.startAt | date: 'longDate' : undefined : 'fr' }}
+                      </small>
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        }
       </div>
     </section>
 

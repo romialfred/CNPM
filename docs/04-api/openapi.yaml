@@ -3029,6 +3029,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageResource'
+  /portal/events:
+    get:
+      tags:
+      - PORTAL
+      summary: Lister les actualités et événements publiés du CNPM.
+      operationId: getMemberEvents
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '200':
+          description: Événements CNPM publiés (hors brouillon et annulés)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResource'
   /portal/payment-instructions:
     get:
       tags:

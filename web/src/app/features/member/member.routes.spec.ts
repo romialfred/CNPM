@@ -96,11 +96,12 @@ describe('memberRoutes', () => {
     expect(route?.children).toBeUndefined();
   });
 
-  it('expose « Le CNPM » comme écran présentationnel, sans passerelle ni fixture', () => {
+  it('expose « Le CNPM » avec les actualités réelles (événements publiés)', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'cnpm');
     expect(route?.loadComponent).toBeTypeOf('function');
-    // Page institutionnelle sans données membre : aucune passerelle composée, aucun enfant.
-    expect(route?.providers).toBeUndefined();
+    // Les actualités sont désormais des données réelles (`GET /portal/events`) : gateway HTTP
+    // concrète + alias `useExisting`, sans enfant ni fixture.
+    expect(route?.providers).toHaveLength(2);
     expect(route?.children).toBeUndefined();
     expect(route?.canActivate).toBeUndefined();
   });

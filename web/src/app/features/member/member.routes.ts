@@ -4,6 +4,8 @@ import { CNPM_DATA_MODE } from '../../core/api/api.config';
 import { DemoMemberContributionsGateway } from './contributions/demo-member-contributions.gateway';
 import { HttpMemberContributionsGateway } from './contributions/http-member-contributions.gateway';
 import { MEMBER_CONTRIBUTIONS_GATEWAY } from './contributions/member-contributions-gateway';
+import { HttpMemberEventsGateway } from './cnpm/http-member-events.gateway';
+import { MEMBER_EVENTS_GATEWAY } from './cnpm/member-events.gateway';
 import { HttpMemberDirectoryGateway } from './directory/http-member-directory.gateway';
 import { MEMBER_DIRECTORY_GATEWAY } from './directory/member-directory.gateway';
 import { DemoMemberDocumentsGateway } from './documents/demo-member-documents.gateway';
@@ -254,10 +256,14 @@ export const memberRoutes: Routes = [
     ],
   },
   {
-    // Point d'entrée institutionnel « Le CNPM » : page présentationnelle, sans passerelle
-    // de données ni fixture membre. Elle n'expose que des actualités en état vide honnête
-    // et des accès vers des écrans existants.
+    // Point d'entrée institutionnel « Le CNPM » : les actualités sont les événements CNPM
+    // réellement publiés (`GET /portal/events`), en état vide honnête tant qu'aucun n'est
+    // publié ; s'y ajoutent des accès vers des écrans existants.
     path: 'cnpm',
+    providers: [
+      HttpMemberEventsGateway,
+      { provide: MEMBER_EVENTS_GATEWAY, useExisting: HttpMemberEventsGateway },
+    ],
     loadComponent: () => import('./cnpm/member-cnpm.page').then((module) => module.MemberCnpmPage),
     title: 'Le CNPM — actualités et informations',
   },
