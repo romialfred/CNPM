@@ -18,7 +18,7 @@ import { HttpMemberProfileGateway } from './profile/http-member-profile.gateway'
 import { MEMBER_PROFILE_GATEWAY } from './profile/member-profile-gateway';
 import { HttpMemberReceiptsGateway } from './receipts/http-member-receipts.gateway';
 import { MEMBER_RECEIPTS_GATEWAY } from './receipts/member-receipts-gateway';
-import { DemoMemberRequestsGateway } from './requests/demo-member-requests.gateway';
+import { HttpMemberRequestsGateway } from './requests/http-member-requests.gateway';
 import { MEMBER_REQUESTS_GATEWAY } from './requests/member-requests-gateway';
 import { pendingMemberRequestChangesGuard } from './requests/pending-member-request-changes.guard';
 import { DemoMemberShowcaseGateway } from './showcase/demo-member-showcase.gateway';
@@ -30,7 +30,6 @@ import { MEMBER_USERS_GATEWAY } from './users/member-users-gateway';
 import {
   UNAVAILABLE_MEMBER_DIRECTORY_GATEWAY,
   UNAVAILABLE_MEMBER_DOCUMENTS_GATEWAY,
-  UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_GATEWAY,
   UNAVAILABLE_MEMBER_SHOWCASE_ANALYTICS_GATEWAY,
   UNAVAILABLE_MEMBER_USERS_GATEWAY,
@@ -137,14 +136,9 @@ export const memberRoutes: Routes = [
   {
     path: 'requests',
     providers: [
-      DemoMemberRequestsGateway,
-      {
-        provide: MEMBER_REQUESTS_GATEWAY,
-        useFactory: () =>
-          inject(CNPM_DATA_MODE) === 'demo'
-            ? inject(DemoMemberRequestsGateway)
-            : UNAVAILABLE_MEMBER_REQUESTS_GATEWAY,
-      },
+      // Refonte « zéro démo » : requêtes réelles via /portal/requests*, bornées à l'organisation.
+      HttpMemberRequestsGateway,
+      { provide: MEMBER_REQUESTS_GATEWAY, useExisting: HttpMemberRequestsGateway },
     ],
     children: [
       {

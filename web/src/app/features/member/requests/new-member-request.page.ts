@@ -1,44 +1,27 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import {
-  AbstractControl,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
-import { finalize, take } from 'rxjs';
-import { CNPM_DATA_MODE } from '../../../core/api/api.config';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
-import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
-import {
-  InlineErrorSummaryComponent,
-  type CnpmFieldError,
-} from '../../../design-system/inline-error-summary/inline-error-summary.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
+import { ToastService } from '../../../design-system/toast/toast.service';
 import { MemberPortalShellComponent } from '../../../layout/member-portal-shell/member-portal-shell.component';
-import { memberRequestCategoryLabel } from './member-request-presenter';
 import {
   MEMBER_REQUESTS_GATEWAY,
-  type MemberRequestCategory,
-  type MemberRequestKind,
-  type SimulatedMemberAttachment,
+  type MemberRequestType,
 } from './member-requests-gateway';
-import {
-  formatSimulatedAttachmentSize,
-  MAX_SIMULATED_ATTACHMENTS,
-  selectSimulatedAttachments,
-} from './simulated-attachment';
+import { REQUEST_TYPE_LABELS } from './member-request-labels';
 
-const CATEGORIES: readonly MemberRequestCategory[] = [
-  'DEMO_INFORMATION',
-  'DEMO_DOCUMENT',
-  'DEMO_PORTAL',
-  'DEMO_CLAIM',
-];
+const REQUEST_TYPES: readonly MemberRequestType[] = ['INFORMATION', 'DOCUMENT', 'CLAIM', 'OTHER'];
 
-/** MP-010 — création d'une requête membre. */
+/**
+ * Espace membre — « Nouvelle requête » (MP-010) : soumission réelle d'une requête.
+ *
+ * <p>La création est idempotente côté serveur (clé d'idempotence). Une saisie non soumise est
+ * protégée à la navigation par {@link pendingMemberRequestChangesGuard}.
+ */
 @Component({
   selector: 'cnpm-new-member-request-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,154 +29,83 @@ const CATEGORIES: readonly MemberRequestCategory[] = [
     ReactiveFormsModule,
     RouterLink,
     MemberPortalShellComponent,
+    PageHeaderComponent,
     AlertComponent,
     ButtonComponent,
-    ErrorStateComponent,
-    InlineErrorSummaryComponent,
-    PageHeaderComponent,
   ],
   templateUrl: './new-member-request.page.html',
   styleUrl: './new-member-request.page.scss',
 })
 export class NewMemberRequestPage {
   private readonly gateway = inject(MEMBER_REQUESTS_GATEWAY);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly router = inject(Router);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly toasts = inject(ToastService);
+  private readonly title = inject(Title);
 
-  protected readonly demoMode = inject(CNPM_DATA_MODE) === 'demo';
-  protected readonly categories = CATEGORIES;
-  protected readonly maxAttachments = MAX_SIMULATED_ATTACHMENTS;
-  protected readonly form = this.formBuilder.group({
-    kind: this.formBuilder.control<MemberRequestKind | ''>('', Validators.required),
-    category: this.formBuilder.control<MemberRequestCategory | ''>('', Validators.required),
-    subject: this.formBuilder.control('', [trimmedRequired, Validators.maxLength(160)]),
-    description: this.formBuilder.control('', [
-      trimmedRequired,
-      trimmedMinLength(20),
-      Validators.maxLength(2000),
+  protected readonly types = REQUEST_TYPES;
+  protected readonly submitting = signal(false);
+  protected readonly submitted = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
+
+  protected readonly form = this.formBuilder.nonNullable.group({
+    type: this.formBuilder.nonNullable.control<MemberRequestType | ''>('', Validators.required),
+    subject: this.formBuilder.nonNullable.control('', [
+      Validators.required,
+      Validators.maxLength(255),
+    ]),
+    description: this.formBuilder.nonNullable.control('', [
+      Validators.required,
+      Validators.maxLength(4000),
     ]),
   });
-  protected readonly submitted = signal(false);
-  protected readonly submitting = signal(false);
-  protected readonly submitError = signal<string | null>(null);
-  protected readonly attachments = signal<readonly SimulatedMemberAttachment[]>([]);
-  protected readonly attachmentError = signal<string | null>(null);
-  private navigationAllowed = false;
 
-  protected formErrors(): readonly CnpmFieldError[] {
-    if (!this.submitted()) return [];
-    const errors: CnpmFieldError[] = [];
-    const controls = this.form.controls;
-    if (controls.kind.invalid) {
-      errors.push({ fieldId: 'new-request-kind', message: 'Choisissez le type de dossier.' });
+  constructor() {
+    this.title.setTitle('Nouvelle requête — Espace membre CNPM');
+  }
+
+  protected typeLabel(type: MemberRequestType): string {
+    return REQUEST_TYPE_LABELS[type];
+  }
+
+  /** Appelé par le guard : autorise la sortie si rien n'est en cours de saisie ou déjà soumis. */
+  confirmNavigation(): boolean {
+    if (this.submitted() || this.form.pristine) {
+      return true;
     }
-    if (controls.category.invalid) {
-      errors.push({
-        fieldId: 'new-request-category',
-        message: 'Choisissez une catégorie.',
-      });
-    }
-    if (controls.subject.hasError('required')) {
-      errors.push({ fieldId: 'new-request-subject', message: 'Saisissez un objet.' });
-    } else if (controls.subject.hasError('maxlength')) {
-      errors.push({
-        fieldId: 'new-request-subject',
-        message: 'Limitez l’objet à 160 caractères.',
-      });
-    }
-    if (controls.description.hasError('required')) {
-      errors.push({ fieldId: 'new-request-description', message: 'Décrivez votre demande.' });
-    } else if (controls.description.hasError('minlengthTrimmed')) {
-      errors.push({
-        fieldId: 'new-request-description',
-        message: 'Décrivez la demande en au moins 20 caractères.',
-      });
-    } else if (controls.description.hasError('maxlength')) {
-      errors.push({
-        fieldId: 'new-request-description',
-        message: 'Limitez la description à 2 000 caractères.',
-      });
-    }
-    return errors;
+    return window.confirm(
+      'Votre requête n’est pas envoyée. Quitter cette page perdra votre saisie. Continuer ?',
+    );
   }
 
   protected submit(): void {
-    this.submitted.set(true);
-    this.submitError.set(null);
-    this.form.markAllAsTouched();
-    if (!this.demoMode || this.form.invalid || this.submitting()) return;
-
-    const values = this.form.getRawValue();
-    if (!values.kind || !values.category) return;
+    if (this.form.invalid || this.submitting()) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const value = this.form.getRawValue();
     this.submitting.set(true);
+    this.errorMessage.set(null);
     this.gateway
       .create({
-        kind: values.kind,
-        category: values.category,
-        subject: values.subject.trim(),
-        description: values.description.trim(),
-        attachments: this.attachments(),
+        type: value.type as MemberRequestType,
+        subject: value.subject,
+        description: value.description,
       })
-      .pipe(
-        take(1),
-        finalize(() => this.submitting.set(false)),
-      )
+      .pipe(takeUntilDestroyed())
       .subscribe({
-        next: (created) => {
-          this.navigationAllowed = true;
-          this.form.markAsPristine();
-          void this.router.navigate(['/member/requests', created.id], {
-            queryParams: { created: '1' },
-          });
+        next: (detail) => {
+          this.submitted.set(true);
+          this.submitting.set(false);
+          this.toasts.success(`Requête ${detail.reference} envoyée à la CNPM.`);
+          void this.router.navigate(['/member/requests', detail.id]);
         },
         error: () => {
-          this.submitError.set(
-            'La création a échoué. Votre saisie et vos pièces jointes sont conservées.',
+          this.submitting.set(false);
+          this.errorMessage.set(
+            'Votre requête n’a pas pu être envoyée. Vos saisies sont conservées ; réessayez.',
           );
         },
       });
   }
-
-  protected selectFiles(input: HTMLInputElement): void {
-    const selection = selectSimulatedAttachments(
-      input.files,
-      this.attachments().length,
-      'new-member-request-attachment',
-    );
-    if (selection.accepted.length > 0) {
-      this.attachments.update((current) => [...current, ...selection.accepted]);
-      this.form.markAsDirty();
-    }
-    this.attachmentError.set(selection.error);
-    input.value = '';
-  }
-
-  protected removeAttachment(id: string): void {
-    this.attachments.update((current) => current.filter((attachment) => attachment.id !== id));
-    this.attachmentError.set(null);
-    this.form.markAsDirty();
-  }
-
-  protected categoryLabel = memberRequestCategoryLabel;
-  protected formatAttachmentSize = formatSimulatedAttachmentSize;
-
-  confirmNavigation(): boolean {
-    if (
-      this.navigationAllowed ||
-      this.submitting() ||
-      (!this.form.dirty && this.attachments().length === 0)
-    ) {
-      return true;
-    }
-    return globalThis.confirm('Quitter sans conserver cette requête ?');
-  }
-}
-
-function trimmedRequired(control: AbstractControl<string>): ValidationErrors | null {
-  return control.value.trim() ? null : { required: true };
-}
-
-function trimmedMinLength(minimum: number) {
-  return (control: AbstractControl<string>): ValidationErrors | null =>
-    control.value.trim().length >= minimum ? null : { minlengthTrimmed: { minimum } };
 }

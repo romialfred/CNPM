@@ -2,7 +2,6 @@ import { unavailableFeature$ } from '../../core/api/unavailable-feature';
 import type { MemberContributionsGateway } from './contributions/member-contributions-gateway';
 import type { MemberDirectoryGateway } from './directory/member-directory.gateway';
 import type { MemberDocumentsGateway } from './documents/member-documents-gateway';
-import type { MemberRequestsGateway } from './requests/member-requests-gateway';
 import type { MemberShowcaseGateway } from './showcase/member-showcase-gateway';
 import type { MemberShowcaseAnalyticsGateway } from './showcase-analytics/member-showcase-analytics.gateway';
 import type { MemberUsersGateway } from './users/member-users-gateway';
@@ -15,14 +14,6 @@ import type { MemberUsersGateway } from './users/member-users-gateway';
 export const UNAVAILABLE_MEMBER_CONTRIBUTIONS_GATEWAY: MemberContributionsGateway = {
   list: () => unavailableFeature$('MP-002'),
   loadDetail: () => unavailableFeature$('MP-003'),
-};
-
-/** OpenAPI ne porte encore que Resource/PageResource/ResourceInput pour ces routes. */
-export const UNAVAILABLE_MEMBER_REQUESTS_GATEWAY: MemberRequestsGateway = {
-  list: () => unavailableFeature$('MP-009'),
-  create: () => unavailableFeature$('MP-010'),
-  loadDetail: () => unavailableFeature$('MP-011'),
-  addMessage: () => unavailableFeature$('MP-011'),
 };
 
 /** `/portal/documents` ne décrit encore aucune projection documentaire membre typée. */
