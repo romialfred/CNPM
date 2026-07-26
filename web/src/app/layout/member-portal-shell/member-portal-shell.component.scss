@@ -1,3 +1,17 @@
+/* Retrait visuel réutilisé pour le rail réduit : le libellé reste dans l'arbre
+   d'accessibilité, seule sa peinture disparaît (`display: none` l'en retirerait). */
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 :host {
   display: block;
 }
@@ -10,6 +24,11 @@
   grid-template-columns: var(--cnpm-size-sidebar-expanded) minmax(0, 1fr);
   min-height: 100dvh;
   background: var(--cnpm-color-surface-page);
+}
+
+/* Rail réduit : la première piste passe à la largeur d'icônes (80 px). */
+.member-shell--collapsed {
+  grid-template-columns: var(--cnpm-size-sidebar-collapsed) minmax(0, 1fr);
 }
 
 .member-shell__skip-link {
@@ -34,13 +53,22 @@
 .member-shell__sidebar {
   position: sticky;
   inset-block-start: 0;
+  /* Au-dessus du header sticky : si une largeur venait à faire chevaucher les deux, la
+     barre reste devant plutôt que masquée. `100dvh` (et non `100vh`) suit la zone visible
+     réelle, alignée sur la grille — plus de désaccord en bas sur mobile. */
+  z-index: var(--cnpm-zIndex-sticky);
   display: flex;
   min-width: 0;
-  height: 100vh;
+  height: 100dvh;
   flex-direction: column;
   overflow-y: auto;
   border-inline-end: 1px solid var(--cnpm-chrome-border);
   background: var(--cnpm-chrome-surface);
+}
+
+.member-shell__sidebar :focus-visible {
+  outline: 2px solid var(--cnpm-chrome-focus);
+  outline-offset: 2px;
 }
 
 .member-shell__sidebar-head {
@@ -52,17 +80,30 @@
   border-block-end: 1px solid var(--cnpm-chrome-border);
 }
 
+/* Plaque claire sous le lockup : le fond navy avalerait le bleu du logo. Une plaque
+   discrète le pose proprement — l'équivalent du sigle « CNPM » servi en mode réduit. */
 .member-shell__brand {
   display: inline-flex;
   min-width: 0;
   align-items: center;
+  padding: var(--cnpm-space-1) var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-neutral-0);
 }
 
 .member-shell__brand img {
   display: block;
   width: auto;
-  height: 2.75rem;
+  height: 2.25rem;
   max-width: 100%;
+}
+
+.member-shell__compact-mark {
+  display: none;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-bold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  color: var(--cnpm-chrome-text);
 }
 
 .member-shell__drawer-close {
@@ -85,8 +126,12 @@
 
 .member-shell__nav {
   display: grid;
+  align-content: start;
   gap: var(--cnpm-space-4);
   padding: var(--cnpm-space-4) var(--cnpm-space-3) var(--cnpm-space-6);
+  /* Occupe l'espace disponible pour repousser le bouton de repli en bas de la barre. */
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .member-shell__group {
@@ -149,20 +194,21 @@
 
 .member-shell__item:hover {
   background: var(--cnpm-chrome-surface-raised);
-  color: var(--cnpm-color-text-primary);
+  color: var(--cnpm-chrome-text);
 }
 
-/* L'état actif n'est jamais porté par la seule couleur : liseré à gauche, fond teinté,
-   graisse renforcée et `aria-current="page"` le signalent conjointement. Le fond est un
-   cran plus soutenu que le survol (blue-100 vs blue-50), pour rester distinct. */
+/* L'état actif n'est jamais porté par la seule couleur : liseré à gauche, fond surélevé,
+   graisse renforcée et `aria-current="page"` le signalent conjointement. Sur le chrome
+   sombre, tout passe par les tokens de chrome (le fond surélevé se distingue du navy de
+   base, le liseré clair reste visible). */
 .member-shell__item--active {
-  background: var(--cnpm-color-brand-blue-100);
-  color: var(--cnpm-color-text-brand);
+  background: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-chrome-text);
   font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .member-shell__item--active .member-shell__item-icon {
-  color: var(--cnpm-color-text-brand);
+  color: var(--cnpm-chrome-text);
 }
 
 .member-shell__item--active::before {
@@ -171,8 +217,67 @@
   inset-inline-start: 0;
   width: var(--cnpm-space-1);
   border-radius: var(--cnpm-radius-pill);
-  background: var(--cnpm-color-brand-blue-700);
+  background: var(--cnpm-color-brand-blue-300);
   content: '';
+}
+
+/* Bouton de repli, épinglé en bas de la barre (la nav grandit au-dessus). */
+.member-shell__collapse {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  margin: var(--cnpm-space-3);
+  padding: var(--cnpm-space-3);
+  min-height: var(--cnpm-size-control-md);
+  border: 1px solid var(--cnpm-chrome-control-border);
+  border-radius: var(--cnpm-radius-md);
+  background: transparent;
+  color: var(--cnpm-chrome-text-secondary);
+  font: inherit;
+  font-size: var(--cnpm-font-size-sm);
+  cursor: pointer;
+}
+
+.member-shell__collapse svg {
+  flex: none;
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+}
+
+.member-shell__collapse:hover {
+  background: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-chrome-text);
+}
+
+/* État réduit : seuls les pictogrammes subsistent. Les libellés sortent de la peinture
+   mais restent annoncés — réduire la barre ne doit pas amputer la navigation au clavier
+   ou au lecteur d'écran. */
+.member-shell--collapsed {
+  .member-shell__item-label,
+  .member-shell__group-title,
+  .member-shell__collapse-label {
+    @include visually-hidden;
+  }
+
+  .member-shell__brand {
+    padding: 0;
+    background: transparent;
+  }
+
+  .member-shell__brand img {
+    display: none;
+  }
+
+  .member-shell__compact-mark {
+    display: inline;
+  }
+
+  .member-shell__item,
+  .member-shell__collapse,
+  .member-shell__sidebar-head {
+    justify-content: center;
+  }
 }
 
 /* ------------------------------------------------------------------------ Cadre */
@@ -290,9 +395,83 @@
 
 /* ----------------------------------------------------- Tiroir sous 1024 px */
 
+/* Palier tablette : la barre se réduit d'office au rail (place comptée), le bouton de repli
+   s'efface — l'état est imposé par la largeur, pas par le membre. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .member-shell,
+  .member-shell--collapsed {
+    grid-template-columns: var(--cnpm-size-sidebar-collapsed) minmax(0, 1fr);
+  }
+
+  .member-shell__item-label,
+  .member-shell__group-title,
+  .member-shell__collapse-label {
+    @include visually-hidden;
+  }
+
+  .member-shell__brand {
+    padding: 0;
+    background: transparent;
+  }
+
+  .member-shell__brand img {
+    display: none;
+  }
+
+  .member-shell__compact-mark {
+    display: inline;
+  }
+
+  .member-shell__item,
+  .member-shell__sidebar-head {
+    justify-content: center;
+  }
+
+  .member-shell__collapse {
+    display: none;
+  }
+}
+
 @media (max-width: 63.9375rem) {
-  .member-shell {
+  /* Le tiroir a la place : l'état réduit du desktop ne doit pas y amputer les libellés. */
+  .member-shell,
+  .member-shell--collapsed {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .member-shell--collapsed {
+    .member-shell__item-label,
+    .member-shell__group-title,
+    .member-shell__collapse-label {
+      position: static;
+      width: auto;
+      height: auto;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+    }
+
+    .member-shell__brand {
+      padding: var(--cnpm-space-1) var(--cnpm-space-3);
+      background: var(--cnpm-color-neutral-0);
+    }
+
+    .member-shell__brand img {
+      display: block;
+    }
+
+    .member-shell__compact-mark {
+      display: none;
+    }
+
+    .member-shell__item,
+    .member-shell__sidebar-head {
+      justify-content: flex-start;
+    }
+  }
+
+  .member-shell__collapse {
+    display: none;
   }
 
   /* Hors tiroir ouvert, la barre sort de l'écran. `visibility: hidden` la retire du

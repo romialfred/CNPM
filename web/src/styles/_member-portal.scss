@@ -5,12 +5,30 @@
 // chaque composant. Elles s'appuient sur les accents décoratifs `.cnpm-tile-accent--*`
 // et l'élévation `.cnpm-liftable` déjà fournis par `_accents.scss`.
 
+// Cadrage de page : `--cnpm-layout-page` / `--cnpm-size-content` n'existent pas dans les
+// tokens — leur absence invalidait `padding` et `max-width`, collant le contenu aux bords
+// sous le header (impression de « header qui déborde »). On reprend les vrais tokens, avec
+// des paliers responsive alignés sur le chrome admin (mobile → tablette → desktop).
 .mp-page {
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-5);
-  padding: var(--cnpm-layout-page);
-  max-width: var(--cnpm-size-content);
+  width: 100%;
+  max-width: var(--cnpm-size-contentMax);
+  margin-inline: auto;
+  padding: var(--cnpm-layout-pagePaddingMobile);
+}
+
+@media (min-width: 768px) {
+  .mp-page {
+    padding: var(--cnpm-layout-pagePaddingTablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .mp-page {
+    padding: var(--cnpm-layout-pagePaddingDesktop);
+  }
 }
 
 .mp-status {
@@ -137,6 +155,11 @@
   align-items: flex-end;
 }
 
+/* Pousse un contrôle de barre d'outils (bascule d'affichage…) à l'extrémité. */
+.mp-toolbar__end {
+  margin-inline-start: auto;
+}
+
 .mp-field {
   display: flex;
   flex-direction: column;
@@ -150,13 +173,8 @@
   }
 }
 
-/* ── Table encadrée (cadre + coins arrondis autour de .cnpm-table) ── */
-.mp-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-  background: var(--cnpm-color-surface-primary);
-}
+/* Le cadre des tables passe désormais par `.cnpm-table__scroll` (source unique du système
+   de tableaux) : `.mp-table-wrap` doublait cette enveloppe, il a été retiré. */
 
 .mp-num {
   text-align: right;

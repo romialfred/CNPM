@@ -20,6 +20,8 @@ import {
   LucideMenu,
   LucideMessageSquareText,
   LucideNewspaper,
+  LucidePanelLeftClose,
+  LucidePanelLeftOpen,
   LucideReceiptText,
   LucideStore,
   LucideUsersRound,
@@ -93,6 +95,8 @@ interface MemberNavGroup {
     LucideMenu,
     LucideMessageSquareText,
     LucideNewspaper,
+    LucidePanelLeftClose,
+    LucidePanelLeftOpen,
     LucideReceiptText,
     LucideStore,
     LucideUsersRound,
@@ -121,6 +125,18 @@ export class MemberPortalShellComponent implements OnDestroy {
 
   /** Tiroir de navigation sous 1024 px. Sur desktop, la barre latérale est permanente. */
   protected readonly drawerOpen = signal(false);
+
+  /**
+   * Repli desktop de la barre latérale (rail d'icônes). Porté du back-office pour offrir au
+   * membre la même maîtrise de l'espace : réduire la barre libère de la largeur sans masquer
+   * la navigation (les libellés restent annoncés aux lecteurs d'écran). Sans effet sous
+   * 1024 px, où la barre est un tiroir modal toujours large.
+   */
+  protected readonly collapsed = signal(false);
+
+  protected toggleCollapsed(): void {
+    this.collapsed.update((value) => !value);
+  }
 
   /**
    * Navigation à la voix du membre. « Le CNPM » réunit les accès institutionnels : ses

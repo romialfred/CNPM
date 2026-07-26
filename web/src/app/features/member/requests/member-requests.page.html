@@ -31,31 +31,33 @@
             </p>
           </cnpm-alert>
         } @else {
-          <div class="mp-table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Référence</th>
-                  <th scope="col">Type</th>
-                  <th scope="col">Objet</th>
-                  <th scope="col">Statut</th>
-                  <th scope="col">Mise à jour</th>
+                  <th scope="col" class="cnpm-table__cell">Référence</th>
+                  <th scope="col" class="cnpm-table__cell">Type</th>
+                  <th scope="col" class="cnpm-table__cell">Objet</th>
+                  <th scope="col" class="cnpm-table__cell">Statut</th>
+                  <th scope="col" class="cnpm-table__cell">Mise à jour</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (request of requests(); track request.id) {
-                  <tr>
-                    <td class="mp-mono">
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell mp-mono">
                       <a [routerLink]="['/member/requests', request.id]">{{ request.reference }}</a>
                     </td>
-                    <td>{{ typeLabel(request.type) }}</td>
-                    <td class="mp-strong">{{ request.subject }}</td>
-                    <td>
+                    <td class="cnpm-table__cell">{{ typeLabel(request.type) }}</td>
+                    <td class="cnpm-table__cell mp-strong">{{ request.subject }}</td>
+                    <td class="cnpm-table__cell">
                       <cnpm-badge [tone]="statusTone(request.status)">
                         {{ statusLabel(request.status) }}
                       </cnpm-badge>
                     </td>
-                    <td>{{ request.updatedAt ? (request.updatedAt | slice: 0 : 10) : '—' }}</td>
+                    <td class="cnpm-table__cell">
+                      {{ request.updatedAt ? (request.updatedAt | slice: 0 : 10) : '—' }}
+                    </td>
                   </tr>
                 }
               </tbody>

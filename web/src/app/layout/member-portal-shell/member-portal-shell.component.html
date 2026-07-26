@@ -8,7 +8,11 @@
   >Aller au contenu principal</a
 >
 
-<div class="member-shell" [class.member-shell--drawer-open]="drawerOpen()">
+<div
+  class="member-shell"
+  [class.member-shell--drawer-open]="drawerOpen()"
+  [class.member-shell--collapsed]="collapsed()"
+>
   <!-- Voile du tiroir mobile. Décoratif : la fermeture au clavier passe par Échap et par
        le bouton dédié, jamais par ce bloc. -->
   @if (drawerOpen()) {
@@ -16,7 +20,7 @@
   }
 
   <aside
-    class="member-shell__sidebar"
+    class="member-shell__sidebar cnpm-chrome--dark"
     id="member-navigation"
     [attr.role]="drawerOpen() ? 'dialog' : null"
     [attr.aria-modal]="drawerOpen() ? 'true' : null"
@@ -33,6 +37,7 @@
           src="/assets/brand/logo-CNPM-lockup.png"
           alt="CNPM — Conseil National du Patronat du Mali"
         />
+        <span class="member-shell__compact-mark" aria-hidden="true">CNPM</span>
       </a>
       <button
         type="button"
@@ -108,6 +113,24 @@
         </div>
       }
     </nav>
+
+    <!-- Repli desktop : bascule le rail d'icônes. `aria-expanded` porte l'état ouvert/réduit ;
+         `aria-controls` désigne la navigation pilotée. Masqué sous 1024 px (tiroir modal). -->
+    <button
+      type="button"
+      class="member-shell__collapse"
+      [attr.aria-expanded]="!collapsed()"
+      aria-controls="member-navigation"
+      [attr.aria-label]="collapsed() ? 'Déployer la navigation' : 'Réduire la navigation'"
+      (click)="toggleCollapsed()"
+    >
+      @if (collapsed()) {
+        <svg lucidePanelLeftOpen aria-hidden="true"></svg>
+      } @else {
+        <svg lucidePanelLeftClose aria-hidden="true"></svg>
+        <span class="member-shell__collapse-label">Réduire</span>
+      }
+    </button>
   </aside>
 
   <div

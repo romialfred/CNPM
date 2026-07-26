@@ -43,36 +43,85 @@
             </article>
           </section>
 
-          <div class="mp-table-wrap">
-            <table class="cnpm-table">
-              <thead>
+          <div class="mp-toolbar">
+            <cnpm-view-toggle
+              class="mp-toolbar__end"
+              label="Affichage des utilisateurs"
+              [value]="view()"
+              (valueChange)="setView($event)"
+            />
+          </div>
+
+          @if (view() === 'grille') {
+            <div class="cnpm-card-grid">
+              @for (user of users(); track user.id) {
+                <article class="cnpm-tile-card cnpm-liftable cnpm-tile-accent--blue">
+                  <div class="cnpm-tile-card__head">
+                    <cnpm-monogram [name]="user.displayName" size="lg" />
+                    <div class="cnpm-tile-card__id">
+                      <p class="cnpm-tile-card__title">{{ user.displayName }}</p>
+                      <p class="cnpm-tile-card__sub">{{ user.email }}</p>
+                    </div>
+                  </div>
+                  <div class="cnpm-tile-card__chips">
+                    <span class="cnpm-chip">{{ user.roleLabel }}</span>
+                    <cnpm-badge [tone]="statusTone(user.status)">
+                      {{ statusLabel(user.status) }}
+                    </cnpm-badge>
+                  </div>
+                  <dl class="cnpm-tile-card__meta">
+                    <div class="cnpm-tile-card__row">
+                      <dt>Dernière connexion</dt>
+                      <dd>
+                        {{ user.lastActivityAt ? (user.lastActivityAt | slice: 0 : 10) : 'Jamais' }}
+                      </dd>
+                    </div>
+                  </dl>
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="cnpm-table__scroll">
+              <table class="cnpm-table">
+                <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Nom</th>
-                  <th scope="col">Courriel</th>
-                  <th scope="col">Rôle</th>
-                  <th scope="col">Statut</th>
-                  <th scope="col">Dernière connexion</th>
+                  <th scope="col" class="cnpm-table__cell">Utilisateur</th>
+                  <th scope="col" class="cnpm-table__cell">Rôle</th>
+                  <th scope="col" class="cnpm-table__cell">Statut</th>
+                  <th scope="col" class="cnpm-table__cell">Dernière connexion</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (user of users(); track user.id) {
-                  <tr>
-                    <td class="mp-strong">{{ user.displayName }}</td>
-                    <td class="mp-mono">{{ user.email }}</td>
-                    <td>{{ user.roleLabel }}</td>
-                    <td>
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell">
+                      <div class="cnpm-cell-id">
+                        <cnpm-monogram [name]="user.displayName" />
+                        <div class="cnpm-cell-id__text">
+                          <span class="cnpm-cell-id__title">{{ user.displayName }}</span>
+                          <span class="cnpm-cell-id__sub cnpm-cell-id__sub--mono">{{
+                            user.email
+                          }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="cnpm-table__cell">
+                      <span class="cnpm-chip">{{ user.roleLabel }}</span>
+                    </td>
+                    <td class="cnpm-table__cell">
                       <cnpm-badge [tone]="statusTone(user.status)">
                         {{ statusLabel(user.status) }}
                       </cnpm-badge>
                     </td>
-                    <td>
+                    <td class="cnpm-table__cell">
                       {{ user.lastActivityAt ? (user.lastActivityAt | slice: 0 : 10) : 'Jamais' }}
                     </td>
                   </tr>
                 }
               </tbody>
-            </table>
-          </div>
+              </table>
+            </div>
+          }
         }
       }
     }

@@ -59,6 +59,15 @@
   height: var(--cnpm-space-12);
 }
 
+/* Sur le chrome sombre, le lockup coloré s'effacerait sur le navy : une plaque claire
+   discrète le pose proprement (l'équivalent du sigle « CNPM » servi en mode réduit). */
+:host-context(.cnpm-chrome--dark) .cnpm-sidebar__logo-viewport {
+  width: auto;
+  padding: var(--cnpm-space-1) var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-neutral-0);
+}
+
 .cnpm-sidebar__compact-mark {
   display: none;
   font-size: var(--cnpm-font-size-sm);

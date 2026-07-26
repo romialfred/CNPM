@@ -1,0 +1,86 @@
+/* Grille de tuiles + carte d'entité — pendant « affichage tuile » des listes (annuaire,
+   utilisateurs…). Inspiré de Medicore, en tokens CNPM : filet supérieur d'accent, coins de
+   carte (12 px), bordure avant ombre. Réutilise `.cnpm-tile-accent--*` et `.cnpm-liftable`
+   (`_accents.scss`), le monogramme et les puces (`_table.scss`). */
+
+.cnpm-card-grid {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  /* 1 colonne en mobile, puis autant que la largeur le permet (≈ 17 rem par carte). */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+}
+
+.cnpm-tile-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  border-block-start: 3px solid var(--cnpm-tile-accent, var(--cnpm-color-border-strong));
+}
+
+.cnpm-tile-card__head {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-tile-card__id {
+  display: grid;
+  min-width: 0;
+}
+
+.cnpm-tile-card__title {
+  margin: 0;
+  overflow: hidden;
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnpm-tile-card__sub {
+  margin: 0;
+  overflow: hidden;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnpm-tile-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+}
+
+/* Ligne de détails (paires libellé/valeur), séparée de l'en-tête par un filet fin. */
+.cnpm-tile-card__meta {
+  display: grid;
+  gap: var(--cnpm-space-2);
+  padding-block-start: var(--cnpm-space-4);
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-tile-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-tile-card__row dt {
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-tile-card__row dd {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+}

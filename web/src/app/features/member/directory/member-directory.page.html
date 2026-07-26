@@ -17,6 +17,12 @@
           placeholder="Nom de l’organisation…"
         />
       </div>
+      <cnpm-view-toggle
+        class="mp-toolbar__end"
+        label="Affichage de l’annuaire"
+        [value]="view()"
+        (valueChange)="setView($event)"
+      />
     </div>
 
     @switch (state()) {
@@ -34,24 +40,56 @@
           <cnpm-alert tone="info" title="Aucun résultat">
             <p>Aucune organisation membre active ne correspond à votre recherche.</p>
           </cnpm-alert>
+        } @else if (view() === 'grille') {
+          <div class="cnpm-card-grid">
+            @for (organization of organizations(); track organization.id) {
+              <article class="cnpm-tile-card cnpm-liftable cnpm-tile-accent--indigo">
+                <div class="cnpm-tile-card__head">
+                  <cnpm-monogram [name]="organization.name" size="lg" />
+                  <div class="cnpm-tile-card__id">
+                    <p class="cnpm-tile-card__title">{{ organization.name }}</p>
+                    <p class="cnpm-tile-card__sub">
+                      Membre depuis
+                      {{ organization.memberSince ? (organization.memberSince | slice: 0 : 4) : '—' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="cnpm-tile-card__chips">
+                  <span class="cnpm-chip">{{ organization.sector }}</span>
+                  <span class="cnpm-chip">{{ organization.category }}</span>
+                </div>
+              </article>
+            }
+          </div>
         } @else {
-          <div class="mp-table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Organisation</th>
-                  <th scope="col">Secteur</th>
-                  <th scope="col">Catégorie</th>
-                  <th scope="col">Membre depuis</th>
+                  <th scope="col" class="cnpm-table__cell">Organisation</th>
+                  <th scope="col" class="cnpm-table__cell">Secteur</th>
+                  <th scope="col" class="cnpm-table__cell">Catégorie</th>
+                  <th scope="col" class="cnpm-table__cell">Membre depuis</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (organization of organizations(); track organization.id) {
-                  <tr>
-                    <td class="mp-strong">{{ organization.name }}</td>
-                    <td>{{ organization.sector }}</td>
-                    <td>{{ organization.category }}</td>
-                    <td>
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell">
+                      <div class="cnpm-cell-id">
+                        <cnpm-monogram [name]="organization.name" />
+                        <div class="cnpm-cell-id__text">
+                          <span class="cnpm-cell-id__title">{{ organization.name }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="cnpm-table__cell">
+                      <span class="cnpm-chip">{{ organization.sector }}</span>
+                    </td>
+                    <td class="cnpm-table__cell">
+                      <span class="cnpm-chip">{{ organization.category }}</span>
+                    </td>
+                    <td class="cnpm-table__cell">
                       {{
                         organization.memberSince
                           ? (organization.memberSince | slice: 0 : 4)

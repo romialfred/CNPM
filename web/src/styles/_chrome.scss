@@ -37,6 +37,67 @@
   --cnpm-chrome-focus: var(--cnpm-color-brand-blue-700);
 }
 
+/* Chrome SOMBRE de la navigation latérale (décision utilisateur : sidebar bleu profond
+   de marque, inspiration Medicore — révision de UX-DEC-016, à consigner en gouvernance).
+   Le fond navy reste au CHROME ; le contenu des pages demeure blanc/neutre. Appliqué via
+   la classe `.cnpm-chrome--dark` posée sur la racine de chaque sidebar — UN seul endroit
+   redéfinit le chrome, comme le reste du fichier. Aucune valeur propre : tout dérive des
+   tokens de marque (color-mix pour les crans intermédiaires).
+
+   Contrastes vérifiés sur le fond `brand-blue-900` (#14205F) :
+     texte blanc (#FFFFFF)            ~15,3:1  (AA texte)
+     texte secondaire blue-200        ~11,0:1  (AA texte)
+     texte discret  blue-300           ~8,1:1  (AA texte)
+     bordure de contrôle blue-400      ~4,0:1  (≥3:1, WCAG 1.4.11)
+     anneau de focus blanc            ~15,3:1  (≥3:1)
+   Le liseré d'actif reprend `--cnpm-nav-accent` (teintes claires ci-dessous, toutes ≥3:1). */
+.cnpm-chrome--dark {
+  --cnpm-chrome-surface: var(--cnpm-color-brand-blue-900);
+  /* Cran éclairci pour survol/actif : navy + 8 % de blanc, sans introduire de hex. */
+  --cnpm-chrome-surface-raised: color-mix(
+    in srgb,
+    var(--cnpm-color-neutral-0) 8%,
+    var(--cnpm-color-brand-blue-900)
+  );
+  --cnpm-chrome-text: var(--cnpm-color-neutral-0);
+  --cnpm-chrome-text-secondary: var(--cnpm-color-brand-blue-200);
+  --cnpm-chrome-text-muted: var(--cnpm-color-brand-blue-300);
+  /* Séparateur décoratif : voile blanc léger (aucun seuil de contraste ne s'y applique). */
+  --cnpm-chrome-border: color-mix(in srgb, var(--cnpm-color-neutral-0) 12%, transparent);
+  /* Limite de contrôle soumise au 3:1 : blue-400 donne 4,0:1 sur le navy. */
+  --cnpm-chrome-control-border: var(--cnpm-color-brand-blue-400);
+  /* Anneau du produit inutilisable sur navy (1,63:1) : anneau blanc, 15,3:1. */
+  --cnpm-chrome-focus: var(--cnpm-color-neutral-0);
+}
+
+/* Accents de domaine — variantes claires pour le fond navy (le clair par défaut plus bas
+   reste servi au chrome clair éventuel). Toutes ≥3:1 sur `brand-blue-900`. */
+.cnpm-chrome--dark {
+  .cnpm-nav-accent--dashboard {
+    --cnpm-nav-accent: var(--cnpm-color-brand-blue-300);
+  }
+
+  .cnpm-nav-accent--repertoire {
+    --cnpm-nav-accent: var(--cnpm-color-semantic-info-500);
+  }
+
+  .cnpm-nav-accent--recouvrement {
+    --cnpm-nav-accent: var(--cnpm-color-semantic-success-500);
+  }
+
+  .cnpm-nav-accent--relation {
+    --cnpm-nav-accent: var(--cnpm-color-semantic-warning-500);
+  }
+
+  .cnpm-nav-accent--supervision {
+    --cnpm-nav-accent: var(--cnpm-color-brand-blue-400);
+  }
+
+  .cnpm-nav-accent--administration {
+    --cnpm-nav-accent: var(--cnpm-color-neutral-400);
+  }
+}
+
 /* Accents de domaine de la navigation.
    Une couleur par famille. Contrastes mesurés sur le fond clair, seuil de 3:1 des
    éléments d'interface non textuels :
