@@ -15,8 +15,8 @@ class CnpmMfaRolePolicyTest {
     @DisplayName("exige le 2FA pour tout rôle réel, y compris le membre standard")
     void requiresMfaForEveryRealRole() {
         assertThat(policy.requiresMfa("MEMBRE_UTILISATEUR")).isTrue();
-        assertThat(policy.requiresMfa("SUPER_ADMIN_TECH")).isTrue();
-        assertThat(policy.requiresMfa(List.of("AUDITEUR_INTERNE"))).isTrue();
+        assertThat(policy.requiresMfa("ADMINISTRATEUR")).isTrue();
+        assertThat(policy.requiresMfa(List.of("AGENT_RECOUVREMENT"))).isTrue();
         // Absence d'identité : rien à exiger.
         assertThat(policy.requiresMfa("")).isFalse();
         assertThat(policy.requiresMfa((String) null)).isFalse();
@@ -24,18 +24,18 @@ class CnpmMfaRolePolicyTest {
     }
 
     @Test
-    @DisplayName("réserve la gestion du second facteur au super-admin et à l'admin sécurité")
+    @DisplayName("réserve la gestion du second facteur à l'administrateur")
     void restrictsMfaManagement() {
-        assertThat(policy.canManageMfa(List.of("ADMIN_SECURITE"))).isTrue();
-        assertThat(policy.canManageMfa(List.of("SUPER_ADMIN_TECH"))).isTrue();
-        assertThat(policy.canManageMfa(List.of("MEMBRE_UTILISATEUR", "COMPTABLE"))).isFalse();
+        assertThat(policy.canManageMfa(List.of("ADMINISTRATEUR"))).isTrue();
+        assertThat(policy.canManageMfa(List.of("AGENT_RECOUVREMENT"))).isFalse();
+        assertThat(policy.canManageMfa(List.of("MEMBRE_UTILISATEUR", "REFERENT_GROUPEMENT"))).isFalse();
         assertThat(policy.canManageMfa(List.of())).isFalse();
     }
 
     @Test
     @DisplayName("normalise casse, accents, tirets et espaces")
     void normalizesRoleTokens() {
-        assertThat(policy.canManageMfa(List.of("admin-securité"))).isTrue();
+        assertThat(policy.canManageMfa(List.of("administrateur"))).isTrue();
         assertThat(policy.isCanonicalRole("membre utilisateur")).isTrue();
         assertThat(policy.isCanonicalRole("ROLE_INEXISTANT")).isFalse();
     }

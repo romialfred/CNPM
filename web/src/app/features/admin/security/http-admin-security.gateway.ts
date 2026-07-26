@@ -134,25 +134,24 @@ export class HttpAdminSecurityGateway implements AdminSecurityGateway {
       : error;
   }
 
+  /**
+   * Accorde ou retire une permission à un rôle via {@code POST
+   * /admin/security/roles/{roleId}/permissions}. Le backend porte l'habilitation
+   * ({@code IAM.ROLE.ASSIGN}), la transaction et l'audit, puis renvoie la ligne de matrice
+   * à jour. Aucune clé d'idempotence : l'opération est idempotente par nature (ON
+   * CONFLICT DO NOTHING / DELETE).
+   */
   setPermissionGrant(
     permissionId: string,
     roleId: string,
     granted: boolean,
   ): Observable<PermissionRow> {
-    return this.unavailable(
-      `la mise à jour de la matrice (permission ${permissionId}, rôle ${roleId}, accordé=${granted})`,
-    );
-  }
-
-  /**
-   * Aucun endpoint ne modifie encore la matrice des permissions : on échoue explicitement
-   * (en nommant l'action tentée) plutôt que de simuler une mutation qui n'aurait pas lieu.
-   */
-  private unavailable<T>(action: string): Observable<T> {
-    return throwError(
-      () =>
-        new Error(`Action indisponible (${action}) : la matrice des droits est en lecture seule.`),
-    );
+    return this.http
+      .post<PermissionRow>(
+        buildCnpmApiUrl(this.baseUrl, `admin/security/roles/${encodeURIComponent(roleId)}/permissions`),
+        { permissionId, granted },
+      )
+      .pipe(catchError((error: unknown) => throwError(() => this.mapError(error))));
   }
 
   /** Filtre l'instantané par la recherche ; les compteurs (avant recherche) sont conservés. */

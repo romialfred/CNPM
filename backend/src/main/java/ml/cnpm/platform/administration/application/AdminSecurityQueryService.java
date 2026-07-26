@@ -52,9 +52,22 @@ public class AdminSecurityQueryService {
                 new AdminSecurityView.PolicyItem("Sessions", "Jeton applicatif, expiration 8 h"),
                 new AdminSecurityView.PolicyItem("Séparation des tâches", "Appliquée côté serveur (RBAC)"));
 
+        // L'édition de la matrice n'est ouverte que si l'appelant porte IAM.ROLE.ASSIGN.
+        // La décision reste côté serveur (le endpoint d'octroi la re-vérifie) ; ce drapeau ne
+        // fait qu'éviter d'offrir une commande vouée au 403.
+        boolean canManagePermissions = hasAuthority("PERM_IAM.ROLE.ASSIGN");
+
         return new AdminSecurityView(
                 accounts, roles, permissions, List.of(), List.of(), policy, posture, counts,
-                membersWithoutAccount(), false);
+                membersWithoutAccount(), canManagePermissions);
+    }
+
+    private static boolean hasAuthority(String authority) {
+        var context = org.springframework.security.core.context.SecurityContextHolder.getContext();
+        var auth = context == null ? null : context.getAuthentication();
+        return auth != null
+                && auth.getAuthorities().stream()
+                        .anyMatch(granted -> authority.equals(granted.getAuthority()));
     }
 
     /**

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import ml.cnpm.platform.administration.application.AdminAccountCreation;
 import ml.cnpm.platform.administration.application.AdminAccountService;
+import ml.cnpm.platform.administration.application.AdminRolePermissionService;
 import ml.cnpm.platform.administration.application.AdminSecurityQueryService;
 import ml.cnpm.platform.administration.application.AdminSecurityView;
 import ml.cnpm.platform.shared.api.CorrelationId;
@@ -34,14 +35,17 @@ public class AdminSecurityController {
 
     private final AdminSecurityQueryService service;
     private final AdminAccountService accounts;
+    private final AdminRolePermissionService rolePermissions;
     private final AccountCredentialService credentials;
 
     public AdminSecurityController(
             AdminSecurityQueryService service,
             AdminAccountService accounts,
+            AdminRolePermissionService rolePermissions,
             AccountCredentialService credentials) {
         this.service = service;
         this.accounts = accounts;
+        this.rolePermissions = rolePermissions;
         this.credentials = credentials;
     }
 
@@ -105,6 +109,24 @@ public class AdminSecurityController {
             HttpServletRequest request) {
         accounts.delete(
                 accountId, input.reason(), actorId(authentication), CorrelationId.current(request));
+    }
+
+    /**
+     * Accorde ou retire une permission à un rôle (matrice d'octroi). Restitue la ligne de
+     * matrice à jour. L'autorisation fine ({@code IAM.ROLE.ASSIGN}) est portée par le service.
+     */
+    @PostMapping("/admin/security/roles/{roleId}/permissions")
+    public AdminSecurityView.PermissionRow setRolePermission(
+            @PathVariable("roleId") UUID roleId,
+            @Valid @RequestBody RolePermissionInput input,
+            JwtAuthenticationToken authentication,
+            HttpServletRequest request) {
+        return rolePermissions.setGrant(
+                roleId,
+                input.permissionId(),
+                input.granted(),
+                actorId(authentication),
+                CorrelationId.current(request));
     }
 
     @PostMapping("/admin/security/accounts/{accountId}/two-factor/reset")

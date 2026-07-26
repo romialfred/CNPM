@@ -1,29 +1,25 @@
 # Matrice RBAC
 
+> **Refonte RBAC (périmètre TDR, migration `V26`).** Le catalogue de rôles a été réduit
+> aux acteurs réellement demandés par le TDR, augmenté d'un rôle `ADMINISTRATEUR`
+> (tous droits). Les 14 rôles de conception antérieurs (direction, comptable, caissier,
+> auditeurs, juridique, communication, support, prestataire technique, administrateur
+> sécurité, secrétaire général, validateur d'enrôlement…) sont retirés. Les **codes de
+> permission** (66) sont inchangés : côté écran, l'octroi se fait désormais **par module du
+> sidebar** (Gestion des membres, Cotisation & Recouvrement, Relance, Supervision,
+> Administration, Paramètres) sur trois niveaux — Lecture / Écriture / Tous. Voir la décision
+> d'écart TDR↔RBAC dans `docs/00-governance/open-decisions.md`.
+
 ## Rôles
 
 | Code | Rôle | 2FA | Risque | Description |
 |---|---|---|---|---|
-| `SUPER_ADMIN_TECH` | Superadministrateur technique | Obligatoire | Très élevé | Exploitation de la plateforme, sans droits métier implicites. |
-| `ADMIN_FONCTIONNEL` | Administrateur fonctionnel CNPM | Obligatoire | Élevé | Paramétrage fonctionnel, référentiels et administration métier. |
-| `SECRETAIRE_GENERAL` | Secrétaire général | Obligatoire | Élevé | Supervision institutionnelle et validations stratégiques. |
-| `DIRECTION_GENERALE` | Direction générale | Obligatoire | Élevé | Pilotage global, décisions et consultation décisionnelle. |
-| `DIRECTION_FINANCIERE` | Direction financière | Obligatoire | Élevé | Supervision des cotisations, paiements, rapprochements et primes. |
-| `COMPTABLE` | Comptable | Obligatoire | Élevé | Traitements comptables, rapprochement et confirmation financière. |
-| `CAISSIER` | Caissier | Obligatoire | Élevé | Enregistrement des encaissements et pièces de caisse. |
-| `AGENT_RECOUVREMENT` | Agent de recouvrement | Obligatoire | Élevé | Campagnes, relances, promesses de paiement et suivi terrain. |
-| `VALIDATEUR_ENROLEMENT` | Validateur des enrôlements | Obligatoire | Élevé | Contrôle KYC et décision d’activation des adhésions. |
-| `RESPONSABLE_GROUPEMENT` | Responsable de groupement | Obligatoire | Moyen | Pilotage des membres et activités de son groupement. |
+| `ADMINISTRATEUR` | Administrateur CNPM | Obligatoire | Très élevé | Administration complète de la plateforme : tous les droits sur tous les modules. |
+| `AGENT_RECOUVREMENT` | Agent de recouvrement | Obligatoire | Élevé | Campagnes, relances, promesses de paiement et suivi terrain (TDR §3.1.3). |
+| `RESPONSABLE_GROUPEMENT` | Responsable de groupement | Obligatoire | Moyen | Pilotage des membres et activités de son groupement (TDR §3.2.3). |
 | `REFERENT_GROUPEMENT` | Référent de groupement | Obligatoire | Moyen | Enrôlement assisté et suivi opérationnel de son périmètre. |
-| `AUDITEUR_INTERNE` | Auditeur interne | Obligatoire | Élevé | Consultation des journaux, états, preuves et contrôles. |
-| `AUDITEUR_EXTERNE` | Auditeur externe | Obligatoire | Élevé | Accès temporaire, en lecture seule, aux périmètres mandatés. |
-| `JURIDIQUE` | Service juridique | Obligatoire | Élevé | Réclamations, contentieux, contrats et conformité. |
-| `COMMUNICATION` | Service communication | Obligatoire | Moyen | Campagnes institutionnelles et contenus non financiers. |
 | `MEMBRE_ADMIN` | Administrateur de l’entreprise membre | Obligatoire | Élevé | Administration du compte entreprise et de ses utilisateurs. |
 | `MEMBRE_UTILISATEUR` | Utilisateur de l’entreprise membre | Selon politique | Moyen | Consultation et opérations déléguées par son entreprise. |
-| `SUPPORT` | Support fonctionnel | Obligatoire | Moyen | Assistance et consultation limitée, sans validation financière. |
-| `PRESTATAIRE_TECH` | Prestataire technique | Obligatoire | Très élevé | Maintenance contrôlée et accès temporaire tracé. |
-| `ADMIN_SECURITE` | Administrateur sécurité | Obligatoire | Très élevé | Politiques d’accès, 2FA, revues et incidents de sécurité. |
 
 ## Permissions par rôle
 

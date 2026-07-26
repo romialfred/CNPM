@@ -25,15 +25,12 @@ import org.springframework.stereotype.Component;
 public class CnpmMfaRolePolicy {
 
     /** Rôles habilités à réinitialiser / désactiver un second facteur (séparation des tâches). */
-    private static final Set<String> MFA_MANAGER_ROLES = Set.of("SUPER_ADMIN_TECH", "ADMIN_SECURITE");
+    private static final Set<String> MFA_MANAGER_ROLES = Set.of("ADMINISTRATEUR");
 
-    /** Vingt rôles canoniques du dépôt (docs/05-security/rbac-grants.csv). */
+    /** Rôles canoniques du dépôt après refonte RBAC (périmètre TDR + ADMINISTRATEUR). */
     private static final Set<String> CANONICAL_ROLES = Set.of(
-            "SUPER_ADMIN_TECH", "ADMIN_SECURITE", "PRESTATAIRE_TECH", "ADMIN_FONCTIONNEL",
-            "DIRECTION_GENERALE", "DIRECTION_FINANCIERE", "SECRETAIRE_GENERAL", "COMPTABLE",
-            "CAISSIER", "AGENT_RECOUVREMENT", "COMMUNICATION", "JURIDIQUE", "VALIDATEUR_ENROLEMENT",
-            "SUPPORT", "RESPONSABLE_GROUPEMENT", "REFERENT_GROUPEMENT", "MEMBRE_ADMIN",
-            "AUDITEUR_INTERNE", "AUDITEUR_EXTERNE", "MEMBRE_UTILISATEUR");
+            "ADMINISTRATEUR", "AGENT_RECOUVREMENT", "RESPONSABLE_GROUPEMENT",
+            "REFERENT_GROUPEMENT", "MEMBRE_ADMIN", "MEMBRE_UTILISATEUR");
 
     /**
      * Un rôle donné exige-t-il le 2FA ? Universel à CNPM : tout rôle réel l'exige. Un rôle

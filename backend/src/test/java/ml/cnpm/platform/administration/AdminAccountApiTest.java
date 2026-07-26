@@ -77,7 +77,7 @@ class AdminAccountApiTest {
         // Rôle réellement semé par V3 : le test n'invente pas de référentiel.
         this.roleId =
                 jdbcTemplate.queryForObject(
-                        "SELECT id::text FROM iam.role WHERE code = 'ADMIN_SECURITE'", String.class);
+                        "SELECT id::text FROM iam.role WHERE code = 'ADMINISTRATEUR'", String.class);
     }
 
     /** Opérateur habilité à la vie des comptes : création (avec rôle) et changement d'état. */

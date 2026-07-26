@@ -153,8 +153,7 @@ class SecurityConfigTest {
                                                                                 Map.of(
                                                                                         "roles",
                                                                                         List.of(
-                                                                                                "COMPTABLE",
-                                                                                                "SUPPORT"))))
+                                                                                                "ADMINISTRATEUR"))))
                                                 .authorities(
                                                         new KeycloakAuthoritiesConverter(
                                                                 permissionDirectory))))
@@ -163,8 +162,7 @@ class SecurityConfigTest {
                 .andExpect(jsonPath("$.username").value("acomptable"))
                 .andExpect(jsonPath("$.email").value("a.comptable@example.test"))
                 .andExpect(jsonPath("$.roles").isArray())
-                .andExpect(jsonPath("$.roles[0]").value("COMPTABLE"))
-                .andExpect(jsonPath("$.roles[1]").value("SUPPORT"))
+                .andExpect(jsonPath("$.roles[0]").value("ADMINISTRATEUR"))
                 .andExpect(jsonPath("$.permissions").isArray())
                 .andExpect(
                         jsonPath("$.permissions")

@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
  * sont fournis par l'environnement, le compte est créé dans {@code iam.user_account} (s'il
  * est absent) avec une empreinte bcrypt du mot de passe, puis ses rôles sont réconciliés à
  * partir de {@code CNPM_BOOTSTRAP_ADMIN_ROLE} (liste séparée par des virgules, défaut
- * {@code SUPER_ADMIN_TECH,ADMIN_FONCTIONNEL} — accès sans restriction du super-admin, cf.
- * AUTH-DEC-021). Le mot de passe n'est JAMAIS dans le dépôt : il vient de l'environnement.
+ * {@code ADMINISTRATEUR} — l'administrateur CNPM disposant de tous les droits, cf. refonte RBAC
+ * périmètre TDR). Le mot de passe n'est JAMAIS dans le dépôt : il vient de l'environnement.
  * Le compte naît avec le second facteur à enrôler (mfa_enabled = false).
  *
  * <p>Idempotent : relancer l'application n'écrase ni le compte ni son mot de passe ; elle
@@ -46,7 +46,7 @@ public class NativeAdminBootstrap {
             @Value("${CNPM_BOOTSTRAP_ADMIN_EMAIL:}") String email,
             @Value("${CNPM_BOOTSTRAP_ADMIN_PASSWORD:}") String password,
             @Value("${CNPM_BOOTSTRAP_ADMIN_NAME:Super administrateur}") String displayName,
-            @Value("${CNPM_BOOTSTRAP_ADMIN_ROLE:SUPER_ADMIN_TECH,ADMIN_FONCTIONNEL}") String roleCode) {
+            @Value("${CNPM_BOOTSTRAP_ADMIN_ROLE:ADMINISTRATEUR}") String roleCode) {
         this.jdbc = jdbc;
         this.passwordEncoder = passwordEncoder;
         this.email = email;

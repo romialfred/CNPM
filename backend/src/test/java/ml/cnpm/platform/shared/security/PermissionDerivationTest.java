@@ -56,11 +56,11 @@ class PermissionDerivationTest {
 
     @Test
     void mapsAdminFunctionalRoleToItsSeededPermissions() {
-        Set<String> permissions = directory.permissionsFor(Set.of("ADMIN_FONCTIONNEL"));
-        assertTrue(permissions.contains("MEMBER.READ"), "ADMIN_FONCTIONNEL doit porter MEMBER.READ");
+        Set<String> permissions = directory.permissionsFor(Set.of("ADMINISTRATEUR"));
+        assertTrue(permissions.contains("MEMBER.READ"), "ADMINISTRATEUR doit porter MEMBER.READ");
         assertTrue(
                 permissions.contains("ADMIN.REFERENTIAL.READ"),
-                "ADMIN_FONCTIONNEL doit porter ADMIN.REFERENTIAL.READ");
+                "ADMINISTRATEUR doit porter ADMIN.REFERENTIAL.READ");
     }
 
     @Test
@@ -83,13 +83,13 @@ class PermissionDerivationTest {
                 Jwt.withTokenValue("t")
                         .header("alg", "none")
                         .subject("u")
-                        .claim("realm_access", Map.of("roles", List.of("ADMIN_FONCTIONNEL")))
+                        .claim("realm_access", Map.of("roles", List.of("ADMINISTRATEUR")))
                         .build();
         Set<String> authorities =
                 jwtAuthenticationConverter.convert(jwt).getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toSet());
-        assertTrue(authorities.contains("ROLE_ADMIN_FONCTIONNEL"));
+        assertTrue(authorities.contains("ROLE_ADMINISTRATEUR"));
         assertTrue(authorities.contains("PERM_MEMBER.READ"));
     }
 
@@ -99,7 +99,7 @@ class PermissionDerivationTest {
                 Jwt.withTokenValue("t")
                         .header("alg", "none")
                         .subject("u")
-                        .claim("realm_access", Map.of("roles", List.of("ADMIN_FONCTIONNEL")))
+                        .claim("realm_access", Map.of("roles", List.of("ADMINISTRATEUR")))
                         .build();
 
         Set<String> authorities =
@@ -109,7 +109,7 @@ class PermissionDerivationTest {
                         .collect(java.util.stream.Collectors.toSet());
 
         // Le rôle reste exposé ET la permission en est dérivée.
-        assertTrue(authorities.contains("ROLE_ADMIN_FONCTIONNEL"));
+        assertTrue(authorities.contains("ROLE_ADMINISTRATEUR"));
         assertTrue(authorities.contains("PERM_MEMBER.READ"));
     }
 

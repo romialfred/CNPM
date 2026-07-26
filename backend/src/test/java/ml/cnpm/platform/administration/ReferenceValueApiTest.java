@@ -89,7 +89,7 @@ class ReferenceValueApiTest {
     }
 
     private static RequestPostProcessor asFunctionalAdmin() {
-        return jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN_FONCTIONNEL"));
+        return jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMINISTRATEUR"));
     }
 
     @Test
@@ -357,7 +357,7 @@ class ReferenceValueApiTest {
                                                 jwt()
                                                         .jwt(j -> j.subject(subject))
                                                         .authorities(
-                                                                new SimpleGrantedAuthority("ROLE_ADMIN_FONCTIONNEL"))))
+                                                                new SimpleGrantedAuthority("ROLE_ADMINISTRATEUR"))))
                         .andExpect(status().isCreated())
                         .andReturn()
                         .getResponse()

@@ -194,125 +194,6 @@
   white-space: nowrap;
 }
 
-/* Les actions restent sur une ligne : un tableau se lit en balayant les lignes, et des
-   lignes deux fois plus hautes coûtent plus cher que le défilement qu'elles évitent. */
-/* ---------------------------- Matrice des droits ---------------------------- */
-
-.cnpm-security__permission-head {
-  font-weight: var(--cnpm-font-weight-regular);
-}
-
-.cnpm-security__grant {
-  text-align: center;
-}
-
-/* La forme distingue déjà les deux cas ; la couleur ne fait que la renforcer, et
-   chaque cellule porte en plus un texte lu par les technologies d'assistance. */
-.cnpm-security__grant-yes {
-  color: var(--cnpm-color-semantic-success-700);
-  vertical-align: middle;
-}
-
-.cnpm-security__grant-no {
-  color: var(--cnpm-color-text-disabled);
-  vertical-align: middle;
-}
-
-/* Cellule éditable : bouton bascule. L'état « accordé » est porté par le pictogramme,
-   `aria-pressed` ET la couleur — jamais la couleur seule. */
-.cnpm-security__grant-toggle {
-  display: inline-grid;
-  width: var(--cnpm-size-control-sm);
-  height: var(--cnpm-size-control-sm);
-  place-items: center;
-  border: 1px solid var(--cnpm-color-border-default);
-  border-radius: var(--cnpm-radius-sm);
-  background: var(--cnpm-color-surface-primary);
-  color: var(--cnpm-color-text-disabled);
-  cursor: pointer;
-}
-
-.cnpm-security__grant-toggle:hover:not(:disabled) {
-  border-color: var(--cnpm-color-brand-blue-300);
-}
-
-.cnpm-security__grant-toggle:focus-visible {
-  outline: 2px solid var(--cnpm-color-brand-blue-700);
-  outline-offset: 1px;
-}
-
-.cnpm-security__grant-toggle:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.cnpm-security__grant-toggle--on {
-  border-color: var(--cnpm-color-semantic-success-600);
-  background: var(--cnpm-color-semantic-success-50);
-  color: var(--cnpm-color-semantic-success-700);
-}
-
-.cnpm-security__legend {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--cnpm-space-4);
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-security__legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--cnpm-space-2);
-}
-
-.cnpm-security__subtitle {
-  margin: 0;
-  font-size: var(--cnpm-font-size-md);
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-primary);
-}
-
-.cnpm-security__roles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: var(--cnpm-space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Bordure plutôt qu'ombre, surface blanche : `ux-ui.md` proscrit les cadres colorés et
-   les ombres lourdes, et la carte ne sert ici qu'au regroupement sémantique. */
-.cnpm-security__role {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-1);
-  padding: var(--cnpm-space-4);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  border-radius: var(--cnpm-radius-lg);
-  background-color: var(--cnpm-color-surface-primary);
-}
-
-.cnpm-security__role-name {
-  margin: 0;
-  font-weight: var(--cnpm-font-weight-semibold);
-  color: var(--cnpm-color-text-brand);
-}
-
-.cnpm-security__role-description {
-  margin: 0;
-  font-size: var(--cnpm-font-size-sm);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-security__role-count {
-  margin: 0;
-  font-size: var(--cnpm-font-size-xs);
-  color: var(--cnpm-color-text-muted);
-}
 
 @media (max-width: 767px) {
   .cnpm-security__input {
@@ -338,14 +219,7 @@
 
   .cnpm-security__filter {
     width: 100%;
-  }
-
-  /* Reflow à 320 px : les cartes de rôle passent sur une colonne unique plutôt que
-     d'imposer une largeur minimale que la page ne peut pas offrir. */
-  .cnpm-security__roles {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+  }}
 
 /* Actions de ligne : boutons compacts alignés, s'enroulant si la colonne est étroite. */
 .cnpm-security__row-actions {
@@ -489,4 +363,155 @@
   margin: 0;
   color: var(--cnpm-color-text-muted);
   font-size: var(--cnpm-font-size-xs);
+}
+
+/* ── Refonte : octroi des droits par module (grille de toggles) ── */
+.cnpm-security__role-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin-bottom: var(--cnpm-space-4);
+}
+
+.cnpm-security__role-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-surface-primary);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--cnpm-color-border-strong);
+  }
+
+  &--active {
+    border-color: var(--cnpm-color-brand-blue-700);
+    background: var(--cnpm-color-brand-blue-50);
+    color: var(--cnpm-color-brand-blue-700);
+    font-weight: var(--cnpm-font-weight-semibold);
+  }
+}
+
+.cnpm-security__role-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding: 0 5px;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.cnpm-security__grid-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-security__grid-col {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.cnpm-security__grid-module {
+  text-align: start;
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__grid-cell {
+  text-align: center;
+}
+
+/* Interrupteur On (vert) / Off (rouge) / Partiel (ambre) */
+.cnpm-security__switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-surface-primary);
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cnpm-color-border-focus, var(--cnpm-color-brand-blue-700));
+    outline-offset: 2px;
+  }
+}
+
+.cnpm-security__switch-track {
+  position: relative;
+  display: inline-block;
+  inline-size: 2rem;
+  block-size: 1.1rem;
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-semantic-error-500, #e40c20);
+  transition: background var(--cnpm-motion-duration-fast, 120ms) ease;
+}
+
+.cnpm-security__switch-thumb {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  inline-size: 0.8rem;
+  block-size: 0.8rem;
+  border-radius: 50%;
+  background: var(--cnpm-color-surface-primary, #fff);
+  transition: inset-inline-start var(--cnpm-motion-duration-fast, 120ms) ease;
+}
+
+.cnpm-security__switch-text {
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-semantic-error-600, #b00817);
+  min-inline-size: 3.2rem;
+  text-align: start;
+}
+
+.cnpm-security__switch--on {
+  border-color: var(--cnpm-color-semantic-success-500, #1f9d55);
+
+  .cnpm-security__switch-track {
+    background: var(--cnpm-color-semantic-success-500, #1f9d55);
+  }
+
+  .cnpm-security__switch-thumb {
+    inset-inline-start: calc(100% - 0.8rem - 2px);
+  }
+
+  .cnpm-security__switch-text {
+    color: var(--cnpm-color-semantic-success-600, #197a43);
+  }
+}
+
+.cnpm-security__switch--partial {
+  border-color: var(--cnpm-color-semantic-warning-500, #d97706);
+
+  .cnpm-security__switch-track {
+    background: var(--cnpm-color-semantic-warning-500, #d97706);
+  }
+
+  .cnpm-security__switch-thumb {
+    inset-inline-start: calc(50% - 0.4rem);
+  }
+
+  .cnpm-security__switch-text {
+    color: var(--cnpm-color-semantic-warning-600, #b45309);
+  }
 }
