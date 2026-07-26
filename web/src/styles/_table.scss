@@ -203,3 +203,130 @@
     transition: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Cellules composables — monogramme d'identité, puces et actions. Partagées par
+   les tableaux et les tuiles (mêmes recettes visuelles). Toutes en tokens ; le
+   rouge de marque reste hors des teintes de monogramme (réservé au critique).
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Monogramme : pastille carrée à initiales. Teintes douces déterministes (voir
+   `MonogramComponent`) — fond clair de la famille, texte foncé de la même famille
+   (contraste ≥ 4,5:1 partout). */
+.cnpm-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--cnpm-space-8);
+  height: var(--cnpm-space-8);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-avatar-bg, var(--cnpm-color-surface-subtle));
+  color: var(--cnpm-avatar-fg, var(--cnpm-color-text-secondary));
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.cnpm-avatar--lg {
+  width: var(--cnpm-space-12);
+  height: var(--cnpm-space-12);
+  border-radius: var(--cnpm-radius-lg);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-avatar--1 {
+  --cnpm-avatar-bg: var(--cnpm-color-brand-blue-100);
+  --cnpm-avatar-fg: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-avatar--2 {
+  --cnpm-avatar-bg: var(--cnpm-color-semantic-info-50);
+  --cnpm-avatar-fg: var(--cnpm-color-semantic-info-700);
+}
+
+.cnpm-avatar--3 {
+  --cnpm-avatar-bg: var(--cnpm-color-semantic-success-50);
+  --cnpm-avatar-fg: var(--cnpm-color-semantic-success-700);
+}
+
+.cnpm-avatar--4 {
+  --cnpm-avatar-bg: var(--cnpm-color-semantic-warning-50);
+  --cnpm-avatar-fg: var(--cnpm-color-semantic-warning-700);
+}
+
+.cnpm-avatar--5 {
+  --cnpm-avatar-bg: var(--cnpm-color-neutral-100);
+  --cnpm-avatar-fg: var(--cnpm-color-neutral-700);
+}
+
+/* Cellule d'identité : monogramme + titre + sous-ligne (matricule, courriel, secteur…). */
+.cnpm-cell-id {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  min-width: 0;
+}
+
+.cnpm-cell-id__text {
+  display: grid;
+  min-width: 0;
+}
+
+.cnpm-cell-id__title {
+  overflow: hidden;
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnpm-cell-id__sub {
+  overflow: hidden;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnpm-cell-id__sub--mono {
+  font-family: var(--cnpm-font-family-mono);
+}
+
+/* Puce d'information (secteur, catégorie, rôle…). Neutre par défaut ; un point ou une
+   icône peut la précéder — le statut n'est jamais porté par la seule couleur. */
+.cnpm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-1) var(--cnpm-space-3);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+  white-space: nowrap;
+}
+
+.cnpm-chip svg {
+  flex: none;
+  width: var(--cnpm-size-icon-xs);
+  height: var(--cnpm-size-icon-xs);
+}
+
+.cnpm-chip__dot {
+  flex: none;
+  width: var(--cnpm-space-2);
+  height: var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-pill);
+  background: currentcolor;
+}
+
+/* Actions de fin de ligne : boutons/icônes compacts, alignés à droite. */
+.cnpm-cell-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  justify-content: flex-end;
+}

@@ -54,35 +54,37 @@
             </article>
           </section>
 
-          <div class="mp-table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Transaction</th>
-                  <th scope="col">Référence</th>
-                  <th scope="col">Canal</th>
-                  <th scope="col" class="mp-num">Montant</th>
-                  <th scope="col">Payé le</th>
-                  <th scope="col">Statut</th>
-                  <th scope="col">Reçu</th>
+                  <th scope="col" class="cnpm-table__cell">Transaction</th>
+                  <th scope="col" class="cnpm-table__cell">Référence</th>
+                  <th scope="col" class="cnpm-table__cell">Canal</th>
+                  <th scope="col" class="cnpm-table__cell cnpm-table__cell--end">Montant</th>
+                  <th scope="col" class="cnpm-table__cell">Payé le</th>
+                  <th scope="col" class="cnpm-table__cell">Statut</th>
+                  <th scope="col" class="cnpm-table__cell">Reçu</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (payment of payments(); track payment.id) {
-                  <tr>
-                    <td class="mp-mono">{{ payment.transactionNumber }}</td>
-                    <td class="mp-mono">{{ payment.referenceValue ?? '—' }}</td>
-                    <td>{{ channelLabel(payment.channel) }}</td>
-                    <td class="mp-num mp-strong">
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell mp-mono">{{ payment.transactionNumber }}</td>
+                    <td class="cnpm-table__cell mp-mono">{{ payment.referenceValue ?? '—' }}</td>
+                    <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
+                    <td class="cnpm-table__cell cnpm-table__cell--end mp-strong">
                       {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
                     </td>
-                    <td>{{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}</td>
-                    <td>
+                    <td class="cnpm-table__cell">
+                      {{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}
+                    </td>
+                    <td class="cnpm-table__cell">
                       <cnpm-badge [tone]="statusTone(payment.confirmed)">
                         {{ statusLabel(payment.confirmed) }}
                       </cnpm-badge>
                     </td>
-                    <td class="mp-mono">{{ payment.receiptNumber ?? '—' }}</td>
+                    <td class="cnpm-table__cell mp-mono">{{ payment.receiptNumber ?? '—' }}</td>
                   </tr>
                 }
               </tbody>

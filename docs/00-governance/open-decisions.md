@@ -38,7 +38,7 @@ Le fichier machine `docs/ui-handoff/data/open-decisions.json` conserve les déta
 | UX-DEC-012 | Sémantique du sélecteur d'espace (AUTH-001) | Trancher entre patron ARIA `tablist` et `radiogroup` pour le choix administration/membre | Produit / UX + Accessibilité | Moyen | Ouverte |
 | UX-DEC-013 | Modèle de consentement des contacts publics | Définir le recueil, la conservation, la révocation et la revérification du consentement à publier des coordonnées | Juridique / DPO + Communication | Élevé | Ouverte |
 | UX-DEC-015 | Nombre d'entrées de la navigation publique | Arbitrer entre les huit entrées de REF-PUB-001 et le regroupement en quatre menus déroulants demandé par le client | Produit / UX + Communication | Moyen | Ouverte |
-| UX-DEC-016 | Chrome sombre de l'espace d'administration | Écart refermé : le chrome sombre est abandonné au profit d'un fond clair conforme à la règle des surfaces blanches ; reste la teinte de « Supervision », faute de turquoise dans les tokens | Produit / UX | Faible | Refermée |
+| UX-DEC-016 | Chrome sombre de la navigation latérale | Rouverte (2026-07-26) : sidebar sombre « bleu profond » demandée par le client (refonte Medicore), cantonnée au chrome ; couleurs de marque CNPM conservées, topbar et contenu clairs | Produit / UX | Faible | Rouverte |
 | DASH-DEC-001 | Historique des indicateurs du tableau de bord | Décider si `DashboardKpi` porte une valeur précédente et une série, sans quoi trois des cinq tuiles ne peuvent afficher ni variation ni courbe | Produit + API | Moyen | Ouverte |
 | UX-DEC-017 | Retrait de la sélection groupée de BO-002 | Arbitrer la suppression de `BulkActionBar` et de la sélection de lignes, exigées par la fiche, alors qu'aucune action groupée réelle n'est livrée | Produit / UX | Faible | Ouverte |
 | UX-DEC-018 | Retrait du fil d'activité de BO-001 | Arbitrer la suppression de `ActivityFeed` et des raccourcis, `ActivityFeed` étant un composant requis par la fiche | Produit / UX | Moyen | Ouverte |
@@ -150,6 +150,23 @@ ou si la navigation revient à huit entrées.
 REF-PUB-001 en conséquence ?
 
 ### UX-DEC-016 — Chrome sombre de l'espace d'administration
+
+> **ROUVERTE (2026-07-26) — la barre latérale repasse au sombre, à la demande explicite du
+> client.** Dans le cadre de la refonte design inspirée de Medicore, le client a demandé une
+> sidebar « bleu profond » (repliable) sur les deux espaces (administration ET membre), tout
+> en gardant la marque CNPM (bleu `#273481` principal, rouge en accent). Le sombre est
+> désormais **cantonné au CHROME** (navigation latérale) : la barre supérieure et les surfaces
+> de contenu restent claires/blanches, ce qui respecte la règle des « surfaces principalement
+> blanches ou neutres » (le grand aplat coloré proscrit vise le CONTENU, pas la navigation).
+>
+> Implémentation : un modificateur `.cnpm-chrome--dark` dans `web/src/styles/_chrome.scss`
+> redéfinit les alias de chrome (fond `brand-blue-900`, texte clair, anneau de focus blanc,
+> accents de domaine en teintes claires ≥ 3:1) — un seul endroit, comme avant. Les défauts
+> que la version sombre imposait sont traités : anneau de focus blanc (15,3:1), plaque claire
+> sous le lockup, limite de contrôle `brand-blue-400` (4,0:1). Les baselines de régression
+> visuelle du chrome sont donc à réviser (raison écrite + validation UX).
+>
+> L'historique « ÉCART REFERMÉ » ci-dessous reste conservé à titre de référence.
 
 > **ÉCART REFERMÉ — le chrome sombre est abandonné.** Après revue visuelle, le client a
 > écarté le fond bleu profond. La navigation et la barre supérieure partagent désormais un

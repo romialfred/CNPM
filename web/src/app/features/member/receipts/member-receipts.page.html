@@ -46,31 +46,35 @@
             </article>
           </section>
 
-          <div class="mp-table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Reçu nº</th>
-                  <th scope="col">Référence</th>
-                  <th scope="col">Canal</th>
-                  <th scope="col" class="mp-num">Montant</th>
-                  <th scope="col">Payé le</th>
-                  <th scope="col">Émis le</th>
-                  <th scope="col">Statut</th>
+                  <th scope="col" class="cnpm-table__cell">Reçu nº</th>
+                  <th scope="col" class="cnpm-table__cell">Référence</th>
+                  <th scope="col" class="cnpm-table__cell">Canal</th>
+                  <th scope="col" class="cnpm-table__cell cnpm-table__cell--end">Montant</th>
+                  <th scope="col" class="cnpm-table__cell">Payé le</th>
+                  <th scope="col" class="cnpm-table__cell">Émis le</th>
+                  <th scope="col" class="cnpm-table__cell">Statut</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (receipt of receipts(); track receipt.id) {
-                  <tr>
-                    <td class="mp-mono">{{ receipt.receiptNumber }}</td>
-                    <td class="mp-mono">{{ receipt.referenceValue ?? '—' }}</td>
-                    <td>{{ channelLabel(receipt.channel) }}</td>
-                    <td class="mp-num mp-strong">
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell mp-mono">{{ receipt.receiptNumber }}</td>
+                    <td class="cnpm-table__cell mp-mono">{{ receipt.referenceValue ?? '—' }}</td>
+                    <td class="cnpm-table__cell">{{ channelLabel(receipt.channel) }}</td>
+                    <td class="cnpm-table__cell cnpm-table__cell--end mp-strong">
                       {{ receipt.amount | number: '1.0-0' : 'fr' }} {{ receipt.currency }}
                     </td>
-                    <td>{{ receipt.paidAt ? (receipt.paidAt | slice: 0 : 10) : '—' }}</td>
-                    <td>{{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}</td>
-                    <td>
+                    <td class="cnpm-table__cell">
+                      {{ receipt.paidAt ? (receipt.paidAt | slice: 0 : 10) : '—' }}
+                    </td>
+                    <td class="cnpm-table__cell">
+                      {{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}
+                    </td>
+                    <td class="cnpm-table__cell">
                       <cnpm-badge [tone]="statusTone(receipt.status)">
                         {{ statusLabel(receipt.status) }}
                       </cnpm-badge>
