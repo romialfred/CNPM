@@ -60,7 +60,7 @@ describe('NewAccountPage (création de compte)', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const tags = Array.from(host.querySelectorAll('.cnpm-new-account__tag')).map((tag) =>
+    const tags = Array.from(host.querySelectorAll('.nacc__tag')).map((tag) =>
       tag.textContent?.trim(),
     );
     expect(tags).toContain('Émission des reçus');
@@ -109,7 +109,7 @@ describe('NewAccountPage (création de compte)', () => {
     fixture.detectChanges();
     await settle();
 
-    const members = host.querySelectorAll('.cnpm-new-account__member');
+    const members = host.querySelectorAll('.nacc__member');
     expect(members.length).toBeGreaterThan(0);
     expect(host.textContent).toContain('Société Malienne de Négoce SA');
   });
@@ -126,7 +126,7 @@ describe('NewAccountPage (création de compte)', () => {
     await settle();
 
     // Choix du premier membre → pré-remplissage de l'identité.
-    host.querySelector<HTMLButtonElement>('.cnpm-new-account__member')!.click();
+    host.querySelector<HTMLButtonElement>('.nacc__member')!.click();
     fixture.detectChanges();
     await settle();
 

@@ -14,7 +14,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LucideChevronRight } from '@lucide/angular';
+import {
+  LucideBriefcase,
+  LucideBuilding2,
+  LucideCheck,
+  LucideChevronRight,
+  LucideShieldCheck,
+  LucideUserPlus,
+} from '@lucide/angular';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
@@ -57,6 +64,11 @@ const MEMBER_ROLE_ID = 'membre-cnpm';
     ButtonComponent,
     AlertComponent,
     LucideChevronRight,
+    LucideBuilding2,
+    LucideBriefcase,
+    LucideShieldCheck,
+    LucideUserPlus,
+    LucideCheck,
   ],
   templateUrl: './new-account.page.html',
   styleUrl: './new-account.page.scss',
@@ -103,6 +115,33 @@ export class NewAccountPage {
   });
 
   protected readonly isMember = computed(() => this.accountType() === 'MEMBER');
+
+  /** Valeurs vivantes du formulaire, pour alimenter le récapitulatif latéral. */
+  private readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.getRawValue(),
+  });
+
+  protected readonly accountTypeLabel = computed(() =>
+    this.isMember() ? 'Compte membre' : 'Compte professionnel',
+  );
+  protected readonly recapName = computed(() => {
+    const value = this.formValue();
+    const name = `${value.firstName ?? ''} ${value.lastName ?? ''}`.trim();
+    return name || 'Nouveau compte';
+  });
+  protected readonly recapInitials = computed(() => {
+    const value = this.formValue();
+    const initials =
+      ((value.firstName ?? '').trim()[0] ?? '') + ((value.lastName ?? '').trim()[0] ?? '');
+    return initials.toUpperCase() || '+';
+  });
+  protected readonly recapEmail = computed(() => (this.formValue().email ?? '').trim());
+  protected readonly recapOrganization = computed(() =>
+    (this.formValue().organization ?? '').trim(),
+  );
+  protected readonly selectedRoleLabel = computed(
+    () => this.roleOptions().find((role) => role.id === this.selectedRoleId())?.label ?? null,
+  );
 
   /** Rôles proposés : les rôles pro hors « membre » côté pro ; uniquement « membre » côté membre. */
   protected readonly roleOptions = computed<readonly SecurityRole[]>(() => {
