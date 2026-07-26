@@ -124,7 +124,8 @@ describe('MemberContributionsPage — MP-002', () => {
     expect(host.querySelector('table caption')?.textContent).toContain('Cotisations');
     expect(host.textContent).toContain('CNPM-COT-2026-001');
     expect(host.textContent).toContain('120');
-    expect(host.textContent).toContain('DEC-008');
+    // Le bandeau interne DEC-008 (barème) n'est plus affiché au cotisant : écran client.
+    expect(host.textContent).not.toContain('DEC-008');
     expect(host.querySelector('.member-contributions__mobile-list article dl')).not.toBeNull();
     expect(host.querySelector('a[href*="demo-contribution-2026-01"]')).not.toBeNull();
     expect(host.textContent).not.toMatch(/taux de|tranche de|catégorie tarifaire/i);
