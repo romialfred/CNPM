@@ -1,22 +1,5 @@
-.member-requests {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-5);
-  padding: var(--cnpm-layout-page);
-  max-width: var(--cnpm-size-content);
-
-  &__status {
-    margin: 0;
-    color: var(--cnpm-color-text-secondary);
-    font-size: var(--cnpm-font-size-sm);
-  }
-
-  &__table-wrap {
-    overflow-x: auto;
-  }
-
-  &__mono {
-    font-family: var(--cnpm-font-family-mono);
-    font-size: var(--cnpm-font-size-sm);
-  }
+// « Mes requêtes » (liste) : présentation portée par les classes globales `.mp-*`
+// (styles/_member-portal.scss). Aucun style de composant spécifique nécessaire.
+:host {
+  display: block;
 }

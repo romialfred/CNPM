@@ -1,5 +1,5 @@
 <cnpm-member-portal-shell>
-  <main class="member-payments" id="contenu-principal">
+  <main class="mp-page" id="contenu-principal">
     <cnpm-page-header
       title="Mes paiements"
       description="Historique de vos encaissements et de leur confirmation par la CNPM."
@@ -7,7 +7,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="member-payments__status" role="status">Chargement de vos paiements…</p>
+        <p class="mp-status" role="status">Chargement de vos paiements…</p>
       }
       @case ('noMembership') {
         <cnpm-alert tone="info" title="Aucune adhésion rattachée">
@@ -29,29 +29,39 @@
             </p>
           </cnpm-alert>
         } @else {
-          <div class="member-payments__totals">
-            <div class="member-payments__total">
-              <span class="member-payments__total-label">Total encaissé</span>
-              <span class="member-payments__total-value">
-                {{ total() | number: '1.0-0' : 'fr' }} FCFA
+          <section class="mp-kpis" aria-label="Synthèse de vos paiements">
+            <article class="mp-kpi cnpm-liftable cnpm-tile-accent--teal">
+              <span class="mp-kpi__emblem" aria-hidden="true"><svg lucideWallet></svg></span>
+              <span class="mp-kpi__label">Total encaissé</span>
+              <span class="mp-kpi__value">
+                {{ total() | number: '1.0-0' : 'fr' }} <span class="mp-kpi__unit">FCFA</span>
               </span>
-            </div>
-            <div class="member-payments__total">
-              <span class="member-payments__total-label">Confirmés</span>
-              <span class="member-payments__total-value">
-                {{ confirmedCount() }} / {{ payments().length }}
+              <span class="mp-kpi__def">Somme de vos règlements</span>
+            </article>
+            <article class="mp-kpi cnpm-liftable cnpm-tile-accent--blue">
+              <span class="mp-kpi__emblem" aria-hidden="true"><svg lucideCircleCheckBig></svg></span>
+              <span class="mp-kpi__label">Confirmés</span>
+              <span class="mp-kpi__value">
+                {{ confirmedCount() }} <span class="mp-kpi__unit">/ {{ payments().length }}</span>
               </span>
-            </div>
-          </div>
+              <span class="mp-kpi__def">Encaissements avec reçu émis</span>
+            </article>
+            <article class="mp-kpi cnpm-liftable cnpm-tile-accent--indigo">
+              <span class="mp-kpi__emblem" aria-hidden="true"><svg lucideReceiptText></svg></span>
+              <span class="mp-kpi__label">Nombre de paiements</span>
+              <span class="mp-kpi__value">{{ payments().length }}</span>
+              <span class="mp-kpi__def">Sur toute la période</span>
+            </article>
+          </section>
 
-          <div class="member-payments__table-wrap">
+          <div class="mp-table-wrap">
             <table class="cnpm-table">
               <thead>
                 <tr>
                   <th scope="col">Transaction</th>
                   <th scope="col">Référence</th>
                   <th scope="col">Canal</th>
-                  <th scope="col" class="member-payments__num">Montant</th>
+                  <th scope="col" class="mp-num">Montant</th>
                   <th scope="col">Payé le</th>
                   <th scope="col">Statut</th>
                   <th scope="col">Reçu</th>
@@ -60,10 +70,10 @@
               <tbody>
                 @for (payment of payments(); track payment.id) {
                   <tr>
-                    <td class="member-payments__mono">{{ payment.transactionNumber }}</td>
-                    <td class="member-payments__mono">{{ payment.referenceValue ?? '—' }}</td>
+                    <td class="mp-mono">{{ payment.transactionNumber }}</td>
+                    <td class="mp-mono">{{ payment.referenceValue ?? '—' }}</td>
                     <td>{{ channelLabel(payment.channel) }}</td>
-                    <td class="member-payments__num">
+                    <td class="mp-num mp-strong">
                       {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
                     </td>
                     <td>{{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}</td>
@@ -72,7 +82,7 @@
                         {{ statusLabel(payment.confirmed) }}
                       </cnpm-badge>
                     </td>
-                    <td class="member-payments__mono">{{ payment.receiptNumber ?? '—' }}</td>
+                    <td class="mp-mono">{{ payment.receiptNumber ?? '—' }}</td>
                   </tr>
                 }
               </tbody>

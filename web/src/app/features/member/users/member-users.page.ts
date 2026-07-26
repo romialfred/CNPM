@@ -1,7 +1,8 @@
 import { SlicePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
+import { LucideUserCheck, LucideUsers } from '@lucide/angular';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -41,6 +42,8 @@ const STATUS_TONES: Readonly<Record<MemberUserStatus, CnpmBadgeTone>> = {
     AlertComponent,
     BadgeComponent,
     ButtonComponent,
+    LucideUsers,
+    LucideUserCheck,
   ],
   templateUrl: './member-users.page.html',
   styleUrl: './member-users.page.scss',
@@ -52,6 +55,9 @@ export class MemberUsersPage {
 
   protected readonly state = signal<LoadState>('loading');
   protected readonly users = signal<readonly MemberUser[]>([]);
+  protected readonly activeCount = computed(
+    () => this.users().filter((user) => user.status === 'ACTIVE').length,
+  );
 
   constructor() {
     this.title.setTitle('Utilisateurs de l’entreprise — Espace membre CNPM');

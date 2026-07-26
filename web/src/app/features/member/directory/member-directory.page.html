@@ -1,25 +1,27 @@
 <cnpm-member-portal-shell>
-  <main class="member-directory" id="contenu-principal">
+  <main class="mp-page" id="contenu-principal">
     <cnpm-page-header
       title="Annuaire des membres"
       description="Les organisations membres actives du CNPM."
     />
 
-    <div class="member-directory__search">
-      <label class="member-directory__label" for="directory-search">Rechercher une organisation</label>
-      <input
-        id="directory-search"
-        class="cnpm-input"
-        type="search"
-        [formControl]="search"
-        autocomplete="off"
-        placeholder="Nom de l’organisation…"
-      />
+    <div class="mp-toolbar">
+      <div class="mp-field">
+        <label class="mp-field__label" for="directory-search">Rechercher une organisation</label>
+        <input
+          id="directory-search"
+          class="cnpm-input"
+          type="search"
+          [formControl]="search"
+          autocomplete="off"
+          placeholder="Nom de l’organisation…"
+        />
+      </div>
     </div>
 
     @switch (state()) {
       @case ('loading') {
-        <p class="member-directory__status" role="status">Chargement de l’annuaire…</p>
+        <p class="mp-status" role="status">Chargement de l’annuaire…</p>
       }
       @case ('error') {
         <cnpm-alert tone="error" title="Chargement impossible">
@@ -33,7 +35,7 @@
             <p>Aucune organisation membre active ne correspond à votre recherche.</p>
           </cnpm-alert>
         } @else {
-          <div class="member-directory__table-wrap">
+          <div class="mp-table-wrap">
             <table class="cnpm-table">
               <thead>
                 <tr>
@@ -46,7 +48,7 @@
               <tbody>
                 @for (organization of organizations(); track organization.id) {
                   <tr>
-                    <td>{{ organization.name }}</td>
+                    <td class="mp-strong">{{ organization.name }}</td>
                     <td>{{ organization.sector }}</td>
                     <td>{{ organization.category }}</td>
                     <td>

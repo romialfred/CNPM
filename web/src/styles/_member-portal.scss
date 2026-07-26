@@ -1,0 +1,174 @@
+// Styles PARTAGÉS du portail membre — refonte premium (tokens CNPM uniquement).
+//
+// Ces classes globales donnent un rendu cohérent (tuiles KPI, panneaux, tables
+// encadrées) à toutes les pages de l'espace membre, sans dupliquer le SCSS dans
+// chaque composant. Elles s'appuient sur les accents décoratifs `.cnpm-tile-accent--*`
+// et l'élévation `.cnpm-liftable` déjà fournis par `_accents.scss`.
+
+.mp-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  padding: var(--cnpm-layout-page);
+  max-width: var(--cnpm-size-content);
+}
+
+.mp-status {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+/* ── Bandeau de tuiles KPI ── */
+.mp-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--cnpm-space-4);
+}
+
+.mp-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--cnpm-space-4) var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  border-block-start: 3px solid var(--cnpm-tile-accent, var(--cnpm-color-border-strong));
+
+  &--alert {
+    border-color: var(--cnpm-color-semantic-error-500, #e40c20);
+  }
+
+  &__emblem {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: var(--cnpm-radius-md);
+    background: color-mix(in srgb, var(--cnpm-tile-accent, currentColor) 14%, transparent);
+    color: var(--cnpm-tile-accent, var(--cnpm-color-text-secondary));
+
+    svg {
+      inline-size: var(--cnpm-size-icon-sm);
+      block-size: var(--cnpm-size-icon-sm);
+    }
+  }
+
+  &__label {
+    font-size: var(--cnpm-font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--cnpm-font-letterSpacing-wide);
+    color: var(--cnpm-color-text-secondary);
+  }
+
+  &__value {
+    font-size: var(--cnpm-font-size-2xl);
+    font-weight: var(--cnpm-font-weight-bold);
+    color: var(--cnpm-color-text-primary);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+
+    &--date {
+      font-size: var(--cnpm-font-size-xl);
+    }
+  }
+
+  &__unit {
+    font-size: var(--cnpm-font-size-sm);
+    font-weight: var(--cnpm-font-weight-medium);
+    color: var(--cnpm-color-text-secondary);
+  }
+
+  &__def {
+    font-size: var(--cnpm-font-size-xs);
+    color: var(--cnpm-color-text-muted, var(--cnpm-color-text-secondary));
+  }
+}
+
+/* ── Panneau encadré (section carte) ── */
+.mp-panel {
+  padding: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cnpm-space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--cnpm-space-4);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: var(--cnpm-font-size-md, 1rem);
+    font-weight: var(--cnpm-font-weight-semibold);
+    color: var(--cnpm-color-text-primary);
+  }
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--cnpm-font-size-sm);
+    color: var(--cnpm-color-text-link, var(--cnpm-color-brand-blue-700));
+    text-decoration: none;
+
+    svg {
+      inline-size: var(--cnpm-size-icon-xs);
+      block-size: var(--cnpm-size-icon-xs);
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* ── Barre d'outils (recherche, filtres) ── */
+.mp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-3);
+  align-items: flex-end;
+}
+
+.mp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-inline-size: 240px;
+
+  &__label {
+    font-size: var(--cnpm-font-size-sm);
+    font-weight: var(--cnpm-font-weight-semibold);
+    color: var(--cnpm-color-text-primary);
+  }
+}
+
+/* ── Table encadrée (cadre + coins arrondis autour de .cnpm-table) ── */
+.mp-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.mp-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.mp-mono {
+  font-family: var(--cnpm-font-family-mono);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.mp-strong {
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
