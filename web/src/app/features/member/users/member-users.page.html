@@ -1,5 +1,5 @@
 <cnpm-member-portal-shell>
-  <main class="member-users" id="contenu-principal">
+  <main class="mp-page" id="contenu-principal">
     <cnpm-page-header
       title="Utilisateurs de l’entreprise"
       description="Les comptes rattachés à votre organisation et leur rôle."
@@ -7,7 +7,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="member-users__status" role="status">Chargement des utilisateurs…</p>
+        <p class="mp-status" role="status">Chargement des utilisateurs…</p>
       }
       @case ('noMembership') {
         <cnpm-alert tone="info" title="Aucune adhésion rattachée">
@@ -26,7 +26,24 @@
             <p>Aucun compte n’est encore rattaché à votre organisation.</p>
           </cnpm-alert>
         } @else {
-          <div class="member-users__table-wrap">
+          <section class="mp-kpis" aria-label="Synthèse des utilisateurs">
+            <article class="mp-kpi cnpm-liftable cnpm-tile-accent--indigo">
+              <span class="mp-kpi__emblem" aria-hidden="true"><svg lucideUsers></svg></span>
+              <span class="mp-kpi__label">Comptes</span>
+              <span class="mp-kpi__value">{{ users().length }}</span>
+              <span class="mp-kpi__def">Rattachés à l’organisation</span>
+            </article>
+            <article class="mp-kpi cnpm-liftable cnpm-tile-accent--teal">
+              <span class="mp-kpi__emblem" aria-hidden="true"><svg lucideUserCheck></svg></span>
+              <span class="mp-kpi__label">Actifs</span>
+              <span class="mp-kpi__value">
+                {{ activeCount() }} <span class="mp-kpi__unit">/ {{ users().length }}</span>
+              </span>
+              <span class="mp-kpi__def">Comptes en activité</span>
+            </article>
+          </section>
+
+          <div class="mp-table-wrap">
             <table class="cnpm-table">
               <thead>
                 <tr>
@@ -40,8 +57,8 @@
               <tbody>
                 @for (user of users(); track user.id) {
                   <tr>
-                    <td>{{ user.displayName }}</td>
-                    <td class="member-users__mono">{{ user.email }}</td>
+                    <td class="mp-strong">{{ user.displayName }}</td>
+                    <td class="mp-mono">{{ user.email }}</td>
                     <td>{{ user.roleLabel }}</td>
                     <td>
                       <cnpm-badge [tone]="statusTone(user.status)">

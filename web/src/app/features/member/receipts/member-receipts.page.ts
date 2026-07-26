@@ -2,6 +2,7 @@ import { DecimalPipe, SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
+import { LucideBadgeCheck, LucideReceiptText } from '@lucide/angular';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -38,6 +39,8 @@ const CHANNEL_LABELS: Readonly<Record<MemberReceiptChannel, string>> = {
     AlertComponent,
     BadgeComponent,
     ButtonComponent,
+    LucideReceiptText,
+    LucideBadgeCheck,
   ],
   templateUrl: './member-receipts.page.html',
   styleUrl: './member-receipts.page.scss',

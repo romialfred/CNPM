@@ -37,8 +37,8 @@
 }
 
 .member-cnpm__news {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--cnpm-space-3);
   margin: 0;
   padding: 0;
@@ -49,15 +49,27 @@
   display: flex;
   align-items: center;
   gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-500);
 }
 
 .member-cnpm__news-icon {
   display: inline-flex;
-  color: var(--cnpm-color-primary, #273481);
+  align-items: center;
+  justify-content: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  flex: none;
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: var(--cnpm-size-icon-sm);
+    height: var(--cnpm-size-icon-sm);
   }
 }
 

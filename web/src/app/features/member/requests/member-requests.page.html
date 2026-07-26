@@ -1,5 +1,5 @@
 <cnpm-member-portal-shell>
-  <main class="member-requests" id="contenu-principal">
+  <main class="mp-page" id="contenu-principal">
     <cnpm-page-header
       title="Mes requêtes"
       description="Vos demandes et réclamations adressées à la CNPM, et leur suivi."
@@ -9,7 +9,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="member-requests__status" role="status">Chargement de vos requêtes…</p>
+        <p class="mp-status" role="status">Chargement de vos requêtes…</p>
       }
       @case ('noMembership') {
         <cnpm-alert tone="info" title="Aucune adhésion rattachée">
@@ -31,7 +31,7 @@
             </p>
           </cnpm-alert>
         } @else {
-          <div class="member-requests__table-wrap">
+          <div class="mp-table-wrap">
             <table class="cnpm-table">
               <thead>
                 <tr>
@@ -45,11 +45,11 @@
               <tbody>
                 @for (request of requests(); track request.id) {
                   <tr>
-                    <td class="member-requests__mono">
+                    <td class="mp-mono">
                       <a [routerLink]="['/member/requests', request.id]">{{ request.reference }}</a>
                     </td>
                     <td>{{ typeLabel(request.type) }}</td>
-                    <td>{{ request.subject }}</td>
+                    <td class="mp-strong">{{ request.subject }}</td>
                     <td>
                       <cnpm-badge [tone]="statusTone(request.status)">
                         {{ statusLabel(request.status) }}

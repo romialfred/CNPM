@@ -1,18 +1,9 @@
-<cnpm-member-portal-shell
-  organization="Sahel Agro SA"
-  userName="Membre"
-  memberCode="CNPM-MEMBRE-000"
-  [notificationCount]="0"
->
+<cnpm-member-portal-shell>
   <main class="member-contributions" id="contenu-principal">
     <cnpm-page-header
       title="Mes cotisations"
       description="Consultez les appels et échéanciers associés à votre organisation."
     />
-
-    <cnpm-alert tone="warning" title="Barème institutionnel non configuré" [live]="false">
-      Aucun taux, tranche ou barème CNPM n’est appliqué tant que la décision DEC-008 reste ouverte.
-    </cnpm-alert>
 
     <cnpm-filter-bar
       [expanded]="filtersExpanded()"

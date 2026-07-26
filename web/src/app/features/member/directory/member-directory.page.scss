@@ -1,30 +1,5 @@
-.member-directory {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-5);
-  padding: var(--cnpm-layout-page);
-  max-width: var(--cnpm-size-content);
-
-  &__search {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-width: 420px;
-  }
-
-  &__label {
-    font-size: var(--cnpm-font-size-sm);
-    font-weight: var(--cnpm-font-weight-semibold);
-    color: var(--cnpm-color-text-primary);
-  }
-
-  &__status {
-    margin: 0;
-    color: var(--cnpm-color-text-secondary);
-    font-size: var(--cnpm-font-size-sm);
-  }
-
-  &__table-wrap {
-    overflow-x: auto;
-  }
+// « Annuaire des membres » : présentation portée par les classes globales `.mp-*`
+// (styles/_member-portal.scss). Aucun style de composant spécifique nécessaire.
+:host {
+  display: block;
 }
