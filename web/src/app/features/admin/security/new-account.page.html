@@ -1,13 +1,13 @@
 <cnpm-admin-shell>
-  <main class="cnpm-new-account" id="contenu-principal">
+  <main class="nacc" id="contenu-principal">
     <cnpm-page-header
       title="Nouveau compte"
-      description="Créez un compte professionnel ou un compte membre, avec son rôle et ses permissions."
+      description="Créez un compte professionnel ou membre, avec son rôle et ses permissions. Le compte naît « invité » : la personne définira son mot de passe et son 2FA à la première connexion."
     />
 
     @switch (state()) {
       @case ('loading') {
-        <p class="cnpm-new-account__status" role="status">Chargement des rôles et permissions…</p>
+        <p class="nacc__status" role="status">Chargement des rôles et permissions…</p>
       }
       @case ('error') {
         <cnpm-alert tone="error" title="Chargement impossible">
@@ -16,336 +16,364 @@
         </cnpm-alert>
       }
       @case ('ready') {
-        <form class="cnpm-new-account__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
-          @if (submitError()) {
-            <cnpm-alert tone="error" title="Création impossible">
-              <p>{{ submitError() }}</p>
-            </cnpm-alert>
-          }
-
-          <!-- Type de compte -->
-          <fieldset class="cnpm-new-account__section">
-            <legend class="cnpm-new-account__legend">Type de compte</legend>
-            <div class="cnpm-new-account__choices">
-              <label class="cnpm-new-account__choice">
-                <input type="radio" formControlName="accountType" value="PROFESSIONAL" />
-                <span>
-                  <strong>Compte professionnel</strong>
-                  <small>Agent ou administrateur de la plateforme.</small>
-                </span>
-              </label>
-              <label class="cnpm-new-account__choice">
-                <input type="radio" formControlName="accountType" value="MEMBER" />
-                <span>
-                  <strong>Compte membre</strong>
-                  <small>Adhérent : accès à l’espace membre.</small>
-                </span>
-              </label>
-            </div>
-          </fieldset>
-
-          <!-- Membre à rattacher (compte membre uniquement) -->
-          @if (isMember()) {
-            <fieldset class="cnpm-new-account__section">
-              <legend class="cnpm-new-account__legend">Membre à rattacher</legend>
-              @if (membersWithoutAccount().length === 0) {
-                <p class="cnpm-new-account__empty" role="status">
-                  Tous les membres disposent déjà d’un compte.
-                </p>
-              } @else {
-                <div class="cnpm-new-account__field">
-                  <label class="cnpm-new-account__label" for="member-search">
-                    Rechercher un membre sans compte
-                  </label>
-                  <input
-                    id="member-search"
-                    class="cnpm-new-account__search"
-                    type="search"
-                    placeholder="Raison sociale, numéro d’adhésion, contact…"
-                    [value]="memberSearch()"
-                    (input)="updateMemberSearch($any($event.target).value)"
-                  />
-                </div>
-
-                @if (memberSelectionError()) {
-                  <p class="cnpm-new-account__field-error">{{ memberSelectionError() }}</p>
-                }
-
-                @if (filteredMembers().length === 0) {
-                  <p class="cnpm-new-account__empty" role="status">
-                    Aucun membre ne correspond à la recherche.
-                  </p>
-                } @else {
-                  <ul
-                    class="cnpm-new-account__members"
-                    role="listbox"
-                    aria-label="Membres sans compte"
-                  >
-                    @for (member of filteredMembers(); track member.id) {
-                      <li>
-                        <button
-                          type="button"
-                          role="option"
-                          class="cnpm-new-account__member"
-                          [class.cnpm-new-account__member--selected]="isMemberSelected(member.id)"
-                          [attr.aria-selected]="isMemberSelected(member.id)"
-                          (click)="selectMember(member)"
-                        >
-                          <span class="cnpm-new-account__member-body">
-                            <strong class="cnpm-new-account__member-name">{{
-                              member.organizationName
-                            }}</strong>
-                            <span class="cnpm-new-account__member-meta">
-                              {{ member.membershipNumber }} · {{ member.categoryLabel }}
-                              @if (member.groupLabel) {
-                                · {{ member.groupLabel }}
-                              }
-                            </span>
-                            @if (member.contactFirstName || member.contactLastName) {
-                              <span class="cnpm-new-account__member-contact">
-                                {{ member.contactFirstName }} {{ member.contactLastName }}
-                                @if (member.contactJobTitle) {
-                                  — {{ member.contactJobTitle }}
-                                }
-                              </span>
-                            }
-                          </span>
-                          @if (isMemberSelected(member.id)) {
-                            <span class="cnpm-new-account__member-badge">Sélectionné</span>
-                          }
-                        </button>
-                      </li>
-                    }
-                  </ul>
-                }
-
-                @if (selectedMember(); as member) {
-                  <p class="cnpm-new-account__selected" role="status">
-                    Membre sélectionné : <strong>{{ member.organizationName }}</strong> ({{
-                      member.membershipNumber
-                    }}). L’identité ci-dessous a été pré-remplie depuis son contact principal ;
-                    ajustez-la si nécessaire.
-                  </p>
-                }
-              }
-            </fieldset>
-          }
-
-          <!-- Identité -->
-          <fieldset class="cnpm-new-account__section">
-            <legend class="cnpm-new-account__legend">
-              Informations
-              @if (isMember()) {
-                <span class="cnpm-new-account__legend-hint">— pré-remplies depuis le membre</span>
-              }
-            </legend>
-            <div class="cnpm-new-account__grid">
-              <cnpm-text-input
-                formControlName="firstName"
-                label="Prénom"
-                name="firstName"
-                autocomplete="given-name"
-                [required]="true"
-                [error]="fieldError('firstName') ?? undefined"
-              />
-              <cnpm-text-input
-                formControlName="lastName"
-                label="Nom"
-                name="lastName"
-                autocomplete="family-name"
-                [required]="true"
-                [error]="fieldError('lastName') ?? undefined"
-              />
-              <cnpm-text-input
-                formControlName="email"
-                label="Adresse électronique"
-                type="email"
-                name="email"
-                autocomplete="email"
-                [required]="true"
-                [error]="fieldError('email') ?? undefined"
-              />
-              <cnpm-text-input
-                formControlName="phone"
-                label="Téléphone"
-                name="phone"
-                autocomplete="tel"
-                [error]="fieldError('phone') ?? undefined"
-              />
-              <cnpm-text-input
-                formControlName="jobTitle"
-                label="Fonction"
-                name="jobTitle"
-                autocomplete="organization-title"
-                [error]="fieldError('jobTitle') ?? undefined"
-              />
-              <cnpm-text-input
-                formControlName="organization"
-                label="Organisation"
-                name="organization"
-                autocomplete="organization"
-                [error]="fieldError('organization') ?? undefined"
-              />
-              <cnpm-text-input
-                formControlName="department"
-                label="Département"
-                name="department"
-                [error]="fieldError('department') ?? undefined"
-              />
-            </div>
-          </fieldset>
-
-          <!-- Rôle + permissions -->
-          <fieldset class="cnpm-new-account__section">
-            <legend class="cnpm-new-account__legend">Rôle et permissions</legend>
-
-            <div class="cnpm-new-account__field">
-              <label class="cnpm-new-account__label" for="new-account-role">Rôle</label>
-              <select
-                id="new-account-role"
-                class="cnpm-new-account__select"
-                formControlName="roleId"
-                [attr.aria-invalid]="fieldError('roleId') ? 'true' : null"
-              >
-                <option value="" disabled>Choisir un rôle…</option>
-                @for (role of roleOptions(); track role.id) {
-                  <option [value]="role.id">{{ role.label }}</option>
-                }
-              </select>
-              @if (fieldError('roleId')) {
-                <p class="cnpm-new-account__field-error">{{ fieldError('roleId') }}</p>
-              }
-            </div>
-
-            @if (rolePermissions().length) {
-              <div class="cnpm-new-account__preview">
-                <p class="cnpm-new-account__preview-title">Ce que ce rôle autorise</p>
-                <ul class="cnpm-new-account__tags">
-                  @for (permission of rolePermissions(); track permission.id) {
-                    <!-- Libellé HUMAIN (description) et non le code technique : le titre du
-                         droit doit se lire sans documentation. Le code reste en info-bulle. -->
-                    <li class="cnpm-new-account__tag" [title]="permission.label">
-                      {{ permission.description }}
-                    </li>
-                  }
-                </ul>
-              </div>
+        <div class="nacc__layout">
+          <form class="nacc__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            @if (submitError()) {
+              <cnpm-alert tone="error" title="Création impossible">
+                <p>{{ submitError() }}</p>
+              </cnpm-alert>
             }
 
-            @if (!isMember() && extraPermissionOptions().length) {
-              <div class="cnpm-new-account__extra">
-                <div class="cnpm-new-account__extra-head">
+            <!-- 1 · Type de compte -->
+            <section class="nacc__card" aria-labelledby="nacc-type">
+              <header class="nacc__card-head">
+                <span class="nacc__step" aria-hidden="true">1</span>
+                <div>
+                  <h2 id="nacc-type" class="nacc__card-title">Type de compte</h2>
+                  <p class="nacc__card-desc">Choisissez la nature du compte à créer.</p>
+                </div>
+              </header>
+
+              <div class="nacc__segmented" role="radiogroup" aria-labelledby="nacc-type">
+                <label class="nacc__segment" [class.nacc__segment--active]="!isMember()">
+                  <input type="radio" formControlName="accountType" value="PROFESSIONAL" />
+                  <span class="nacc__segment-emblem" aria-hidden="true"><svg lucideBriefcase></svg></span>
+                  <span class="nacc__segment-body">
+                    <strong class="nacc__segment-title">Compte professionnel</strong>
+                    <small class="nacc__segment-desc">Agent ou administrateur de la plateforme.</small>
+                  </span>
+                  <span class="nacc__segment-check" aria-hidden="true"><svg lucideCheck></svg></span>
+                </label>
+                <label class="nacc__segment" [class.nacc__segment--active]="isMember()">
+                  <input type="radio" formControlName="accountType" value="MEMBER" />
+                  <span class="nacc__segment-emblem" aria-hidden="true"><svg lucideBuilding2></svg></span>
+                  <span class="nacc__segment-body">
+                    <strong class="nacc__segment-title">Compte membre</strong>
+                    <small class="nacc__segment-desc">Adhérent : accès à l’espace membre.</small>
+                  </span>
+                  <span class="nacc__segment-check" aria-hidden="true"><svg lucideCheck></svg></span>
+                </label>
+              </div>
+            </section>
+
+            <!-- 2 · Membre à rattacher (membre uniquement) -->
+            @if (isMember()) {
+              <section class="nacc__card" aria-labelledby="nacc-member">
+                <header class="nacc__card-head">
+                  <span class="nacc__step" aria-hidden="true">2</span>
                   <div>
-                    <p class="cnpm-new-account__preview-title">Permissions supplémentaires</p>
-                    <p class="cnpm-new-account__extra-hint">
-                      Ajoutez des droits au-delà du rôle. Regroupés par domaine.
+                    <h2 id="nacc-member" class="nacc__card-title">Membre à rattacher</h2>
+                    <p class="nacc__card-desc">
+                      L’identité du compte est reprise du contact principal du membre.
                     </p>
                   </div>
-                  <!-- Compteur : l'opérateur voit combien de droits il ajoute au rôle. -->
-                  <span
-                    class="cnpm-new-account__counter"
-                    [class.cnpm-new-account__counter--active]="extraSelectedCount() > 0"
-                  >
-                    {{ extraSelectedCount() }} accordée{{ extraSelectedCount() > 1 ? 's' : '' }}
-                  </span>
-                </div>
+                </header>
 
-                <div class="cnpm-new-account__search">
-                  <label class="cnpm-new-account__sr" for="perm-search">
-                    Rechercher une permission
-                  </label>
-                  <input
-                    id="perm-search"
-                    class="cnpm-new-account__search-input"
-                    type="search"
-                    autocomplete="off"
-                    placeholder="Rechercher un droit (ex. « cotisation »)…"
-                    [ngModel]="permissionSearch()"
-                    [ngModelOptions]="{ standalone: true }"
-                    (ngModelChange)="permissionSearch.set($event)"
-                  />
-                </div>
+                @if (membersWithoutAccount().length === 0) {
+                  <p class="nacc__empty" role="status">Tous les membres disposent déjà d’un compte.</p>
+                } @else {
+                  <div class="nacc__field">
+                    <label class="nacc__label" for="member-search">Rechercher un membre sans compte</label>
+                    <input
+                      id="member-search"
+                      class="cnpm-input"
+                      type="search"
+                      placeholder="Raison sociale, numéro d’adhésion, contact…"
+                      [value]="memberSearch()"
+                      (input)="updateMemberSearch($any($event.target).value)"
+                    />
+                  </div>
 
-                <!-- Matrice repliable par domaine : un domaine par ligne, ses droits en
-                     interrupteurs. Aucune liste plate de codes. -->
-                <div class="cnpm-new-account__domains">
-                  @for (group of extraPermissionGroups(); track group.domain) {
-                    <section class="cnpm-new-account__domain">
-                      <button
-                        type="button"
-                        class="cnpm-new-account__domain-head"
-                        [attr.aria-expanded]="group.expanded"
-                        (click)="toggleDomain(group.domain)"
-                      >
-                        <svg
-                          class="cnpm-new-account__domain-chevron"
-                          [class.cnpm-new-account__domain-chevron--open]="group.expanded"
-                          lucideChevronRight
-                          [size]="iconSize.compact"
-                          aria-hidden="true"
-                        ></svg>
-                        <span class="cnpm-new-account__domain-name">{{ group.domain }}</span>
-                        @if (group.selectedCount > 0) {
-                          <span class="cnpm-new-account__domain-badge">
-                            {{ group.selectedCount }}
-                          </span>
-                        }
-                        <span class="cnpm-new-account__domain-total">
-                          {{ group.permissions.length }} droit{{
-                            group.permissions.length > 1 ? 's' : ''
-                          }}
-                        </span>
-                      </button>
-
-                      @if (group.expanded) {
-                        <ul class="cnpm-new-account__perms">
-                          @for (permission of group.permissions; track permission.id) {
-                            <li class="cnpm-new-account__perm">
-                              <label class="cnpm-new-account__perm-label">
-                                <input
-                                  type="checkbox"
-                                  class="cnpm-new-account__perm-toggle"
-                                  [checked]="isExtraSelected(permission.id)"
-                                  (change)="toggleExtra(permission.id, $any($event.target).checked)"
-                                />
-                                <span class="cnpm-new-account__perm-text">
-                                  <span class="cnpm-new-account__perm-name">
-                                    {{ permission.description }}
-                                  </span>
-                                  <small class="cnpm-new-account__perm-code">{{
-                                    permission.label
-                                  }}</small>
-                                </span>
-                              </label>
-                            </li>
-                          }
-                        </ul>
-                      }
-                    </section>
-                  } @empty {
-                    <p class="cnpm-new-account__empty" role="status">
-                      Aucun droit ne correspond à votre recherche.
-                    </p>
+                  @if (memberSelectionError()) {
+                    <p class="nacc__field-error" role="alert">{{ memberSelectionError() }}</p>
                   }
+
+                  @if (filteredMembers().length === 0) {
+                    <p class="nacc__empty" role="status">Aucun membre ne correspond à la recherche.</p>
+                  } @else {
+                    <ul class="nacc__members" role="listbox" aria-label="Membres sans compte">
+                      @for (member of filteredMembers(); track member.id) {
+                        <li>
+                          <button
+                            type="button"
+                            role="option"
+                            class="nacc__member"
+                            [class.nacc__member--selected]="isMemberSelected(member.id)"
+                            [attr.aria-selected]="isMemberSelected(member.id)"
+                            (click)="selectMember(member)"
+                          >
+                            <span class="nacc__member-body">
+                              <strong class="nacc__member-name">{{ member.organizationName }}</strong>
+                              <span class="nacc__member-meta">
+                                {{ member.membershipNumber }} · {{ member.categoryLabel }}
+                                @if (member.groupLabel) {
+                                  · {{ member.groupLabel }}
+                                }
+                              </span>
+                              @if (member.contactFirstName || member.contactLastName) {
+                                <span class="nacc__member-contact">
+                                  {{ member.contactFirstName }} {{ member.contactLastName }}
+                                  @if (member.contactJobTitle) {
+                                    — {{ member.contactJobTitle }}
+                                  }
+                                </span>
+                              }
+                            </span>
+                            @if (isMemberSelected(member.id)) {
+                              <span class="nacc__member-badge" aria-hidden="true">
+                                <svg lucideCheck></svg>
+                              </span>
+                            }
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                }
+              </section>
+            }
+
+            <!-- 3 · Identité -->
+            <section class="nacc__card" aria-labelledby="nacc-identity">
+              <header class="nacc__card-head">
+                <span class="nacc__step" aria-hidden="true">{{ isMember() ? '3' : '2' }}</span>
+                <div>
+                  <h2 id="nacc-identity" class="nacc__card-title">Informations</h2>
+                  <p class="nacc__card-desc">
+                    @if (isMember()) {
+                      Pré-remplies depuis le membre — ajustez si nécessaire.
+                    } @else {
+                      Identité et coordonnées de la personne.
+                    }
+                  </p>
+                </div>
+              </header>
+
+              <div class="nacc__grid">
+                <cnpm-text-input
+                  formControlName="firstName"
+                  label="Prénom"
+                  name="firstName"
+                  autocomplete="given-name"
+                  [required]="true"
+                  [error]="fieldError('firstName') ?? undefined"
+                />
+                <cnpm-text-input
+                  formControlName="lastName"
+                  label="Nom"
+                  name="lastName"
+                  autocomplete="family-name"
+                  [required]="true"
+                  [error]="fieldError('lastName') ?? undefined"
+                />
+                <cnpm-text-input
+                  formControlName="email"
+                  label="Adresse électronique"
+                  type="email"
+                  name="email"
+                  autocomplete="email"
+                  [required]="true"
+                  [error]="fieldError('email') ?? undefined"
+                />
+                <cnpm-text-input
+                  formControlName="phone"
+                  label="Téléphone"
+                  name="phone"
+                  autocomplete="tel"
+                  [error]="fieldError('phone') ?? undefined"
+                />
+                <cnpm-text-input
+                  formControlName="jobTitle"
+                  label="Fonction"
+                  name="jobTitle"
+                  autocomplete="organization-title"
+                  [error]="fieldError('jobTitle') ?? undefined"
+                />
+                <cnpm-text-input
+                  formControlName="organization"
+                  label="Organisation"
+                  name="organization"
+                  autocomplete="organization"
+                  [error]="fieldError('organization') ?? undefined"
+                />
+                <cnpm-text-input
+                  formControlName="department"
+                  label="Département"
+                  name="department"
+                  [error]="fieldError('department') ?? undefined"
+                />
+              </div>
+            </section>
+
+            <!-- 4 · Rôle et permissions -->
+            <section class="nacc__card" aria-labelledby="nacc-role">
+              <header class="nacc__card-head">
+                <span class="nacc__step" aria-hidden="true">{{ isMember() ? '4' : '3' }}</span>
+                <div>
+                  <h2 id="nacc-role" class="nacc__card-title">Rôle et permissions</h2>
+                  <p class="nacc__card-desc">Le rôle fixe les droits ; ajoutez des permissions si besoin.</p>
+                </div>
+              </header>
+
+              <div class="nacc__field">
+                <label class="nacc__label" for="new-account-role">Rôle</label>
+                <select
+                  id="new-account-role"
+                  class="cnpm-input"
+                  formControlName="roleId"
+                  [attr.aria-invalid]="fieldError('roleId') ? 'true' : null"
+                >
+                  <option value="" disabled>Choisir un rôle…</option>
+                  @for (role of roleOptions(); track role.id) {
+                    <option [value]="role.id">{{ role.label }}</option>
+                  }
+                </select>
+                @if (fieldError('roleId')) {
+                  <p class="nacc__field-error" role="alert">{{ fieldError('roleId') }}</p>
+                }
+              </div>
+
+              @if (rolePermissions().length) {
+                <div class="nacc__preview">
+                  <p class="nacc__preview-title">Ce que ce rôle autorise</p>
+                  <ul class="nacc__tags">
+                    @for (permission of rolePermissions(); track permission.id) {
+                      <li class="nacc__tag" [title]="permission.label">{{ permission.description }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+
+              @if (!isMember() && extraPermissionOptions().length) {
+                <div class="nacc__extra">
+                  <div class="nacc__extra-head">
+                    <div>
+                      <p class="nacc__preview-title">Permissions supplémentaires</p>
+                      <p class="nacc__extra-hint">Ajoutez des droits au-delà du rôle, regroupés par domaine.</p>
+                    </div>
+                    <span class="nacc__counter" [class.nacc__counter--active]="extraSelectedCount() > 0">
+                      {{ extraSelectedCount() }} accordée{{ extraSelectedCount() > 1 ? 's' : '' }}
+                    </span>
+                  </div>
+
+                  <div class="nacc__field">
+                    <label class="nacc__sr" for="perm-search">Rechercher une permission</label>
+                    <input
+                      id="perm-search"
+                      class="cnpm-input"
+                      type="search"
+                      autocomplete="off"
+                      placeholder="Rechercher un droit (ex. « cotisation »)…"
+                      [ngModel]="permissionSearch()"
+                      [ngModelOptions]="{ standalone: true }"
+                      (ngModelChange)="permissionSearch.set($event)"
+                    />
+                  </div>
+
+                  <div class="nacc__domains">
+                    @for (group of extraPermissionGroups(); track group.domain) {
+                      <section class="nacc__domain">
+                        <button
+                          type="button"
+                          class="nacc__domain-head"
+                          [attr.aria-expanded]="group.expanded"
+                          (click)="toggleDomain(group.domain)"
+                        >
+                          <svg
+                            class="nacc__domain-chevron"
+                            [class.nacc__domain-chevron--open]="group.expanded"
+                            lucideChevronRight
+                            [size]="iconSize.compact"
+                            aria-hidden="true"
+                          ></svg>
+                          <span class="nacc__domain-name">{{ group.domain }}</span>
+                          @if (group.selectedCount > 0) {
+                            <span class="nacc__domain-badge">{{ group.selectedCount }}</span>
+                          }
+                          <span class="nacc__domain-total">
+                            {{ group.permissions.length }} droit{{ group.permissions.length > 1 ? 's' : '' }}
+                          </span>
+                        </button>
+
+                        @if (group.expanded) {
+                          <ul class="nacc__perms">
+                            @for (permission of group.permissions; track permission.id) {
+                              <li class="nacc__perm">
+                                <label class="nacc__perm-label">
+                                  <input
+                                    type="checkbox"
+                                    class="nacc__perm-toggle"
+                                    [checked]="isExtraSelected(permission.id)"
+                                    (change)="toggleExtra(permission.id, $any($event.target).checked)"
+                                  />
+                                  <span class="nacc__perm-text">
+                                    <span class="nacc__perm-name">{{ permission.description }}</span>
+                                    <small class="nacc__perm-code">{{ permission.label }}</small>
+                                  </span>
+                                </label>
+                              </li>
+                            }
+                          </ul>
+                        }
+                      </section>
+                    } @empty {
+                      <p class="nacc__empty" role="status">Aucun droit ne correspond à votre recherche.</p>
+                    }
+                  </div>
+                </div>
+              }
+            </section>
+          </form>
+
+          <!-- Récapitulatif collant -->
+          <aside class="nacc__aside" aria-label="Récapitulatif du compte">
+            <div class="nacc__recap">
+              <p class="nacc__recap-eyebrow">Récapitulatif</p>
+              <div class="nacc__recap-identity">
+                <span class="nacc__recap-avatar" aria-hidden="true">{{ recapInitials() }}</span>
+                <div>
+                  <strong class="nacc__recap-name">{{ recapName() }}</strong>
+                  <span class="nacc__recap-type">{{ accountTypeLabel() }}</span>
                 </div>
               </div>
-            }
-          </fieldset>
 
-          <p class="cnpm-new-account__note">
-            Aucun mot de passe n’est saisi ici : le compte est créé « invité ». La personne définira
-            son mot de passe et enrôlera son second facteur à la première connexion.
-          </p>
+              <dl class="nacc__recap-list">
+                <div class="nacc__recap-row">
+                  <dt>Courriel</dt>
+                  <dd>{{ recapEmail() || '—' }}</dd>
+                </div>
+                <div class="nacc__recap-row">
+                  <dt>Organisation</dt>
+                  <dd>{{ recapOrganization() || '—' }}</dd>
+                </div>
+                <div class="nacc__recap-row">
+                  <dt>Rôle</dt>
+                  <dd>{{ selectedRoleLabel() ?? 'À choisir' }}</dd>
+                </div>
+                @if (!isMember()) {
+                  <div class="nacc__recap-row">
+                    <dt>Droits en plus</dt>
+                    <dd>{{ extraSelectedCount() }}</dd>
+                  </div>
+                }
+              </dl>
 
-          <div class="cnpm-new-account__actions">
-            <cnpm-button variant="secondary" (click)="cancel()" [disabled]="submitting()">
-              Annuler
-            </cnpm-button>
-            <cnpm-button variant="primary" (click)="submit()" [loading]="submitting()">
-              Créer le compte
-            </cnpm-button>
-          </div>
-        </form>
+              <p class="nacc__recap-note">
+                <svg lucideShieldCheck aria-hidden="true"></svg>
+                Compte créé « invité » : mot de passe et 2FA définis à la première connexion.
+              </p>
+
+              <div class="nacc__recap-actions">
+                <cnpm-button variant="primary" (click)="submit()" [loading]="submitting()">
+                  <span class="nacc__recap-cta"><svg lucideUserPlus aria-hidden="true"></svg> Créer le compte</span>
+                </cnpm-button>
+                <cnpm-button variant="secondary" (click)="cancel()" [disabled]="submitting()">
+                  Annuler
+                </cnpm-button>
+              </div>
+            </div>
+          </aside>
+        </div>
       }
     }
   </main>
