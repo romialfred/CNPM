@@ -22,11 +22,11 @@ public class SessionIdentityProjection {
 
     /**
      * Rôle propriétaire de la plateforme. Le compte d'amorçage natif porte ce rôle privilégié
-     * et est présenté comme « Propriétaire » (désignation owner demandée, AUTH-DEC-022), sans
-     * altérer le catalogue {@code iam.role} où {@code SUPER_ADMIN_TECH} reste
-     * « Superadministrateur technique » pour tout autre usage.
+     * et est présenté comme « Propriétaire » (désignation owner demandée, AUTH-DEC-022). Depuis
+     * la refonte RBAC (périmètre TDR), ce rôle est {@code ADMINISTRATEUR} — l'administrateur CNPM
+     * disposant de tous les droits.
      */
-    private static final String OWNER_ROLE = "SUPER_ADMIN_TECH";
+    private static final String OWNER_ROLE = "ADMINISTRATEUR";
     private static final String OWNER_LABEL = "Propriétaire";
     private static final String NO_ROLE_LABEL = "Aucun rôle attribué";
 

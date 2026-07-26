@@ -4688,6 +4688,45 @@ paths:
                 $ref: '#/components/schemas/AdminSecurityAccount'
       x-requirements:
       - BO-030
+  /admin/security/roles/{roleId}/permissions:
+    post:
+      tags:
+      - ADMIN
+      summary: Accorder ou retirer une permission à un rôle.
+      description: >-
+        Ajoute ou retire une association rôle ↔ permission dans la matrice d'octroi. Le
+        catalogue des codes de permission n'est pas modifié. Exige IAM.ROLE.ASSIGN ; audité.
+      operationId: setAdminRolePermission
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      - name: roleId
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Uuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Ligne de matrice à jour (droit et rôles habilités).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+      x-requirements:
+      - BO-030
 components:
   securitySchemes:
     oauth2:

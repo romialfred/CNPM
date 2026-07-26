@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Service applicatif du module ADM : lecture et création des valeurs de référentiel.
  *
  * <p>L'autorisation est portée ici, au service applicatif, et non au contrôleur
- * (ADR-008) : lecture et écriture sont réservées au rôle {@code ADMIN_FONCTIONNEL}, seul
+ * (ADR-008) : lecture et écriture sont réservées au rôle {@code ADMINISTRATEUR}, seul
  * porteur d'{@code ADMIN.REFERENTIAL.READ}/{@code WRITE} dans
  * {@code V3__seed_roles_permissions_and_references.sql}. Le contrôle est côté serveur et
  * refusé par défaut ; des tests négatifs vérifient les 403.
@@ -42,7 +42,7 @@ public class ReferenceValueService {
         this.auditRecorder = auditRecorder;
     }
 
-    @PreAuthorize("hasRole('ADMIN_FONCTIONNEL')")
+    @PreAuthorize("hasRole('ADMINISTRATEUR')")
     @Transactional(readOnly = true)
     public PageResult<ReferenceValue> list(String domain, int page, int size) {
         return repository.list(domain, page, size);
@@ -55,7 +55,7 @@ public class ReferenceValueService {
      * @throws StateConflictException si une valeur existe déjà pour ce (domaine, code)
      *     avec un contenu différent
      */
-    @PreAuthorize("hasRole('ADMIN_FONCTIONNEL')")
+    @PreAuthorize("hasRole('ADMINISTRATEUR')")
     @Transactional
     public ReferenceValueCreation create(
             ReferenceValueDraft draft, UUID actorUserId, UUID correlationId) {
@@ -88,7 +88,7 @@ public class ReferenceValueService {
      * @throws StateConflictException si la version attendue ne correspond pas à la version
      *     courante (modification concurrente déjà survenue)
      */
-    @PreAuthorize("hasRole('ADMIN_FONCTIONNEL')")
+    @PreAuthorize("hasRole('ADMINISTRATEUR')")
     @Transactional
     public ReferenceValue update(
             UUID id,

@@ -12,15 +12,19 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   LucideBan,
-  LucideCheck,
   LucideKeyRound,
-  LucideMinus,
   LucideSend,
   LucideTrash2,
   LucideUserCheck,
   LucideUserPlus,
 } from '@lucide/angular';
-import { catchError, map, type Observable, of, startWith, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, type Observable, of, startWith, switchMap } from 'rxjs';
+import {
+  moduleCodes,
+  PERMISSION_MODULES,
+  type PermissionLevel,
+  type PermissionModule,
+} from './permission-modules';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { DialogComponent } from '../../../design-system/dialog/dialog.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
@@ -197,9 +201,7 @@ const AUDIT_COLUMNS: readonly DataTableColumn[] = [
     SkeletonComponent,
     TabsComponent,
     LucideBan,
-    LucideCheck,
     LucideKeyRound,
-    LucideMinus,
     LucideSend,
     LucideTrash2,
     LucideUserCheck,
@@ -387,6 +389,116 @@ export class AdminSecurityPage {
       next.delete(key);
       return next;
     });
+  }
+
+  // ─────────────────── Grille d'octroi par module du sidebar ───────────────────
+  protected readonly permissionModules = PERMISSION_MODULES;
+  protected readonly levels: readonly { readonly key: PermissionLevel | 'all'; readonly label: string }[] = [
+    { key: 'read', label: 'Lecture' },
+    { key: 'write', label: 'Écriture / modifier / supprimer' },
+    { key: 'all', label: 'Tous' },
+  ];
+
+  /** Rôle en cours d'édition dans la grille ; premier rôle par défaut. */
+  private readonly pickedRoleId = signal<string | null>(null);
+  protected readonly activeRole = computed(() => {
+    const roles = this.roles();
+    return roles.find((role) => role.id === this.pickedRoleId()) ?? roles[0] ?? null;
+  });
+
+  protected selectRole(roleId: string): void {
+    this.pickedRoleId.set(roleId);
+  }
+
+  /** Index code → ligne de matrice (la colonne `label` porte le code technique). */
+  private readonly permissionByCode = computed(() => {
+    const map = new Map<string, PermissionRow>();
+    for (const row of this.permissions()) {
+      map.set(row.label, row);
+    }
+    return map;
+  });
+
+  private isCodeGranted(code: string, roleId: string): boolean {
+    return (
+      this.permissionByCode()
+        .get(code)
+        ?.grants.some((grant) => grant.roleId === roleId && grant.granted) ?? false
+    );
+  }
+
+  /** État d'une cellule module×niveau : 'on' (tout accordé), 'off' (rien), 'partial'. */
+  protected moduleState(
+    roleId: string,
+    module: PermissionModule,
+    level: PermissionLevel | 'all',
+  ): 'on' | 'off' | 'partial' {
+    const codes = moduleCodes(module, level);
+    if (codes.length === 0) {
+      return 'off';
+    }
+    const granted = codes.filter((code) => this.isCodeGranted(code, roleId)).length;
+    if (granted === 0) {
+      return 'off';
+    }
+    return granted === codes.length ? 'on' : 'partial';
+  }
+
+  private readonly savingModules = signal<ReadonlySet<string>>(new Set());
+  protected isModuleSaving(roleId: string, moduleKey: string, level: string): boolean {
+    return this.savingModules().has(`${roleId}:${moduleKey}:${level}`);
+  }
+
+  /**
+   * Bascule un groupe de droits (module × niveau) pour le rôle : si tout est accordé, on
+   * retire ; sinon on accorde les codes manquants. Chaque code passe par l'endpoint d'octroi
+   * (habilitation + audit côté serveur) ; la matrice est rechargée à la fin.
+   */
+  protected toggleModule(
+    roleId: string,
+    module: PermissionModule,
+    level: PermissionLevel | 'all',
+  ): void {
+    const key = `${roleId}:${module.key}:${level}`;
+    if (!this.canManagePermissions() || this.savingModules().has(key)) {
+      return;
+    }
+    const codes = moduleCodes(module, level);
+    const target = this.moduleState(roleId, module, level) !== 'on';
+    const changes = codes
+      .filter((code) => this.isCodeGranted(code, roleId) !== target)
+      .map((code) => this.permissionByCode().get(code))
+      .filter((row): row is PermissionRow => Boolean(row))
+      .map((row) => this.gateway.setPermissionGrant(row.id, roleId, target));
+    if (changes.length === 0) {
+      return;
+    }
+    this.savingModules.update((current) => new Set(current).add(key));
+    forkJoin(changes)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.savingModules.update((current) => {
+            const next = new Set(current);
+            next.delete(key);
+            return next;
+          });
+          this.toast.success(
+            `${target ? 'Accordé' : 'Retiré'} : ${module.label} · ${
+              level === 'read' ? 'Lecture' : level === 'write' ? 'Écriture' : 'Tous'
+            }.`,
+          );
+          this.retryTick.update((tick) => tick + 1);
+        },
+        error: () => {
+          this.savingModules.update((current) => {
+            const next = new Set(current);
+            next.delete(key);
+            return next;
+          });
+          this.toast.error('La modification des droits a échoué. Réessayez.');
+        },
+      });
   }
   protected readonly sessions = computed<readonly SecuritySession[]>(
     () => this.data()?.sessions ?? [],

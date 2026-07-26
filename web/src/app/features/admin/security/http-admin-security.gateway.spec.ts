@@ -169,10 +169,27 @@ describe('HttpAdminSecurityGateway — écritures sur les comptes', () => {
     await expect(result).rejects.toBeInstanceOf(AdminSecurityAccessError);
   });
 
-  it('échoue explicitement sur la matrice, qu’aucun endpoint ne modifie encore', async () => {
-    await expect(
-      firstValueFrom(gateway.setPermissionGrant('perm-1', ROLE_ID, true)),
-    ).rejects.toThrow(/lecture seule/);
-    http.expectNone(() => true);
+  it('accorde une permission à un rôle via l’endpoint dédié', async () => {
+    const result = firstValueFrom(gateway.setPermissionGrant('perm-1', ROLE_ID, true));
+    const request = http.expectOne(`/v1/admin/security/roles/${ROLE_ID}/permissions`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ permissionId: 'perm-1', granted: true });
+    request.flush({
+      id: 'perm-1',
+      label: 'CONTRIBUTION.READ',
+      domain: 'Cotisations',
+      description: 'Consulter les cotisations',
+      grants: [{ roleId: ROLE_ID, roleLabel: 'Administrateur CNPM', granted: true }],
+    });
+    const row = await result;
+    expect(row.grants[0].granted).toBe(true);
+  });
+
+  it('traduit un refus d’habilitation sur l’octroi de droit', async () => {
+    const result = firstValueFrom(gateway.setPermissionGrant('perm-1', ROLE_ID, false));
+    http
+      .expectOne(`/v1/admin/security/roles/${ROLE_ID}/permissions`)
+      .flush(problem(403), { status: 403, statusText: 'Forbidden' });
+    await expect(result).rejects.toBeInstanceOf(AdminSecurityAccessError);
   });
 });

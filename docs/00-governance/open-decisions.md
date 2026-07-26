@@ -1128,5 +1128,32 @@ suspendu ne peut pas voir son accès rétabli sans être réactivé au préalabl
 remise du lien (courriel, SMS) une fois le module de notification livré : aujourd'hui, le
 jeton est remis à l'opérateur, qui le transmet.
 
+## SEC-DEC-001 — Périmètre des rôles RBAC (écart TDR ↔ matrice de conception)
+
+**Propriétaire.** Sécurité (RSSI) + Direction CNPM.
+**Impact.** Surface d'administration, séparation des tâches, lisibilité de l'octroi des droits.
+**Statut.** **Tranchée** à la demande du client (2026-07-26) : réduction appliquée (migration `V26`).
+
+**Constat.** La matrice RBAC de conception (`docs/05-security/rbac-matrix.md`,
+`CNPM_RBAC_Matrice.xlsx`) définissait **20 rôles**, alors que le **TDR** ne demande
+explicitement que l'**Agent de recouvrement** (§3.1.3) et les **Groupements** (§3.2.3), et ne
+cite qu'en passant « comptable » et « auditeur externe ». Les 14 rôles restants (directions,
+caissier, validateur d'enrôlement, auditeurs, juridique, communication, support, prestataire
+technique, administrateur sécurité, secrétaire général) étaient une élaboration de conception,
+non une exigence du TDR.
+
+**Décision.** Catalogue réduit à **6 rôles** : `ADMINISTRATEUR` (nouveau, tous droits),
+`AGENT_RECOUVREMENT`, `RESPONSABLE_GROUPEMENT`, `REFERENT_GROUPEMENT`, `MEMBRE_ADMIN`,
+`MEMBRE_UTILISATEUR`. Les **codes de permission** (66) restent inchangés (aucune rupture des
+`@PreAuthorize`) ; l'**octroi des droits** est présenté **par module du sidebar** (Gestion des
+membres, Cotisation & Recouvrement, Relance, Supervision, Administration, Paramètres) sur trois
+niveaux — Lecture / Écriture-modifier-supprimer / Tous — via des interrupteurs, sur l'écran
+Administration → Gestion des utilisateurs → onglet Rôles. Endpoint d'octroi réel
+`POST /admin/security/roles/{roleId}/permissions` (habilité `IAM.ROLE.ASSIGN`, audité).
+
+**À rouvrir si.** Le client souhaite réintroduire une séparation financière fine
+(comptable/caissier/direction financière) ou un profil d'audit dédié : ces rôles pourront être
+re-semés sans changer les codes de permission.
+
 ## Processus
 Toute nouvelle décision porte un identifiant, un propriétaire, une date cible, un impact, des options et une trace d’approbation. Une décision fermée doit être reportée dans les documents, contrats et tests concernés.

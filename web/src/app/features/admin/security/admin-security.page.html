@@ -299,172 +299,137 @@
           <!-- ================ Rôles et permissions ================ -->
           @case ('roles') {
             @if (canManagePermissions()) {
-              <cnpm-alert tone="info" title="Matrice éditable" [live]="false">
-                Cliquez une cellule pour accorder ou retirer un droit à un rôle. Chaque modification
-                est tracée. Le rôle technique ne reçoit aucun droit financier.
+              <cnpm-alert tone="info" title="Droits par module" [live]="false">
+                Choisissez un rôle, puis activez ou désactivez ses droits par module du menu.
+                « Tous » couvre la lecture et l’écriture du module. Chaque bascule est tracée.
               </cnpm-alert>
             } @else {
-              <cnpm-alert tone="info" title="Matrice en lecture seule" [live]="false">
-                Vous n’avez pas le droit de modifier les permissions : elles s’affichent en lecture
-                seule. Le rôle technique ne reçoit aucun droit financier.
+              <cnpm-alert tone="info" title="Droits en lecture seule" [live]="false">
+                Vous n’avez pas le droit de modifier les permissions : la grille s’affiche en
+                lecture seule.
               </cnpm-alert>
             }
 
-            <cnpm-data-table
-              caption="Matrice des permissions par rôle. Chaque ligne est une permission, chaque colonne un rôle, et chaque cellule indique si le rôle est autorisé."
-              [columns]="permissionColumns()"
-              [rows]="permissions()"
-              [state]="tableState()"
-              [rowKey]="permissionKey"
-            >
-              <ng-template #row let-permission>
-                <th scope="row" class="cnpm-table__cell cnpm-security__permission-head">
-                  <span class="cnpm-security__identity">
-                    <span class="cnpm-security__identity-name">{{ permission.label }}</span>
-                    <span class="cnpm-security__identity-detail">{{ permission.domain }}</span>
-                  </span>
-                </th>
-                <!-- Le statut n'est jamais porté par la seule couleur : la forme du
-                     pictogramme distingue déjà les deux cas, et chaque cellule porte un
-                     texte lu par les technologies d'assistance. Une case cochée sans
-                     libellé serait indéchiffrable hors du contexte visuel. -->
-                @for (grant of permission.grants; track grant.roleId) {
-                  <td class="cnpm-table__cell cnpm-security__grant">
-                    @if (canManagePermissions()) {
-                      <!-- Cellule éditable : un clic bascule le droit. L'état est porté par
-                           `aria-pressed` et le pictogramme, jamais par la seule couleur. -->
+            @switch (tableState()) {
+              @case ('loading') {
+                <cnpm-skeleton variant="table" [rows]="6" [columns]="4" label="Chargement des droits…" />
+              }
+              @case ('error') {
+                @if (offline()) {
+                  <cnpm-error-state variant="offline">
+                    <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+                  </cnpm-error-state>
+                } @else {
+                  <cnpm-error-state
+                    variant="recoverable"
+                    title="Les droits n’ont pas pu être chargés"
+                    description="Le référentiel des rôles est momentanément indisponible."
+                  >
+                    <cnpm-button variant="secondary" size="sm" (click)="retry()">Réessayer</cnpm-button>
+                  </cnpm-error-state>
+                }
+              }
+              @case ('forbidden') {
+                <cnpm-error-state variant="forbidden" />
+              }
+              @default {
+                @if (activeRole(); as role) {
+                  <!-- Sélecteur de rôle -->
+                  <div class="cnpm-security__role-tabs" role="tablist" aria-label="Rôles de la plateforme">
+                    @for (r of roles(); track r.id) {
                       <button
                         type="button"
-                        class="cnpm-security__grant-toggle"
-                        [class.cnpm-security__grant-toggle--on]="grant.granted"
-                        [attr.aria-pressed]="grant.granted"
-                        [disabled]="isGrantSaving(permission.id, grant.roleId)"
-                        [attr.aria-label]="
-                          (grant.granted ? 'Retirer' : 'Accorder') +
-                          ' : ' +
-                          permission.label +
-                          ' pour ' +
-                          grant.roleLabel
-                        "
-                        (click)="togglePermission(permission, grant)"
+                        role="tab"
+                        class="cnpm-security__role-tab"
+                        [class.cnpm-security__role-tab--active]="r.id === role.id"
+                        [attr.aria-selected]="r.id === role.id"
+                        (click)="selectRole(r.id)"
                       >
-                        @if (grant.granted) {
-                          <svg lucideCheck [size]="iconSize.compact" aria-hidden="true"></svg>
-                        } @else {
-                          <svg lucideMinus [size]="iconSize.compact" aria-hidden="true"></svg>
-                        }
+                        {{ r.label }}
+                        <span class="cnpm-security__role-tab-count">{{ r.accounts }}</span>
                       </button>
-                    } @else {
-                      @if (grant.granted) {
-                        <svg
-                          lucideCheck
-                          class="cnpm-security__grant-yes"
-                          [size]="iconSize.compact"
-                          aria-hidden="true"
-                        ></svg>
-                      } @else {
-                        <svg
-                          lucideMinus
-                          class="cnpm-security__grant-no"
-                          [size]="iconSize.compact"
-                          aria-hidden="true"
-                        ></svg>
-                      }
-                      <span class="cnpm-security__sr">
-                        {{ grant.roleLabel }} : {{ grant.granted ? 'autorisé' : 'non autorisé' }}
-                      </span>
                     }
-                  </td>
-                }
-              </ng-template>
+                  </div>
 
-              <div data-table-status>
-                @switch (tableState()) {
-                  @case ('loading') {
-                    <cnpm-skeleton
-                      variant="table"
-                      [rows]="8"
-                      [columns]="columnCount()"
-                      label="Chargement de la matrice des permissions…"
-                    />
-                  }
-                  @case ('empty') {
-                    <cnpm-empty-state
-                      variant="no-data"
-                      title="Aucune permission publiée"
-                      description="Le référentiel des rôles et permissions n’est pas encore alimenté."
-                    />
-                  }
-                  @case ('noResult') {
-                    <cnpm-empty-state
-                      variant="no-results"
-                      title="Aucune permission ne correspond"
-                      description="Élargissez la recherche ou retirez le filtre."
-                    />
-                  }
-                  @case ('error') {
-                    @if (offline()) {
-                      <cnpm-error-state variant="offline">
-                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
-                          Réessayer
-                        </cnpm-button>
-                      </cnpm-error-state>
-                    } @else {
-                      <cnpm-error-state
-                        variant="recoverable"
-                        title="La matrice n’a pas pu être chargée"
-                        description="Le référentiel des permissions est momentanément indisponible."
-                      >
-                        <cnpm-button variant="secondary" size="sm" (click)="retry()">
-                          Réessayer
-                        </cnpm-button>
-                      </cnpm-error-state>
-                    }
-                  }
-                  @case ('forbidden') {
-                    <cnpm-error-state variant="forbidden" />
-                  }
+                  <!-- Grille : modules du sidebar (lignes) × niveaux (colonnes), toggles On/Off -->
+                  <div class="cnpm-security__grid-wrap">
+                    <table
+                      class="cnpm-table cnpm-security__grid"
+                      [attr.aria-label]="'Droits du rôle ' + role.label + ' par module'"
+                    >
+                      <thead>
+                        <tr>
+                          <th scope="col">Module</th>
+                          @for (lvl of levels; track lvl.key) {
+                            <th scope="col" class="cnpm-security__grid-col">{{ lvl.label }}</th>
+                          }
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (module of permissionModules; track module.key) {
+                          <tr>
+                            <th scope="row" class="cnpm-security__grid-module">{{ module.label }}</th>
+                            @for (lvl of levels; track lvl.key) {
+                              <td class="cnpm-security__grid-cell">
+                                <button
+                                  type="button"
+                                  class="cnpm-security__switch"
+                                  [class.cnpm-security__switch--on]="
+                                    moduleState(role.id, module, lvl.key) === 'on'
+                                  "
+                                  [class.cnpm-security__switch--partial]="
+                                    moduleState(role.id, module, lvl.key) === 'partial'
+                                  "
+                                  [disabled]="
+                                    !canManagePermissions() ||
+                                    isModuleSaving(role.id, module.key, lvl.key)
+                                  "
+                                  [attr.aria-pressed]="moduleState(role.id, module, lvl.key) === 'on'"
+                                  [attr.aria-label]="
+                                    module.label +
+                                    ' — ' +
+                                    lvl.label +
+                                    ' : ' +
+                                    (moduleState(role.id, module, lvl.key) === 'on'
+                                      ? 'activé'
+                                      : moduleState(role.id, module, lvl.key) === 'partial'
+                                        ? 'partiel'
+                                        : 'désactivé')
+                                  "
+                                  (click)="toggleModule(role.id, module, lvl.key)"
+                                >
+                                  <span class="cnpm-security__switch-track" aria-hidden="true">
+                                    <span class="cnpm-security__switch-thumb"></span>
+                                  </span>
+                                  <span class="cnpm-security__switch-text">
+                                    @switch (moduleState(role.id, module, lvl.key)) {
+                                      @case ('on') {
+                                        On
+                                      }
+                                      @case ('partial') {
+                                        Partiel
+                                      }
+                                      @default {
+                                        Off
+                                      }
+                                    }
+                                  </span>
+                                </button>
+                              </td>
+                            }
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <cnpm-empty-state
+                    variant="no-data"
+                    title="Aucun rôle"
+                    description="Le référentiel des rôles n’est pas encore alimenté."
+                  />
                 }
-              </div>
-            </cnpm-data-table>
-
-            <!-- La légende explicite les deux pictogrammes de la matrice. Sans elle,
-                 la lecture repose sur une convention implicite. -->
-            @if (tableState() === 'ready') {
-              <p class="cnpm-security__legend">
-                <span class="cnpm-security__legend-item">
-                  <svg
-                    lucideCheck
-                    class="cnpm-security__grant-yes"
-                    [size]="iconSize.compact"
-                    aria-hidden="true"
-                  ></svg>
-                  Autorisé
-                </span>
-                <span class="cnpm-security__legend-item">
-                  <svg
-                    lucideMinus
-                    class="cnpm-security__grant-no"
-                    [size]="iconSize.compact"
-                    aria-hidden="true"
-                  ></svg>
-                  Non autorisé
-                </span>
-              </p>
-
-              <h2 class="cnpm-security__subtitle">Rôles de la plateforme</h2>
-              <ul class="cnpm-security__roles">
-                @for (role of roles(); track role.id) {
-                  <li class="cnpm-security__role">
-                    <p class="cnpm-security__role-name">{{ role.label }}</p>
-                    <p class="cnpm-security__role-description">{{ role.description }}</p>
-                    <p class="cnpm-security__role-count">
-                      {{ role.accounts | number }}
-                      {{ role.accounts === 1 ? 'compte rattaché' : 'comptes rattachés' }}
-                    </p>
-                  </li>
-                }
-              </ul>
+              }
             }
           }
 

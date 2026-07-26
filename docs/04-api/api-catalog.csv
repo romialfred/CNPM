@@ -113,3 +113,4 @@ POST;/admin/security/accounts/{accountId}/status;ADMIN;changeAdminSecurityAccoun
 DELETE;/admin/security/accounts/{accountId};ADMIN;deleteAdminSecurityAccount;Supprimer un compte de la plateforme.
 POST;/admin/security/accounts/{accountId}/password-reset;ADMIN;issueAccountCredentialToken;Emettre un lien d activation ou de recuperation d acces.
 POST;/admin/security/accounts/{accountId}/two-factor/reset;ADMIN;resetAdminSecurityAccountTwoFactor;Reinitialiser le second facteur d un compte.
+POST;/admin/security/roles/{roleId}/permissions;ADMIN;setAdminRolePermission;Accorder ou retirer une permission a un role.
