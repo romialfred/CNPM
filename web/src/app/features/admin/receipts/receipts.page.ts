@@ -39,7 +39,7 @@ const STATUSES: readonly ReceiptStatus[] = ['ISSUED', 'CANCELLED'];
 const CHANNELS: readonly ReceiptChannel[] = ['MOBILE_MONEY', 'BANK_TRANSFER', 'CASH', 'CHECK'];
 const PERIODS: readonly ReceiptPeriod[] = ['2024-T1', '2024-T2', '2024-T3', '2024-T4'];
 const SORT_KEYS: readonly ReceiptSortKey[] = ['issuedAt', 'amount', 'status'];
-const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
+const DATE_FORMATTER = new Intl.DateTimeFormat('fr-ML', {
   dateStyle: 'medium',
   timeStyle: 'short',
   timeZone: 'UTC',

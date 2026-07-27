@@ -32,7 +32,7 @@ import {
   type ServiceRequestStatus,
 } from './requests-gateway';
 
-const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
+const DATE_FORMATTER = new Intl.DateTimeFormat('fr-ML', {
   dateStyle: 'medium',
   timeStyle: 'short',
   timeZone: 'UTC',

@@ -49,7 +49,7 @@ const STATUSES: readonly ServiceRequestStatus[] = [
 ];
 const PRIORITIES: readonly ServiceRequestPriority[] = ['NORMAL', 'HIGH', 'URGENT'];
 const SORT_KEYS: readonly ServiceRequestSortKey[] = ['submittedAt', 'targetAt', 'priority'];
-const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
+const DATE_FORMATTER = new Intl.DateTimeFormat('fr-ML', {
   dateStyle: 'medium',
   timeStyle: 'short',
   timeZone: 'UTC',

@@ -80,9 +80,12 @@
    capitales), séparé du corps par un filet un cran plus marqué que ceux des lignes. Sur
    une seule ligne : le débordement éventuel est absorbé par le conteneur défilant, jamais
    par la page. */
+/* En-tête raffiné (inspiration SafeX, sans majuscules — la casse normale reste la demande du
+   commanditaire) : une bande neutre discrète pose l'en-tête, un filet d'accent de marque de
+   2 px le souligne. La bande se clippe aux coins arrondis du conteneur défilant. */
 .cnpm-table__head .cnpm-table__cell {
   padding-block: var(--cnpm-space-3);
-  background-color: transparent;
+  background-color: var(--cnpm-color-surface-subtle);
   color: var(--cnpm-color-text-secondary);
   font-weight: var(--cnpm-font-weight-semibold);
   font-size: var(--cnpm-font-size-sm);
@@ -90,7 +93,7 @@
   text-transform: none;
   vertical-align: middle;
   white-space: nowrap;
-  border-bottom: 1px solid var(--cnpm-color-border-default);
+  border-bottom: 2px solid var(--cnpm-color-brand-blue-300);
 }
 
 /* Libellé + note sur une MÊME ligne (« Montant » + « (FCFA) ») : en-tête compact qui ne

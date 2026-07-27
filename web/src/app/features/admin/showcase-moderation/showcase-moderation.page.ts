@@ -19,7 +19,7 @@ import {
 } from './showcase-moderation-gateway';
 import { ShowcaseModerationPreviewComponent } from './showcase-moderation-preview.component';
 
-const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
+const DATE_FORMATTER = new Intl.DateTimeFormat('fr-ML', {
   dateStyle: 'medium',
   timeStyle: 'short',
   timeZone: 'UTC',

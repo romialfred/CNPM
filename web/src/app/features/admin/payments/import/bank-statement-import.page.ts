@@ -206,7 +206,7 @@ export class BankStatementImportPage {
   }
 
   protected formatFileSize(size: number): string {
-    return `${Math.max(1, Math.round(size / 1024)).toLocaleString('fr-FR')} Ko`;
+    return `${Math.max(1, Math.round(size / 1024)).toLocaleString('fr-ML')} Ko`;
   }
 
   private requestInspection(file: BankStatementLocalFile): void {
