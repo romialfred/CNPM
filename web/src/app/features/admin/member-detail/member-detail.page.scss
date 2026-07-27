@@ -68,6 +68,18 @@
   object-fit: cover;
 }
 
+/* Bandeau de secours en dégradé de marque : aucune image externe (respect du CLAUDE.md —
+   aucun actif de marque non maîtrisé, aucune requête tierce). Le voile ::after garantit le
+   contraste du texte par-dessus. */
+.cnpm-member__hero-media--placeholder {
+  background-image: linear-gradient(
+    135deg,
+    var(--cnpm-color-brand-blue-900),
+    var(--cnpm-color-brand-blue-700) 55%,
+    var(--cnpm-color-brand-blue-800)
+  );
+}
+
 /* Voile fonctionnel, non décoratif : il garantit le contraste du texte blanc quelle que
    soit la photo servie — opaque en bas, où se lit le contenu, transparent en haut, où la
    photo reste visible (WCAG 1.4.3). */

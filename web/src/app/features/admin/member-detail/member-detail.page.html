@@ -72,12 +72,15 @@
 
       @default {
         @if (detail(); as member) {
-          <!-- Héros vitrine : nom en grand sur une illustration topique du secteur, avec
-               un voile qui garantit le contraste du texte blanc (WCAG 1.4.3). L'image est
-               décorative — l'information est déjà écrite —, d'où `alt=""`. Le statut est
-               porté par le libellé d'un badge, jamais par la seule couleur. -->
+          <!-- Héros vitrine : nom en grand sur un bandeau en dégradé de marque (aucune
+               requête externe), avec un voile qui garantit le contraste du texte blanc
+               (WCAG 1.4.3). Le bandeau est décoratif (`aria-hidden`). Le statut est porté
+               par le libellé d'un badge, jamais par la seule couleur. -->
           <header class="cnpm-member__hero">
-            <img class="cnpm-member__hero-media" [src]="heroImage()" alt="" loading="lazy" />
+            <div
+              class="cnpm-member__hero-media cnpm-member__hero-media--placeholder"
+              aria-hidden="true"
+            ></div>
             <div class="cnpm-member__hero-body">
               <div class="cnpm-member__hero-badges">
                 <cnpm-badge [tone]="verificationTone(member.identity.verification)">

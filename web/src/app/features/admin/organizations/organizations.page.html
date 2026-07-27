@@ -136,14 +136,7 @@
                 <ng-template #row let-organization>
                   <td class="cnpm-table__cell cnpm-organizations__cell--identity">
                     <span class="cnpm-organizations__identity">
-                      <img
-                        class="cnpm-organizations__logo"
-                        [src]="logoUrl(organization)"
-                        alt=""
-                        loading="lazy"
-                        width="40"
-                        height="40"
-                      />
+                      <cnpm-monogram [name]="organization.legalName" />
                       <span class="cnpm-organizations__identity-text">
                         <strong>{{ organization.legalName }}</strong>
                       </span>
@@ -205,14 +198,7 @@
                 <li>
                   <div class="cnpm-organizations__card-head">
                     <div class="cnpm-organizations__card-identity">
-                      <img
-                        class="cnpm-organizations__logo"
-                        [src]="logoUrl(organization)"
-                        alt=""
-                        loading="lazy"
-                        width="40"
-                        height="40"
-                      />
+                      <cnpm-monogram [name]="organization.legalName" />
                       <div>
                         <strong>{{ organization.legalName }}</strong>
                         @if (organization.tradeName) {

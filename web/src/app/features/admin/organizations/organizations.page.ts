@@ -19,6 +19,7 @@ import {
   type FilterChip,
 } from '../../../design-system/filter-bar/filter-bar.component';
 import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
+import { MonogramComponent } from '../../../design-system/monogram/monogram.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
@@ -49,6 +50,7 @@ const DONUT_GAP = 4;
     FormsModule,
     RouterLink,
     AdminShellComponent,
+    MonogramComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
@@ -309,18 +311,6 @@ export class OrganizationsPage {
     return SECTOR_LABELS[code] ?? titleCaseWords(code.replaceAll('_', ' '));
   }
 
-  /**
-   * Vignette illustrative de l'entreprise. La photo est réelle mais purement décorative
-   * (`alt=""`) : la raison sociale, adjacente, porte l'information. Les mots-clés suivent
-   * le secteur pour rester topiques ; le verrou déterministe, dérivé de l'identifiant,
-   * garde la même image d'un rendu à l'autre.
-   */
-  protected logoUrl(organization: Organization): string {
-    const code = organization.sectorCode ? normalizeSectorCode(organization.sectorCode) : '';
-    const keywords = SECTOR_IMAGE_KEYWORDS[code] ?? 'office,building';
-    return `https://loremflickr.com/96/96/${keywords}?lock=${imageLock(organization.id)}`;
-  }
-
   protected listQueryParams(): Record<string, string> {
     const query = this.params();
     return Object.fromEntries(query.keys.map((key) => [key, query.get(key) ?? '']));
@@ -436,31 +426,6 @@ const SECTOR_LABELS: Readonly<Record<string, string>> = {
   TELECOMMUNICATIONS: 'Télécommunications',
 };
 
-/** Mots-clés topiques par secteur pour l'illustration décorative de la ligne. */
-const SECTOR_IMAGE_KEYWORDS: Readonly<Record<string, string>> = {
-  FABRICATION: 'factory',
-  SERVICES: 'office',
-  LOGISTIQUE: 'warehouse,logistics',
-  NUMERIQUE: 'technology,computer',
-  DISTRIBUTION: 'warehouse',
-  ENERGIE: 'energy,power',
-  TRANSFORMATION: 'agriculture,factory',
-  EMBALLAGE: 'packaging',
-  CONSTRUCTION: 'construction',
-  TEXTILE: 'textile',
-  MAINTENANCE: 'industrial,machine',
-  AGROALIMENTAIRE: 'food,factory',
-  AGRICULTURE: 'agriculture',
-  COMMERCE: 'shop,store',
-  SANTE: 'clinic,health',
-  FINANCE: 'finance,office',
-  TRANSPORT: 'transport,truck',
-  TOURISME: 'hotel,travel',
-  ARTISANAT: 'craft,workshop',
-  MINES: 'mine,industry',
-  TELECOMMUNICATIONS: 'telecom,antenna',
-};
-
 function normalizeSectorCode(value: string): string {
   return value
     .trim()
@@ -477,22 +442,3 @@ function titleCaseWords(value: string): string {
     .join(' ');
 }
 
-/**
- * Verrou déterministe pour `loremflickr`, dérivé de l'identifiant : la même entreprise
- * garde la même image. Les quatre derniers chiffres suffisent quand l'identifiant en
- * contient ; sinon un condensé simple de la chaîne prend le relais.
- */
-function imageLock(id: string): number {
-  const digits = id.replace(/\D/g, '');
-  if (digits) {
-    const tail = Number(digits.slice(-4));
-    if (Number.isFinite(tail) && tail > 0) {
-      return tail;
-    }
-  }
-  let hash = 0;
-  for (let index = 0; index < id.length; index += 1) {
-    hash = (hash * 31 + id.charCodeAt(index)) % 100000;
-  }
-  return hash + 1;
-}
