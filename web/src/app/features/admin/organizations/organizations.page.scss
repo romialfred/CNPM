@@ -96,9 +96,9 @@
   color: var(--cnpm-color-text-secondary);
 }
 
-.cnpm-organizations__count strong {
+.cnpm-organizations__count-value {
   color: var(--cnpm-color-text-primary);
-  font-weight: var(--cnpm-font-weight-semibold);
+  font-weight: var(--cnpm-font-weight-medium);
   font-variant-numeric: tabular-nums;
 }
 
@@ -173,10 +173,9 @@
   min-width: 0;
 }
 
-.cnpm-organizations__identity-text strong,
-.cnpm-organizations__card-identity strong {
+.cnpm-organizations__name {
   color: var(--cnpm-color-text-primary);
-  font-weight: var(--cnpm-font-weight-semibold);
+  font-weight: var(--cnpm-font-weight-medium);
   overflow-wrap: anywhere;
 }
 

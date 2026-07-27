@@ -115,7 +115,7 @@
           <div class="cnpm-organizations__main">
             <div class="cnpm-organizations__results" aria-live="polite">
               <p class="cnpm-organizations__count">
-                <strong>{{ totalItems() }}</strong>
+                <span class="cnpm-organizations__count-value">{{ totalItems() }}</span>
                 {{ totalItems() === 1 ? 'entreprise trouvée' : 'entreprises trouvées' }}
               </p>
               @if (rangeLabel()) {
@@ -138,7 +138,7 @@
                     <span class="cnpm-organizations__identity">
                       <cnpm-monogram [name]="organization.legalName" />
                       <span class="cnpm-organizations__identity-text">
-                        <strong>{{ organization.legalName }}</strong>
+                        <span class="cnpm-organizations__name">{{ organization.legalName }}</span>
                       </span>
                     </span>
                   </td>
@@ -200,7 +200,7 @@
                     <div class="cnpm-organizations__card-identity">
                       <cnpm-monogram [name]="organization.legalName" />
                       <div>
-                        <strong>{{ organization.legalName }}</strong>
+                        <span class="cnpm-organizations__name">{{ organization.legalName }}</span>
                         @if (organization.tradeName) {
                           <span>{{ organization.tradeName }}</span>
                         }

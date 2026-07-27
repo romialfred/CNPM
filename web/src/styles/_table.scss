@@ -80,20 +80,25 @@
    capitales), séparé du corps par un filet un cran plus marqué que ceux des lignes. Sur
    une seule ligne : le débordement éventuel est absorbé par le conteneur défilant, jamais
    par la page. */
-/* En-tête raffiné (inspiration SafeX, sans majuscules — la casse normale reste la demande du
-   commanditaire) : une bande neutre discrète pose l'en-tête, un filet d'accent de marque de
-   2 px le souligne. La bande se clippe aux coins arrondis du conteneur défilant. */
+/* En-tête raffiné et COLORÉ (demande du commanditaire), casse normale conservée : bande
+   teintée de marque + libellés en bleu de marque + filet d'accent 2 px. Le fond est mélangé
+   à la surface courante (`color-mix`) pour rester lisible en clair ET en sombre. La bande se
+   clippe aux coins arrondis du conteneur défilant. */
 .cnpm-table__head .cnpm-table__cell {
   padding-block: var(--cnpm-space-3);
-  background-color: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-secondary);
+  background-color: color-mix(
+    in srgb,
+    var(--cnpm-color-brand-blue-500) 12%,
+    var(--cnpm-color-surface-primary)
+  );
+  color: var(--cnpm-color-text-brand);
   font-weight: var(--cnpm-font-weight-semibold);
   font-size: var(--cnpm-font-size-sm);
   letter-spacing: normal;
   text-transform: none;
   vertical-align: middle;
   white-space: nowrap;
-  border-bottom: 2px solid var(--cnpm-color-brand-blue-300);
+  border-bottom: 2px solid var(--cnpm-color-brand-blue-500);
 }
 
 /* Libellé + note sur une MÊME ligne (« Montant » + « (FCFA) ») : en-tête compact qui ne
@@ -277,10 +282,13 @@
   min-width: 0;
 }
 
+/* Nom d'entité : distingué par la COULEUR (texte primaire) et une graisse MEDIUM, pas par du
+   gras lourd — « supprimer le gras » (commanditaire). La hiérarchie vient de la couleur et de
+   la sous-ligne discrète, pas du poids. */
 .cnpm-cell-id__title {
   overflow: hidden;
   color: var(--cnpm-color-text-primary);
-  font-weight: var(--cnpm-font-weight-semibold);
+  font-weight: var(--cnpm-font-weight-medium);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
