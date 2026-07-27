@@ -598,29 +598,6 @@ export class MemberDetailPage {
     () => this.sectorProfile().activities,
   );
 
-  /**
-   * Illustration du héros, photo réelle et topique servie par loremflickr. Le paramètre
-   * `lock`, dérivé du code membre, rend l'image déterministe (une fiche montre toujours
-   * la même) tout en la différenciant d'un membre à l'autre. Décorative : `alt=""`.
-   */
-  protected readonly heroImage = computed(() => {
-    const identity = this.detail()?.identity;
-    if (!identity) {
-      return '';
-    }
-    const lock = (this.hashCode(identity.code) % 1000) + 1;
-    return `https://loremflickr.com/1280/420/${this.sectorProfile().imageKeywords}?lock=${lock}`;
-  });
-
-  /** Hachage stable et positif d'un code membre, pour un `lock` d'image reproductible. */
-  private hashCode(value: string): number {
-    let hash = 0;
-    for (let index = 0; index < value.length; index += 1) {
-      hash = (Math.imul(hash, 31) + value.charCodeAt(index)) | 0;
-    }
-    return Math.abs(hash);
-  }
-
   /** Libellé et teinte du badge de vérification affiché dans le héros. */
   protected verificationLabel(status: CnpmVerificationStatus): string {
     return VERIFICATION_LABELS[status];

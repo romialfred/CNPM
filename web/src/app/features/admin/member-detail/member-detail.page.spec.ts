@@ -260,17 +260,16 @@ describe('MemberDetailPage — vitrine', () => {
     return { ...contexte, detail };
   }
 
-  it('sert une illustration réelle et topique dans le héros, décorative', async () => {
+  it('rend un héros décoratif en dégradé de marque, sans requête externe', async () => {
     const { host } = await ready();
-    const media = host.querySelector('.cnpm-member__hero-media') as HTMLImageElement | null;
+    const media = host.querySelector('.cnpm-member__hero-media');
 
     expect(media).not.toBeNull();
-    // Photo réelle, déterministe (paramètre `lock`), et différée pour ne pas retarder la fiche.
-    expect(media?.getAttribute('src')).toContain('loremflickr.com');
-    expect(media?.getAttribute('src')).toContain('lock=');
-    expect(media?.getAttribute('loading')).toBe('lazy');
-    // Illustration décorative : l'information est déjà écrite, l'alt reste vide.
-    expect(media?.getAttribute('alt')).toBe('');
+    // Bandeau en tokens de marque : ni <img>, ni source externe (CLAUDE.md).
+    expect(media?.tagName.toLowerCase()).not.toBe('img');
+    expect(media?.getAttribute('src')).toBeNull();
+    // Purement décoratif : retiré de l'arbre d'accessibilité.
+    expect(media?.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('affiche le bandeau de profil attendu sur une vitrine', async () => {

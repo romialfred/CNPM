@@ -35,11 +35,6 @@ const SECTORS: Readonly<Record<string, SectorPresentation>> = {
   'SEC-TEXTILE': { label: 'Textile', keywords: 'textile,fabric', lock: 51 },
 };
 
-const GENERIC_KEYWORDS = 'business,office';
-const GENERIC_LOCK = 60;
-const IMAGE_WIDTH = 480;
-const IMAGE_HEIGHT = 320;
-
 /** Libellé humain d'un secteur ; `null`/vide restitue « Non renseigné ». */
 export function sectorLabel(value: string | null): string {
   if (value === null || value.trim().length === 0) {
@@ -49,18 +44,17 @@ export function sectorLabel(value: string | null): string {
 }
 
 /**
- * URL loremflickr topique et déterministe pour un secteur.
- * Retourne `null` lorsqu'aucun secteur n'est renseigné, afin de laisser l'appelant
- * afficher une icône de repli du design system.
+ * Ancien point d'illustration externe (loremflickr) — NEUTRALISÉ : renvoie toujours `null`
+ * pour qu'un secteur s'affiche via l'icône de repli du design system, sans requête tierce ni
+ * actif de marque non maîtrisé (CLAUDE.md). La signature est conservée : les appelants
+ * gardent leur garde `@if (…; as image) { <img> } @else { <icône> }`, désormais toujours en `@else`.
  */
 export function sectorImage(value: string | null): string | null {
   if (value === null || value.trim().length === 0) {
     return null;
   }
-  const preset = SECTORS[value];
-  const keywords = preset?.keywords ?? GENERIC_KEYWORDS;
-  const lock = preset?.lock ?? genericLock(value);
-  return `https://loremflickr.com/${IMAGE_WIDTH}/${IMAGE_HEIGHT}/${keywords}?lock=${lock}`;
+  // Plus aucune URL externe : les écrans basculent sur leur icône de repli.
+  return null;
 }
 
 /** Mise en forme générique d'un code inconnu : retire le préfixe, normalise la casse. */
@@ -73,11 +67,3 @@ function humanize(value: string): string {
   return raw.length > 0 ? raw.charAt(0).toUpperCase() + raw.slice(1) : value;
 }
 
-/** Verrou stable dérivé d'un code inconnu, pour varier les photos génériques. */
-function genericLock(value: string): number {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) % 1000;
-  }
-  return GENERIC_LOCK + hash;
-}
