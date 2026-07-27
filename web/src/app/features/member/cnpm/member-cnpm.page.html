@@ -10,14 +10,16 @@
       <div class="member-cnpm__panel">
         @switch (eventsState()) {
           @case ('loading') {
-            <p class="member-cnpm__status" role="status">Chargement des actualités…</p>
+            <cnpm-skeleton variant="text" [rows]="3" label="Chargement des actualités…" />
           }
           @case ('error') {
-            <cnpm-empty-state
-              variant="no-data"
+            <cnpm-error-state
+              variant="recoverable"
               title="Actualités indisponibles"
               description="Les actualités du CNPM n’ont pas pu être chargées pour le moment."
-            />
+            >
+              <cnpm-button variant="secondary" (click)="loadEvents()">Réessayer</cnpm-button>
+            </cnpm-error-state>
           }
           @case ('ready') {
             @if (events().length === 0) {

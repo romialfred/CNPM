@@ -7,7 +7,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="cnpm-receipts-registry__status" role="status">Chargement des reçus…</p>
+        <cnpm-skeleton variant="table" [rows]="6" [columns]="6" label="Chargement des reçus…" />
       }
       @case ('error') {
         <cnpm-alert tone="error" title="Chargement impossible">
@@ -17,9 +17,11 @@
       }
       @case ('ready') {
         @if (receipts().length === 0) {
-          <p class="cnpm-receipts-registry__status" role="status">
-            Aucun reçu n’a encore été délivré.
-          </p>
+          <cnpm-empty-state
+            variant="first-use"
+            title="Aucun reçu délivré"
+            description="Les reçus officiels apparaîtront ici dès qu’un encaissement est confirmé par la CNPM."
+          />
         } @else {
           <div class="cnpm-table__scroll">
             <table class="cnpm-table">

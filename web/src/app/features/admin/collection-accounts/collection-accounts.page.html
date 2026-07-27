@@ -87,7 +87,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="cnpm-collection-accounts__status" role="status">Chargement des comptes…</p>
+        <cnpm-skeleton variant="table" [rows]="5" [columns]="6" label="Chargement des comptes…" />
       }
       @case ('error') {
         <cnpm-alert tone="error" title="Chargement impossible">
@@ -97,9 +97,11 @@
       }
       @case ('ready') {
         @if (accounts().length === 0) {
-          <p class="cnpm-collection-accounts__status" role="status">
-            Aucun compte d’encaissement n’est encore configuré.
-          </p>
+          <cnpm-empty-state
+            variant="first-use"
+            title="Aucun compte d’encaissement"
+            description="Configurez un premier compte (Orange Money, Wave, MTN, banque) pour permettre les paiements des cotisants."
+          />
         } @else {
           <div class="cnpm-table__scroll">
             <table class="cnpm-table">
