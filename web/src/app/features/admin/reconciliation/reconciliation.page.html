@@ -1,5 +1,5 @@
 <cnpm-admin-shell>
-  <main class="cnpm-reconciliation" id="contenu-principal">
+  <div class="cnpm-reconciliation">
     <cnpm-page-header
       title="Rapprochement"
       description="Importez un relevé : les lignes portant une référence validée sont appariées au cotisant. Confirmez pour créer l’encaissement ; les lignes sans référence restent à traiter."
@@ -70,35 +70,45 @@
         @if (cases().length === 0) {
           <p class="cnpm-reconciliation__status" role="status">Aucun cas de rapprochement. Importez un relevé.</p>
         } @else {
-          <div class="cnpm-reconciliation__table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col" class="cnpm-reconciliation__num">Montant</th>
-                  <th scope="col">Libellé</th>
-                  <th scope="col">Cotisant apparié</th>
-                  <th scope="col">État</th>
-                  @if (canRecord()) { <th scope="col">Décision</th> }
+                  <th scope="col" class="cnpm-table__cell">Date</th>
+                  <th scope="col" class="cnpm-table__cell cnpm-table__cell--end">Montant</th>
+                  <th scope="col" class="cnpm-table__cell">Libellé</th>
+                  <th scope="col" class="cnpm-table__cell">Cotisant apparié</th>
+                  <th scope="col" class="cnpm-table__cell">État</th>
+                  @if (canRecord()) {
+                    <th scope="col" class="cnpm-table__cell">Décision</th>
+                  }
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (c of cases(); track c.id) {
-                  <tr>
-                    <td>{{ c.bookingDate ?? '—' }}</td>
-                    <td class="cnpm-reconciliation__num">{{ c.amount | number: '1.0-0' : 'fr' }} {{ c.currency }}</td>
-                    <td class="cnpm-reconciliation__label-cell">{{ c.referenceText ?? '—' }}</td>
-                    <td>
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell">{{ c.bookingDate ?? '—' }}</td>
+                    <td class="cnpm-table__cell cnpm-table__cell--end">
+                      {{ c.amount | number: '1.0-0' : 'fr-ML' }} {{ c.currency }}
+                    </td>
+                    <td class="cnpm-table__cell cnpm-reconciliation__label-cell">
+                      {{ c.referenceText ?? '—' }}
+                    </td>
+                    <td class="cnpm-table__cell">
                       {{ c.organizationName ?? '—' }}
                       @if (c.matchedReferenceValue) {
                         <span class="cnpm-reconciliation__ref">{{ c.matchedReferenceValue }}</span>
                       }
                     </td>
-                    <td><cnpm-badge [tone]="statusTone(c.status)">{{ statusLabel(c.status) }}</cnpm-badge></td>
+                    <td class="cnpm-table__cell">
+                      <cnpm-badge [tone]="statusTone(c.status)">
+                        {{ statusLabel(c.status) }}
+                      </cnpm-badge>
+                    </td>
                     @if (canRecord()) {
-                      <td>
+                      <td class="cnpm-table__cell">
                         @if (c.status === 'PROPOSED') {
-                          <div class="cnpm-reconciliation__row-actions">
+                          <div class="cnpm-cell-actions cnpm-reconciliation__row-actions">
                             <cnpm-button variant="primary" [loading]="busyId() === c.id" (click)="decide(c, 'CONFIRM')">Confirmer</cnpm-button>
                             <cnpm-button variant="secondary" [loading]="busyId() === c.id" (click)="decide(c, 'REJECT')">Rejeter</cnpm-button>
                           </div>
@@ -117,5 +127,5 @@
         }
       }
     }
-  </main>
+  </div>
 </cnpm-admin-shell>

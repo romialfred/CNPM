@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
@@ -40,6 +47,8 @@ const CHANNEL_LABELS: Readonly<Record<CollectionChannel, string>> = {
 export class PaymentInstructionsPage {
   private readonly gateway = inject(PAYMENT_INSTRUCTIONS_GATEWAY);
   private readonly title = inject(Title);
+  // `load()`/Réessayer hors contexte d'injection → `DestroyRef` passé explicitement (NG0203).
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly state = signal<LoadState>('loading');
   protected readonly instructions = signal<PaymentInstructions | null>(null);
@@ -81,7 +90,7 @@ export class PaymentInstructionsPage {
     this.state.set('loading');
     this.gateway
       .load()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (instructions) => {
           this.instructions.set(instructions);

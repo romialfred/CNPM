@@ -3,7 +3,7 @@ import localeFrMl from '@angular/common/locales/fr-ML';
 import { LOCALE_ID, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-import { Subject } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
 import { DemoSessionGateway } from '../../../layout/admin-shell/demo-session.gateway';
@@ -71,8 +71,13 @@ async function setup(id = CALL.id) {
       provideRouter([]),
       { provide: LOCALE_ID, useValue: 'fr-ML' },
       {
+        // Le vrai `ActivatedRoute` expose `paramMap` comme Observable : la fiche le lit
+        // réactivement pour se recharger quand seul le paramètre change (A→B).
         provide: ActivatedRoute,
-        useValue: { snapshot: { paramMap: convertToParamMap({ id }) } },
+        useValue: {
+          paramMap: of(convertToParamMap({ id })),
+          snapshot: { paramMap: convertToParamMap({ id }) },
+        },
       },
       { provide: CONTRIBUTIONS_GATEWAY, useValue: gateway },
       { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },

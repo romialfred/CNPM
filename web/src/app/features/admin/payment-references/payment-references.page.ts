@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -57,6 +64,8 @@ export class PaymentReferencesPage {
   private readonly session = inject(SESSION_GATEWAY);
   private readonly toast = inject(ToastService);
   private readonly title = inject(Title);
+  // Actions/rechargement hors contexte d'injection → `DestroyRef` passé explicitement (NG0203).
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly sessionIdentity = toSignal(
     this.session.identity.pipe(catchError(() => of(null))),
@@ -98,7 +107,7 @@ export class PaymentReferencesPage {
     this.state.set('loading');
     this.gateway
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (references) => {
           this.references.set(references);
@@ -141,7 +150,7 @@ export class PaymentReferencesPage {
         page: 1,
         pageSize: 8,
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (page) => {
           this.searching.set(false);
@@ -175,7 +184,7 @@ export class PaymentReferencesPage {
     this.generating.set(true);
     this.gateway
       .generate({ membershipId: member.id, exercise })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.generating.set(false);
@@ -195,7 +204,7 @@ export class PaymentReferencesPage {
     this.busyId.set(reference.id);
     this.gateway
       .validate(reference.id)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.busyId.set(null);
@@ -220,7 +229,7 @@ export class PaymentReferencesPage {
     this.busyId.set(reference.id);
     this.gateway
       .revoke(reference.id, reason.trim())
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.busyId.set(null);

@@ -31,11 +31,11 @@
             </div>
             <div>
               <dt>Créée le</dt>
-              <dd>{{ req.createdAt | date: 'longDate' : undefined : 'fr' }}</dd>
+              <dd>{{ req.createdAt | date: 'longDate' : undefined : 'fr-ML' }}</dd>
             </div>
             <div>
               <dt>Dernière mise à jour</dt>
-              <dd>{{ req.updatedAt | date: 'longDate' : undefined : 'fr' }}</dd>
+              <dd>{{ req.updatedAt | date: 'longDate' : undefined : 'fr-ML' }}</dd>
             </div>
           </dl>
 
@@ -58,7 +58,7 @@
                     <p class="request-detail__message-head">
                       <span class="request-detail__sender">{{ senderLabel(message.sender) }}</span>
                       <span class="request-detail__when">
-                        {{ message.createdAt | date: 'short' : undefined : 'fr' }}
+                        {{ message.createdAt | date: 'short' : undefined : 'fr-ML' }}
                       </span>
                     </p>
                     <p class="request-detail__message-body">{{ message.body }}</p>

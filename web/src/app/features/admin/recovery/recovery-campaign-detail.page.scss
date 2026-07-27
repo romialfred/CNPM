@@ -57,7 +57,7 @@
 .campaign-detail__performance h2,
 .campaign-detail__notice h2 {
   color: var(--cnpm-color-text-primary);
-  font-family: var(--cnpm-font-family-heading);
+  font-family: var(--cnpm-font-family-sans);
   margin: 0;
 }
 
@@ -72,7 +72,7 @@
 
 .campaign-detail__eyebrow {
   color: var(--cnpm-color-brand-blue-800);
-  font-family: var(--cnpm-font-family-heading);
+  font-family: var(--cnpm-font-family-sans);
   font-size: var(--cnpm-font-size-xs);
   font-weight: var(--cnpm-font-weight-bold);
   letter-spacing: 0.04em;
@@ -102,7 +102,7 @@
 .campaign-detail__metrics strong,
 .campaign-detail__performance strong {
   color: var(--cnpm-color-text-primary);
-  font-family: var(--cnpm-font-family-heading);
+  font-family: var(--cnpm-font-family-sans);
   font-size: var(--cnpm-font-size-lg);
   line-height: var(--cnpm-line-height-tight);
 }

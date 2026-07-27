@@ -1,0 +1,32 @@
+:host {
+  display: inline-flex;
+  flex: none;
+}
+
+.cnpm-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cnpm-size-control-lg);
+  height: var(--cnpm-size-control-lg);
+  border: 0;
+  border-radius: var(--cnpm-radius-md);
+  background: transparent;
+  color: var(--cnpm-chrome-text-secondary);
+  cursor: pointer;
+}
+
+.cnpm-theme-toggle svg {
+  width: var(--cnpm-size-icon-md);
+  height: var(--cnpm-size-icon-md);
+}
+
+.cnpm-theme-toggle:hover {
+  background: var(--cnpm-chrome-surface-raised);
+  color: var(--cnpm-chrome-text);
+}
+
+.cnpm-theme-toggle:focus-visible {
+  outline: 2px solid var(--cnpm-chrome-focus);
+  outline-offset: 2px;
+}

@@ -76,7 +76,7 @@
               <span class="member-home__kpi-emblem" aria-hidden="true"><svg lucideWallet></svg></span>
               <span class="member-home__kpi-label">Reste dû</span>
               <span class="member-home__kpi-value">
-                {{ data.outstandingTotal | number: '1.0-0' : 'fr' }}
+                {{ data.outstandingTotal | number: '1.0-0' : 'fr-ML' }}
                 <span class="member-home__kpi-unit">FCFA</span>
               </span>
               <span class="member-home__kpi-def">Tous exercices confondus</span>
@@ -91,7 +91,7 @@
               </span>
               <span class="member-home__kpi-label">Dont en retard</span>
               <span class="member-home__kpi-value">
-                {{ data.overdueAmount | number: '1.0-0' : 'fr' }}
+                {{ data.overdueAmount | number: '1.0-0' : 'fr-ML' }}
                 <span class="member-home__kpi-unit">FCFA</span>
               </span>
               <span class="member-home__kpi-def">Échéance dépassée</span>
@@ -103,7 +103,7 @@
               </span>
               <span class="member-home__kpi-label">Total cotisé</span>
               <span class="member-home__kpi-value">
-                {{ data.settledTotal | number: '1.0-0' : 'fr' }}
+                {{ data.settledTotal | number: '1.0-0' : 'fr-ML' }}
                 <span class="member-home__kpi-unit">FCFA</span>
               </span>
               <span class="member-home__kpi-def">Réglé à ce jour</span>
@@ -131,7 +131,7 @@
               </span>
               <span class="member-home__kpi-def">
                 @if (data.lastPayment; as last) {
-                  Dernier : {{ last.amount | number: '1.0-0' : 'fr' }} {{ last.currency }}
+                  Dernier : {{ last.amount | number: '1.0-0' : 'fr-ML' }} {{ last.currency }}
                 } @else {
                   Aucun règlement enregistré
                 }
@@ -166,13 +166,13 @@
                       <tr>
                         <td class="member-home__year">{{ exercise.year }}</td>
                         <td class="member-home__num">
-                          {{ exercise.called | number: '1.0-0' : 'fr' }}
+                          {{ exercise.called | number: '1.0-0' : 'fr-ML' }}
                         </td>
                         <td class="member-home__num">
-                          {{ exercise.settled | number: '1.0-0' : 'fr' }}
+                          {{ exercise.settled | number: '1.0-0' : 'fr-ML' }}
                         </td>
                         <td class="member-home__num" [class.member-home__due]="exercise.outstanding > 0">
-                          {{ exercise.outstanding | number: '1.0-0' : 'fr' }}
+                          {{ exercise.outstanding | number: '1.0-0' : 'fr-ML' }}
                         </td>
                         <td>
                           <span class="member-home__progress" [attr.title]="exerciseRatio(exercise) + '%'">

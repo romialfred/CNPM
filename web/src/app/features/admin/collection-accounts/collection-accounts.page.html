@@ -1,5 +1,5 @@
 <cnpm-admin-shell>
-  <main class="cnpm-collection-accounts" id="contenu-principal">
+  <div class="cnpm-collection-accounts">
     <cnpm-page-header
       title="Comptes d’encaissement"
       description="Coordonnées d’encaissement de la CNPM (Orange Money, Wave, MTN, virement). Un compte n’est proposé au paiement qu’après validation par un second agent."
@@ -101,25 +101,25 @@
             Aucun compte d’encaissement n’est encore configuré.
           </p>
         } @else {
-          <div class="cnpm-collection-accounts__table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Canal</th>
-                  <th scope="col">Libellé</th>
-                  <th scope="col">Titulaire</th>
-                  <th scope="col">Coordonnées</th>
-                  <th scope="col">État</th>
-                  <th scope="col">Actions</th>
+                  <th scope="col" class="cnpm-table__cell">Canal</th>
+                  <th scope="col" class="cnpm-table__cell">Libellé</th>
+                  <th scope="col" class="cnpm-table__cell">Titulaire</th>
+                  <th scope="col" class="cnpm-table__cell">Coordonnées</th>
+                  <th scope="col" class="cnpm-table__cell">État</th>
+                  <th scope="col" class="cnpm-table__cell">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (account of accounts(); track account.id) {
-                  <tr>
-                    <td>{{ channelLabel(account.channel) }}</td>
-                    <td>{{ account.label }}</td>
-                    <td>{{ account.accountHolder }}</td>
-                    <td>
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell">{{ channelLabel(account.channel) }}</td>
+                    <td class="cnpm-table__cell">{{ account.label }}</td>
+                    <td class="cnpm-table__cell">{{ account.accountHolder }}</td>
+                    <td class="cnpm-table__cell">
                       <span class="cnpm-collection-accounts__identifier">{{
                         account.accountIdentifier
                       }}</span>
@@ -127,13 +127,13 @@
                         <span class="cnpm-collection-accounts__bank">{{ account.bankName }}</span>
                       }
                     </td>
-                    <td>
+                    <td class="cnpm-table__cell">
                       <cnpm-badge [tone]="statusTone(account.status)">{{
                         statusLabel(account.status)
                       }}</cnpm-badge>
                     </td>
-                    <td>
-                      <div class="cnpm-collection-accounts__row-actions">
+                    <td class="cnpm-table__cell">
+                      <div class="cnpm-cell-actions cnpm-collection-accounts__row-actions">
                         @if (account.status === 'DRAFT' && canApprove()) {
                           <cnpm-button
                             variant="primary"
@@ -162,5 +162,5 @@
         }
       }
     }
-  </main>
+  </div>
 </cnpm-admin-shell>

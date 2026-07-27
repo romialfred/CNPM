@@ -185,7 +185,7 @@
 
 .cnpm-request-detail__error {
   margin: 0;
-  color: var(--cnpm-color-status-error-text);
+  color: var(--cnpm-color-text-critical);
   font-size: var(--cnpm-font-size-sm);
 }
 
@@ -201,7 +201,7 @@
 }
 
 .cnpm-request-detail__internal {
-  border-left: 4px solid var(--cnpm-color-status-warning-border);
+  border-left: 4px solid var(--cnpm-color-semantic-warning-500);
 }
 
 .cnpm-request-detail__internal-warning {

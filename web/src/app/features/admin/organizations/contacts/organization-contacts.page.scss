@@ -178,7 +178,7 @@
   display: inline-flex !important;
   margin: 0 !important;
   padding: 0.1rem 0.45rem;
-  border-radius: var(--cnpm-radius-full);
+  border-radius: var(--cnpm-radius-pill);
   color: var(--cnpm-color-text-secondary) !important;
   background: var(--cnpm-color-surface-secondary);
 }
@@ -257,7 +257,7 @@
   }
   .cnpm-contacts__card-tags > span {
     padding: 0.15rem 0.5rem;
-    border-radius: var(--cnpm-radius-full);
+    border-radius: var(--cnpm-radius-pill);
     background: var(--cnpm-color-surface-secondary);
     font-size: var(--cnpm-font-size-xs);
   }

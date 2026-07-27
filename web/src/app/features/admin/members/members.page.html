@@ -420,6 +420,49 @@
                 </li>
               }
             </ul>
+          } @else if (view() === 'tiles') {
+            <!-- La vue tuiles porte les MÊMES états que la table : le socle
+                 loading-empty-error impose de ne jamais laisser une page blanche. Sans ce
+                 bloc, chargement/vide/erreur/403 en mode tuiles n'affichaient rien. -->
+            <div data-tiles-status>
+              @switch (tableState()) {
+                @case ('loading') {
+                  <cnpm-skeleton variant="card" [rows]="4" label="Chargement des membres…" />
+                }
+                @case ('empty') {
+                  <cnpm-empty-state
+                    variant="first-use"
+                    title="Aucun membre enregistré"
+                    description="La base de membres est vide. Créez un premier membre pour commencer."
+                  />
+                }
+                @case ('noResult') {
+                  <cnpm-empty-state
+                    variant="no-results"
+                    title="Aucun membre ne correspond"
+                    description="Élargissez la recherche ou retirez un filtre."
+                  >
+                    <cnpm-button variant="secondary" size="sm" (click)="resetFilters()">
+                      Réinitialiser les filtres
+                    </cnpm-button>
+                  </cnpm-empty-state>
+                }
+                @case ('error') {
+                  <cnpm-error-state
+                    variant="recoverable"
+                    title="La liste n’a pas pu être chargée"
+                    description="Le service des membres est momentanément indisponible. Vos filtres sont conservés."
+                  >
+                    <cnpm-button variant="secondary" size="sm" (click)="retry()">
+                      Réessayer
+                    </cnpm-button>
+                  </cnpm-error-state>
+                }
+                @case ('forbidden') {
+                  <cnpm-error-state variant="forbidden" />
+                }
+              }
+            </div>
           }
 
           @if (tableState() === 'ready') {

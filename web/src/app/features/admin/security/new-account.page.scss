@@ -3,8 +3,9 @@
 }
 
 .nacc {
-  padding: var(--cnpm-layout-page);
-  max-width: var(--cnpm-size-contentMax, 1200px);
+  /* Padding horizontal fourni par le <main> du shell admin ; on borne juste la largeur. */
+  max-width: var(--cnpm-size-contentMax);
+  margin-inline: auto;
 
   &__status {
     margin: 0;

@@ -1,0 +1,62 @@
+/* Thème sombre applicatif — OPT-IN, activé par `data-theme="dark"` sur `<html>` (posé par
+   le `ThemeService`). Défaut = clair : sans l'attribut, rien ne change, l'expérience claire
+   livrée reste intacte.
+   ---------------------------------------------------------------------------------------
+   `tokens.css` est généré (« do not edit ») : on REDÉFINIT ici, sous le sélecteur de thème,
+   les tokens SÉMANTIQUES de surface/texte/bordure. La quasi-totalité des composants passe
+   par ces tokens et bascule donc automatiquement. Les rampes de marque (`brand-blue-*`,
+   `semantic-*`) restent inchangées : les pastilles douces (avatars, puces, badges) demeurent
+   des éléments clairs à texte foncé — lisibles sur fond sombre (contraste interne préservé).
+
+   Contrastes visés (WCAG 2.2 AA) sur `surface-page` (#0C111D) / `surface-primary` (#101828) :
+     texte primaire  neutral-50  (#F8F9FC) ~ 17:1
+     texte secondaire neutral-300 (#D0D5DD) ~ 12:1
+     texte discret   neutral-400 (#98A2B3) ~ 7:1
+     texte de marque brand-blue-300 (#AEBBE8) ~ 9:1
+   Le chrome de la sidebar (`.cnpm-chrome--dark`) reste navy, séparé du contenu par sa bordure. */
+
+:root[data-theme='dark'] {
+  /* Surfaces : la page est le cran le plus sombre, les cartes un cran au-dessus. */
+  --cnpm-color-surface-page: var(--cnpm-color-neutral-950);
+  --cnpm-color-surface-primary: var(--cnpm-color-neutral-900);
+  --cnpm-color-surface-secondary: var(--cnpm-color-neutral-950);
+  --cnpm-color-surface-subtle: var(--cnpm-color-neutral-800);
+  /* « inverse » = opposé du thème : clair en mode sombre (lien d'évitement, etc.). */
+  --cnpm-color-surface-inverse: var(--cnpm-color-neutral-100);
+  --cnpm-color-surface-overlay: rgba(0, 0, 0, 0.64);
+
+  /* Texte. */
+  --cnpm-color-text-primary: var(--cnpm-color-neutral-50);
+  --cnpm-color-text-secondary: var(--cnpm-color-neutral-300);
+  --cnpm-color-text-muted: var(--cnpm-color-neutral-400);
+  --cnpm-color-text-disabled: var(--cnpm-color-neutral-500);
+  --cnpm-color-text-brand: var(--cnpm-color-brand-blue-300);
+  --cnpm-color-text-link: var(--cnpm-color-brand-blue-300);
+  --cnpm-color-text-inverse: var(--cnpm-color-neutral-900);
+  --cnpm-color-text-critical: var(--cnpm-color-brand-red-300);
+
+  /* Bordures. La bordure de focus s'éclaircit pour rester visible sur fond sombre. */
+  --cnpm-color-border-subtle: var(--cnpm-color-neutral-800);
+  --cnpm-color-border-default: var(--cnpm-color-neutral-700);
+  --cnpm-color-border-strong: var(--cnpm-color-neutral-600);
+  --cnpm-color-border-focus: var(--cnpm-color-brand-blue-400);
+
+  /* L'anneau de focus (halo) doit rester perceptible sur fond sombre. */
+  --cnpm-shadow-focus: 0 0 0 4px rgba(126, 145, 207, 0.35);
+
+  /* Repères de graphique adaptés au fond sombre. */
+  --cnpm-chart-grid: var(--cnpm-color-neutral-800);
+  --cnpm-chart-axis: var(--cnpm-color-neutral-400);
+  --cnpm-chart-tooltipBackground: var(--cnpm-color-neutral-700);
+
+  /* Alias de chrome de la BARRE SUPÉRIEURE (chrome clair) : sans surcharge, l'état surélevé
+     (`brand-blue-50`) et l'anneau de focus (`brand-blue-700`) resteraient clairs sur la
+     topbar devenue sombre. On les adapte ici. La sidebar `.cnpm-chrome--dark` redéfinit ces
+     mêmes alias pour son propre compte (navy) et n'est donc pas affectée. */
+  --cnpm-chrome-surface-raised: var(--cnpm-color-surface-subtle);
+  --cnpm-chrome-focus: var(--cnpm-color-brand-blue-400);
+}
+
+/* Chrome clair (topbar) : en thème sombre, ses alias suivent déjà `surface-page` /
+   `text-*` redéfinis ci-dessus, donc la barre supérieure devient sombre sans réglage
+   supplémentaire. La sidebar `.cnpm-chrome--dark` conserve son navy propre. */

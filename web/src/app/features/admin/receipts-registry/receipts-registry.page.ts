@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { DecimalPipe, SlicePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
-import { BadgeComponent } from '../../../design-system/badge/badge.component';
+import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
@@ -35,6 +35,8 @@ type LoadState = 'loading' | 'ready' | 'error';
 export class ReceiptsRegistryPage {
   private readonly gateway = inject(RECEIPTS_REGISTRY_GATEWAY);
   private readonly title = inject(Title);
+  // `load()`/Réessayer hors contexte d'injection → `DestroyRef` passé explicitement (NG0203).
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly receipts = signal<readonly IssuedReceipt[]>([]);
   protected readonly state = signal<LoadState>('loading');
@@ -48,7 +50,7 @@ export class ReceiptsRegistryPage {
     this.state.set('loading');
     this.gateway
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (receipts) => {
           this.receipts.set(receipts);
@@ -56,5 +58,28 @@ export class ReceiptsRegistryPage {
         },
         error: () => this.state.set('error'),
       });
+  }
+
+  /** Libellé français du statut du reçu (même correspondance que l'écran membre). */
+  protected statusLabel(status: string): string {
+    if (status === 'ISSUED') {
+      return 'Émis';
+    }
+    if (status === 'CANCELLED') {
+      return 'Annulé';
+    }
+    return status;
+  }
+
+  /** Tonalité du badge : un reçu annulé n'est pas « vert » — le statut n'est pas porté par
+   *  la seule couleur, mais la couleur ne doit pas non plus contredire le libellé. */
+  protected statusTone(status: string): CnpmBadgeTone {
+    if (status === 'ISSUED') {
+      return 'success';
+    }
+    if (status === 'CANCELLED') {
+      return 'error';
+    }
+    return 'neutral';
   }
 }

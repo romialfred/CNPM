@@ -1,5 +1,5 @@
 <cnpm-admin-shell>
-  <main class="cnpm-payments-recording" id="contenu-principal">
+  <div class="cnpm-payments-recording">
     <cnpm-page-header
       title="Encaissements"
       description="Enregistrez un encaissement reçu contre la référence validée d’un cotisant. L’écriture est définitive et rattache le versement à son compte cotisant."
@@ -144,34 +144,40 @@
             Aucun encaissement n’a encore été enregistré.
           </p>
         } @else {
-          <div class="cnpm-payments-recording__table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Transaction</th>
-                  <th scope="col">Cotisant</th>
-                  <th scope="col">Référence</th>
-                  <th scope="col">Canal</th>
-                  <th scope="col" class="cnpm-payments-recording__num">Montant</th>
-                  <th scope="col">Payé le</th>
+                  <th scope="col" class="cnpm-table__cell">Transaction</th>
+                  <th scope="col" class="cnpm-table__cell">Cotisant</th>
+                  <th scope="col" class="cnpm-table__cell">Référence</th>
+                  <th scope="col" class="cnpm-table__cell">Canal</th>
+                  <th scope="col" class="cnpm-table__cell cnpm-table__cell--end">Montant</th>
+                  <th scope="col" class="cnpm-table__cell">Payé le</th>
                   @if (canConfirm()) {
-                    <th scope="col">Action</th>
+                    <th scope="col" class="cnpm-table__cell">Action</th>
                   }
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (payment of payments(); track payment.id) {
-                  <tr>
-                    <td class="cnpm-payments-recording__mono">{{ payment.transactionNumber }}</td>
-                    <td>{{ payment.organizationName ?? '—' }}</td>
-                    <td class="cnpm-payments-recording__mono">{{ payment.referenceValue ?? '—' }}</td>
-                    <td>{{ channelLabel(payment.channel) }}</td>
-                    <td class="cnpm-payments-recording__num">
-                      {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell cnpm-payments-recording__mono">
+                      {{ payment.transactionNumber }}
                     </td>
-                    <td>{{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}</td>
+                    <td class="cnpm-table__cell">{{ payment.organizationName ?? '—' }}</td>
+                    <td class="cnpm-table__cell cnpm-payments-recording__mono">
+                      {{ payment.referenceValue ?? '—' }}
+                    </td>
+                    <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
+                    <td class="cnpm-table__cell cnpm-table__cell--end">
+                      {{ payment.amount | number: '1.0-0' : 'fr-ML' }} {{ payment.currency }}
+                    </td>
+                    <td class="cnpm-table__cell">
+                      {{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}
+                    </td>
                     @if (canConfirm()) {
-                      <td>
+                      <td class="cnpm-table__cell">
                         <cnpm-button
                           variant="primary"
                           [loading]="confirmingId() === payment.id"
@@ -189,5 +195,5 @@
         }
       }
     }
-  </main>
+  </div>
 </cnpm-admin-shell>

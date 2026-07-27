@@ -38,10 +38,12 @@
   color: var(--cnpm-color-text-primary);
 }
 
-/* L'état sélectionné : fond de marque léger + texte de marque, en plus de `aria-pressed`. */
+/* L'état sélectionné : fond de marque léger + texte de marque, en plus de `aria-pressed`.
+   Le fond est mélangé à la surface courante pour rester lisible dans les deux thèmes (en
+   sombre, `brand-blue-100` figé donnerait un texte de marque clair sur fond clair). */
 .cnpm-view-toggle__btn--active,
 .cnpm-view-toggle__btn--active:hover {
-  background: var(--cnpm-color-brand-blue-100);
+  background: color-mix(in srgb, var(--cnpm-color-brand-blue-500) 16%, var(--cnpm-color-surface-primary));
   color: var(--cnpm-color-text-brand);
 }
 
