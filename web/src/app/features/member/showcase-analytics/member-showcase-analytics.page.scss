@@ -89,7 +89,9 @@
 
 .showcase-analytics__metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* Auto-fit plutôt que 4 colonnes fixes : à 360/390 px les 4 KPI se compressaient. Le
+     repli se fait de lui-même (4 → 2 → 1), comme `.mp-kpis`. */
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: var(--cnpm-space-3);
 }
 
@@ -211,18 +213,20 @@
   text-align: start;
 }
 
+/* Aligné sur la convention maison (`_table.scss`) : casse normale + bande neutre + filet
+   d'accent de marque 2 px. Ce tableau était le seul du produit à afficher des capitales. */
 .showcase-analytics thead th {
   padding: var(--cnpm-space-3) var(--cnpm-space-4);
-  background: transparent;
-  color: var(--cnpm-color-text-muted);
-  font-size: var(--cnpm-font-size-xs);
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-semibold);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  text-transform: uppercase;
+  letter-spacing: normal;
+  text-transform: none;
   text-align: left;
   white-space: nowrap;
   vertical-align: middle;
-  border-bottom: 1px solid var(--cnpm-color-border-default);
+  border-bottom: 2px solid var(--cnpm-color-brand-blue-300);
 }
 
 .showcase-analytics tbody :is(td, th) {
