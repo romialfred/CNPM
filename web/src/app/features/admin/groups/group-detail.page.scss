@@ -48,6 +48,16 @@
   background: var(--cnpm-color-surface-primary);
 }
 
+/* Accent sémantique par bordure gauche (principe SafeX) : marque pour les cartes de contenu,
+   neutre pour la note d'indisponibilité. */
+.cnpm-group-detail__card {
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-500);
+}
+
+.cnpm-group-detail__unavailable {
+  border-inline-start: 3px solid var(--cnpm-color-border-strong);
+}
+
 .cnpm-group-detail__card h2,
 .cnpm-group-detail__unavailable h2 {
   margin: 0 0 var(--cnpm-space-4);
@@ -70,10 +80,10 @@
   width: var(--cnpm-size-control-xl);
   height: var(--cnpm-size-control-xl);
   overflow: hidden;
-  border: 1px solid var(--cnpm-color-border-subtle);
+  border: 1px solid var(--cnpm-color-brand-blue-100);
   border-radius: var(--cnpm-radius-md);
-  background: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-muted);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
 }
 
 .cnpm-group-detail__avatar img {
