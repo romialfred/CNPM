@@ -11,6 +11,7 @@ import ml.cnpm.platform.administration.application.AdminSecurityQueryService;
 import ml.cnpm.platform.administration.application.AdminSecurityView;
 import ml.cnpm.platform.shared.api.CorrelationId;
 import ml.cnpm.platform.shared.security.credential.AccountCredentialService;
+import ml.cnpm.platform.shared.security.credential.CredentialLinkService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -36,17 +37,17 @@ public class AdminSecurityController {
     private final AdminSecurityQueryService service;
     private final AdminAccountService accounts;
     private final AdminRolePermissionService rolePermissions;
-    private final AccountCredentialService credentials;
+    private final CredentialLinkService credentialLinks;
 
     public AdminSecurityController(
             AdminSecurityQueryService service,
             AdminAccountService accounts,
             AdminRolePermissionService rolePermissions,
-            AccountCredentialService credentials) {
+            CredentialLinkService credentialLinks) {
         this.service = service;
         this.accounts = accounts;
         this.rolePermissions = rolePermissions;
-        this.credentials = credentials;
+        this.credentialLinks = credentialLinks;
     }
 
     @GetMapping("/admin/security/snapshot")
@@ -85,9 +86,11 @@ public class AdminSecurityController {
     /**
      * Émet un lien d'activation ou de récupération d'accès.
      *
-     * <p>Le jeton est remis UNE SEULE FOIS, dans cette réponse : il n'est stocké nulle part
-     * en clair et ne pourra pas être relu. L'opérateur le transmet au titulaire, qui pose
-     * lui-même son mot de passe — l'administration ne le connaît donc jamais.
+     * <p>Le lien est envoyé par e-mail au titulaire (bienvenue/activation ou réinitialisation).
+     * Le jeton est EN OUTRE remis UNE SEULE FOIS dans cette réponse — repli pour un relais
+     * manuel si l'e-mail n'aboutit pas. Il n'est stocké nulle part en clair et ne pourra pas
+     * être relu. Le titulaire pose lui-même son mot de passe : l'administration ne le connaît
+     * jamais.
      */
     @PostMapping("/admin/security/accounts/{accountId}/password-reset")
     public AdminCredentialTokenView issueCredentialToken(
@@ -95,7 +98,8 @@ public class AdminSecurityController {
             JwtAuthenticationToken authentication,
             HttpServletRequest request) {
         AccountCredentialService.IssuedToken issued =
-                credentials.issue(accountId, actorId(authentication), CorrelationId.current(request));
+                credentialLinks.issueAndNotify(
+                        accountId, actorId(authentication), CorrelationId.current(request));
         return new AdminCredentialTokenView(
                 issued.token(), issued.expiresAt().toString(), issued.activation());
     }
