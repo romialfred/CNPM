@@ -3,7 +3,6 @@
     #trigger
     class="cnpm-account-menu__trigger"
     type="button"
-    aria-haspopup="menu"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="panelId()"
     [attr.aria-label]="'Compte de ' + name() + (secondary() ? ', ' + secondary() : '')"
@@ -19,12 +18,14 @@
     <svg class="cnpm-account-menu__chevron" lucideChevronDown aria-hidden="true"></svg>
   </button>
 
+  <!-- Modèle « disclosure », pas « menu » ARIA : une bascule qui révèle une liste de liens
+       de navigation (Échap referme), sans navigation aux flèches. Annoncer role="menu"
+       promettrait un clavier fléché inexistant. `aria-expanded` + `aria-controls` suffisent. -->
   @if (open()) {
-    <div class="cnpm-account-menu__panel" [id]="panelId()" role="menu">
+    <div class="cnpm-account-menu__panel" [id]="panelId()">
       @if (profileLink(); as link) {
         <a
           class="cnpm-account-menu__item"
-          role="menuitem"
           [routerLink]="link"
           (click)="close()"
         >
@@ -35,7 +36,6 @@
       @if (preferencesLink(); as link) {
         <a
           class="cnpm-account-menu__item"
-          role="menuitem"
           [routerLink]="link"
           (click)="close()"
         >
@@ -46,7 +46,6 @@
       @if (helpLink(); as link) {
         <a
           class="cnpm-account-menu__item"
-          role="menuitem"
           [routerLink]="link"
           (click)="close()"
         >
@@ -56,7 +55,6 @@
       }
       <a
         class="cnpm-account-menu__item cnpm-account-menu__item--danger"
-        role="menuitem"
         routerLink="/auth/logout"
         (click)="close()"
       >

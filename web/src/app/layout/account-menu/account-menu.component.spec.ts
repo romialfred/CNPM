@@ -39,7 +39,8 @@ describe('AccountMenuComponent', () => {
     expect(trigger?.getAttribute('aria-expanded')).toBe('true');
     const logout = host.querySelector<HTMLAnchorElement>('a[href="/auth/logout"]');
     expect(logout).not.toBeNull();
-    expect(logout?.getAttribute('role')).toBe('menuitem');
+    // Modèle disclosure : un lien de navigation ordinaire, sans role="menuitem".
+    expect(logout?.getAttribute('role')).toBeNull();
     expect(logout?.textContent).toContain('Se déconnecter');
     // Pas de lien profil tant qu'aucune route n'est fournie.
     expect(host.textContent).not.toContain('Mon profil');
