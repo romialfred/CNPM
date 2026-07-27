@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LucideBell, LucideMenu, LucidePlus, LucideSearch } from '@lucide/angular';
 import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
+import { ThemeToggleComponent } from '../../design-system/theme-toggle/theme-toggle.component';
 import { AccountMenuComponent } from '../account-menu/account-menu.component';
 import { SESSION_GATEWAY } from './session-gateway';
 
@@ -33,6 +34,7 @@ import { SESSION_GATEWAY } from './session-gateway';
     FormsModule,
     RouterLink,
     AccountMenuComponent,
+    ThemeToggleComponent,
     LucideBell,
     LucideMenu,
     LucidePlus,
