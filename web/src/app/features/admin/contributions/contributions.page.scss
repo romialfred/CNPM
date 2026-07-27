@@ -49,6 +49,12 @@
   outline-offset: 1px;
 }
 
+/* CONTOURNEMENT TEMPORAIRE DOCUMENTÉ (`frontend-angular.md` autorise `::ng-deep` à cette
+   seule condition). Cet écran resserre la densité de `cnpm-filter-bar` / `cnpm-data-table`
+   (masquer l'en-tête de filtres, passer le corps en 4 colonnes) — des variantes que ces
+   composants du design system n'exposent pas encore en entrée. À RETIRER dès qu'un
+   `[density]`/`[layout]` public est ajouté à ces composants ; le style repassera alors par
+   l'API publique, sans percer l'encapsulation. Suivi : dette design-system (audit lot 3). */
 :host ::ng-deep .cnpm-contributions__filters .cnpm-filters {
   gap: var(--cnpm-space-2);
   padding: var(--cnpm-space-3);
@@ -181,6 +187,8 @@
   text-align: right;
 }
 
+/* Contournement temporaire documenté (voir bloc en tête de fichier) : densité resserrée du
+   tableau de bord des appels, en attendant un `[density]` public sur `cnpm-data-table`. */
 :host ::ng-deep .cnpm-contributions__desktop-table .cnpm-table__scroll {
   border-right: 0;
   border-left: 0;
@@ -409,6 +417,8 @@
 }
 
 @media (max-width: 767px) {
+  /* Contournement temporaire documenté (voir bloc en tête de fichier) : bascule responsive
+     de la barre de filtres, en attendant un `[layout]` public sur `cnpm-filter-bar`. */
   :host ::ng-deep .cnpm-contributions__filters .cnpm-filters__head {
     display: flex;
   }
