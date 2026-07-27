@@ -10,8 +10,11 @@ import {
   LucideMessageSquareText,
   LucideStore,
 } from '@lucide/angular';
+import { ButtonComponent } from '../../../design-system/button/button.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
+import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { MemberPortalShellComponent } from '../../../layout/member-portal-shell/member-portal-shell.component';
 import { MEMBER_EVENTS_GATEWAY, type MemberEvent } from './member-events.gateway';
 
@@ -44,7 +47,10 @@ type EventsState = 'loading' | 'ready' | 'error';
     LucideFolderArchive,
     LucideMessageSquareText,
     LucideStore,
+    ButtonComponent,
     EmptyStateComponent,
+    ErrorStateComponent,
+    SkeletonComponent,
     PageHeaderComponent,
     MemberPortalShellComponent,
   ],

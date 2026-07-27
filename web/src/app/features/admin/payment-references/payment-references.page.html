@@ -106,7 +106,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="cnpm-payment-references__status" role="status">Chargement des références…</p>
+        <cnpm-skeleton variant="table" [rows]="5" [columns]="5" label="Chargement des références…" />
       }
       @case ('error') {
         <cnpm-alert tone="error" title="Chargement impossible">
@@ -116,9 +116,11 @@
       }
       @case ('ready') {
         @if (references().length === 0) {
-          <p class="cnpm-payment-references__status" role="status">
-            Aucune référence de paiement n’a encore été générée.
-          </p>
+          <cnpm-empty-state
+            variant="first-use"
+            title="Aucune référence de paiement"
+            description="Générez la référence unique d’un cotisant pour qu’il puisse régler sa cotisation."
+          />
         } @else {
           <div class="cnpm-table__scroll">
             <table class="cnpm-table">

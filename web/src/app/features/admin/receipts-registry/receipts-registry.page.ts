@@ -5,7 +5,9 @@ import { Title } from '@angular/platform-browser';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
+import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
+import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import {
   RECEIPTS_REGISTRY_GATEWAY,
@@ -27,7 +29,9 @@ type LoadState = 'loading' | 'ready' | 'error';
     AlertComponent,
     BadgeComponent,
     ButtonComponent,
+    EmptyStateComponent,
     PageHeaderComponent,
+    SkeletonComponent,
   ],
   templateUrl: './receipts-registry.page.html',
   styleUrl: './receipts-registry.page.scss',

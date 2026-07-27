@@ -130,7 +130,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="cnpm-payments-recording__status" role="status">Chargement des encaissements…</p>
+        <cnpm-skeleton variant="table" [rows]="6" [columns]="7" label="Chargement des encaissements…" />
       }
       @case ('error') {
         <cnpm-alert tone="error" title="Chargement impossible">
@@ -140,9 +140,11 @@
       }
       @case ('ready') {
         @if (payments().length === 0) {
-          <p class="cnpm-payments-recording__status" role="status">
-            Aucun encaissement n’a encore été enregistré.
-          </p>
+          <cnpm-empty-state
+            variant="first-use"
+            title="Aucun encaissement enregistré"
+            description="Enregistrez un encaissement contre une référence validée pour le rattacher à un cotisant."
+          />
         } @else {
           <div class="cnpm-table__scroll">
             <table class="cnpm-table">

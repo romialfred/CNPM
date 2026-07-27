@@ -13,7 +13,9 @@ import { Title } from '@angular/platform-browser';
 import { catchError, of } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
+import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
+import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
@@ -61,6 +63,8 @@ const CHANNELS: readonly ChannelOption[] = [
     DecimalPipe,
     SlicePipe,
     AdminShellComponent,
+    EmptyStateComponent,
+    SkeletonComponent,
     AlertComponent,
     ButtonComponent,
     PageHeaderComponent,

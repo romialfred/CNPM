@@ -13,7 +13,9 @@ import { catchError, of } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
+import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
+import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
@@ -56,6 +58,8 @@ const CHANNELS: readonly ChannelOption[] = [
   imports: [
     ReactiveFormsModule,
     AdminShellComponent,
+    EmptyStateComponent,
+    SkeletonComponent,
     AlertComponent,
     BadgeComponent,
     ButtonComponent,

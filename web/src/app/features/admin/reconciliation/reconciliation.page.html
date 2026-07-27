@@ -58,7 +58,7 @@
 
     @switch (state()) {
       @case ('loading') {
-        <p class="cnpm-reconciliation__status" role="status">Chargement des cas…</p>
+        <cnpm-skeleton variant="table" [rows]="5" [columns]="6" label="Chargement des cas…" />
       }
       @case ('error') {
         <cnpm-alert tone="error" title="Chargement impossible">
@@ -68,7 +68,11 @@
       }
       @case ('ready') {
         @if (cases().length === 0) {
-          <p class="cnpm-reconciliation__status" role="status">Aucun cas de rapprochement. Importez un relevé.</p>
+          <cnpm-empty-state
+            variant="first-use"
+            title="Aucun cas de rapprochement"
+            description="Importez un relevé bancaire pour proposer des appariements à confirmer."
+          />
         } @else {
           <div class="cnpm-table__scroll">
             <table class="cnpm-table">
