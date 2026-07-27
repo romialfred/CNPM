@@ -74,7 +74,7 @@
                     <td class="cnpm-table__cell mp-mono">{{ payment.referenceValue ?? '—' }}</td>
                     <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
                     <td class="cnpm-table__cell cnpm-table__cell--end mp-strong">
-                      {{ payment.amount | number: '1.0-0' : 'fr-ML' }} {{ payment.currency }}
+                      {{ payment.amount | number: '1.0-0' : 'fr-ML' }} FCFA
                     </td>
                     <td class="cnpm-table__cell">
                       {{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}
