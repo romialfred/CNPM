@@ -1,3 +1,9 @@
+.cnpm-payment-references__dialog-error {
+  margin: var(--cnpm-space-2) 0 0;
+  color: var(--cnpm-color-text-critical);
+  font-size: var(--cnpm-font-size-sm);
+}
+
 .cnpm-payment-references {
   display: flex;
   flex-direction: column;
