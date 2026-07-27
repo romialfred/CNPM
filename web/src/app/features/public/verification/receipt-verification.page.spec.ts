@@ -1,3 +1,5 @@
+import { registerLocaleData } from '@angular/common';
+import localeFrMl from '@angular/common/locales/fr-ML';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import {
@@ -15,6 +17,10 @@ import {
   type ReceiptVerificationGateway,
 } from './receipt-verification-gateway';
 import { ReceiptVerificationPage } from './receipt-verification.page';
+
+// Le montant s'affiche via `number: … : 'fr-ML'` : la locale doit être enregistrée pour ce
+// spec (indépendamment de l'ordre d'exécution des autres fichiers de test).
+registerLocaleData(localeFrMl);
 
 class ControllableVerificationGateway implements ReceiptVerificationGateway {
   readonly calls: { code: string; result: Subject<PublicReceiptVerificationResult> }[] = [];

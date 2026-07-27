@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { OfflineNoticeComponent } from '../../design-system/offline-notice/offline-notice.component';
 import { ThemeToggleComponent } from '../../design-system/theme-toggle/theme-toggle.component';
 import { AccountMenuComponent } from '../account-menu/account-menu.component';
 import {
@@ -87,6 +88,7 @@ interface MemberNavGroup {
     RouterLinkActive,
     AccountMenuComponent,
     ThemeToggleComponent,
+    OfflineNoticeComponent,
     LucideBell,
     LucideBookUser,
     LucideChartNoAxesCombined,

@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { OfflineNoticeComponent } from '../../design-system/offline-notice/offline-notice.component';
 import { SidebarNavigationComponent } from './sidebar-navigation.component';
 import { TopBarComponent } from './top-bar.component';
 
@@ -34,7 +35,7 @@ import { TopBarComponent } from './top-bar.component';
     '(document:keydown)': 'trapDrawerFocus($event)',
     '(window:resize)': 'synchroniseViewport()',
   },
-  imports: [SidebarNavigationComponent, TopBarComponent],
+  imports: [SidebarNavigationComponent, TopBarComponent, OfflineNoticeComponent],
   templateUrl: './admin-shell.component.html',
   styleUrl: './admin-shell.component.scss',
 })
