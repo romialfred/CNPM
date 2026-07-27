@@ -85,9 +85,11 @@ services:
         value: 22.22.3
       - key: CNPM_DATA_MODE
         value: http
-      # Cablage automatique : l'hote reel du backend alimente le baseUrl du front.
-      - key: API_HOST
-        fromService: { type: web, name: cnpm-backend, property: host }
+      # baseUrl explicite du front : URL PUBLIQUE complete du backend. `fromService host`
+      # renvoie l'hote INTERNE (reseau prive Render, sans `.onrender.com`) et tronque donc
+      # l'URL cote navigateur ; on force ici l'origine publique (prioritaire sur API_HOST).
+      - key: CNPM_BASE_URL
+        value: https://cnpm-backend-5nl5.onrender.com
     # SPA : toute route inconnue est servie par index.html (routage cote client Angular).
     routes:
       - type: rewrite

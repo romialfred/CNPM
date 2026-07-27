@@ -24,6 +24,30 @@ spring:
     # Aucun repli sur les identifiants, pour la même raison que la base.
     username: ${RABBITMQ_DEFAULT_USER}
     password: ${RABBITMQ_DEFAULT_PASS}
+  # Relais SMTP (paramètres repris de SafeX : mail.data-univers.com en SSL implicite sur 465).
+  # Les identifiants ne sont JAMAIS dans le dépôt : ils viennent de l'environnement
+  # (MAIL_USERNAME / MAIL_PASSWORD). Sans identifiants, l'envoi est simplement désactivé
+  # (cf. cnpm.mail.enabled) et l'émission de lien continue de retourner le jeton à l'opérateur.
+  mail:
+    host: ${MAIL_HOST:mail.data-univers.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          socketFactory:
+            port: ${MAIL_PORT:465}
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+          ssl:
+            enable: true
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -45,3 +69,21 @@ management:
     health:
       probes:
         enabled: true
+  health:
+    # La sonde SMTP ouvre une connexion au relais à chaque appel de /health et ajoute
+    # plusieurs secondes au démarrage sur l'hébergeur ; l'envoi d'e-mail n'est pas un
+    # composant dont l'indisponibilité doit faire chuter la disponibilité de la plateforme.
+    mail:
+      enabled: false
+
+# Notifications de compte par e-mail (activation / réinitialisation de mot de passe).
+cnpm:
+  mail:
+    # Désactivé par défaut : local et tests ne joignent aucun relais. Mettre à true en
+    # production une fois MAIL_USERNAME / MAIL_PASSWORD fournis.
+    enabled: ${CNPM_MAIL_ENABLED:false}
+    # Adresse et nom d'expéditeur. Le nom affiché est « CNPM Support Membre » (demande).
+    from: ${MAIL_FROM:no-reply@data-univers.com}
+    from-name: ${CNPM_MAIL_FROM_NAME:CNPM Support Membre}
+    # Base publique du portail : sert à construire les liens d'activation / réinitialisation.
+    base-url: ${CNPM_PUBLIC_BASE_URL:https://cnpm.data-univers.com}
