@@ -82,7 +82,7 @@
               <h2 id="recent-controls-title">Contrôles locaux récents</h2>
               <div class="statement-import__recent-list">
                 @for (run of context()?.recentRuns ?? []; track run.id) {
-                  <article><div><strong>{{ run.fileName }}</strong><small>{{ run.checkedAt | date: 'd MMM y, HH:mm': 'UTC': 'fr-FR' }}</small></div><cnpm-badge [tone]="run.status === 'REVIEWED' ? 'success' : 'warning'">{{ recentStatusLabel(run.status) }}</cnpm-badge><p>{{ run.totalLines }} lignes · {{ run.alerts }} alertes</p></article>
+                  <article><div><strong>{{ run.fileName }}</strong><small>{{ run.checkedAt | date: 'd MMM y, HH:mm': 'UTC': 'fr-ML' }}</small></div><cnpm-badge [tone]="run.status === 'REVIEWED' ? 'success' : 'warning'">{{ recentStatusLabel(run.status) }}</cnpm-badge><p>{{ run.totalLines }} lignes · {{ run.alerts }} alertes</p></article>
                 }
               </div>
               <p class="statement-import__recent-note">Aucun de ces contrôles n’a produit une écriture financière.</p>
@@ -106,7 +106,7 @@
             <div class="statement-import__table-scroll" tabindex="0" aria-label="Tableau des lignes, défilement horizontal possible">
               <table><thead><tr><th scope="col">Date de valeur</th><th scope="col">Référence</th><th scope="col">Payeur</th><th scope="col">Montant</th><th scope="col">Contrôle</th><th scope="col">Explication</th></tr></thead><tbody>
                 @for (line of result.lines; track line.id) {
-                  <tr><td>{{ line.valueDate | date: 'dd/MM/yyyy': 'UTC': 'fr-FR' }}</td><th scope="row">{{ line.reference }}</th><td>{{ line.payer }}</td><td class="statement-import__amount">{{ line.amount | number: '1.0-0' }} XOF</td><td><cnpm-badge [tone]="statusTone(line.status)">{{ statusLabel(line.status) }}</cnpm-badge></td><td>{{ line.explanation }}</td></tr>
+                  <tr><td>{{ line.valueDate | date: 'dd/MM/yyyy': 'UTC': 'fr-ML' }}</td><th scope="row">{{ line.reference }}</th><td>{{ line.payer }}</td><td class="statement-import__amount">{{ line.amount | number: '1.0-0' }} XOF</td><td><cnpm-badge [tone]="statusTone(line.status)">{{ statusLabel(line.status) }}</cnpm-badge></td><td>{{ line.explanation }}</td></tr>
                 }
               </tbody></table>
             </div>

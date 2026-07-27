@@ -28,7 +28,10 @@ import { TopBarComponent } from './top-bar.component';
   // focalisé, et Échap resterait sans effet dès que le focus sort du tiroir.
   host: {
     '(document:keydown.escape)': 'handleEscape($event)',
-    '(document:keydown.tab)': 'trapDrawerFocus($event)',
+    // `keydown` générique, pas `keydown.tab` : la liaison `.tab` ne matche que Tab SANS
+    // modificateur, donc Maj+Tab (« shift.tab ») échappait au piège. On filtre Tab dans le
+    // gestionnaire, comme le shell membre — piège de focus dans les DEUX sens (WCAG 2.2).
+    '(document:keydown)': 'trapDrawerFocus($event)',
     '(window:resize)': 'synchroniseViewport()',
   },
   imports: [SidebarNavigationComponent, TopBarComponent],
@@ -94,6 +97,7 @@ export class AdminShellComponent implements OnDestroy {
   protected trapDrawerFocus(event: Event): void {
     if (!this.drawerOpen()) return;
     const keyboardEvent = event as KeyboardEvent;
+    if (keyboardEvent.key !== 'Tab') return;
 
     const focusable = this.drawerFocusableElements();
     if (focusable.length === 0) {

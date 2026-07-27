@@ -47,7 +47,7 @@ const KINDS: readonly DocumentKind[] = [
 ];
 const SORT_KEYS: readonly DocumentSortKey[] = ['updatedAt', 'expiresAt', 'title'];
 const PAGE_SIZES = [10, 25, 50] as const;
-const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeZone: 'UTC' });
+const DATE_FORMATTER = new Intl.DateTimeFormat('fr-ML', { dateStyle: 'medium', timeZone: 'UTC' });
 
 /** BO-023 — bibliothèque de métadonnées documentaire, sans contenu ni opération GED. */
 @Component({

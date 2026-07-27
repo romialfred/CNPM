@@ -197,7 +197,7 @@ export function buildOrganizationProfile(
     {
       key: 'contribution',
       label: 'Cotisation annuelle',
-      value: `${annualContribution.toLocaleString('fr-FR')} FCFA`,
+      value: `${annualContribution.toLocaleString('fr-ML')} FCFA`,
       caption: 'appel de l’exercice en cours',
     },
     {

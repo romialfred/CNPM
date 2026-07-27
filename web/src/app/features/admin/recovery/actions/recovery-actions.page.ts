@@ -59,12 +59,12 @@ const STATUSES: readonly RecoveryActionStatus[] = [
 const SUSPENSIONS: readonly RecoverySuspensionKind[] = ['DISPUTE', 'PROMISE'];
 const SORTS: readonly RecoveryActionSortKey[] = ['scheduledAt', 'organization', 'kind', 'status'];
 const PAGE_SIZES = [5, 10, 25] as const;
-const DATE_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
+const DATE_FORMATTER = new Intl.DateTimeFormat('fr-ML', {
   dateStyle: 'medium',
   timeStyle: 'short',
   timeZone: 'UTC',
 });
-const DAY_FORMATTER = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeZone: 'UTC' });
+const DAY_FORMATTER = new Intl.DateTimeFormat('fr-ML', { dateStyle: 'medium', timeZone: 'UTC' });
 
 @Component({
   selector: 'cnpm-recovery-actions-page',
