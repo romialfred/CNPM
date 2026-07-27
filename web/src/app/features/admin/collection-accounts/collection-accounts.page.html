@@ -164,5 +164,33 @@
         }
       }
     }
+
+    <!-- Désactivation à motiver : dialogue accessible du design system (piège de focus, Échap,
+         restauration du focus) en remplacement du `prompt()` natif. -->
+    <cnpm-dialog
+      [open]="pendingDisable() !== null"
+      title="Désactiver le compte d’encaissement"
+      eyebrow="Action à motiver"
+      describedBy="ca-disable-help"
+      (dismiss)="cancelDisable()"
+    >
+      <p id="ca-disable-help">
+        Le compte ne sera plus proposé au paiement. Indiquez le motif (3 caractères minimum) ;
+        il est conservé dans la piste d’audit.
+      </p>
+      <cnpm-text-input
+        [formControl]="disableReason"
+        label="Motif de la désactivation"
+        name="ca-disable-reason"
+        [required]="true"
+      />
+      @if (disableError(); as error) {
+        <p class="cnpm-collection-accounts__dialog-error" role="alert">{{ error }}</p>
+      }
+      <div cnpm-dialog-footer>
+        <cnpm-button variant="secondary" (click)="cancelDisable()">Annuler</cnpm-button>
+        <cnpm-button variant="primary" (click)="confirmDisable()">Désactiver le compte</cnpm-button>
+      </div>
+    </cnpm-dialog>
   </div>
 </cnpm-admin-shell>

@@ -8,15 +8,17 @@ import {
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { catchError, of } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
+import { DialogComponent } from '../../../design-system/dialog/dialog.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
+import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
@@ -42,8 +44,11 @@ type LoadState = 'loading' | 'ready' | 'error';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
+    ReactiveFormsModule,
     DecimalPipe,
     AdminShellComponent,
+    DialogComponent,
+    TextInputComponent,
     EmptyStateComponent,
     SkeletonComponent,
     AlertComponent,
@@ -61,6 +66,12 @@ export class ReconciliationPage {
   private readonly title = inject(Title);
   // Actions/rechargement hors contexte d'injection → `DestroyRef` passé explicitement (NG0203).
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Dialogue de rejet (remplace `prompt()` : dialogue accessible, motif tracé). `null` = fermé.
+   *  La confirmation d'un cas, elle, ne demande pas de motif — pas de dialogue. */
+  protected readonly pendingReject = signal<ReconciliationCase | null>(null);
+  protected readonly rejectReason = new FormControl('', { nonNullable: true });
+  protected readonly rejectError = signal<string | null>(null);
 
   private readonly sessionIdentity = toSignal(
     this.session.identity.pipe(catchError(() => of(null))),
@@ -193,16 +204,38 @@ export class ReconciliationPage {
 
   protected decide(reconciliationCase: ReconciliationCase, decision: 'CONFIRM' | 'REJECT'): void {
     if (!this.canRecord() || this.busyId()) return;
-    let reason = '';
     if (decision === 'REJECT') {
-      const entered = globalThis.prompt('Motif du rejet de ce cas ?');
-      if (entered === null) return;
-      if (entered.trim().length < 3) {
-        this.toast.error('Un motif d’au moins 3 caractères est requis.');
-        return;
-      }
-      reason = entered.trim();
+      // Le rejet exige un motif : on ouvre le dialogue plutôt que d'agir directement.
+      this.rejectReason.setValue('');
+      this.rejectError.set(null);
+      this.pendingReject.set(reconciliationCase);
+      return;
     }
+    this.runDecision(reconciliationCase, 'CONFIRM', '');
+  }
+
+  protected cancelReject(): void {
+    this.pendingReject.set(null);
+  }
+
+  protected confirmReject(): void {
+    const reconciliationCase = this.pendingReject();
+    if (!reconciliationCase) return;
+    const reason = this.rejectReason.value.trim();
+    if (reason.length < 3) {
+      this.rejectError.set('Un motif d’au moins 3 caractères est requis.');
+      return;
+    }
+    this.pendingReject.set(null);
+    this.rejectError.set(null);
+    this.runDecision(reconciliationCase, 'REJECT', reason);
+  }
+
+  private runDecision(
+    reconciliationCase: ReconciliationCase,
+    decision: 'CONFIRM' | 'REJECT',
+    reason: string,
+  ): void {
     this.busyId.set(reconciliationCase.id);
     this.gateway
       .decide(reconciliationCase.id, decision, reason)

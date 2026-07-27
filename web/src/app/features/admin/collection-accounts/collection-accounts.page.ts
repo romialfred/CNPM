@@ -7,12 +7,13 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { catchError, of } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
+import { DialogComponent } from '../../../design-system/dialog/dialog.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
@@ -58,6 +59,7 @@ const CHANNELS: readonly ChannelOption[] = [
   imports: [
     ReactiveFormsModule,
     AdminShellComponent,
+    DialogComponent,
     EmptyStateComponent,
     SkeletonComponent,
     AlertComponent,
@@ -80,6 +82,12 @@ export class CollectionAccountsPage {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly channels = CHANNELS;
+
+  /** Dialogue de désactivation (remplace `prompt()` : dialogue accessible du design system,
+   *  piège de focus, Échap, motif tracé). `null` = fermé. */
+  protected readonly pendingDisable = signal<CollectionAccount | null>(null);
+  protected readonly disableReason = new FormControl('', { nonNullable: true });
+  protected readonly disableError = signal<string | null>(null);
 
   private readonly sessionIdentity = toSignal(
     this.session.identity.pipe(catchError(() => of(null))),
@@ -208,17 +216,31 @@ export class CollectionAccountsPage {
       });
   }
 
+  /** Ouvre le dialogue de désactivation (le motif est saisi puis validé dans le dialogue). */
   protected disable(account: CollectionAccount): void {
     if (!this.canWrite() || this.busyId()) return;
-    const reason = globalThis.prompt('Motif de la désactivation de ce compte d’encaissement ?');
-    if (reason === null) return;
-    if (reason.trim().length < 3) {
-      this.toast.error('Un motif d’au moins 3 caractères est requis.');
+    this.disableReason.setValue('');
+    this.disableError.set(null);
+    this.pendingDisable.set(account);
+  }
+
+  protected cancelDisable(): void {
+    this.pendingDisable.set(null);
+  }
+
+  protected confirmDisable(): void {
+    const account = this.pendingDisable();
+    if (!account) return;
+    const reason = this.disableReason.value.trim();
+    if (reason.length < 3) {
+      this.disableError.set('Un motif d’au moins 3 caractères est requis.');
       return;
     }
+    this.pendingDisable.set(null);
+    this.disableError.set(null);
     this.busyId.set(account.id);
     this.gateway
-      .disable(account.id, reason.trim())
+      .disable(account.id, reason)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

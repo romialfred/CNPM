@@ -131,5 +131,33 @@
         }
       }
     }
+
+    <!-- Rejet à motiver : dialogue accessible du design system en remplacement du `prompt()`
+         natif (piège de focus, Échap, restauration du focus, motif tracé). -->
+    <cnpm-dialog
+      [open]="pendingReject() !== null"
+      title="Rejeter le cas de rapprochement"
+      eyebrow="Action à motiver"
+      describedBy="rc-reject-help"
+      (dismiss)="cancelReject()"
+    >
+      <p id="rc-reject-help">
+        Le cas sera écarté sans créer d’encaissement. Indiquez le motif (3 caractères minimum) ;
+        il est conservé dans la piste d’audit.
+      </p>
+      <cnpm-text-input
+        [formControl]="rejectReason"
+        label="Motif du rejet"
+        name="rc-reject-reason"
+        [required]="true"
+      />
+      @if (rejectError(); as error) {
+        <p class="cnpm-reconciliation__dialog-error" role="alert">{{ error }}</p>
+      }
+      <div cnpm-dialog-footer>
+        <cnpm-button variant="secondary" (click)="cancelReject()">Annuler</cnpm-button>
+        <cnpm-button variant="primary" (click)="confirmReject()">Rejeter le cas</cnpm-button>
+      </div>
+    </cnpm-dialog>
   </div>
 </cnpm-admin-shell>

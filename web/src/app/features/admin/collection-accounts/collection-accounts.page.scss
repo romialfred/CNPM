@@ -12,6 +12,12 @@
     flex-wrap: wrap;
   }
 
+  &__dialog-error {
+    margin: var(--cnpm-space-2) 0 0;
+    color: var(--cnpm-color-text-critical);
+    font-size: var(--cnpm-font-size-sm);
+  }
+
   &__count {
     margin: 0;
     color: var(--cnpm-color-text-secondary);

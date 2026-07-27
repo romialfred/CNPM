@@ -7,15 +7,17 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { catchError, of } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
+import { DialogComponent } from '../../../design-system/dialog/dialog.component';
 import { EmptyStateComponent } from '../../../design-system/empty-state/empty-state.component';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
+import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
@@ -51,13 +53,16 @@ interface SelectedMember {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
+    ReactiveFormsModule,
     AdminShellComponent,
+    DialogComponent,
     EmptyStateComponent,
     SkeletonComponent,
     AlertComponent,
     BadgeComponent,
     ButtonComponent,
     PageHeaderComponent,
+    TextInputComponent,
   ],
   templateUrl: './payment-references.page.html',
   styleUrl: './payment-references.page.scss',
@@ -70,6 +75,11 @@ export class PaymentReferencesPage {
   private readonly title = inject(Title);
   // Actions/rechargement hors contexte d'injection → `DestroyRef` passé explicitement (NG0203).
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Dialogue de révocation (remplace `prompt()` : dialogue accessible, motif tracé). `null` = fermé. */
+  protected readonly pendingRevoke = signal<PaymentReference | null>(null);
+  protected readonly revokeReason = new FormControl('', { nonNullable: true });
+  protected readonly revokeError = signal<string | null>(null);
 
   private readonly sessionIdentity = toSignal(
     this.session.identity.pipe(catchError(() => of(null))),
@@ -222,17 +232,31 @@ export class PaymentReferencesPage {
       });
   }
 
+  /** Ouvre le dialogue de révocation (le motif est saisi puis validé dans le dialogue). */
   protected revoke(reference: PaymentReference): void {
     if (!this.canRevoke() || this.busyId()) return;
-    const reason = globalThis.prompt('Motif de la révocation de cette référence ?');
-    if (reason === null) return;
-    if (reason.trim().length < 3) {
-      this.toast.error('Un motif d’au moins 3 caractères est requis.');
+    this.revokeReason.setValue('');
+    this.revokeError.set(null);
+    this.pendingRevoke.set(reference);
+  }
+
+  protected cancelRevoke(): void {
+    this.pendingRevoke.set(null);
+  }
+
+  protected confirmRevoke(): void {
+    const reference = this.pendingRevoke();
+    if (!reference) return;
+    const reason = this.revokeReason.value.trim();
+    if (reason.length < 3) {
+      this.revokeError.set('Un motif d’au moins 3 caractères est requis.');
       return;
     }
+    this.pendingRevoke.set(null);
+    this.revokeError.set(null);
     this.busyId.set(reference.id);
     this.gateway
-      .revoke(reference.id, reason.trim())
+      .revoke(reference.id, reason)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

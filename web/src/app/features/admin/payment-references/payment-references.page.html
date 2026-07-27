@@ -185,5 +185,33 @@
         }
       }
     }
+
+    <!-- Révocation à motiver : dialogue accessible du design system en remplacement du
+         `prompt()` natif (piège de focus, Échap, restauration du focus, motif tracé). -->
+    <cnpm-dialog
+      [open]="pendingRevoke() !== null"
+      title="Révoquer la référence de paiement"
+      eyebrow="Action à motiver"
+      describedBy="pr-revoke-help"
+      (dismiss)="cancelRevoke()"
+    >
+      <p id="pr-revoke-help">
+        La référence ne sera plus exploitable pour un paiement. Indiquez le motif
+        (3 caractères minimum) ; il est conservé dans la piste d’audit.
+      </p>
+      <cnpm-text-input
+        [formControl]="revokeReason"
+        label="Motif de la révocation"
+        name="pr-revoke-reason"
+        [required]="true"
+      />
+      @if (revokeError(); as error) {
+        <p class="cnpm-payment-references__dialog-error" role="alert">{{ error }}</p>
+      }
+      <div cnpm-dialog-footer>
+        <cnpm-button variant="secondary" (click)="cancelRevoke()">Annuler</cnpm-button>
+        <cnpm-button variant="primary" (click)="confirmRevoke()">Révoquer la référence</cnpm-button>
+      </div>
+    </cnpm-dialog>
   </div>
 </cnpm-admin-shell>
