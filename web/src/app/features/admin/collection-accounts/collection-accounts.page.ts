@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -64,6 +71,9 @@ export class CollectionAccountsPage {
   private readonly formBuilder = inject(FormBuilder);
   private readonly toast = inject(ToastService);
   private readonly title = inject(Title);
+  // `load()` et les actions (créer/valider/désactiver) s'exécutent hors contexte
+  // d'injection : `takeUntilDestroyed()` sans argument y lèverait NG0203.
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly channels = CHANNELS;
 
@@ -112,7 +122,7 @@ export class CollectionAccountsPage {
     this.state.set('loading');
     this.gateway
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (accounts) => {
           this.accounts.set(accounts);
@@ -160,7 +170,7 @@ export class CollectionAccountsPage {
         bankName: raw.bankName.trim() || undefined,
         instructions: raw.instructions.trim() || undefined,
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.submitting.set(false);
@@ -180,7 +190,7 @@ export class CollectionAccountsPage {
     this.busyId.set(account.id);
     this.gateway
       .approve(account.id)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.busyId.set(null);
@@ -205,7 +215,7 @@ export class CollectionAccountsPage {
     this.busyId.set(account.id);
     this.gateway
       .disable(account.id, reason.trim())
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.busyId.set(null);

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { DecimalPipe, SlicePipe } from '@angular/common';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -67,6 +74,8 @@ export class PaymentsRecordingPage {
   private readonly session = inject(SESSION_GATEWAY);
   private readonly toast = inject(ToastService);
   private readonly title = inject(Title);
+  // Actions/rechargement hors contexte d'injection → `DestroyRef` passé explicitement (NG0203).
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly channels = CHANNELS;
 
@@ -112,7 +121,7 @@ export class PaymentsRecordingPage {
     this.state.set('loading');
     this.gateway
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (payments) => {
           this.payments.set(payments);
@@ -142,7 +151,7 @@ export class PaymentsRecordingPage {
     this.loadingReferences.set(true);
     this.references
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (all) => {
           this.loadingReferences.set(false);
@@ -173,7 +182,7 @@ export class PaymentsRecordingPage {
         amount: this.amount().trim(),
         providerTransactionId: this.providerTransactionId().trim() || undefined,
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.submitting.set(false);
@@ -193,7 +202,7 @@ export class PaymentsRecordingPage {
     this.confirmingId.set(payment.id);
     this.gateway
       .confirm(payment.id)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (confirmation) => {
           this.confirmingId.set(null);

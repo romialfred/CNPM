@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -48,6 +55,8 @@ export class ReconciliationPage {
   private readonly session = inject(SESSION_GATEWAY);
   private readonly toast = inject(ToastService);
   private readonly title = inject(Title);
+  // Actions/rechargement hors contexte d'injection → `DestroyRef` passé explicitement (NG0203).
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly sessionIdentity = toSignal(
     this.session.identity.pipe(catchError(() => of(null))),
@@ -88,7 +97,7 @@ export class ReconciliationPage {
     this.state.set('loading');
     this.gateway
       .list()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (cases) => {
           this.cases.set(cases);
@@ -133,7 +142,7 @@ export class ReconciliationPage {
         periodEnd: this.periodEnd() || lines[lines.length - 1].bookingDate,
         lines,
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (summary) => {
           this.importing.set(false);
@@ -193,7 +202,7 @@ export class ReconciliationPage {
     this.busyId.set(reconciliationCase.id);
     this.gateway
       .decide(reconciliationCase.id, decision, reason)
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.busyId.set(null);

@@ -40,11 +40,13 @@
                     <td>{{ receipt.organizationName ?? '—' }}</td>
                     <td class="cnpm-receipts-registry__mono">{{ receipt.referenceValue ?? '—' }}</td>
                     <td class="cnpm-receipts-registry__num">
-                      {{ receipt.amount | number: '1.0-0' : 'fr' }} {{ receipt.currency }}
+                      {{ receipt.amount | number: '1.0-0' : 'fr-ML' }} {{ receipt.currency }}
                     </td>
                     <td>{{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}</td>
                     <td>
-                      <cnpm-badge tone="success">{{ receipt.status }}</cnpm-badge>
+                      <cnpm-badge [tone]="statusTone(receipt.status)">{{
+                        statusLabel(receipt.status)
+                      }}</cnpm-badge>
                     </td>
                   </tr>
                 }

@@ -34,7 +34,7 @@
               <span class="mp-kpi__emblem" aria-hidden="true"><svg lucideWallet></svg></span>
               <span class="mp-kpi__label">Total encaissé</span>
               <span class="mp-kpi__value">
-                {{ total() | number: '1.0-0' : 'fr' }} <span class="mp-kpi__unit">FCFA</span>
+                {{ total() | number: '1.0-0' : 'fr-ML' }} <span class="mp-kpi__unit">FCFA</span>
               </span>
               <span class="mp-kpi__def">Somme de vos règlements</span>
             </article>
@@ -74,7 +74,7 @@
                     <td class="cnpm-table__cell mp-mono">{{ payment.referenceValue ?? '—' }}</td>
                     <td class="cnpm-table__cell">{{ channelLabel(payment.channel) }}</td>
                     <td class="cnpm-table__cell cnpm-table__cell--end mp-strong">
-                      {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
+                      {{ payment.amount | number: '1.0-0' : 'fr-ML' }} {{ payment.currency }}
                     </td>
                     <td class="cnpm-table__cell">
                       {{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}

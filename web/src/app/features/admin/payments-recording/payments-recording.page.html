@@ -167,7 +167,7 @@
                     <td class="cnpm-payments-recording__mono">{{ payment.referenceValue ?? '—' }}</td>
                     <td>{{ channelLabel(payment.channel) }}</td>
                     <td class="cnpm-payments-recording__num">
-                      {{ payment.amount | number: '1.0-0' : 'fr' }} {{ payment.currency }}
+                      {{ payment.amount | number: '1.0-0' : 'fr-ML' }} {{ payment.currency }}
                     </td>
                     <td>{{ payment.paidAt ? (payment.paidAt | slice: 0 : 10) : '—' }}</td>
                     @if (canConfirm()) {

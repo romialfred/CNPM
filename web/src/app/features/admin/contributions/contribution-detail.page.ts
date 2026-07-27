@@ -2,7 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { catchError, combineLatest, map, of, startWith, switchMap } from 'rxjs';
 import { UnavailableHttpFeatureError } from '../../../core/api/unavailable-feature';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
@@ -75,14 +75,17 @@ export class ContributionDetailPage {
   private readonly gateway = inject(CONTRIBUTIONS_GATEWAY);
   private readonly route = inject(ActivatedRoute);
   private readonly retryTick = signal(0);
-  private readonly id = this.route.snapshot.paramMap.get('id') ?? '';
 
+  // L'identifiant est lu RÉACTIVEMENT depuis `paramMap` : Angular réutilise l'instance du
+  // composant quand seul le paramètre change (/contributions/A → /B), donc lire le
+  // `snapshot` une seule fois figerait la fiche sur A. Le flux se relance aussi sur `retryTick`.
   private readonly result = toSignal(
-    toObservable(this.retryTick).pipe(
-      switchMap(() =>
-        this.gateway.searchCalls(DETAIL_QUERY).pipe(
+    combineLatest([this.route.paramMap, toObservable(this.retryTick)]).pipe(
+      switchMap(([params]) => {
+        const id = params.get('id') ?? '';
+        return this.gateway.searchCalls(DETAIL_QUERY).pipe(
           map((page): DetailState => {
-            const call = page.rows.find((item) => item.id === this.id);
+            const call = page.rows.find((item) => item.id === id);
             return call ? { kind: 'ready', call } : { kind: 'not-found' };
           }),
           catchError((error: unknown) => {
@@ -95,8 +98,8 @@ export class ContributionDetailPage {
             return of<DetailState>({ kind: 'error' });
           }),
           startWith<DetailState>({ kind: 'loading' }),
-        ),
-      ),
+        );
+      }),
     ),
     { initialValue: { kind: 'loading' } as DetailState },
   );

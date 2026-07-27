@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
@@ -30,6 +37,9 @@ export class MemberProfilePage {
   private readonly gateway = inject(MEMBER_PROFILE_GATEWAY);
   private readonly toast = inject(ToastService);
   private readonly title = inject(Title);
+  // Passé explicitement : `load()`/enregistrement sont appelés hors contexte d'injection
+  // (bouton, action), où `takeUntilDestroyed()` sans argument lèverait NG0203.
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly state = signal<LoadState>('loading');
   protected readonly profile = signal<MemberProfile | null>(null);
@@ -62,7 +72,7 @@ export class MemberProfilePage {
     this.state.set('loading');
     this.gateway
       .load()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (profile) => {
           this.profile.set(profile);
@@ -126,7 +136,7 @@ export class MemberProfilePage {
     this.saving.set(true);
     this.gateway
       .updateAvatar(match[1], match[2])
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (profile) => {
           this.saving.set(false);
@@ -152,7 +162,7 @@ export class MemberProfilePage {
     this.removing.set(true);
     this.gateway
       .deleteAvatar()
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (profile) => {
           this.removing.set(false);

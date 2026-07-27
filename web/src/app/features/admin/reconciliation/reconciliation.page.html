@@ -86,7 +86,7 @@
                 @for (c of cases(); track c.id) {
                   <tr>
                     <td>{{ c.bookingDate ?? '—' }}</td>
-                    <td class="cnpm-reconciliation__num">{{ c.amount | number: '1.0-0' : 'fr' }} {{ c.currency }}</td>
+                    <td class="cnpm-reconciliation__num">{{ c.amount | number: '1.0-0' : 'fr-ML' }} {{ c.currency }}</td>
                     <td class="cnpm-reconciliation__label-cell">{{ c.referenceText ?? '—' }}</td>
                     <td>
                       {{ c.organizationName ?? '—' }}
