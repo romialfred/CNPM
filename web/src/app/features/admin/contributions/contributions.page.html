@@ -232,10 +232,13 @@
                 >Voir</cnpm-button
               >
               @if (canEmit(call)) {
+                <!-- Émission d'appel non encore raccordée au backend : le bouton est
+                     désactivé (aria-disabled) plutôt que silencieusement sans effet. -->
                 <cnpm-button
                   variant="secondary"
                   size="sm"
-                  [accessibleLabel]="'Émettre l’appel ' + call.reference"
+                  [disabled]="true"
+                  [accessibleLabel]="'Émettre l’appel ' + call.reference + ' — fonction à venir'"
                   >Émettre</cnpm-button
                 >
               }
@@ -243,7 +246,8 @@
                 <cnpm-button
                   variant="secondary"
                   size="sm"
-                  [accessibleLabel]="'Relancer l’appel ' + call.reference"
+                  [disabled]="true"
+                  [accessibleLabel]="'Relancer l’appel ' + call.reference + ' — fonction à venir'"
                   >Relancer</cnpm-button
                 >
               }

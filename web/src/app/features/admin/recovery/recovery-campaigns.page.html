@@ -289,7 +289,12 @@
               @for (campaign of campaignRows().slice(0, 4); track campaign.id) {
                 <li>
                   <span>{{ campaign.reference }}</span>
-                  <meter min="0" max="100" [value]="deliveryRate(campaign) ?? 0">
+                  <meter
+                    min="0"
+                    max="100"
+                    [value]="deliveryRate(campaign) ?? 0"
+                    [attr.aria-label]="'Taux de livraison de la campagne ' + campaign.reference"
+                  >
                     {{ deliveryRate(campaign) ?? 0 }} %
                   </meter>
                   <strong>{{ deliveryRate(campaign) | number: '1.0-0' }} %</strong>
