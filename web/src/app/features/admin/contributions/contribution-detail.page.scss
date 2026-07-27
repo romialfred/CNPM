@@ -34,6 +34,13 @@
   background: var(--cnpm-color-surface-primary);
 }
 
+/* Accent gauche de marque (SafeX) sur le hero et les cartes ; la note conserve son accent
+   d'avertissement défini plus bas. */
+.contribution-detail__hero,
+.contribution-detail__card {
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-500);
+}
+
 .contribution-detail__hero {
   display: flex;
   align-items: flex-start;

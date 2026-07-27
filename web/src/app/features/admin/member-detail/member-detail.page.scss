@@ -172,6 +172,7 @@
 .cnpm-member__card {
   padding: var(--cnpm-layout-cardPadding);
   border: 1px solid var(--cnpm-color-border-subtle);
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-500);
   border-radius: var(--cnpm-radius-lg);
   background-color: var(--cnpm-color-surface-primary);
   min-width: 0;

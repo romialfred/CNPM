@@ -39,6 +39,8 @@
   gap: var(--cnpm-space-4);
   padding: var(--cnpm-space-5);
   border: 1px solid var(--cnpm-color-border-subtle);
+  /* Accent gauche de marque (principe SafeX). */
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-500);
   border-radius: var(--cnpm-radius-lg);
   /* Teinte de marque douce : premium sans aplat saturé. */
   background: color-mix(
@@ -234,6 +236,7 @@
   min-width: 0;
   padding: var(--cnpm-layout-cardPadding);
   border: 1px solid var(--cnpm-color-border-subtle);
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-500);
   border-radius: var(--cnpm-radius-lg);
   background: var(--cnpm-color-surface-primary);
 }
