@@ -108,6 +108,11 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
+.cnpm-organizations__viewbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* --------------------------------------------------------------- Corps de table.
    Les cellules `<td>` du corps sont projetées via `<ng-template #row>` : elles
    portent l'encapsulation de CETTE page, non celle du composant de table. Leur
@@ -428,12 +433,61 @@
   background: var(--cnpm-color-brand-blue-400);
 }
 
-/* --------------------------------------------------------------- Cartes mobiles. */
+/* --------------------------------------------------- Cartes (vue tuiles, tous formats). */
 .cnpm-organizations__cards {
-  display: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--cnpm-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.cnpm-organizations__cards > li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  border-block-start: 3px solid var(--cnpm-color-brand-blue-500);
+}
+
+.cnpm-organizations__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-organizations__cards dl {
+  display: grid;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+}
+
+.cnpm-organizations__cards dl > div {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: var(--cnpm-space-2);
+}
+
+.cnpm-organizations__cards dt {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+.cnpm-organizations__cards dd {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.cnpm-organizations__card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
 }
 
 /* Densité compacte au desktop, composée uniquement de tokens : la table et les
@@ -477,57 +531,5 @@
 
   .cnpm-organizations__aside {
     flex-direction: column;
-  }
-
-  .cnpm-organizations__table {
-    display: none;
-  }
-
-  .cnpm-organizations__cards {
-    display: flex;
-    flex-direction: column;
-    gap: var(--cnpm-space-3);
-  }
-
-  .cnpm-organizations__cards > li {
-    padding: var(--cnpm-space-4);
-    border: 1px solid var(--cnpm-color-border-subtle);
-    border-radius: var(--cnpm-radius-lg);
-    background: var(--cnpm-color-surface-primary);
-  }
-
-  .cnpm-organizations__card-head {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--cnpm-space-3);
-  }
-
-  .cnpm-organizations__cards dl {
-    display: grid;
-    gap: var(--cnpm-space-2);
-    margin: var(--cnpm-space-4) 0;
-  }
-
-  .cnpm-organizations__cards dl > div {
-    display: grid;
-    grid-template-columns: 5rem minmax(0, 1fr);
-    gap: var(--cnpm-space-2);
-  }
-
-  .cnpm-organizations__cards dt {
-    color: var(--cnpm-color-text-muted);
-  }
-
-  .cnpm-organizations__cards dd {
-    margin: 0;
-    color: var(--cnpm-color-text-primary);
-    overflow-wrap: anywhere;
-  }
-
-  .cnpm-organizations__card-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--cnpm-space-2);
   }
 }

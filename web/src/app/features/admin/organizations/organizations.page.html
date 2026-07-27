@@ -123,6 +123,15 @@
               }
             </div>
 
+            <div class="cnpm-organizations__viewbar">
+              <cnpm-view-toggle
+                label="Affichage des entreprises"
+                [value]="view()"
+                (valueChange)="setView($event)"
+              />
+            </div>
+
+            @if (view() === 'liste') {
             <div class="cnpm-organizations__table">
               <cnpm-data-table
                 caption="Entreprises, types, secteurs, statuts et niveaux de risque."
@@ -192,7 +201,7 @@
                 </ng-template>
               </cnpm-data-table>
             </div>
-
+            } @else {
             <ul class="cnpm-organizations__cards" aria-label="Entreprises">
               @for (organization of rows(); track organization.id) {
                 <li>
@@ -241,6 +250,7 @@
                 </li>
               }
             </ul>
+            }
 
             <cnpm-pagination
               [page]="page()"

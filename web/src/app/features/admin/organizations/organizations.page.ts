@@ -23,6 +23,10 @@ import { MonogramComponent } from '../../../design-system/monogram/monogram.comp
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
+import {
+  type CnpmViewMode,
+  ViewToggleComponent,
+} from '../../../design-system/view-toggle/view-toggle.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import {
   ORGANIZATIONS_GATEWAY,
@@ -60,6 +64,7 @@ const DONUT_GAP = 4;
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
+    ViewToggleComponent,
     LucideEye,
     LucidePencil,
   ],
@@ -99,6 +104,19 @@ export class OrganizationsPage {
     }
     return { key, direction: this.params().get('ordre') === 'desc' ? 'desc' : 'asc' };
   });
+
+  /** Vue liste (table) ou tuiles (cartes), reflétée dans l'URL (`?vue=grille`). */
+  protected readonly view = computed<CnpmViewMode>(() =>
+    this.params().get('vue') === 'grille' ? 'grille' : 'liste',
+  );
+
+  protected setView(mode: CnpmViewMode): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { vue: mode === 'grille' ? 'grille' : null },
+      queryParamsHandling: 'merge',
+    });
+  }
 
   protected readonly searchDraft = signal(this.route.snapshot.queryParamMap.get('q') ?? '');
   protected readonly typeDraft = signal(this.route.snapshot.queryParamMap.get('type') ?? '');
