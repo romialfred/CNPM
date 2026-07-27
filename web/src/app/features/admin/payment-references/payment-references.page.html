@@ -1,5 +1,5 @@
 <cnpm-admin-shell>
-  <main class="cnpm-payment-references" id="contenu-principal">
+  <div class="cnpm-payment-references">
     <cnpm-page-header
       title="Références de paiement"
       description="Générez la référence unique d’un cotisant, validez-la avant diffusion, ou révoquez-la. Une référence n’est communiquée au cotisant qu’une fois validée par la CNPM."
@@ -120,24 +120,24 @@
             Aucune référence de paiement n’a encore été générée.
           </p>
         } @else {
-          <div class="cnpm-payment-references__table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Référence</th>
-                  <th scope="col">Cotisant</th>
-                  <th scope="col">Exercice</th>
-                  <th scope="col">État</th>
-                  <th scope="col">Actions</th>
+                  <th scope="col" class="cnpm-table__cell">Référence</th>
+                  <th scope="col" class="cnpm-table__cell">Cotisant</th>
+                  <th scope="col" class="cnpm-table__cell">Exercice</th>
+                  <th scope="col" class="cnpm-table__cell">État</th>
+                  <th scope="col" class="cnpm-table__cell">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (reference of references(); track reference.id) {
-                  <tr>
-                    <td>
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell">
                       <span class="cnpm-payment-references__value">{{ reference.referenceValue }}</span>
                     </td>
-                    <td>
+                    <td class="cnpm-table__cell">
                       <span class="cnpm-payment-references__org">{{
                         reference.organizationName ?? '—'
                       }}</span>
@@ -147,14 +147,14 @@
                         }}</span>
                       }
                     </td>
-                    <td>{{ reference.exercise ?? '—' }}</td>
-                    <td>
+                    <td class="cnpm-table__cell">{{ reference.exercise ?? '—' }}</td>
+                    <td class="cnpm-table__cell">
                       <cnpm-badge [tone]="statusTone(reference.status)">{{
                         statusLabel(reference.status)
                       }}</cnpm-badge>
                     </td>
-                    <td>
-                      <div class="cnpm-payment-references__row-actions">
+                    <td class="cnpm-table__cell">
+                      <div class="cnpm-cell-actions cnpm-payment-references__row-actions">
                         @if (reference.status === 'PENDING_VALIDATION' && canValidate()) {
                           <cnpm-button
                             variant="primary"
@@ -183,5 +183,5 @@
         }
       }
     }
-  </main>
+  </div>
 </cnpm-admin-shell>

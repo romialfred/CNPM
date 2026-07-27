@@ -2,8 +2,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--cnpm-space-5);
-  padding: var(--cnpm-layout-page);
-  max-width: var(--cnpm-size-content);
+  padding: var(--cnpm-layout-pagePaddingDesktop);
+  max-width: var(--cnpm-size-contentMax);
+  margin-inline: auto;
 
   &__form {
     display: flex;
@@ -26,7 +27,7 @@
 
   &__error {
     margin: 0;
-    color: var(--cnpm-color-feedback-error, #e40c20);
+    color: var(--cnpm-color-text-critical);
     font-size: var(--cnpm-font-size-xs);
   }
 

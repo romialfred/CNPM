@@ -1,5 +1,5 @@
 <cnpm-admin-shell>
-  <main class="cnpm-receipts-registry" id="contenu-principal">
+  <div class="cnpm-receipts-registry">
     <cnpm-page-header
       title="Reçus"
       description="Registre des reçus officiels délivrés par la CNPM après confirmation d’un encaissement."
@@ -21,29 +21,35 @@
             Aucun reçu n’a encore été délivré.
           </p>
         } @else {
-          <div class="cnpm-receipts-registry__table-wrap">
+          <div class="cnpm-table__scroll">
             <table class="cnpm-table">
-              <thead>
+              <thead class="cnpm-table__head">
                 <tr>
-                  <th scope="col">Reçu</th>
-                  <th scope="col">Cotisant</th>
-                  <th scope="col">Référence</th>
-                  <th scope="col" class="cnpm-receipts-registry__num">Montant</th>
-                  <th scope="col">Émis le</th>
-                  <th scope="col">État</th>
+                  <th scope="col" class="cnpm-table__cell">Reçu</th>
+                  <th scope="col" class="cnpm-table__cell">Cotisant</th>
+                  <th scope="col" class="cnpm-table__cell">Référence</th>
+                  <th scope="col" class="cnpm-table__cell cnpm-table__cell--end">Montant</th>
+                  <th scope="col" class="cnpm-table__cell">Émis le</th>
+                  <th scope="col" class="cnpm-table__cell">État</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="cnpm-table__body">
                 @for (receipt of receipts(); track receipt.id) {
-                  <tr>
-                    <td class="cnpm-receipts-registry__mono">{{ receipt.receiptNumber }}</td>
-                    <td>{{ receipt.organizationName ?? '—' }}</td>
-                    <td class="cnpm-receipts-registry__mono">{{ receipt.referenceValue ?? '—' }}</td>
-                    <td class="cnpm-receipts-registry__num">
+                  <tr class="cnpm-table__row">
+                    <td class="cnpm-table__cell cnpm-receipts-registry__mono">
+                      {{ receipt.receiptNumber }}
+                    </td>
+                    <td class="cnpm-table__cell">{{ receipt.organizationName ?? '—' }}</td>
+                    <td class="cnpm-table__cell cnpm-receipts-registry__mono">
+                      {{ receipt.referenceValue ?? '—' }}
+                    </td>
+                    <td class="cnpm-table__cell cnpm-table__cell--end">
                       {{ receipt.amount | number: '1.0-0' : 'fr-ML' }} {{ receipt.currency }}
                     </td>
-                    <td>{{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}</td>
-                    <td>
+                    <td class="cnpm-table__cell">
+                      {{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}
+                    </td>
+                    <td class="cnpm-table__cell">
                       <cnpm-badge [tone]="statusTone(receipt.status)">{{
                         statusLabel(receipt.status)
                       }}</cnpm-badge>
@@ -56,5 +62,5 @@
         }
       }
     }
-  </main>
+  </div>
 </cnpm-admin-shell>
