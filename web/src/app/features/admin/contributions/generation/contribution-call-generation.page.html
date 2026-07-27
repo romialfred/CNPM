@@ -174,7 +174,7 @@
               <article><span>Appels simulés</span><strong>{{ result.draftCalls | number: '1.0-0' }}</strong><small>Aucun enregistré</small></article>
               <article><span>Exclusions</span><strong>{{ result.excludedMembers | number: '1.0-0' }}</strong><small>Hors calcul</small></article>
               <article class="is-critical"><span>Blocages</span><strong>{{ result.blockingIssues }}</strong><small>Revue obligatoire</small></article>
-              <article><span>Total projeté</span><strong>{{ result.illustrativeTotal | number: '1.0-0' }}</strong><small>XOF</small></article>
+              <article><span>Total projeté</span><strong>{{ result.illustrativeTotal | number: '1.0-0' : 'fr-ML' }}</strong><small>FCFA</small></article>
             </div>
           </section>
 

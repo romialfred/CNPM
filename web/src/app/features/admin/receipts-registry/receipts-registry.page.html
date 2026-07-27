@@ -46,7 +46,7 @@
                       {{ receipt.referenceValue ?? '—' }}
                     </td>
                     <td class="cnpm-table__cell cnpm-table__cell--end">
-                      {{ receipt.amount | number: '1.0-0' : 'fr-ML' }} {{ receipt.currency }}
+                      {{ receipt.amount | number: '1.0-0' : 'fr-ML' }} FCFA
                     </td>
                     <td class="cnpm-table__cell">
                       {{ receipt.issuedAt ? (receipt.issuedAt | slice: 0 : 10) : '—' }}

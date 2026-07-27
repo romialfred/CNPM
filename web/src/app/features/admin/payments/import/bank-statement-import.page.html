@@ -97,7 +97,7 @@
               <article><span>Doublons potentiels</span><strong>{{ result.duplicates }}</strong><small>À exclure</small></article>
               <article><span>Non imputées</span><strong>{{ result.unallocated }}</strong><small>Revue manuelle</small></article>
               <article class="is-critical"><span>Incohérentes</span><strong>{{ result.invalidLines }}</strong><small>Blocage</small></article>
-              <article><span>Total contrôlé</span><strong>{{ result.illustrativeAmount | number: '1.0-0' }}</strong><small>XOF</small></article>
+              <article><span>Total contrôlé</span><strong>{{ result.illustrativeAmount | number: '1.0-0' : 'fr-ML' }}</strong><small>FCFA</small></article>
             </div>
           </section>
 
@@ -106,7 +106,7 @@
             <div class="statement-import__table-scroll" tabindex="0" aria-label="Tableau des lignes, défilement horizontal possible">
               <table><thead><tr><th scope="col">Date de valeur</th><th scope="col">Référence</th><th scope="col">Payeur</th><th scope="col">Montant</th><th scope="col">Contrôle</th><th scope="col">Explication</th></tr></thead><tbody>
                 @for (line of result.lines; track line.id) {
-                  <tr><td>{{ line.valueDate | date: 'dd/MM/yyyy': 'UTC': 'fr-ML' }}</td><th scope="row">{{ line.reference }}</th><td>{{ line.payer }}</td><td class="statement-import__amount">{{ line.amount | number: '1.0-0' }} XOF</td><td><cnpm-badge [tone]="statusTone(line.status)">{{ statusLabel(line.status) }}</cnpm-badge></td><td>{{ line.explanation }}</td></tr>
+                  <tr><td>{{ line.valueDate | date: 'dd/MM/yyyy': 'UTC': 'fr-ML' }}</td><th scope="row">{{ line.reference }}</th><td>{{ line.payer }}</td><td class="statement-import__amount">{{ line.amount | number: '1.0-0' : 'fr-ML' }} FCFA</td><td><cnpm-badge [tone]="statusTone(line.status)">{{ statusLabel(line.status) }}</cnpm-badge></td><td>{{ line.explanation }}</td></tr>
                 }
               </tbody></table>
             </div>
