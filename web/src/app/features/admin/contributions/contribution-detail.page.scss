@@ -46,7 +46,7 @@
   margin: 0 0 var(--cnpm-space-1);
   color: var(--cnpm-color-text-brand);
   font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-bold);
+  font-weight: var(--cnpm-font-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -86,7 +86,7 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
-.contribution-detail__metrics strong {
+.contribution-detail__metrics .cnpm-figure {
   color: var(--cnpm-color-text-primary);
   font-size: var(--cnpm-font-size-lg);
   font-variant-numeric: tabular-nums;
@@ -122,7 +122,7 @@
   gap: var(--cnpm-space-3);
 }
 
-.contribution-detail__card-head > strong {
+.contribution-detail__card-head > .cnpm-figure {
   color: var(--cnpm-color-text-brand);
   font-size: var(--cnpm-font-size-xl);
 }
@@ -147,7 +147,7 @@
   line-height: 1.7;
 }
 
-.contribution-detail__equation strong {
+.contribution-detail__equation .cnpm-figure {
   color: var(--cnpm-color-text-primary);
   font-variant-numeric: tabular-nums;
 }

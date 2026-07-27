@@ -12,9 +12,15 @@
   min-width: 0;
 }
 
+/* Libellé DISCRET (principe SafeX) : petit, en capitales espacées, gris — la valeur, en
+   dessous, porte l'information en graisse normale. La hiérarchie vient de la casse et de la
+   couleur, pas d'un gras lourd sur le libellé. */
 .cnpm-definitions__label {
   font-family: var(--cnpm-font-family-sans);
-  font-size: var(--cnpm-font-size-sm);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
   color: var(--cnpm-color-text-muted);
 }
 

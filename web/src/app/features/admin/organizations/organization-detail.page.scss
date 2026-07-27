@@ -58,7 +58,7 @@
   background: var(--cnpm-color-brand-blue-700);
   color: var(--cnpm-color-text-inverse);
   font-size: var(--cnpm-font-size-xl);
-  font-weight: var(--cnpm-font-weight-bold);
+  font-weight: var(--cnpm-font-weight-semibold);
 }
 
 .cnpm-organization-detail__hero-body {
@@ -134,7 +134,7 @@
 .cnpm-organization-detail__figure-value {
   margin: var(--cnpm-space-1) 0;
   font-size: var(--cnpm-font-size-lg);
-  font-weight: var(--cnpm-font-weight-bold);
+  font-weight: var(--cnpm-font-weight-semibold);
   color: var(--cnpm-color-text-primary);
 }
 

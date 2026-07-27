@@ -57,19 +57,19 @@
           <section class="contribution-detail__metrics" aria-label="Montants de la cotisation">
             <article>
               <span>Montant appelé</span>
-              <strong>{{ item.calledAmount | number: '1.0-0' }} FCFA</strong>
+              <span class="cnpm-figure">{{ item.calledAmount | number: '1.0-0' }} FCFA</span>
             </article>
             <article>
               <span>Montant réglé</span>
-              <strong>{{ item.paidAmount | number: '1.0-0' }} FCFA</strong>
+              <span class="cnpm-figure">{{ item.paidAmount | number: '1.0-0' }} FCFA</span>
             </article>
             <article>
               <span>Ajustement explicite</span>
-              <strong>{{ item.adjustmentAmount | number: '1.0-0' }} FCFA</strong>
+              <span class="cnpm-figure">{{ item.adjustmentAmount | number: '1.0-0' }} FCFA</span>
             </article>
             <article class="contribution-detail__metric--accent">
               <span>Reste à payer</span>
-              <strong>{{ item.outstandingAmount | number: '1.0-0' }} FCFA</strong>
+              <span class="cnpm-figure">{{ item.outstandingAmount | number: '1.0-0' }} FCFA</span>
             </article>
           </section>
 
@@ -80,7 +80,7 @@
                   <p class="contribution-detail__eyebrow">Situation</p>
                   <h2 id="situation-appel">Progression du règlement</h2>
                 </div>
-                <strong>{{ settledShare() | number: '1.0-0' }} %</strong>
+                <span class="cnpm-figure">{{ settledShare() | number: '1.0-0' }} %</span>
               </div>
               <div
                 class="contribution-detail__progress"
@@ -93,13 +93,13 @@
                 <span [style.width.%]="settledShare()"></span>
               </div>
               <p class="contribution-detail__equation">
-                <strong>{{ item.calledAmount | number: '1.0-0' }}</strong>
+                <span class="cnpm-figure">{{ item.calledAmount | number: '1.0-0' }}</span>
                 appelé =
-                <strong>{{ item.paidAmount | number: '1.0-0' }}</strong>
+                <span class="cnpm-figure">{{ item.paidAmount | number: '1.0-0' }}</span>
                 réglé +
-                <strong>{{ item.adjustmentAmount | number: '1.0-0' }}</strong>
+                <span class="cnpm-figure">{{ item.adjustmentAmount | number: '1.0-0' }}</span>
                 ajusté +
-                <strong>{{ item.outstandingAmount | number: '1.0-0' }}</strong>
+                <span class="cnpm-figure">{{ item.outstandingAmount | number: '1.0-0' }}</span>
                 restant (FCFA)
               </p>
             </section>
