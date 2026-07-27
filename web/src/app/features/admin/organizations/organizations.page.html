@@ -115,7 +115,7 @@
           <div class="cnpm-organizations__main">
             <div class="cnpm-organizations__results" aria-live="polite">
               <p class="cnpm-organizations__count">
-                <strong>{{ totalItems() }}</strong>
+                <span class="cnpm-organizations__count-value">{{ totalItems() }}</span>
                 {{ totalItems() === 1 ? 'entreprise trouvée' : 'entreprises trouvées' }}
               </p>
               @if (rangeLabel()) {
@@ -123,6 +123,15 @@
               }
             </div>
 
+            <div class="cnpm-organizations__viewbar">
+              <cnpm-view-toggle
+                label="Affichage des entreprises"
+                [value]="view()"
+                (valueChange)="setView($event)"
+              />
+            </div>
+
+            @if (view() === 'liste') {
             <div class="cnpm-organizations__table">
               <cnpm-data-table
                 caption="Entreprises, types, secteurs, statuts et niveaux de risque."
@@ -138,7 +147,7 @@
                     <span class="cnpm-organizations__identity">
                       <cnpm-monogram [name]="organization.legalName" />
                       <span class="cnpm-organizations__identity-text">
-                        <strong>{{ organization.legalName }}</strong>
+                        <span class="cnpm-organizations__name">{{ organization.legalName }}</span>
                       </span>
                     </span>
                   </td>
@@ -192,7 +201,7 @@
                 </ng-template>
               </cnpm-data-table>
             </div>
-
+            } @else {
             <ul class="cnpm-organizations__cards" aria-label="Entreprises">
               @for (organization of rows(); track organization.id) {
                 <li>
@@ -200,7 +209,7 @@
                     <div class="cnpm-organizations__card-identity">
                       <cnpm-monogram [name]="organization.legalName" />
                       <div>
-                        <strong>{{ organization.legalName }}</strong>
+                        <span class="cnpm-organizations__name">{{ organization.legalName }}</span>
                         @if (organization.tradeName) {
                           <span>{{ organization.tradeName }}</span>
                         }
@@ -241,6 +250,7 @@
                 </li>
               }
             </ul>
+            }
 
             <cnpm-pagination
               [page]="page()"

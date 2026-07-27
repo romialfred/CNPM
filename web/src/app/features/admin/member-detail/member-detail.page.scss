@@ -117,7 +117,7 @@
   margin: 0;
   font-size: var(--cnpm-font-size-4xl);
   line-height: var(--cnpm-font-lineHeight-4xl);
-  font-weight: var(--cnpm-font-weight-bold);
+  font-weight: var(--cnpm-font-weight-semibold);
   letter-spacing: var(--cnpm-font-letterSpacing-tight);
   color: var(--cnpm-color-text-inverse);
   overflow-wrap: anywhere;
@@ -172,6 +172,7 @@
 .cnpm-member__card {
   padding: var(--cnpm-layout-cardPadding);
   border: 1px solid var(--cnpm-color-border-subtle);
+  border-inline-start: 3px solid var(--cnpm-color-brand-blue-500);
   border-radius: var(--cnpm-radius-lg);
   background-color: var(--cnpm-color-surface-primary);
   min-width: 0;
