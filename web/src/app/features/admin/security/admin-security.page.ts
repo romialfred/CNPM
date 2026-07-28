@@ -395,7 +395,7 @@ export class AdminSecurityPage {
   protected readonly permissionModules = PERMISSION_MODULES;
   protected readonly levels: readonly { readonly key: PermissionLevel | 'all'; readonly label: string }[] = [
     { key: 'read', label: 'Lecture' },
-    { key: 'write', label: 'Écriture / modifier / supprimer' },
+    { key: 'write', label: 'Écriture' },
     { key: 'all', label: 'Tous' },
   ];
 

@@ -411,6 +411,78 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Droits par rôle : nom du rôle + liste de modules (un par ligne, bascules à droite) ── */
+.cnpm-security__role-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-3);
+  margin-block: var(--cnpm-space-4) var(--cnpm-space-3);
+}
+
+.cnpm-security__role-name {
+  margin: 0;
+  font-size: var(--cnpm-font-size-lg);
+  font-weight: var(--cnpm-font-weight-semibold);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__role-meta {
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-security__perm-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  overflow: hidden;
+}
+
+.cnpm-security__perm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  border-block-end: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-security__perm-row:last-child {
+  border-block-end: none;
+}
+
+.cnpm-security__perm-label {
+  min-width: 0;
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-primary);
+}
+
+.cnpm-security__perm-toggles {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-2);
+}
+
+@media (max-width: 767px) {
+  .cnpm-security__perm-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--cnpm-space-2);
+  }
+
+  .cnpm-security__perm-toggles {
+    justify-content: flex-start;
+  }
+}
+
 .cnpm-security__grid-wrap {
   overflow-x: auto;
   border: 1px solid var(--cnpm-color-border-subtle);

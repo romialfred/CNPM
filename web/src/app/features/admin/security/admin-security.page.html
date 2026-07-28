@@ -351,77 +351,67 @@
                     }
                   </div>
 
-                  <!-- Grille : modules du sidebar (lignes) × niveaux (colonnes), toggles On/Off -->
-                  <div class="cnpm-security__grid-wrap">
-                    <table
-                      class="cnpm-table cnpm-security__grid"
-                      [attr.aria-label]="'Droits du rôle ' + role.label + ' par module'"
-                    >
-                      <thead>
-                        <tr>
-                          <th scope="col">Module</th>
-                          @for (lvl of levels; track lvl.key) {
-                            <th scope="col" class="cnpm-security__grid-col">{{ lvl.label }}</th>
-                          }
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (module of permissionModules; track module.key) {
-                          <tr>
-                            <th scope="row" class="cnpm-security__grid-module">{{ module.label }}</th>
-                            @for (lvl of levels; track lvl.key) {
-                              <td class="cnpm-security__grid-cell">
-                                <button
-                                  type="button"
-                                  class="cnpm-security__switch"
-                                  [class.cnpm-security__switch--on]="
-                                    moduleState(role.id, module, lvl.key) === 'on'
-                                  "
-                                  [class.cnpm-security__switch--partial]="
-                                    moduleState(role.id, module, lvl.key) === 'partial'
-                                  "
-                                  [disabled]="
-                                    !canManagePermissions() ||
-                                    isModuleSaving(role.id, module.key, lvl.key)
-                                  "
-                                  [attr.aria-pressed]="moduleState(role.id, module, lvl.key) === 'on'"
-                                  [attr.aria-label]="
-                                    module.label +
-                                    ' — ' +
-                                    lvl.label +
-                                    ' : ' +
-                                    (moduleState(role.id, module, lvl.key) === 'on'
-                                      ? 'activé'
-                                      : moduleState(role.id, module, lvl.key) === 'partial'
-                                        ? 'partiel'
-                                        : 'désactivé')
-                                  "
-                                  (click)="toggleModule(role.id, module, lvl.key)"
-                                >
-                                  <span class="cnpm-security__switch-track" aria-hidden="true">
-                                    <span class="cnpm-security__switch-thumb"></span>
-                                  </span>
-                                  <span class="cnpm-security__switch-text">
-                                    @switch (moduleState(role.id, module, lvl.key)) {
-                                      @case ('on') {
-                                        On
-                                      }
-                                      @case ('partial') {
-                                        Partiel
-                                      }
-                                      @default {
-                                        Off
-                                      }
-                                    }
-                                  </span>
-                                </button>
-                              </td>
-                            }
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
+                  <!-- Nom du rôle sélectionné -->
+                  <div class="cnpm-security__role-head">
+                    <h3 class="cnpm-security__role-name">{{ role.label }}</h3>
+                    <span class="cnpm-security__role-meta">
+                      {{ role.accounts }} compte{{ role.accounts > 1 ? 's' : '' }} · droits par module
+                    </span>
                   </div>
+
+                  <!-- Droits par module : un module par LIGNE, ses bascules alignées à droite.
+                       L'état d'une bascule est porté par la position du curseur ET aria-pressed
+                       (jamais par la seule couleur). -->
+                  <ul
+                    class="cnpm-security__perm-list"
+                    [attr.aria-label]="'Droits du rôle ' + role.label + ' par module'"
+                  >
+                    @for (module of permissionModules; track module.key) {
+                      <li class="cnpm-security__perm-row">
+                        <span class="cnpm-security__perm-label">{{ module.label }}</span>
+                        <div
+                          class="cnpm-security__perm-toggles"
+                          role="group"
+                          [attr.aria-label]="module.label"
+                        >
+                          @for (lvl of levels; track lvl.key) {
+                            <button
+                              type="button"
+                              class="cnpm-security__switch"
+                              [class.cnpm-security__switch--on]="
+                                moduleState(role.id, module, lvl.key) === 'on'
+                              "
+                              [class.cnpm-security__switch--partial]="
+                                moduleState(role.id, module, lvl.key) === 'partial'
+                              "
+                              [disabled]="
+                                !canManagePermissions() ||
+                                isModuleSaving(role.id, module.key, lvl.key)
+                              "
+                              [attr.aria-pressed]="moduleState(role.id, module, lvl.key) === 'on'"
+                              [attr.aria-label]="
+                                module.label +
+                                ' — ' +
+                                lvl.label +
+                                ' : ' +
+                                (moduleState(role.id, module, lvl.key) === 'on'
+                                  ? 'activé'
+                                  : moduleState(role.id, module, lvl.key) === 'partial'
+                                    ? 'partiel'
+                                    : 'désactivé')
+                              "
+                              (click)="toggleModule(role.id, module, lvl.key)"
+                            >
+                              <span class="cnpm-security__switch-track" aria-hidden="true">
+                                <span class="cnpm-security__switch-thumb"></span>
+                              </span>
+                              <span class="cnpm-security__switch-text">{{ lvl.label }}</span>
+                            </button>
+                          }
+                        </div>
+                      </li>
+                    }
+                  </ul>
                 } @else {
                   <cnpm-empty-state
                     variant="no-data"
