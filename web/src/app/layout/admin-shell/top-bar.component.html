@@ -11,21 +11,13 @@
     <svg lucideMenu [size]="iconSize.control"></svg>
   </button>
 
-  <!-- Titre de l'espace.
-       Aucune accroche institutionnelle n'existe dans les sources — le seul slogan du
-       dépôt appartient à une entreprise de démonstration. Rien n'est donc inventé ici :
-       la surtitre nomme l'objet réel de la plateforme, et l'accroche est une donnée,
-       le prénom de la personne connectée.
-       Ce n'est pas un `h1` : chaque page porte le sien dans `PageHeader`. -->
+  <!-- Identité de la plateforme : le nom réel de l'objet géré, en titre, avec une accroche
+       fonctionnelle. La personne connectée n'apparaît PAS ici (elle figure déjà dans le
+       menu de compte, à droite). Ce n'est pas un `h1` : chaque page porte le sien dans
+       `PageHeader`. -->
   <p class="cnpm-topbar__title">
-    <span class="cnpm-topbar__eyebrow">Plateforme Nationale de Gestion des Membres du CNPM</span>
-    <span class="cnpm-topbar__headline">
-      @if (identity | async; as user) {
-        Bonjour {{ firstName(user.displayName) }}
-      } @else {
-        Espace d’administration
-      }
-    </span>
+    <span class="cnpm-topbar__headline">Plateforme Nationale de Gestion des Membres du CNPM</span>
+    <span class="cnpm-topbar__subtitle">Gestion digitale des membres et des cotisations</span>
   </p>
 
   <!-- `role="search"` fournit le repère attendu par le catalogue (FRM-012) ; le
@@ -94,17 +86,6 @@
     </details>
 
     <cnpm-theme-toggle />
-
-    @if (user.permissions.includes('ENROLLMENT.CREATE')) {
-      <a
-        class="cnpm-topbar__primary-action"
-        routerLink="/admin/enrollments/new"
-        aria-label="Créer un nouvel enrôlement"
-      >
-        <svg lucidePlus [size]="iconSize.control"></svg>
-        <span>Nouvelle action</span>
-      </a>
-    }
 
     <cnpm-account-menu
       class="cnpm-topbar__identity"

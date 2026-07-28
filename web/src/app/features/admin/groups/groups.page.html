@@ -74,6 +74,9 @@
           >
             <ng-template #row let-group>
               <td class="cnpm-table__cell">
+                <span class="cnpm-groups__code">{{ group.code }}</span>
+              </td>
+              <td class="cnpm-table__cell">
                 <div class="cnpm-groups__identity">
                   <span class="cnpm-groups__avatar" aria-hidden="true">
                     @if (sectorImage(group.sectorCode); as image) {
@@ -82,10 +85,7 @@
                       <svg lucideBuilding2 [size]="iconSize.control"></svg>
                     }
                   </span>
-                  <span class="cnpm-groups__identity-text">
-                    <span class="cnpm-groups__code">{{ group.code }}</span>
-                    <strong class="cnpm-groups__name">{{ group.name }}</strong>
-                  </span>
+                  <span class="cnpm-groups__name">{{ group.name }}</span>
                 </div>
               </td>
               <td class="cnpm-table__cell">
@@ -138,7 +138,7 @@
                       statusLabel(group.status)
                     }}</cnpm-badge>
                   </span>
-                  <strong class="cnpm-groups__card-name">{{ group.name }}</strong>
+                  <span class="cnpm-groups__card-name">{{ group.name }}</span>
                   <span class="cnpm-groups__card-sector">
                     {{ sectorLabel(group.sectorCode) }}
                   </span>

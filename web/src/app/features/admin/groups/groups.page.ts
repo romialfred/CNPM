@@ -111,6 +111,7 @@ export class GroupsPage {
   });
 
   protected readonly columns: readonly DataTableColumn[] = [
+    { key: 'code', label: 'Code' },
     { key: 'name', label: 'Groupement professionnel' },
     { key: 'sectorCode', label: 'Secteur' },
     { key: 'status', label: 'Statut' },

@@ -56,18 +56,12 @@
   display: block;
 }
 
-.cnpm-groups__identity-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--cnpm-space-1);
-  min-width: 0;
-}
-
 .cnpm-groups__code {
   font-family: var(--cnpm-font-family-mono);
   font-size: var(--cnpm-font-size-xs);
   letter-spacing: var(--cnpm-font-letterSpacing-wide);
   color: var(--cnpm-color-text-muted);
+  white-space: nowrap;
 }
 
 .cnpm-groups__name {

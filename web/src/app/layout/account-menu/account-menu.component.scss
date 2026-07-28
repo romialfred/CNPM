@@ -49,9 +49,12 @@
   text-align: start;
 }
 
+/* Le déclencheur vit dans le chrome (barre supérieure) : ses libellés suivent les tokens
+   chrome pour rester lisibles sur fond clair ET sur le fond sombre de marque. Le panneau
+   déroulant, lui, reste une surface blanche (tokens de couleur inchangés plus bas). */
 .cnpm-account-menu__name {
   overflow: hidden;
-  color: var(--cnpm-color-text-primary);
+  color: var(--cnpm-chrome-text);
   font-size: var(--cnpm-font-size-sm);
   font-weight: var(--cnpm-font-weight-semibold);
   text-overflow: ellipsis;
@@ -60,7 +63,7 @@
 
 .cnpm-account-menu__secondary {
   overflow: hidden;
-  color: var(--cnpm-color-text-muted);
+  color: var(--cnpm-chrome-text-secondary);
   font-size: var(--cnpm-font-size-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -70,7 +73,7 @@
   width: var(--cnpm-size-icon-sm);
   height: var(--cnpm-size-icon-sm);
   flex: none;
-  color: var(--cnpm-color-text-muted);
+  color: var(--cnpm-chrome-text-muted);
   transition: rotate var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
 }
 

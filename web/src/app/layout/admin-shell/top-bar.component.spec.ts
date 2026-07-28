@@ -2,7 +2,6 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of } from 'rxjs';
 import { DemoSessionGateway } from './demo-session.gateway';
 import { SESSION_GATEWAY, type SessionGateway } from './session-gateway';
 import { TopBarComponent } from './top-bar.component';
@@ -56,12 +55,12 @@ describe('TopBarComponent', () => {
     expect(host.textContent).toContain('Le centre de notifications n’est pas encore raccordé.');
   });
 
-  it('présente une seule action globale et le menu du compte connecté', async () => {
+  it('présente le menu du compte connecté, sans CTA générique', async () => {
     const { host } = await setup();
-    const action = host.querySelector<HTMLAnchorElement>('.cnpm-topbar__primary-action');
 
-    expect(action?.getAttribute('href')).toBe('/admin/enrollments/new');
-    expect(action?.getAttribute('aria-label')).toBe('Créer un nouvel enrôlement');
+    // Plus d'action globale « Nouvelle action » : l'action primaire est désormais
+    // contextuelle à chaque page (bouton « Nouveau … » dans l'en-tête de page).
+    expect(host.querySelector('.cnpm-topbar__primary-action')).toBeNull();
     // L'identité devient un menu de compte : initiales, nom + rôle, et la déconnexion.
     expect(host.querySelector('.cnpm-account-menu__avatar')?.textContent?.trim()).toBe('TR');
     expect(host.querySelector('.cnpm-account-menu__trigger')?.getAttribute('aria-label')).toBe(
@@ -223,35 +222,15 @@ describe('TopBarComponent', () => {
     expect(panel.open).toBe(true);
   });
 
-  it('affiche une accroche nominative sans dupliquer le h1 de la page', async () => {
+  it('affiche l identité de la plateforme, jamais l utilisateur connecté, sans dupliquer le h1', async () => {
     const { host } = await setup();
     const title = host.querySelector<HTMLElement>('.cnpm-topbar__title');
 
     expect(title?.textContent).toContain('Plateforme Nationale de Gestion des Membres du CNPM');
-    expect(title?.textContent).toContain('Bonjour TIEGNAN');
+    expect(title?.textContent).toContain('Gestion digitale des membres et des cotisations');
+    // La personne connectée figure dans le menu de compte, pas sous le titre.
+    expect(title?.textContent).not.toContain('Bonjour');
     // La barre est présente sur toutes les pages : un `h1` ici en ferait deux par écran.
     expect(host.querySelector('h1')).toBeNull();
-  });
-
-  it('retombe sur un titre neutre tant que l identité est inconnue', async () => {
-    const { host } = await setup({ identity: of(null) });
-
-    expect(host.querySelector('.cnpm-topbar__headline')?.textContent?.trim()).toBe(
-      'Espace d’administration',
-    );
-  });
-
-  it('masque l action d enrôlement sans la permission backend', async () => {
-    const { host } = await setup({
-      identity: of({
-        displayName: 'Lecteur',
-        roleLabel: 'LECTEUR',
-        exerciseLabel: null,
-        notificationCount: null,
-        demoMode: false,
-        permissions: ['MEMBER.READ'],
-      }),
-    });
-    expect(host.querySelector('.cnpm-topbar__primary-action')).toBeNull();
   });
 });
