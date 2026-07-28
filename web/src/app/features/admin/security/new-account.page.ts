@@ -7,12 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import {
-  FormsModule,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   LucideBriefcase,
@@ -57,7 +52,6 @@ const MEMBER_ROLE_ID = 'membre-cnpm';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
-    FormsModule,
     AdminShellComponent,
     PageHeaderComponent,
     TextInputComponent,
@@ -110,7 +104,7 @@ export class NewAccountPage {
   private readonly accountType = toSignal(this.form.controls.accountType.valueChanges, {
     initialValue: this.form.controls.accountType.value,
   });
-  private readonly selectedRoleId = toSignal(this.form.controls.roleId.valueChanges, {
+  protected readonly selectedRoleId = toSignal(this.form.controls.roleId.valueChanges, {
     initialValue: this.form.controls.roleId.value,
   });
 
@@ -160,6 +154,52 @@ export class NewAccountPage {
     return (this.snapshot()?.permissions ?? []).filter((permission) =>
       permission.grants.some((grant) => grant.roleId === roleId && grant.granted),
     );
+  });
+
+  /** Identifiants des droits déjà accordés par le rôle (base cochée et verrouillée). */
+  private readonly rolePermissionIds = computed(
+    () => new Set(this.rolePermissions().map((permission) => permission.id)),
+  );
+
+  /** Un droit vient-il du rôle (coché, non décochable ici) ? */
+  protected isInRole(permissionId: string): boolean {
+    return this.rolePermissionIds().has(permissionId);
+  }
+
+  /** Un droit est-il accordé au compte (par le rôle OU ajouté en personnalisation) ? */
+  protected isChecked(permissionId: string): boolean {
+    return this.isInRole(permissionId) || this.extraPermissions().has(permissionId);
+  }
+
+  /**
+   * Matrice complète des droits par domaine, affichée dès qu'un rôle est choisi. Les droits
+   * du rôle sont cochés et verrouillés (ils viennent du profil) ; les autres se cochent pour
+   * personnaliser le compte. Les domaines sont dépliés par défaut ; `expandedDomains` porte
+   * ici l'ensemble des domaines REPLIÉS par l'opérateur.
+   */
+  protected readonly permissionMatrix = computed(() => {
+    if (!this.selectedRoleId()) {
+      return [];
+    }
+    const collapsed = this.expandedDomains();
+    const roleIds = this.rolePermissionIds();
+    const selected = this.extraPermissions();
+    const byDomain = new Map<string, PermissionRow[]>();
+    for (const permission of this.snapshot()?.permissions ?? []) {
+      const list = byDomain.get(permission.domain) ?? [];
+      list.push(permission);
+      byDomain.set(permission.domain, list);
+    }
+    return [...byDomain.entries()]
+      .sort((left, right) => left[0].localeCompare(right[0], 'fr'))
+      .map(([domain, permissions]) => ({
+        domain,
+        permissions: permissions
+          .slice()
+          .sort((a, b) => a.description.localeCompare(b.description, 'fr')),
+        grantedCount: permissions.filter((p) => roleIds.has(p.id) || selected.has(p.id)).length,
+        expanded: !collapsed.has(domain),
+      }));
   });
 
   /** Permissions restantes, proposées en supplément (non déjà accordées par le rôle). */

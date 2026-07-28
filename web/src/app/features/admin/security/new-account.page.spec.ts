@@ -51,7 +51,7 @@ describe('NewAccountPage (création de compte)', () => {
     expect(roleOptions).toContain('admin-technique');
   });
 
-  it('affiche les permissions du rôle choisi', async () => {
+  it('affiche la matrice des permissions du rôle choisi (droits du rôle cochés et verrouillés)', async () => {
     await settle();
     const select = host.querySelector<HTMLSelectElement>('#new-account-role')!;
     select.value = 'gestionnaire-cotisations';
@@ -60,10 +60,13 @@ describe('NewAccountPage (création de compte)', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const tags = Array.from(host.querySelectorAll('.nacc__tag')).map((tag) =>
-      tag.textContent?.trim(),
-    );
-    expect(tags).toContain('Émission des reçus');
+    // Les droits du rôle apparaissent dans la matrice, cochés et non modifiables ici.
+    const rows = Array.from(host.querySelectorAll('.nacc__perm'));
+    const receiptRow = rows.find((row) => row.textContent?.includes('Émission des reçus'));
+    expect(receiptRow).toBeDefined();
+    const toggle = receiptRow?.querySelector<HTMLInputElement>('input[type="checkbox"]');
+    expect(toggle?.checked).toBe(true);
+    expect(toggle?.disabled).toBe(true);
   });
 
   it('crée le compte avec les données saisies et redirige vers la liste', async () => {
