@@ -63,30 +63,21 @@ const STATUS_TONES: Readonly<Record<ContributionCallStatus, CnpmBadgeTone>> = {
 const PAGE_SIZES = [5, 10, 25, 50] as const;
 const DEFAULT_PAGE_SIZE = 5;
 
-interface InstallmentView {
-  readonly label: string;
-  readonly dueDate: string;
-  readonly amountDue: number;
-  readonly amountPaid: number;
-  readonly outstanding: number;
-  readonly status: 'SETTLED' | 'PARTIAL' | 'PENDING' | 'OVERDUE';
-}
-
 /**
  * BO-011 — appels de cotisation.
  *
  * Filtres, tri et page vivent dans l'URL : la vue reste partageable et le retour depuis
  * un détail retrouve son contexte, comme l'exige `frontend-angular.md`.
  *
- * Deux éléments de la fiche ne sont pas rendus ici, et le sont sciemment :
+ * Cet écran reste une LISTE : indicateurs, filtres, tableau paginé. Le détail d'un appel
+ * (échéancier en tranches) n'est pas embarqué en bas de page — il vit sur sa fiche dédiée
+ * {@code /admin/contributions/:id}, atteinte par « Voir ». Empiler le détail d'une seule
+ * société sous la liste brouillait la lecture et affichait en permanence une entreprise
+ * arbitraire (la première ligne).
  *
- * - les onglets « Cotisations par membre » / « Appels générés » sont spécifiés comme
- *   *routés*, or le câblage des routes ne relève pas de cet écran ; un onglet non routé
- *   promettrait une adresse partageable qui n'existerait pas ;
- * - le détail d'échéancier et le graphique d'encaissements attendent respectivement un
- *   `Drawer` et un `ChartContainer`, absents du design system à ce jour. Les improviser
- *   dans une feature contredirait `ux-ui.md` (« réutiliser les composants du design
- *   system ») et créerait un composant hors catalogue.
+ * Les onglets « Cotisations par membre » / « Appels générés » sont spécifiés comme
+ * *routés* ; leur câblage ne relève pas de cet écran, et un onglet non routé promettrait
+ * une adresse partageable qui n'existerait pas.
  */
 @Component({
   selector: 'cnpm-contributions-page',
@@ -220,74 +211,6 @@ export class ContributionsPage {
   protected readonly fiscalYears = computed(() => this.data()?.fiscalYears ?? []);
   protected readonly asOf = computed(() => this.data()?.asOf ?? null);
 
-  /** La sélection locale actualise le détail sans modifier les filtres portés par l'URL. */
-  protected readonly selectedCallId = signal<string | null>(null);
-  protected readonly selectedCall = computed<ContributionCallRow | null>(() => {
-    const rows = this.rows();
-    const id = this.selectedCallId();
-    return (id ? rows.find((call) => call.id === id) : null) ?? rows[0] ?? null;
-  });
-
-  /**
-   * Décomposition déterministe en trois tranches, dérivée de l’appel sélectionné.
-   */
-  protected readonly installments = computed<readonly InstallmentView[]>(() => {
-    const call = this.selectedCall();
-    if (!call) {
-      return [];
-    }
-    const dates = this.installmentDates(call);
-    const base = Math.floor(call.calledAmount / 3);
-    const dues = [base, base, call.calledAmount - base * 2];
-    let paid = call.paidAmount;
-
-    return dues.map((amountDue, index) => {
-      const amountPaid = Math.min(amountDue, paid);
-      paid -= amountPaid;
-      const outstanding = amountDue - amountPaid;
-      const pastDue = dates[index] < (this.asOf() ?? dates[index]);
-      return {
-        label: `${index + 1}${index === 0 ? 're' : 'e'} tranche`,
-        dueDate: dates[index],
-        amountDue,
-        amountPaid,
-        outstanding,
-        status:
-          outstanding === 0
-            ? 'SETTLED'
-            : amountPaid > 0
-              ? 'PARTIAL'
-              : pastDue
-                ? 'OVERDUE'
-                : 'PENDING',
-      };
-    });
-  });
-
-  /** Même périmètre que le tableau : appelé, encaissé et solde proviennent du port. */
-  protected readonly chart = computed(() => {
-    const summary = this.overview();
-    if (!summary) {
-      return [];
-    }
-    const maximum = Math.max(summary.calledTotal, 1);
-    return [
-      { label: 'Appelé', value: summary.calledTotal, height: 100, tone: 'called' },
-      {
-        label: 'Encaissé',
-        value: summary.collectedTotal,
-        height: Math.max(4, (summary.collectedTotal / maximum) * 100),
-        tone: 'collected',
-      },
-      {
-        label: 'Solde',
-        value: summary.outstandingTotal,
-        height: Math.max(4, (summary.outstandingTotal / maximum) * 100),
-        tone: 'outstanding',
-      },
-    ] as const;
-  });
-
   protected readonly hasFilters = computed(() =>
     Boolean(this.search() || this.fiscalYear() || this.quarter() || this.status()),
   );
@@ -395,16 +318,9 @@ export class ContributionsPage {
     return call.status !== 'DRAFT' && call.status !== 'SETTLED';
   }
 
-  protected selectCall(call: ContributionCallRow): void {
-    this.selectedCallId.set(call.id);
-  }
-
-  protected installmentStatusLabel(status: InstallmentView['status']): string {
-    return STATUS_LABELS[status];
-  }
-
-  protected installmentStatusTone(status: InstallmentView['status']): CnpmBadgeTone {
-    return STATUS_TONES[status];
+  /** Ouvre la fiche complète de l'appel (échéancier détaillé) sur sa route dédiée. */
+  protected openCall(call: ContributionCallRow): void {
+    void this.router.navigate(['/admin/contributions', call.id]);
   }
 
   protected applySearch(): void {
@@ -460,22 +376,5 @@ export class ContributionsPage {
       queryParams: params,
       queryParamsHandling: 'merge',
     });
-  }
-
-  private installmentDates(call: ContributionCallRow): readonly [string, string, string] {
-    const year = Number(call.fiscalYear);
-    const february = year % 4 === 0 ? '02-29' : '02-28';
-    const months: Readonly<Record<Quarter, readonly [string, string, string]>> = {
-      T1: ['01-31', february, '03-31'],
-      T2: ['04-30', '05-31', '06-30'],
-      T3: ['07-31', '08-31', '09-30'],
-      T4: ['10-31', '11-30', '12-31'],
-    };
-    const [first, second, third] = months[call.quarter];
-    return [
-      `${call.fiscalYear}-${first}`,
-      `${call.fiscalYear}-${second}`,
-      `${call.fiscalYear}-${third}`,
-    ];
   }
 }
