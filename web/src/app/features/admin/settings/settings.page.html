@@ -255,7 +255,6 @@
     <section class="cnpm-settings__registry" aria-labelledby="settings-registry-title">
       <div class="cnpm-settings__registry-heading" aria-live="polite">
         <div>
-          <p class="cnpm-settings__eyebrow">ADMIN.REFERENTIAL.READ</p>
           <h2 id="settings-registry-title" #registryHeading tabindex="-1">
             Valeurs de référentiel
           </h2>
@@ -288,7 +287,7 @@
           <cnpm-error-state
             variant="forbidden"
             title="Lecture du référentiel refusée"
-            description="La permission ADMIN.REFERENTIAL.READ est requise. Le serveur reste la frontière d’autorisation."
+            description="Vous n’avez pas l’autorisation de consulter ce paramétrage."
           />
         }
         @case ('notFound') {

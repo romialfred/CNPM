@@ -18,7 +18,7 @@ describe('ADMIN_NAV', () => {
     expect(Object.fromEntries(delivered)).toEqual({
       'Tableau de bord': '/admin/dashboard',
       Membres: '/admin/members',
-      Entreprises: '/admin/organizations',
+      Prospects: '/admin/organizations',
       Enrôlements: '/admin/enrollments',
       Cotisations: '/admin/contributions',
       'Comptes d’encaissement': '/admin/collection-accounts',
