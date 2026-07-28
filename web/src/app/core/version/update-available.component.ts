@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { LucideInfo } from '@lucide/angular';
 import { ButtonComponent } from '../../design-system/button/button.component';
 import { DialogComponent } from '../../design-system/dialog/dialog.component';
+import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
 import { VersionCheckService } from './version-check.service';
 
 /**
@@ -15,7 +17,7 @@ import { VersionCheckService } from './version-check.service';
 @Component({
   selector: 'cnpm-update-available',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DialogComponent, ButtonComponent],
+  imports: [DialogComponent, ButtonComponent, LucideInfo],
   template: `
     <cnpm-dialog
       [open]="service.updateAvailable()"
@@ -24,15 +26,24 @@ import { VersionCheckService } from './version-check.service';
       describedBy="cnpm-update-message"
       [dismissible]="false"
     >
+      <!-- Bandeau média : logo CNPM coiffé d'un badge d'information. -->
+      <div cnpm-dialog-media class="cnpm-update__hero">
+        <span class="cnpm-update__logo-wrap">
+          <img
+            class="cnpm-update__logo"
+            src="assets/brand/logo-CNPM.png"
+            alt="Conseil National du Patronat du Mali"
+          />
+          <span class="cnpm-update__badge" aria-hidden="true">
+            <svg lucideInfo [size]="iconSize.compact"></svg>
+          </span>
+        </span>
+      </div>
+
       <div class="cnpm-update">
-        <img
-          class="cnpm-update__logo"
-          src="assets/brand/logo-CNPM.png"
-          alt="Conseil National du Patronat du Mali"
-        />
         <p id="cnpm-update-message" class="cnpm-update__message">
-          Une nouvelle version de la plateforme est disponible. Actualisez pour en bénéficier —
-          <strong>vous ne serez pas déconnecté</strong> et vous reviendrez sur la même page.
+          Une nouvelle version de la plateforme est disponible. Actualisez pour en bénéficier.
+          <strong>Vous ne serez pas déconnecté</strong> et vous reviendrez sur la même page.
         </p>
         <p class="cnpm-update__hint">
           Astuce : si vous remplissez un formulaire, enregistrez votre saisie avant d’actualiser.
@@ -45,17 +56,39 @@ import { VersionCheckService } from './version-check.service';
     </cnpm-dialog>
   `,
   styles: `
+    .cnpm-update__logo-wrap {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .cnpm-update__logo {
+      block-size: 3.5rem;
+      inline-size: auto;
+    }
+
+    /* Badge d'information posé sur le coin du logo : identifie la fenêtre comme un message
+       d'information, en complément du logo de marque. */
+    .cnpm-update__badge {
+      position: absolute;
+      inset-block-start: calc(-1 * var(--cnpm-space-1));
+      inset-inline-end: calc(-1 * var(--cnpm-space-2));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: var(--cnpm-space-6);
+      block-size: var(--cnpm-space-6);
+      border-radius: var(--cnpm-radius-pill);
+      background-color: var(--cnpm-color-brand-blue-700);
+      color: var(--cnpm-color-text-inverse);
+      box-shadow: 0 0 0 2px var(--cnpm-color-surface-primary);
+    }
+
     .cnpm-update {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: var(--cnpm-space-3);
       text-align: center;
-    }
-
-    .cnpm-update__logo {
-      block-size: 3rem;
-      inline-size: auto;
     }
 
     .cnpm-update__message {
@@ -78,4 +111,5 @@ import { VersionCheckService } from './version-check.service';
 })
 export class UpdateAvailableComponent {
   protected readonly service = inject(VersionCheckService);
+  protected readonly iconSize = CNPM_ICON_SIZE;
 }

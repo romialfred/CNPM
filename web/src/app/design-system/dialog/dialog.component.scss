@@ -30,6 +30,16 @@
   outline: none;
 }
 
+/* Bandeau média (logo, icône d'en-tête). Ne s'affiche que s'il porte du contenu :
+   `:empty` le replie pour ne pas laisser d'espace sur les dialogues sans média. */
+.cnpm-dialog__media:not(:empty) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-6) var(--cnpm-space-6) 0;
+}
+
 .cnpm-dialog__header {
   display: flex;
   align-items: flex-start;
@@ -37,6 +47,17 @@
   gap: var(--cnpm-space-4);
   padding: var(--cnpm-space-5) var(--cnpm-space-6);
   border-bottom: 1px solid var(--cnpm-color-border-subtle);
+}
+
+/* Quand un média coiffe le dialogue, l'en-tête se centre et s'allège (pas de filet). */
+.cnpm-dialog__media:not(:empty) + .cnpm-dialog__header {
+  padding-top: var(--cnpm-space-4);
+  border-bottom: 0;
+  text-align: center;
+}
+
+.cnpm-dialog__media:not(:empty) + .cnpm-dialog__header .cnpm-dialog__heading {
+  width: 100%;
 }
 
 .cnpm-dialog__heading {
@@ -103,21 +124,36 @@
   border-top: 1px solid var(--cnpm-color-border-subtle);
 }
 
-/* Apparition sobre : une légère montée, désactivée si le mouvement est réduit. */
+/* Apparition premium : un léger zoom (scale) avec fondu, désactivé si le mouvement est
+   réduit. Le voile s'estompe en même temps pour un enchaînement doux. */
 @media (prefers-reduced-motion: no-preference) {
+  .cnpm-dialog__scrim {
+    animation: cnpm-dialog-scrim-in var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+  }
+
   .cnpm-dialog__panel {
-    animation: cnpm-dialog-in var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+    animation: cnpm-dialog-in var(--cnpm-motion-duration-normal) var(--cnpm-motion-easing-enter);
+    transform-origin: center;
+  }
+}
+
+@keyframes cnpm-dialog-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
 @keyframes cnpm-dialog-in {
   from {
     opacity: 0;
-    transform: translateY(var(--cnpm-space-3));
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
-    transform: none;
+    transform: scale(1);
   }
 }
 
