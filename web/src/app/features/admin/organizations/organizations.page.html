@@ -1,8 +1,8 @@
 <cnpm-admin-shell>
   <div class="cnpm-organizations">
     <cnpm-page-header
-      title="Entreprises"
-      description="Consultez le registre des entreprises et leur état de cycle de vie."
+      title="Prospects"
+      description="Entreprises à démarcher pour les amener à adhérer. Un prospect enrôlé devient membre actif."
     />
 
     <cnpm-filter-bar
@@ -95,14 +95,14 @@
       @case ('empty') {
         <cnpm-empty-state
           variant="no-data"
-          title="Aucune entreprise enregistrée"
-          description="Le registre ne contient encore aucune entreprise consultable."
+          title="Aucun prospect enregistré"
+          description="Le registre ne contient encore aucun prospect. Créez-en un pour démarrer le démarchage."
         />
       }
       @case ('noResult') {
         <cnpm-empty-state
           variant="no-results"
-          title="Aucune entreprise ne correspond"
+          title="Aucun prospect ne correspond"
           description="Retirez un filtre ou élargissez la recherche."
         >
           <cnpm-button variant="secondary" size="sm" (click)="resetFilters()"

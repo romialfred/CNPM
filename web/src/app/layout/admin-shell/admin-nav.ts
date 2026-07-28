@@ -83,7 +83,7 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
       icon: 'members',
       entries: [
         { label: 'Membres', route: '/admin/members', icon: 'members' },
-        { label: 'Entreprises', route: '/admin/organizations', icon: 'companies' },
+        { label: 'Prospects', route: '/admin/organizations', icon: 'companies' },
         {
           label: 'Groupements',
           route: '/admin/groups',
@@ -102,11 +102,6 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
       icon: 'contributions',
       entries: [
         { label: 'Cotisations', route: '/admin/contributions', icon: 'contributions' },
-        {
-          label: 'Comptes d’encaissement',
-          route: '/admin/collection-accounts',
-          icon: 'payments',
-        },
         {
           label: 'Références de paiement',
           route: '/admin/payment-references',
@@ -166,6 +161,11 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
       label: 'Paramètre',
       icon: 'settings',
       entries: [
+        {
+          label: 'Comptes d’encaissement',
+          route: '/admin/collection-accounts',
+          icon: 'payments',
+        },
         {
           label: 'Canal',
           route: '/admin/settings/channel',
