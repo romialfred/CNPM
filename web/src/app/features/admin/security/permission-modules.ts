@@ -23,8 +23,8 @@ export interface PermissionModule {
 
 export const PERMISSION_MODULES: readonly PermissionModule[] = [
   {
-    key: 'members',
-    label: 'Gestion des membres (Répertoire)',
+    key: 'repertoire',
+    label: 'Répertoire',
     read: ['MEMBER.READ', 'GROUP.READ'],
     write: [
       'MEMBER.WRITE',
@@ -37,9 +37,9 @@ export const PERMISSION_MODULES: readonly PermissionModule[] = [
     ],
   },
   {
-    key: 'contributions',
-    label: 'Cotisation et Recouvrement',
-    read: ['CONTRIBUTION.READ', 'PAYMENT.READ', 'RECEIPT.READ', 'INCENTIVE.READ'],
+    key: 'recouvrement',
+    label: 'Cotisations et recouvrement',
+    read: ['CONTRIBUTION.READ', 'PAYMENT.READ', 'RECEIPT.READ', 'INCENTIVE.READ', 'RECOVERY.READ'],
     write: [
       'CONTRIBUTION.GENERATE',
       'CONTRIBUTION.ADJUST',
@@ -56,42 +56,32 @@ export const PERMISSION_MODULES: readonly PermissionModule[] = [
       'INCENTIVE.CALCULATE',
       'INCENTIVE.APPROVE',
       'INCENTIVE.RULE.WRITE',
+      'RECOVERY.CAMPAIGN.WRITE',
+      'RECOVERY.ACTION.WRITE',
+      'RECOVERY.EXPORT',
     ],
   },
   {
-    key: 'recovery',
-    label: 'Relance',
-    read: ['RECOVERY.READ'],
-    write: ['RECOVERY.CAMPAIGN.WRITE', 'RECOVERY.ACTION.WRITE', 'RECOVERY.EXPORT'],
+    key: 'relation',
+    label: 'Relation membre',
+    read: ['REQUEST.READ', 'DOCUMENT.READ'],
+    write: ['REQUEST.WRITE', 'REQUEST.CLOSE', 'DOCUMENT.WRITE', 'DOCUMENT.SENSITIVE.READ'],
   },
   {
     key: 'supervision',
     label: 'Supervision',
-    read: ['REPORT.EXECUTIVE.READ', 'AUDIT.READ', 'OPS.MONITOR.READ'],
+    read: ['REPORT.EXECUTIVE.READ', 'REPORT.OPERATIONAL.READ', 'OPS.MONITOR.READ'],
     write: [
       'REPORT.DESIGN',
       'REPORT.EXPORT',
-      'AUDIT.EXPORT',
       'INTEGRATION.CONFIG.WRITE',
       'INTEGRATION.REPLAY',
       'OPS.DEPLOY',
     ],
   },
   {
-    key: 'administration',
-    label: 'Administration',
-    read: ['IAM.USER.READ', 'IAM.ACCESS.REVIEW', 'DOCUMENT.READ'],
-    write: [
-      'IAM.USER.WRITE',
-      'IAM.ROLE.ASSIGN',
-      'IAM.MFA.RESET',
-      'DOCUMENT.WRITE',
-      'DOCUMENT.SENSITIVE.READ',
-    ],
-  },
-  {
-    key: 'settings',
-    label: 'Paramètres (Données de référence)',
+    key: 'parametre',
+    label: 'Paramètre',
     read: ['ADMIN.PARAMETER.READ', 'ADMIN.REFERENTIAL.READ'],
     write: [
       'ADMIN.PARAMETER.WRITE',
@@ -103,6 +93,18 @@ export const PERMISSION_MODULES: readonly PermissionModule[] = [
       'NOTIFICATION.TEMPLATE.WRITE',
       'GOVERNANCE.WRITE',
       'EVENT.WRITE',
+    ],
+  },
+  {
+    key: 'administration',
+    label: 'Administration',
+    read: ['IAM.USER.READ', 'IAM.ACCESS.REVIEW', 'AUDIT.READ', 'SECURITY.EVENT.READ'],
+    write: [
+      'IAM.USER.WRITE',
+      'IAM.ROLE.ASSIGN',
+      'IAM.MFA.RESET',
+      'AUDIT.EXPORT',
+      'SECURITY.INCIDENT.WRITE',
     ],
   },
 ];
