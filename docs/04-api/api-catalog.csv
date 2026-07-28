@@ -82,6 +82,7 @@ GET;/service-requests/{id};REQUEST;getServiceRequest;Consulter une requête.
 POST;/service-requests/{id}/messages;REQUEST;addServiceRequestMessage;Ajouter un échange.
 POST;/service-requests/{id}/close;REQUEST;closeServiceRequest;Clôturer avec preuve.
 GET;/professional-groups;GROUP;listProfessionalGroups;Lister les groupements.
+POST;/professional-groups;GROUP;createProfessionalGroup;Créer un groupement professionnel.
 GET;/professional-groups/{id};GROUP;getProfessionalGroup;Consulter un groupement professionnel.
 GET;/professional-groups/{id}/dashboard;GROUP;getGroupDashboard;Afficher le tableau sectoriel.
 GET;/bonus-calculations;INCENTIVE;listBonusCalculations;Lister les primes.

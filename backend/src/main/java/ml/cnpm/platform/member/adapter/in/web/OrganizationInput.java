@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.List;
 import ml.cnpm.platform.member.application.OrganizationDraft;
 
 /**
@@ -21,6 +22,7 @@ public record OrganizationInput(
         @Size(max = 255) String tradeName,
         @NotBlank @Size(max = 40) String organizationType,
         @Size(max = 80) String sectorCode,
+        @Size(max = 20) List<@Size(max = 80) String> sectorCodes,
         @NotBlank @Size(max = 40) String identifierType,
         @NotBlank @Size(max = 160) String identifierValue,
         @Size(max = 4000) String description,
@@ -33,11 +35,28 @@ public record OrganizationInput(
         @PositiveOrZero @Digits(integer = 17, fraction = 2) BigDecimal revenueN1) {
 
     OrganizationDraft toDraft() {
+        // Secteurs multi-valués nettoyés : on retire les entrées vides et les doublons tout
+        // en préservant l'ordre de saisie (le premier fait office de secteur principal).
+        List<String> sectors =
+                sectorCodes == null
+                        ? List.of()
+                        : sectorCodes.stream()
+                                .filter(code -> code != null && !code.isBlank())
+                                .map(String::trim)
+                                .distinct()
+                                .toList();
+        // Secteur principal (affiché en liste, utilisé par le filtre) : le champ explicite
+        // s'il est fourni, sinon le premier secteur multi-valué.
+        String primarySector =
+                sectorCode != null && !sectorCode.isBlank()
+                        ? sectorCode
+                        : (sectors.isEmpty() ? null : sectors.get(0));
         return new OrganizationDraft(
                 legalName,
                 tradeName,
                 organizationType,
-                sectorCode,
+                primarySector,
+                sectors,
                 identifierType,
                 identifierValue,
                 description,

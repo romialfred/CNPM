@@ -73,6 +73,71 @@
   font-family: inherit;
 }
 
+/* Groupe de secteurs (multi-sélection) : fieldset sans bordure native, cases en grille
+   responsive. Le statut de sélection est porté par la case cochée, jamais par la couleur
+   seule (accessibilité). */
+.cnpm-organizations__sectors-field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.cnpm-organizations__sectors-field .cnpm-organizations__label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--cnpm-space-2);
+  padding: 0;
+  margin-bottom: var(--cnpm-space-2);
+}
+
+.cnpm-organizations__sectors-field .cnpm-organizations__hint {
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-regular);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organizations__sectors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--cnpm-space-2) var(--cnpm-space-3);
+}
+
+.cnpm-organizations__sector-option {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-border-default);
+  border-radius: var(--cnpm-radius-md);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+  cursor: pointer;
+}
+
+.cnpm-organizations__sector-option:hover {
+  border-color: var(--cnpm-color-border-strong);
+}
+
+/* Sélection visible (fond + bordure de marque), en complément de la case cochée —
+   le statut n'est donc jamais porté par la seule couleur. */
+.cnpm-organizations__sector-option:has(input:checked) {
+  border-color: var(--cnpm-color-brand-blue-300);
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-organizations__sector-option:focus-within {
+  border-color: var(--cnpm-color-brand-blue-700);
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-organizations__sector-option input {
+  flex: none;
+  width: var(--cnpm-space-4);
+  height: var(--cnpm-space-4);
+  accent-color: var(--cnpm-color-brand-blue-700);
+}
+
 .cnpm-organizations__form-actions {
   display: flex;
   justify-content: flex-end;

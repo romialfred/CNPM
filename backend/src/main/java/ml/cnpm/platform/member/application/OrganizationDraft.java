@@ -14,6 +14,7 @@ public record OrganizationDraft(
         String tradeName,
         String organizationType,
         String sectorCode,
+        java.util.List<String> sectorCodes,
         String identifierType,
         String identifierValue,
         String description,
@@ -23,4 +24,13 @@ public record OrganizationDraft(
         String address,
         Integer employeeCount,
         java.math.BigDecimal capital,
-        java.math.BigDecimal revenueN1) {}
+        java.math.BigDecimal revenueN1) {
+
+    /**
+     * {@code sectorCodes} n'est jamais nul : un draft sans secteur multi-valué porte une
+     * liste vide, ce qui évite aux adaptateurs de reprendre le test de nullité.
+     */
+    public OrganizationDraft {
+        sectorCodes = sectorCodes == null ? java.util.List.of() : java.util.List.copyOf(sectorCodes);
+    }
+}

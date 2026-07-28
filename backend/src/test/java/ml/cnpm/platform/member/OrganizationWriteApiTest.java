@@ -142,6 +142,51 @@ class OrganizationWriteApiTest {
     }
 
     @Test
+    void persistsMultipleSectorsAndDerivesThePrimaryFromTheFirst() throws Exception {
+        // Multi-secteur : sectorCodes fourni sans sectorCode explicite. Le premier code fait
+        // office de secteur principal (colonne organization.sector_code) et l'ensemble est
+        // persisté dans la table de liaison member.organization_sector.
+        String requestBody =
+                """
+                {
+                  "legalName": "Multi Secteurs SA",
+                  "organizationType": "SA",
+                  "sectorCodes": ["NUMERIQUE", "FINANCE"],
+                  "identifierType": "RCCM",
+                  "identifierValue": "ML-2024-M-100"
+                }
+                """;
+        String id =
+                com.jayway.jsonpath.JsonPath.read(
+                        mockMvc.perform(
+                                        post("/organizations")
+                                                .header("Idempotency-Key", IDEMPOTENCY_KEY)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(requestBody)
+                                                .with(asMemberWriter()))
+                                .andExpect(status().isCreated())
+                                // Secteur principal = premier secteur transmis.
+                                .andExpect(jsonPath("$.sectorCode").value("NUMERIQUE"))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString(),
+                        "$.id");
+
+        // Les deux secteurs sont persistés dans la table de liaison.
+        org.junit.jupiter.api.Assertions.assertEquals(
+                2L,
+                count(
+                        "SELECT count(*) FROM member.organization_sector WHERE organization_id = ?::uuid",
+                        id));
+        org.junit.jupiter.api.Assertions.assertEquals(
+                1L,
+                count(
+                        "SELECT count(*) FROM member.organization_sector "
+                                + "WHERE organization_id = ?::uuid AND sector_code = 'FINANCE'",
+                        id));
+    }
+
+    @Test
     void replaysAnIdenticalCreationAsIdempotent200() throws Exception {
         String first =
                 com.jayway.jsonpath.JsonPath.read(

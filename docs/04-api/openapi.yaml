@@ -6147,6 +6147,19 @@ components:
           type: string
           maxLength: 80
           nullable: true
+          description: >-
+            Secteur principal (affiché en liste, utilisé par le filtre). Déduit du premier
+            élément de sectorCodes lorsqu'il n'est pas fourni explicitement.
+        sectorCodes:
+          type: array
+          maxItems: 20
+          nullable: true
+          description: >-
+            Secteurs d'activité de l'entreprise (multi-valué). Le premier fait office de
+            secteur principal. Codes du référentiel ref.reference_value domaine SECTOR.
+          items:
+            type: string
+            maxLength: 80
         identifierType:
           type: string
           minLength: 1

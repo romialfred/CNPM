@@ -80,16 +80,25 @@
 
         <section class="cnpm-organizations__form-section">
           <h3 class="cnpm-organizations__form-legend">Activité</h3>
-          <div class="cnpm-organizations__form-grid">
-            <div class="cnpm-organizations__field">
-              <label class="cnpm-organizations__label" for="prospect-sector">Secteur d’activité</label>
-              <select id="prospect-sector" class="cnpm-input" formControlName="sectorCode">
-                <option value="">Non renseigné</option>
-                @for (sector of sectors; track sector.code) {
-                  <option [value]="sector.code">{{ sector.label }}</option>
-                }
-              </select>
+          <fieldset class="cnpm-organizations__field cnpm-organizations__field--wide cnpm-organizations__sectors-field">
+            <legend class="cnpm-organizations__label">
+              Secteurs d’activité
+              <span class="cnpm-organizations__hint">plusieurs choix possibles</span>
+            </legend>
+            <div class="cnpm-organizations__sectors-grid">
+              @for (sector of sectors; track sector.code) {
+                <label class="cnpm-organizations__sector-option">
+                  <input
+                    type="checkbox"
+                    [checked]="isSectorSelected(sector.code)"
+                    (change)="toggleSector(sector.code)"
+                  />
+                  <span>{{ sector.label }}</span>
+                </label>
+              }
             </div>
+          </fieldset>
+          <div class="cnpm-organizations__form-grid">
             <div class="cnpm-organizations__field">
               <label class="cnpm-organizations__label" for="prospect-employees">
                 Nombre d’employés
