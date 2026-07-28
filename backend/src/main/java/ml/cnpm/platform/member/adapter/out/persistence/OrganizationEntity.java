@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -38,6 +39,30 @@ class OrganizationEntity {
 
     @Column(name = "risk_level", nullable = false, length = 20)
     private String riskLevel;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "website", length = 255)
+    private String website;
+
+    @Column(name = "email", length = 320)
+    private String email;
+
+    @Column(name = "phone", length = 40)
+    private String phone;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "employee_count")
+    private Integer employeeCount;
+
+    @Column(name = "capital", precision = 19, scale = 2)
+    private BigDecimal capital;
+
+    @Column(name = "revenue_n1", precision = 19, scale = 2)
+    private BigDecimal revenueN1;
 
     @Version
     @Column(name = "version", nullable = false)
@@ -110,5 +135,25 @@ class OrganizationEntity {
 
     void applySectorCode(String value) {
         this.sectorCode = value;
+    }
+
+    /** Renseigne les champs de profil facultatifs (coordonnées, description, indicateurs). */
+    void applyProfile(
+            String description,
+            String website,
+            String email,
+            String phone,
+            String address,
+            Integer employeeCount,
+            BigDecimal capital,
+            BigDecimal revenueN1) {
+        this.description = description;
+        this.website = website;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.employeeCount = employeeCount;
+        this.capital = capital;
+        this.revenueN1 = revenueN1;
     }
 }

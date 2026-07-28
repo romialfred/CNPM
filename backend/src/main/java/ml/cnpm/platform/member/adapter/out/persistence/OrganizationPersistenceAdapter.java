@@ -91,6 +91,15 @@ class OrganizationPersistenceAdapter implements OrganizationRepository {
                         draft.sectorCode(),
                         INITIAL_STATUS,
                         INITIAL_RISK_LEVEL);
+        organization.applyProfile(
+                draft.description(),
+                draft.website(),
+                draft.email(),
+                draft.phone(),
+                draft.address(),
+                draft.employeeCount(),
+                draft.capital(),
+                draft.revenueN1());
         OrganizationEntity saved = jpaRepository.save(organization);
         identifierJpaRepository.save(
                 new OrganizationIdentifierEntity(
