@@ -57,6 +57,12 @@ let dialogInstanceCount = 0;
           [attr.aria-describedby]="describedBy() || null"
           tabindex="-1"
         >
+          <!-- Bandeau média projeté (logo, icône…), au-dessus de l'en-tête. Rendu seulement
+               s'il est fourni : la règle CSS :empty le replie sans laisser d'espace. -->
+          <div class="cnpm-dialog__media">
+            <ng-content select="[cnpm-dialog-media]" />
+          </div>
+
           <header class="cnpm-dialog__header">
             <div class="cnpm-dialog__heading">
               @if (eyebrow()) {
