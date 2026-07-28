@@ -289,13 +289,9 @@
                                   />
                                   <span class="nacc__perm-text">
                                     <span class="nacc__perm-name">{{ permission.description }}</span>
-                                    <small class="nacc__perm-code">
-                                      @if (isInRole(permission.id)) {
-                                        Inclus dans le rôle
-                                      } @else {
-                                        {{ permission.label }}
-                                      }
-                                    </small>
+                                    @if (isInRole(permission.id)) {
+                                      <small class="nacc__perm-code">Inclus dans le rôle</small>
+                                    }
                                   </span>
                                 </label>
                               </li>
@@ -313,7 +309,13 @@
           <!-- Récapitulatif collant -->
           <aside class="nacc__aside" aria-label="Récapitulatif du compte">
             <div class="nacc__recap">
-              <p class="nacc__recap-eyebrow">Récapitulatif</p>
+              <header class="nacc__recap-header">
+                <span class="nacc__recap-header-icon" aria-hidden="true">
+                  <svg lucideClipboardList></svg>
+                </span>
+                <span class="nacc__recap-header-title">Récapitulatif</span>
+              </header>
+              <div class="nacc__recap-body">
               <div class="nacc__recap-identity">
                 <span class="nacc__recap-avatar" aria-hidden="true">{{ recapInitials() }}</span>
                 <div>
@@ -355,6 +357,7 @@
                 <cnpm-button variant="secondary" (click)="cancel()" [disabled]="submitting()">
                   Annuler
                 </cnpm-button>
+              </div>
               </div>
             </div>
           </aside>

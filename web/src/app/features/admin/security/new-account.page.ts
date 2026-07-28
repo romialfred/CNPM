@@ -14,6 +14,7 @@ import {
   LucideBuilding2,
   LucideCheck,
   LucideChevronRight,
+  LucideClipboardList,
   LucideShieldCheck,
   LucideUserPlus,
 } from '@lucide/angular';
@@ -60,6 +61,7 @@ const MEMBER_ROLE_ID = 'membre-cnpm';
     LucideChevronRight,
     LucideBuilding2,
     LucideBriefcase,
+    LucideClipboardList,
     LucideShieldCheck,
     LucideUserPlus,
     LucideCheck,
