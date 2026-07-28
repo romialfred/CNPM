@@ -3,7 +3,17 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { LucideEye, LucidePencil } from '@lucide/angular';
+import {
+  LucideArrowLeft,
+  LucideBriefcase,
+  LucideBuilding2,
+  LucideChevronDown,
+  LucideEye,
+  LucideFileText,
+  LucideInfo,
+  LucidePencil,
+  LucidePhone,
+} from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
@@ -51,6 +61,124 @@ const DONUT_RADIUS = 52;
 const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS;
 const DONUT_GAP = 4;
 
+/** Un secteur fin (feuille) : son code préfixe son domaine (`BTP.ROUTES_PONTS`). */
+interface SectorLeaf {
+  readonly code: string;
+  readonly label: string;
+}
+
+/** Un domaine d'activité regroupant plusieurs secteurs fins. */
+interface SectorDomain {
+  readonly code: string;
+  readonly label: string;
+  readonly sectors: readonly SectorLeaf[];
+}
+
+/**
+ * Nomenclature d'activité à deux niveaux (domaine → secteurs), inspirée du tissu
+ * économique malien. Les codes de domaine restent alignés sur le référentiel SECTOR
+ * (liste/filtre) ; les codes de secteur les préfixent. Nomenclature large, à affiner par
+ * le CNPM — aucune valeur officielle n'est ici présentée comme homologuée.
+ */
+const SECTOR_DOMAINS: readonly SectorDomain[] = [
+  {
+    code: 'AGRICULTURE',
+    label: 'Agriculture & agro-industrie',
+    sectors: [
+      { code: 'AGRICULTURE.VIVRIER', label: 'Cultures vivrières' },
+      { code: 'AGRICULTURE.RENTE', label: 'Cultures de rente (coton, etc.)' },
+      { code: 'AGRICULTURE.ELEVAGE', label: 'Élevage' },
+      { code: 'AGRICULTURE.PECHE', label: 'Pêche & aquaculture' },
+      { code: 'AGRICULTURE.AGRO_TRANSFO', label: 'Agro-transformation' },
+    ],
+  },
+  {
+    code: 'MINES',
+    label: 'Mines & carrières',
+    sectors: [
+      { code: 'MINES.OR', label: 'Or & métaux précieux' },
+      { code: 'MINES.CARRIERES', label: 'Carrières & granulats' },
+      { code: 'MINES.EXPLORATION', label: 'Exploration & services miniers' },
+    ],
+  },
+  {
+    code: 'BTP',
+    label: 'Bâtiment & travaux publics',
+    sectors: [
+      { code: 'BTP.ROUTES_PONTS', label: 'Routes & ponts' },
+      { code: 'BTP.BATIMENT', label: 'Bâtiment' },
+      { code: 'BTP.HYDRAULIQUE', label: 'Travaux hydrauliques' },
+      { code: 'BTP.GENIE_CIVIL', label: 'Génie civil' },
+    ],
+  },
+  {
+    code: 'INDUSTRIE',
+    label: 'Industrie & fabrication',
+    sectors: [
+      { code: 'INDUSTRIE.AGROALIM', label: 'Agroalimentaire' },
+      { code: 'INDUSTRIE.TEXTILE', label: 'Textile & cuir' },
+      { code: 'INDUSTRIE.MATERIAUX', label: 'Matériaux de construction' },
+      { code: 'INDUSTRIE.CHIMIE', label: 'Chimie & plastiques' },
+    ],
+  },
+  {
+    code: 'ENERGIE',
+    label: 'Énergie',
+    sectors: [
+      { code: 'ENERGIE.ELECTRICITE', label: 'Électricité' },
+      { code: 'ENERGIE.RENOUVELABLE', label: 'Énergies renouvelables' },
+      { code: 'ENERGIE.HYDROCARBURES', label: 'Hydrocarbures & distribution' },
+    ],
+  },
+  {
+    code: 'COMMERCE',
+    label: 'Commerce & distribution',
+    sectors: [
+      { code: 'COMMERCE.GROS', label: 'Commerce de gros' },
+      { code: 'COMMERCE.DETAIL', label: 'Commerce de détail' },
+      { code: 'COMMERCE.IMPORT_EXPORT', label: 'Import-export' },
+    ],
+  },
+  {
+    code: 'TRANSPORT',
+    label: 'Transport & logistique',
+    sectors: [
+      { code: 'TRANSPORT.ROUTIER', label: 'Transport routier' },
+      { code: 'TRANSPORT.AERIEN', label: 'Transport aérien' },
+      { code: 'TRANSPORT.LOGISTIQUE', label: 'Logistique & entreposage' },
+    ],
+  },
+  {
+    code: 'NUMERIQUE',
+    label: 'Numérique & télécoms',
+    sectors: [
+      { code: 'NUMERIQUE.TELECOM', label: 'Télécommunications' },
+      { code: 'NUMERIQUE.SERVICES_IT', label: 'Services numériques' },
+      { code: 'NUMERIQUE.FINTECH', label: 'Fintech' },
+    ],
+  },
+  {
+    code: 'FINANCE',
+    label: 'Banque, finance & assurance',
+    sectors: [
+      { code: 'FINANCE.BANQUE', label: 'Banque' },
+      { code: 'FINANCE.ASSURANCE', label: 'Assurance' },
+      { code: 'FINANCE.MICROFINANCE', label: 'Microfinance' },
+    ],
+  },
+  {
+    code: 'SERVICES',
+    label: 'Services & tertiaire',
+    sectors: [
+      { code: 'SERVICES.CONSEIL', label: 'Conseil & audit' },
+      { code: 'SERVICES.TOURISME', label: 'Tourisme & hôtellerie' },
+      { code: 'SERVICES.SANTE', label: 'Santé' },
+      { code: 'SERVICES.EDUCATION', label: 'Éducation & formation' },
+      { code: 'SERVICES.ARTISANAT', label: 'Artisanat' },
+    ],
+  },
+];
+
 /** BO-005 — liste paginée des entreprises, partageable par son URL. */
 @Component({
   selector: 'cnpm-organizations-page',
@@ -74,8 +202,15 @@ const DONUT_GAP = 4;
     SkeletonComponent,
     TextInputComponent,
     ViewToggleComponent,
+    LucideArrowLeft,
+    LucideBriefcase,
+    LucideBuilding2,
+    LucideChevronDown,
     LucideEye,
+    LucideFileText,
+    LucideInfo,
     LucidePencil,
+    LucidePhone,
   ],
   templateUrl: './organizations.page.html',
   styleUrl: './organizations.page.scss',
@@ -125,42 +260,76 @@ export class OrganizationsPage {
     { code: 'AUTRE', label: 'Autre' },
   ];
 
-  /** Secteurs d'activité (liste déroulante) — alignés sur le référentiel SECTOR. */
-  protected readonly sectors: readonly { readonly code: string; readonly label: string }[] = [
-    { code: 'AGRICULTURE', label: 'Agriculture et agro-industrie' },
-    { code: 'INDUSTRIE', label: 'Industrie et fabrication' },
-    { code: 'MINES', label: 'Mines et carrières' },
-    { code: 'BTP', label: 'Bâtiment et travaux publics' },
-    { code: 'COMMERCE', label: 'Commerce et distribution' },
-    { code: 'TRANSPORT', label: 'Transport et logistique' },
-    { code: 'ENERGIE', label: 'Énergie' },
-    { code: 'FINANCE', label: 'Banque, finance et assurance' },
-    { code: 'NUMERIQUE', label: 'Numérique et télécommunications' },
-    { code: 'TOURISME', label: 'Tourisme et hôtellerie' },
-    { code: 'SERVICES', label: 'Services aux entreprises' },
-    { code: 'SANTE', label: 'Santé' },
-    { code: 'EDUCATION', label: 'Éducation et formation' },
-    { code: 'ARTISANAT', label: 'Artisanat' },
-    { code: 'AUTRE', label: 'Autre' },
-  ];
+  /**
+   * Nomenclature d'activité à DEUX niveaux : domaine (ex. « BTP ») puis secteurs fins
+   * (ex. « Routes & ponts »). Le code d'un secteur préfixe son domaine (`BTP.ROUTES_PONTS`),
+   * ce qui permet de retrouver le domaine sans table de correspondance. Nomenclature large,
+   * à affiner par le CNPM.
+   */
+  protected readonly sectorDomains: readonly SectorDomain[] = SECTOR_DOMAINS;
+
+  /** Index code de secteur → libellé, pour l'affichage des puces de sélection. */
+  private readonly sectorLabelByCode: ReadonlyMap<string, string> = new Map(
+    SECTOR_DOMAINS.flatMap((domain) =>
+      domain.sectors.map((sector) => [sector.code, sector.label] as const),
+    ),
+  );
+
+  /** Ordre canonique des secteurs (aplati), pour conserver un tri stable à la sélection. */
+  private readonly sectorOrder: readonly string[] = SECTOR_DOMAINS.flatMap((domain) =>
+    domain.sectors.map((sector) => sector.code),
+  );
 
   /**
-   * Secteurs cochés (multi-sélection). Le premier de la liste fait office de secteur
-   * principal ; l'ordre suit l'ordre d'affichage du référentiel.
+   * Secteurs cochés (multi-sélection, codes fins). Le premier fait office de secteur
+   * principal ; son domaine est envoyé dans `sectorCode` (compatible liste/filtre).
    */
   protected readonly selectedSectors = signal<readonly string[]>([]);
+
+  /** Domaines dépliés dans l'accordéon. */
+  protected readonly expandedDomains = signal<ReadonlySet<string>>(new Set());
+
+  /** Puces récapitulatives (code + libellé) des secteurs cochés, dans l'ordre canonique. */
+  protected readonly selectedSectorChips = computed(() =>
+    this.selectedSectors().map((code) => ({
+      code,
+      label: this.sectorLabelByCode.get(code) ?? code,
+    })),
+  );
 
   protected isSectorSelected(code: string): boolean {
     return this.selectedSectors().includes(code);
   }
 
-  /** Coche/décoche un secteur en conservant l'ordre du référentiel. */
+  /** Coche/décoche un secteur fin en conservant l'ordre canonique de la nomenclature. */
   protected toggleSector(code: string): void {
     this.selectedSectors.update((current) =>
       current.includes(code)
         ? current.filter((value) => value !== code)
-        : this.sectors.map((sector) => sector.code).filter((value) => current.includes(value) || value === code),
+        : this.sectorOrder.filter((value) => current.includes(value) || value === code),
     );
+  }
+
+  protected isDomainExpanded(code: string): boolean {
+    return this.expandedDomains().has(code);
+  }
+
+  protected toggleDomain(code: string): void {
+    this.expandedDomains.update((current) => {
+      const next = new Set(current);
+      if (next.has(code)) {
+        next.delete(code);
+      } else {
+        next.add(code);
+      }
+      return next;
+    });
+  }
+
+  /** Nombre de secteurs cochés dans un domaine (badge de l'accordéon). */
+  protected domainSelectedCount(domain: SectorDomain): number {
+    const selected = this.selectedSectors();
+    return domain.sectors.filter((sector) => selected.includes(sector.code)).length;
   }
 
   protected readonly iconSize = CNPM_ICON_SIZE;
@@ -484,6 +653,7 @@ export class OrganizationsPage {
     this.formError.set(null);
     this.prospectForm.reset();
     this.selectedSectors.set([]);
+    this.expandedDomains.set(new Set());
     this.showForm.set(true);
   }
 
@@ -505,12 +675,15 @@ export class OrganizationsPage {
       return raw.trim() && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
     };
     const sectors = this.selectedSectors();
+    // Secteur principal = DOMAINE du premier secteur coché (aligné sur le référentiel
+    // SECTOR utilisé par la liste et le filtre) ; l'ensemble des secteurs fins part dans
+    // sectorCodes.
+    const primaryDomain = sectors[0] ? (sectors[0].split('.')[0] ?? '') : '';
     const input: CreateProspectInput = {
       legalName: value.legalName.trim(),
       tradeName: value.tradeName.trim(),
       organizationType: value.organizationType.trim(),
-      // Secteur principal = premier secteur coché ; l'ensemble part dans sectorCodes.
-      sectorCode: sectors[0] ?? '',
+      sectorCode: primaryDomain,
       sectorCodes: sectors,
       identifierType: value.identifierType.trim(),
       identifierValue: value.identifierValue.trim(),
@@ -531,6 +704,7 @@ export class OrganizationsPage {
         this.showForm.set(false);
         this.prospectForm.reset();
         this.selectedSectors.set([]);
+        this.expandedDomains.set(new Set());
         // Recharge la liste pour faire apparaître le nouveau prospect.
         this.retry();
       },
