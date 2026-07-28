@@ -36,6 +36,7 @@ class ControllableGateway implements EnrollmentsGateway {
   readonly reject = vi.fn(() => this.rejectionResult);
   readonly requestComplement = vi.fn(() => this.complementResult);
   readonly startReview = vi.fn(() => this.startReviewResult);
+  readonly enrollProspect = vi.fn(() => new Subject<EnrollmentApplication>());
 
   list(): Subject<EnrollmentPage> {
     return new Subject<EnrollmentPage>();

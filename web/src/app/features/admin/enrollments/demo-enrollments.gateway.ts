@@ -54,6 +54,22 @@ export class DemoEnrollmentsGateway implements EnrollmentsGateway {
       : throwError(() => new EnrollmentNotFoundError());
   }
 
+  enrollProspect(organizationId: string): Observable<EnrollmentApplication> {
+    const seq = this.applications.size + 1;
+    const created: EnrollmentApplication = {
+      id: `20000000-0000-4000-8000-${String(seq).padStart(12, '0')}`,
+      caseNumber: `ENR-DEMO-${String(seq).padStart(4, '0')}`,
+      organizationId,
+      channel: 'AGENT',
+      status: 'DRAFT',
+      submittedAt: null,
+      assignedTo: null,
+      version: 0,
+    };
+    this.applications.set(created.id, created);
+    return of(created).pipe(delay(DEMO_DELAY_MS));
+  }
+
   startReview(id: string): Observable<EnrollmentApplication> {
     return this.transition(id, ['SUBMITTED'], {
       status: 'UNDER_REVIEW',

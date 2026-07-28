@@ -25,6 +25,8 @@ import { PageHeaderComponent } from '../../../design-system/page-header/page-hea
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
+import { ToastService } from '../../../design-system/toast/toast.service';
+import { ENROLLMENTS_GATEWAY } from '../enrollments/enrollments-gateway';
 import {
   type CnpmViewMode,
   ViewToggleComponent,
@@ -83,6 +85,11 @@ export class OrganizationsPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly enrollments = inject(ENROLLMENTS_GATEWAY);
+  private readonly toast = inject(ToastService);
+
+  /** Prospect en cours d'enrôlement (bouton en chargement). */
+  protected readonly enrollingId = signal<string | null>(null);
 
   // Formulaire de création d'un prospect (inline, simple). Le statut naît PROSPECT côté
   // serveur ; un prospect enrôlé devient ensuite membre actif.
@@ -454,6 +461,25 @@ export class OrganizationsPage {
       error: (error: unknown) => {
         this.submitting.set(false);
         this.formError.set(this.createErrorMessage(error));
+      },
+    });
+  }
+
+  /** Ouvre un dossier d'enrôlement pour ce prospect, puis mène à la liste des enrôlements. */
+  protected enroll(organization: Organization): void {
+    if (this.enrollingId()) return;
+    this.enrollingId.set(organization.id);
+    this.enrollments.enrollProspect(organization.id).subscribe({
+      next: () => {
+        this.enrollingId.set(null);
+        this.toast.success(
+          `Dossier d'enrôlement ouvert pour ${organization.legalName}. Poursuivez la revue puis approuvez pour créer le membre.`,
+        );
+        void this.router.navigate(['/admin/enrollments']);
+      },
+      error: () => {
+        this.enrollingId.set(null);
+        this.toast.error('L’enrôlement n’a pas pu être ouvert. Réessayez.');
       },
     });
   }

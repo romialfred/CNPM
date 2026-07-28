@@ -79,6 +79,33 @@ export class HttpEnrollmentsGateway implements EnrollmentsGateway {
     );
   }
 
+  enrollProspect(organizationId: string): Observable<EnrollmentApplication> {
+    return defer(() => {
+      const commandId = `enroll-prospect:${organizationId}`;
+      const idempotencyKey = this.idempotencyKeys.getOrCreate(commandId);
+      // Le contrat exige un numéro de dossier ; on en dérive un stable et unique du prospect.
+      const caseNumber = `ENR-${idempotencyKey}`.slice(0, 60);
+      const headers = new HttpHeaders().set('Idempotency-Key', idempotencyKey);
+      const body = { caseNumber, organizationId, channel: 'AGENT' };
+      return this.http
+        .post<EnrollmentApplicationResponse>(
+          buildCnpmApiUrl(this.baseUrl, 'enrollment-applications'),
+          body,
+          { headers },
+        )
+        .pipe(
+          map(mapEnrollment),
+          tap(() => this.idempotencyKeys.release(commandId)),
+          catchError((error: unknown) => {
+            if (!(error instanceof CnpmApiError) || !error.retryable) {
+              this.idempotencyKeys.release(commandId);
+            }
+            return throwError(() => mapDomainError(error));
+          }),
+        );
+    });
+  }
+
   startReview(id: string): Observable<EnrollmentApplication> {
     return this.post(id, 'start-review', null);
   }
