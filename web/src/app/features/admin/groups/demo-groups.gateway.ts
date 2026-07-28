@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { delay, of, throwError, type Observable } from 'rxjs';
 import {
+  type CreateProfessionalGroupInput,
+  GroupConflictError,
   GroupNotFoundError,
   type GroupsGateway,
   type ProfessionalGroup,
@@ -31,19 +33,39 @@ const DEMO_GROUPS: readonly ProfessionalGroup[] = [
 
 @Injectable()
 export class DemoGroupsGateway implements GroupsGateway {
+  /** Copie mutable : la démo accepte des créations le temps de la session. */
+  private readonly groups: ProfessionalGroup[] = [...DEMO_GROUPS];
+
   list(query: ProfessionalGroupQuery): Observable<ProfessionalGroupPage> {
     const start = (query.page - 1) * query.pageSize;
     return of({
-      rows: DEMO_GROUPS.slice(start, start + query.pageSize),
-      totalItems: DEMO_GROUPS.length,
+      rows: this.groups.slice(start, start + query.pageSize),
+      totalItems: this.groups.length,
     }).pipe(delay(DEMO_LATENCY_MS));
   }
 
   get(id: string): Observable<ProfessionalGroup> {
-    const group = DEMO_GROUPS.find((candidate) => candidate.id === id);
+    const group = this.groups.find((candidate) => candidate.id === id);
     return group
       ? of({ ...group }).pipe(delay(DEMO_LATENCY_MS))
       : throwError(() => new GroupNotFoundError());
+  }
+
+  create(input: CreateProfessionalGroupInput): Observable<ProfessionalGroup> {
+    const code = input.code.trim().toUpperCase();
+    if (this.groups.some((candidate) => candidate.code.toUpperCase() === code)) {
+      return throwError(() => new GroupConflictError());
+    }
+    const created: ProfessionalGroup = {
+      id: `20000000-0000-4000-8000-${String(this.groups.length + 1).padStart(12, '0')}`,
+      code,
+      name: input.name.trim(),
+      sectorCode: input.sectorCode?.trim() ? input.sectorCode.trim() : null,
+      status: 'ACTIVE',
+      version: 0,
+    };
+    this.groups.unshift(created);
+    return of({ ...created }).pipe(delay(DEMO_LATENCY_MS));
   }
 }
 

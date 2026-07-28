@@ -4,4 +4,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /** Répertoire Spring Data interne du module GROUP. */
-interface ProfessionalGroupJpaRepository extends JpaRepository<ProfessionalGroupEntity, UUID> {}
+interface ProfessionalGroupJpaRepository extends JpaRepository<ProfessionalGroupEntity, UUID> {
+
+    boolean existsByCode(String code);
+}

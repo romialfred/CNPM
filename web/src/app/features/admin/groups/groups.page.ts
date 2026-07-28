@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideBuilding2, LucideChevronRight, LucideEye } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -13,10 +15,13 @@ import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
+import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import {
+  type CreateProfessionalGroupInput,
   GROUPS_GATEWAY,
   GroupAccessError,
+  GroupConflictError,
   GroupNotFoundError,
   type ProfessionalGroup,
   type ProfessionalGroupQuery,
@@ -35,7 +40,9 @@ const DEFAULT_PAGE_SIZE = 10;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
+    ReactiveFormsModule,
     AdminShellComponent,
+    AlertComponent,
     BadgeComponent,
     ButtonComponent,
     DataTableComponent,
@@ -44,6 +51,7 @@ const DEFAULT_PAGE_SIZE = 10;
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
+    TextInputComponent,
     LucideBuilding2,
     LucideChevronRight,
     LucideEye,
@@ -55,8 +63,20 @@ export class GroupsPage {
   private readonly gateway = inject(GROUPS_GATEWAY);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
 
   protected readonly iconSize = CNPM_ICON_SIZE;
+
+  // Formulaire de création (inline). Le statut naît ACTIVE côté serveur ; le code est
+  // normalisé en majuscules et son unicité est vérifiée par le backend (409 sur doublon).
+  protected readonly showForm = signal(false);
+  protected readonly submitting = signal(false);
+  protected readonly formError = signal<string | null>(null);
+  protected readonly form = this.fb.nonNullable.group({
+    code: ['', [Validators.required, Validators.maxLength(60)]],
+    name: ['', [Validators.required, Validators.maxLength(255)]],
+    sectorCode: ['', [Validators.maxLength(80)]],
+  });
   protected readonly pageSizes = PAGE_SIZES;
 
   private readonly params = toSignal(this.route.queryParamMap, {
@@ -156,6 +176,57 @@ export class GroupsPage {
 
   protected retry(): void {
     this.retryTick.update((tick) => tick + 1);
+  }
+
+  protected openForm(): void {
+    this.formError.set(null);
+    this.form.reset();
+    this.showForm.set(true);
+  }
+
+  protected cancelForm(): void {
+    this.showForm.set(false);
+    this.formError.set(null);
+  }
+
+  protected submitCreate(): void {
+    if (this.submitting()) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const value = this.form.getRawValue();
+    const input: CreateProfessionalGroupInput = {
+      code: value.code.trim(),
+      name: value.name.trim(),
+      sectorCode: value.sectorCode.trim() ? value.sectorCode.trim() : null,
+    };
+    this.submitting.set(true);
+    this.formError.set(null);
+    this.gateway.create(input).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.showForm.set(false);
+        this.form.reset();
+        // Recharge la première page pour faire apparaître le nouveau groupement.
+        this.goToFirstPage();
+        this.retry();
+      },
+      error: (error: unknown) => {
+        this.submitting.set(false);
+        this.formError.set(this.messageFor(error));
+      },
+    });
+  }
+
+  private messageFor(error: unknown): string {
+    if (error instanceof GroupConflictError) {
+      return error.message || 'Un groupement porte déjà ce code.';
+    }
+    if (error instanceof GroupAccessError) {
+      return "Vous n'avez pas le droit de créer un groupement.";
+    }
+    return 'La création a échoué. Vérifiez votre connexion et réessayez.';
   }
 
   private patch(queryParams: Record<string, string | number | null>): void {

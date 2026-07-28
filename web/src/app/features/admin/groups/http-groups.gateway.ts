@@ -4,7 +4,9 @@ import { catchError, map, type Observable, throwError } from 'rxjs';
 import { buildCnpmApiUrl, CNPM_API_BASE_URL } from '../../../core/api/api.config';
 import { CnpmApiError } from '../../../core/api/api-problem';
 import {
+  type CreateProfessionalGroupInput,
   GroupAccessError,
+  GroupConflictError,
   GroupNotFoundError,
   type GroupsGateway,
   type ProfessionalGroup,
@@ -63,6 +65,18 @@ export class HttpGroupsGateway implements GroupsGateway {
         catchError((error: unknown) => throwError(() => mapDomainError(error))),
       );
   }
+
+  create(input: CreateProfessionalGroupInput): Observable<ProfessionalGroup> {
+    return this.http
+      .post<ProfessionalGroupResponse>(
+        buildCnpmApiUrl(this.baseUrl, 'professional-groups'),
+        { code: input.code, name: input.name, sectorCode: input.sectorCode },
+      )
+      .pipe(
+        map(mapProfessionalGroup),
+        catchError((error: unknown) => throwError(() => mapDomainError(error))),
+      );
+  }
 }
 
 function mapProfessionalGroup(response: ProfessionalGroupResponse): ProfessionalGroup {
@@ -80,5 +94,6 @@ function mapDomainError(error: unknown): unknown {
   if (!(error instanceof CnpmApiError)) return error;
   if (error.category === 'authorization') return new GroupAccessError();
   if (error.category === 'not-found') return new GroupNotFoundError();
+  if (error.category === 'conflict') return new GroupConflictError(error.message || undefined);
   return error;
 }

@@ -9,6 +9,33 @@
   min-height: var(--cnpm-space-5);
 }
 
+/* Formulaire de création inline : carte sobre, bordure avant ombre (charte CNPM). */
+.cnpm-groups__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-groups__form-title {
+  margin: 0;
+}
+
+.cnpm-groups__form-grid {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.cnpm-groups__form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-3);
+}
+
 .cnpm-groups__count {
   display: inline-flex;
   align-items: center;

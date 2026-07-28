@@ -7,8 +7,10 @@ import { DemoSessionGateway } from '../../../layout/admin-shell/demo-session.gat
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
 import { GroupDetailPage } from './group-detail.page';
 import {
+  type CreateProfessionalGroupInput,
   GROUPS_GATEWAY,
   GroupAccessError,
+  GroupConflictError,
   GroupNotFoundError,
   type GroupsGateway,
   type ProfessionalGroup,
@@ -36,6 +38,11 @@ class GroupsStub implements GroupsGateway {
   readonly get = vi.fn((id: string) => {
     void id;
     return this.getResult;
+  });
+  createResult: Observable<ProfessionalGroup> = of(GROUP);
+  readonly create = vi.fn((input: CreateProfessionalGroupInput) => {
+    void input;
+    return this.createResult;
   });
 }
 
@@ -179,5 +186,60 @@ describe('BO-025 — fiche groupement', () => {
     gateway.getResult = throwError(() => error);
     const { host } = await setup(GroupDetailPage, { id: GROUP.id, gateway });
     expect(host.textContent).toContain(expected);
+  });
+});
+
+interface CreateHarness {
+  openForm(): void;
+  submitCreate(): void;
+  form: { setValue(value: { code: string; name: string; sectorCode: string }): void };
+  showForm(): boolean;
+}
+
+describe('BO-024 — création d’un groupement', () => {
+  beforeEach(() => TestBed.resetTestingModule());
+
+  it('ouvre le formulaire depuis le bouton « Nouveau groupement »', async () => {
+    const gateway = new GroupsStub();
+    gateway.listResult = of({ rows: [GROUP], totalItems: 1 });
+    const { fixture, host } = await setup(GroupsPage, { gateway });
+
+    const trigger = host.querySelector<HTMLButtonElement>('.cnpm-page-header__actions button');
+    expect(trigger?.textContent).toContain('Nouveau groupement');
+    trigger?.click();
+    fixture.detectChanges();
+    expect(host.querySelector('.cnpm-groups__form')).not.toBeNull();
+  });
+
+  it('crée un groupement (code normalisé, secteur vide → null) et referme le formulaire', async () => {
+    const gateway = new GroupsStub();
+    gateway.listResult = of({ rows: [GROUP], totalItems: 1 });
+    gateway.createResult = of(GROUP);
+    const { fixture } = await setup(GroupsPage, { gateway });
+    const comp = fixture.componentInstance as unknown as CreateHarness;
+
+    comp.openForm();
+    comp.form.setValue({ code: '  apbef ', name: '  Assoc ', sectorCode: '' });
+    comp.submitCreate();
+    fixture.detectChanges();
+
+    expect(gateway.create).toHaveBeenCalledWith({ code: 'apbef', name: 'Assoc', sectorCode: null });
+    expect(comp.showForm()).toBe(false);
+  });
+
+  it('affiche le conflit de code sans fermer le formulaire', async () => {
+    const gateway = new GroupsStub();
+    gateway.listResult = of({ rows: [GROUP], totalItems: 1 });
+    gateway.createResult = throwError(() => new GroupConflictError());
+    const { fixture, host } = await setup(GroupsPage, { gateway });
+    const comp = fixture.componentInstance as unknown as CreateHarness;
+
+    comp.openForm();
+    comp.form.setValue({ code: 'GRP-AGRI', name: 'Doublon', sectorCode: '' });
+    comp.submitCreate();
+    fixture.detectChanges();
+
+    expect(comp.showForm()).toBe(true);
+    expect(host.textContent).toContain('Un groupement porte déjà ce code');
   });
 });

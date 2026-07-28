@@ -41,6 +41,18 @@ class ProfessionalGroupPersistenceAdapter implements ProfessionalGroupRepository
         return repository.findById(id).map(ProfessionalGroupPersistenceAdapter::toDomain);
     }
 
+    @Override
+    public boolean existsByCode(String code) {
+        return repository.existsByCode(code);
+    }
+
+    @Override
+    public ProfessionalGroup create(String code, String name, String sectorCode, String status) {
+        ProfessionalGroupEntity saved =
+                repository.save(ProfessionalGroupEntity.forCreation(code, name, sectorCode, status));
+        return toDomain(saved);
+    }
+
     private static ProfessionalGroup toDomain(ProfessionalGroupEntity entity) {
         return new ProfessionalGroup(
                 entity.getId(),
