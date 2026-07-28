@@ -50,9 +50,23 @@ export interface OrganizationUpdate {
   readonly sectorCode: string;
 }
 
+/**
+ * Champs de création d'un prospect. Le statut naît PROSPECT côté serveur ; un prospect
+ * enrôlé devient ensuite membre actif. L'identifiant légal est requis par le contrat.
+ */
+export interface CreateProspectInput {
+  readonly legalName: string;
+  readonly tradeName: string;
+  readonly organizationType: string;
+  readonly sectorCode: string;
+  readonly identifierType: string;
+  readonly identifierValue: string;
+}
+
 export interface OrganizationsGateway {
   search(query: OrganizationQuery): Observable<OrganizationPage>;
   get(id: string): Observable<Organization>;
+  create(input: CreateProspectInput): Observable<Organization>;
   update(
     id: string,
     expectedVersion: number,

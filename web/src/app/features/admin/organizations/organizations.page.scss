@@ -5,6 +5,33 @@
   min-width: 0;
 }
 
+/* Formulaire de création d'un prospect : carte sobre, bordure avant ombre. */
+.cnpm-organizations__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-organizations__form-title {
+  margin: 0;
+}
+
+.cnpm-organizations__form-grid {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.cnpm-organizations__form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-3);
+}
+
 /* ------------------------------------------------------------------- Filtres.
    Rangée compacte : chaque champ s'étire à parts égales, la recherche compte
    double, et « Appliquer » reste ancré à droite. Sous 767 px les champs passent

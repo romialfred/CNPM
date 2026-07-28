@@ -3,7 +3,63 @@
     <cnpm-page-header
       title="Prospects"
       description="Entreprises à démarcher pour les amener à adhérer. Un prospect enrôlé devient membre actif."
-    />
+    >
+      @if (!showForm()) {
+        <cnpm-button variant="primary" (click)="openForm()">Nouveau prospect</cnpm-button>
+      }
+    </cnpm-page-header>
+
+    @if (showForm()) {
+      <form
+        class="cnpm-organizations__form"
+        [formGroup]="prospectForm"
+        (ngSubmit)="submitCreate()"
+        novalidate
+      >
+        <h2 class="cnpm-organizations__form-title">Nouveau prospect</h2>
+        @if (formError(); as error) {
+          <cnpm-alert tone="error" title="Création impossible">
+            <p>{{ error }}</p>
+          </cnpm-alert>
+        }
+        <div class="cnpm-organizations__form-grid">
+          <cnpm-text-input
+            formControlName="legalName"
+            label="Raison sociale"
+            name="legalName"
+            [required]="true"
+          />
+          <cnpm-text-input formControlName="tradeName" label="Nom commercial (facultatif)" name="tradeName" />
+          <cnpm-text-input
+            formControlName="organizationType"
+            label="Type d’entreprise"
+            name="organizationType"
+            [required]="true"
+          />
+          <cnpm-text-input formControlName="sectorCode" label="Secteur (facultatif)" name="sectorCode" />
+          <cnpm-text-input
+            formControlName="identifierType"
+            label="Type d’identifiant (ex. RCCM, NIF)"
+            name="identifierType"
+            [required]="true"
+          />
+          <cnpm-text-input
+            formControlName="identifierValue"
+            label="Numéro d’identifiant"
+            name="identifierValue"
+            [required]="true"
+          />
+        </div>
+        <div class="cnpm-organizations__form-actions">
+          <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="submitting()">
+            Annuler
+          </cnpm-button>
+          <cnpm-button variant="primary" (click)="submitCreate()" [loading]="submitting()">
+            Créer le prospect
+          </cnpm-button>
+        </div>
+      </form>
+    }
 
     <cnpm-filter-bar
       [expanded]="filtersExpanded()"

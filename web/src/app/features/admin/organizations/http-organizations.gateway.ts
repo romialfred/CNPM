@@ -4,6 +4,7 @@ import { catchError, defer, map, type Observable, throwError } from 'rxjs';
 import { buildCnpmApiUrl, CNPM_API_BASE_URL } from '../../../core/api/api.config';
 import { CnpmApiError } from '../../../core/api/api-problem';
 import {
+  type CreateProspectInput,
   OrganizationAccessError,
   OrganizationConflictError,
   OrganizationNotFoundError,
@@ -88,6 +89,15 @@ export class HttpOrganizationsGateway implements OrganizationsGateway {
       .get<OrganizationViewResponse>(
         buildCnpmApiUrl(this.baseUrl, `organizations/${encodeURIComponent(id)}`),
       )
+      .pipe(
+        map(mapOrganization),
+        catchError((error: unknown) => throwError(() => mapDomainError(error))),
+      );
+  }
+
+  create(input: CreateProspectInput): Observable<Organization> {
+    return this.http
+      .post<OrganizationViewResponse>(buildCnpmApiUrl(this.baseUrl, 'organizations'), input)
       .pipe(
         map(mapOrganization),
         catchError((error: unknown) => throwError(() => mapDomainError(error))),
