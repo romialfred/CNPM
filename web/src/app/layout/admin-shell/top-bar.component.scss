@@ -37,21 +37,26 @@
   margin: 0;
 }
 
-.cnpm-topbar__eyebrow {
-  color: var(--cnpm-chrome-text-muted);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-medium);
-  letter-spacing: var(--cnpm-font-letterSpacing-wide);
-  line-height: var(--cnpm-font-lineHeight-xs);
-  text-transform: uppercase;
-}
-
+/* Titre de la plateforme : grand et gras (demande du commanditaire). Une seule ligne,
+   tronquée si la largeur manque — le sous-titre reste toujours lisible en dessous. */
 .cnpm-topbar__headline {
   overflow: hidden;
   color: var(--cnpm-chrome-text);
   font-size: var(--cnpm-font-size-lg);
-  font-weight: var(--cnpm-font-weight-semibold);
+  font-weight: var(--cnpm-font-weight-bold);
   line-height: var(--cnpm-font-lineHeight-lg);
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Accroche fonctionnelle sous le titre. */
+.cnpm-topbar__subtitle {
+  overflow: hidden;
+  color: var(--cnpm-chrome-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+  line-height: var(--cnpm-font-lineHeight-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }

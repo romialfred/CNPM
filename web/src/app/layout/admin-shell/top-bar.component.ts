@@ -13,8 +13,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { LucideBell, LucideMenu, LucidePlus, LucideSearch } from '@lucide/angular';
+import { LucideBell, LucideMenu, LucideSearch } from '@lucide/angular';
 import { CNPM_ICON_SIZE } from '../../design-system/icon/icon';
 import { ThemeToggleComponent } from '../../design-system/theme-toggle/theme-toggle.component';
 import { AccountMenuComponent } from '../account-menu/account-menu.component';
@@ -32,12 +31,10 @@ import { SESSION_GATEWAY } from './session-gateway';
   imports: [
     AsyncPipe,
     FormsModule,
-    RouterLink,
     AccountMenuComponent,
     ThemeToggleComponent,
     LucideBell,
     LucideMenu,
-    LucidePlus,
     LucideSearch,
   ],
   templateUrl: './top-bar.component.html',
@@ -166,16 +163,6 @@ export class TopBarComponent {
   protected closeSearch(): void {
     this.searchOpen.set(false);
     this.searchToggle()?.nativeElement.focus();
-  }
-
-  /**
-   * Prénom affiché dans l'accroche.
-   *
-   * Le port ne fournit qu'un `displayName` ; le premier mot en est extrait plutôt que
-   * d'ajouter un champ au contrat pour un besoin d'affichage.
-   */
-  protected firstName(displayName: string): string {
-    return displayName.split(/\s+/u).filter(Boolean)[0] ?? displayName;
   }
 
   protected submit(): void {

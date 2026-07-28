@@ -31,6 +31,7 @@
     [attr.aria-hidden]="drawerOpen() ? 'true' : null"
   >
     <cnpm-top-bar
+      class="cnpm-chrome--dark"
       [drawerOpen]="drawerOpen()"
       (drawerToggle)="toggleDrawer()"
       (searchSubmit)="runSearch($event)"
