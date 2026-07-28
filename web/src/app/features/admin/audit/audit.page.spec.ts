@@ -124,10 +124,12 @@ describe('AuditPage — BO-032', () => {
     );
     expect(host.querySelector(`time[datetime="${EVENT.createdAt}"]`)).not.toBeNull();
     expect(host.textContent).toContain(EVENT.id);
-    expect(host.textContent).toContain(EVENT.actorUserId);
-    expect(host.textContent).toContain(EVENT.actionCode);
-    expect(host.textContent).toContain(EVENT.entityType);
-    expect(host.textContent).toContain(EVENT.entityId);
+    // Les codes techniques sont humanisés : identifiants raccourcis, action/objet en clair.
+    expect(host.textContent).toContain(EVENT.actorUserId!.slice(0, 8));
+    expect(host.textContent).not.toContain(EVENT.actionCode);
+    expect(host.textContent).toContain('Audit viewed');
+    expect(host.textContent).toContain('Audit log');
+    expect(host.textContent).toContain(EVENT.entityId!.slice(0, 8));
     expect(host.textContent).toContain(EVENT.beforeHash);
     expect(host.textContent).toContain(EVENT.afterHash);
     expect(host.textContent).toContain(EVENT.correlationId);
