@@ -26,6 +26,53 @@
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
 }
 
+/* Sections du formulaire : Identification · Contact · Activité · Description. */
+.cnpm-organizations__form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding-block-start: var(--cnpm-space-4);
+  border-block-start: 1px solid var(--cnpm-color-border-subtle);
+}
+
+.cnpm-organizations__form-section:first-of-type {
+  padding-block-start: 0;
+  border-block-start: none;
+}
+
+.cnpm-organizations__form-legend {
+  margin: 0;
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+  color: var(--cnpm-color-text-brand);
+}
+
+.cnpm-organizations__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  min-width: 0;
+}
+
+/* Champ pleine largeur (adresse, description) : occupe toute la grille. */
+.cnpm-organizations__field--wide {
+  grid-column: 1 / -1;
+}
+
+.cnpm-organizations__label {
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-organizations__field textarea.cnpm-input {
+  resize: vertical;
+  min-height: var(--cnpm-space-12);
+  font-family: inherit;
+}
+
 .cnpm-organizations__form-actions {
   display: flex;
   justify-content: flex-end;

@@ -15,4 +15,12 @@ public record OrganizationDraft(
         String organizationType,
         String sectorCode,
         String identifierType,
-        String identifierValue) {}
+        String identifierValue,
+        String description,
+        String website,
+        String email,
+        String phone,
+        String address,
+        Integer employeeCount,
+        java.math.BigDecimal capital,
+        java.math.BigDecimal revenueN1) {}
