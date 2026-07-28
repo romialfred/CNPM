@@ -12,6 +12,8 @@ import ml.cnpm.platform.administration.application.AdminSecurityView;
 import ml.cnpm.platform.shared.api.CorrelationId;
 import ml.cnpm.platform.shared.security.credential.AccountCredentialService;
 import ml.cnpm.platform.shared.security.credential.CredentialLinkService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -33,6 +35,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class AdminSecurityController {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AdminSecurityController.class);
 
     private final AdminSecurityQueryService service;
     private final AdminAccountService accounts;
@@ -61,9 +65,22 @@ public class AdminSecurityController {
             @Valid @RequestBody AdminAccountInput input,
             JwtAuthenticationToken authentication,
             HttpServletRequest request) {
-        AdminAccountCreation outcome =
-                accounts.create(
-                        input.toDraft(), actorId(authentication), CorrelationId.current(request));
+        UUID actor = actorId(authentication);
+        UUID correlation = CorrelationId.current(request);
+        AdminAccountCreation outcome = accounts.create(input.toDraft(), actor, correlation);
+        if (outcome.created()) {
+            // À la création réelle, on émet aussitôt le lien d'activation et on l'envoie par
+            // e-mail (message de bienvenue/enrôlement). L'échec d'émission ou d'envoi n'annule
+            // JAMAIS la création : le compte existe déjà et l'opérateur pourra relancer
+            // l'invitation depuis l'écran. On ne rejoue pas l'envoi pour un rejeu (200).
+            try {
+                credentialLinks.issueAndNotify(
+                        UUID.fromString(outcome.account().id()), actor, correlation);
+            } catch (RuntimeException ex) {
+                LOG.warn(
+                        "Compte créé mais lien d'activation non émis/envoyé : {}", ex.getMessage());
+            }
+        }
         // 201 pour une création réelle, 200 pour un rejeu qui ne fait que constater.
         return ResponseEntity.status(outcome.created() ? HttpStatus.CREATED : HttpStatus.OK)
                 .body(outcome.account());
