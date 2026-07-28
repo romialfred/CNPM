@@ -35,6 +35,10 @@ import { PageHeaderComponent } from '../../../design-system/page-header/page-hea
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
 import { ToastService } from '../../../design-system/toast/toast.service';
+import {
+  type CnpmViewMode,
+  ViewToggleComponent,
+} from '../../../design-system/view-toggle/view-toggle.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
 import {
@@ -82,6 +86,7 @@ interface EditorFormValue {
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
+    ViewToggleComponent,
   ],
   templateUrl: './settings.page.html',
   styleUrl: './settings.page.scss',
@@ -128,6 +133,15 @@ export class SettingsPage {
     return (PAGE_SIZES as readonly number[]).includes(value) ? value : DEFAULT_PAGE_SIZE;
   });
   protected readonly hasDomainFilter = computed(() => this.domain().length > 0);
+
+  /** Vue liste (table) ou tuiles (cartes), reflétée dans l'URL (`?vue=grille`). */
+  protected readonly view = computed<CnpmViewMode>(() =>
+    this.params().get('vue') === 'grille' ? 'grille' : 'liste',
+  );
+
+  protected setView(mode: CnpmViewMode): void {
+    this.patch({ vue: mode === 'grille' ? 'grille' : null });
+  }
 
   protected readonly filterForm = this.formBuilder.nonNullable.group({
     domain: [this.domain(), [Validators.maxLength(80)]],
