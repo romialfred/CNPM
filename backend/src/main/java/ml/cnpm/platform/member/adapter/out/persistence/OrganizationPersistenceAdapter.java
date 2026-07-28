@@ -43,12 +43,15 @@ class OrganizationPersistenceAdapter implements OrganizationRepository {
 
     private final OrganizationJpaRepository jpaRepository;
     private final OrganizationIdentifierJpaRepository identifierJpaRepository;
+    private final OrganizationSectorJpaRepository sectorJpaRepository;
 
     OrganizationPersistenceAdapter(
             OrganizationJpaRepository jpaRepository,
-            OrganizationIdentifierJpaRepository identifierJpaRepository) {
+            OrganizationIdentifierJpaRepository identifierJpaRepository,
+            OrganizationSectorJpaRepository sectorJpaRepository) {
         this.jpaRepository = jpaRepository;
         this.identifierJpaRepository = identifierJpaRepository;
+        this.sectorJpaRepository = sectorJpaRepository;
     }
 
     @Override
@@ -107,6 +110,11 @@ class OrganizationPersistenceAdapter implements OrganizationRepository {
                         organizationId,
                         draft.identifierType(),
                         draft.identifierValue()));
+        // Secteurs multi-valués : une ligne de liaison par secteur retenu (déjà dédupliqués
+        // au bord du système). Le secteur principal reste porté par organization.sector_code.
+        for (String sectorCode : draft.sectorCodes()) {
+            sectorJpaRepository.save(new OrganizationSectorEntity(organizationId, sectorCode));
+        }
         return toDomain(saved);
     }
 

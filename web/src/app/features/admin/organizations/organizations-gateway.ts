@@ -59,6 +59,11 @@ export interface CreateProspectInput {
   readonly tradeName: string;
   readonly organizationType: string;
   readonly sectorCode: string;
+  /**
+   * Secteurs d'activité (multi-valué). Le premier fait office de secteur principal ;
+   * le serveur le recopie dans `sectorCode` s'il n'est pas fourni séparément.
+   */
+  readonly sectorCodes: readonly string[];
   readonly identifierType: string;
   readonly identifierValue: string;
   /** Champs de profil facultatifs (null quand non renseignés). */

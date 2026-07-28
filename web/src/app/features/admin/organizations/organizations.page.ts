@@ -106,7 +106,6 @@ export class OrganizationsPage {
     phone: ['', [Validators.maxLength(40)]],
     website: ['', [Validators.maxLength(255)]],
     address: ['', [Validators.maxLength(1000)]],
-    sectorCode: ['', [Validators.maxLength(80)]],
     employeeCount: ['', []],
     capital: ['', []],
     revenueN1: ['', []],
@@ -144,6 +143,25 @@ export class OrganizationsPage {
     { code: 'ARTISANAT', label: 'Artisanat' },
     { code: 'AUTRE', label: 'Autre' },
   ];
+
+  /**
+   * Secteurs cochés (multi-sélection). Le premier de la liste fait office de secteur
+   * principal ; l'ordre suit l'ordre d'affichage du référentiel.
+   */
+  protected readonly selectedSectors = signal<readonly string[]>([]);
+
+  protected isSectorSelected(code: string): boolean {
+    return this.selectedSectors().includes(code);
+  }
+
+  /** Coche/décoche un secteur en conservant l'ordre du référentiel. */
+  protected toggleSector(code: string): void {
+    this.selectedSectors.update((current) =>
+      current.includes(code)
+        ? current.filter((value) => value !== code)
+        : this.sectors.map((sector) => sector.code).filter((value) => current.includes(value) || value === code),
+    );
+  }
 
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly pageSizes = PAGE_SIZES;
@@ -465,6 +483,7 @@ export class OrganizationsPage {
   protected openForm(): void {
     this.formError.set(null);
     this.prospectForm.reset();
+    this.selectedSectors.set([]);
     this.showForm.set(true);
   }
 
@@ -485,11 +504,14 @@ export class OrganizationsPage {
       const parsed = Number(raw.replace(/\s/g, '').replace(',', '.'));
       return raw.trim() && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
     };
+    const sectors = this.selectedSectors();
     const input: CreateProspectInput = {
       legalName: value.legalName.trim(),
       tradeName: value.tradeName.trim(),
       organizationType: value.organizationType.trim(),
-      sectorCode: value.sectorCode.trim(),
+      // Secteur principal = premier secteur coché ; l'ensemble part dans sectorCodes.
+      sectorCode: sectors[0] ?? '',
+      sectorCodes: sectors,
       identifierType: value.identifierType.trim(),
       identifierValue: value.identifierValue.trim(),
       description: text(value.description),
@@ -508,6 +530,7 @@ export class OrganizationsPage {
         this.submitting.set(false);
         this.showForm.set(false);
         this.prospectForm.reset();
+        this.selectedSectors.set([]);
         // Recharge la liste pour faire apparaître le nouveau prospect.
         this.retry();
       },
