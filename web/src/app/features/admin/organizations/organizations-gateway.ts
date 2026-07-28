@@ -61,6 +61,15 @@ export interface CreateProspectInput {
   readonly sectorCode: string;
   readonly identifierType: string;
   readonly identifierValue: string;
+  /** Champs de profil facultatifs (null quand non renseignés). */
+  readonly description: string | null;
+  readonly website: string | null;
+  readonly email: string | null;
+  readonly phone: string | null;
+  readonly address: string | null;
+  readonly employeeCount: number | null;
+  readonly capital: number | null;
+  readonly revenueN1: number | null;
 }
 
 export interface OrganizationsGateway {

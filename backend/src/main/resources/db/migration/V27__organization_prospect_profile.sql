@@ -9,11 +9,11 @@
 -- ultérieur (table de liaison) ; ici le secteur unique existant est conservé.
 
 ALTER TABLE member.organization
-    ADD COLUMN IF NOT EXISTS description   text,
+    ADD COLUMN IF NOT EXISTS description   varchar(4000),
     ADD COLUMN IF NOT EXISTS website       varchar(255),
     ADD COLUMN IF NOT EXISTS email         varchar(320),
     ADD COLUMN IF NOT EXISTS phone         varchar(40),
-    ADD COLUMN IF NOT EXISTS address       text,
+    ADD COLUMN IF NOT EXISTS address       varchar(1000),
     ADD COLUMN IF NOT EXISTS employee_count integer,
     ADD COLUMN IF NOT EXISTS capital       numeric(19, 2),
     ADD COLUMN IF NOT EXISTS revenue_n1    numeric(19, 2);

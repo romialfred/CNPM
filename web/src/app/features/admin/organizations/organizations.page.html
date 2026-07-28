@@ -22,34 +22,129 @@
             <p>{{ error }}</p>
           </cnpm-alert>
         }
-        <div class="cnpm-organizations__form-grid">
-          <cnpm-text-input
-            formControlName="legalName"
-            label="Raison sociale"
-            name="legalName"
-            [required]="true"
-          />
-          <cnpm-text-input formControlName="tradeName" label="Nom commercial (facultatif)" name="tradeName" />
-          <cnpm-text-input
-            formControlName="organizationType"
-            label="Type d’entreprise"
-            name="organizationType"
-            [required]="true"
-          />
-          <cnpm-text-input formControlName="sectorCode" label="Secteur (facultatif)" name="sectorCode" />
-          <cnpm-text-input
-            formControlName="identifierType"
-            label="Type d’identifiant (ex. RCCM, NIF)"
-            name="identifierType"
-            [required]="true"
-          />
-          <cnpm-text-input
-            formControlName="identifierValue"
-            label="Numéro d’identifiant"
-            name="identifierValue"
-            [required]="true"
-          />
-        </div>
+        <section class="cnpm-organizations__form-section">
+          <h3 class="cnpm-organizations__form-legend">Identification</h3>
+          <div class="cnpm-organizations__form-grid">
+            <cnpm-text-input
+              formControlName="legalName"
+              label="Raison sociale"
+              name="legalName"
+              [required]="true"
+            />
+            <cnpm-text-input
+              formControlName="tradeName"
+              label="Nom commercial (facultatif)"
+              name="tradeName"
+            />
+            <div class="cnpm-organizations__field">
+              <label class="cnpm-organizations__label" for="prospect-type">Type d’entreprise *</label>
+              <select id="prospect-type" class="cnpm-input" formControlName="organizationType">
+                <option value="" disabled>Choisir une forme juridique…</option>
+                @for (type of organizationTypes; track type.code) {
+                  <option [value]="type.code">{{ type.label }}</option>
+                }
+              </select>
+            </div>
+            <cnpm-text-input
+              formControlName="identifierType"
+              label="Type d’identifiant (ex. RCCM, NIF)"
+              name="identifierType"
+              [required]="true"
+            />
+            <cnpm-text-input
+              formControlName="identifierValue"
+              label="Numéro d’identifiant"
+              name="identifierValue"
+              [required]="true"
+            />
+          </div>
+        </section>
+
+        <section class="cnpm-organizations__form-section">
+          <h3 class="cnpm-organizations__form-legend">Contact</h3>
+          <div class="cnpm-organizations__form-grid">
+            <cnpm-text-input formControlName="email" label="E-mail" type="email" name="email" />
+            <cnpm-text-input formControlName="phone" label="Téléphone" type="tel" name="phone" />
+            <cnpm-text-input formControlName="website" label="Site web" name="website" />
+            <div class="cnpm-organizations__field cnpm-organizations__field--wide">
+              <label class="cnpm-organizations__label" for="prospect-address">Adresse physique</label>
+              <textarea
+                id="prospect-address"
+                class="cnpm-input"
+                rows="2"
+                formControlName="address"
+              ></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="cnpm-organizations__form-section">
+          <h3 class="cnpm-organizations__form-legend">Activité</h3>
+          <div class="cnpm-organizations__form-grid">
+            <div class="cnpm-organizations__field">
+              <label class="cnpm-organizations__label" for="prospect-sector">Secteur d’activité</label>
+              <select id="prospect-sector" class="cnpm-input" formControlName="sectorCode">
+                <option value="">Non renseigné</option>
+                @for (sector of sectors; track sector.code) {
+                  <option [value]="sector.code">{{ sector.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="cnpm-organizations__field">
+              <label class="cnpm-organizations__label" for="prospect-employees">
+                Nombre d’employés
+              </label>
+              <input
+                id="prospect-employees"
+                class="cnpm-input"
+                type="number"
+                min="0"
+                formControlName="employeeCount"
+              />
+            </div>
+            <div class="cnpm-organizations__field">
+              <label class="cnpm-organizations__label" for="prospect-capital">Capital (FCFA)</label>
+              <input
+                id="prospect-capital"
+                class="cnpm-input"
+                type="number"
+                min="0"
+                step="1000"
+                formControlName="capital"
+              />
+            </div>
+            <div class="cnpm-organizations__field">
+              <label class="cnpm-organizations__label" for="prospect-revenue">
+                Chiffre d’affaires 2025 (FCFA)
+              </label>
+              <input
+                id="prospect-revenue"
+                class="cnpm-input"
+                type="number"
+                min="0"
+                step="1000"
+                formControlName="revenueN1"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section class="cnpm-organizations__form-section">
+          <h3 class="cnpm-organizations__form-legend">Description</h3>
+          <div class="cnpm-organizations__field cnpm-organizations__field--wide">
+            <label class="cnpm-organizations__label" for="prospect-desc">
+              Présentation de l’entreprise
+            </label>
+            <textarea
+              id="prospect-desc"
+              class="cnpm-input"
+              rows="4"
+              formControlName="description"
+              placeholder="Activité, produits, marchés, historique…"
+            ></textarea>
+          </div>
+        </section>
+
         <div class="cnpm-organizations__form-actions">
           <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="submitting()">
             Annuler

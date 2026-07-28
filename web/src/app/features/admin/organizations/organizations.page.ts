@@ -98,12 +98,52 @@ export class OrganizationsPage {
   protected readonly formError = signal<string | null>(null);
   protected readonly prospectForm = this.fb.nonNullable.group({
     legalName: ['', [Validators.required, Validators.maxLength(255)]],
+    tradeName: ['', [Validators.maxLength(255)]],
     organizationType: ['', [Validators.required, Validators.maxLength(40)]],
-    sectorCode: ['', [Validators.maxLength(80)]],
     identifierType: ['', [Validators.required, Validators.maxLength(40)]],
     identifierValue: ['', [Validators.required, Validators.maxLength(160)]],
-    tradeName: ['', [Validators.maxLength(255)]],
+    email: ['', [Validators.email, Validators.maxLength(320)]],
+    phone: ['', [Validators.maxLength(40)]],
+    website: ['', [Validators.maxLength(255)]],
+    address: ['', [Validators.maxLength(1000)]],
+    sectorCode: ['', [Validators.maxLength(80)]],
+    employeeCount: ['', []],
+    capital: ['', []],
+    revenueN1: ['', []],
+    description: ['', [Validators.maxLength(4000)]],
   });
+
+  /** Formes juridiques (liste déroulante) — alignées sur le référentiel ORGANIZATION_TYPE. */
+  protected readonly organizationTypes: readonly { readonly code: string; readonly label: string }[] = [
+    { code: 'SA', label: 'Société anonyme (SA)' },
+    { code: 'SARL', label: 'Société à responsabilité limitée (SARL)' },
+    { code: 'SUARL', label: 'SARL unipersonnelle (SUARL)' },
+    { code: 'SAS', label: 'Société par actions simplifiée (SAS)' },
+    { code: 'GIE', label: "Groupement d'intérêt économique (GIE)" },
+    { code: 'COOPERATIVE', label: 'Coopérative' },
+    { code: 'ENTREPRISE_INDIVIDUELLE', label: 'Entreprise individuelle' },
+    { code: 'ASSOCIATION', label: 'Association' },
+    { code: 'AUTRE', label: 'Autre' },
+  ];
+
+  /** Secteurs d'activité (liste déroulante) — alignés sur le référentiel SECTOR. */
+  protected readonly sectors: readonly { readonly code: string; readonly label: string }[] = [
+    { code: 'AGRICULTURE', label: 'Agriculture et agro-industrie' },
+    { code: 'INDUSTRIE', label: 'Industrie et fabrication' },
+    { code: 'MINES', label: 'Mines et carrières' },
+    { code: 'BTP', label: 'Bâtiment et travaux publics' },
+    { code: 'COMMERCE', label: 'Commerce et distribution' },
+    { code: 'TRANSPORT', label: 'Transport et logistique' },
+    { code: 'ENERGIE', label: 'Énergie' },
+    { code: 'FINANCE', label: 'Banque, finance et assurance' },
+    { code: 'NUMERIQUE', label: 'Numérique et télécommunications' },
+    { code: 'TOURISME', label: 'Tourisme et hôtellerie' },
+    { code: 'SERVICES', label: 'Services aux entreprises' },
+    { code: 'SANTE', label: 'Santé' },
+    { code: 'EDUCATION', label: 'Éducation et formation' },
+    { code: 'ARTISANAT', label: 'Artisanat' },
+    { code: 'AUTRE', label: 'Autre' },
+  ];
 
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly pageSizes = PAGE_SIZES;
@@ -440,6 +480,11 @@ export class OrganizationsPage {
       return;
     }
     const value = this.prospectForm.getRawValue();
+    const text = (raw: string): string | null => (raw.trim() ? raw.trim() : null);
+    const amount = (raw: string): number | null => {
+      const parsed = Number(raw.replace(/\s/g, '').replace(',', '.'));
+      return raw.trim() && Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+    };
     const input: CreateProspectInput = {
       legalName: value.legalName.trim(),
       tradeName: value.tradeName.trim(),
@@ -447,6 +492,14 @@ export class OrganizationsPage {
       sectorCode: value.sectorCode.trim(),
       identifierType: value.identifierType.trim(),
       identifierValue: value.identifierValue.trim(),
+      description: text(value.description),
+      website: text(value.website),
+      email: text(value.email),
+      phone: text(value.phone),
+      address: text(value.address),
+      employeeCount: amount(value.employeeCount),
+      capital: amount(value.capital),
+      revenueN1: amount(value.revenueN1),
     };
     this.submitting.set(true);
     this.formError.set(null);
