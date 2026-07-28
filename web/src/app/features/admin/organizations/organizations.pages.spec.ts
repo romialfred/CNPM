@@ -40,6 +40,7 @@ class OrganizationsStub implements OrganizationsGateway {
     }),
   );
   readonly get = vi.fn(() => of(ORGANIZATION));
+  readonly create = vi.fn(() => of({ ...ORGANIZATION, status: 'PROSPECT' }));
 
   search(): Subject<OrganizationPage> {
     const result = new Subject<OrganizationPage>();

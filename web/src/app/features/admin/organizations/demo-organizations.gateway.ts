@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { delay, map, of, throwError, type Observable } from 'rxjs';
 import {
+  type CreateProspectInput,
   OrganizationConflictError,
   OrganizationNotFoundError,
   type Organization,
@@ -164,6 +165,21 @@ export class DemoOrganizationsGateway implements OrganizationsGateway {
     return organization
       ? of({ ...organization }).pipe(delay(DEMO_LATENCY_MS))
       : throwError(() => new OrganizationNotFoundError());
+  }
+
+  create(input: CreateProspectInput): Observable<Organization> {
+    const created: Organization = {
+      id: `10000000-0000-4000-8000-${String(this.records.length + 1).padStart(12, '0')}`,
+      legalName: input.legalName.trim(),
+      tradeName: input.tradeName.trim() || null,
+      organizationType: input.organizationType.trim(),
+      sectorCode: input.sectorCode.trim() || null,
+      status: 'PROSPECT',
+      riskLevel: 'NORMAL',
+      version: 0,
+    };
+    this.records = [created, ...this.records];
+    return of({ ...created }).pipe(delay(DEMO_LATENCY_MS));
   }
 
   update(

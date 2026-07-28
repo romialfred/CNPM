@@ -1,10 +1,11 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideEye, LucidePencil } from '@lucide/angular';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
+import { AlertComponent } from '../../../design-system/alert/alert.component';
 import { BadgeComponent, type CnpmBadgeTone } from '../../../design-system/badge/badge.component';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { DataTableComponent } from '../../../design-system/data-table/data-table.component';
@@ -23,14 +24,17 @@ import { MonogramComponent } from '../../../design-system/monogram/monogram.comp
 import { PageHeaderComponent } from '../../../design-system/page-header/page-header.component';
 import { PaginationComponent } from '../../../design-system/pagination/pagination.component';
 import { SkeletonComponent } from '../../../design-system/skeleton/skeleton.component';
+import { TextInputComponent } from '../../../design-system/text-input/text-input.component';
 import {
   type CnpmViewMode,
   ViewToggleComponent,
 } from '../../../design-system/view-toggle/view-toggle.component';
 import { AdminShellComponent } from '../../../layout/admin-shell/admin-shell.component';
 import {
+  type CreateProspectInput,
   ORGANIZATIONS_GATEWAY,
   OrganizationAccessError,
+  OrganizationValidationError,
   type Organization,
   type OrganizationQuery,
 } from './organizations-gateway';
@@ -52,8 +56,10 @@ const DONUT_GAP = 4;
   imports: [
     DecimalPipe,
     FormsModule,
+    ReactiveFormsModule,
     RouterLink,
     AdminShellComponent,
+    AlertComponent,
     MonogramComponent,
     BadgeComponent,
     ButtonComponent,
@@ -64,6 +70,7 @@ const DONUT_GAP = 4;
     PageHeaderComponent,
     PaginationComponent,
     SkeletonComponent,
+    TextInputComponent,
     ViewToggleComponent,
     LucideEye,
     LucidePencil,
@@ -75,6 +82,21 @@ export class OrganizationsPage {
   private readonly gateway = inject(ORGANIZATIONS_GATEWAY);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+
+  // Formulaire de création d'un prospect (inline, simple). Le statut naît PROSPECT côté
+  // serveur ; un prospect enrôlé devient ensuite membre actif.
+  protected readonly showForm = signal(false);
+  protected readonly submitting = signal(false);
+  protected readonly formError = signal<string | null>(null);
+  protected readonly prospectForm = this.fb.nonNullable.group({
+    legalName: ['', [Validators.required, Validators.maxLength(255)]],
+    organizationType: ['', [Validators.required, Validators.maxLength(40)]],
+    sectorCode: ['', [Validators.maxLength(80)]],
+    identifierType: ['', [Validators.required, Validators.maxLength(40)]],
+    identifierValue: ['', [Validators.required, Validators.maxLength(160)]],
+    tradeName: ['', [Validators.maxLength(255)]],
+  });
 
   protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly pageSizes = PAGE_SIZES;
@@ -391,6 +413,59 @@ export class OrganizationsPage {
 
   protected retry(): void {
     this.retryTick.update((tick) => tick + 1);
+  }
+
+  protected openForm(): void {
+    this.formError.set(null);
+    this.prospectForm.reset();
+    this.showForm.set(true);
+  }
+
+  protected cancelForm(): void {
+    this.showForm.set(false);
+    this.formError.set(null);
+  }
+
+  protected submitCreate(): void {
+    if (this.submitting()) return;
+    if (this.prospectForm.invalid) {
+      this.prospectForm.markAllAsTouched();
+      return;
+    }
+    const value = this.prospectForm.getRawValue();
+    const input: CreateProspectInput = {
+      legalName: value.legalName.trim(),
+      tradeName: value.tradeName.trim(),
+      organizationType: value.organizationType.trim(),
+      sectorCode: value.sectorCode.trim(),
+      identifierType: value.identifierType.trim(),
+      identifierValue: value.identifierValue.trim(),
+    };
+    this.submitting.set(true);
+    this.formError.set(null);
+    this.gateway.create(input).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.showForm.set(false);
+        this.prospectForm.reset();
+        // Recharge la liste pour faire apparaître le nouveau prospect.
+        this.retry();
+      },
+      error: (error: unknown) => {
+        this.submitting.set(false);
+        this.formError.set(this.createErrorMessage(error));
+      },
+    });
+  }
+
+  private createErrorMessage(error: unknown): string {
+    if (error instanceof OrganizationValidationError) {
+      return error.message;
+    }
+    if (error instanceof OrganizationAccessError) {
+      return "Vous n'avez pas le droit de créer un prospect.";
+    }
+    return 'La création a échoué. Vérifiez les informations et réessayez.';
   }
 
   private patch(queryParams: Record<string, string | number | null>): void {
