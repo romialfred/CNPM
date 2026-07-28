@@ -85,7 +85,13 @@ export class SidebarNavigationComponent {
    * leurs cinq intitulés qui restent tous visibles — ce que la demande exige réellement.
    * Le groupe de l'écran ouvert se déplie de lui-même.
    */
-  private readonly openedGroups = signal<ReadonlySet<string>>(new Set());
+  /**
+   * Accordéon : un seul groupe ouvert à la fois.
+   *
+   * `undefined` = aucune action manuelle, on suit le groupe de l'écran ouvert. `null` =
+   * l'utilisateur a tout refermé. Sinon, le seul groupe explicitement ouvert.
+   */
+  private readonly manualOpen = signal<string | null | undefined>(undefined);
 
   private readonly currentUrl = toSignal(
     this.router.events.pipe(
@@ -105,20 +111,19 @@ export class SidebarNavigationComponent {
       .find((group) => group?.entries.some((entry) => url.startsWith(entry.route)))?.id;
   });
 
+  /** Groupe effectivement ouvert : action manuelle si elle existe, sinon le groupe actif. */
+  private readonly openGroup = computed(() => {
+    const manual = this.manualOpen();
+    return manual === undefined ? this.activeGroup() : manual;
+  });
+
   protected isOpen(groupId: string): boolean {
-    return groupId === this.activeGroup() || this.openedGroups().has(groupId);
+    return groupId === this.openGroup();
   }
 
   protected toggleGroup(groupId: string): void {
-    this.openedGroups.update((opened) => {
-      const next = new Set(opened);
-      if (next.has(groupId)) {
-        next.delete(groupId);
-      } else {
-        next.add(groupId);
-      }
-      return next;
-    });
+    // Accordéon : ouvrir un groupe referme tous les autres ; recliquer l'ouvert le referme.
+    this.manualOpen.set(this.openGroup() === groupId ? null : groupId);
   }
 
   protected readonly hasPending = computed(() => this.navigation().some((entry) => entry.pending));

@@ -119,6 +119,18 @@
   font-size: var(--cnpm-font-size-xs);
 }
 
+/* Libellés humains (action / acteur / objet) : texte lisible, pas de code technique. */
+.cnpm-audit__action {
+  color: var(--cnpm-color-text-brand);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-audit__actor,
+.cnpm-audit__object {
+  color: var(--cnpm-color-text-primary);
+  font-weight: var(--cnpm-font-weight-medium);
+}
+
 .cnpm-audit__mobile-list {
   display: none;
   margin: 0;

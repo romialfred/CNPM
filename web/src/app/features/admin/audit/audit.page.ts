@@ -39,6 +39,44 @@ const DATE_FORMATTER = new Intl.DateTimeFormat('fr-ML', {
   timeZone: 'UTC',
 });
 
+/** Casse de phrase (« Compte créé ») à partir d'un fragment déjà espacé et en minuscules. */
+function humanize(value: string): string {
+  const trimmed = value.trim().toLowerCase();
+  return trimmed ? trimmed.charAt(0).toUpperCase() + trimmed.slice(1) : trimmed;
+}
+
+/** Libellés lisibles des actions d'audit connues. Les inconnues retombent sur `humanize`. */
+const ACTION_LABELS: Readonly<Record<string, string>> = {
+  'USER_ACCOUNT.CREATED': 'Compte créé',
+  'USER_ACCOUNT.CREDENTIAL_TOKEN_ISSUED': 'Lien d’activation envoyé',
+  'USER_ACCOUNT.PASSWORD_SET': 'Mot de passe défini',
+  'USER_ACCOUNT.SUSPENDED': 'Compte suspendu',
+  'USER_ACCOUNT.REACTIVATED': 'Compte réactivé',
+  'USER_ACCOUNT.MFA_RESET': 'Second facteur réinitialisé',
+  'USER_ACCOUNT.DELETED': 'Compte supprimé',
+  'ROLE_PERMISSION.GRANTED': 'Permission accordée',
+  'ROLE_PERMISSION.REVOKED': 'Permission retirée',
+  'PROFESSIONAL_GROUP.CREATED': 'Groupement créé',
+};
+
+/** Nature des objets concernés, en clair. */
+const OBJECT_LABELS: Readonly<Record<string, string>> = {
+  'iam.user_account': 'Compte utilisateur',
+  'iam.role_permission': 'Droit de rôle',
+  'iam.role': 'Rôle',
+  'member.professional_group': 'Groupement professionnel',
+  'member.organization': 'Entreprise',
+  'member.membership': 'Adhésion',
+  'member.person': 'Personne',
+};
+
+/** Types d'acteur, en clair. */
+const ACTOR_LABELS: Readonly<Record<string, string>> = {
+  USER: 'Utilisateur',
+  SYSTEM: 'Système',
+  SERVICE: 'Service',
+};
+
 type AuditViewState = 'loading' | 'ready' | 'empty' | 'error' | 'authentication' | 'forbidden';
 
 /**
@@ -170,6 +208,36 @@ export class AuditPage {
 
   protected formatTimestamp(value: string): string {
     return `${DATE_FORMATTER.format(new Date(value))} UTC`;
+  }
+
+  /**
+   * Traduit un code d'action technique en libellé lisible (français). Les codes connus
+   * sont nommés explicitement ; tout code inconnu retombe sur une mise en forme générique
+   * (dernier segment, underscores en espaces, casse de phrase) plutôt que le brut.
+   */
+  protected actionLabel(code: string): string {
+    return (
+      ACTION_LABELS[code] ??
+      humanize((code.split('.').pop() ?? code).replace(/_/g, ' '))
+    );
+  }
+
+  /** Nature de l'objet concerné, en clair (« Compte utilisateur » plutôt que iam.user_account). */
+  protected objectLabel(entityType: string): string {
+    return (
+      OBJECT_LABELS[entityType] ??
+      humanize((entityType.split('.').pop() ?? entityType).replace(/_/g, ' '))
+    );
+  }
+
+  /** Type d'acteur en clair (« Utilisateur » plutôt que USER). */
+  protected actorLabel(actorType: string): string {
+    return ACTOR_LABELS[actorType] ?? humanize(actorType.replace(/_/g, ' '));
+  }
+
+  /** Identifiant technique raccourci pour l'affichage (les 8 premiers caractères). */
+  protected shortId(id: string | null | undefined): string {
+    return id ? id.slice(0, 8) : '';
   }
 
   protected onPageChange(page: number): void {
