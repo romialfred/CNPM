@@ -233,45 +233,25 @@
                 }
               </div>
 
-              @if (rolePermissions().length) {
-                <div class="nacc__preview">
-                  <p class="nacc__preview-title">Ce que ce rôle autorise</p>
-                  <ul class="nacc__tags">
-                    @for (permission of rolePermissions(); track permission.id) {
-                      <li class="nacc__tag" [title]="permission.label">{{ permission.description }}</li>
-                    }
-                  </ul>
-                </div>
-              }
-
-              @if (!isMember() && extraPermissionOptions().length) {
+              @if (selectedRoleId() && permissionMatrix().length) {
                 <div class="nacc__extra">
                   <div class="nacc__extra-head">
                     <div>
-                      <p class="nacc__preview-title">Permissions supplémentaires</p>
-                      <p class="nacc__extra-hint">Ajoutez des droits au-delà du rôle, regroupés par domaine.</p>
+                      <p class="nacc__preview-title">Permissions du profil</p>
+                      <p class="nacc__extra-hint">
+                        Le rôle coche ses droits (verrouillés). Cochez d’autres droits pour
+                        personnaliser ce profil.
+                      </p>
                     </div>
-                    <span class="nacc__counter" [class.nacc__counter--active]="extraSelectedCount() > 0">
-                      {{ extraSelectedCount() }} accordée{{ extraSelectedCount() > 1 ? 's' : '' }}
-                    </span>
-                  </div>
-
-                  <div class="nacc__field">
-                    <label class="nacc__sr" for="perm-search">Rechercher une permission</label>
-                    <input
-                      id="perm-search"
-                      class="cnpm-input"
-                      type="search"
-                      autocomplete="off"
-                      placeholder="Rechercher un droit (ex. « cotisation »)…"
-                      [ngModel]="permissionSearch()"
-                      [ngModelOptions]="{ standalone: true }"
-                      (ngModelChange)="permissionSearch.set($event)"
-                    />
+                    @if (!isMember()) {
+                      <span class="nacc__counter" [class.nacc__counter--active]="extraSelectedCount() > 0">
+                        +{{ extraSelectedCount() }} en plus
+                      </span>
+                    }
                   </div>
 
                   <div class="nacc__domains">
-                    @for (group of extraPermissionGroups(); track group.domain) {
+                    @for (group of permissionMatrix(); track group.domain) {
                       <section class="nacc__domain">
                         <button
                           type="button"
@@ -287,8 +267,8 @@
                             aria-hidden="true"
                           ></svg>
                           <span class="nacc__domain-name">{{ group.domain }}</span>
-                          @if (group.selectedCount > 0) {
-                            <span class="nacc__domain-badge">{{ group.selectedCount }}</span>
+                          @if (group.grantedCount > 0) {
+                            <span class="nacc__domain-badge">{{ group.grantedCount }}</span>
                           }
                           <span class="nacc__domain-total">
                             {{ group.permissions.length }} droit{{ group.permissions.length > 1 ? 's' : '' }}
@@ -303,12 +283,19 @@
                                   <input
                                     type="checkbox"
                                     class="nacc__perm-toggle"
-                                    [checked]="isExtraSelected(permission.id)"
+                                    [checked]="isChecked(permission.id)"
+                                    [disabled]="isInRole(permission.id) || isMember()"
                                     (change)="toggleExtra(permission.id, $any($event.target).checked)"
                                   />
                                   <span class="nacc__perm-text">
                                     <span class="nacc__perm-name">{{ permission.description }}</span>
-                                    <small class="nacc__perm-code">{{ permission.label }}</small>
+                                    <small class="nacc__perm-code">
+                                      @if (isInRole(permission.id)) {
+                                        Inclus dans le rôle
+                                      } @else {
+                                        {{ permission.label }}
+                                      }
+                                    </small>
                                   </span>
                                 </label>
                               </li>
@@ -316,8 +303,6 @@
                           </ul>
                         }
                       </section>
-                    } @empty {
-                      <p class="nacc__empty" role="status">Aucun droit ne correspond à votre recherche.</p>
                     }
                   </div>
                 </div>
