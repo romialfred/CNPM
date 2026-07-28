@@ -113,12 +113,9 @@ export class AuditPage {
   protected readonly pageSizes = PAGE_SIZES;
   protected readonly columns: readonly DataTableColumn[] = [
     { key: 'createdAt', label: 'Horodatage' },
-    { key: 'event', label: 'Événement' },
     { key: 'actor', label: 'Acteur' },
     { key: 'action', label: 'Action' },
     { key: 'entity', label: 'Objet' },
-    { key: 'hashes', label: 'Empreintes' },
-    { key: 'correlation', label: 'Corrélation' },
   ];
 
   /** L'URL reste l'unique source de vérité de la pagination partageable. */

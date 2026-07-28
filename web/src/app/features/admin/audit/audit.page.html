@@ -78,7 +78,7 @@
         @case ('ready') {
           <div class="cnpm-audit__desktop-table">
             <cnpm-data-table
-              caption="Journaux d’audit, du plus récent au plus ancien : horodatage, événement, acteur, action, objet, empreintes avant et après, puis identifiant de corrélation."
+              caption="Journaux d’audit, du plus récent au plus ancien : horodatage, acteur, action et objet."
               [columns]="columns"
               [rows]="events()"
               [rowKey]="rowKey"
@@ -90,57 +90,17 @@
                   </time>
                 </td>
                 <td class="cnpm-table__cell">
-                  <code class="cnpm-audit__identifier">{{ event.id }}</code>
-                </td>
-                <td class="cnpm-table__cell">
-                  <span class="cnpm-audit__stack">
+                  @if (event.actorUserId) {
                     <span class="cnpm-audit__actor">{{ actorLabel(event.actorType) }}</span>
-                    @if (event.actorUserId) {
-                      <code class="cnpm-audit__identifier" [title]="event.actorUserId">
-                        {{ shortId(event.actorUserId) }}…
-                      </code>
-                    } @else {
-                      <span class="cnpm-audit__muted">Non attribué</span>
-                    }
-                  </span>
+                  } @else {
+                    <span class="cnpm-audit__muted">Système</span>
+                  }
                 </td>
                 <td class="cnpm-table__cell">
                   <span class="cnpm-audit__action">{{ actionLabel(event.actionCode) }}</span>
                 </td>
                 <td class="cnpm-table__cell">
-                  <span class="cnpm-audit__stack">
-                    <span class="cnpm-audit__object">{{ objectLabel(event.entityType) }}</span>
-                    @if (event.entityId) {
-                      <code class="cnpm-audit__identifier" [title]="event.entityId">
-                        {{ shortId(event.entityId) }}…
-                      </code>
-                    } @else {
-                      <span class="cnpm-audit__muted">Sans identifiant</span>
-                    }
-                  </span>
-                </td>
-                <td class="cnpm-table__cell">
-                  <span class="cnpm-audit__hashes">
-                    <span>
-                      <span class="cnpm-audit__hash-label">Avant</span>
-                      @if (event.beforeHash) {
-                        <code>{{ event.beforeHash }}</code>
-                      } @else {
-                        <span class="cnpm-audit__muted">Non fournie</span>
-                      }
-                    </span>
-                    <span>
-                      <span class="cnpm-audit__hash-label">Après</span>
-                      @if (event.afterHash) {
-                        <code>{{ event.afterHash }}</code>
-                      } @else {
-                        <span class="cnpm-audit__muted">Non fournie</span>
-                      }
-                    </span>
-                  </span>
-                </td>
-                <td class="cnpm-table__cell">
-                  <code class="cnpm-audit__identifier">{{ event.correlationId }}</code>
+                  <span class="cnpm-audit__object">{{ objectLabel(event.entityType) }}</span>
                 </td>
               </ng-template>
             </cnpm-data-table>
@@ -164,56 +124,9 @@
 
                   <dl class="cnpm-audit__details">
                     <div>
-                      <dt>Événement</dt>
-                      <dd>
-                        <code>{{ event.id }}</code>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Utilisateur acteur</dt>
-                      <dd>
-                        @if (event.actorUserId) {
-                          <code>{{ event.actorUserId }}</code>
-                        } @else {
-                          <span>Non attribué</span>
-                        }
-                      </dd>
-                    </div>
-                    <div>
                       <dt>Objet</dt>
                       <dd>
                         <strong>{{ objectLabel(event.entityType) }}</strong>
-                        @if (event.entityId) {
-                          <code [title]="event.entityId">{{ shortId(event.entityId) }}…</code>
-                        } @else {
-                          <span>Sans identifiant</span>
-                        }
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Empreinte avant</dt>
-                      <dd>
-                        @if (event.beforeHash) {
-                          <code>{{ event.beforeHash }}</code>
-                        } @else {
-                          <span>Non fournie</span>
-                        }
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Empreinte après</dt>
-                      <dd>
-                        @if (event.afterHash) {
-                          <code>{{ event.afterHash }}</code>
-                        } @else {
-                          <span>Non fournie</span>
-                        }
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>Corrélation</dt>
-                      <dd>
-                        <code>{{ event.correlationId }}</code>
                       </dd>
                     </div>
                   </dl>
