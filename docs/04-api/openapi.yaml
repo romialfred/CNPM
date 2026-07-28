@@ -3441,6 +3441,42 @@ paths:
       - GRP-004
       - GRP-005
       - GRP-006
+    post:
+      tags:
+      - GROUP
+      summary: Créer un groupement professionnel.
+      description: >-
+        Ajoute un groupement au référentiel. Le code identifie le groupement de façon
+        unique (normalisé en majuscules) ; un code déjà pris est un conflit. Requiert la
+        permission GROUP.WRITE. Le groupement naît au statut ACTIVE.
+      operationId: createProfessionalGroup
+      parameters:
+      - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfessionalGroupRequest'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '201':
+          description: Groupement créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfessionalGroupView'
+      x-requirements:
+      - GRP-001
   /professional-groups/{id}:
     get:
       tags:
@@ -5888,6 +5924,27 @@ components:
         totalPages:
           type: integer
           minimum: 0
+      additionalProperties: false
+    CreateProfessionalGroupRequest:
+      type: object
+      description: Données de création d'un groupement professionnel.
+      required:
+      - code
+      - name
+      properties:
+        code:
+          type: string
+          maxLength: 60
+          description: Code unique du groupement (normalisé en majuscules côté serveur).
+        name:
+          type: string
+          maxLength: 255
+          description: Dénomination complète du groupement.
+        sectorCode:
+          type: string
+          maxLength: 80
+          nullable: true
+          description: Secteur d'activité rattaché, facultatif.
       additionalProperties: false
     ProfessionalGroupView:
       type: object

@@ -36,6 +36,21 @@ class ProfessionalGroupEntity {
         // Requis par JPA.
     }
 
+    /**
+     * Fabrique une entité neuve prête à être persistée. L'identifiant technique est un UUID
+     * tiré ici ; la {@code version} reste nulle, ce qui signale à JPA une insertion.
+     */
+    static ProfessionalGroupEntity forCreation(
+            String code, String name, String sectorCode, String status) {
+        ProfessionalGroupEntity entity = new ProfessionalGroupEntity();
+        entity.id = UUID.randomUUID();
+        entity.code = code;
+        entity.name = name;
+        entity.sectorCode = sectorCode;
+        entity.status = status;
+        return entity;
+    }
+
     UUID getId() {
         return id;
     }
