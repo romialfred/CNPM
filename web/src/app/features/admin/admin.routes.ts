@@ -530,7 +530,14 @@ export const adminRoutes: Routes = [
         path: 'security/users',
         loadComponent: () =>
           import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
-        title: 'Sécurité — Administration CNPM',
+        title: 'Gestion des utilisateurs — Administration CNPM',
+      },
+      {
+        path: 'security/sessions',
+        data: { defaultTab: 'sessions' },
+        loadComponent: () =>
+          import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
+        title: 'Gestion des sessions — Administration CNPM',
       },
       {
         // Création d'un compte : écran plein, hors modale (BO-030).
@@ -551,6 +558,31 @@ export const adminRoutes: Routes = [
         canDeactivate: [pendingSettingsChangesGuard],
         loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
         title: 'Paramétrage fonctionnel — Administration CNPM',
+      },
+      // Sous-menus « Paramètre » : la même page, verrouillée sur un domaine de référentiel.
+      {
+        path: 'settings/channel',
+        data: { fixedDomain: 'CHANNEL', fixedDomainLabel: 'Canal' },
+        canActivate: [settingsReadGuard],
+        canDeactivate: [pendingSettingsChangesGuard],
+        loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
+        title: 'Canal — Paramètre CNPM',
+      },
+      {
+        path: 'settings/category',
+        data: { fixedDomain: 'CATEGORY', fixedDomainLabel: 'Catégorie' },
+        canActivate: [settingsReadGuard],
+        canDeactivate: [pendingSettingsChangesGuard],
+        loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
+        title: 'Catégorie — Paramètre CNPM',
+      },
+      {
+        path: 'settings/status',
+        data: { fixedDomain: 'STATUS', fixedDomainLabel: 'Statut' },
+        canActivate: [settingsReadGuard],
+        canDeactivate: [pendingSettingsChangesGuard],
+        loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
+        title: 'Statut — Paramètre CNPM',
       },
       {
         path: 'collection-accounts',

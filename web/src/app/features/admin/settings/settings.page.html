@@ -1,8 +1,12 @@
 <cnpm-admin-shell>
   <div class="cnpm-settings">
     <cnpm-page-header
-      title="Paramétrage fonctionnel"
-      description="Gérez les valeurs de référentiel autorisées par le contrat d’administration."
+      [title]="fixedDomainLabel ?? 'Paramétrage fonctionnel'"
+      [description]="
+        fixedDomainLabel
+          ? 'Gérez les valeurs de référentiel du domaine « ' + fixedDomainLabel + ' ».'
+          : 'Gérez les valeurs de référentiel autorisées par le contrat d’administration.'
+      "
     >
       @if (canWrite()) {
         <cnpm-button variant="primary" size="lg" (click)="openCreate()">
@@ -11,7 +15,8 @@
       }
     </cnpm-page-header>
 
-    <section class="cnpm-settings__filter" aria-labelledby="settings-filter-title">
+    @if (!fixedDomain) {
+      <section class="cnpm-settings__filter" aria-labelledby="settings-filter-title">
       <div>
         <h2 id="settings-filter-title">Filtrer le registre</h2>
         <p>
@@ -55,7 +60,8 @@
           }
         </div>
       </form>
-    </section>
+      </section>
+    }
 
     @if (editorMode() !== 'closed') {
       <section class="cnpm-settings__editor" aria-labelledby="settings-editor-title">

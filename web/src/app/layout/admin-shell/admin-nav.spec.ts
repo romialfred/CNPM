@@ -33,9 +33,13 @@ describe('ADMIN_NAV', () => {
       Vitrines: '/admin/showcases/moderation',
       Intégrations: '/admin/integrations',
       Reporting: '/admin/reporting',
-      Audit: '/admin/security/audit',
-      Paramétrage: '/admin/settings',
+      Canal: '/admin/settings/channel',
+      Catégorie: '/admin/settings/category',
+      Statut: '/admin/settings/status',
+      'Rôles et permissions': '/admin/security/roles',
       'Gestion des utilisateurs': '/admin/security/users',
+      'Gestion des sessions': '/admin/security/sessions',
+      'Journal d’audit': '/admin/security/audit',
     });
   });
 
@@ -86,13 +90,13 @@ describe('ADMIN_NAV', () => {
 
   it('filtre les rubriques sensibles selon la projection de permissions', () => {
     expect(visibleAdminNav([]).map((entry) => entry.route)).not.toContain('/admin/security/audit');
-    expect(visibleAdminNav([]).map((entry) => entry.route)).not.toContain('/admin/settings');
+    expect(visibleAdminNav([]).map((entry) => entry.route)).not.toContain('/admin/settings/channel');
 
     const routes = visibleAdminNav(['AUDIT.READ', 'ADMIN.REFERENTIAL.READ']).map(
       (entry) => entry.route,
     );
     expect(routes).toContain('/admin/security/audit');
-    expect(routes).toContain('/admin/settings');
+    expect(routes).toContain('/admin/settings/channel');
   });
 });
 
@@ -106,7 +110,7 @@ describe('ADMIN_NAV_TREE', () => {
     // diverger, et ce test le constate plutot que de le supposer.
     expect(dansArbre).toEqual(ADMIN_NAV.map((entry) => entry.route));
     expect(new Set(dansArbre).size).toBe(dansArbre.length);
-    expect(dansArbre).toHaveLength(20);
+    expect(dansArbre).toHaveLength(24);
   });
 
   it('garde le tableau de bord hors groupe, donc a un seul clic', () => {

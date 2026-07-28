@@ -53,16 +53,14 @@
     margin: 0;
   }
 
-  /* Le libelle passe en capitales, a la taille la plus petite de l'echelle : il nomme
-     la mesure, il ne la concurrence pas. */
+  /* Le libelle nomme la mesure sans la concurrencer : petite taille, casse NORMALE
+     (demande du commanditaire — plus lisible que des capitales). */
   &__kpi-label {
     min-width: 0;
     color: var(--cnpm-color-text-secondary);
-    font-size: var(--cnpm-font-size-xs);
+    font-size: var(--cnpm-font-size-sm);
     font-weight: var(--cnpm-font-weight-semibold);
-    letter-spacing: var(--cnpm-font-letterSpacing-wide);
-    line-height: var(--cnpm-font-lineHeight-xs);
-    text-transform: uppercase;
+    line-height: var(--cnpm-font-lineHeight-sm);
   }
 
   /* Pastille teintee par l'accent de la tuile. Une seule couleur source : le fond en

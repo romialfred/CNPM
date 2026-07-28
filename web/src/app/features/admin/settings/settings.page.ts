@@ -96,6 +96,16 @@ export class SettingsPage {
   private readonly title = inject(Title);
   private readonly toast = inject(ToastService);
 
+  /**
+   * Domaine imposé par la route (sous-menus « Paramètre » : Canal / Catégorie / Statut).
+   * Quand il est posé, la page se verrouille sur ce domaine : le filtre libre disparaît et
+   * les créations naissent dans ce domaine.
+   */
+  protected readonly fixedDomain =
+    (this.route.snapshot.data?.['fixedDomain'] as string | undefined)?.toUpperCase() ?? null;
+  protected readonly fixedDomainLabel =
+    (this.route.snapshot.data?.['fixedDomainLabel'] as string | undefined) ?? null;
+
   protected readonly pageSizes = PAGE_SIZES;
 
   private readonly sessionIdentity = toSignal(
@@ -109,7 +119,9 @@ export class SettingsPage {
   private readonly params = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
   });
-  protected readonly domain = computed(() => this.params().get('domain')?.trim() ?? '');
+  protected readonly domain = computed(
+    () => this.fixedDomain ?? this.params().get('domain')?.trim() ?? '',
+  );
   protected readonly page = computed(() => positiveInteger(this.params().get('page'), 1));
   protected readonly pageSize = computed(() => {
     const value = positiveInteger(this.params().get('size'), DEFAULT_PAGE_SIZE);
@@ -225,7 +237,11 @@ export class SettingsPage {
   });
 
   constructor() {
-    this.title.setTitle('Paramétrage fonctionnel — Administration CNPM');
+    this.title.setTitle(
+      this.fixedDomainLabel
+        ? `${this.fixedDomainLabel} — Paramètre CNPM`
+        : 'Paramétrage fonctionnel — Administration CNPM',
+    );
 
     effect(() => {
       const domain = this.domain();

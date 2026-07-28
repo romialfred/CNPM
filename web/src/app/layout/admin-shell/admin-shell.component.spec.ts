@@ -71,15 +71,15 @@ describe('AdminShellComponent — drawer accessible', () => {
     expect(link?.textContent).toContain('Vitrines');
   });
 
-  it('garde les cinq intitules de domaine visibles et les groupes replies', async () => {
-    // Contrainte du client : aucune barre de defilement dans la navigation. Vingt-trois
-    // lignes n'y tiennent pas ; ce sont les intitules qui doivent tous rester visibles.
+  it('garde les six intitules de domaine visibles et les groupes replies', async () => {
+    // Contrainte du client : aucune barre de defilement dans la navigation. Les lignes
+    // n'y tiennent pas dépliées ; ce sont les intitules qui doivent tous rester visibles.
     const { host } = await setup();
     const intitules = Array.from(
       host.querySelectorAll<HTMLButtonElement>('.cnpm-sidebar__group-trigger'),
     );
 
-    expect(intitules).toHaveLength(5);
+    expect(intitules).toHaveLength(6);
     expect(intitules.every((bouton) => bouton.getAttribute('aria-expanded') === 'false')).toBe(
       true,
     );
