@@ -3,7 +3,44 @@
     <cnpm-page-header
       title="Groupements professionnels"
       description="Consultez le référentiel des groupements autorisés. L’ordre est stable par code."
-    />
+    >
+      @if (!showForm()) {
+        <cnpm-button variant="primary" (click)="openForm()">Nouveau groupement</cnpm-button>
+      }
+    </cnpm-page-header>
+
+    @if (showForm()) {
+      <form class="cnpm-groups__form" [formGroup]="form" (ngSubmit)="submitCreate()" novalidate>
+        <h2 class="cnpm-groups__form-title">Nouveau groupement professionnel</h2>
+        @if (formError(); as error) {
+          <cnpm-alert tone="error" title="Création impossible">
+            <p>{{ error }}</p>
+          </cnpm-alert>
+        }
+        <div class="cnpm-groups__form-grid">
+          <cnpm-text-input formControlName="code" label="Code" name="code" [required]="true" />
+          <cnpm-text-input
+            formControlName="name"
+            label="Dénomination"
+            name="name"
+            [required]="true"
+          />
+          <cnpm-text-input
+            formControlName="sectorCode"
+            label="Secteur (code, facultatif)"
+            name="sectorCode"
+          />
+        </div>
+        <div class="cnpm-groups__form-actions">
+          <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="submitting()">
+            Annuler
+          </cnpm-button>
+          <cnpm-button variant="primary" (click)="submitCreate()" [loading]="submitting()">
+            Créer le groupement
+          </cnpm-button>
+        </div>
+      </form>
+    }
 
     <div class="cnpm-groups__summary" aria-live="polite">
       @if (state() === 'ready' || state() === 'empty' || state() === 'pageEmpty') {

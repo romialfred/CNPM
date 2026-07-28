@@ -22,12 +22,28 @@ export interface ProfessionalGroupPage {
   readonly totalItems: number;
 }
 
+/** Données saisies pour créer un groupement (le statut naît ACTIVE côté serveur). */
+export interface CreateProfessionalGroupInput {
+  readonly code: string;
+  readonly name: string;
+  readonly sectorCode: string | null;
+}
+
 export interface GroupsGateway {
   list(query: ProfessionalGroupQuery): Observable<ProfessionalGroupPage>;
   get(id: string): Observable<ProfessionalGroup>;
+  create(input: CreateProfessionalGroupInput): Observable<ProfessionalGroup>;
 }
 
 export const GROUPS_GATEWAY = new InjectionToken<GroupsGateway>('GROUPS_GATEWAY');
+
+/** Le code proposé est déjà porté par un groupement existant (409). */
+export class GroupConflictError extends Error {
+  constructor(message = 'Un groupement porte déjà ce code') {
+    super(message);
+    this.name = 'GroupConflictError';
+  }
+}
 
 export class GroupAccessError extends Error {
   constructor(message = 'Accès refusé aux groupements professionnels') {
