@@ -5,6 +5,7 @@ import { BehaviorSubject, of, Subject } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DemoSessionGateway } from '../../../layout/admin-shell/demo-session.gateway';
 import { SESSION_GATEWAY } from '../../../layout/admin-shell/session-gateway';
+import { ENROLLMENTS_GATEWAY } from '../enrollments/enrollments-gateway';
 import { OrganizationDetailPage } from './organization-detail.page';
 import { buildOrganizationProfile } from './organization-profile';
 import { OrganizationEditPage } from './organization-edit.page';
@@ -69,6 +70,7 @@ async function setup<T>(component: Type<T>, id: string | null = null) {
       { provide: ActivatedRoute, useValue: activatedRoute(id) },
       { provide: SESSION_GATEWAY, useClass: DemoSessionGateway },
       { provide: ORGANIZATIONS_GATEWAY, useValue: gateway },
+      { provide: ENROLLMENTS_GATEWAY, useValue: { enrollProspect: vi.fn(() => of(ORGANIZATION)) } },
     ],
   }).compileComponents();
   const fixture = TestBed.createComponent(component);

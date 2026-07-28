@@ -252,6 +252,16 @@
                         title="Modifier l’entreprise"
                         ><svg lucidePencil [size]="iconSize.compact" aria-hidden="true"></svg
                       ></a>
+                      @if (organization.status === 'PROSPECT') {
+                        <cnpm-button
+                          variant="secondary"
+                          size="sm"
+                          [loading]="enrollingId() === organization.id"
+                          (click)="enroll(organization)"
+                        >
+                          Enrôler
+                        </cnpm-button>
+                      }
                     </span>
                   </td>
                 </ng-template>

@@ -47,6 +47,8 @@ export interface EnrollmentRejection {
 export interface EnrollmentsGateway {
   list(query: EnrollmentPageQuery): Observable<EnrollmentPage>;
   get(id: string): Observable<EnrollmentApplication>;
+  /** Ouvre un dossier d'enrôlement pour un prospect (organisation) existant. */
+  enrollProspect(organizationId: string): Observable<EnrollmentApplication>;
   startReview(id: string): Observable<EnrollmentApplication>;
   requestComplement(id: string, comment: string): Observable<EnrollmentApplication>;
   approve(id: string, input: EnrollmentApproval): Observable<EnrollmentApplication>;
