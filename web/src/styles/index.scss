@@ -7,5 +7,6 @@
 @use 'table';
 @use 'cards';
 @use 'member-portal';
+@use 'prospect-form';
 // Dernier : le thème sombre redéfinit des tokens sémantiques, il doit primer.
 @use 'theme-dark';

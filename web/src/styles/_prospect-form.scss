@@ -1,0 +1,358 @@
+// Formulaire de création de prospect (et gabarit réutilisable) — feuille GLOBALE.
+// Les classes .cnpm-prospect__* sont à préfixe unique : aucun risque de fuite de style.
+// Sortie du SCSS du composant pour rester sous le budget de 16 kB (voir plan design).
+
+/* ============================================================================
+   Formulaire de création d'un prospect — mise en page « fiche » (héro + cartes
+   de section + guide latéral collant + accordéon domaine › secteur).
+   ============================================================================ */
+.cnpm-prospect {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-5);
+  min-width: 0;
+}
+
+.cnpm-prospect__hero {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-4) var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-prospect__hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--cnpm-space-12);
+  block-size: var(--cnpm-space-12);
+  flex: none;
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-prospect__hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cnpm-prospect__hero-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-xl);
+}
+
+.cnpm-prospect__hero-sub {
+  margin: var(--cnpm-space-1) 0 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+/* Corps : formulaire (1fr) + guide latéral collant, puis barre d'actions pleine largeur. */
+.cnpm-prospect__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  grid-template-areas: 'main guide' 'actions actions';
+  gap: var(--cnpm-space-5);
+  align-items: start;
+}
+
+.cnpm-prospect__main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  min-width: 0;
+}
+
+.cnpm-prospect__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-5);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-prospect__card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-3);
+}
+
+.cnpm-prospect__card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--cnpm-space-10);
+  block-size: var(--cnpm-space-10);
+  flex: none;
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-prospect__card-title {
+  margin: 0;
+  font-size: var(--cnpm-font-size-md);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-prospect__card-sub {
+  margin: var(--cnpm-space-1) 0 0;
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-sm);
+}
+
+.cnpm-prospect__grid {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.cnpm-prospect__grid--indicators {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
+/* ---- Secteurs : puces récapitulatives + accordéon domaine › secteur ---- */
+.cnpm-prospect__sectors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.cnpm-prospect__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-prospect__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-space-1) var(--cnpm-space-3);
+  border: 1px solid var(--cnpm-color-brand-blue-300);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-medium);
+  cursor: pointer;
+}
+
+.cnpm-prospect__chip:hover {
+  border-color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-prospect__chip:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: 1px;
+}
+
+.cnpm-prospect__accordion {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--cnpm-space-2);
+  align-items: start;
+}
+
+.cnpm-prospect__domain {
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-md);
+  overflow: hidden;
+}
+
+.cnpm-prospect__domain--open {
+  border-color: var(--cnpm-color-border-strong);
+}
+
+.cnpm-prospect__domain-head {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  width: 100%;
+  padding: var(--cnpm-space-3);
+  border: 0;
+  background: var(--cnpm-color-surface-subtle);
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-medium);
+  text-align: left;
+  cursor: pointer;
+}
+
+.cnpm-prospect__domain-head:hover {
+  background: var(--cnpm-color-brand-blue-50);
+}
+
+.cnpm-prospect__domain-head:focus-visible {
+  outline: 2px solid var(--cnpm-color-brand-blue-700);
+  outline-offset: -2px;
+}
+
+.cnpm-prospect__domain-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cnpm-prospect__domain-chevron {
+  flex: none;
+  color: var(--cnpm-color-text-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cnpm-prospect__domain-chevron {
+    transition: transform var(--cnpm-motion-duration-fast) var(--cnpm-motion-easing-standard);
+  }
+}
+
+.cnpm-prospect__domain--open .cnpm-prospect__domain-chevron {
+  transform: rotate(180deg);
+}
+
+.cnpm-prospect__domain-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--cnpm-space-5);
+  block-size: var(--cnpm-space-5);
+  padding: 0 var(--cnpm-space-1);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-prospect__domain-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-1);
+  padding: var(--cnpm-space-2) var(--cnpm-space-3) var(--cnpm-space-3);
+}
+
+.cnpm-prospect__sector {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-1) var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-sm);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-primary);
+  cursor: pointer;
+}
+
+.cnpm-prospect__sector:hover {
+  background: var(--cnpm-color-surface-subtle);
+}
+
+.cnpm-prospect__sector input {
+  flex: none;
+  width: var(--cnpm-space-4);
+  height: var(--cnpm-space-4);
+  accent-color: var(--cnpm-color-brand-blue-700);
+}
+
+/* ---- Guide de saisie (panneau latéral collant) ---- */
+.cnpm-prospect__guide {
+  grid-area: guide;
+  position: sticky;
+  top: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+  overflow: hidden;
+}
+
+.cnpm-prospect__guide-head {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-2);
+  padding: var(--cnpm-space-3) var(--cnpm-space-4);
+  background: var(--cnpm-color-brand-blue-700);
+  color: var(--cnpm-color-text-inverse);
+  font-size: var(--cnpm-font-size-sm);
+  font-weight: var(--cnpm-font-weight-semibold);
+}
+
+.cnpm-prospect__guide-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-4);
+  padding: var(--cnpm-space-4);
+}
+
+.cnpm-prospect__guide-title {
+  margin: 0 0 var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-xs);
+  font-weight: var(--cnpm-font-weight-semibold);
+  letter-spacing: var(--cnpm-font-letterSpacing-wide);
+  text-transform: uppercase;
+  color: var(--cnpm-color-text-muted);
+}
+
+.cnpm-prospect__guide-group ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cnpm-prospect__guide-group li {
+  display: flex;
+  gap: var(--cnpm-space-2);
+  font-size: var(--cnpm-font-size-sm);
+  color: var(--cnpm-color-text-secondary);
+}
+
+.cnpm-prospect__guide-dot {
+  flex: none;
+  inline-size: var(--cnpm-space-2);
+  block-size: var(--cnpm-space-2);
+  margin-block-start: var(--cnpm-space-2);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-border-strong);
+}
+
+.cnpm-prospect__guide-dot--req {
+  background: var(--cnpm-color-text-critical);
+}
+
+.cnpm-prospect__actions {
+  grid-area: actions;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+/* Sous 1024 px : le guide passe sous le formulaire, plus de colonne latérale. */
+@media (max-width: 1023px) {
+  .cnpm-prospect__body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'main' 'guide' 'actions';
+  }
+
+  .cnpm-prospect__guide {
+    position: static;
+  }
+}

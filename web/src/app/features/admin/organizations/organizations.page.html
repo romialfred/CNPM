@@ -10,161 +10,325 @@
     </cnpm-page-header>
 
     @if (showForm()) {
-      <form
-        class="cnpm-organizations__form"
-        [formGroup]="prospectForm"
-        (ngSubmit)="submitCreate()"
-        novalidate
-      >
-        <h2 class="cnpm-organizations__form-title">Nouveau prospect</h2>
-        @if (formError(); as error) {
-          <cnpm-alert tone="error" title="Création impossible">
-            <p>{{ error }}</p>
-          </cnpm-alert>
-        }
-        <section class="cnpm-organizations__form-section">
-          <h3 class="cnpm-organizations__form-legend">Identification</h3>
-          <div class="cnpm-organizations__form-grid">
-            <cnpm-text-input
-              formControlName="legalName"
-              label="Raison sociale"
-              name="legalName"
-              [required]="true"
-            />
-            <cnpm-text-input
-              formControlName="tradeName"
-              label="Nom commercial (facultatif)"
-              name="tradeName"
-            />
-            <div class="cnpm-organizations__field">
-              <label class="cnpm-organizations__label" for="prospect-type">Type d’entreprise *</label>
-              <select id="prospect-type" class="cnpm-input" formControlName="organizationType">
-                <option value="" disabled>Choisir une forme juridique…</option>
-                @for (type of organizationTypes; track type.code) {
-                  <option [value]="type.code">{{ type.label }}</option>
-                }
-              </select>
-            </div>
-            <cnpm-text-input
-              formControlName="identifierType"
-              label="Type d’identifiant (ex. RCCM, NIF)"
-              name="identifierType"
-              [required]="true"
-            />
-            <cnpm-text-input
-              formControlName="identifierValue"
-              label="Numéro d’identifiant"
-              name="identifierValue"
-              [required]="true"
-            />
+      <div class="cnpm-prospect">
+        <div class="cnpm-prospect__hero">
+          <span class="cnpm-prospect__hero-icon" aria-hidden="true">
+            <svg lucideBuilding2 [size]="iconSize.navigation"></svg>
+          </span>
+          <div class="cnpm-prospect__hero-text">
+            <h2 class="cnpm-prospect__hero-title">Nouveau prospect</h2>
+            <p class="cnpm-prospect__hero-sub">
+              Renseignez la fiche complète de l’entreprise à démarcher.
+            </p>
           </div>
-        </section>
-
-        <section class="cnpm-organizations__form-section">
-          <h3 class="cnpm-organizations__form-legend">Contact</h3>
-          <div class="cnpm-organizations__form-grid">
-            <cnpm-text-input formControlName="email" label="E-mail" type="email" name="email" />
-            <cnpm-text-input formControlName="phone" label="Téléphone" type="tel" name="phone" />
-            <cnpm-text-input formControlName="website" label="Site web" name="website" />
-            <div class="cnpm-organizations__field cnpm-organizations__field--wide">
-              <label class="cnpm-organizations__label" for="prospect-address">Adresse physique</label>
-              <textarea
-                id="prospect-address"
-                class="cnpm-input"
-                rows="2"
-                formControlName="address"
-              ></textarea>
-            </div>
-          </div>
-        </section>
-
-        <section class="cnpm-organizations__form-section">
-          <h3 class="cnpm-organizations__form-legend">Activité</h3>
-          <fieldset class="cnpm-organizations__field cnpm-organizations__field--wide cnpm-organizations__sectors-field">
-            <legend class="cnpm-organizations__label">
-              Secteurs d’activité
-              <span class="cnpm-organizations__hint">plusieurs choix possibles</span>
-            </legend>
-            <div class="cnpm-organizations__sectors-grid">
-              @for (sector of sectors; track sector.code) {
-                <label class="cnpm-organizations__sector-option">
-                  <input
-                    type="checkbox"
-                    [checked]="isSectorSelected(sector.code)"
-                    (change)="toggleSector(sector.code)"
-                  />
-                  <span>{{ sector.label }}</span>
-                </label>
-              }
-            </div>
-          </fieldset>
-          <div class="cnpm-organizations__form-grid">
-            <div class="cnpm-organizations__field">
-              <label class="cnpm-organizations__label" for="prospect-employees">
-                Nombre d’employés
-              </label>
-              <input
-                id="prospect-employees"
-                class="cnpm-input"
-                type="number"
-                min="0"
-                formControlName="employeeCount"
-              />
-            </div>
-            <div class="cnpm-organizations__field">
-              <label class="cnpm-organizations__label" for="prospect-capital">Capital (FCFA)</label>
-              <input
-                id="prospect-capital"
-                class="cnpm-input"
-                type="number"
-                min="0"
-                step="1000"
-                formControlName="capital"
-              />
-            </div>
-            <div class="cnpm-organizations__field">
-              <label class="cnpm-organizations__label" for="prospect-revenue">
-                Chiffre d’affaires 2025 (FCFA)
-              </label>
-              <input
-                id="prospect-revenue"
-                class="cnpm-input"
-                type="number"
-                min="0"
-                step="1000"
-                formControlName="revenueN1"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section class="cnpm-organizations__form-section">
-          <h3 class="cnpm-organizations__form-legend">Description</h3>
-          <div class="cnpm-organizations__field cnpm-organizations__field--wide">
-            <label class="cnpm-organizations__label" for="prospect-desc">
-              Présentation de l’entreprise
-            </label>
-            <textarea
-              id="prospect-desc"
-              class="cnpm-input"
-              rows="4"
-              formControlName="description"
-              placeholder="Activité, produits, marchés, historique…"
-            ></textarea>
-          </div>
-        </section>
-
-        <div class="cnpm-organizations__form-actions">
-          <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="submitting()">
-            Annuler
-          </cnpm-button>
-          <cnpm-button variant="primary" (click)="submitCreate()" [loading]="submitting()">
-            Créer le prospect
+          <cnpm-button variant="tertiary" (click)="cancelForm()" [disabled]="submitting()">
+            <svg lucideArrowLeft [size]="iconSize.compact" aria-hidden="true"></svg>
+            Retour
           </cnpm-button>
         </div>
-      </form>
+
+        <form
+          class="cnpm-prospect__body"
+          [formGroup]="prospectForm"
+          (ngSubmit)="submitCreate()"
+          novalidate
+        >
+          <div class="cnpm-prospect__main">
+            @if (formError(); as error) {
+              <cnpm-alert tone="error" title="Création impossible">
+                <p>{{ error }}</p>
+              </cnpm-alert>
+            }
+
+            <section class="cnpm-prospect__card">
+              <header class="cnpm-prospect__card-head">
+                <span class="cnpm-prospect__card-icon" aria-hidden="true">
+                  <svg lucideBuilding2 [size]="iconSize.control"></svg>
+                </span>
+                <div>
+                  <h3 class="cnpm-prospect__card-title">Identification</h3>
+                  <p class="cnpm-prospect__card-sub">
+                    Raison sociale, forme juridique et identifiant légal.
+                  </p>
+                </div>
+              </header>
+              <div class="cnpm-prospect__grid">
+                <cnpm-text-input
+                  formControlName="legalName"
+                  label="Raison sociale"
+                  name="legalName"
+                  [required]="true"
+                />
+                <cnpm-text-input
+                  formControlName="tradeName"
+                  label="Nom commercial (facultatif)"
+                  name="tradeName"
+                />
+                <div class="cnpm-organizations__field">
+                  <label class="cnpm-organizations__label" for="prospect-type"
+                    >Type d’entreprise *</label
+                  >
+                  <select id="prospect-type" class="cnpm-input" formControlName="organizationType">
+                    <option value="" disabled>Choisir une forme juridique…</option>
+                    @for (type of organizationTypes; track type.code) {
+                      <option [value]="type.code">{{ type.label }}</option>
+                    }
+                  </select>
+                </div>
+                <cnpm-text-input
+                  formControlName="identifierType"
+                  label="Type d’identifiant (ex. RCCM, NIF)"
+                  name="identifierType"
+                  [required]="true"
+                />
+                <cnpm-text-input
+                  formControlName="identifierValue"
+                  label="Numéro d’identifiant"
+                  name="identifierValue"
+                  [required]="true"
+                />
+              </div>
+            </section>
+
+            <section class="cnpm-prospect__card">
+              <header class="cnpm-prospect__card-head">
+                <span class="cnpm-prospect__card-icon" aria-hidden="true">
+                  <svg lucidePhone [size]="iconSize.control"></svg>
+                </span>
+                <div>
+                  <h3 class="cnpm-prospect__card-title">Contact</h3>
+                  <p class="cnpm-prospect__card-sub">Coordonnées et adresse de l’entreprise.</p>
+                </div>
+              </header>
+              <div class="cnpm-prospect__grid">
+                <cnpm-text-input formControlName="email" label="E-mail" type="email" name="email" />
+                <cnpm-text-input formControlName="phone" label="Téléphone" type="tel" name="phone" />
+                <cnpm-text-input formControlName="website" label="Site web" name="website" />
+                <div class="cnpm-organizations__field cnpm-organizations__field--wide">
+                  <label class="cnpm-organizations__label" for="prospect-address"
+                    >Adresse physique</label
+                  >
+                  <textarea
+                    id="prospect-address"
+                    class="cnpm-input"
+                    rows="2"
+                    formControlName="address"
+                  ></textarea>
+                </div>
+              </div>
+            </section>
+
+            <section class="cnpm-prospect__card">
+              <header class="cnpm-prospect__card-head">
+                <span class="cnpm-prospect__card-icon" aria-hidden="true">
+                  <svg lucideBriefcase [size]="iconSize.control"></svg>
+                </span>
+                <div>
+                  <h3 class="cnpm-prospect__card-title">Activité</h3>
+                  <p class="cnpm-prospect__card-sub">
+                    Secteurs d’activité (par domaine) et indicateurs de taille.
+                  </p>
+                </div>
+              </header>
+
+              <fieldset class="cnpm-prospect__sectors">
+                <legend class="cnpm-organizations__label">
+                  Secteurs d’activité
+                  <span class="cnpm-organizations__hint">domaine › secteur, plusieurs choix</span>
+                </legend>
+
+                @if (selectedSectorChips().length) {
+                  <ul class="cnpm-prospect__chips" aria-label="Secteurs sélectionnés">
+                    @for (chip of selectedSectorChips(); track chip.code) {
+                      <li>
+                        <button
+                          type="button"
+                          class="cnpm-prospect__chip"
+                          (click)="toggleSector(chip.code)"
+                          [attr.aria-label]="'Retirer ' + chip.label"
+                        >
+                          {{ chip.label }}
+                          <span aria-hidden="true">×</span>
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+
+                <div class="cnpm-prospect__accordion">
+                  @for (domain of sectorDomains; track domain.code) {
+                    <div
+                      class="cnpm-prospect__domain"
+                      [class.cnpm-prospect__domain--open]="isDomainExpanded(domain.code)"
+                    >
+                      <button
+                        type="button"
+                        class="cnpm-prospect__domain-head"
+                        (click)="toggleDomain(domain.code)"
+                        [attr.aria-expanded]="isDomainExpanded(domain.code)"
+                      >
+                        <svg
+                          class="cnpm-prospect__domain-chevron"
+                          lucideChevronDown
+                          [size]="iconSize.compact"
+                          aria-hidden="true"
+                        ></svg>
+                        <span class="cnpm-prospect__domain-name">{{ domain.label }}</span>
+                        @if (domainSelectedCount(domain); as count) {
+                          <span class="cnpm-prospect__domain-count">{{ count }}</span>
+                        }
+                      </button>
+                      @if (isDomainExpanded(domain.code)) {
+                        <div class="cnpm-prospect__domain-body">
+                          @for (sector of domain.sectors; track sector.code) {
+                            <label class="cnpm-prospect__sector">
+                              <input
+                                type="checkbox"
+                                [checked]="isSectorSelected(sector.code)"
+                                (change)="toggleSector(sector.code)"
+                              />
+                              <span>{{ sector.label }}</span>
+                            </label>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </fieldset>
+
+              <div class="cnpm-prospect__grid cnpm-prospect__grid--indicators">
+                <div class="cnpm-organizations__field">
+                  <label class="cnpm-organizations__label" for="prospect-employees"
+                    >Nombre d’employés</label
+                  >
+                  <input
+                    id="prospect-employees"
+                    class="cnpm-input"
+                    type="number"
+                    min="0"
+                    formControlName="employeeCount"
+                  />
+                </div>
+                <div class="cnpm-organizations__field">
+                  <label class="cnpm-organizations__label" for="prospect-capital"
+                    >Capital (FCFA)</label
+                  >
+                  <input
+                    id="prospect-capital"
+                    class="cnpm-input"
+                    type="number"
+                    min="0"
+                    step="1000"
+                    formControlName="capital"
+                  />
+                </div>
+                <div class="cnpm-organizations__field">
+                  <label class="cnpm-organizations__label" for="prospect-revenue"
+                    >Chiffre d’affaires 2025 (FCFA)</label
+                  >
+                  <input
+                    id="prospect-revenue"
+                    class="cnpm-input"
+                    type="number"
+                    min="0"
+                    step="1000"
+                    formControlName="revenueN1"
+                  />
+                </div>
+              </div>
+            </section>
+
+            <section class="cnpm-prospect__card">
+              <header class="cnpm-prospect__card-head">
+                <span class="cnpm-prospect__card-icon" aria-hidden="true">
+                  <svg lucideFileText [size]="iconSize.control"></svg>
+                </span>
+                <div>
+                  <h3 class="cnpm-prospect__card-title">Description</h3>
+                  <p class="cnpm-prospect__card-sub">Présentation libre de l’entreprise.</p>
+                </div>
+              </header>
+              <div class="cnpm-organizations__field cnpm-organizations__field--wide">
+                <label class="cnpm-organizations__label" for="prospect-desc"
+                  >Présentation de l’entreprise</label
+                >
+                <textarea
+                  id="prospect-desc"
+                  class="cnpm-input"
+                  rows="5"
+                  formControlName="description"
+                  placeholder="Activité, produits, marchés, historique…"
+                ></textarea>
+              </div>
+            </section>
+          </div>
+
+          <aside class="cnpm-prospect__guide" aria-label="Guide de saisie">
+            <div class="cnpm-prospect__guide-head">
+              <svg lucideInfo [size]="iconSize.compact" aria-hidden="true"></svg>
+              Guide de saisie
+            </div>
+            <div class="cnpm-prospect__guide-scroll">
+              <div class="cnpm-prospect__guide-group">
+                <p class="cnpm-prospect__guide-title">Identification</p>
+                <ul>
+                  <li>
+                    <span class="cnpm-prospect__guide-dot cnpm-prospect__guide-dot--req"></span>
+                    <span><strong>Raison sociale</strong> : dénomination légale exacte.</span>
+                  </li>
+                  <li>
+                    <span class="cnpm-prospect__guide-dot cnpm-prospect__guide-dot--req"></span>
+                    <span><strong>Type &amp; numéro d’identifiant</strong> : RCCM, NIF…</span>
+                  </li>
+                  <li>
+                    <span class="cnpm-prospect__guide-dot"></span>
+                    <span><strong>Forme juridique</strong> : SA, SARL, GIE…</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="cnpm-prospect__guide-group">
+                <p class="cnpm-prospect__guide-title">Contact</p>
+                <ul>
+                  <li>
+                    <span class="cnpm-prospect__guide-dot"></span>
+                    <span>E-mail, téléphone et site web du référent.</span>
+                  </li>
+                  <li>
+                    <span class="cnpm-prospect__guide-dot"></span>
+                    <span>Adresse physique du siège.</span>
+                  </li>
+                </ul>
+              </div>
+              <div class="cnpm-prospect__guide-group">
+                <p class="cnpm-prospect__guide-title">Activité</p>
+                <ul>
+                  <li>
+                    <span class="cnpm-prospect__guide-dot"></span>
+                    <span>Dépliez un domaine, puis cochez ses secteurs.</span>
+                  </li>
+                  <li>
+                    <span class="cnpm-prospect__guide-dot"></span>
+                    <span>Effectif, capital et chiffre d’affaires 2025.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+
+          <div class="cnpm-prospect__actions">
+            <cnpm-button variant="secondary" (click)="cancelForm()" [disabled]="submitting()">
+              Annuler
+            </cnpm-button>
+            <cnpm-button variant="primary" (click)="submitCreate()" [loading]="submitting()">
+              Créer le prospect
+            </cnpm-button>
+          </div>
+        </form>
+      </div>
     }
 
+    @if (!showForm()) {
     <cnpm-filter-bar
       [expanded]="filtersExpanded()"
       [chips]="chips()"
@@ -555,6 +719,7 @@
           </aside>
         </div>
       }
+    }
     }
   </div>
 </cnpm-admin-shell>
