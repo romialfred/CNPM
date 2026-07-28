@@ -151,12 +151,6 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
       entries: [
         { label: 'Reporting', route: '/admin/reporting', icon: 'reporting' },
         {
-          label: 'Audit',
-          route: '/admin/security/audit',
-          icon: 'audit',
-          requiredPermission: 'AUDIT.READ',
-        },
-        {
           label: 'Intégrations',
           route: '/admin/integrations',
           icon: 'integrations',
@@ -168,20 +162,54 @@ export const ADMIN_NAV_TREE: readonly AdminNavNode[] = [
   {
     kind: 'group',
     group: {
-      id: 'administration',
-      label: 'Administration',
-      icon: 'administration',
+      id: 'parametre',
+      label: 'Paramètre',
+      icon: 'settings',
       entries: [
         {
-          label: 'Paramétrage',
-          route: '/admin/settings',
+          label: 'Canal',
+          route: '/admin/settings/channel',
           icon: 'settings',
           requiredPermission: 'ADMIN.REFERENTIAL.READ',
         },
         {
+          label: 'Catégorie',
+          route: '/admin/settings/category',
+          icon: 'settings',
+          requiredPermission: 'ADMIN.REFERENTIAL.READ',
+        },
+        {
+          label: 'Statut',
+          route: '/admin/settings/status',
+          icon: 'settings',
+          requiredPermission: 'ADMIN.REFERENTIAL.READ',
+        },
+      ],
+    },
+  },
+  {
+    kind: 'group',
+    group: {
+      id: 'administration',
+      label: 'Administration',
+      icon: 'administration',
+      entries: [
+        { label: 'Rôles et permissions', route: '/admin/security/roles', icon: 'administration' },
+        {
           label: 'Gestion des utilisateurs',
           route: '/admin/security/users',
-          icon: 'administration',
+          icon: 'members',
+        },
+        {
+          label: 'Gestion des sessions',
+          route: '/admin/security/sessions',
+          icon: 'integrations',
+        },
+        {
+          label: 'Journal d’audit',
+          route: '/admin/security/audit',
+          icon: 'audit',
+          requiredPermission: 'AUDIT.READ',
         },
       ],
     },
