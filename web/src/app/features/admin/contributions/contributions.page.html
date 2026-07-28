@@ -180,7 +180,7 @@
             </td>
             <td class="cnpm-table__cell">
               <span class="cnpm-contributions__member"
-                ><strong>{{ call.memberName }}</strong
+                ><strong [title]="call.memberName">{{ call.memberName }}</strong
                 ><small>{{ call.memberCode }}</small></span
               >
             </td>
@@ -219,7 +219,7 @@
                   statusLabel(call.status)
                 }}</cnpm-badge>
                 @if (isPartiallySettled(call)) {
-                  <cnpm-badge tone="neutral">Partiellement réglé</cnpm-badge>
+                  <cnpm-badge tone="neutral" title="Règlement partiel">Partiel</cnpm-badge>
                 }
               </span>
             </td>
@@ -228,7 +228,7 @@
                 variant="tertiary"
                 size="sm"
                 [accessibleLabel]="'Voir l’appel ' + call.reference"
-                (click)="selectCall(call)"
+                (click)="openCall(call)"
                 >Voir</cnpm-button
               >
               @if (canEmit(call)) {
@@ -321,7 +321,7 @@
               <span>Reste à payer</span
               ><strong>{{ call.outstandingAmount | number: '1.0-0' }} FCFA</strong>
             </p>
-            <cnpm-button variant="secondary" size="sm" (click)="selectCall(call)"
+            <cnpm-button variant="secondary" size="sm" (click)="openCall(call)"
               >Voir le détail</cnpm-button
             >
           </article>
@@ -339,126 +339,5 @@
         />
       }
     </section>
-
-    @if (selectedCall(); as call) {
-      <section class="cnpm-contributions__detail-grid">
-        <article class="cnpm-contributions__detail" aria-labelledby="titre-echeancier">
-          <header>
-            <div>
-              <h2 id="titre-echeancier">Détail de l’échéancier — {{ call.memberName }}</h2>
-              <p>{{ call.reference }} · {{ periodLabel(call) }}</p>
-              <!-- Garde-fou DEC-008 : le barème n'est pas homologué. La mention de
-                   démonstration a été retirée, mais celle-ci porte une information de
-                   gouvernance et doit rester tant que la décision est ouverte. -->
-              <p class="cnpm-contributions__demo-note">
-                Répartition indicative en trois tranches ; elle ne constitue aucun barème CNPM.
-              </p>
-            </div>
-            <div class="cnpm-contributions__detail-actions">
-              <cnpm-badge [tone]="statusTone(call.status)">{{ statusLabel(call.status) }}</cnpm-badge>
-              <a
-                class="cnpm-contributions__detail-link"
-                [routerLink]="['/admin/contributions', call.id]"
-              >
-                Ouvrir la fiche complète
-              </a>
-            </div>
-          </header>
-          <dl class="cnpm-contributions__summary">
-            <div>
-              <dt>Montant appelé</dt>
-              <dd>{{ call.calledAmount | number: '1.0-0' }} FCFA</dd>
-            </div>
-            <div>
-              <dt>Montant réglé</dt>
-              <dd>{{ call.paidAmount | number: '1.0-0' }} FCFA</dd>
-            </div>
-            <div>
-              <dt>Reste à payer</dt>
-              <dd>{{ call.outstandingAmount | number: '1.0-0' }} FCFA</dd>
-            </div>
-          </dl>
-          <div class="cnpm-contributions__installments">
-            <table>
-              <caption class="cnpm-contributions__sr-only">
-                Tranches de l’échéancier sélectionné
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">Tranche</th>
-                  <th scope="col">Échéance</th>
-                  <th scope="col">Montant dû</th>
-                  <th scope="col">Réglé</th>
-                  <th scope="col">Reste</th>
-                  <th scope="col">Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (item of installments(); track item.label) {
-                  <tr>
-                    <th scope="row">{{ item.label }}</th>
-                    <td>{{ item.dueDate | date: 'dd/MM/yyyy' }}</td>
-                    <td>{{ item.amountDue | number: '1.0-0' }}</td>
-                    <td>{{ item.amountPaid | number: '1.0-0' }}</td>
-                    <td>{{ item.outstanding | number: '1.0-0' }}</td>
-                    <td>
-                      <cnpm-badge [tone]="installmentStatusTone(item.status)">{{
-                        installmentStatusLabel(item.status)
-                      }}</cnpm-badge>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        <article class="cnpm-contributions__chart" aria-labelledby="titre-graphique">
-          <header>
-            <div>
-              <h2 id="titre-graphique">Situation des encaissements</h2>
-              <p>Même périmètre que les filtres du tableau</p>
-            </div>
-          </header>
-          <div
-            class="cnpm-contributions__bars"
-            role="img"
-            aria-label="Comparaison des montants appelés, encaissés et restant dus"
-          >
-            @for (bar of chart(); track bar.label) {
-              <div class="cnpm-contributions__bar-item">
-                <span class="cnpm-contributions__bar-value">{{ bar.value | number: '1.0-0' }}</span>
-                <span class="cnpm-contributions__bar-track"
-                  ><span
-                    class="cnpm-contributions__bar cnpm-contributions__bar--{{ bar.tone }}"
-                    [style.height.%]="bar.height"
-                  ></span
-                ></span>
-                <span>{{ bar.label }}</span>
-              </div>
-            }
-          </div>
-          <table class="cnpm-contributions__sr-only">
-            <caption>
-              Données du graphique d’encaissements
-            </caption>
-            <thead>
-              <tr>
-                <th>Mesure</th>
-                <th>Montant FCFA</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (bar of chart(); track bar.label) {
-                <tr>
-                  <th>{{ bar.label }}</th>
-                  <td>{{ bar.value }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </article>
-      </section>
-    }
   </main>
 </cnpm-admin-shell>

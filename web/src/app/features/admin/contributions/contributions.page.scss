@@ -137,9 +137,7 @@
   color: var(--cnpm-color-semantic-warning-700);
 }
 
-.cnpm-contributions__table-card,
-.cnpm-contributions__detail,
-.cnpm-contributions__chart {
+.cnpm-contributions__table-card {
   min-width: 0;
   border: 1px solid var(--cnpm-color-border-subtle);
   border-radius: var(--cnpm-radius-lg);
@@ -211,9 +209,10 @@
   white-space: nowrap;
 }
 
+/* Cellules composites nom/code et date/échéance : deux informations empilées, hauteur
+   maîtrisée (chaque part tient sur une seule ligne). */
 .cnpm-contributions__member,
-.cnpm-contributions__due,
-.cnpm-contributions__status {
+.cnpm-contributions__due {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -222,11 +221,37 @@
 
 .cnpm-contributions__member {
   min-width: 9rem;
+  max-width: 16rem;
+}
+
+/* La raison sociale ne passe jamais sur deux lignes : elle est tronquée par des points de
+   suspension, le nom complet restant accessible via l'attribut title. */
+.cnpm-contributions__member strong {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Statut : les badges (état + « Partiel ») restent côte à côte sur une seule ligne. */
+.cnpm-contributions__status {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: var(--cnpm-space-2);
 }
 
 .cnpm-contributions__member small,
-.cnpm-contributions__due small,
+.cnpm-contributions__due small {
+  color: var(--cnpm-color-text-muted);
+  font-size: var(--cnpm-font-size-xs);
+}
+
+/* Métadonnée d'ajustement : sur sa propre ligne, sous le montant (jamais collée à lui). */
 .cnpm-contributions__meta {
+  display: block;
+  margin-block-start: var(--cnpm-space-1);
   color: var(--cnpm-color-text-muted);
   font-size: var(--cnpm-font-size-xs);
 }
@@ -240,25 +265,8 @@
   display: none;
 }
 
-.cnpm-contributions__detail-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: var(--cnpm-space-3);
-}
-
-.cnpm-contributions__detail,
-.cnpm-contributions__chart {
-  padding: var(--cnpm-space-3);
-}
-
-.cnpm-contributions__detail header,
-.cnpm-contributions__chart header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--cnpm-space-3);
-}
-
+/* Réutilisés par la liste mobile : rangée d'actions (badge + lien fiche) et lien-bouton
+   « Ouvrir la fiche complète ». */
 .cnpm-contributions__detail-actions {
   display: flex;
   flex-wrap: wrap;
@@ -289,130 +297,9 @@
   outline-offset: 2px;
 }
 
-.cnpm-contributions__detail h2,
-.cnpm-contributions__chart h2 {
-  margin: 0;
-  color: var(--cnpm-color-text-primary);
-  font-size: var(--cnpm-font-size-sm);
-  font-weight: var(--cnpm-font-weight-semibold);
-}
-
-.cnpm-contributions__detail header p,
-.cnpm-contributions__chart header p {
-  margin: var(--cnpm-space-1) 0 0;
-  color: var(--cnpm-color-text-muted);
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.cnpm-contributions__summary {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--cnpm-space-2);
-  margin: var(--cnpm-space-3) 0;
-}
-
-.cnpm-contributions__summary div {
-  min-width: 0;
-}
-
-.cnpm-contributions__summary dt {
-  color: var(--cnpm-color-text-muted);
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.cnpm-contributions__summary dd {
-  margin: var(--cnpm-space-1) 0 0;
-  color: var(--cnpm-color-text-brand);
-  font-size: var(--cnpm-font-size-xs);
-  font-weight: var(--cnpm-font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-}
-
-.cnpm-contributions__installments {
-  overflow-x: auto;
-}
-
-.cnpm-contributions__installments table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.cnpm-contributions__installments th,
-.cnpm-contributions__installments td {
-  padding: var(--cnpm-space-2);
-  border: 1px solid var(--cnpm-color-border-subtle);
-  text-align: right;
-  white-space: nowrap;
-}
-
-.cnpm-contributions__installments th:first-child,
-.cnpm-contributions__installments td:first-child,
-.cnpm-contributions__installments th:last-child,
-.cnpm-contributions__installments td:last-child {
-  text-align: left;
-}
-
-.cnpm-contributions__installments thead th {
-  background: var(--cnpm-color-surface-subtle);
-  color: var(--cnpm-color-text-secondary);
-}
-
-.cnpm-contributions__bars {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--cnpm-space-10);
-  min-height: 12rem;
-  padding: var(--cnpm-space-4) var(--cnpm-space-6) 0;
-  border-bottom: 1px solid var(--cnpm-chart-grid);
-}
-
-.cnpm-contributions__bar-item {
-  display: grid;
-  grid-template-rows: auto 8rem auto;
-  align-items: end;
-  justify-items: center;
-  gap: var(--cnpm-space-1);
-  min-width: 5rem;
-  color: var(--cnpm-color-text-secondary);
-  font-size: var(--cnpm-font-size-xs);
-}
-
-.cnpm-contributions__bar-value {
-  color: var(--cnpm-color-text-primary);
-  font-weight: var(--cnpm-font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-}
-
-.cnpm-contributions__bar-track {
-  display: flex;
-  align-items: flex-end;
-  width: var(--cnpm-space-8);
-  height: 8rem;
-  background: var(--cnpm-color-surface-subtle);
-}
-
-.cnpm-contributions__bar {
-  width: 100%;
-  background: var(--cnpm-color-brand-blue-700);
-}
-
-.cnpm-contributions__bar--collected {
-  background: var(--cnpm-color-semantic-success-600);
-}
-
-.cnpm-contributions__bar--outstanding {
-  background: var(--cnpm-color-semantic-warning-600);
-}
-
 @media (max-width: 1279px) {
   .cnpm-contributions__kpis {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .cnpm-contributions__detail-grid {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -475,9 +362,5 @@
     flex-direction: column;
     gap: var(--cnpm-space-1);
     margin: 0;
-  }
-
-  .cnpm-contributions__summary {
-    grid-template-columns: minmax(0, 1fr);
   }
 }

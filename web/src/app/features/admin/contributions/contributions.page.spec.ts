@@ -174,9 +174,9 @@ describe('ContributionsPage — états requis', () => {
     const text = host.textContent ?? '';
     expect(text).toContain('Encaissé');
     expect(text).not.toContain('Encaisser');
-    expect(text).toContain('Détail de l’échéancier');
-    expect(text).toContain('Situation des encaissements');
-    expect(text).toContain('ne constitue aucun barème CNPM');
+    // Le détail d'échéancier n'est plus embarqué en bas de la liste : il vit sur sa fiche
+    // dédiée (/admin/contributions/:id), atteinte par « Voir ».
+    expect(text).not.toContain('Détail de l’échéancier');
     const unavailableActions = Array.from(host.querySelectorAll('button')).filter((button) =>
       /Générer des appels|Créer un échéancier/.test(button.textContent ?? ''),
     );
