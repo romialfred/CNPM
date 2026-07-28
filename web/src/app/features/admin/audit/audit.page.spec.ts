@@ -123,16 +123,16 @@ describe('AuditPage — BO-032', () => {
       'du plus récent au plus ancien',
     );
     expect(host.querySelector(`time[datetime="${EVENT.createdAt}"]`)).not.toBeNull();
-    expect(host.textContent).toContain(EVENT.id);
-    // Les codes techniques sont humanisés : identifiants raccourcis, action/objet en clair.
-    expect(host.textContent).toContain(EVENT.actorUserId!.slice(0, 8));
-    expect(host.textContent).not.toContain(EVENT.actionCode);
+    // Vue épurée : seules des informations LISIBLES (acteur, action, objet en clair) —
+    // aucun code technique (UUID d'événement, empreintes, corrélation) n'est affiché.
+    expect(host.textContent).toContain('Utilisateur');
     expect(host.textContent).toContain('Audit viewed');
     expect(host.textContent).toContain('Audit log');
-    expect(host.textContent).toContain(EVENT.entityId!.slice(0, 8));
-    expect(host.textContent).toContain(EVENT.beforeHash);
-    expect(host.textContent).toContain(EVENT.afterHash);
-    expect(host.textContent).toContain(EVENT.correlationId);
+    expect(host.textContent).not.toContain(EVENT.actionCode);
+    expect(host.textContent).not.toContain(EVENT.id);
+    expect(host.textContent).not.toContain(EVENT.beforeHash);
+    expect(host.textContent).not.toContain(EVENT.afterHash);
+    expect(host.textContent).not.toContain(EVENT.correlationId);
     expect(host.querySelector('.cnpm-audit__mobile-list article dl')).not.toBeNull();
     expect(host.querySelector('.cnpm-audit__panel input')).toBeNull();
     expect(findButton(host, 'Exporter')).toBeUndefined();
