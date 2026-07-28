@@ -259,12 +259,19 @@
             Valeurs de référentiel
           </h2>
         </div>
-        @if (state() === 'ready' || state() === 'empty' || state() === 'noResult') {
-          <p>
-            <strong>{{ totalItems() }}</strong>
-            {{ totalItems() === 1 ? 'valeur trouvée' : 'valeurs trouvées' }}
-          </p>
-        }
+        <div class="cnpm-settings__registry-controls">
+          @if (state() === 'ready' || state() === 'empty' || state() === 'noResult') {
+            <p>
+              <strong>{{ totalItems() }}</strong>
+              {{ totalItems() === 1 ? 'valeur trouvée' : 'valeurs trouvées' }}
+            </p>
+          }
+          <cnpm-view-toggle
+            label="Affichage des valeurs de référentiel"
+            [value]="view()"
+            (valueChange)="setView($event)"
+          />
+        </div>
       </div>
 
       @switch (state()) {
@@ -347,6 +354,7 @@
           </cnpm-empty-state>
         }
         @case ('ready') {
+          @if (view() === 'liste') {
           <div class="cnpm-settings__table">
             <cnpm-data-table
               caption="Valeurs de référentiel, domaines, codes, libellés, états et versions."
@@ -382,7 +390,7 @@
               </ng-template>
             </cnpm-data-table>
           </div>
-
+          } @else {
           <ul class="cnpm-settings__cards" aria-label="Valeurs de référentiel">
             @for (value of rows(); track value.id) {
               <li>
@@ -424,6 +432,7 @@
               </li>
             }
           </ul>
+          }
 
           <cnpm-pagination
             [page]="page()"

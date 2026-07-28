@@ -216,11 +216,30 @@
   overflow-wrap: anywhere;
 }
 
+/* Vue tuiles : grille responsive de cartes, rendue par le gabarit quand `?vue=grille`. */
 .cnpm-settings__cards {
-  display: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: var(--cnpm-space-3);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.cnpm-settings__cards > li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cnpm-space-3);
+  padding: var(--cnpm-space-4);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.cnpm-settings__registry-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--cnpm-space-4);
 }
 
 .cnpm-settings__card-heading > div {
@@ -281,22 +300,6 @@
     flex-direction: column;
   }
 
-  .cnpm-settings__table {
-    display: none;
-  }
-
-  .cnpm-settings__cards {
-    display: flex;
-    flex-direction: column;
-    gap: var(--cnpm-space-3);
-  }
-
-  .cnpm-settings__cards > li {
-    padding: var(--cnpm-space-4);
-    border: 1px solid var(--cnpm-color-border-subtle);
-    border-radius: var(--cnpm-radius-lg);
-    background: var(--cnpm-color-surface-primary);
-  }
 }
 
 @media (max-width: 359px) {
