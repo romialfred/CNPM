@@ -132,7 +132,7 @@ describe('LoginPage (AUTH-001)', () => {
 
   it('transmet l’espace sélectionné à la passerelle', async () => {
     const { fixture, element } = await setup();
-    fill(fixture, element, 'agent@cnpm.example', 'secret');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'secret');
     submit(element);
     expect(gateway.lastRequest?.space).toBe('admin');
   });
@@ -140,7 +140,7 @@ describe('LoginPage (AUTH-001)', () => {
   it('affiche une erreur neutre et conserve l’e-mail quand les identifiants sont refusés', async () => {
     const { fixture, element } = await setup();
     gateway.outcome = 'invalid';
-    fill(fixture, element, 'agent@cnpm.example', 'mauvais');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'mauvais');
     submit(element);
     fixture.detectChanges();
 
@@ -149,14 +149,14 @@ describe('LoginPage (AUTH-001)', () => {
     // Le message ne doit pas révéler si le compte existe.
     expect(alert?.textContent).not.toContain('existe');
     expect(element.querySelector<HTMLInputElement>('input[type="email"]')?.value).toBe(
-      'agent@cnpm.example',
+      'romuald.tiegnan@gmail.com',
     );
   });
 
   it('efface le mot de passe après un échec', async () => {
     const { fixture, element } = await setup();
     gateway.outcome = 'invalid';
-    fill(fixture, element, 'agent@cnpm.example', 'mauvais');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'mauvais');
     submit(element);
     fixture.detectChanges();
 
@@ -169,7 +169,7 @@ describe('LoginPage (AUTH-001)', () => {
     // La navigation réelle est neutralisée : le test vérifie l'intention de navigation,
     // pas le routeur, dont la table est volontairement vide ici.
     const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
-    fill(fixture, element, 'agent@cnpm.example', 'secret');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'secret');
     submit(element);
 
     expect(TestBed.inject(AuthFlowStore).activeChallenge()?.id).toBe('challenge-1');
@@ -182,7 +182,7 @@ describe('LoginPage (AUTH-001)', () => {
     const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
     gateway.outcome = 'enrollment-required';
 
-    fill(fixture, element, 'nouveau@cnpm.example', 'secret');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'secret');
     submit(element);
 
     // On va vers l'enrôlement, jamais vers la vérification d'un code inexistant.
@@ -200,9 +200,25 @@ describe('LoginPage (AUTH-001)', () => {
     expect(gateway.lastRequest).toBeUndefined();
   });
 
+  it('bloque toute identité non autorisée par un message d’accès restreint, sans appeler la passerelle', async () => {
+    const { fixture, element } = await setup();
+    fill(fixture, element, 'quelquun@example.com', 'un-mot-de-passe');
+    submit(element);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    // La source d'authentification n'est jamais sollicitée pour une identité non autorisée.
+    expect(gateway.lastRequest).toBeUndefined();
+    // Le message soigné s'affiche et invite à contacter l'éditeur.
+    const text = element.textContent ?? '';
+    expect(text).toContain('Accès restreint');
+    expect(text).toContain('éditeur de la plateforme');
+  });
+
   it('transmet le consentement « se souvenir » plutôt que de l’ignorer', async () => {
     const { fixture, element } = await setup();
-    fill(fixture, element, 'agent@cnpm.example', 'secret');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'secret');
     const checkbox = element.querySelector<HTMLInputElement>('input[type="checkbox"]')!;
     checkbox.checked = true;
     checkbox.dispatchEvent(new Event('change'));
@@ -215,7 +231,7 @@ describe('LoginPage (AUTH-001)', () => {
 
   it('n’active pas « se souvenir » par défaut', async () => {
     const { fixture, element } = await setup();
-    fill(fixture, element, 'agent@cnpm.example', 'secret');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'secret');
     submit(element);
 
     expect(gateway.lastRequest?.rememberDevice).toBe(false);
@@ -224,7 +240,7 @@ describe('LoginPage (AUTH-001)', () => {
   it('distingue un accès refusé d’identifiants erronés', async () => {
     const { fixture, element } = await setup();
     gateway.outcome = 'forbidden';
-    fill(fixture, element, 'suspendu@cnpm.example', 'secret');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'secret');
     submit(element);
     fixture.detectChanges();
 
@@ -236,7 +252,7 @@ describe('LoginPage (AUTH-001)', () => {
   it('annonce un profil HTTP indisponible sans transmettre davantage le mot de passe', async () => {
     const { fixture, element } = await setup();
     gateway.unavailable = true;
-    fill(fixture, element, 'agent@cnpm.example', 'secret');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'secret');
     submit(element);
     fixture.detectChanges();
 
@@ -248,7 +264,7 @@ describe('LoginPage (AUTH-001)', () => {
   it('relie l’alerte au formulaire après un échec', async () => {
     const { fixture, element } = await setup();
     gateway.outcome = 'invalid';
-    fill(fixture, element, 'agent@cnpm.example', 'mauvais');
+    fill(fixture, element, 'romuald.tiegnan@gmail.com', 'mauvais');
     submit(element);
     fixture.detectChanges();
 

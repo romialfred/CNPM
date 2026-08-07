@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { AlertComponent } from '../../design-system/alert/alert.component';
 import { ButtonComponent } from '../../design-system/button/button.component';
 import { CheckboxComponent } from '../../design-system/checkbox/checkbox.component';
+import { DialogComponent } from '../../design-system/dialog/dialog.component';
 import { OfflineNoticeComponent } from '../../design-system/offline-notice/offline-notice.component';
 import { PasswordInputComponent } from '../../design-system/password-input/password-input.component';
 import { TabsComponent, type CnpmTab } from '../../design-system/tabs/tabs.component';
@@ -23,6 +24,13 @@ import { AUTH_GATEWAY, type AuthSpace } from './auth-gateway';
 import { AuthFlowStore } from './auth-flow.store';
 
 type FormState = 'idle' | 'submitting' | 'error' | 'forbidden' | 'unavailable';
+
+/**
+ * Accès verrouillé (décision d'exploitation) : seule cette identité peut se connecter.
+ * Toute autre tentative ouvre un message d'accès restreint invitant à contacter l'éditeur.
+ * Ce garde-fou d'interface reflète la consigne ; il ne remplace pas le contrôle backend.
+ */
+const AUTHORIZED_EMAIL = 'romuald.tiegnan@gmail.com';
 
 /**
  * AUTH-001 — étape identifiants.
@@ -44,6 +52,7 @@ type FormState = 'idle' | 'submitting' | 'error' | 'forbidden' | 'unavailable';
     CheckboxComponent,
     ButtonComponent,
     AlertComponent,
+    DialogComponent,
     OfflineNoticeComponent,
   ],
   templateUrl: './login.page.html',
@@ -81,6 +90,13 @@ export class LoginPage {
   protected readonly state = signal<FormState>('idle');
   /** Passe à vrai à la première tentative d'envoi ; borne les messages « requis ». */
   protected readonly submitted = signal(false);
+
+  /** Ouvre le message « accès restreint » lorsqu'une identité non autorisée tente d'entrer. */
+  protected readonly restrictedOpen = signal(false);
+
+  protected closeRestricted(): void {
+    this.restrictedOpen.set(false);
+  }
 
   protected readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -124,6 +140,12 @@ export class LoginPage {
     this.submitted.set(true);
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+    // Accès verrouillé : hors de l'identité autorisée, aucune connexion. On affiche le
+    // message d'accès restreint et on n'appelle même pas la source d'authentification.
+    if (this.form.controls.email.value.trim().toLowerCase() !== AUTHORIZED_EMAIL) {
+      this.restrictedOpen.set(true);
       return;
     }
     this.state.set('submitting');

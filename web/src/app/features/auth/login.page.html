@@ -14,8 +14,8 @@
       <div class="cnpm-login__demo" role="note">
         <strong>Mode démonstration</strong>
         <span>
-          Connectez-vous avec n’importe quel e-mail et mot de passe, puis saisissez le code de
-          vérification <b>123456</b>.
+          L’accès est réservé au compte autorisé ; la vérification en deux étapes attend le code
+          <b>123456</b>.
         </span>
       </div>
     }
@@ -107,4 +107,43 @@
     <!-- BLOCKED (UX-DEC-011) : aucun canal de support n'est arbitré ; inventer une
          adresse ou un numéro serait une donnée institutionnelle fabriquée. -->
   </div>
+
+  <!-- Accès restreint : toute identité non autorisée reçoit ce message soigné plutôt
+       qu'un échec brut. La connexion n'est même pas tentée. -->
+  <cnpm-dialog
+    [open]="restrictedOpen()"
+    title="Accès restreint"
+    eyebrow="Plateforme sécurisée"
+    (dismiss)="closeRestricted()"
+  >
+    <div class="cnpm-login__restricted">
+      <span class="cnpm-login__restricted-icon" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          width="30"
+          height="30"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          <circle cx="12" cy="16" r="1.1" fill="currentColor" stroke="none" />
+        </svg>
+      </span>
+      <p class="cnpm-login__restricted-lead">
+        Cette plateforme est en <strong>accès restreint</strong>. Votre compte n’est pas autorisé
+        à s’y connecter pour le moment.
+      </p>
+      <p class="cnpm-login__restricted-contact">
+        Pour obtenir un accès, veuillez <strong>contacter l’éditeur de la plateforme</strong>.
+      </p>
+    </div>
+
+    <ng-container cnpm-dialog-footer>
+      <cnpm-button variant="primary" (click)="closeRestricted()">J’ai compris</cnpm-button>
+    </ng-container>
+  </cnpm-dialog>
 </cnpm-auth-shell>
