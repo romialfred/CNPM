@@ -84,6 +84,37 @@
    (UX-DEC-011) : conserver des sélecteurs qui ne ciblent plus rien laisserait croire,
    à la relecture, que ces éléments existent encore. */
 
+/* Message d'accès restreint (popup) : centré, icône verrou dans une pastille de marque,
+   texte clair. Ton institutionnel (bleu de marque) plutôt qu'alarmant. */
+.cnpm-login__restricted {
+  display: grid;
+  gap: var(--cnpm-space-3);
+  justify-items: center;
+  text-align: center;
+}
+
+.cnpm-login__restricted-icon {
+  display: grid;
+  place-items: center;
+  width: var(--cnpm-space-16);
+  height: var(--cnpm-space-16);
+  border-radius: var(--cnpm-radius-pill);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-brand-blue-700);
+}
+
+.cnpm-login__restricted-lead {
+  margin: 0;
+  color: var(--cnpm-color-text-primary);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+.cnpm-login__restricted-contact {
+  margin: 0;
+  color: var(--cnpm-color-text-secondary);
+  font-size: var(--cnpm-font-size-sm);
+}
+
 @media (max-width: 767px) {
   .cnpm-login {
     min-height: 0;
