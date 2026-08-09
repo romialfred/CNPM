@@ -22,7 +22,7 @@ const BLOCKED_AUTH_SCREENS = {
     description:
       "La récupération sera activée lorsque la COGEF aura choisi le parcours du fournisseur d'identité et son canal d'assistance.",
     decision:
-      'Destination Keycloak ou parcours CNPM natif, ainsi que le canal de support, à arbitrer.',
+      'Destination Keycloak ou parcours COGEF natif, ainsi que le canal de support, à arbitrer.',
   },
 } as const satisfies Record<string, BlockedAuthContent>;
 

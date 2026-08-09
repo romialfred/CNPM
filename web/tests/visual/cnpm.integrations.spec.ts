@@ -87,7 +87,7 @@ test('BO-038 — supervision fictive, consultative et sans appel externe', async
   await expect(healthBadges.filter({ hasText: 'Dégradé' })).toBeVisible();
   await expect(healthBadges.filter({ hasText: 'Suspendu' })).toBeVisible();
   await expect(healthBadges.filter({ hasText: 'Indisponible' })).toBeVisible();
-  await expect(page.getByText('identifiant CNPM préservé').first()).toBeVisible();
+  await expect(page.getByText('identifiant COGEF préservé').first()).toBeVisible();
   const tabs = page.getByRole('tab');
   await expect(tabs).toHaveCount(2);
   for (const tab of await tabs.all()) {

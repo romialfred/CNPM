@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 /**
- * Contrat de l'écran CNPM « Encaissements » (Lot 4 de la refonte, méthode A : saisie agent).
+ * Contrat de l'écran COGEF « Encaissements » (Lot 4 de la refonte, méthode A : saisie agent).
  *
  * <p>Un seul adaptateur HTTP réel, aucune passerelle de démonstration. L'agent enregistre un
  * encaissement reçu contre une référence validée ; le serveur en tient l'idempotence et

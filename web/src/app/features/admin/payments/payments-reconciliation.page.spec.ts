@@ -41,7 +41,7 @@ const LINE: StatementLine = {
   suggestions: [
     {
       id: 'sugg-test-1',
-      memberCode: 'CNPM-2026-0101',
+      memberCode: 'COGEF-2026-0101',
       memberName: 'Sahel Agro SA',
       contributionLabel: 'Cotisation annuelle 2026',
       period: 'T1 2026 – T4 2026',
@@ -51,7 +51,7 @@ const LINE: StatementLine = {
     },
     {
       id: 'sugg-test-2',
-      memberCode: 'CNPM-2026-0208',
+      memberCode: 'COGEF-2026-0208',
       memberName: 'Sahel Agro Services',
       contributionLabel: 'Cotisation annuelle 2026',
       period: 'T1 2026 – T4 2026',
@@ -70,7 +70,7 @@ const LINE_TO_CONFIRM: StatementLine = {
   status: 'TO_CONFIRM',
   suggestions: [],
   allocation: {
-    memberCode: 'CNPM-2026-0101',
+    memberCode: 'COGEF-2026-0101',
     memberName: 'Sahel Agro SA',
     contributionLabel: 'Cotisation annuelle 2026',
     allocatedAmount: 1000000,

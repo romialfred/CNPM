@@ -16,7 +16,7 @@ const READY_PAGE: MemberDocumentPage = {
   items: [
     {
       id: 'document-0003',
-      reference: 'CNPM-DOC-0003',
+      reference: 'COGEF-DOC-0003',
       title: 'Attestation annuelle 2025',
       type: 'ATTESTATION',
       typeLabel: 'Attestation',
@@ -120,7 +120,7 @@ describe('MemberDocumentsPage — MP-012', () => {
     expect(host.querySelector('table caption')?.textContent).toContain(
       'Métadonnées documentaires',
     );
-    expect(host.textContent).toContain('CNPM-DOC-0003');
+    expect(host.textContent).toContain('COGEF-DOC-0003');
     expect(host.textContent).toContain('Expiré');
     expect(host.querySelector('.member-documents__mobile-list article dl')).not.toBeNull();
     expect(
@@ -137,7 +137,7 @@ describe('MemberDocumentsPage — MP-012', () => {
 
     const search = host.querySelector<HTMLInputElement>('#member-document-search');
     if (!search) throw new Error('Recherche absente');
-    search.value = '  CNPM-DOC  ';
+    search.value = '  COGEF-DOC  ';
     search.dispatchEvent(new Event('input'));
     const type = host.querySelector<HTMLSelectElement>('#member-document-type');
     if (!type) throw new Error('Type absent');
@@ -152,7 +152,7 @@ describe('MemberDocumentsPage — MP-012', () => {
     expect(navigate).toHaveBeenCalledWith([], {
       relativeTo: expect.anything(),
       queryParams: expect.objectContaining({
-        q: 'CNPM-DOC',
+        q: 'COGEF-DOC',
         type: 'ATTESTATION',
         sort: 'reference',
         order: 'asc',

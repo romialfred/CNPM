@@ -54,7 +54,7 @@ export class MemberDirectoryPage {
   protected readonly view = signal<CnpmViewMode>('liste');
 
   constructor() {
-    this.title.setTitle('Annuaire des membres — Espace membre CNPM');
+    this.title.setTitle('Annuaire des membres — Espace membre COGEF');
     this.search.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.load());

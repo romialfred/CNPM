@@ -178,31 +178,31 @@ const GROUP_WEIGHTS: readonly DimensionWeight[] = [
 
 const REGION_WEIGHTS: readonly DimensionWeight[] = [
   {
-    id: 'bamako',
-    label: 'Bamako',
-    shortLabel: 'Bamako',
+    id: 'ouagadougou',
+    label: 'Ouagadougou',
+    shortLabel: 'Ouagadougou',
     expected: 548,
     collected: 583,
     members: 512,
   },
   {
-    id: 'koulikoro',
-    label: 'Koulikoro',
-    shortLabel: 'Koulikoro',
+    id: 'kaya',
+    label: 'Kaya',
+    shortLabel: 'Kaya',
     expected: 128,
     collected: 121,
     members: 138,
   },
   {
-    id: 'sikasso',
-    label: 'Sikasso',
-    shortLabel: 'Sikasso',
+    id: 'bobo-dioulasso',
+    label: 'Bobo-Dioulasso',
+    shortLabel: 'Bobo-Dioulasso',
     expected: 114,
     collected: 106,
     members: 122,
   },
-  { id: 'segou', label: 'Ségou', shortLabel: 'Ségou', expected: 86, collected: 78, members: 94 },
-  { id: 'mopti', label: 'Mopti', shortLabel: 'Mopti', expected: 62, collected: 51, members: 68 },
+  { id: 'koudougou', label: 'Koudougou', shortLabel: 'Koudougou', expected: 86, collected: 78, members: 94 },
+  { id: 'ouahigouya', label: 'Ouahigouya', shortLabel: 'Ouahigouya', expected: 62, collected: 51, members: 68 },
   {
     id: 'autres',
     label: 'Autres régions',
@@ -244,8 +244,8 @@ const RATE_FORMAT = new Intl.NumberFormat('fr-ML', {
 });
 
 /**
- * Comparaison insensible à la casse et aux diacritiques : chercher « Segou » doit
- * trouver « Ségou », faute de quoi la recherche ne rend rien à qui tape sans accents.
+ * Comparaison insensible à la casse et aux diacritiques : chercher « Koudougou » doit
+ * trouver « Koudougou », faute de quoi la recherche ne rend rien à qui tape sans accents.
  */
 function fold(value: string): string {
   return value

@@ -10,7 +10,7 @@ const emptyEventsGateway: MemberEventsGateway = {
   list: () => of([]),
 };
 
-describe('MemberCnpmPage — point d’entrée « Le CNPM »', () => {
+describe('MemberCnpmPage — point d’entrée « La COGEF »', () => {
   let host: HTMLElement;
 
   beforeEach(async () => {
@@ -29,7 +29,7 @@ describe('MemberCnpmPage — point d’entrée « Le CNPM »', () => {
 
   it('affiche le titre institutionnel et un contenu principal identifiable', () => {
     expect(host.querySelector('main#contenu-principal')).not.toBeNull();
-    expect(host.querySelector('h1')?.textContent).toContain('Le CNPM');
+    expect(host.querySelector('h1')?.textContent).toContain('La COGEF');
   });
 
   it('n’invente aucune actualité : sans événement publié, la section reste en état vide honnête', () => {

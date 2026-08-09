@@ -24,7 +24,7 @@ const PUBLISHED: MemberShowcase = {
   name: 'Atelier Kanu',
   tagline: 'Prestations de services numériques',
   sector: 'Services numériques',
-  location: 'Bamako',
+  location: 'Ouagadougou',
   employeeRange: 'Non communiqué',
   foundedYear: 2026,
   legalForm: 'Société anonyme',

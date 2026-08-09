@@ -57,7 +57,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       name: 'Atelier Kanu',
       tagline: 'Solutions numériques pour les entreprises',
       sector: 'Services numériques',
-      location: 'Bamako',
+      location: 'Ouagadougou',
       summary:
         'Entreprise de services numériques accompagnant les organisations sur leurs projets applicatifs et leur infrastructure.',
       publicationStatus: 'PUBLISHED',
@@ -67,7 +67,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       name: 'Horizon Sahel',
       tagline: 'Transport et logistique multimodale',
       sector: 'Logistique',
-      location: 'Kayes',
+      location: 'Banfora',
       summary:
         'Opérateur logistique assurant le transport, l’entreposage et la distribution de marchandises sur les corridors régionaux.',
       publicationStatus: 'PUBLISHED',
@@ -77,7 +77,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       name: 'Fabrique Nianan',
       tagline: 'Transformation agroalimentaire',
       sector: 'Agroalimentaire',
-      location: 'Sikasso',
+      location: 'Bobo-Dioulasso',
       summary:
         'Unité de transformation valorisant les productions agricoles locales en produits conditionnés pour le marché national.',
       publicationStatus: 'PUBLISHED',
@@ -87,7 +87,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       name: 'Studio Bolo',
       tagline: 'Conseil créatif et communication',
       sector: 'Services aux entreprises',
-      location: 'Mopti',
+      location: 'Ouahigouya',
       summary:
         'Agence de conseil accompagnant les entreprises sur leur identité de marque et leurs supports de communication.',
       publicationStatus: 'PUBLISHED',
@@ -107,7 +107,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       name: 'Bâtir Kora',
       tagline: 'Construction responsable',
       sector: 'BTP et génie civil',
-      location: 'Ségou',
+      location: 'Koudougou',
       summary:
         'Entreprise de BTP intervenant sur les ouvrages de bâtiment et de génie civil, de l’étude à la réception des travaux.',
       publicationStatus: 'PUBLISHED',
@@ -117,7 +117,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       name: 'Santé Niela',
       tagline: 'Équipements professionnels de santé',
       sector: 'Équipements professionnels',
-      location: 'Gao',
+      location: 'Fada N’Gourma',
       summary:
         'Fournisseur d’équipements professionnels et de consommables pour les structures de santé et les laboratoires.',
       publicationStatus: 'PUBLISHED',
@@ -127,7 +127,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       name: 'Conseil Faro',
       tagline: 'Accompagnement des petites entreprises',
       sector: 'Conseil',
-      location: 'Bamako',
+      location: 'Ouagadougou',
       summary:
         'Cabinet de conseil accompagnant les petites entreprises sur leur gestion, leur organisation et leur mise en conformité.',
       publicationStatus: 'PUBLISHED',
@@ -206,8 +206,8 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
 
   private static readonly PROJECTS: readonly ShowcaseProject[] = [
     {
-      id: 'route-kati-koulikoro',
-      title: 'Route Kati–Koulikoro',
+      id: 'route-ziniare-kaya',
+      title: 'Route Ziniaré–Kaya',
       summary:
         'Construction de 42 km de route bitumée, avec ouvrages de drainage et signalisation.',
       category: 'Routes et infrastructures',
@@ -425,7 +425,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       brochureAvailable: false,
       isDemoContent: true,
       publicationStatus: 'PUBLISHED',
-      seoTitle: `${record.name} — annuaire CNPM`,
+      seoTitle: `${record.name} — annuaire COGEF`,
       seoDescription: record.summary,
       allowIndexing: false,
     };
@@ -448,7 +448,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       sector: 'BTP et génie civil',
       legalForm: 'Société anonyme',
       summary:
-        'Entreprise malienne spécialisée dans les travaux publics, le génie civil et l’aménagement durable des infrastructures.',
+        'Entreprise burkinabè spécialisée dans les travaux publics, le génie civil et l’aménagement durable des infrastructures.',
       seoDescription:
         'Découvrez les activités, réalisations et coordonnées de SOMACOP SA, membre vérifié de la COGEF.',
 
@@ -470,7 +470,7 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
         // jamais la ligne directe d'une personne identifiée.
         phone: '+223 20 00 00 00',
         email: 'accueil@somacop.example',
-        address: 'ACI 2000, Bamako, Mali',
+        address: 'ACI 2000, Ouagadougou, Burkina Faso',
         hours: 'Du lundi au vendredi, 08h00 – 17h00',
       },
       contactConsent: DemoShowcaseGateway.DEMO_CONSENT,

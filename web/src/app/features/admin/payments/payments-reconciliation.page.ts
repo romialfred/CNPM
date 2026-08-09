@@ -108,7 +108,7 @@ const ANOMALY_LABELS: Readonly<Record<AnomalyType, string>> = {
   DUPLICATE: 'Encaissement en double',
   UNKNOWN_PAYER: 'Payeur non identifié',
   AMOUNT_MISMATCH: 'Montant incohérent',
-  OUT_OF_SCOPE: 'Hors périmètre CNPM',
+  OUT_OF_SCOPE: 'Hors périmètre COGEF',
 };
 
 /**

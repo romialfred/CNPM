@@ -26,7 +26,7 @@ export interface MemberPayment {
   readonly amount: number;
   readonly currency: string;
   readonly paidAt: string | null;
-  /** Vrai si la CNPM a confirmé l'encaissement (reçu émis). */
+  /** Vrai si la COGEF a confirmé l'encaissement (reçu émis). */
   readonly confirmed: boolean;
   readonly receiptNumber: string | null;
 }

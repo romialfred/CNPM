@@ -46,7 +46,7 @@ describe('MemberPortalShellComponent — barre latérale dédiée au membre', ()
     const titles = Array.from(host.querySelectorAll('.member-shell__group-title')).map((element) =>
       element.textContent?.trim(),
     );
-    expect(titles).toEqual(['Mon espace', 'Le CNPM', 'Mon compte']);
+    expect(titles).toEqual(['Mon espace', 'La COGEF', 'Mon compte']);
   });
 
   it('rend les treize destinations comme de vrais liens, sans lien mort', () => {
@@ -68,7 +68,7 @@ describe('MemberPortalShellComponent — barre latérale dédiée au membre', ()
     expect(host.querySelector('.member-shell__notification-count')?.textContent).toContain('4');
   });
 
-  it('surface bien l’entrée « Le CNPM » attendue par le membre', () => {
+  it('surface bien l’entrée « La COGEF » attendue par le membre', () => {
     const labels = Array.from(host.querySelectorAll('.member-shell__item-label')).map((element) =>
       element.textContent?.trim(),
     );
@@ -94,7 +94,7 @@ describe('MemberPortalShellComponent — barre latérale dédiée au membre', ()
   });
 
   it('garde la rubrique parente active sur un écran enfant', async () => {
-    await TestBed.inject(Router).navigateByUrl('/member/contributions/CNPM-2024');
+    await TestBed.inject(Router).navigateByUrl('/member/contributions/COGEF-2024');
     fixture.detectChanges();
     await fixture.whenStable();
 

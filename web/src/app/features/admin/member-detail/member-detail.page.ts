@@ -270,7 +270,7 @@ const SECTOR_PROFILES: Readonly<Record<SectorKey, SectorProfile>> = {
   },
   FINANCE: {
     imageKeywords: 'bank,office',
-    tagline: 'Financer la croissance des entreprises maliennes.',
+    tagline: 'Financer la croissance des entreprises burkinabès.',
     activities: [
       { title: 'Financement', description: 'Crédits et lignes de trésorerie aux entreprises.' },
       { title: 'Moyens de paiement', description: 'Comptes, cartes et transferts.' },
@@ -340,7 +340,7 @@ const SECTOR_PROFILES: Readonly<Record<SectorKey, SectorProfile>> = {
   },
   TOURISME: {
     imageKeywords: 'hotel,tourism',
-    tagline: 'Faire rayonner l’accueil et le patrimoine malien.',
+    tagline: 'Faire rayonner l’accueil et le patrimoine burkinabè.',
     activities: [
       { title: 'Hébergement', description: 'Hôtellerie et résidences.' },
       { title: 'Restauration', description: 'Services de bouche et événementiel.' },
@@ -360,7 +360,7 @@ const SECTOR_PROFILES: Readonly<Record<SectorKey, SectorProfile>> = {
   },
   DEFAULT: {
     imageKeywords: 'business,office',
-    tagline: 'Un membre engagé au sein du patronat malien.',
+    tagline: 'Un membre engagé au sein du patronat burkinabè.',
     activities: [
       { title: 'Cœur de métier', description: 'Activité principale de l’organisation.' },
       { title: 'Services aux clients', description: 'Offre commerciale et relation client.' },
@@ -459,7 +459,7 @@ export class MemberDetailPage {
    * inventer la règle qu'il affiche.
    */
   protected readonly verificationExplanation =
-    'Le CNPM a constaté l’existence du membre et l’état de son dossier d’adhésion. Les critères détaillés et la durée de validité du badge restent à arrêter.';
+    'La COGEF a constaté l’existence du membre et l’état de son dossier d’adhésion. Les critères détaillés et la durée de validité du badge restent à arrêter.';
 
   /**
    * Humanise le code de catégorie hors gabarit, là où la valeur alimente un composant

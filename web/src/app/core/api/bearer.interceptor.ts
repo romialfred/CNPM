@@ -5,11 +5,11 @@ import { CNPM_ACCESS_TOKEN } from './access-token';
 import { CNPM_API_BASE_URL, isCnpmApiRequest } from './api.config';
 
 /**
- * Ajoute `Authorization: Bearer <jeton>` aux seuls appels de l'API CNPM.
+ * Ajoute `Authorization: Bearer <jeton>` aux seuls appels de l'API COGEF.
  *
  * Trois gardes, chacune évitant une fuite ou une régression :
  *
- * - la cible : seul le domaine de l'API CNPM reçoit le jeton. Les échanges OIDC avec
+ * - la cible : seul le domaine de l'API COGEF reçoit le jeton. Les échanges OIDC avec
  *   Keycloak et les requêtes d'actifs ne doivent JAMAIS le porter — un jeton d'API
  *   envoyé à un tiers est une fuite ;
  * - l'en-tête déjà présent : si un appelant a posé son propre `Authorization`

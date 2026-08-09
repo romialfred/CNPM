@@ -2,7 +2,7 @@ import { EnvironmentProviders, InjectionToken, makeEnvironmentProviders } from '
 
 export interface CnpmApiConfig {
   /**
-   * Racine versionnée du contrat CNPM. Elle peut être relative en local ou absolue
+   * Racine versionnée du contrat COGEF. Elle peut être relative en local ou absolue
    * lorsqu'un environnement expose l'API sur un hôte distinct.
    */
   readonly baseUrl?: string;
@@ -50,16 +50,16 @@ export function readCnpmRuntimeConfig(source: unknown = globalThis): CnpmApiConf
     return {};
   }
   if (!isRecord(candidate)) {
-    throw new Error('La configuration runtime CNPM doit être un objet.');
+    throw new Error('La configuration runtime COGEF doit être un objet.');
   }
 
   const dataMode = candidate['dataMode'];
   if (dataMode !== undefined && dataMode !== 'http' && dataMode !== 'demo') {
-    throw new Error('Le mode de données CNPM doit valoir « http » ou « demo ».');
+    throw new Error('Le mode de données COGEF doit valoir « http » ou « demo ».');
   }
   const baseUrl = candidate['baseUrl'];
   if (baseUrl !== undefined && typeof baseUrl !== 'string') {
-    throw new Error("La racine de l'API CNPM doit être une chaîne.");
+    throw new Error("La racine de l'API COGEF doit être une chaîne.");
   }
 
   return {
@@ -82,7 +82,7 @@ export function isCnpmApiRequest(url: string, baseUrl: string): boolean {
 export function normalizeApiBaseUrl(baseUrl: string): string {
   const normalized = baseUrl.trim().replace(/\/+$/, '');
   if (normalized.length === 0) {
-    throw new Error("La racine de l'API CNPM ne peut pas être vide.");
+    throw new Error("La racine de l'API COGEF ne peut pas être vide.");
   }
   return normalized;
 }

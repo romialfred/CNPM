@@ -134,7 +134,7 @@ export class LegalPage {
       this.seo.apply({
         title: document ? `${document.title} — COGEF` : 'Document légal introuvable — COGEF',
         description: document
-          ? `Statut de publication du document « ${document.title} » de la plateforme CNPM.`
+          ? `Statut de publication du document « ${document.title} » de la plateforme COGEF.`
           : 'Le document légal demandé ne correspond à aucune page déclarée.',
         robots: 'noindex,nofollow',
         canonicalPath: `/legal/${document?.slug ?? boundedSlug}`,

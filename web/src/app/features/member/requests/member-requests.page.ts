@@ -51,7 +51,7 @@ export class MemberRequestsPage {
   protected readonly requests = signal<readonly MemberRequestSummary[]>([]);
 
   constructor() {
-    this.title.setTitle('Mes requêtes — Espace membre CNPM');
+    this.title.setTitle('Mes requêtes — Espace membre COGEF');
     this.load();
   }
 

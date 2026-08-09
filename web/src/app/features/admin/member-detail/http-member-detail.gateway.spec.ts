@@ -31,9 +31,9 @@ describe('HttpMemberDetailGateway', () => {
     const promise = firstValueFrom(gateway.load(ORG));
     const request = http.expectOne(`/v1/organizations/${ORG}/member-detail`);
     expect(request.request.method).toBe('GET');
-    request.flush({ identity: { code: 'CNPM-2022-0001', organization: 'SOMADIS' } });
+    request.flush({ identity: { code: 'COGEF-2022-0001', organization: 'SOMADIS' } });
     const detail = await promise;
-    expect(detail.identity.code).toBe('CNPM-2022-0001');
+    expect(detail.identity.code).toBe('COGEF-2022-0001');
   });
 
   it('traduit 403 en MemberDetailAccessError', async () => {

@@ -1,7 +1,7 @@
 import type { DocManual } from './documentation.model';
 
 /**
- * Documentation technique de la plateforme CNPM.
+ * Documentation technique de la plateforme COGEF.
  *
  * Contenu factuel, aligné sur le dépôt : la pile vient de `CLAUDE.md`, le schéma et le
  * dictionnaire de `docs/03-data/data-model.md` et des migrations Flyway, l'arborescence
@@ -231,7 +231,7 @@ export const TECHNICAL_MANUAL: DocManual = {
                 ['member.organization_identifier', 'Identifiants légaux et fiscaux', '11', 'Non'],
                 ['member.address', 'Adresses normalisées', '13', 'Non'],
                 ['member.organization_contact', 'Contacts et représentants', '12', 'Non'],
-                ['member.membership', 'Adhésion d’une entreprise au CNPM', '12', 'Non'],
+                ['member.membership', 'Adhésion d’une entreprise à la COGEF', '12', 'Non'],
                 ['member.membership_status_history', 'Historique immuable des statuts', '7', 'Oui'],
                 ['member.professional_group', 'Groupements professionnels', '10', 'Non'],
                 ['member.group_membership', 'Rattachement entreprise-groupement', '11', 'Non'],
@@ -369,7 +369,7 @@ export const TECHNICAL_MANUAL: DocManual = {
               caption: 'payment.payment_transaction — transaction (append-only)',
               headers: ['Colonne', 'Type', 'Rôle'],
               rows: [
-                ['transaction_number', 'varchar(80)', 'Référence CNPM'],
+                ['transaction_number', 'varchar(80)', 'Référence COGEF'],
                 ['channel', 'varchar(30)', 'MOBILE_MONEY, BANK, CASH'],
                 ['amount', 'numeric(19,2)', 'Montant'],
                 ['paid_at', 'timestamptz', 'Date de paiement (clé de partition)'],

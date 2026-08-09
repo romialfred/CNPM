@@ -27,7 +27,7 @@ const AUDIENCE_COUNTS: Readonly<
 /**
  * Calculateur local du scénario BO-012.
  *
- * Les valeurs ne représentent aucun barème CNPM : elles permettent uniquement de
+ * Les valeurs ne représentent aucun barème COGEF : elles permettent uniquement de
  * valider la composition, les contrôles et la revue des exceptions tant que DEC-008
  * reste ouverte. Le port ne propose volontairement aucune émission.
  */
@@ -55,7 +55,7 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
       issues: [
         {
           id: 'issue-001',
-          memberCode: 'CNPM-2026-0142',
+          memberCode: 'COGEF-2026-0142',
           organizationName: 'Atelier Horizon SARL',
           severity: 'BLOCKING',
           reason: 'Catégorie de cotisation absente',
@@ -63,7 +63,7 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
         },
         {
           id: 'issue-002',
-          memberCode: 'CNPM-2026-0381',
+          memberCode: 'COGEF-2026-0381',
           organizationName: 'Kora Numérique SA',
           severity: 'BLOCKING',
           reason: 'Période d’adhésion non qualifiée',
@@ -71,7 +71,7 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
         },
         {
           id: 'issue-003',
-          memberCode: 'CNPM-2026-0917',
+          memberCode: 'COGEF-2026-0917',
           organizationName: 'Nimba Services SAS',
           severity: 'BLOCKING',
           reason: 'Aucun barème homologué applicable',
@@ -79,7 +79,7 @@ export class DemoContributionCallGenerationGateway implements ContributionCallGe
         },
         {
           id: 'issue-004',
-          memberCode: 'CNPM-2026-0724',
+          memberCode: 'COGEF-2026-0724',
           organizationName: 'Djoliba Emballages SARL',
           severity: 'WARNING',
           reason: 'Changement de catégorie en attente de revue',

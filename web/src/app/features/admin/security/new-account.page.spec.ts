@@ -114,7 +114,7 @@ describe('NewAccountPage (création de compte)', () => {
 
     const members = host.querySelectorAll('.nacc__member');
     expect(members.length).toBeGreaterThan(0);
-    expect(host.textContent).toContain('Société Malienne de Négoce SA');
+    expect(host.textContent).toContain('Société Burkinabè de Négoce SA');
   });
 
   it('pré-remplit l’identité en choisissant un membre et transmet son identifiant', async () => {
@@ -135,7 +135,7 @@ describe('NewAccountPage (création de compte)', () => {
 
     expect(host.querySelector<HTMLInputElement>('input[name="firstName"]')?.value).toBe('Oumar');
     expect(host.querySelector<HTMLInputElement>('input[name="organization"]')?.value).toBe(
-      'Société Malienne de Négoce SA',
+      'Société Burkinabè de Négoce SA',
     );
 
     const submit = Array.from(host.querySelectorAll<HTMLButtonElement>('button')).find(
@@ -149,7 +149,7 @@ describe('NewAccountPage (création de compte)', () => {
         accountType: 'MEMBER',
         memberId: 'mem-2041',
         roleId: 'membre-cnpm',
-        organization: 'Société Malienne de Négoce SA',
+        organization: 'Société Burkinabè de Négoce SA',
       }),
     );
     expect(navigate).toHaveBeenCalledWith(['/admin/security/users']);

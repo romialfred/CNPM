@@ -64,7 +64,7 @@ export class MemberProfilePage {
   });
 
   constructor() {
-    this.title.setTitle('Profil — Espace membre CNPM');
+    this.title.setTitle('Profil — Espace membre COGEF');
     this.load();
   }
 

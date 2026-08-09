@@ -16,7 +16,7 @@ const READY_PAGE: MemberContributionPage = {
   items: [
     {
       id: 'demo-contribution-2026-01',
-      reference: 'CNPM-COT-2026-001',
+      reference: 'COGEF-COT-2026-001',
       exercise: 2026,
       dueDate: '2026-09-30',
       calledAmount: 180000,
@@ -122,7 +122,7 @@ describe('MemberContributionsPage — MP-002', () => {
 
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.querySelector('table caption')?.textContent).toContain('Cotisations');
-    expect(host.textContent).toContain('CNPM-COT-2026-001');
+    expect(host.textContent).toContain('COGEF-COT-2026-001');
     expect(host.textContent).toContain('120');
     // Le bandeau interne DEC-008 (barème) n'est plus affiché au cotisant : écran client.
     expect(host.textContent).not.toContain('DEC-008');

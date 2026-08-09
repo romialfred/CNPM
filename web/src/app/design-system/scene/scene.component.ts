@@ -18,7 +18,7 @@ const SCENE_ALT: Readonly<Record<CnpmSceneName, string>> = {
 };
 
 /**
- * Illustration vectorielle de la plateforme CNPM.
+ * Illustration vectorielle de la plateforme COGEF.
  *
  * Ces scenes remplacent les aplats de couleur qui tenaient lieu d'images. Elles sont
  * dessinees, non generees a la volee, et ne representent aucune personne identifiable

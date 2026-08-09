@@ -21,8 +21,8 @@ describe('DemoReceiptsGateway', () => {
 
     expect(page.totalItems).toBe(12);
     expect(page.rows).toHaveLength(10);
-    expect(page.rows.every((row) => row.demonstrationReference.startsWith('CNPM-REC-'))).toBe(true);
-    expect(page.rows.every((row) => row.paymentReference.startsWith('PAY-CNPM-'))).toBe(true);
+    expect(page.rows.every((row) => row.demonstrationReference.startsWith('COGEF-REC-'))).toBe(true);
+    expect(page.rows.every((row) => row.paymentReference.startsWith('PAY-COGEF-'))).toBe(true);
     expect(page.overview).toMatchObject({ totalRecords: 12, issuedCount: 9, cancelledCount: 3 });
   });
 
@@ -45,7 +45,7 @@ describe('DemoReceiptsGateway', () => {
     const first = await firstValueFrom(gateway.search({ ...BASE_QUERY, pageSize: 50 }));
     const cancelled = first.rows.filter((row) => row.status === 'CANCELLED');
 
-    expect(cancelled.every((row) => row.replacedByReference?.startsWith('CNPM-REC-'))).toBe(true);
+    expect(cancelled.every((row) => row.replacedByReference?.startsWith('COGEF-REC-'))).toBe(true);
     expect(first.rows.every((row) => row.sourcePaymentStatus === 'CONFIRMED')).toBe(true);
     expect(first.rows.every((row) => row.paymentConfirmedAt < row.issuedAt)).toBe(true);
   });

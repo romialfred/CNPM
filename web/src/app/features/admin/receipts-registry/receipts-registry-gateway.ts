@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 /**
- * Contrat de l'écran CNPM « Reçus » (Lot 6). Un seul adaptateur HTTP réel, aucune démo.
+ * Contrat de l'écran COGEF « Reçus » (Lot 6). Un seul adaptateur HTTP réel, aucune démo.
  */
 
 export interface IssuedReceipt {

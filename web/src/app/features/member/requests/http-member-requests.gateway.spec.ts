@@ -36,7 +36,7 @@ describe('HttpMemberRequestsGateway', () => {
       items: [
         {
           id: 'r1',
-          reference: 'CNPM-REQ-000001',
+          reference: 'COGEF-REQ-000001',
           type: 'INFORMATION',
           subject: 'Attestation',
           status: 'SUBMITTED',
@@ -51,7 +51,7 @@ describe('HttpMemberRequestsGateway', () => {
       totalPages: 1,
     });
     const page = await result;
-    expect(page.items[0].reference).toBe('CNPM-REQ-000001');
+    expect(page.items[0].reference).toBe('COGEF-REQ-000001');
   });
 
   it('crée une requête avec une clé d’idempotence', async () => {
@@ -64,7 +64,7 @@ describe('HttpMemberRequestsGateway', () => {
     expect(request.request.headers.get('Idempotency-Key')).toBeTruthy();
     request.flush({
       id: 'r2',
-      reference: 'CNPM-REQ-000002',
+      reference: 'COGEF-REQ-000002',
       type: 'CLAIM',
       subject: 'Réclamation',
       description: 'Contenu.',
@@ -75,7 +75,7 @@ describe('HttpMemberRequestsGateway', () => {
       conversation: [],
     });
     const detail = await result;
-    expect(detail.reference).toBe('CNPM-REQ-000002');
+    expect(detail.reference).toBe('COGEF-REQ-000002');
     expect(detail.conversation).toEqual([]);
   });
 
@@ -86,7 +86,7 @@ describe('HttpMemberRequestsGateway', () => {
     expect(request.request.body).toEqual({ body: 'Merci.' });
     request.flush({
       id: 'r1',
-      reference: 'CNPM-REQ-000001',
+      reference: 'COGEF-REQ-000001',
       type: 'INFORMATION',
       subject: 'Attestation',
       description: 'Demande.',

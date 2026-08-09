@@ -98,7 +98,7 @@ const EVENTS: readonly PublicDemoEvent[] = [
     summary: 'Présentation guidée du portail membre et de ses principaux parcours.',
     startsOn: '2026-09-17T09:00:00Z',
     endsOn: '2026-09-17T11:00:00Z',
-    location: 'Bamako',
+    location: 'Ouagadougou',
     fictionalDemo: true,
   },
   {
@@ -108,7 +108,7 @@ const EVENTS: readonly PublicDemoEvent[] = [
     summary: 'Temps d’échange entre entreprises autour des services numériques.',
     startsOn: '2026-10-08T14:00:00Z',
     endsOn: '2026-10-08T16:30:00Z',
-    location: 'Bamako',
+    location: 'Ouagadougou',
     fictionalDemo: true,
   },
   {

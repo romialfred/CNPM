@@ -113,7 +113,7 @@ export class RecoveryCampaignDetailPage {
     const state = this.result();
     return state.kind === 'ready' ? state.campaign : null;
   });
-  protected readonly bamakoOffset = '+0000';
+  protected readonly ouagaOffset = '+0000';
 
   protected statusLabel(status: CampaignStatus): string {
     return STATUS_LABELS[status];

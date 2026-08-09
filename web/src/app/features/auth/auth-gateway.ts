@@ -47,7 +47,7 @@ export interface TotpEnrollment {
   readonly qrImage: string;
   /** Clé à saisir manuellement dans l'application d'authentification. */
   readonly manualKey: string;
-  /** Émetteur affiché dans l'application d'authentification, par ex. « CNPM ». */
+  /** Émetteur affiché dans l'application d'authentification, par ex. « COGEF ». */
   readonly issuer: string;
   /** Compte auquel le facteur est rattaché (adresse ou identifiant). */
   readonly account: string;

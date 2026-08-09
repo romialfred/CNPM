@@ -72,7 +72,7 @@ describe('MemberShowcasePreviewPage — MP-016', () => {
     expect(host.querySelector('.showcase-preview__frame--mobile')).not.toBeNull();
     expect(host.querySelector('.showcase-template-host--mobile')).not.toBeNull();
     expect(host.textContent).toContain('Atelier Kanu');
-    expect(host.textContent).toContain('Badge CNPM non attribué');
+    expect(host.textContent).toContain('Badge COGEF non attribué');
     expect(host.textContent).toContain('Section masquée — consentement absent');
     expect(host.querySelector('.showcase-preview h1')).toBe(document.activeElement);
     expect(TestBed.inject(Meta).getTag('name="robots"')?.content).toBe('noindex,nofollow');

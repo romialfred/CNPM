@@ -32,7 +32,7 @@ describe('DemoEnrollmentsGateway', () => {
     await expect(
       firstValueFrom(
         gateway.approve(complement.id, {
-          membershipNumber: 'CNPM-DEMO',
+          membershipNumber: 'COGEF-DEMO',
           categoryCode: 'DEMO',
         }),
       ),

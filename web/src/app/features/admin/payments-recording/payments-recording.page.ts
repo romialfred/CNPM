@@ -49,7 +49,7 @@ const CHANNELS: readonly ChannelOption[] = [
 ];
 
 /**
- * Écran CNPM « Encaissements » (Lot 4 de la refonte, méthode A).
+ * Écran COGEF « Encaissements » (Lot 4 de la refonte, méthode A).
  *
  * <p>L'agent enregistre un encaissement reçu contre une référence VALIDÉE : le versement se
  * trouve ainsi rattaché au cotisant. L'écriture est idempotente et en ajout seul côté serveur ;

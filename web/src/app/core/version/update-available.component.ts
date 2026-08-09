@@ -26,7 +26,7 @@ import { VersionCheckService } from './version-check.service';
       describedBy="cnpm-update-message"
       [dismissible]="false"
     >
-      <!-- Bandeau média : logo CNPM coiffé d'un badge d'information. -->
+      <!-- Bandeau média : logo COGEF coiffé d'un badge d'information. -->
       <div cnpm-dialog-media class="cnpm-update__hero">
         <span class="cnpm-update__logo-wrap">
           <img

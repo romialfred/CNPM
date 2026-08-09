@@ -112,14 +112,14 @@ const PAGE_SIZES = [10, 25, 50] as const;
 const DEFAULT_PAGE_SIZE = 10;
 
 /**
- * Décalage de Bamako, appliqué explicitement à tout horodatage affiché.
+ * Décalage de Ouagadougou, appliqué explicitement à tout horodatage affiché.
  *
  * La fiche exige que « le fuseau et la date [soient] explicites ». Sans décalage
  * imposé, `DatePipe` rendrait l'heure du poste : la même campagne s'afficherait à
- * 09:00 à Bamako et à 11:00 sur un poste réglé sur Le Caire, sans que rien ne le
+ * 09:00 à Ouagadougou et à 11:00 sur un poste réglé sur Le Caire, sans que rien ne le
  * signale.
  */
-const BAMAKO_OFFSET = '+0000';
+const OUAGA_OFFSET = '+0000';
 
 interface StatusOption {
   readonly value: string;
@@ -181,7 +181,7 @@ export class RecoveryCampaignsPage {
   protected readonly tabs = TABS;
   protected readonly channels = CHANNELS;
   protected readonly channelLabels = CHANNEL_LABELS;
-  protected readonly bamakoOffset = BAMAKO_OFFSET;
+  protected readonly ouagaOffset = OUAGA_OFFSET;
 
   protected readonly filtersExpanded = signal(true);
 
@@ -342,7 +342,7 @@ export class RecoveryCampaignsPage {
     { key: 'segment', label: 'Segment cible' },
     { key: 'scenario', label: 'Scénario' },
     { key: 'channels', label: 'Canaux' },
-    { key: 'schedule', label: 'Planification', note: '(Africa/Bamako)', sortable: true },
+    { key: 'schedule', label: 'Planification', note: '(Africa/Ouagadougou)', sortable: true },
     { key: 'audience', label: 'Audience', align: 'end', sortable: true },
     { key: 'delivery', label: 'Délivrés', align: 'end', sortable: true },
     { key: 'opened', label: 'Ouverts', align: 'end' },
@@ -356,7 +356,7 @@ export class RecoveryCampaignsPage {
     { key: 'organization', label: 'Membre', sortable: true },
     { key: 'destination', label: 'Destination' },
     { key: 'channel', label: 'Canal' },
-    { key: 'sentAt', label: 'Horodatage', note: '(Africa/Bamako)', sortable: true },
+    { key: 'sentAt', label: 'Horodatage', note: '(Africa/Ouagadougou)', sortable: true },
     { key: 'status', label: 'Diffusion', sortable: true },
     { key: 'failureReason', label: 'Motif' },
   ];

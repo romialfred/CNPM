@@ -32,7 +32,7 @@ describe('HttpPaymentInstructionsGateway', () => {
     );
     expect(request.request.method).toBe('GET');
     request.flush({
-      references: [{ id: 'r1', referenceValue: 'CNPM-COT-2026-000001', exercise: 2026 }],
+      references: [{ id: 'r1', referenceValue: 'COGEF-COT-2026-000001', exercise: 2026 }],
       collectionAccounts: [
         {
           id: 'a1',
@@ -47,7 +47,7 @@ describe('HttpPaymentInstructionsGateway', () => {
     });
 
     const instructions = await result;
-    expect(instructions.references[0].referenceValue).toBe('CNPM-COT-2026-000001');
+    expect(instructions.references[0].referenceValue).toBe('COGEF-COT-2026-000001');
     expect(instructions.collectionAccounts[0].channel).toBe('ORANGE_MONEY');
   });
 

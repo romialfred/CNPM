@@ -167,7 +167,7 @@ describe('EnrollmentReviewPage', () => {
     if (!membership || !category) {
       throw new Error('Champs d’approbation introuvables');
     }
-    membership.value = '  CNPM-DEMO-2026-001  ';
+    membership.value = '  COGEF-DEMO-2026-001  ';
     membership.dispatchEvent(new Event('input'));
     category.value = '  CAT-DEMO  ';
     category.dispatchEvent(new Event('input'));
@@ -175,7 +175,7 @@ describe('EnrollmentReviewPage', () => {
 
     button(host, 'Approuver et activer').click();
     expect(gateway.approve).toHaveBeenCalledWith(ENROLLMENT_ID, {
-      membershipNumber: 'CNPM-DEMO-2026-001',
+      membershipNumber: 'COGEF-DEMO-2026-001',
       categoryCode: 'CAT-DEMO',
     });
 

@@ -37,7 +37,7 @@ describe('DemoMemberContributionsGateway — MP-002/MP-003', () => {
         direction: 'asc',
       }),
     );
-    expect(filtered.items.map((item) => item.reference)).toEqual(['CNPM-COT-2025-002']);
+    expect(filtered.items.map((item) => item.reference)).toEqual(['COGEF-COT-2025-002']);
     expect(filtered.availableExercises).toEqual([2026, 2025, 2024]);
   });
 

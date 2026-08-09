@@ -13,7 +13,7 @@ const ITEMS: readonly CnpmNavMenuItem[] = [
   imports: [NavMenuComponent],
   template: `
     <button type="button" class="dehors">Dehors</button>
-    <cnpm-nav-menu menuId="nav-test" label="Le CNPM" [items]="items()" />
+    <cnpm-nav-menu menuId="nav-test" label="La COGEF" [items]="items()" />
   `,
 })
 class HostComponent {

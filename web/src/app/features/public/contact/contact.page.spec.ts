@@ -43,12 +43,15 @@ function submit(host: HTMLElement): void {
 describe('ContactPage (PUB-014)', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('reste fermé en mode HTTP sans destination officielle', async () => {
+  it('n’ouvre pas le formulaire en mode HTTP mais publie les coordonnées COGEF', async () => {
     const { host } = await setup('http');
 
+    // Le formulaire de transmission reste fermé hors démonstration…
     expect(host.querySelector('form')).toBeNull();
-    expect(host.textContent).toContain('Canal de contact non raccordé');
-    expect(host.textContent).toContain('Aucun message ne peut être envoyé');
+    expect(host.textContent).toContain('Envoi en ligne non raccordé');
+    // …mais les coordonnées institutionnelles de Ouagadougou restent joignables.
+    expect(host.textContent).toContain('(+226) 25 33 03 09');
+    expect(host.textContent).toContain('Ouagadougou');
   });
 
   it('expose la sémantique requise et place l’action primaire à droite', async () => {

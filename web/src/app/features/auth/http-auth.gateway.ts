@@ -53,7 +53,7 @@ function readAuthError(error: unknown): {
   return { status: 0 };
 }
 
-/** Libellé de compte de l'URI otpauth (`otpauth://totp/CNPM:<login>?...`), pour l'alt du QR. */
+/** Libellé de compte de l'URI otpauth (`otpauth://totp/COGEF:<login>?...`), pour l'alt du QR. */
 function accountFromUri(otpAuthUri: string): string {
   const label = decodeURIComponent(/totp\/([^?]+)/u.exec(otpAuthUri)?.[1] ?? '');
   const account = label.split(':').slice(1).join(':').trim();

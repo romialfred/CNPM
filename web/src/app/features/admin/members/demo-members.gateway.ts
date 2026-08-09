@@ -29,9 +29,9 @@ interface MemberFixture {
 
 const STATUSES: readonly MemberStatus[] = ['ACTIVE', 'DORMANT', 'PROSPECT'];
 
-/** Année d'adhésion lue dans un code `CNPM-AAAA-NNNN`, au 1ᵉʳ janvier ; `null` sinon. */
+/** Année d'adhésion lue dans un code `COGEF-AAAA-NNNN`, au 1ᵉʳ janvier ; `null` sinon. */
 function joinYearFromCode(code: string): string | null {
-  const year = /CNPM-(\d{4})-/u.exec(code)?.[1];
+  const year = /COGEF-(\d{4})-/u.exec(code)?.[1];
   return year ? `${year}-01-01` : null;
 }
 
@@ -42,7 +42,7 @@ function isMemberStatus(value: string): value is MemberStatus {
 /**
  * Comparaison insensible à la casse et aux diacritiques.
  *
- * Sans dépliage des accents, chercher « Segou » ne trouverait pas « Ségou Industries » :
+ * Sans dépliage des accents, chercher « Koudougou » ne trouverait pas « Koudougou Industries » :
  * l'utilisateur qui tape vite, ou sur un clavier sans accents, n'obtiendrait rien.
  */
 function fold(value: string): string {
@@ -82,11 +82,11 @@ export class DemoMembersGateway implements MembersGateway {
       paid: member.paid,
       status: member.status as MemberStatus,
       lastActivity: member.lastActivity,
-      // Année d'adhésion déduite du code `CNPM-AAAA-NNNN` — la fixture ne porte pas de
+      // Année d'adhésion déduite du code `COGEF-AAAA-NNNN` — la fixture ne porte pas de
       // date dédiée, mais le code en contient l'année, suffisante pour « Membre depuis ».
       joinedAt: joinYearFromCode(member.code),
       // `segment` mélange un marqueur et des échos du statut, parfois contradictoires
-      // (`CNPM-2024-0528` est DORMANT et « Actif »). Seul le marqueur est retenu ;
+      // (`COGEF-2024-0528` est DORMANT et « Actif »). Seul le marqueur est retenu ;
       // les échos sont ignorés. Voir DATA-DEC-001.
       isLargeContributor: member.segment === 'Grand cotisant',
     }));

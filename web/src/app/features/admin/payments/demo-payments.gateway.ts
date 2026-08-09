@@ -43,7 +43,7 @@ const DEMO_LINES: readonly StatementLine[] = [
     suggestions: [
       {
         id: 'sugg-0001-a',
-        memberCode: 'CNPM-2026-0101',
+        memberCode: 'COGEF-2026-0101',
         memberName: 'Sahel Agro SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -57,7 +57,7 @@ const DEMO_LINES: readonly StatementLine[] = [
       },
       {
         id: 'sugg-0001-b',
-        memberCode: 'CNPM-2026-0111',
+        memberCode: 'COGEF-2026-0111',
         memberName: 'Wassoulou Agro SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -70,7 +70,7 @@ const DEMO_LINES: readonly StatementLine[] = [
   {
     id: 'line-0002',
     reference: 'VIR-2026-0714-01002',
-    payer: 'Niger Textile SARL',
+    payer: 'Nakambé Textile SARL',
     amount: 8750000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-14T10:18:00Z',
@@ -80,8 +80,8 @@ const DEMO_LINES: readonly StatementLine[] = [
     suggestions: [
       {
         id: 'sugg-0002-a',
-        memberCode: 'CNPM-2026-0102',
-        memberName: 'Niger Textile SARL',
+        memberCode: 'COGEF-2026-0102',
+        memberName: 'Nakambé Textile SARL',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
         expectedAmount: 8750000,
@@ -121,7 +121,7 @@ const DEMO_LINES: readonly StatementLine[] = [
     suggestions: [
       {
         id: 'sugg-0004-a',
-        memberCode: 'CNPM-2026-0106',
+        memberCode: 'COGEF-2026-0106',
         memberName: 'Manding BTP SARL',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -147,7 +147,7 @@ const DEMO_LINES: readonly StatementLine[] = [
     suggestions: [
       {
         id: 'sugg-0005-a',
-        memberCode: 'CNPM-2026-0105',
+        memberCode: 'COGEF-2026-0105',
         memberName: 'Delta Ciment SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -170,7 +170,7 @@ const DEMO_LINES: readonly StatementLine[] = [
     suggestions: [
       {
         id: 'sugg-0006-a',
-        memberCode: 'CNPM-2026-0104',
+        memberCode: 'COGEF-2026-0104',
         memberName: 'Faso Bureautique SARL',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
@@ -180,7 +180,7 @@ const DEMO_LINES: readonly StatementLine[] = [
       },
       {
         id: 'sugg-0006-b',
-        memberCode: 'CNPM-2026-0104',
+        memberCode: 'COGEF-2026-0104',
         memberName: 'Faso Bureautique SARL',
         contributionLabel: 'Régularisation 2025',
         period: 'T3 2025 – T4 2025',
@@ -193,7 +193,7 @@ const DEMO_LINES: readonly StatementLine[] = [
   {
     id: 'line-0007',
     reference: 'MM-2026-0712-01007',
-    payer: 'Bamako Froid SA',
+    payer: 'Ouagadougou Froid SA',
     amount: 1750000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-12T14:03:00Z',
@@ -203,8 +203,8 @@ const DEMO_LINES: readonly StatementLine[] = [
     suggestions: [
       {
         id: 'sugg-0007-a',
-        memberCode: 'CNPM-2026-0107',
-        memberName: 'Bamako Froid SA',
+        memberCode: 'COGEF-2026-0107',
+        memberName: 'Ouagadougou Froid SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
         expectedAmount: 3500000,
@@ -219,7 +219,7 @@ const DEMO_LINES: readonly StatementLine[] = [
   {
     id: 'line-0008',
     reference: 'VIR-2026-0712-01008',
-    payer: 'Kayes Logistique SA',
+    payer: 'Banfora Logistique SA',
     amount: 10000000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-12T11:56:00Z',
@@ -229,8 +229,8 @@ const DEMO_LINES: readonly StatementLine[] = [
     suggestions: [
       {
         id: 'sugg-0008-a',
-        memberCode: 'CNPM-2026-0103',
-        memberName: 'Kayes Logistique SA',
+        memberCode: 'COGEF-2026-0103',
+        memberName: 'Banfora Logistique SA',
         contributionLabel: 'Cotisation annuelle 2026',
         period: 'T1 2026 – T4 2026',
         expectedAmount: 10000000,
@@ -246,15 +246,15 @@ const DEMO_LINES: readonly StatementLine[] = [
   {
     id: 'line-0009',
     reference: 'MM-2026-0711-01009',
-    payer: 'Sikasso Coton SARL',
+    payer: 'Bobo-Dioulasso Coton SARL',
     amount: 6300000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-11T10:31:00Z',
     transactionReference: 'TRX-MM-260711-1009',
     status: 'TO_CONFIRM',
     allocation: {
-      memberCode: 'CNPM-2026-0108',
-      memberName: 'Sikasso Coton SARL',
+      memberCode: 'COGEF-2026-0108',
+      memberName: 'Bobo-Dioulasso Coton SARL',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 6300000,
       remainder: 0,
@@ -264,15 +264,15 @@ const DEMO_LINES: readonly StatementLine[] = [
   {
     id: 'line-0010',
     reference: 'VIR-2026-0711-01010',
-    payer: 'Mopti Pêche SA',
+    payer: 'Ouahigouya Pêche SA',
     amount: 9500000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-11T09:12:00Z',
     transactionReference: 'TRX-VIR-260711-1010',
     status: 'TO_CONFIRM',
     allocation: {
-      memberCode: 'CNPM-2026-0109',
-      memberName: 'Mopti Pêche SA',
+      memberCode: 'COGEF-2026-0109',
+      memberName: 'Ouahigouya Pêche SA',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 8000000,
       remainder: 1500000,
@@ -282,15 +282,15 @@ const DEMO_LINES: readonly StatementLine[] = [
   {
     id: 'line-0011',
     reference: 'VIR-2026-0710-01011',
-    payer: 'Gao Énergie SARL',
+    payer: 'Fada N’Gourma Énergie SARL',
     amount: 4200000,
     channel: 'BANK_TRANSFER',
     valueDate: '2026-07-10T16:48:00Z',
     transactionReference: 'TRX-VIR-260710-1011',
     status: 'MATCHED',
     allocation: {
-      memberCode: 'CNPM-2026-0110',
-      memberName: 'Gao Énergie SARL',
+      memberCode: 'COGEF-2026-0110',
+      memberName: 'Fada N’Gourma Énergie SARL',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 4200000,
       remainder: 0,
@@ -300,15 +300,15 @@ const DEMO_LINES: readonly StatementLine[] = [
   {
     id: 'line-0012',
     reference: 'MM-2026-0710-01012',
-    payer: 'Koulikoro Transit SARL',
+    payer: 'Kaya Transit SARL',
     amount: 3100000,
     channel: 'MOBILE_MONEY',
     valueDate: '2026-07-10T13:27:00Z',
     transactionReference: 'TRX-MM-260710-1012',
     status: 'MATCHED',
     allocation: {
-      memberCode: 'CNPM-2026-0112',
-      memberName: 'Koulikoro Transit SARL',
+      memberCode: 'COGEF-2026-0112',
+      memberName: 'Kaya Transit SARL',
       contributionLabel: 'Cotisation annuelle 2026',
       allocatedAmount: 3100000,
       remainder: 0,
@@ -325,7 +325,7 @@ const DEMO_LINES: readonly StatementLine[] = [
     transactionReference: 'TRX-CAI-260709-1013',
     status: 'MATCHED',
     allocation: {
-      memberCode: 'CNPM-2026-0111',
+      memberCode: 'COGEF-2026-0111',
       memberName: 'Wassoulou Agro SA',
       contributionLabel: 'Régularisation 2025',
       allocatedAmount: 1250000,
@@ -380,7 +380,7 @@ const QUEUE_STATUSES: Readonly<Record<ReconciliationQueue, readonly StatementLin
 
 /**
  * Comparaison insensible à la casse et aux diacritiques : chercher « Peche » doit
- * trouver « Mopti Pêche SA », sinon une frappe rapide ou un clavier sans accents ne
+ * trouver « Ouahigouya Pêche SA », sinon une frappe rapide ou un clavier sans accents ne
  * renvoie rien.
  */
 function fold(value: string): string {

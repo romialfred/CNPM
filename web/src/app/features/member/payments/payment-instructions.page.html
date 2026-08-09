@@ -2,7 +2,7 @@
   <main class="member-payment-instructions" id="contenu-principal">
     <cnpm-page-header
       title="Comment payer ma cotisation"
-      description="Choisissez votre moyen de paiement, payez depuis votre compte vers la CNPM en indiquant votre référence. Aucun montant n’est débité sur cette page."
+      description="Choisissez votre moyen de paiement, payez depuis votre compte vers la COGEF en indiquant votre référence. Aucun montant n’est débité sur cette page."
     />
 
     @switch (state()) {
@@ -39,7 +39,7 @@
         } @else {
           <cnpm-alert tone="info" title="Référence en préparation">
             <p>
-              Votre référence de paiement n’a pas encore été validée par la CNPM. Elle apparaîtra
+              Votre référence de paiement n’a pas encore été validée par la COGEF. Elle apparaîtra
               ici dès sa validation ; vous pourrez alors régler votre cotisation.
             </p>
           </cnpm-alert>
@@ -48,7 +48,7 @@
         <!-- Moyens de paiement -->
         @if (channels().length === 0) {
           <cnpm-alert tone="info" title="Moyens de paiement à venir">
-            <p>La CNPM n’a pas encore publié de coordonnées d’encaissement. Réessayez plus tard.</p>
+            <p>La COGEF n’a pas encore publié de coordonnées d’encaissement. Réessayez plus tard.</p>
           </cnpm-alert>
         } @else if (primaryReference()) {
           <section class="member-payment-instructions__channels" aria-label="Choisir un moyen de paiement">
@@ -108,7 +108,7 @@
                 <strong>{{ primaryReference()!.referenceValue }}</strong> dans le motif du paiement.
               </li>
               <li>
-                La CNPM confirme la réception, puis votre reçu officiel vous est délivré et notifié.
+                La COGEF confirme la réception, puis votre reçu officiel vous est délivré et notifié.
               </li>
             </ol>
           </section>

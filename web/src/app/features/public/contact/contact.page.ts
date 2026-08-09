@@ -18,8 +18,10 @@ import {
   type ValidatorFn,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LucideClock, LucideMail, LucideMapPin, LucidePhone } from '@lucide/angular';
 import { CNPM_DATA_MODE } from '../../../core/api/api.config';
 import { PageSeoService } from '../../../core/seo/page-seo.service';
+import { CNPM_ICON_SIZE } from '../../../design-system/icon/icon';
 import { ButtonComponent } from '../../../design-system/button/button.component';
 import { ErrorStateComponent } from '../../../design-system/error-state/error-state.component';
 import {
@@ -53,6 +55,10 @@ const trimmedRequired: ValidatorFn = (
     InlineErrorSummaryComponent,
     PublicShellComponent,
     ReactiveFormsModule,
+    LucideClock,
+    LucideMail,
+    LucideMapPin,
+    LucidePhone,
   ],
   templateUrl: './contact.page.html',
   styleUrls: ['./contact.page.scss', './contact.assurance.scss', './contact.responsive.scss'],
@@ -67,6 +73,7 @@ export class ContactPage {
   private readonly successPanel = viewChild<ElementRef<HTMLElement>>('successPanel');
 
   protected readonly isDemo = this.dataMode === 'demo';
+  protected readonly iconSize = CNPM_ICON_SIZE;
   protected readonly attempted = signal(false);
   protected readonly errors = signal<readonly CnpmFieldError[]>([]);
   protected readonly localCheckComplete = signal(false);

@@ -94,7 +94,7 @@ import {
             <p class="cnpm-auth__trust-text">{{ trustText() }}</p>
           </div>
 
-          <ul class="cnpm-auth__benefits" aria-label="Bénéfices de la plateforme CNPM">
+          <ul class="cnpm-auth__benefits" aria-label="Bénéfices de la plateforme COGEF">
             <li>
               <span aria-hidden="true"><svg lucideShieldCheck></svg></span>
               <div>

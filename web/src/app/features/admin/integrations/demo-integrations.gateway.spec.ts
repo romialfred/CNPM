@@ -46,7 +46,7 @@ describe('DemoIntegrationsGateway — BO-038', () => {
     expect(serialized).not.toContain('token');
     expect(serialized).not.toContain('secret');
     expect(serialized).not.toContain('payload');
-    expect(snapshot.logs.every((entry) => entry.correlationLabel.startsWith('CNPM-INT-'))).toBe(
+    expect(snapshot.logs.every((entry) => entry.correlationLabel.startsWith('COGEF-INT-'))).toBe(
       true,
     );
   });

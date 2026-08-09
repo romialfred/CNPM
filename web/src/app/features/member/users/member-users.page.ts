@@ -72,7 +72,7 @@ export class MemberUsersPage {
   protected readonly view = signal<CnpmViewMode>('liste');
 
   constructor() {
-    this.title.setTitle('Utilisateurs de l’entreprise — Espace membre CNPM');
+    this.title.setTitle('Utilisateurs de l’entreprise — Espace membre COGEF');
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => this.view.set(params.get('vue') === 'grille' ? 'grille' : 'liste'));

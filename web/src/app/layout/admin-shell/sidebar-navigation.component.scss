@@ -60,7 +60,7 @@
 }
 
 /* Sur le chrome sombre, le lockup coloré s'effacerait sur le navy : une plaque claire
-   discrète le pose proprement (l'équivalent du sigle « CNPM » servi en mode réduit). */
+   discrète le pose proprement (l'équivalent du sigle « COGEF » servi en mode réduit). */
 :host-context(.cnpm-chrome--dark) .cnpm-sidebar__logo-viewport {
   width: auto;
   padding: var(--cnpm-space-1) var(--cnpm-space-2);

@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 /**
- * Contrat de « Actualités & informations » (MP) : les événements CNPM RÉELLEMENT publiés.
+ * Contrat de « Actualités & informations » (MP) : les événements COGEF RÉELLEMENT publiés.
  *
  * <p>Un seul adaptateur HTTP réel, aucune démo. Aucune actualité n'est fabriquée : tant qu'aucun
  * événement n'est publié, la liste est vide et la page affiche un état vide honnête.

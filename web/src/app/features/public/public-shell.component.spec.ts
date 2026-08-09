@@ -59,7 +59,7 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
 
   it('n’expose aucun libellé dupliqué dans la navigation principale', async () => {
     // Défaut constaté par le client, capture à l'appui : la barre concaténait sept
-    // liens de site puis les ancres de la page, si bien que « Le CNPM », « Services »
+    // liens de site puis les ancres de la page, si bien que « La COGEF », « Services »
     // et « Actualités » y figuraient deux fois — et les deux ancres homonymes
     // pointaient en prime vers des sections croisées.
     const { host } = await setup();
@@ -78,7 +78,7 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     );
 
     expect(declencheurs.map((bouton) => bouton.textContent?.trim())).toEqual([
-      'Le CNPM',
+      'La COGEF',
       'Services',
       'Membres',
       'Actualités',
@@ -109,7 +109,7 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(hrefs).toContain('/verification/DEMO-VERIF-2026-001');
     // Les ancres de page ne sont plus projetées dans la coquille : concaténées à la
     // navigation de site, elles produisaient des libellés strictement dupliqués
-    // (« Le CNPM », « Services », « Actualités » apparaissaient deux fois).
+    // (« La COGEF », « Services », « Actualités » apparaissaient deux fois).
     expect(hrefs).not.toContain('#services');
     expect(hrefs).not.toContain('#chiffres');
     expect(hrefs).not.toContain('#');
@@ -126,7 +126,7 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     const colonnes = Array.from(host.querySelectorAll('.cnpm-public__footer-column'));
 
     expect(colonnes.map((colonne) => colonne.querySelector('h2')?.textContent?.trim())).toEqual([
-      'Le CNPM',
+      'La COGEF',
       'Services',
       'Membres',
       'Actualités',

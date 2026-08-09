@@ -33,7 +33,7 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     );
     expect(fictitious.length).toBeGreaterThan(0);
     expect(fictitious.every((account) => account.email.endsWith('.example'))).toBe(true);
-    expect(snapshot.audit.every((entry) => entry.correlationId.startsWith('CNPM-AUD-'))).toBe(true);
+    expect(snapshot.audit.every((entry) => entry.correlationId.startsWith('COGEF-AUD-'))).toBe(true);
   });
 
   it('crée un compte « invité » sans second facteur ni connexion, et le fait apparaître', async () => {
@@ -110,7 +110,7 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     const trace = apres.audit.find((entry) => entry.action.includes('Réinitialisation du second'));
     expect(trace).toBeDefined();
     expect(trace?.action).toContain('Perte du téléphone du membre');
-    expect(trace?.correlationId.startsWith('CNPM-AUD-')).toBe(true);
+    expect(trace?.correlationId.startsWith('COGEF-AUD-')).toBe(true);
   });
 
   it('rejette une action sur un compte inconnu', async () => {
@@ -147,7 +147,7 @@ describe('DemoAdminSecurityGateway — composition BO-030', () => {
     const apres = await firstValueFrom(gateway.load({ tab: 'audit', search: '' }));
     const trace = apres.audit.find((entry) => entry.action.includes('lien d’activation'));
     expect(trace).toBeDefined();
-    expect(trace?.correlationId.startsWith('CNPM-AUD-LNK-')).toBe(true);
+    expect(trace?.correlationId.startsWith('COGEF-AUD-LNK-')).toBe(true);
   });
 
   it('émet un lien de récupération pour un compte déjà actif', async () => {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { delay, type Observable, of } from 'rxjs';
 import type { AuditEvent, AuditEventPage, AuditEventQuery, AuditGateway } from './audit-gateway';
 
-/** Empreinte synthétique de 64 caractères, jamais dérivée d'une donnée CNPM. */
+/** Empreinte synthétique de 64 caractères, jamais dérivée d'une donnée COGEF. */
 function demoHash(character: string): string {
   return character.repeat(64);
 }

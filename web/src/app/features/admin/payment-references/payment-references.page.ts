@@ -41,9 +41,9 @@ interface SelectedMember {
 }
 
 /**
- * Écran CNPM « Références de paiement » (Lot 2 de la refonte).
+ * Écran COGEF « Références de paiement » (Lot 2 de la refonte).
  *
- * <p>La CNPM y génère la référence unique d'un cotisant, la valide avant diffusion, ou la
+ * <p>La COGEF y génère la référence unique d'un cotisant, la valide avant diffusion, ou la
  * révoque. La souveraineté reste au serveur : une référence n'est diffusable qu'une fois
  * validée, et chaque action exige sa permission. Le sélecteur de cotisant réutilise la
  * recherche de membres existante, sans dupliquer de source.
@@ -203,7 +203,7 @@ export class PaymentReferencesPage {
         next: () => {
           this.generating.set(false);
           this.showForm.set(false);
-          this.toast.success('Référence générée (en attente de validation CNPM).');
+          this.toast.success('Référence générée (en attente de validation COGEF).');
           this.load();
         },
         error: (error: unknown) => {

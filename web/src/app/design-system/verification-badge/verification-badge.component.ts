@@ -4,7 +4,7 @@ import { BadgeComponent, type CnpmBadgeTone } from '../badge/badge.component';
 export type CnpmVerificationStatus = 'VERIFIED' | 'PENDING' | 'EXPIRED' | 'SUSPENDED';
 
 /**
- * Badge de vérification CNPM, avec son explication (`VerificationBadge` du catalogue).
+ * Badge de vérification COGEF, avec son explication (`VerificationBadge` du catalogue).
  *
  * Le badge ne se contente pas d'afficher un état : il ouvre une explication, comme
  * l'exige la fiche PUB-006. Le déclencheur est un bouton, donc atteignable au

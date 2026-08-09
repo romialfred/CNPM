@@ -256,7 +256,7 @@ export const memberRoutes: Routes = [
     ],
   },
   {
-    // Point d'entrée institutionnel « Le CNPM » : les actualités sont les événements CNPM
+    // Point d'entrée institutionnel « La COGEF » : les actualités sont les événements COGEF
     // réellement publiés (`GET /portal/events`), en état vide honnête tant qu'aucun n'est
     // publié ; s'y ajoutent des accès vers des écrans existants.
     path: 'cnpm',

@@ -26,7 +26,7 @@ const READY: PublicShowcasePage = {
       name: 'Atelier Kanu',
       tagline: 'Un partenaire des services numériques',
       sector: 'Services numériques',
-      location: 'Bamako',
+      location: 'Ouagadougou',
       summary: 'Entreprise inscrite à l’annuaire public de la COGEF.',
       isDemoContent: true,
       publicationStatus: 'PUBLISHED',

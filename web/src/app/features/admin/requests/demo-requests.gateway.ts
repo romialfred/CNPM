@@ -18,7 +18,7 @@ export const DEMO_REQUEST_ERROR_ID = 'REQ-DEMO-ERREUR';
 
 /**
  * Jeu fermé et 100 % fictif pour BO-021/022. Les échéances servent uniquement à
- * vérifier les états d'interface : elles ne constituent ni un SLA CNPM ni un délai
+ * vérifier les états d'interface : elles ne constituent ni un SLA COGEF ni un délai
  * communiqué à un membre réel.
  */
 const DEMO_REQUESTS: readonly ServiceRequestDetail[] = [
@@ -269,7 +269,7 @@ function request(index: number, fixture: RequestFixture): ServiceRequestDetail {
     description:
       fixture.description ??
       'Demande transmise au service concerné pour qualification et traitement.',
-    confidentialityLabel: 'Interne CNPM',
+    confidentialityLabel: 'Interne COGEF',
     memberConversation: fixture.conversation ?? [
       memberMessage(
         index * 10,

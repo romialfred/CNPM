@@ -10,9 +10,9 @@ import { PaymentsRecordingConflictError } from './payments-recording-gateway';
 
 const PAYMENT = {
   id: 'p1',
-  transactionNumber: 'CNPM-PAY-00000001',
-  referenceValue: 'CNPM-COT-2026-000001',
-  membershipNumber: 'CNPM-2022-0001',
+  transactionNumber: 'COGEF-PAY-00000001',
+  referenceValue: 'COGEF-COT-2026-000001',
+  membershipNumber: 'COGEF-2022-0001',
   organizationName: 'Société de test',
   channel: 'ORANGE_MONEY',
   amount: '150000.00',
@@ -66,13 +66,13 @@ describe('HttpPaymentsRecordingGateway', () => {
     expect(request.request.method).toBe('POST');
     expect(request.request.headers.get('Idempotency-Key')).toBeTruthy();
     request.flush({
-      receipt: { id: 'r1', receiptNumber: 'CNPM-REC-00000001' },
+      receipt: { id: 'r1', receiptNumber: 'COGEF-REC-00000001' },
       verificationToken: 'abcdef0123456789',
       created: true,
     });
 
     const confirmation = await result;
-    expect(confirmation.receiptNumber).toBe('CNPM-REC-00000001');
+    expect(confirmation.receiptNumber).toBe('COGEF-REC-00000001');
     expect(confirmation.verificationToken).toBe('abcdef0123456789');
   });
 

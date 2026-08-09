@@ -96,7 +96,7 @@ describe('memberRoutes', () => {
     expect(route?.children).toBeUndefined();
   });
 
-  it('expose « Le CNPM » avec les actualités réelles (événements publiés)', () => {
+  it('expose « La COGEF » avec les actualités réelles (événements publiés)', () => {
     const route = memberRoutes.find((candidate) => candidate.path === 'cnpm');
     expect(route?.loadComponent).toBeTypeOf('function');
     // Les actualités sont désormais des données réelles (`GET /portal/events`) : gateway HTTP

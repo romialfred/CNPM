@@ -56,7 +56,7 @@ describe('HttpMembersGateway', () => {
       items: [
         {
           id: '11111111-1111-4111-8111-111111111111',
-          membershipNumber: 'CNPM-2026-001',
+          membershipNumber: 'COGEF-2026-001',
           organizationId: '22222222-2222-4222-8222-222222222222',
           organizationLegalName: 'Mali Industrie SA',
           categoryCode: 'CAT-A',
@@ -156,7 +156,7 @@ describe('HttpMembersGateway', () => {
       items: [
         {
           id: '11111111-1111-4111-8111-111111111111',
-          membershipNumber: 'CNPM-2026-001',
+          membershipNumber: 'COGEF-2026-001',
           organizationId: '22222222-2222-4222-8222-222222222222',
           organizationLegalName: 'Entreprise Sahel',
           categoryCode: 'CAT-A',

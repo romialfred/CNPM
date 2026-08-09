@@ -33,15 +33,15 @@ describe('HttpMemberPaymentsGateway', () => {
       payments: [
         {
           id: 'p1',
-          transactionNumber: 'CNPM-PAY-00000001',
-          referenceValue: 'CNPM-COT-2026-000001',
+          transactionNumber: 'COGEF-PAY-00000001',
+          referenceValue: 'COGEF-COT-2026-000001',
           exercise: 2026,
           channel: 'ORANGE_MONEY',
           amount: '150000.00',
           currency: 'XOF',
           paidAt: '2026-07-24T10:00:00Z',
           confirmed: true,
-          receiptNumber: 'CNPM-REC-00000001',
+          receiptNumber: 'COGEF-REC-00000001',
         },
       ],
     });
@@ -49,7 +49,7 @@ describe('HttpMemberPaymentsGateway', () => {
     const payments = await result;
     expect(payments[0].amount).toBe(150000);
     expect(payments[0].confirmed).toBe(true);
-    expect(payments[0].receiptNumber).toBe('CNPM-REC-00000001');
+    expect(payments[0].receiptNumber).toBe('COGEF-REC-00000001');
   });
 
   it('traduit un 404 en « aucune adhésion rattachée »', async () => {

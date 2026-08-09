@@ -1,7 +1,7 @@
 import type { DocManual } from './documentation.model';
 
 /**
- * Manuel utilisateur du back-office CNPM.
+ * Manuel utilisateur du back-office COGEF.
  *
  * Décrit les parcours réels de la plateforme (connexion, tableau de bord, membres,
  * cotisations, paiements, reçus, requêtes, vitrine, utilisateurs, compte) sans inventer
@@ -38,7 +38,7 @@ export const USER_MANUAL: DocManual = {
             },
             {
               kind: 'paragraph',
-              text: "Première connexion ou mot de passe perdu : votre administrateur CNPM vous transmet un lien à usage unique, valable 24 heures. Vous y choisissez vous-même votre mot de passe — personne au CNPM ne le connaît, pas même l'administrateur qui a émis le lien. Le lien ne sert qu'une fois ; en demander un nouveau annule le précédent.",
+              text: "Première connexion ou mot de passe perdu : votre administrateur COGEF vous transmet un lien à usage unique, valable 24 heures. Vous y choisissez vous-même votre mot de passe — personne à la COGEF ne le connaît, pas même l'administrateur qui a émis le lien. Le lien ne sert qu'une fois ; en demander un nouveau annule le précédent.",
             },
           ],
         },
@@ -277,7 +277,7 @@ export const USER_MANUAL: DocManual = {
             {
               kind: 'list',
               items: [
-                'Le membre édite le contenu de sa page ; il ne modifie jamais le statut de vérification CNPM.',
+                'Le membre édite le contenu de sa page ; il ne modifie jamais le statut de vérification COGEF.',
                 'Un gabarit contraint encadre la mise en forme (pas d’éditeur libre) ; médias avec métadonnées de droits et texte alternatif.',
                 'La page suit des états : brouillon, revue, approuvé, planifié, publié, rejeté, retiré, suspendu.',
                 'Le badge de vérification explique ce qui a été vérifié et quand.',
@@ -368,7 +368,7 @@ export const USER_MANUAL: DocManual = {
               items: [
                 'Accueil membre : synthèse de sa situation.',
                 'Ses cotisations, paiements et reçus.',
-                'Ses requêtes adressées au CNPM.',
+                'Ses requêtes adressées à la COGEF.',
                 'La gestion de sa vitrine publique (édition, aperçu, publication).',
                 'Son profil et le répertoire.',
               ],

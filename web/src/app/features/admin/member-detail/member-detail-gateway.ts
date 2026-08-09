@@ -47,7 +47,7 @@ export interface MemberIdentity {
   readonly address: string;
   readonly status: MemberStatus;
   readonly verification: CnpmVerificationStatus;
-  /** Date ISO `AAAA-MM-JJ` du constat CNPM ; `null` si la source ne la porte pas. */
+  /** Date ISO `AAAA-MM-JJ` du constat COGEF ; `null` si la source ne la porte pas. */
   readonly verifiedAt: string | null;
   /** Marqueur orthogonal au statut, jamais une valeur de statut. */
   readonly isLargeContributor: boolean;

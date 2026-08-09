@@ -183,7 +183,7 @@ export class BankStatementImportPage {
   }
 
   protected profileLabel(profile: DemoStatementProfile): string {
-    return profile === 'CNPM_DEMO_CSV_V0' ? 'CSV CNPM v0 · format interne' : profile;
+    return profile === 'CNPM_DEMO_CSV_V0' ? 'CSV COGEF v0 · format interne' : profile;
   }
 
   protected statusLabel(status: StatementLineControlStatus): string {

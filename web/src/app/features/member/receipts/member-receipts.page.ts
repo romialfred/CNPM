@@ -58,7 +58,7 @@ export class MemberReceiptsPage {
   );
 
   constructor() {
-    this.title.setTitle('Mes reçus — Espace membre CNPM');
+    this.title.setTitle('Mes reçus — Espace membre COGEF');
     this.load();
   }
 

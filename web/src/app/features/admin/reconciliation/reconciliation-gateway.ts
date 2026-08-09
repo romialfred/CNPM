@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 /**
- * Contrat de l'écran CNPM « Rapprochement » (Lot 5). Un seul adaptateur HTTP réel, aucune démo.
+ * Contrat de l'écran COGEF « Rapprochement » (Lot 5). Un seul adaptateur HTTP réel, aucune démo.
  */
 
 export type ReconciliationStatus = 'PROPOSED' | 'CONFIRMED' | 'REJECTED' | 'UNMATCHED';

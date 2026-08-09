@@ -156,31 +156,31 @@ export class HomePage {
       id: 'cotisations',
       title: 'Cotisations',
       text: 'Suivre les appels et la situation de paiement.',
-      image: '/assets/tiles/cotisations-bceao.jpg',
+      image: '/assets/tiles/cotisations-bceao-ouaga.jpg',
     },
     {
       id: 'requetes',
       title: 'Requêtes',
       text: 'Créer et suivre une demande adressée à la COGEF.',
-      image: '/assets/tiles/requetes-marche.jpg',
+      image: '/assets/tiles/requetes-roodwoko.jpg',
     },
     {
       id: 'recus',
       title: 'Reçus',
       text: 'Retrouver les documents disponibles après émission.',
-      image: '/assets/tiles/recus-arche-bamako.jpg',
+      image: '/assets/tiles/recus-heros-ouaga.jpg',
     },
     {
       id: 'reporting',
       title: 'Tableaux de bord',
       text: 'Consulter des indicateurs adaptés à son espace.',
-      image: '/assets/tiles/reporting-aci2000.jpg',
+      image: '/assets/tiles/reporting-ouaga.jpg',
     },
     {
       id: 'vitrine',
       title: 'Vitrine publique',
       text: 'Valoriser une entreprise selon les règles de publication.',
-      image: '/assets/tiles/vitrine-djenne.jpg',
+      image: '/assets/tiles/vitrine-bobo.jpg',
     },
   ];
 

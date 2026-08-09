@@ -111,7 +111,7 @@ function documentMetadata(
 ): MemberDocumentMetadata {
   return {
     id: `document-${suffix}`,
-    reference: `CNPM-DOC-${suffix}`,
+    reference: `COGEF-DOC-${suffix}`,
     title,
     type,
     typeLabel,

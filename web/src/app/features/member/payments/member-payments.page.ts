@@ -62,7 +62,7 @@ export class MemberPaymentsPage {
   );
 
   constructor() {
-    this.title.setTitle('Mes paiements — Espace membre CNPM');
+    this.title.setTitle('Mes paiements — Espace membre COGEF');
     this.load();
   }
 

@@ -35,7 +35,7 @@ const EVENT: PublicDemoEvent = {
   summary: 'Inscription non ouverte.',
   startsOn: '2026-09-17T09:00:00Z',
   endsOn: '2026-09-17T11:00:00Z',
-  location: 'Bamako',
+  location: 'Ouagadougou',
   fictionalDemo: true,
 };
 

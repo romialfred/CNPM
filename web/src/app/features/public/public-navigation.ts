@@ -26,7 +26,7 @@ export interface PublicNavGroup {
 export const PUBLIC_NAVIGATION: readonly PublicNavGroup[] = [
   {
     id: 'nav-institution',
-    label: 'Le CNPM',
+    label: 'La COGEF',
     items: [
       { label: 'Présentation', routerLink: '/le-cnpm', hint: 'Missions, gouvernance et réseau' },
       { label: 'Agenda', routerLink: '/agenda', hint: 'Rendez-vous et événements' },
@@ -38,7 +38,7 @@ export const PUBLIC_NAVIGATION: readonly PublicNavGroup[] = [
     label: 'Services',
     items: [
       { label: 'Nos services', routerLink: '/services', hint: 'Accompagnement aux entreprises' },
-      { label: 'Adhérer au CNPM', routerLink: '/adhesion', hint: 'Préparer une demande' },
+      { label: 'Adhérer à la COGEF', routerLink: '/adhesion', hint: 'Préparer une demande' },
       {
         label: 'Vérifier un reçu',
         routerLink: '/verification/DEMO-VERIF-2026-001',

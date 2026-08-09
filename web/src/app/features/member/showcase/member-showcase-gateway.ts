@@ -21,7 +21,7 @@ export interface MemberShowcaseSeoDraft {
  * `data/member-showcase.schema.json` autorisé pour MP-015/016.
  *
  * La frontière exclut volontairement contacts, médias, documents, partenaires,
- * certifications revendiquées, badge CNPM et données d’organisation réelles.
+ * certifications revendiquées, badge COGEF et données d’organisation réelles.
  */
 export interface MemberShowcaseDraft {
   readonly version: number;

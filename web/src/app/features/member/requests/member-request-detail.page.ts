@@ -63,7 +63,7 @@ export class MemberRequestDetailPage {
   });
 
   constructor() {
-    this.title.setTitle('Détail de la requête — Espace membre CNPM');
+    this.title.setTitle('Détail de la requête — Espace membre COGEF');
     this.load();
   }
 
@@ -117,6 +117,6 @@ export class MemberRequestDetailPage {
   }
 
   protected senderLabel(sender: MemberRequestMessageSender): string {
-    return sender === 'MEMBER' ? 'Vous' : 'CNPM';
+    return sender === 'MEMBER' ? 'Vous' : 'COGEF';
   }
 }

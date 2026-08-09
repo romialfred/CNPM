@@ -8,7 +8,7 @@ describe('DemoEnrollmentGateway', () => {
     const context = await firstValueFrom(gateway.load());
 
     expect(context.draft?.id).toBe('ENR-BROUILLON-2026-0001');
-    expect(context.draft?.values.legalName).toBe('SOCIÉTÉ MALIENNE DE LOGISTIQUE');
+    expect(context.draft?.values.legalName).toBe('SOCIÉTÉ BURKINABÈ DE LOGISTIQUE');
     expect(context.draft?.values.contactEmail).toMatch(/\.example$/);
     expect(context.draft?.savedAt).toBe('2024-05-27T10:15:00Z');
   });

@@ -17,7 +17,7 @@ import {
 type LoadState = 'loading' | 'ready' | 'error';
 
 /**
- * Écran CNPM « Reçus » (Lot 6) : registre des reçus officiels délivrés, en lecture réelle.
+ * Écran COGEF « Reçus » (Lot 6) : registre des reçus officiels délivrés, en lecture réelle.
  */
 @Component({
   selector: 'cnpm-receipts-registry-page',

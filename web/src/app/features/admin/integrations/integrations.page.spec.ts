@@ -48,7 +48,7 @@ const LOG: IntegrationLogEntry = {
   direction: 'INBOUND',
   exchangeLabel: 'Import',
   outcome: 'SUCCESS',
-  correlationLabel: 'CNPM-INT-TEST',
+  correlationLabel: 'COGEF-INT-TEST',
   contractVersion: 'v1-2026',
   provenanceLabel: 'Jeu synthétique Test',
   qualityLabel: 'Conforme',
@@ -171,7 +171,7 @@ describe('IntegrationsPage — BO-038', () => {
     expect(host.textContent).toContain('Opérationnel');
     expect(host.textContent).toContain(PARTNER.contractVersion);
     expect(host.textContent).toContain(PARTNER.sourceLabel);
-    expect(host.textContent).toContain('identifiant CNPM préservé');
+    expect(host.textContent).toContain('identifiant COGEF préservé');
     const liveRegion = host.querySelector<HTMLElement>('.cnpm-integrations__sr[role="status"]');
     expect(liveRegion?.getAttribute('aria-live')).toBe('polite');
     expect(liveRegion?.getAttribute('aria-atomic')).toBe('true');

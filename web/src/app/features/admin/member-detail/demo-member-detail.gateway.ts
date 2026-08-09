@@ -122,7 +122,7 @@ const LEGAL_FORMS: readonly string[] = [
   'Société par actions simplifiée',
 ];
 
-const REGIONS: readonly string[] = ['Bamako', 'Koulikoro', 'Ségou', 'Sikasso', 'Mopti'];
+const REGIONS: readonly string[] = ['Ouagadougou', 'Kaya', 'Koudougou', 'Bobo-Dioulasso', 'Ouahigouya'];
 
 /** Agents de démonstration. Personnes fictives, adresses en `.example`. */
 const AGENTS: readonly Omit<AssignedAgent, 'portfolio' | 'recoveryRate' | 'lastContactOn'>[] = [
@@ -617,7 +617,7 @@ export class DemoMemberDetailGateway implements MemberDetailGateway {
       {
         id: 'adhesion',
         at: `${this.joinedOn(index)}T09:00:00Z`,
-        actor: 'Admin CNPM',
+        actor: 'Admin COGEF',
         action: 'Adhésion validée',
         detail: `Dossier accepté pour ${member.organization}.`,
       },

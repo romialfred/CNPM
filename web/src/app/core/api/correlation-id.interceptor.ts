@@ -7,7 +7,7 @@ import { CNPM_UUID_FACTORY } from './request-id';
 export const CORRELATION_ID_HEADER = 'X-Correlation-Id';
 
 /**
- * La corrélation est ajoutée uniquement à l'API CNPM. Elle ne doit pas modifier les
+ * La corrélation est ajoutée uniquement à l'API COGEF. Elle ne doit pas modifier les
  * appels d'actifs ou les échanges OIDC gérés par le futur client d'identité.
  */
 export const correlationIdInterceptor: HttpInterceptorFn = (request, next) => {

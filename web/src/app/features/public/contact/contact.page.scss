@@ -60,6 +60,83 @@
   gap: var(--cnpm-space-5);
 }
 
+/* Coordonnées institutionnelles COGEF : carte neutre bordée, sans aplat coloré. */
+.contact-coordinates {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: var(--cnpm-space-8);
+  padding: var(--cnpm-space-8);
+  border: 1px solid var(--cnpm-color-border-subtle);
+  border-radius: var(--cnpm-radius-lg);
+  background: var(--cnpm-color-surface-primary);
+}
+
+.contact-coordinates__intro > .contact-eyebrow {
+  color: var(--cnpm-color-text-brand);
+}
+
+.contact-coordinates__lead {
+  margin: var(--cnpm-space-2) 0 0;
+  color: var(--cnpm-color-text-secondary);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+.contact-coordinates__list {
+  display: grid;
+  gap: var(--cnpm-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-coordinates__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cnpm-space-3);
+}
+
+.contact-coordinates__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--cnpm-size-control-md);
+  height: var(--cnpm-size-control-md);
+  border-radius: var(--cnpm-radius-md);
+  background: var(--cnpm-color-brand-blue-50);
+  color: var(--cnpm-color-text-brand);
+}
+
+.contact-coordinates__value {
+  color: var(--cnpm-color-text-primary);
+  font-size: var(--cnpm-font-size-md);
+  line-height: var(--cnpm-font-lineHeight-md);
+}
+
+a.contact-coordinates__value {
+  color: var(--cnpm-color-text-link);
+  font-weight: var(--cnpm-font-weight-semibold);
+  text-decoration: none;
+}
+
+a.contact-coordinates__value:hover {
+  text-decoration: underline;
+}
+
+a.contact-coordinates__value:focus-visible {
+  outline: 2px solid var(--cnpm-color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--cnpm-radius-sm);
+}
+
+@media (max-width: 47.9375rem) {
+  .contact-coordinates {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--cnpm-space-6);
+  }
+}
+
 .contact-section-title {
   margin: 0;
   color: var(--cnpm-color-text-brand);

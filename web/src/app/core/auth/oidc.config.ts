@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 
 /**
- * Configuration OIDC du client public CNPM.
+ * Configuration OIDC du client public COGEF.
  *
  * Lue au démarrage depuis `__CNPM_RUNTIME_CONFIG__.oidc`, remplaçable au déploiement
  * sans recompiler. Aucune valeur sensible : un client public n'a pas de secret, la

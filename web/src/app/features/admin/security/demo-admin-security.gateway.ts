@@ -28,7 +28,7 @@ import type {
 const MEMBERS_WITHOUT_ACCOUNT: readonly MemberWithoutAccount[] = [
   {
     id: 'mem-2041',
-    organizationName: 'Société Malienne de Négoce SA',
+    organizationName: 'Société Burkinabè de Négoce SA',
     membershipNumber: 'ADH-2041',
     categoryLabel: 'Grande Entreprise',
     groupLabel: 'Commerce et distribution',
@@ -64,7 +64,7 @@ const MEMBERS_WITHOUT_ACCOUNT: readonly MemberWithoutAccount[] = [
   },
   {
     id: 'mem-2044',
-    organizationName: 'BTP Niger Construction',
+    organizationName: 'BTP Nakambé Construction',
     membershipNumber: 'ADH-2044',
     categoryLabel: 'Grande Entreprise',
     groupLabel: 'Bâtiment et travaux publics',
@@ -76,7 +76,7 @@ const MEMBERS_WITHOUT_ACCOUNT: readonly MemberWithoutAccount[] = [
   },
   {
     id: 'mem-2045',
-    organizationName: 'Bamako Digital Solutions',
+    organizationName: 'Ouagadougou Digital Solutions',
     membershipNumber: 'ADH-2045',
     categoryLabel: 'TPE',
     groupLabel: 'Numérique et services',
@@ -88,7 +88,7 @@ const MEMBERS_WITHOUT_ACCOUNT: readonly MemberWithoutAccount[] = [
   },
   {
     id: 'mem-2046',
-    organizationName: 'Transport Fluvial du Niger',
+    organizationName: 'Transport Fluvial du Mouhoun',
     membershipNumber: 'ADH-2046',
     categoryLabel: 'Moyenne Entreprise',
     groupLabel: 'Transport et logistique',
@@ -290,7 +290,7 @@ const SESSIONS: readonly SecuritySession[] = [
     accountName: 'Romuald Tiegnan',
     accountEmail: 'romuald.tiegnan@gmail.com',
     device: 'Poste Windows 11 · Chrome',
-    location: 'Bamako, Mali',
+    location: 'Ouagadougou, Burkina Faso',
     startedAtLabel: '17 juillet 2026, 09:41',
     lastSeenAt: '2026-07-17T10:12:00+00:00',
     lastSeenAtLabel: '17 juillet 2026, 10:12',
@@ -301,8 +301,8 @@ const SESSIONS: readonly SecuritySession[] = [
     id: 'ses-02',
     accountName: 'Romuald Tiegnan',
     accountEmail: 'romuald.tiegnan@gmail.com',
-    device: 'Mobile Android · application CNPM',
-    location: 'Bamako, Mali',
+    device: 'Mobile Android · application COGEF',
+    location: 'Ouagadougou, Burkina Faso',
     startedAtLabel: '17 juillet 2026, 07:05',
     lastSeenAt: '2026-07-17T08:30:00+00:00',
     lastSeenAtLabel: '17 juillet 2026, 08:30',
@@ -314,7 +314,7 @@ const SESSIONS: readonly SecuritySession[] = [
     accountName: 'Compte de démonstration',
     accountEmail: 'demo.agent@cnpm-demo.example',
     device: 'Poste Windows 11 · Edge',
-    location: 'Ségou, Mali',
+    location: 'Koudougou, Burkina Faso',
     startedAtLabel: '17 juillet 2026, 08:15',
     lastSeenAt: '2026-07-17T10:04:00+00:00',
     lastSeenAtLabel: '17 juillet 2026, 10:04',
@@ -325,8 +325,8 @@ const SESSIONS: readonly SecuritySession[] = [
     id: 'ses-04',
     accountName: 'Compte de démonstration',
     accountEmail: 'demo.agent@cnpm-demo.example',
-    device: 'Mobile Android · application CNPM',
-    location: 'Sikasso, Mali',
+    device: 'Mobile Android · application COGEF',
+    location: 'Bobo-Dioulasso, Burkina Faso',
     startedAtLabel: '16 juillet 2026, 17:32',
     lastSeenAt: '2026-07-17T09:58:00+00:00',
     lastSeenAtLabel: '17 juillet 2026, 09:58',
@@ -338,7 +338,7 @@ const SESSIONS: readonly SecuritySession[] = [
     accountName: 'Romuald Tiegnan',
     accountEmail: 'romuald.tiegnan@gmail.com',
     device: 'Poste macOS · Safari',
-    location: 'Bamako, Mali',
+    location: 'Ouagadougou, Burkina Faso',
     startedAtLabel: '16 juillet 2026, 14:08',
     lastSeenAt: '2026-07-16T16:20:00+00:00',
     lastSeenAtLabel: '16 juillet 2026, 16:20',
@@ -350,7 +350,7 @@ const SESSIONS: readonly SecuritySession[] = [
     accountName: 'Oumar Sangaré',
     accountEmail: 'demo.agent@cnpm-demo.example',
     device: 'Poste Windows 10 · Firefox',
-    location: 'Mopti, Mali',
+    location: 'Ouahigouya, Burkina Faso',
     startedAtLabel: '17 juillet 2026, 07:50',
     lastSeenAt: '2026-07-17T08:02:00+00:00',
     lastSeenAtLabel: '17 juillet 2026, 08:02',
@@ -378,7 +378,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Consultation du journal d’audit',
     target: 'Journal d’audit',
     outcome: 'SUCCESS',
-    correlationId: 'CNPM-AUD-0114',
+    correlationId: 'COGEF-AUD-0114',
   },
   {
     id: 'aud-02',
@@ -388,7 +388,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Modification de rôle',
     target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'SUCCESS',
-    correlationId: 'CNPM-AUD-0113',
+    correlationId: 'COGEF-AUD-0113',
   },
   {
     id: 'aud-03',
@@ -398,7 +398,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Ouverture de session',
     target: 'Espace administration',
     outcome: 'SUCCESS',
-    correlationId: 'CNPM-AUD-0112',
+    correlationId: 'COGEF-AUD-0112',
   },
   {
     id: 'aud-04',
@@ -408,7 +408,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Tentative de connexion',
     target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'FAILURE',
-    correlationId: 'CNPM-AUD-0111',
+    correlationId: 'COGEF-AUD-0111',
   },
   {
     id: 'aud-05',
@@ -418,7 +418,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Tentative de connexion',
     target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'FAILURE',
-    correlationId: 'CNPM-AUD-0110',
+    correlationId: 'COGEF-AUD-0110',
   },
   {
     id: 'aud-06',
@@ -428,7 +428,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Suspension automatique après échecs répétés',
     target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'BLOCKED',
-    correlationId: 'CNPM-AUD-0109',
+    correlationId: 'COGEF-AUD-0109',
   },
   {
     id: 'aud-07',
@@ -438,7 +438,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Export de données de cotisations',
     target: 'Export approuvé, expirable',
     outcome: 'SUCCESS',
-    correlationId: 'CNPM-AUD-0108',
+    correlationId: 'COGEF-AUD-0108',
   },
   {
     id: 'aud-08',
@@ -448,7 +448,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Ouverture de session',
     target: 'Espace administration',
     outcome: 'SUCCESS',
-    correlationId: 'CNPM-AUD-0107',
+    correlationId: 'COGEF-AUD-0107',
   },
   {
     id: 'aud-09',
@@ -458,7 +458,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Réinitialisation du second facteur (motif consigné)',
     target: 'Compte demo.agent@cnpm-demo.example',
     outcome: 'SUCCESS',
-    correlationId: 'CNPM-AUD-0106',
+    correlationId: 'COGEF-AUD-0106',
   },
   {
     id: 'aud-10',
@@ -468,7 +468,7 @@ const AUDIT: readonly AuditEntry[] = [
     action: 'Accès depuis un appareil non reconnu',
     target: 'Espace administration',
     outcome: 'BLOCKED',
-    correlationId: 'CNPM-AUD-0105',
+    correlationId: 'COGEF-AUD-0105',
   },
 ];
 
@@ -616,7 +616,7 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
           ` — motif : ${reason.trim()}`,
         target: account.fullName,
         outcome: 'SUCCESS',
-        correlationId: `CNPM-AUD-STA-${String(this.statusCount).padStart(4, '0')}`,
+        correlationId: `COGEF-AUD-STA-${String(this.statusCount).padStart(4, '0')}`,
       };
       this.audit = [entry, ...this.audit];
       return { ...account, status };
@@ -636,7 +636,7 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
         action: `Réinitialisation du second facteur — motif : ${reason.trim()}`,
         target: account.fullName,
         outcome: 'SUCCESS',
-        correlationId: `CNPM-AUD-2FA-${String(this.resetCount).padStart(4, '0')}`,
+        correlationId: `COGEF-AUD-2FA-${String(this.resetCount).padStart(4, '0')}`,
       };
       this.audit = [entry, ...this.audit];
       return { ...account, twoFactor: 'PENDING' };
@@ -657,7 +657,7 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
       action: `Suppression du compte — motif : ${reason.trim()}`,
       target: account.fullName,
       outcome: 'SUCCESS',
-      correlationId: `CNPM-AUD-DEL-${String(this.deleteCount).padStart(4, '0')}`,
+      correlationId: `COGEF-AUD-DEL-${String(this.deleteCount).padStart(4, '0')}`,
     };
     this.audit = [entry, ...this.audit];
     this.accounts = this.accounts.filter((candidate) => candidate.id !== accountId);
@@ -685,7 +685,7 @@ export class DemoAdminSecurityGateway implements AdminSecurityGateway {
       action: activation ? 'Émission d’un lien d’activation' : 'Émission d’un lien de récupération',
       target: account.fullName,
       outcome: 'SUCCESS',
-      correlationId: `CNPM-AUD-LNK-${String(this.tokenCount).padStart(4, '0')}`,
+      correlationId: `COGEF-AUD-LNK-${String(this.tokenCount).padStart(4, '0')}`,
     };
     this.audit = [entry, ...this.audit];
     return of({

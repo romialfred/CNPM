@@ -49,7 +49,7 @@ const CHANNELS: readonly ChannelOption[] = [
 /**
  * Écran « Comptes d'encaissement de la COGEF » (Lot 1 de la refonte).
  *
- * <p>La CNPM y configure ses coordonnées d'encaissement (Orange Money, Wave, MTN, banque). Un
+ * <p>La COGEF y configure ses coordonnées d'encaissement (Orange Money, Wave, MTN, banque). Un
  * compte naît en brouillon et n'est diffusable qu'après validation par un SECOND agent — la
  * porte de non-diffusion est tenue par le serveur ; l'écran n'en est que le reflet.
  */

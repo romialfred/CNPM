@@ -15,7 +15,7 @@ import {
 const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
   {
     id: 'demo-contribution-2026-01',
-    reference: 'CNPM-COT-2026-001',
+    reference: 'COGEF-COT-2026-001',
     exercise: 2026,
     issuedOn: '2026-01-15',
     dueDate: '2026-09-30',
@@ -28,7 +28,7 @@ const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
       'Aucun barème, taux ou palier institutionnel n’est appliqué tant que la décision DEC-008 reste ouverte.',
     adjustments: [
       {
-        reference: 'CNPM-AJ-2026-001',
+        reference: 'COGEF-AJ-2026-001',
         direction: 'CREDIT',
         amount: 15000,
         currency: 'XOF',
@@ -71,7 +71,7 @@ const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
   },
   {
     id: 'demo-contribution-2026-02',
-    reference: 'CNPM-COT-2026-002',
+    reference: 'COGEF-COT-2026-002',
     exercise: 2026,
     issuedOn: '2026-02-10',
     dueDate: '2026-10-31',
@@ -98,7 +98,7 @@ const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
   },
   {
     id: 'demo-contribution-2025-01',
-    reference: 'CNPM-COT-2025-001',
+    reference: 'COGEF-COT-2025-001',
     exercise: 2025,
     issuedOn: '2025-01-20',
     dueDate: '2025-06-30',
@@ -135,7 +135,7 @@ const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
   },
   {
     id: 'demo-contribution-2025-02',
-    reference: 'CNPM-COT-2025-002',
+    reference: 'COGEF-COT-2025-002',
     exercise: 2025,
     issuedOn: '2025-03-14',
     dueDate: '2025-11-30',
@@ -162,7 +162,7 @@ const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
   },
   {
     id: 'demo-contribution-2024-01',
-    reference: 'CNPM-COT-2024-001',
+    reference: 'COGEF-COT-2024-001',
     exercise: 2024,
     issuedOn: '2024-02-01',
     dueDate: '2024-08-31',
@@ -175,7 +175,7 @@ const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
       'Aucun taux ni palier institutionnel n’est disponible tant que la décision DEC-008 reste ouverte.',
     adjustments: [
       {
-        reference: 'CNPM-AJ-2024-001',
+        reference: 'COGEF-AJ-2024-001',
         direction: 'DEBIT',
         amount: 5000,
         currency: 'XOF',
@@ -198,7 +198,7 @@ const DEMO_CONTRIBUTIONS: readonly MemberContributionDetail[] = [
   },
   {
     id: 'demo-contribution-2024-02',
-    reference: 'CNPM-COT-2024-002',
+    reference: 'COGEF-COT-2024-002',
     exercise: 2024,
     issuedOn: '2024-04-18',
     dueDate: '2024-12-15',

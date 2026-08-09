@@ -76,7 +76,7 @@ interface SectorDomain {
 
 /**
  * Nomenclature d'activité à deux niveaux (domaine → secteurs), inspirée du tissu
- * économique malien. Les codes de domaine restent alignés sur le référentiel SECTOR
+ * économique burkinabè. Les codes de domaine restent alignés sur le référentiel SECTOR
  * (liste/filtre) ; les codes de secteur les préfixent. Nomenclature large, à affiner par
  * le COGEF — aucune valeur officielle n'est ici présentée comme homologuée.
  */

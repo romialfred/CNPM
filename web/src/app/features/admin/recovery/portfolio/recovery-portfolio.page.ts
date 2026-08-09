@@ -292,7 +292,7 @@ export class RecoveryPortfolioPage {
   }
 
   protected formatDate(value: string): string {
-    return `${DATE_FORMATTER.format(new Date(value))} · Bamako`;
+    return `${DATE_FORMATTER.format(new Date(value))} · Ouagadougou`;
   }
 
   protected formatDay(value: string): string {

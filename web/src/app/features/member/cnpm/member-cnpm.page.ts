@@ -27,7 +27,7 @@ interface MemberCnpmShortcut {
 }
 
 /**
- * « Le CNPM » — le point d'entrée institutionnel de l'espace membre.
+ * « La COGEF » — le point d'entrée institutionnel de l'espace membre.
  *
  * La page n'invente aucune actualité : sans flux officiel raccordé, la section reste en
  * état vide honnête (aucune communication fabriquée). Elle rassemble en revanche les
@@ -97,7 +97,7 @@ export class MemberCnpmPage {
     },
     {
       label: 'Mes requêtes',
-      description: 'Adressez une demande au CNPM et suivez ses réponses.',
+      description: 'Adressez une demande à la COGEF et suivez ses réponses.',
       route: '/member/requests',
       icon: 'requests',
     },

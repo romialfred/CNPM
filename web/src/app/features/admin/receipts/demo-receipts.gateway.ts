@@ -15,7 +15,7 @@ const DEMO_LATENCY_MS = 100;
 
 /**
  * Registre fermé pour REC-001..006 / BO-016. Les références, membres, paiements,
- * montants et dates ne correspondent à aucun reçu CNPM réel.
+ * montants et dates ne correspondent à aucun reçu COGEF réel.
  */
 const DEMO_RECEIPTS: readonly ReceiptRegistryRow[] = [
   receipt(
@@ -149,7 +149,7 @@ function receipt(
     channel,
     issuedAt,
     status: options.status ?? 'ISSUED',
-    paymentReference: `PAY-CNPM-2024-${String(index).padStart(4, '0')}`,
+    paymentReference: `PAY-COGEF-2024-${String(index).padStart(4, '0')}`,
     paymentConfirmedAt: precedingConfirmation(issuedAt),
     sourcePaymentStatus: 'CONFIRMED',
     supersedesReference: options.supersedesReference ?? null,
@@ -159,7 +159,7 @@ function receipt(
 }
 
 function reference(index: number): string {
-  return `CNPM-REC-2024-${String(index).padStart(4, '0')}`;
+  return `COGEF-REC-2024-${String(index).padStart(4, '0')}`;
 }
 
 function precedingConfirmation(issuedAt: string): string {

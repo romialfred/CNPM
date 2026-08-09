@@ -46,7 +46,7 @@ const EMPTY_PAGE: MembersPageData = {
 const MEMBER_ROW: MemberRow = {
   id: 'membership-demo-001',
   organizationId: 'organization-demo-001',
-  code: 'CNPM-2026-001',
+  code: 'COGEF-2026-001',
   organization: 'Entreprise Sahel SA',
   category: 'A',
   group: 'Industries',

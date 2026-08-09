@@ -13,13 +13,51 @@
   </section>
 
   <div class="contact-page">
+    <section class="contact-coordinates" aria-labelledby="contact-coordinates-title">
+      <div class="contact-coordinates__intro">
+        <p class="contact-eyebrow">Coordonnées</p>
+        <h2 class="contact-section-title" id="contact-coordinates-title">Nous joindre directement</h2>
+        <p class="contact-coordinates__lead">
+          Confédération Générale des Entreprises du Faso — siège de Ouagadougou.
+        </p>
+      </div>
+      <ul class="contact-coordinates__list">
+        <li>
+          <span class="contact-coordinates__icon" aria-hidden="true">
+            <svg lucideMapPin [size]="iconSize.compact"></svg>
+          </span>
+          <span class="contact-coordinates__value">
+            1221 Avenue du Dr Kwamé N'Krumah<br />01 BP 1482 Ouagadougou 01, Burkina Faso
+          </span>
+        </li>
+        <li>
+          <span class="contact-coordinates__icon" aria-hidden="true">
+            <svg lucidePhone [size]="iconSize.compact"></svg>
+          </span>
+          <a class="contact-coordinates__value" href="tel:+22625330309">(+226) 25 33 03 09</a>
+        </li>
+        <li>
+          <span class="contact-coordinates__icon" aria-hidden="true">
+            <svg lucideMail [size]="iconSize.compact"></svg>
+          </span>
+          <a class="contact-coordinates__value" href="mailto:cnpb2024@gmail.com">cnpb2024&#64;gmail.com</a>
+        </li>
+        <li>
+          <span class="contact-coordinates__icon" aria-hidden="true">
+            <svg lucideClock [size]="iconSize.compact"></svg>
+          </span>
+          <span class="contact-coordinates__value">Lundi – vendredi, 8h00 – 16h30</span>
+        </li>
+      </ul>
+    </section>
+
     @if (!isDemo) {
       <section class="contact-unavailable" aria-labelledby="contact-unavailable-title">
-        <h2 class="contact-section-title" id="contact-unavailable-title">Contact institutionnel</h2>
+        <h2 class="contact-section-title" id="contact-unavailable-title">Formulaire en ligne</h2>
         <cnpm-error-state
           variant="recoverable"
-          title="Canal de contact non raccordé"
-          description="Aucune destination institutionnelle de transmission n’est actuellement publiée. Aucun message ne peut être envoyé depuis cette page."
+          title="Envoi en ligne non raccordé"
+          description="Le formulaire de transmission n’est pas encore raccordé. Utilisez les coordonnées ci-dessus (téléphone ou e-mail) pour joindre la Confédération."
         />
       </section>
     } @else {

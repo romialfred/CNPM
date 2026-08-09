@@ -122,7 +122,7 @@ describe('HttpEnrollmentsGateway', () => {
 
   it('réemploie la clé d idempotence d une approbation après une panne temporaire', async () => {
     const input: EnrollmentApproval = {
-      membershipNumber: 'CNPM-DEMO-0001',
+      membershipNumber: 'COGEF-DEMO-0001',
       categoryCode: 'CAT-DEMO',
       comment: 'Décision de démonstration.',
     };

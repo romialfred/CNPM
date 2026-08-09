@@ -34,7 +34,7 @@ import {
 type LoadState = 'loading' | 'ready' | 'error';
 
 /**
- * Écran CNPM « Rapprochement » (Lot 5) : import d'un relevé et file des cas.
+ * Écran COGEF « Rapprochement » (Lot 5) : import d'un relevé et file des cas.
  *
  * <p>L'import propose des appariements par la référence lue dans le libellé ; c'est la décision
  * de la COGEF qui, en confirmant, crée l'encaissement. Rien de démo, tout via le vrai backend.

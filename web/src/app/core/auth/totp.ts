@@ -29,7 +29,7 @@ export function formatManualKey(secret: string): string {
 
 /**
  * URI `otpauth://totp/...` scannable par toute application d'authentification.
- * L'`issuer` est le titre affiché (« CNPM »), la partie compte la ligne du dessous.
+ * L'`issuer` est le titre affiché (« COGEF »), la partie compte la ligne du dessous.
  */
 export function buildOtpauthUri(params: {
   readonly issuer: string;

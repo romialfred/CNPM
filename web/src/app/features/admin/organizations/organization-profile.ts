@@ -134,7 +134,7 @@ const ACTIVITY_POOL: readonly Omit<OrganizationActivity, 'date'>[] = [
   {
     kind: 'receipt',
     title: 'Reçu officiel émis',
-    detail: 'Reçu CNPM généré et transmis au contact principal.',
+    detail: 'Reçu COGEF généré et transmis au contact principal.',
   },
   {
     kind: 'reminder',
@@ -170,7 +170,7 @@ export function buildOrganizationProfile(
   const preset = SECTOR_PRESENTATION[sector] ?? {
     tagline: 'Au service de ses membres et de l’économie',
     presentation:
-      'Entreprise membre du réseau CNPM, engagée dans le développement du secteur privé malien.',
+      'Entreprise membre du réseà la COGEF, engagée dans le développement du secteur privé burkinabè.',
   };
 
   const foundedYear = 1995 + Math.floor(random() * 28);

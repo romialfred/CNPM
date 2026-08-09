@@ -62,7 +62,7 @@ export class NewMemberRequestPage {
   });
 
   constructor() {
-    this.title.setTitle('Nouvelle requête — Espace membre CNPM');
+    this.title.setTitle('Nouvelle requête — Espace membre COGEF');
   }
 
   protected typeLabel(type: MemberRequestType): string {
@@ -98,7 +98,7 @@ export class NewMemberRequestPage {
         next: (detail) => {
           this.submitted.set(true);
           this.submitting.set(false);
-          this.toasts.success(`Requête ${detail.reference} envoyée à la CNPM.`);
+          this.toasts.success(`Requête ${detail.reference} envoyée à la COGEF.`);
           void this.router.navigate(['/member/requests', detail.id]);
         },
         error: () => {

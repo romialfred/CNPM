@@ -10,13 +10,13 @@ export const DEMO_MEMBER_SHOWCASE_DRAFT: MemberShowcaseDraft = {
   name: 'Atelier Kanu',
   tagline: 'Services agronomiques de proximité pour les exploitations du Sud',
   sector: 'Services agricoles',
-  location: 'Sikasso',
+  location: 'Bobo-Dioulasso',
   employeeRange: '10–19 collaborateurs',
   foundedYear: 2021,
   legalForm: 'Société à responsabilité limitée',
   verificationStatus: 'UNVERIFIED',
   summary:
-    'Atelier Kanu accompagne les exploitations agricoles de la région de Sikasso : conseil agronomique, formation des équipes techniques et suivi de la qualité des productions.',
+    'Atelier Kanu accompagne les exploitations agricoles de la région de Bobo-Dioulasso : conseil agronomique, formation des équipes techniques et suivi de la qualité des productions.',
   activities: ['Conseil agronomique', 'Ateliers de formation', 'Suivi qualité'],
   projects: [
     {
@@ -34,7 +34,7 @@ export const DEMO_MEMBER_SHOWCASE_DRAFT: MemberShowcaseDraft = {
   ],
   certifications: [],
   seo: {
-    title: 'Atelier Kanu — vitrine CNPM',
+    title: 'Atelier Kanu — vitrine COGEF',
     description:
       'Présentation des activités et des réalisations d’Atelier Kanu, membre de la COGEF.',
     allowIndexing: false,

@@ -14,9 +14,9 @@ import {
 const REFERENCE = {
   id: '10000000-0000-4000-8000-000000000001',
   membershipId: 'b2222222-0000-4000-8000-000000000001',
-  membershipNumber: 'CNPM-2022-0001',
+  membershipNumber: 'COGEF-2022-0001',
   organizationName: 'Société de test',
-  referenceValue: 'CNPM-COT-2026-000001',
+  referenceValue: 'COGEF-COT-2026-000001',
   exercise: 2026,
   status: 'PENDING_VALIDATION',
   approvedAt: null,
@@ -48,7 +48,7 @@ describe('HttpPaymentReferencesGateway', () => {
 
     const references = await result;
     expect(references).toHaveLength(1);
-    expect(references[0].referenceValue).toBe('CNPM-COT-2026-000001');
+    expect(references[0].referenceValue).toBe('COGEF-COT-2026-000001');
     expect(references[0].status).toBe('PENDING_VALIDATION');
   });
 

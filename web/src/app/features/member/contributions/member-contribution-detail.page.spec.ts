@@ -15,7 +15,7 @@ import {
 
 const DETAIL: MemberContributionDetail = {
   id: 'demo-contribution-2026-01',
-  reference: 'CNPM-COT-2026-001',
+  reference: 'COGEF-COT-2026-001',
   exercise: 2026,
   issuedOn: '2026-01-15',
   dueDate: '2026-09-30',
@@ -27,7 +27,7 @@ const DETAIL: MemberContributionDetail = {
   amountOriginNote: 'Aucun calcul réglementaire n’est effectué.',
   adjustments: [
     {
-      reference: 'CNPM-AJ-2026-001',
+      reference: 'COGEF-AJ-2026-001',
       direction: 'CREDIT',
       amount: 15000,
       currency: 'XOF',

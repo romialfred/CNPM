@@ -11,7 +11,7 @@ export interface ContributionGenerationContext {
   readonly audiences: readonly ContributionAudience[];
   /** Date d'arrêté déterministe du calcul. */
   readonly asOf: string;
-  /** `false` tant que DEC-008 ne fournit aucun barème CNPM opposable. */
+  /** `false` tant que DEC-008 ne fournit aucun barème COGEF opposable. */
   readonly officialScaleAvailable: false;
 }
 

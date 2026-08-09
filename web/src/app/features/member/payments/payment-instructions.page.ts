@@ -35,7 +35,7 @@ const CHANNEL_LABELS: Readonly<Record<CollectionChannel, string>> = {
  * <p>Le cotisant choisit son canal (Orange Money / Wave / MTN / virement), lit les coordonnées
  * d'encaissement validées de la COGEF et sa référence, puis paie depuis son propre compte. Rien
  * n'est débité ici : la plateforme n'affiche que des instructions, le paiement se fait chez
- * l'opérateur ou la banque du cotisant, et le rapprochement suit côté CNPM.
+ * l'opérateur ou la banque du cotisant, et le rapprochement suit côté COGEF.
  */
 @Component({
   selector: 'cnpm-member-payment-instructions-page',
@@ -59,7 +59,7 @@ export class PaymentInstructionsPage {
     () => this.instructions()?.references[0] ?? null,
   );
 
-  /** Canaux réellement proposés par la CNPM, dédupliqués dans l'ordre d'apparition. */
+  /** Canaux réellement proposés par la COGEF, dédupliqués dans l'ordre d'apparition. */
   protected readonly channels = computed<readonly CollectionChannel[]>(() => {
     const accounts = this.instructions()?.collectionAccounts ?? [];
     const seen = new Set<CollectionChannel>();
@@ -82,7 +82,7 @@ export class PaymentInstructionsPage {
   });
 
   constructor() {
-    this.title.setTitle('Comment payer — Espace membre CNPM');
+    this.title.setTitle('Comment payer — Espace membre COGEF');
     this.load();
   }
 

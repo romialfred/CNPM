@@ -54,41 +54,41 @@ const FIXTURES: readonly CallFixture[] = [
   { memberCode: 'MBR-0101', memberName: 'Sahel Agro SA', fiscalYear: '2024', quarter: 'T1', calledAmount: 12_500_000, paidAmount: 12_500_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
   { memberCode: 'MBR-0102', memberName: 'Djoliba Logistique SARL', fiscalYear: '2024', quarter: 'T1', calledAmount: 8_750_000, paidAmount: 4_000_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
   { memberCode: 'MBR-0103', memberName: 'Faso Textile SA', fiscalYear: '2024', quarter: 'T1', calledAmount: 7_250_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
-  { memberCode: 'MBR-0104', memberName: 'Niger Cargo SARL', fiscalYear: '2024', quarter: 'T1', calledAmount: 3_200_000, paidAmount: 3_200_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
+  { memberCode: 'MBR-0104', memberName: 'Nakambé Cargo SARL', fiscalYear: '2024', quarter: 'T1', calledAmount: 3_200_000, paidAmount: 3_200_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
   // Solde soldé par un avoir : l'identité « appelé = payé + reste » ne tient qu'en
   // affichant l'ajustement, ce que la vue fait explicitement.
-  { memberCode: 'MBR-0105', memberName: 'Bamako Digital Services SAS', fiscalYear: '2024', quarter: 'T1', calledAmount: 5_400_000, paidAmount: 5_150_000, adjustmentAmount: 250_000, dueDate: '2024-03-31', emitted: true },
-  { memberCode: 'MBR-0106', memberName: 'Kayes Minerais SA', fiscalYear: '2024', quarter: 'T1', calledAmount: 18_500_000, paidAmount: 18_500_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
-  { memberCode: 'MBR-0107', memberName: 'Ségou Agro-Industrie SARL', fiscalYear: '2024', quarter: 'T1', calledAmount: 4_750_000, paidAmount: 1_500_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
-  { memberCode: 'MBR-0108', memberName: 'Mopti Pêcheries SA', fiscalYear: '2024', quarter: 'T1', calledAmount: 2_100_000, paidAmount: 2_100_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
+  { memberCode: 'MBR-0105', memberName: 'Ouagadougou Digital Services SAS', fiscalYear: '2024', quarter: 'T1', calledAmount: 5_400_000, paidAmount: 5_150_000, adjustmentAmount: 250_000, dueDate: '2024-03-31', emitted: true },
+  { memberCode: 'MBR-0106', memberName: 'Banfora Minerais SA', fiscalYear: '2024', quarter: 'T1', calledAmount: 18_500_000, paidAmount: 18_500_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
+  { memberCode: 'MBR-0107', memberName: 'Koudougou Agro-Industrie SARL', fiscalYear: '2024', quarter: 'T1', calledAmount: 4_750_000, paidAmount: 1_500_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
+  { memberCode: 'MBR-0108', memberName: 'Ouahigouya Pêcheries SA', fiscalYear: '2024', quarter: 'T1', calledAmount: 2_100_000, paidAmount: 2_100_000, adjustmentAmount: 0, dueDate: '2024-03-31', emitted: true },
 
   // Exercice 2024 — T2, échéances à venir pour l'essentiel.
   { memberCode: 'MBR-0101', memberName: 'Sahel Agro SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 12_500_000, paidAmount: 6_000_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
   { memberCode: 'MBR-0102', memberName: 'Djoliba Logistique SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 8_750_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
   { memberCode: 'MBR-0103', memberName: 'Faso Textile SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 7_250_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-06-15', emitted: true },
-  { memberCode: 'MBR-0104', memberName: 'Niger Cargo SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 3_200_000, paidAmount: 1_200_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
-  { memberCode: 'MBR-0105', memberName: 'Bamako Digital Services SAS', fiscalYear: '2024', quarter: 'T2', calledAmount: 5_400_000, paidAmount: 5_400_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
-  { memberCode: 'MBR-0106', memberName: 'Kayes Minerais SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 18_500_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: false },
-  { memberCode: 'MBR-0107', memberName: 'Ségou Agro-Industrie SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 4_750_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: false },
-  { memberCode: 'MBR-0108', memberName: 'Mopti Pêcheries SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 2_100_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-06-10', emitted: true },
-  { memberCode: 'MBR-0109', memberName: 'Sikasso Coton Union SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 9_600_000, paidAmount: 9_600_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
-  { memberCode: 'MBR-0110', memberName: 'Tombouctou Transit SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 1_250_000, paidAmount: 1_000_000, adjustmentAmount: 0, dueDate: '2024-06-20', emitted: true },
-  { memberCode: 'MBR-0111', memberName: 'Koulikoro Ciments SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 14_200_000, paidAmount: 7_100_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
-  { memberCode: 'MBR-0112', memberName: 'Gao Énergie Solaire SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 6_300_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
+  { memberCode: 'MBR-0104', memberName: 'Nakambé Cargo SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 3_200_000, paidAmount: 1_200_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
+  { memberCode: 'MBR-0105', memberName: 'Ouagadougou Digital Services SAS', fiscalYear: '2024', quarter: 'T2', calledAmount: 5_400_000, paidAmount: 5_400_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
+  { memberCode: 'MBR-0106', memberName: 'Banfora Minerais SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 18_500_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: false },
+  { memberCode: 'MBR-0107', memberName: 'Koudougou Agro-Industrie SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 4_750_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: false },
+  { memberCode: 'MBR-0108', memberName: 'Ouahigouya Pêcheries SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 2_100_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-06-10', emitted: true },
+  { memberCode: 'MBR-0109', memberName: 'Bobo-Dioulasso Coton Union SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 9_600_000, paidAmount: 9_600_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
+  { memberCode: 'MBR-0110', memberName: 'Dori Transit SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 1_250_000, paidAmount: 1_000_000, adjustmentAmount: 0, dueDate: '2024-06-20', emitted: true },
+  { memberCode: 'MBR-0111', memberName: 'Kaya Ciments SA', fiscalYear: '2024', quarter: 'T2', calledAmount: 14_200_000, paidAmount: 7_100_000, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
+  { memberCode: 'MBR-0112', memberName: 'Fada N’Gourma Énergie Solaire SARL', fiscalYear: '2024', quarter: 'T2', calledAmount: 6_300_000, paidAmount: 0, adjustmentAmount: 0, dueDate: '2024-07-31', emitted: true },
 
   // Exercice 2023 — T4, clôturé pour l'essentiel.
   { memberCode: 'MBR-0101', memberName: 'Sahel Agro SA', fiscalYear: '2023', quarter: 'T4', calledAmount: 11_800_000, paidAmount: 11_800_000, adjustmentAmount: 0, dueDate: '2023-12-31', emitted: true },
   { memberCode: 'MBR-0103', memberName: 'Faso Textile SA', fiscalYear: '2023', quarter: 'T4', calledAmount: 6_900_000, paidAmount: 6_900_000, adjustmentAmount: 0, dueDate: '2023-12-31', emitted: true },
   { memberCode: 'MBR-0113', memberName: 'Bandiagara Tourisme SARL', fiscalYear: '2023', quarter: 'T4', calledAmount: 1_450_000, paidAmount: 950_000, adjustmentAmount: 0, dueDate: '2023-12-31', emitted: true },
   { memberCode: 'MBR-0114', memberName: 'Kidal Télécom Services SA', fiscalYear: '2023', quarter: 'T4', calledAmount: 3_750_000, paidAmount: 3_750_000, adjustmentAmount: 0, dueDate: '2023-12-31', emitted: true },
-  { memberCode: 'MBR-0109', memberName: 'Sikasso Coton Union SARL', fiscalYear: '2023', quarter: 'T4', calledAmount: 9_100_000, paidAmount: 9_100_000, adjustmentAmount: 0, dueDate: '2023-12-31', emitted: true },
-  { memberCode: 'MBR-0112', memberName: 'Gao Énergie Solaire SARL', fiscalYear: '2023', quarter: 'T4', calledAmount: 5_800_000, paidAmount: 2_900_000, adjustmentAmount: 500_000, dueDate: '2023-12-31', emitted: true },
+  { memberCode: 'MBR-0109', memberName: 'Bobo-Dioulasso Coton Union SARL', fiscalYear: '2023', quarter: 'T4', calledAmount: 9_100_000, paidAmount: 9_100_000, adjustmentAmount: 0, dueDate: '2023-12-31', emitted: true },
+  { memberCode: 'MBR-0112', memberName: 'Fada N’Gourma Énergie Solaire SARL', fiscalYear: '2023', quarter: 'T4', calledAmount: 5_800_000, paidAmount: 2_900_000, adjustmentAmount: 500_000, dueDate: '2023-12-31', emitted: true },
 ];
 
 /**
  * Comparaison insensible à la casse et aux diacritiques.
  *
- * Sans dépliage des accents, chercher « Segou » ne trouverait pas « Ségou
+ * Sans dépliage des accents, chercher « Koudougou » ne trouverait pas « Koudougou
  * Agro-Industrie » : l'utilisateur qui tape vite, ou sur un clavier sans accents,
  * n'obtiendrait rien.
  */

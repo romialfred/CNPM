@@ -150,7 +150,7 @@ describe('PublicEnrollmentPage (PUB-012)', () => {
   it('présente un guide d’adhésion sans formulaire tant que le contrat public est incomplet', async () => {
     const { harness } = await setup('http');
     // La soumission en ligne n'est pas raccordée : on affiche les étapes, jamais le formulaire.
-    expect(harness.routeNativeElement?.textContent).toContain('Préparer votre adhésion au CNPM');
+    expect(harness.routeNativeElement?.textContent).toContain('Préparer votre adhésion à la COGEF');
     expect(harness.routeNativeElement?.textContent).toContain('sera bientôt disponible');
     expect(harness.routeNativeElement?.querySelector('form')).toBeNull();
   });
