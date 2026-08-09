@@ -2,7 +2,7 @@ import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
 /**
- * Contrat de l'écran « Comptes d'encaissement de la CNPM » (Lot 1 de la refonte).
+ * Contrat de l'écran « Comptes d'encaissement de la COGEF » (Lot 1 de la refonte).
  *
  * <p>Il n'existe qu'un seul adaptateur : {@link HttpCollectionAccountsGateway}. Aucune
  * passerelle de démonstration — l'écran ne fonctionne que contre le vrai backend, conformément

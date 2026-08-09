@@ -84,7 +84,7 @@ export class ReceiptVerificationPage {
           this.result.set(null);
           this.state.set('loading');
           this.seo.apply({
-            title: 'Vérification d’un aperçu de reçu — CNPM',
+            title: 'Vérification d’un aperçu de reçu — COGEF',
             description:
               'Vérification publique limitée d’un aperçu de reçu, conformément à REC-006.',
             robots: 'noindex,nofollow',

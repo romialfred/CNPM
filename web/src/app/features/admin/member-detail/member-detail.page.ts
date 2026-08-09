@@ -158,7 +158,7 @@ const PRIORITY_TONES: Readonly<Record<ActionPriority, CnpmBadgeTone>> = {
 };
 
 const VERIFICATION_LABELS: Readonly<Record<CnpmVerificationStatus, string>> = {
-  VERIFIED: 'Membre vérifié par le CNPM',
+  VERIFIED: 'Membre vérifié par la COGEF',
   PENDING: 'Vérification en cours',
   EXPIRED: 'Vérification expirée',
   SUSPENDED: 'Membre suspendu',
@@ -240,7 +240,7 @@ const SECTOR_MATCHERS: readonly (readonly [SectorKey, readonly string[]])[] = [
 const SECTOR_PROFILES: Readonly<Record<SectorKey, SectorProfile>> = {
   BTP: {
     imageKeywords: 'construction,building',
-    tagline: 'Construire les infrastructures qui font avancer le Mali.',
+    tagline: 'Construire les infrastructures qui font avancer le Burkina Faso.',
     activities: [
       { title: 'Gros œuvre et structures', description: 'Fondations, ossatures et bâtiments livrés clés en main.' },
       { title: 'Voirie et réseaux divers', description: 'Routes, assainissement et réseaux enterrés.' },
@@ -565,8 +565,8 @@ export class MemberDetailPage {
       const detail = this.detail();
       this.pageTitle.setTitle(
         detail
-          ? `${detail.identity.organization} — Fiche membre — Administration CNPM`
-          : 'Fiche membre — Administration CNPM',
+          ? `${detail.identity.organization} — Fiche membre — Administration COGEF`
+          : 'Fiche membre — Administration COGEF',
       );
     });
   }
@@ -626,7 +626,7 @@ export class MemberDetailPage {
         : { label: 'Effectif', value: MISSING, muted: true },
       { label: 'Date d’adhésion', value: this.formatDay(profile.joinedOn) },
       { label: 'Statut', value: MEMBER_STATUS_LABELS[identity.status] },
-      { label: 'Membre CNPM', value: `Depuis ${profile.joinedOn.slice(0, 4)}` },
+      { label: 'Membre COGEF', value: `Depuis ${profile.joinedOn.slice(0, 4)}` },
     ];
   });
 

@@ -22,7 +22,7 @@ import { VersionCheckService } from './version-check.service';
     <cnpm-dialog
       [open]="service.updateAvailable()"
       title="Mise à jour disponible"
-      eyebrow="Plateforme CNPM"
+      eyebrow="Plateforme COGEF"
       describedBy="cnpm-update-message"
       [dismissible]="false"
     >
@@ -32,7 +32,7 @@ import { VersionCheckService } from './version-check.service';
           <img
             class="cnpm-update__logo"
             src="assets/brand/logo-CNPM.png"
-            alt="Conseil National du Patronat du Mali"
+            alt="Confédération Générale des Entreprises du Faso"
           />
           <span class="cnpm-update__badge" aria-hidden="true">
             <svg lucideInfo [size]="iconSize.compact"></svg>

@@ -128,17 +128,17 @@ export class ShowcaseDetailPage {
   private resolve(outcome: DetailOutcome): void {
     if ('error' in outcome) {
       this.state.set('error');
-      this.blockIndexing(outcome.request, 'Contenu indisponible — CNPM');
+      this.blockIndexing(outcome.request, 'Contenu indisponible — COGEF');
       return;
     }
     if (outcome.result.outcome === 'not-public') {
       this.state.set('not-public');
-      this.blockIndexing(outcome.request, 'Vitrine non publiée — CNPM');
+      this.blockIndexing(outcome.request, 'Vitrine non publiée — COGEF');
       return;
     }
     if (outcome.result.outcome === 'not-found') {
       this.state.set('showcase-not-found');
-      this.blockIndexing(outcome.request, 'Vitrine introuvable — CNPM');
+      this.blockIndexing(outcome.request, 'Vitrine introuvable — COGEF');
       return;
     }
 
@@ -148,7 +148,7 @@ export class ShowcaseDetailPage {
       const project = showcase.projects.find((item) => item.id === outcome.request.projectId);
       if (!project) {
         this.state.set('project-not-found');
-        this.blockIndexing(outcome.request, 'Réalisation introuvable — CNPM');
+        this.blockIndexing(outcome.request, 'Réalisation introuvable — COGEF');
         return;
       }
       this.project.set(project);

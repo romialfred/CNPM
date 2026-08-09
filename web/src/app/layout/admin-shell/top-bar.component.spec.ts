@@ -226,7 +226,7 @@ describe('TopBarComponent', () => {
     const { host } = await setup();
     const title = host.querySelector<HTMLElement>('.cnpm-topbar__title');
 
-    expect(title?.textContent).toContain('Plateforme Nationale de Gestion des Membres du CNPM');
+    expect(title?.textContent).toContain('Plateforme Nationale de Gestion des Membres de la COGEF');
     expect(title?.textContent).toContain('Gestion digitale des membres et des cotisations');
     // La personne connectée figure dans le menu de compte, pas sous le titre.
     expect(title?.textContent).not.toContain('Bonjour');

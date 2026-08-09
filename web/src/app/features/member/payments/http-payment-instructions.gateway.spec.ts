@@ -38,7 +38,7 @@ describe('HttpPaymentInstructionsGateway', () => {
           id: 'a1',
           channel: 'ORANGE_MONEY',
           label: 'Compte principal CNPM',
-          accountHolder: 'CNPM',
+          accountHolder: 'COGEF',
           accountIdentifier: '+22370000000',
           bankName: null,
           instructions: null,

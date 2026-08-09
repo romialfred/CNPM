@@ -186,8 +186,8 @@ export class OrganizationEditPage {
       const organization = this.organization();
       this.title.setTitle(
         organization
-          ? `Modifier ${organization.legalName} — Administration CNPM`
-          : 'Modifier une entreprise — Administration CNPM',
+          ? `Modifier ${organization.legalName} — Administration COGEF`
+          : 'Modifier une entreprise — Administration COGEF',
       );
     });
   }

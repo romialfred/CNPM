@@ -137,7 +137,7 @@ export class HttpAuthGateway implements AuthGateway {
               enrollmentId: challenge,
               qrImage,
               manualKey: formatManualKey(body.manualKey),
-              issuer: 'CNPM',
+              issuer: 'COGEF',
               account: accountFromUri(body.otpAuthUri),
             })),
           ),

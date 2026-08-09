@@ -122,7 +122,7 @@ function round(value: number): number {
  *   Les deux actions restent visibles mais inertes, en énonçant leur indisponibilité :
  *   un export qui échoue en silence coûte plus cher qu'un export annoncé absent.
  * - `MapPanel` — la fiche exige « un actif officiel validé, pas une approximation
- *   générée ». Aucun fond de carte du Mali validé n'existe dans le dépôt ; les taux
+ *   générée ». Aucun fond de carte du Burkina Faso validé n'existe dans le dépôt ; les taux
  *   régionaux sont donc listés, ce qui les rend au passage lisibles au clavier et au
  *   lecteur d'écran.
  * - Le clic sur une série pour filtrer ou ouvrir le détail : la cible de ce détail

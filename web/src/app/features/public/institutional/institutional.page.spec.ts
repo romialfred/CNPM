@@ -32,7 +32,7 @@ async function setup(mode: 'about' | 'services') {
 describe('InstitutionalPage (PUB-002/PUB-003)', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
-  it('présente le rôle du CNPM sans inventer de règle institutionnelle', async () => {
+  it('présente le rôle de la COGEF sans inventer de règle institutionnelle', async () => {
     const { host } = await setup('about');
     expect(host.querySelectorAll('h1')).toHaveLength(1);
     expect(host.querySelector('h1')?.textContent).toContain('plateforme au service');

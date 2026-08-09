@@ -1,16 +1,21 @@
 /* CNPM UI/UX Handoff v1.0 - generated; do not edit directly */
 :root {
-  --cnpm-color-brand-blue-50: #F4F6FF;
-  --cnpm-color-brand-blue-100: #E9EDFF;
-  --cnpm-color-brand-blue-200: #D5DCFA;
-  --cnpm-color-brand-blue-300: #AEBBE8;
-  --cnpm-color-brand-blue-400: #7F91CF;
-  --cnpm-color-brand-blue-500: #5268B3;
-  --cnpm-color-brand-blue-600: #3A4E9E;
-  --cnpm-color-brand-blue-700: #273481;
-  --cnpm-color-brand-blue-800: #1D286C;
-  --cnpm-color-brand-blue-900: #14205F;
-  --cnpm-color-brand-blue-950: #0B123B;
+  /* CHARTE COGEF (Confédération Générale des Entreprises du Faso) — famille OR épousant le
+     logo (or #DEAB1F). Les NOMS de tokens restent `brand-blue-*` (référencés dans tout le
+     code) ; seules les valeurs changent, ce qui recolore toute l'application en or/bronze.
+     L'extrémité claire sert aux teintes (sélections, survols), l'extrémité foncée au texte
+     de marque, aux liens, aux boutons et au chrome sombre (contraste AA vérifié). */
+  --cnpm-color-brand-blue-50: #FBF6E7;
+  --cnpm-color-brand-blue-100: #F6EBC4;
+  --cnpm-color-brand-blue-200: #EEDDA0;
+  --cnpm-color-brand-blue-300: #E2C866;
+  --cnpm-color-brand-blue-400: #CDA636;
+  --cnpm-color-brand-blue-500: #DEAB1F;
+  --cnpm-color-brand-blue-600: #B98A16;
+  --cnpm-color-brand-blue-700: #8A6410;
+  --cnpm-color-brand-blue-800: #5E440B;
+  --cnpm-color-brand-blue-900: #3E2D07;
+  --cnpm-color-brand-blue-950: #241A04;
   --cnpm-color-brand-red-50: #FFF2F3;
   --cnpm-color-brand-red-100: #FFE2E5;
   --cnpm-color-brand-red-200: #FFC9CE;
@@ -59,15 +64,15 @@
   --cnpm-color-surface-primary: #FFFFFF;
   --cnpm-color-surface-secondary: #FCFCFD;
   --cnpm-color-surface-subtle: #F2F4F7;
-  --cnpm-color-surface-inverse: #14205F;
+  --cnpm-color-surface-inverse: #3E2D07;
   --cnpm-color-surface-overlay: rgba(16,24,40,0.54);
   --cnpm-color-text-primary: #101828;
   --cnpm-color-text-secondary: #475467;
   --cnpm-color-text-muted: #667085;
   --cnpm-color-text-disabled: #98A2B3;
-  --cnpm-color-text-brand: #273481;
+  --cnpm-color-text-brand: #8A6410;
   --cnpm-color-text-inverse: #FFFFFF;
-  --cnpm-color-text-link: #273481;
+  --cnpm-color-text-link: #8A6410;
   --cnpm-color-text-critical: #B42318;
   --cnpm-color-border-subtle: #EAECF0;
   --cnpm-color-border-default: #D0D5DD;

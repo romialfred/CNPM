@@ -6,7 +6,7 @@ import type { Observable } from 'rxjs';
  *
  * <p>Un seul adaptateur HTTP réel, aucune démo. Le périmètre est déduit du compte connecté
  * (organisation de l'adhésion) ; un membre ne voit jamais la requête d'une autre organisation,
- * ni les notes internes de la CNPM.
+ * ni les notes internes de la COGEF.
  */
 
 export type MemberRequestType = 'INFORMATION' | 'DOCUMENT' | 'CLAIM' | 'OTHER';

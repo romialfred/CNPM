@@ -116,15 +116,21 @@
   background-color: var(--cnpm-color-brand-blue-50);
 }
 
-/* Danger et CTA public : rouge de marque réservé aux actions critiques/publiques. */
-.cnpm-button--danger,
-.cnpm-button--public-cta {
+/* Danger : rouge de marque, réservé aux actions destructives. */
+.cnpm-button--danger {
   background-color: var(--cnpm-color-brand-red-600);
   color: var(--cnpm-color-text-inverse);
 }
-.cnpm-button--danger:hover:not(:disabled):not(.cnpm-button--inert),
-.cnpm-button--public-cta:hover:not(:disabled):not(.cnpm-button--inert) {
+.cnpm-button--danger:hover:not(:disabled):not(.cnpm-button--inert) {
   background-color: var(--cnpm-color-brand-red-700);
+}
+/* CTA public COGEF : OR VIF du logo (brand-500), texte foncé pour un contraste AA. */
+.cnpm-button--public-cta {
+  background-color: var(--cnpm-color-brand-blue-500);
+  color: var(--cnpm-color-text-primary);
+}
+.cnpm-button--public-cta:hover:not(:disabled):not(.cnpm-button--inert) {
+  background-color: var(--cnpm-color-brand-blue-600);
 }
 /* Sur fond rouge, le contour bleu de marque manquerait de contraste : on utilise le
    texte primaire, opaque, qui reste lisible contre le rouge comme contre la page. */

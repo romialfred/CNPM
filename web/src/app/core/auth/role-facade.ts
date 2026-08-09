@@ -34,7 +34,7 @@ export const ROLE_FACADES: readonly RoleFacadeInfo[] = [
   },
   {
     id: 'ADMIN_CNPM',
-    label: 'Administrateur CNPM',
+    label: 'Administrateur COGEF',
     description: 'Gestion administrative et fonctionnelle globale de la plateforme.',
   },
   {
@@ -44,8 +44,8 @@ export const ROLE_FACADES: readonly RoleFacadeInfo[] = [
   },
   {
     id: 'MEMBRE_CNPM',
-    label: 'Membre CNPM',
-    description: 'Espace personnel : cotisations, requêtes et informations CNPM.',
+    label: 'Membre COGEF',
+    description: 'Espace personnel : cotisations, requêtes et informations COGEF.',
   },
   {
     id: 'AUDITEUR',

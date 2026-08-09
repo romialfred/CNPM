@@ -38,7 +38,7 @@ class StubGateway implements AuthGateway {
       enrollmentId: 'stub',
       qrImage: 'data:image/svg+xml,stub',
       manualKey: 'STUB',
-      issuer: 'CNPM',
+      issuer: 'COGEF',
       account: 'stub@cnpm.example',
     } as const);
   }

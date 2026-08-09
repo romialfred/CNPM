@@ -5,7 +5,7 @@ import type { Observable } from 'rxjs';
  * Contrat de « Mes paiements » (MP-004) : l'historique RÉEL des encaissements du cotisant.
  *
  * <p>Un seul adaptateur HTTP réel, aucune démo. Le périmètre est déduit du compte connecté ;
- * un membre ne voit jamais le versement d'un autre. La confirmation de la CNPM se lit à la
+ * un membre ne voit jamais le versement d'un autre. La confirmation de la COGEF se lit à la
  * présence d'un reçu.
  */
 

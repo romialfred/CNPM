@@ -37,7 +37,7 @@ type LoadState = 'loading' | 'ready' | 'error';
  * Écran CNPM « Rapprochement » (Lot 5) : import d'un relevé et file des cas.
  *
  * <p>L'import propose des appariements par la référence lue dans le libellé ; c'est la décision
- * de la CNPM qui, en confirmant, crée l'encaissement. Rien de démo, tout via le vrai backend.
+ * de la COGEF qui, en confirmant, crée l'encaissement. Rien de démo, tout via le vrai backend.
  */
 @Component({
   selector: 'cnpm-reconciliation-page',
@@ -104,7 +104,7 @@ export class ReconciliationPage {
   protected readonly linesText = signal('');
 
   constructor() {
-    this.title.setTitle('Rapprochement — Administration CNPM');
+    this.title.setTitle('Rapprochement — Administration COGEF');
     this.load();
   }
 

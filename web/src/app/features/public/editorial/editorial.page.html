@@ -12,7 +12,7 @@
       </p>
       @if (mode() === 'agenda') {
         <h1 #pageTitle tabindex="-1">Agenda</h1>
-        <p>Les prochains rendez-vous du réseau et des services numériques du CNPM.</p>
+        <p>Les prochains rendez-vous du réseau et des services numériques de la COGEF.</p>
       } @else if (mode() === 'article' && article(); as current) {
         <p class="editorial-category">{{ current.category }}</p>
         <h1 #pageTitle tabindex="-1">{{ current.title }}</h1>
@@ -21,7 +21,7 @@
         <h1 #pageTitle tabindex="-1">Actualité introuvable</h1>
       } @else {
         <h1 #pageTitle tabindex="-1">Actualités</h1>
-        <p>L’information publique du CNPM et de son réseau d’entreprises.</p>
+        <p>L’information publique de la COGEF et de son réseau d’entreprises.</p>
       }
     </div>
   </section>

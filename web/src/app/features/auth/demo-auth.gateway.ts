@@ -94,12 +94,12 @@ export class DemoAuthGateway implements AuthGateway {
     const secret = randomBase32Secret();
     this.activeSecret = secret;
     const account = DemoAuthGateway.DEMO_EMAIL;
-    const otpauthUri = buildOtpauthUri({ issuer: 'CNPM', account, secret });
+    const otpauthUri = buildOtpauthUri({ issuer: 'COGEF', account, secret });
     const enrollment$ = renderOtpauthQr(otpauthUri).then((qrImage): TotpEnrollment => ({
       enrollmentId: DemoAuthGateway.ENROLLMENT_ID,
       qrImage,
       manualKey: formatManualKey(secret),
-      issuer: 'CNPM',
+      issuer: 'COGEF',
       account,
     }));
     return from(enrollment$).pipe(delay(DemoAuthGateway.LATENCY_MS));

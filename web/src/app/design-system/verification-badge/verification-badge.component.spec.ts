@@ -9,7 +9,7 @@ import {
 @Component({
   imports: [VerificationBadgeComponent],
   template: `
-    <cnpm-verification-badge [status]="status()" explanation="Statut constaté par le CNPM." />
+    <cnpm-verification-badge [status]="status()" explanation="Statut constaté par la COGEF." />
     <cnpm-verification-badge [status]="status()" explanation="Second badge sur la même page." />
   `,
 })

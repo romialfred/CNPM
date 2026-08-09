@@ -179,7 +179,7 @@ describe('HttpAdminSecurityGateway — écritures sur les comptes', () => {
       label: 'CONTRIBUTION.READ',
       domain: 'Cotisations',
       description: 'Consulter les cotisations',
-      grants: [{ roleId: ROLE_ID, roleLabel: 'Administrateur CNPM', granted: true }],
+      grants: [{ roleId: ROLE_ID, roleLabel: 'Administrateur COGEF', granted: true }],
     });
     const row = await result;
     expect(row.grants[0].granted).toBe(true);

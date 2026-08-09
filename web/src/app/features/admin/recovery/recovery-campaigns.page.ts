@@ -412,7 +412,7 @@ export class RecoveryCampaignsPage {
       case 'pledges':
         return 'Promesses de paiement obtenues à la suite des relances : membre, campagne d’origine, montant promis, échéance et statut.';
       default:
-        return 'Campagnes de relance du CNPM : référence, segment cible, scénario, canaux, planification, audience, diffusion, conversion et statut.';
+        return 'Campagnes de relance de la COGEF : référence, segment cible, scénario, canaux, planification, audience, diffusion, conversion et statut.';
     }
   });
 

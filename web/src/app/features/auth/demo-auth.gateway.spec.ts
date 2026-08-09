@@ -94,7 +94,7 @@ describe('DemoAuthGateway', () => {
     const enrollment = await firstValueFrom(gateway.beginTotpEnrollment());
 
     expect(enrollment.enrollmentId).toBeTruthy();
-    expect(enrollment.issuer).toBe('CNPM');
+    expect(enrollment.issuer).toBe('COGEF');
     // QR réel (PNG data URI) généré localement, scannable par Microsoft Authenticator.
     expect(enrollment.qrImage.startsWith('data:image/')).toBe(true);
     // La clé manuelle est le secret Base32 réel (regroupé par blocs pour la lisibilité).

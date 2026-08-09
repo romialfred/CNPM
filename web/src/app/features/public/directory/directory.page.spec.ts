@@ -27,7 +27,7 @@ const READY: PublicShowcasePage = {
       tagline: 'Un partenaire des services numériques',
       sector: 'Services numériques',
       location: 'Bamako',
-      summary: 'Entreprise inscrite à l’annuaire public du CNPM.',
+      summary: 'Entreprise inscrite à l’annuaire public de la COGEF.',
       isDemoContent: true,
       publicationStatus: 'PUBLISHED',
     },

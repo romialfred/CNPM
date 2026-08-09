@@ -81,9 +81,9 @@ export class ContactPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Contact — CNPM',
+      title: 'Contact — COGEF',
       description:
-        'Formulaire de contact du CNPM, vérifié dans le navigateur sans conservation de coordonnées.',
+        'Formulaire de contact de la COGEF, vérifié dans le navigateur sans conservation de coordonnées.',
       robots: 'noindex,nofollow',
       canonicalPath: '/contact',
     });

@@ -100,7 +100,7 @@ const MEMBERS_WITHOUT_ACCOUNT: readonly MemberWithoutAccount[] = [
   },
   {
     id: 'mem-2047',
-    organizationName: 'Énergie Solaire du Mali',
+    organizationName: 'Énergie Solaire du Burkina Faso',
     membershipNumber: 'ADH-2047',
     categoryLabel: 'PME',
     groupLabel: 'Énergie',
@@ -121,7 +121,7 @@ const MEMBERS_WITHOUT_ACCOUNT: readonly MemberWithoutAccount[] = [
  *
  * Les données sont FICTIVES et synthétiques (domaines en `.example`), à la seule
  * exception du compte super-administrateur de l'exploitant, conservé sur demande explicite
- * en développement — c'est SON propre identifiant, pas la donnée d'un membre du CNPM.
+ * en développement — c'est SON propre identifiant, pas la donnée d'un membre de la COGEF.
  *
  * Aucun champ ne porte de secret : pas de mot de passe, pas de jeton, pas d'OTP, pas
  * d'empreinte de session ni d'adresse IP complète. Le contrat ne les expose pas, donc
@@ -163,7 +163,7 @@ const ROLE_SEED: readonly Omit<SecurityRole, 'accounts'>[] = [
   },
   {
     id: 'membre-cnpm',
-    label: 'Membre CNPM',
+    label: 'Membre COGEF',
     description:
       'Adhérent : accès à l’espace membre (cotisations, requêtes, informations). Aucun droit d’administration.',
   },

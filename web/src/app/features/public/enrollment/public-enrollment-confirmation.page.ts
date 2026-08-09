@@ -45,7 +45,7 @@ export class PublicEnrollmentConfirmationPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Récapitulatif de préparation d’adhésion — CNPM',
+      title: 'Récapitulatif de préparation d’adhésion — COGEF',
       description: 'Récapitulatif local des informations préparées pour une demande d’adhésion.',
       robots: 'noindex,nofollow',
       canonicalPath: '/adhesion/confirmation',

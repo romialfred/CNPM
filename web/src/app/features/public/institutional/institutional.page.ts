@@ -120,10 +120,10 @@ export class InstitutionalPage {
   constructor() {
     const isServices = this.mode() === 'services';
     this.seo.apply({
-      title: isServices ? 'Services numériques — CNPM' : 'Le CNPM — Présentation',
+      title: isServices ? 'Services numériques — COGEF' : 'Le COGEF — Présentation',
       description: isServices
         ? 'Présentation des services numériques destinés aux membres.'
-        : 'Présentation sobre du rôle et de la plateforme digitale du CNPM.',
+        : 'Présentation sobre du rôle et de la plateforme digitale de la COGEF.',
       robots: 'noindex,nofollow',
       canonicalPath: isServices ? '/services' : '/le-cnpm',
     });

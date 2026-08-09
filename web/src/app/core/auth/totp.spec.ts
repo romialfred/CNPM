@@ -46,10 +46,10 @@ describe('TOTP natif (RFC 6238)', () => {
   });
 
   it('construit une URI otpauth conforme, scannable', () => {
-    const uri = buildOtpauthUri({ issuer: 'CNPM', account: 'user@cnpm.ml', secret: RFC_SECRET });
+    const uri = buildOtpauthUri({ issuer: 'COGEF', account: 'user@cnpm.ml', secret: RFC_SECRET });
     expect(uri.startsWith('otpauth://totp/')).toBe(true);
     expect(uri).toContain(`secret=${RFC_SECRET}`);
-    expect(uri).toContain('issuer=CNPM');
+    expect(uri).toContain('issuer=COGEF');
     expect(uri).toContain('algorithm=SHA1');
     expect(uri).toContain('digits=6');
     expect(uri).toContain('period=30');

@@ -3,7 +3,7 @@
     <div class="institutional-hero__inner">
       <div>
         <p class="institutional-eyebrow">
-          {{ mode() === 'services' ? 'Services aux membres' : 'Conseil National du Patronat du Mali' }}
+          {{ mode() === 'services' ? 'Services aux membres' : 'Confédération Générale des Entreprises du Faso' }}
         </p>
         @if (mode() === 'services') {
           <h1 #pageTitle tabindex="-1">Des services numériques plus lisibles</h1>
@@ -15,7 +15,7 @@
           <h1 #pageTitle tabindex="-1">Une plateforme au service des entreprises</h1>
           <p>
             Le CNPM réunit les entreprises et leurs groupements autour de la représentation, de
-            l’accompagnement et du développement économique du Mali.
+            l’accompagnement et du développement économique du Burkina Faso.
           </p>
         }
         <div class="institutional-hero__actions">
@@ -26,7 +26,7 @@
             variant="secondary"
             [routerLink]="mode() === 'services' ? '/le-cnpm' : '/services'"
           >
-            {{ mode() === 'services' ? 'Découvrir le CNPM' : 'Voir les services' }}
+            {{ mode() === 'services' ? 'Découvrir la COGEF' : 'Voir les services' }}
           </cnpm-button>
         </div>
       </div>
@@ -43,7 +43,7 @@
       <strong>Présentation de la plateforme</strong>
       <p>
         Cette page décrit l’expérience numérique de la plateforme. Elle ne remplace aucun texte
-        statutaire, règlement, barème ou procédure officielle du CNPM.
+        statutaire, règlement, barème ou procédure officielle de la COGEF.
       </p>
     </aside>
 

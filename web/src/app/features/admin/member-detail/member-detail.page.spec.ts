@@ -278,7 +278,7 @@ describe('MemberDetailPage — vitrine', () => {
       (node) => node.textContent?.trim() ?? '',
     );
 
-    for (const attendu of ['Secteur', 'Localisation', 'Effectif', 'Statut', 'Membre CNPM']) {
+    for (const attendu of ['Secteur', 'Localisation', 'Effectif', 'Statut', 'Membre COGEF']) {
       expect(labels).toContain(attendu);
     }
   });

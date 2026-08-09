@@ -130,8 +130,8 @@ export class RequestDetailPage {
       const request = this.request();
       this.title.setTitle(
         request
-          ? `${request.reference} — Traitement — Administration CNPM`
-          : 'Traitement d’un dossier — Administration CNPM',
+          ? `${request.reference} — Traitement — Administration COGEF`
+          : 'Traitement d’un dossier — Administration COGEF',
       );
     });
   }

@@ -180,8 +180,8 @@ export class MemberEditPage {
       const member = this.member();
       this.title.setTitle(
         member
-          ? `Modifier ${member.legalName} — Dossier membre — Administration CNPM`
-          : 'Modifier un dossier membre — Administration CNPM',
+          ? `Modifier ${member.legalName} — Dossier membre — Administration COGEF`
+          : 'Modifier un dossier membre — Administration COGEF',
       );
     });
   }

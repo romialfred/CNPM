@@ -12,7 +12,7 @@ function demoHash(character: string): string {
  *
  * Toutes les valeurs sont FICTIVES : UUID réservés à la fixture, codes préfixés
  * `DEMO_`, acteurs non nominatifs et empreintes répétitives. Aucun événement, compte,
- * secret, signature, cachet ou identifiant réel du CNPM n'est utilisé.
+ * secret, signature, cachet ou identifiant réel de la COGEF n'est utilisé.
  */
 const DEMO_EVENTS: readonly AuditEvent[] = Object.freeze(
   [

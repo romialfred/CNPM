@@ -65,7 +65,7 @@ function seedFrom(value: string): number {
 /** Présentation type par secteur (secteur inconnu → texte générique). */
 const SECTOR_PRESENTATION: Readonly<Record<string, { tagline: string; presentation: string }>> = {
   AGRICULTURE: {
-    tagline: 'Cultiver la valeur, nourrir le Mali',
+    tagline: 'Cultiver la valeur, nourrir le Burkina Faso',
     presentation:
       'Acteur du secteur agricole et agro-alimentaire, engagé dans des filières durables et la valorisation des productions locales.',
   },
@@ -110,7 +110,7 @@ const SECTOR_PRESENTATION: Readonly<Record<string, { tagline: string; presentati
       'Entreprise de services aux organisations, du conseil à l’accompagnement opérationnel.',
   },
   TELECOM: {
-    tagline: 'Connecter le Mali',
+    tagline: 'Connecter le Burkina Faso',
     presentation:
       'Opérateur des télécommunications et du numérique, engagé dans la connectivité du territoire.',
   },
@@ -119,7 +119,7 @@ const SECTOR_PRESENTATION: Readonly<Record<string, { tagline: string; presentati
     presentation: 'Entreprise de transport et de logistique, au cœur des échanges régionaux.',
   },
   TOURISME: {
-    tagline: 'Faire rayonner le Mali',
+    tagline: 'Faire rayonner le Burkina Faso',
     presentation:
       'Acteur du tourisme et de l’hôtellerie, engagé dans la valorisation du patrimoine et de l’accueil.',
   },
@@ -154,7 +154,7 @@ const ACTIVITY_POOL: readonly Omit<OrganizationActivity, 'date'>[] = [
   {
     kind: 'meeting',
     title: 'Rencontre du groupement',
-    detail: 'Participation à une réunion sectorielle du CNPM.',
+    detail: 'Participation à une réunion sectorielle de la COGEF.',
   },
 ];
 

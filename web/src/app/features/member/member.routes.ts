@@ -51,7 +51,7 @@ export const memberRoutes: Routes = [
       { provide: MEMBER_HOME_GATEWAY, useExisting: HttpMemberHomeGateway },
     ],
     loadComponent: () => import('./home/member-home.page').then((m) => m.MemberHomePage),
-    title: 'Mon espace membre — CNPM',
+    title: 'Mon espace membre — COGEF',
   },
   {
     path: 'contributions',
@@ -76,7 +76,7 @@ export const memberRoutes: Routes = [
           import('./contributions/member-contributions.page').then(
             (module) => module.MemberContributionsPage,
           ),
-        title: 'Mes cotisations — CNPM',
+        title: 'Mes cotisations — COGEF',
       },
       {
         path: ':id',
@@ -84,7 +84,7 @@ export const memberRoutes: Routes = [
           import('./contributions/member-contribution-detail.page').then(
             (module) => module.MemberContributionDetailPage,
           ),
-        title: 'Détail de la cotisation — CNPM',
+        title: 'Détail de la cotisation — COGEF',
       },
     ],
   },
@@ -103,7 +103,7 @@ export const memberRoutes: Routes = [
         pathMatch: 'full',
         loadComponent: () =>
           import('./payments/member-payments.page').then((module) => module.MemberPaymentsPage),
-        title: 'Mes paiements — CNPM',
+        title: 'Mes paiements — COGEF',
       },
       {
         path: 'instructions',
@@ -111,7 +111,7 @@ export const memberRoutes: Routes = [
           import('./payments/payment-instructions.page').then(
             (module) => module.PaymentInstructionsPage,
           ),
-        title: 'Comment payer — CNPM',
+        title: 'Comment payer — COGEF',
       },
     ],
   },
@@ -129,7 +129,7 @@ export const memberRoutes: Routes = [
         pathMatch: 'full',
         loadComponent: () =>
           import('./receipts/member-receipts.page').then((module) => module.MemberReceiptsPage),
-        title: 'Mes reçus — CNPM',
+        title: 'Mes reçus — COGEF',
       },
     ],
   },
@@ -146,7 +146,7 @@ export const memberRoutes: Routes = [
         pathMatch: 'full',
         loadComponent: () =>
           import('./requests/member-requests.page').then((module) => module.MemberRequestsPage),
-        title: 'Mes requêtes — CNPM',
+        title: 'Mes requêtes — COGEF',
       },
       {
         path: 'new',
@@ -155,7 +155,7 @@ export const memberRoutes: Routes = [
           import('./requests/new-member-request.page').then(
             (module) => module.NewMemberRequestPage,
           ),
-        title: 'Nouvelle requête — CNPM',
+        title: 'Nouvelle requête — COGEF',
       },
       {
         path: ':id',
@@ -163,7 +163,7 @@ export const memberRoutes: Routes = [
           import('./requests/member-request-detail.page').then(
             (module) => module.MemberRequestDetailPage,
           ),
-        title: 'Détail de la requête — CNPM',
+        title: 'Détail de la requête — COGEF',
       },
     ],
   },
@@ -181,7 +181,7 @@ export const memberRoutes: Routes = [
     ],
     loadComponent: () =>
       import('./documents/member-documents.page').then((module) => module.MemberDocumentsPage),
-    title: 'Mes documents — CNPM',
+    title: 'Mes documents — COGEF',
   },
   {
     path: 'profile',
@@ -192,7 +192,7 @@ export const memberRoutes: Routes = [
     ],
     loadComponent: () =>
       import('./profile/member-profile.page').then((module) => module.MemberProfilePage),
-    title: 'Profil entreprise — CNPM',
+    title: 'Profil entreprise — COGEF',
   },
   {
     path: 'users',
@@ -203,7 +203,7 @@ export const memberRoutes: Routes = [
     ],
     loadComponent: () =>
       import('./users/member-users.page').then((module) => module.MemberUsersPage),
-    title: 'Utilisateurs de l’entreprise — CNPM',
+    title: 'Utilisateurs de l’entreprise — COGEF',
   },
   {
     path: 'showcase',
@@ -235,7 +235,7 @@ export const memberRoutes: Routes = [
           import('./showcase/member-showcase-editor.page').then(
             (module) => module.MemberShowcaseEditorPage,
           ),
-        title: 'Éditeur de vitrine — CNPM',
+        title: 'Éditeur de vitrine — COGEF',
       },
       {
         path: 'preview',
@@ -243,7 +243,7 @@ export const memberRoutes: Routes = [
           import('./showcase/member-showcase-preview.page').then(
             (module) => module.MemberShowcasePreviewPage,
           ),
-        title: 'Aperçu privé de la vitrine — CNPM',
+        title: 'Aperçu privé de la vitrine — COGEF',
       },
       {
         path: 'analytics',
@@ -251,7 +251,7 @@ export const memberRoutes: Routes = [
           import('./showcase-analytics/member-showcase-analytics.page').then(
             (module) => module.MemberShowcaseAnalyticsPage,
           ),
-        title: 'Statistiques privées de la vitrine — CNPM',
+        title: 'Statistiques privées de la vitrine — COGEF',
       },
     ],
   },
@@ -265,7 +265,7 @@ export const memberRoutes: Routes = [
       { provide: MEMBER_EVENTS_GATEWAY, useExisting: HttpMemberEventsGateway },
     ],
     loadComponent: () => import('./cnpm/member-cnpm.page').then((module) => module.MemberCnpmPage),
-    title: 'Le CNPM — actualités et informations',
+    title: 'Le COGEF — actualités et informations',
   },
   {
     path: 'directory',
@@ -276,7 +276,7 @@ export const memberRoutes: Routes = [
     ],
     loadComponent: () =>
       import('./directory/member-directory.page').then((module) => module.MemberDirectoryPage),
-    title: 'Annuaire privé et opportunités — CNPM',
+    title: 'Annuaire privé et opportunités — COGEF',
   },
   // Alias temporaire pour ne pas casser les liens de démonstration déjà partagés.
   // Repli du catalogue : sans lui, /member ne correspond à aucune route et rend un

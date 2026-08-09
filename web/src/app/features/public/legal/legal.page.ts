@@ -132,7 +132,7 @@ export class LegalPage {
       this.requestedSlugLabel.set(boundedSlug);
       this.current.set(document);
       this.seo.apply({
-        title: document ? `${document.title} — CNPM` : 'Document légal introuvable — CNPM',
+        title: document ? `${document.title} — COGEF` : 'Document légal introuvable — COGEF',
         description: document
           ? `Statut de publication du document « ${document.title} » de la plateforme CNPM.`
           : 'Le document légal demandé ne correspond à aucune page déclarée.',

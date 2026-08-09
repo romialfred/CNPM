@@ -97,7 +97,7 @@ export class MemberShowcasePreviewPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Aperçu privé de la vitrine — CNPM',
+      title: 'Aperçu privé de la vitrine — COGEF',
       description: 'Aperçu privé et non indexable d’un brouillon de vitrine membre.',
       robots: 'noindex,nofollow',
       canonicalPath: '/member/showcase/preview',

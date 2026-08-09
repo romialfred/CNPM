@@ -20,7 +20,7 @@ const BLOCKED_AUTH_SCREENS = {
     eyebrow: 'Accès au compte',
     title: 'Mot de passe oublié',
     description:
-      "La récupération sera activée lorsque le CNPM aura choisi le parcours du fournisseur d'identité et son canal d'assistance.",
+      "La récupération sera activée lorsque la COGEF aura choisi le parcours du fournisseur d'identité et son canal d'assistance.",
     decision:
       'Destination Keycloak ou parcours CNPM natif, ainsi que le canal de support, à arbitrer.',
   },
@@ -51,23 +51,23 @@ export const authRoutes: Routes = [
       {
         path: 'login',
         loadComponent: () => import('./login.page').then((m) => m.LoginPage),
-        title: 'Connexion — CNPM',
+        title: 'Connexion — COGEF',
       },
       {
         path: 'verify',
         loadComponent: () => import('./verify.page').then((m) => m.VerifyPage),
-        title: 'Vérification — CNPM',
+        title: 'Vérification — COGEF',
       },
       {
         path: 'verify/method',
         loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
-        title: 'Méthode de vérification — CNPM',
+        title: 'Méthode de vérification — COGEF',
         data: { blockedAuth: BLOCKED_AUTH_SCREENS.method },
       },
       {
         path: 'forgot-password',
         loadComponent: () => import('./blocked-auth.page').then((module) => module.BlockedAuthPage),
-        title: 'Mot de passe oublié — CNPM',
+        title: 'Mot de passe oublié — COGEF',
         data: { blockedAuth: BLOCKED_AUTH_SCREENS.forgot },
       },
       // Les deux routes servent le même geste — le titulaire pose son propre mot de passe
@@ -76,13 +76,13 @@ export const authRoutes: Routes = [
       {
         path: 'reset-password',
         loadComponent: () => import('./set-password.page').then((module) => module.SetPasswordPage),
-        title: 'Réinitialiser le mot de passe — CNPM',
+        title: 'Réinitialiser le mot de passe — COGEF',
         data: { activation: false },
       },
       {
         path: 'activate',
         loadComponent: () => import('./set-password.page').then((module) => module.SetPasswordPage),
-        title: 'Activer le compte — CNPM',
+        title: 'Activer le compte — COGEF',
         data: { activation: true },
       },
       {
@@ -92,26 +92,26 @@ export const authRoutes: Routes = [
         path: '2fa-enrollment',
         loadComponent: () =>
           import('./two-factor-enrollment.page').then((m) => m.TwoFactorEnrollmentPage),
-        title: 'Enrôlement 2FA — CNPM',
+        title: 'Enrôlement 2FA — COGEF',
       },
       {
         // Retour de la redirection OIDC Keycloak : échange le code contre un jeton.
         path: 'callback',
         loadComponent: () => import('./oidc-callback.page').then((m) => m.OidcCallbackPage),
-        title: 'Connexion — CNPM',
+        title: 'Connexion — COGEF',
       },
       {
         // Déconnexion volontaire : termine la session et retourne à la connexion.
         path: 'logout',
         loadComponent: () => import('./logout.page').then((m) => m.LogoutPage),
-        title: 'Déconnexion — CNPM',
+        title: 'Déconnexion — COGEF',
       },
       {
         // AUTH-008 : atteint après expiration de session. Aucun garde de gateway —
         // c'est un écran d'information, pas une étape d'authentification.
         path: 'session-ended',
         loadComponent: () => import('./session-ended.page').then((m) => m.SessionEndedPage),
-        title: 'Session expirée — CNPM',
+        title: 'Session expirée — COGEF',
       },
       { path: '', pathMatch: 'full', redirectTo: 'login' },
     ],

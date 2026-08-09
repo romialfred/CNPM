@@ -335,7 +335,7 @@ export class NewAccountPage {
   }
 
   constructor() {
-    // Le type de compte pilote le rôle : un membre reçoit d'office le rôle « Membre CNPM ».
+    // Le type de compte pilote le rôle : un membre reçoit d'office le rôle « Membre COGEF ».
     this.form.controls.accountType.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((type) => {

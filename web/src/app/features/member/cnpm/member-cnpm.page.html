@@ -2,7 +2,7 @@
   <main class="member-cnpm" id="contenu-principal">
     <cnpm-page-header
       title="Le CNPM"
-      description="Les actualités du Conseil National du Patronat du Mali et vos accès à la vie du réseau."
+      description="Les actualités de la Confédération Générale des Entreprises du Faso et vos accès à la vie du réseau."
     />
 
     <section class="member-cnpm__section" aria-labelledby="member-cnpm-news">
@@ -16,7 +16,7 @@
             <cnpm-error-state
               variant="recoverable"
               title="Actualités indisponibles"
-              description="Les actualités du CNPM n’ont pas pu être chargées pour le moment."
+              description="Les actualités de la COGEF n’ont pas pu être chargées pour le moment."
             >
               <cnpm-button variant="secondary" (click)="loadEvents()">Réessayer</cnpm-button>
             </cnpm-error-state>
@@ -26,7 +26,7 @@
               <cnpm-empty-state
                 variant="no-data"
                 title="Aucune actualité publiée"
-                description="Les événements et communications officiels du CNPM s’afficheront ici dès leur publication."
+                description="Les événements et communications officiels de la COGEF s’afficheront ici dès leur publication."
               />
             } @else {
               <ul class="member-cnpm__news">

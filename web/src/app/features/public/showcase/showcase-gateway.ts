@@ -133,7 +133,7 @@ export interface MemberShowcase {
   readonly foundedYear: number;
   readonly legalForm: string;
   readonly verificationStatus: VerificationStatus;
-  /** Date à laquelle le CNPM a constaté le statut ; le badge doit l'exposer. */
+  /** Date à laquelle la COGEF a constaté le statut ; le badge doit l'exposer. */
   readonly verifiedAt: string | null;
   /** Ancienneté d'adhésion, distincte de l'année de création de l'entreprise. */
   readonly memberSince: string;

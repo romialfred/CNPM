@@ -117,7 +117,7 @@ export class PaymentsRecordingPage {
   protected readonly providerTransactionId = signal('');
 
   constructor() {
-    this.title.setTitle('Encaissements — Administration CNPM');
+    this.title.setTitle('Encaissements — Administration COGEF');
     this.load();
   }
 

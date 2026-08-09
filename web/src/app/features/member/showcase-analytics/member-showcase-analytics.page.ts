@@ -144,7 +144,7 @@ export class MemberShowcaseAnalyticsPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Statistiques privées de la vitrine — CNPM',
+      title: 'Statistiques privées de la vitrine — COGEF',
       description: 'Statistiques agrégées et anonymes d’une vitrine membre.',
       robots: 'noindex,nofollow',
       canonicalPath: '/member/showcase/analytics',

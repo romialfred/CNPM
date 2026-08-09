@@ -105,8 +105,8 @@ export class GroupDetailPage {
       const group = this.group();
       this.title.setTitle(
         group
-          ? `${group.name} — Groupement — Administration CNPM`
-          : 'Fiche groupement — Administration CNPM',
+          ? `${group.name} — Groupement — Administration COGEF`
+          : 'Fiche groupement — Administration COGEF',
       );
     });
   }

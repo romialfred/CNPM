@@ -68,7 +68,7 @@ export interface PublicFooterContact {
             <a
               class="cnpm-public__brand-link"
               routerLink="/"
-              aria-label="Conseil National du Patronat du Mali — accueil"
+              aria-label="Confédération Générale des Entreprises du Faso — accueil"
             >
               <span class="cnpm-public__logo-frame" aria-hidden="true">
                 <img
@@ -128,7 +128,7 @@ export interface PublicFooterContact {
                 <div>
                   <p class="cnpm-public__drawer-kicker">Navigation</p>
                   <h2 class="cnpm-public__drawer-title" id="navigation-mobile-title">
-                    Site du CNPM
+                    Site de la COGEF
                   </h2>
                 </div>
                 <button
@@ -254,11 +254,11 @@ export interface PublicFooterContact {
               />
             </span>
             <h2 class="cnpm-public__visually-hidden" id="pied-cnpm">
-              Conseil National du Patronat du Mali
+              Confédération Générale des Entreprises du Faso
             </h2>
             <p>
               Une union de groupements d'employeurs au service des entreprises et du développement
-              économique du Mali.
+              économique du Burkina Faso.
             </p>
             <a class="cnpm-public__footer-cta" routerLink="/auth/login">
               <svg lucideLogIn [size]="iconSize.compact" aria-hidden="true"></svg>
@@ -287,7 +287,7 @@ export interface PublicFooterContact {
 
         <div class="cnpm-public__legal-bar">
           <p>
-            <abbr title="Conseil National du Patronat du Mali">CNPM</abbr> © {{ currentYear }} —
+            <abbr title="Confédération Générale des Entreprises du Faso">COGEF</abbr> © {{ currentYear }} —
             Tous droits réservés.
           </p>
           <ul aria-label="Informations légales">

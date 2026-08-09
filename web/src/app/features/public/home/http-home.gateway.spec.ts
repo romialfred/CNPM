@@ -34,7 +34,7 @@ describe('HttpHomeGateway', () => {
         { id: 'active-members', label: 'Membres actifs', value: 0, unit: null },
       ],
       news: [],
-      sourceNotice: 'Chiffres établis à partir du registre des membres du CNPM.',
+      sourceNotice: 'Chiffres établis à partir du registre des membres de la COGEF.',
       dataAsOf: '2026-07-22T00:00:00Z',
     });
 

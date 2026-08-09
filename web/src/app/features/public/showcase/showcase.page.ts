@@ -116,7 +116,7 @@ export class ShowcasePage {
       { id: 'statut', label: 'Statut', value: data.legalForm, icon: 'legal' as const },
       {
         id: 'adhesion',
-        label: 'Membre CNPM',
+        label: 'Membre COGEF',
         // Le statut est écrit, jamais porté par la seule couleur du bandeau.
         value: `Membre actif depuis ${data.memberSince}`,
         icon: 'member' as const,
@@ -160,7 +160,7 @@ export class ShowcasePage {
   /** Mention d'adhésion affichée dans l'en-tête public. */
   protected readonly memberBadge = computed(() => {
     const data = this.showcase();
-    return data ? `Membre CNPM — Membre actif depuis ${data.memberSince}` : null;
+    return data ? `Membre COGEF — Membre actif depuis ${data.memberSince}` : null;
   });
 
   protected readonly testimonial = computed(() => {
@@ -171,14 +171,14 @@ export class ShowcasePage {
   /**
    * Explication du badge.
    *
-   * N'énonce que ce que le handoff établit : le statut est calculé par le CNPM et le
+   * N'énonce que ce que le handoff établit : le statut est calculé par la COGEF et le
    * membre ne peut pas l'activer lui-même (`requirements.md`). Les critères, la durée
    * et la portée relèvent d'UX-DEC-004, non tranchée — les décrire ici reviendrait à
    * inventer une garantie institutionnelle.
    */
   protected readonly badgeExplanation = computed(
     () =>
-      'Ce statut est attribué par le CNPM. L’entreprise membre ne peut pas l’activer elle-même.',
+      'Ce statut est attribué par la COGEF. L’entreprise membre ne peut pas l’activer elle-même.',
   );
 
   constructor() {
@@ -224,7 +224,7 @@ export class ShowcasePage {
   /** Une vitrine non publique ne doit jamais être indexée. */
   private blockIndexing(slug: string): void {
     this.seo.apply({
-      title: 'Vitrine indisponible — CNPM',
+      title: 'Vitrine indisponible — COGEF',
       description: 'Cette vitrine membre n’est pas disponible publiquement.',
       robots: 'noindex,nofollow',
       canonicalPath: `/membres/${encodeURIComponent(slug)}`,

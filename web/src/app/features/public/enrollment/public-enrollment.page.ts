@@ -174,7 +174,7 @@ export class PublicEnrollmentPage {
 
   constructor() {
     this.seo.apply({
-      title: 'Demande d’adhésion — CNPM',
+      title: 'Demande d’adhésion — COGEF',
       description:
         'Parcours local présentant les informations attendues pour une future demande d’adhésion.',
       robots: 'noindex,nofollow',

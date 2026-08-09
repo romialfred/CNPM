@@ -32,7 +32,7 @@ export interface BlockedAuthContent {
   template: `
     <cnpm-auth-shell
       trustTitle="Une identité numérique sous contrôle"
-      trustText="Les parcours sensibles restent fermés tant que leurs méthodes, canaux et règles de sécurité n'ont pas été validés par le CNPM."
+      trustText="Les parcours sensibles restent fermés tant que leurs méthodes, canaux et règles de sécurité n'ont pas été validés par la COGEF."
     >
       <article class="blocked-auth" aria-labelledby="blocked-auth-title">
         <div class="blocked-auth__heading">

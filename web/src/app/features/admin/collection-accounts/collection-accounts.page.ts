@@ -47,7 +47,7 @@ const CHANNELS: readonly ChannelOption[] = [
 ];
 
 /**
- * Écran « Comptes d'encaissement de la CNPM » (Lot 1 de la refonte).
+ * Écran « Comptes d'encaissement de la COGEF » (Lot 1 de la refonte).
  *
  * <p>La CNPM y configure ses coordonnées d'encaissement (Orange Money, Wave, MTN, banque). Un
  * compte naît en brouillon et n'est diffusable qu'après validation par un SECOND agent — la
@@ -126,7 +126,7 @@ export class CollectionAccountsPage {
   );
 
   constructor() {
-    this.title.setTitle('Comptes d’encaissement — Administration CNPM');
+    this.title.setTitle('Comptes d’encaissement — Administration COGEF');
     this.load();
   }
 

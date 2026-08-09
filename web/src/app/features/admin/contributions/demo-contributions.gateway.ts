@@ -43,7 +43,7 @@ interface CallFixture {
 }
 
 /**
- * Données de démonstration — raisons sociales fictives, aucun membre réel du CNPM.
+ * Données de démonstration — raisons sociales fictives, aucun membre réel de la COGEF.
  *
  * `CLAUDE.md` interdit toute donnée officielle inventée comme toute donnée réelle de
  * membre : ces enregistrements sont manifestement synthétiques et ne doivent jamais

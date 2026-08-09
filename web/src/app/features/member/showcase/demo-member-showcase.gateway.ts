@@ -36,7 +36,7 @@ export const DEMO_MEMBER_SHOWCASE_DRAFT: MemberShowcaseDraft = {
   seo: {
     title: 'Atelier Kanu — vitrine CNPM',
     description:
-      'Présentation des activités et des réalisations d’Atelier Kanu, membre du CNPM.',
+      'Présentation des activités et des réalisations d’Atelier Kanu, membre de la COGEF.',
     allowIndexing: false,
   },
   publication: {

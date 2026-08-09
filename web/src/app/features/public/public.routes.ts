@@ -35,7 +35,7 @@ export const publicRoutes: Routes = [
           import('./enrollment/public-enrollment-confirmation.page').then(
             (m) => m.PublicEnrollmentConfirmationPage,
           ),
-        title: 'Confirmation d’adhésion — CNPM',
+        title: 'Confirmation d’adhésion — COGEF',
       },
       {
         path: '',
@@ -43,7 +43,7 @@ export const publicRoutes: Routes = [
         canDeactivate: [pendingPublicEnrollmentChangesGuard],
         loadComponent: () =>
           import('./enrollment/public-enrollment.page').then((m) => m.PublicEnrollmentPage),
-        title: 'Demande d’adhésion — CNPM',
+        title: 'Demande d’adhésion — COGEF',
       },
     ],
   },
@@ -61,21 +61,21 @@ export const publicRoutes: Routes = [
     ],
     loadComponent: () =>
       import('./verification/receipt-verification.page').then((m) => m.ReceiptVerificationPage),
-    title: 'Vérification d’un reçu — CNPM',
+    title: 'Vérification d’un reçu — COGEF',
   },
   {
     path: 'le-cnpm',
     data: { mode: 'about' },
     loadComponent: () =>
       import('./institutional/institutional.page').then((m) => m.InstitutionalPage),
-    title: 'Le CNPM — Présentation',
+    title: 'Le COGEF — Présentation',
   },
   {
     path: 'services',
     data: { mode: 'services' },
     loadComponent: () =>
       import('./institutional/institutional.page').then((m) => m.InstitutionalPage),
-    title: 'Services numériques — CNPM',
+    title: 'Services numériques — COGEF',
   },
   {
     path: 'actualites',
@@ -95,13 +95,13 @@ export const publicRoutes: Routes = [
         pathMatch: 'full',
         data: { mode: 'news' },
         loadComponent: () => import('./editorial/editorial.page').then((m) => m.EditorialPage),
-        title: 'Actualités — CNPM',
+        title: 'Actualités — COGEF',
       },
       {
         path: ':slug',
         data: { mode: 'article' },
         loadComponent: () => import('./editorial/editorial.page').then((m) => m.EditorialPage),
-        title: 'Actualité — CNPM',
+        title: 'Actualité — COGEF',
       },
     ],
   },
@@ -119,17 +119,17 @@ export const publicRoutes: Routes = [
     ],
     data: { mode: 'agenda' },
     loadComponent: () => import('./editorial/editorial.page').then((m) => m.EditorialPage),
-    title: 'Agenda — CNPM',
+    title: 'Agenda — COGEF',
   },
   {
     path: 'contact',
     loadComponent: () => import('./contact/contact.page').then((m) => m.ContactPage),
-    title: 'Contact — CNPM',
+    title: 'Contact — COGEF',
   },
   {
     path: 'legal/:document',
     loadComponent: () => import('./legal/legal.page').then((m) => m.LegalPage),
-    title: 'Information juridique — CNPM',
+    title: 'Information juridique — COGEF',
   },
   {
     path: '',
@@ -144,7 +144,7 @@ export const publicRoutes: Routes = [
       },
     ],
     loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
-    title: 'Conseil National du Patronat du Mali',
+    title: 'Confédération Générale des Entreprises du Faso',
   },
 ];
 
@@ -167,33 +167,33 @@ export const showcaseRoutes: Routes = [
         pathMatch: 'full',
         data: { mode: 'directory' },
         loadComponent: () => import('./directory/directory.page').then((m) => m.DirectoryPage),
-        title: 'Annuaire des membres — CNPM',
+        title: 'Annuaire des membres — COGEF',
       },
       {
         path: 'recherche',
         data: { mode: 'search' },
         loadComponent: () => import('./directory/directory.page').then((m) => m.DirectoryPage),
-        title: 'Rechercher un membre — CNPM',
+        title: 'Rechercher un membre — COGEF',
       },
       {
         path: ':slug/activites',
         data: { mode: 'activities' },
         loadComponent: () =>
           import('./showcase-detail/showcase-detail.page').then((m) => m.ShowcaseDetailPage),
-        title: 'Activités et réalisations — CNPM',
+        title: 'Activités et réalisations — COGEF',
       },
       {
         path: ':slug/realisations/:id',
         data: { mode: 'project' },
         loadComponent: () =>
           import('./showcase-detail/showcase-detail.page').then((m) => m.ShowcaseDetailPage),
-        title: 'Détail d’une réalisation — CNPM',
+        title: 'Détail d’une réalisation — COGEF',
       },
       {
         path: ':slug',
         loadComponent: () => import('./showcase/showcase.page').then((m) => m.ShowcasePage),
         // Le titre définitif est posé par la page à partir des données SEO de la vitrine.
-        title: 'Vitrine membre — CNPM',
+        title: 'Vitrine membre — COGEF',
       },
     ],
   },

@@ -29,7 +29,7 @@ describe('AuthShellComponent', () => {
     host = fixture.nativeElement as HTMLElement;
   });
 
-  it('présente le siège du CNPM en photographie, non en illustration', () => {
+  it('présente le siège de la COGEF en photographie, non en illustration', () => {
     const photo = host.querySelector<HTMLImageElement>('.cnpm-auth__photo');
 
     expect(photo?.getAttribute('src')).toBe('/assets/photos/cnpm-siege.webp');
@@ -89,7 +89,7 @@ describe('AuthShellComponent', () => {
     // donc rester pilotable par la page, sans quoi il annoncerait « Bienvenue » à
     // quelqu'un qui est déjà en train de se connecter.
     expect(host.querySelector('.cnpm-auth__trust-title')?.textContent?.trim()).toBe(
-      'Bienvenue dans votre espace CNPM',
+      'Bienvenue dans votre espace COGEF',
     );
 
     const local = TestBed.createComponent(AuthShellComponent);

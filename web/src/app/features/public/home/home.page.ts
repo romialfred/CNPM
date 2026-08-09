@@ -79,9 +79,9 @@ export class HomePage {
 
 
   protected readonly institution = {
-    title: 'La plateforme digitale du Conseil National du Patronat du Mali',
+    title: 'La plateforme digitale de la Confédération Générale des Entreprises du Faso',
     baseline:
-      'Une union de groupements d’employeurs pour la défense et l’intérêt des entreprises du Mali.',
+      'Une union de groupements d’employeurs pour la défense et l’intérêt des entreprises du Burkina Faso.',
   };
 
   protected readonly promises: readonly { id: string; label: string; accent: CnpmTileAccent }[] = [
@@ -146,7 +146,7 @@ export class HomePage {
   ];
 
   /**
-   * Illustrations : photographies réelles du Mali (Wikimedia Commons, libres de droits),
+   * Illustrations : photographies réelles du Burkina Faso (Wikimedia Commons, libres de droits),
    * servies en local depuis `public/assets/tiles/`. Crédits et licences dans
    * `assets/tiles/CREDITS.md`. L'attribut `alt` reste vide : l'image est décorative,
    * le titre voisin porte le sens.
@@ -161,7 +161,7 @@ export class HomePage {
     {
       id: 'requetes',
       title: 'Requêtes',
-      text: 'Créer et suivre une demande adressée au CNPM.',
+      text: 'Créer et suivre une demande adressée à la COGEF.',
       image: '/assets/tiles/requetes-marche.jpg',
     },
     {
@@ -203,14 +203,14 @@ export class HomePage {
       },
       reseau: {
         src: '/assets/photos/reseau-entreprises.webp',
-        alt: 'Un intervenant désigne une carte régionale reliant le Mali à ses pays voisins.',
+        alt: 'Un intervenant désigne une carte régionale reliant le Burkina Faso à ses pays voisins.',
       },
     };
     return parSujet[id] ?? parSujet['prise-en-main'];
   }
 
   constructor() {
-    this.title.setTitle('Conseil National du Patronat du Mali');
+    this.title.setTitle('Confédération Générale des Entreprises du Faso');
     this.meta.updateTag({ name: 'description', content: this.institution.baseline });
     this.loadHighlights();
   }

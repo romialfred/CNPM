@@ -1,6 +1,6 @@
 <cnpm-auth-shell>
   <div class="cnpm-login">
-    <h1 class="cnpm-login__title">Connexion à votre espace CNPM</h1>
+    <h1 class="cnpm-login__title">Connexion à votre espace COGEF</h1>
     <p class="cnpm-login__subtitle">Choisissez votre espace, puis identifiez-vous.</p>
 
     <cnpm-tabs
@@ -35,7 +35,7 @@
     @if (state() === 'forbidden') {
       <div #errorAlert class="cnpm-login__alert" [id]="errorAlertId" tabindex="-1">
         <cnpm-alert tone="warning" title="Accès non autorisé">
-          Cet accès est actuellement refusé. Contactez le secrétariat du CNPM pour connaître la
+          Cet accès est actuellement refusé. Contactez le secrétariat de la COGEF pour connaître la
           situation de votre compte.
         </cnpm-alert>
       </div>

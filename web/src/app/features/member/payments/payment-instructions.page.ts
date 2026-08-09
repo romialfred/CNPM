@@ -33,7 +33,7 @@ const CHANNEL_LABELS: Readonly<Record<CollectionChannel, string>> = {
  * Espace membre — « Comment payer ma cotisation » (Lot 3 de la refonte).
  *
  * <p>Le cotisant choisit son canal (Orange Money / Wave / MTN / virement), lit les coordonnées
- * d'encaissement validées de la CNPM et sa référence, puis paie depuis son propre compte. Rien
+ * d'encaissement validées de la COGEF et sa référence, puis paie depuis son propre compte. Rien
  * n'est débité ici : la plateforme n'affiche que des instructions, le paiement se fait chez
  * l'opérateur ou la banque du cotisant, et le rapprochement suit côté CNPM.
  */

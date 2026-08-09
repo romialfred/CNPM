@@ -68,7 +68,7 @@ interface MemberNavGroup {
  * Cadre de l'espace membre — sa navigation lui est DÉDIÉE, à la première personne.
  *
  * Contrairement au back-office, le membre est chez lui : la barre latérale gauche regroupe
- * ses données personnelles (« Mon espace »), ses accès à la vie du CNPM (« Le CNPM ») et
+ * ses données personnelles (« Mon espace »), ses accès à la vie de la COGEF (« Le CNPM ») et
  * son compte (« Mon compte »). Sous 1024 px, cette même barre devient un tiroir modal
  * (focus piégé, Échap, défilement verrouillé, focus restauré), comme l'exige WCAG 2.2 AA.
  */
@@ -117,7 +117,7 @@ export class MemberPortalShellComponent implements OnDestroy {
   private bodyScrollLocked = false;
 
   readonly organization = input('Espace membre');
-  readonly userName = input('Membre CNPM');
+  readonly userName = input('Membre COGEF');
   readonly memberCode = input('');
   /**
    * Compteur de notifications. Défaut à 0 : aucun flux de notifications n'est encore

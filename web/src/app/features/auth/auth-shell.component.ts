@@ -56,9 +56,9 @@ import {
         </main>
 
         <footer class="cnpm-auth__footer">
-          <p class="cnpm-auth__legal">© CNPM — Tous droits réservés.</p>
+          <p class="cnpm-auth__legal">© COGEF — Tous droits réservés.</p>
           <p class="cnpm-auth__secure">
-            <svg lucideShieldCheck aria-hidden="true"></svg> Une plateforme sécurisée par le CNPM
+            <svg lucideShieldCheck aria-hidden="true"></svg> Une plateforme sécurisée par la COGEF
           </p>
         </footer>
       </div>
@@ -86,7 +86,7 @@ import {
             src="/assets/brand/logo-CNPM-lockup.png"
             width="276"
             height="137"
-            alt="CNPM — Conseil National du Patronat du Mali"
+            alt="COGEF — Confédération Générale des Entreprises du Faso"
           />
 
           <div class="cnpm-auth__trust">
@@ -131,7 +131,7 @@ import {
   styleUrl: './auth-shell.component.scss',
 })
 export class AuthShellComponent {
-  readonly trustTitle = input('Bienvenue dans votre espace CNPM');
+  readonly trustTitle = input('Bienvenue dans votre espace COGEF');
   readonly trustText = input(
     'Accédez à votre espace pour gérer vos cotisations, documents et services membres en toute sécurité.',
   );

@@ -176,7 +176,7 @@ function fallbackCode(status: number): string {
 function fallbackMessage(status: number): string {
   switch (categoryForStatus(status)) {
     case 'network':
-      return 'Le service CNPM est momentanément inaccessible.';
+      return 'Le service COGEF est momentanément inaccessible.';
     case 'validation':
       return 'La requête contient une donnée invalide.';
     case 'authentication':
@@ -192,7 +192,7 @@ function fallbackMessage(status: number): string {
     case 'rate-limit':
       return 'Trop de requêtes ont été envoyées. Réessayez ultérieurement.';
     case 'server':
-      return 'Le service CNPM rencontre une erreur temporaire.';
+      return 'Le service COGEF rencontre une erreur temporaire.';
     case 'unknown':
       return 'La requête n’a pas pu être traitée.';
   }

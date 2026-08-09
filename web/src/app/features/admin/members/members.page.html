@@ -213,7 +213,7 @@
 
           @if (view() === 'table') {
             <cnpm-data-table
-              caption="Liste des membres du CNPM, avec leur groupement, contact, cotisations et statut."
+              caption="Liste des membres de la COGEF, avec leur groupement, contact, cotisations et statut."
               [columns]="columns()"
               [rows]="rows()"
               [state]="tableState()"
@@ -352,7 +352,7 @@
              sous le curseur ne se lit pas. Les informations qui vivaient au dos (contact,
              telephone, derniere activite) restent sur la fiche du membre. -->
           @if (view() === 'tiles' && tableState() === 'ready') {
-            <ul class="cnpm-members__tiles" aria-label="Membres du CNPM">
+            <ul class="cnpm-members__tiles" aria-label="Membres de la COGEF">
               @for (member of rows(); track member.id) {
                 <li class="cnpm-members__tile" [class]="statusAccentClass(member.status)">
                   <div class="cnpm-members__tile-head">

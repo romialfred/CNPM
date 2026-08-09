@@ -253,8 +253,8 @@ export class SettingsPage {
   constructor() {
     this.title.setTitle(
       this.fixedDomainLabel
-        ? `${this.fixedDomainLabel} — Paramètre CNPM`
-        : 'Paramétrage fonctionnel — Administration CNPM',
+        ? `${this.fixedDomainLabel} — Paramètre COGEF`
+        : 'Paramétrage fonctionnel — Administration COGEF',
     );
 
     effect(() => {

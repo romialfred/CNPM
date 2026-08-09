@@ -102,7 +102,7 @@ export class DemoMembersGateway implements MembersGateway {
       rows,
       totalItems: filtered.length,
       // La synthèse décrit la base entière, pas le filtre courant : elle répond à
-      // « où en est le CNPM ? », question dont la réponse ne change pas parce qu'on
+      // « où en est la COGEF ? », question dont la réponse ne change pas parce qu'on
       // a restreint l'affichage.
       overview: this.overview(),
       categories: this.distinct((member) => member.category),

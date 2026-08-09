@@ -1,7 +1,7 @@
 import { InjectionToken } from '@angular/core';
 import type { Observable } from 'rxjs';
 
-/** Indicateur public du CNPM, avec sa date de constat. */
+/** Indicateur public de la COGEF, avec sa date de constat. */
 export interface PublicMetric {
   readonly id: string;
   readonly label: string;

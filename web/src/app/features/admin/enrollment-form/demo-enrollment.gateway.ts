@@ -40,7 +40,7 @@ function distinct(pick: (member: MemberFixture) => string): readonly string[] {
 /**
  * Formes juridiques et périodicités servies par l'adaptateur local.
  *
- * La nomenclature officielle du CNPM reste servie par le back-office. L'écran
+ * La nomenclature officielle de la COGEF reste servie par le back-office. L'écran
  * l'affiche telle qu'elle lui parvient et n'en fabrique aucune.
  */
 const DEMO_LEGAL_FORMS: readonly string[] = [

@@ -152,7 +152,7 @@ export const USER_MANUAL: DocManual = {
           blocks: [
             {
               kind: 'paragraph',
-              text: 'Les pages Entreprises et Groupements présentent les personnes morales et les groupements professionnels du CNPM, avec recherche, filtres et accès au détail.',
+              text: 'Les pages Entreprises et Groupements présentent les personnes morales et les groupements professionnels de la COGEF, avec recherche, filtres et accès au détail.',
             },
           ],
         },
@@ -246,7 +246,7 @@ export const USER_MANUAL: DocManual = {
     {
       id: 'um-requetes',
       title: '7. Requêtes',
-      summary: 'Créer et suivre une demande ou une réclamation adressée au CNPM.',
+      summary: 'Créer et suivre une demande ou une réclamation adressée à la COGEF.',
       subsections: [
         {
           id: 'um-requetes-cycle',

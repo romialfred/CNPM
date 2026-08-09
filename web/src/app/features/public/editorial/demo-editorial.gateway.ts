@@ -14,7 +14,7 @@ const ARTICLES: readonly PublicDemoArticle[] = [
     summary: 'Un parcours éditorial pour situer cotisations, reçus et requêtes.',
     body: [
       'Cette publication illustre la manière dont une actualité peut guider les membres vers leurs services numériques.',
-      'Les démarches citées restent soumises aux règles, validations et contrats officiels du CNPM.',
+      'Les démarches citées restent soumises aux règles, validations et contrats officiels de la COGEF.',
       'Chaque information sensible demeure accessible uniquement après authentification.',
     ],
     publishedOn: '2026-07-08',

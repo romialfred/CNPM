@@ -51,7 +51,7 @@ export type CnpmVerificationStatus = 'VERIFIED' | 'PENDING' | 'EXPIRED' | 'SUSPE
 export class VerificationBadgeComponent {
   readonly status = input.required<CnpmVerificationStatus>();
   readonly explanation = input.required<string>();
-  /** Date à laquelle le CNPM a constaté le statut ; omise si la source ne la porte pas. */
+  /** Date à laquelle la COGEF a constaté le statut ; omise si la source ne la porte pas. */
   readonly verifiedAt = input<string | null>(null);
 
   private static nextId = 0;
@@ -68,7 +68,7 @@ export class VerificationBadgeComponent {
     CnpmVerificationStatus,
     { tone: CnpmBadgeTone; label: string }
   > = {
-    VERIFIED: { tone: 'success', label: 'Membre vérifié par le CNPM' },
+    VERIFIED: { tone: 'success', label: 'Membre vérifié par la COGEF' },
     PENDING: { tone: 'info', label: 'Vérification en cours' },
     EXPIRED: { tone: 'warning', label: 'Vérification expirée' },
     SUSPENDED: { tone: 'error', label: 'Membre suspendu' },

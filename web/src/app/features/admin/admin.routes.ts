@@ -310,34 +310,34 @@ export const adminRoutes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard.page').then((m) => m.DashboardPage),
-        title: 'Tableau de bord — Administration CNPM',
+        title: 'Tableau de bord — Administration COGEF',
       },
       {
         path: 'profile',
         loadComponent: () => import('./account/profile.page').then((m) => m.ProfilePage),
-        title: 'Mon profil — Administration CNPM',
+        title: 'Mon profil — Administration COGEF',
       },
       {
         path: 'preferences',
         loadComponent: () => import('./account/preferences.page').then((m) => m.PreferencesPage),
-        title: 'Mes préférences — Administration CNPM',
+        title: 'Mes préférences — Administration COGEF',
       },
       {
         path: 'help',
         loadComponent: () =>
           import('./documentation/documentation.page').then((m) => m.DocumentationPage),
-        title: 'Aide et documentation — Administration CNPM',
+        title: 'Aide et documentation — Administration COGEF',
       },
       {
         path: 'members',
         loadComponent: () => import('./members/members.page').then((m) => m.MembersPage),
-        title: 'Membres — Administration CNPM',
+        title: 'Membres — Administration COGEF',
       },
       {
         path: 'organizations',
         loadComponent: () =>
           import('./organizations/organizations.page').then((m) => m.OrganizationsPage),
-        title: 'Entreprises — Administration CNPM',
+        title: 'Entreprises — Administration COGEF',
       },
       {
         path: 'organizations/:id/contacts',
@@ -346,7 +346,7 @@ export const adminRoutes: Routes = [
           import('./organizations/contacts/organization-contacts.page').then(
             (m) => m.OrganizationContactsPage,
           ),
-        title: 'Contacts de l’entreprise — Administration CNPM',
+        title: 'Contacts de l’entreprise — Administration COGEF',
       },
       {
         // La route d'édition précède la fiche paramétrée et ne propose aucune création.
@@ -354,31 +354,31 @@ export const adminRoutes: Routes = [
         canDeactivate: [pendingOrganizationChangesGuard],
         loadComponent: () =>
           import('./organizations/organization-edit.page').then((m) => m.OrganizationEditPage),
-        title: 'Modifier une entreprise — Administration CNPM',
+        title: 'Modifier une entreprise — Administration COGEF',
       },
       {
         path: 'organizations/:id',
         loadComponent: () =>
           import('./organizations/organization-detail.page').then((m) => m.OrganizationDetailPage),
-        title: 'Fiche entreprise — Administration CNPM',
+        title: 'Fiche entreprise — Administration COGEF',
       },
       {
         path: 'groups',
         canActivate: [groupReadGuard],
         loadComponent: () => import('./groups/groups.page').then((m) => m.GroupsPage),
-        title: 'Groupements professionnels — Administration CNPM',
+        title: 'Groupements professionnels — Administration COGEF',
       },
       {
         path: 'groups/:id',
         canActivate: [groupReadGuard],
         loadComponent: () => import('./groups/group-detail.page').then((m) => m.GroupDetailPage),
-        title: 'Fiche groupement — Administration CNPM',
+        title: 'Fiche groupement — Administration COGEF',
       },
       {
         path: 'enrollments',
         loadComponent: () =>
           import('./enrollments/enrollments.page').then((m) => m.EnrollmentsPage),
-        title: 'Enrôlements — Administration CNPM',
+        title: 'Enrôlements — Administration COGEF',
       },
       {
         // Chemin fixe déclaré avant la route paramétrée du même segment.
@@ -386,25 +386,25 @@ export const adminRoutes: Routes = [
         canDeactivate: [pendingEnrollmentChangesGuard],
         loadComponent: () =>
           import('./enrollment-form/enrollment-form.page').then((m) => m.EnrollmentFormPage),
-        title: 'Nouvel enrôlement — Administration CNPM',
+        title: 'Nouvel enrôlement — Administration COGEF',
       },
       {
         path: 'enrollments/:id/review',
         loadComponent: () =>
           import('./enrollments/enrollment-review.page').then((m) => m.EnrollmentReviewPage),
-        title: 'Validation d’un enrôlement — Administration CNPM',
+        title: 'Validation d’un enrôlement — Administration COGEF',
       },
       {
         path: 'members/:id/edit',
         canDeactivate: [pendingMemberEditChangesGuard],
         loadComponent: () => import('./member-edit/member-edit.page').then((m) => m.MemberEditPage),
-        title: 'Modifier un dossier membre — Administration CNPM',
+        title: 'Modifier un dossier membre — Administration COGEF',
       },
       {
         path: 'members/:id',
         loadComponent: () =>
           import('./member-detail/member-detail.page').then((m) => m.MemberDetailPage),
-        title: 'Fiche membre — Administration CNPM',
+        title: 'Fiche membre — Administration COGEF',
       },
       {
         // Précède impérativement `contributions/:id` : sinon le segment littéral
@@ -415,19 +415,19 @@ export const adminRoutes: Routes = [
           import('./contributions/generation/contribution-call-generation.page').then(
             (m) => m.ContributionCallGenerationPage,
           ),
-        title: 'Générer des appels de cotisation — Administration CNPM',
+        title: 'Générer des appels de cotisation — Administration COGEF',
       },
       {
         path: 'contributions/:id',
         loadComponent: () =>
           import('./contributions/contribution-detail.page').then((m) => m.ContributionDetailPage),
-        title: 'Détail d’une cotisation — Administration CNPM',
+        title: 'Détail d’une cotisation — Administration COGEF',
       },
       {
         path: 'contributions',
         loadComponent: () =>
           import('./contributions/contributions.page').then((m) => m.ContributionsPage),
-        title: 'Cotisations — Administration CNPM',
+        title: 'Cotisations — Administration COGEF',
       },
       {
         path: 'payments/reconciliation',
@@ -435,7 +435,7 @@ export const adminRoutes: Routes = [
           import('./payments/payments-reconciliation.page').then(
             (m) => m.PaymentsReconciliationPage,
           ),
-        title: 'Rapprochement des paiements — Administration CNPM',
+        title: 'Rapprochement des paiements — Administration COGEF',
       },
       {
         path: 'payments/import',
@@ -444,13 +444,13 @@ export const adminRoutes: Routes = [
           import('./payments/import/bank-statement-import.page').then(
             (m) => m.BankStatementImportPage,
           ),
-        title: 'Import de relevé bancaire — Administration CNPM',
+        title: 'Import de relevé bancaire — Administration COGEF',
       },
       {
         path: 'receipts',
         canActivate: [receiptReadGuard],
         loadComponent: () => import('./receipts/receipts.page').then((m) => m.ReceiptsPage),
-        title: 'Registre des reçus — Administration CNPM',
+        title: 'Registre des reçus — Administration COGEF',
       },
       {
         path: 'recovery/campaigns/:id',
@@ -458,19 +458,19 @@ export const adminRoutes: Routes = [
           import('./recovery/recovery-campaign-detail.page').then(
             (m) => m.RecoveryCampaignDetailPage,
           ),
-        title: 'Détail d’une campagne — Administration CNPM',
+        title: 'Détail d’une campagne — Administration COGEF',
       },
       {
         path: 'recovery/campaigns',
         loadComponent: () =>
           import('./recovery/recovery-campaigns.page').then((m) => m.RecoveryCampaignsPage),
-        title: 'Campagnes de relance — Administration CNPM',
+        title: 'Campagnes de relance — Administration COGEF',
       },
       {
         path: 'recovery/actions',
         loadComponent: () =>
           import('./recovery/actions/recovery-actions.page').then((m) => m.RecoveryActionsPage),
-        title: 'File des actions de relance — Administration CNPM',
+        title: 'File des actions de relance — Administration COGEF',
       },
       {
         path: 'recovery/portfolio',
@@ -478,31 +478,31 @@ export const adminRoutes: Routes = [
           import('./recovery/portfolio/recovery-portfolio.page').then(
             (m) => m.RecoveryPortfolioPage,
           ),
-        title: 'Portefeuille agent de recouvrement — Administration CNPM',
+        title: 'Portefeuille agent de recouvrement — Administration COGEF',
       },
       {
         path: 'reporting',
         loadComponent: () => import('./reporting/reporting.page').then((m) => m.ReportingPage),
-        title: 'Reporting — Administration CNPM',
+        title: 'Reporting — Administration COGEF',
       },
       {
         path: 'requests',
         canActivate: [requestReadGuard],
         loadComponent: () => import('./requests/requests.page').then((m) => m.RequestsPage),
-        title: 'Requêtes et réclamations — Administration CNPM',
+        title: 'Requêtes et réclamations — Administration COGEF',
       },
       {
         path: 'requests/:id',
         canActivate: [requestReadGuard],
         loadComponent: () =>
           import('./requests/request-detail.page').then((m) => m.RequestDetailPage),
-        title: 'Traitement d’un dossier — Administration CNPM',
+        title: 'Traitement d’un dossier — Administration COGEF',
       },
       {
         path: 'documents',
         canActivate: [documentReadGuard],
         loadComponent: () => import('./documents/documents.page').then((m) => m.DocumentsPage),
-        title: 'GED et documents — Administration CNPM',
+        title: 'GED et documents — Administration COGEF',
       },
       {
         path: 'showcases/moderation',
@@ -510,54 +510,54 @@ export const adminRoutes: Routes = [
           import('./showcase-moderation/showcase-moderation.page').then(
             (m) => m.ShowcaseModerationPage,
           ),
-        title: 'Modération des vitrines membres — Administration CNPM',
+        title: 'Modération des vitrines membres — Administration COGEF',
       },
       {
         path: 'integrations',
         canActivate: [integrationsReadGuard],
         loadComponent: () =>
           import('./integrations/integrations.page').then((m) => m.IntegrationsPage),
-        title: 'Supervision des intégrations — Administration CNPM',
+        title: 'Supervision des intégrations — Administration COGEF',
       },
       {
         path: 'security/roles',
         data: { defaultTab: 'roles' },
         loadComponent: () =>
           import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
-        title: 'Rôles et permissions — Administration CNPM',
+        title: 'Rôles et permissions — Administration COGEF',
       },
       {
         path: 'security/users',
         loadComponent: () =>
           import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
-        title: 'Gestion des utilisateurs — Administration CNPM',
+        title: 'Gestion des utilisateurs — Administration COGEF',
       },
       {
         path: 'security/sessions',
         data: { defaultTab: 'sessions' },
         loadComponent: () =>
           import('./security/admin-security.page').then((m) => m.AdminSecurityPage),
-        title: 'Gestion des sessions — Administration CNPM',
+        title: 'Gestion des sessions — Administration COGEF',
       },
       {
         // Création d'un compte : écran plein, hors modale (BO-030).
         path: 'security/accounts/new',
         loadComponent: () =>
           import('./security/new-account.page').then((m) => m.NewAccountPage),
-        title: 'Nouveau compte — Administration CNPM',
+        title: 'Nouveau compte — Administration COGEF',
       },
       {
         path: 'security/audit',
         canActivate: [auditReadGuard],
         loadComponent: () => import('./audit/audit.page').then((m) => m.AuditPage),
-        title: 'Journal d’audit — Administration CNPM',
+        title: 'Journal d’audit — Administration COGEF',
       },
       {
         path: 'settings',
         canActivate: [settingsReadGuard],
         canDeactivate: [pendingSettingsChangesGuard],
         loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
-        title: 'Paramétrage fonctionnel — Administration CNPM',
+        title: 'Paramétrage fonctionnel — Administration COGEF',
       },
       // Sous-menus « Paramètre » : la même page, verrouillée sur un domaine de référentiel.
       {
@@ -566,7 +566,7 @@ export const adminRoutes: Routes = [
         canActivate: [settingsReadGuard],
         canDeactivate: [pendingSettingsChangesGuard],
         loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
-        title: 'Canal — Paramètre CNPM',
+        title: 'Canal — Paramètre COGEF',
       },
       {
         path: 'settings/category',
@@ -574,7 +574,7 @@ export const adminRoutes: Routes = [
         canActivate: [settingsReadGuard],
         canDeactivate: [pendingSettingsChangesGuard],
         loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
-        title: 'Catégorie — Paramètre CNPM',
+        title: 'Catégorie — Paramètre COGEF',
       },
       {
         path: 'settings/status',
@@ -582,7 +582,7 @@ export const adminRoutes: Routes = [
         canActivate: [settingsReadGuard],
         canDeactivate: [pendingSettingsChangesGuard],
         loadComponent: () => import('./settings/settings.page').then((m) => m.SettingsPage),
-        title: 'Statut — Paramètre CNPM',
+        title: 'Statut — Paramètre COGEF',
       },
       {
         path: 'collection-accounts',
@@ -590,7 +590,7 @@ export const adminRoutes: Routes = [
           import('./collection-accounts/collection-accounts.page').then(
             (m) => m.CollectionAccountsPage,
           ),
-        title: 'Comptes d’encaissement — Administration CNPM',
+        title: 'Comptes d’encaissement — Administration COGEF',
       },
       {
         path: 'payment-references',
@@ -598,7 +598,7 @@ export const adminRoutes: Routes = [
           import('./payment-references/payment-references.page').then(
             (m) => m.PaymentReferencesPage,
           ),
-        title: 'Références de paiement — Administration CNPM',
+        title: 'Références de paiement — Administration COGEF',
       },
       {
         path: 'payments/recording',
@@ -606,19 +606,19 @@ export const adminRoutes: Routes = [
           import('./payments-recording/payments-recording.page').then(
             (m) => m.PaymentsRecordingPage,
           ),
-        title: 'Encaissements — Administration CNPM',
+        title: 'Encaissements — Administration COGEF',
       },
       {
         path: 'receipts-registry',
         loadComponent: () =>
           import('./receipts-registry/receipts-registry.page').then((m) => m.ReceiptsRegistryPage),
-        title: 'Reçus — Administration CNPM',
+        title: 'Reçus — Administration COGEF',
       },
       {
         path: 'reconciliation',
         loadComponent: () =>
           import('./reconciliation/reconciliation.page').then((m) => m.ReconciliationPage),
-        title: 'Rapprochement — Administration CNPM',
+        title: 'Rapprochement — Administration COGEF',
       },
       // Compatibilité des favoris et captures antérieurs à l'alignement sur
       // l'inventaire UI. Les nouveaux liens utilisent exclusivement les routes canoniques.

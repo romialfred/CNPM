@@ -450,11 +450,11 @@ export class DemoShowcaseGateway implements ShowcaseGateway {
       summary:
         'Entreprise malienne spécialisée dans les travaux publics, le génie civil et l’aménagement durable des infrastructures.',
       seoDescription:
-        'Découvrez les activités, réalisations et coordonnées de SOMACOP SA, membre vérifié du CNPM.',
+        'Découvrez les activités, réalisations et coordonnées de SOMACOP SA, membre vérifié de la COGEF.',
 
       verificationStatus: 'VERIFIED',
       // La fixture ne porte pas de date de vérification. Le badge doit exposer la
-      // date à laquelle le CNPM a constaté le statut ; à défaut, il ne l'annonce pas
+      // date à laquelle la COGEF a constaté le statut ; à défaut, il ne l'annonce pas
       // plutôt que d'afficher une date fabriquée.
       verifiedAt: null,
       memberSince: 'mai 2022',

@@ -4,7 +4,7 @@
       <div class="cnpm-home__hero-copy">
         <p class="cnpm-home__eyebrow">
           <span aria-hidden="true"></span>
-          Bienvenue sur la plateforme du CNPM
+          Bienvenue sur la plateforme de la COGEF
         </p>
         <h1 class="cnpm-home__title" id="accueil-titre">{{ institution.title }}</h1>
         <p class="cnpm-home__baseline">{{ institution.baseline }}</p>
@@ -15,7 +15,7 @@
         </div>
       </div>
 
-      <ul class="cnpm-home__promises" aria-label="Rôles du CNPM">
+      <ul class="cnpm-home__promises" aria-label="Rôles de la COGEF">
         @for (promise of promises; track promise.id) {
           <li [class]="'cnpm-home__promise cnpm-tile-accent--' + promise.accent">
             <span class="cnpm-home__promise-icon" aria-hidden="true">
@@ -61,7 +61,7 @@
             @if (highlights(); as data) {
               <div class="cnpm-home__preview-content">
                 <aside class="cnpm-home__preview-sidebar" aria-hidden="true">
-                  <span class="cnpm-home__preview-brand">CNPM</span>
+                  <span class="cnpm-home__preview-brand">COGEF</span>
                   <span class="cnpm-home__preview-nav cnpm-home__preview-nav--active"
                     >Tableau de bord</span
                   >

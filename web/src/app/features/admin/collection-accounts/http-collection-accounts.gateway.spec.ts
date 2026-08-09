@@ -15,7 +15,7 @@ const ACCOUNT = {
   id: '10000000-0000-4000-8000-000000000001',
   channel: 'ORANGE_MONEY',
   label: 'Compte principal CNPM',
-  accountHolder: 'CNPM',
+  accountHolder: 'COGEF',
   accountIdentifier: '+22370111213',
   bankName: null,
   instructions: null,
@@ -58,7 +58,7 @@ describe('HttpCollectionAccountsGateway', () => {
       gateway.create({
         channel: 'ORANGE_MONEY',
         label: 'Compte principal CNPM',
-        accountHolder: 'CNPM',
+        accountHolder: 'COGEF',
         accountIdentifier: '+22370111213',
       }),
     );

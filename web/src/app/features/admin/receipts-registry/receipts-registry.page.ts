@@ -46,7 +46,7 @@ export class ReceiptsRegistryPage {
   protected readonly state = signal<LoadState>('loading');
 
   constructor() {
-    this.title.setTitle('Reçus — Administration CNPM');
+    this.title.setTitle('Reçus — Administration COGEF');
     this.load();
   }
 

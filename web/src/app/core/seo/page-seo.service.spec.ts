@@ -16,18 +16,18 @@ describe('PageSeoService', () => {
   it('remplace toutes les métadonnées susceptibles de rester après une navigation SPA', () => {
     const service = TestBed.inject(PageSeoService);
     service.apply({
-      title: 'Annuaire des membres — CNPM',
+      title: 'Annuaire des membres — COGEF',
       description: 'Annuaire public de démonstration.',
       robots: 'noindex,nofollow',
       canonicalPath: '/membres',
     });
 
-    expect(document.title).toBe('Annuaire des membres — CNPM');
+    expect(document.title).toBe('Annuaire des membres — COGEF');
     expect(document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content).toBe(
       'noindex,nofollow',
     );
     expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content).toBe(
-      'Annuaire des membres — CNPM',
+      'Annuaire des membres — COGEF',
     );
     const canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     expect(new URL(canonical?.href ?? 'http://invalid/').pathname).toBe('/membres');

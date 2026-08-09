@@ -210,7 +210,7 @@ export class EditorialPage {
       this.state.set(outcome.article ? 'ready' : 'not-found');
       if (outcome.article) {
         this.seo.apply({
-          title: `${outcome.article.title} — CNPM`,
+          title: `${outcome.article.title} — COGEF`,
           description: outcome.article.summary,
           robots: 'noindex,nofollow',
           canonicalPath: `/actualites/${outcome.article.slug}`,
@@ -237,16 +237,16 @@ export class EditorialPage {
   private applySeo(mode: EditorialMode): void {
     if (mode === 'agenda') {
       this.seo.apply({
-        title: 'Agenda — CNPM',
-        description: 'Les prochains rendez-vous publics du CNPM et de son réseau.',
+        title: 'Agenda — COGEF',
+        description: 'Les prochains rendez-vous publics de la COGEF et de son réseau.',
         robots: 'noindex,nofollow',
         canonicalPath: '/agenda',
       });
       return;
     }
     this.seo.apply({
-      title: mode === 'article' ? 'Actualité — CNPM' : 'Actualités — CNPM',
-      description: 'L’espace éditorial public du CNPM et de son réseau d’entreprises.',
+      title: mode === 'article' ? 'Actualité — COGEF' : 'Actualités — COGEF',
+      description: 'L’espace éditorial public de la COGEF et de son réseau d’entreprises.',
       robots: 'noindex,nofollow',
       canonicalPath: '/actualites',
     });

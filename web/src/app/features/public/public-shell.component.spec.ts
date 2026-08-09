@@ -53,7 +53,7 @@ describe('PublicShellComponent (LAY-003 / NAV-003)', () => {
     expect(logo?.getAttribute('width')).toBe('276');
     expect(logo?.getAttribute('height')).toBe('137');
     expect(host.querySelector('.cnpm-public__brand-link')?.getAttribute('aria-label')).toContain(
-      'Conseil National du Patronat du Mali',
+      'Confédération Générale des Entreprises du Faso',
     );
   });
 

@@ -25,7 +25,7 @@ const LATENCY_MS = 140;
 /**
  * Jeu de fixtures déterministe.
  *
- * Aucune raison sociale, aucun matricule et aucun montant réel : ni membre du CNPM, ni
+ * Aucune raison sociale, aucun matricule et aucun montant réel : ni membre de la COGEF, ni
  * établissement bancaire, ni opérateur existant. `CLAUDE.md` interdit d'inventer une
  * donnée institutionnelle.
  */

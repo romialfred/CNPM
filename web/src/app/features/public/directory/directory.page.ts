@@ -220,10 +220,10 @@ export class DirectoryPage {
   private updateMetadata(mode: DirectoryMode): void {
     const isSearch = mode === 'search';
     this.seo.apply({
-      title: isSearch ? 'Rechercher un membre — CNPM' : 'Annuaire des membres — CNPM',
+      title: isSearch ? 'Rechercher un membre — COGEF' : 'Annuaire des membres — COGEF',
       description: isSearch
-        ? 'Rechercher une vitrine membre publiée dans l’annuaire du CNPM.'
-        : 'Consulter les vitrines membres publiées dans l’annuaire du CNPM.',
+        ? 'Rechercher une vitrine membre publiée dans l’annuaire de la COGEF.'
+        : 'Consulter les vitrines membres publiées dans l’annuaire de la COGEF.',
       // Le contrat R4 n'est pas encore promu dans les contrats canoniques : aucune indexation.
       robots: 'noindex,nofollow',
       canonicalPath: isSearch ? '/membres/recherche' : '/membres',

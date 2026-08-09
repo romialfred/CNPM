@@ -272,7 +272,7 @@ function rate(collected: number, expected: number): number | null {
  * séparément divergent à la première correction.
  *
  * Données entièrement fictives, conformément à `CLAUDE.md` : aucune donnée réelle de
- * membre, aucun montant officiel du CNPM.
+ * membre, aucun montant officiel de la COGEF.
  */
 @Injectable()
 export class DemoReportingGateway implements ReportingGateway {

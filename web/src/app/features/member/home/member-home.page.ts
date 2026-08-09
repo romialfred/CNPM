@@ -95,7 +95,7 @@ export class MemberHomePage {
   });
 
   constructor() {
-    this.title.setTitle('Accueil du portail membre — CNPM');
+    this.title.setTitle('Accueil du portail membre — COGEF');
     this.load();
   }
 

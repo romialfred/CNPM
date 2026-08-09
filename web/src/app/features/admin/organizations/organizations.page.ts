@@ -78,7 +78,7 @@ interface SectorDomain {
  * Nomenclature d'activité à deux niveaux (domaine → secteurs), inspirée du tissu
  * économique malien. Les codes de domaine restent alignés sur le référentiel SECTOR
  * (liste/filtre) ; les codes de secteur les préfixent. Nomenclature large, à affiner par
- * le CNPM — aucune valeur officielle n'est ici présentée comme homologuée.
+ * le COGEF — aucune valeur officielle n'est ici présentée comme homologuée.
  */
 const SECTOR_DOMAINS: readonly SectorDomain[] = [
   {
@@ -264,7 +264,7 @@ export class OrganizationsPage {
    * Nomenclature d'activité à DEUX niveaux : domaine (ex. « BTP ») puis secteurs fins
    * (ex. « Routes & ponts »). Le code d'un secteur préfixe son domaine (`BTP.ROUTES_PONTS`),
    * ce qui permet de retrouver le domaine sans table de correspondance. Nomenclature large,
-   * à affiner par le CNPM.
+   * à affiner par la COGEF.
    */
   protected readonly sectorDomains: readonly SectorDomain[] = SECTOR_DOMAINS;
 

@@ -113,7 +113,7 @@ export class PaymentReferencesPage {
   protected readonly formError = signal<string | null>(null);
 
   constructor() {
-    this.title.setTitle('Références de paiement — Administration CNPM');
+    this.title.setTitle('Références de paiement — Administration COGEF');
     this.load();
   }
 
